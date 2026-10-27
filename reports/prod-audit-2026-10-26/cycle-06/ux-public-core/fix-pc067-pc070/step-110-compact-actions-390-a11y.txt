@@ -1,0 +1,613 @@
+9611	RootWebArea	"Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video"	focusable=true focused=true
+9947	generic	""	
+9612	generic	""	
+13339	status	""	
+9617	region	"Notifications (F8)"	focusable=true
+9619	link	"Skip to main content"	focusable=true
+9966	generic	""	
+13343	StaticText	"Notification"	
+13344	StaticText	" "	
+13345	StaticText	"Sign in to favorite"	
+13346	StaticText	"Create an account or sign in to save your favorite resources."	
+13347	StaticText	"Sign in"	
+9954	generic	""	focusable=true
+9618	list	""	focusable=true
+9964	generic	""	focusable=true
+9620	StaticText	"Skip to main content"	
+9621	banner	""	
+9991	generic	""	
+-1000006544	InlineTextBox	"Notification"	
+-1000006545	InlineTextBox	" "	
+-1000006546	InlineTextBox	"Sign in to favorite"	
+-1000006547	InlineTextBox	"Create an account or sign in to save your favorite resources."	
+-1000006548	InlineTextBox	"Sign in"	
+13338	listitem	""	focusable=true level=1
+-1000005590	InlineTextBox	"Skip to main content"	
+9622	button	"Toggle sidebar"	focusable=true
+9626	link	"AWESOME.VIDEO home"	focusable=true
+9631	button	"Search 1,949 resources"	focusable=true
+9635	button	"Sign in, account menu"	focusable=true expanded=false
+9640	main	""	focusable=true
+9651	contentinfo	""	
+13330	generic	""	
+13331	generic	""	
+13336	button	"Sign in"	focusable=true
+13337	button	"Dismiss notification"	focusable=true
+9624	StaticText	"Toggle sidebar"	
+9629	StaticText	"AWESOME.VIDEO"	
+9630	StaticText	" home"	
+9634	StaticText	"Search 1,949 resources"	
+9638	StaticText	"Sign in"	
+9639	StaticText	", account menu"	
+9641	navigation	"Breadcrumb"	
+9995	generic	""	
+9653	StaticText	"── INDEX"	
+9654	link	"awesome.video home"	focusable=true
+9656	paragraph	""	
+9658	heading	"INDEXED"	level=2
+9660	paragraph	""	
+9662	paragraph	""	
+9668	navigation	"Explore categories"	
+9698	heading	"SOURCE"	level=2
+9700	link	"krzemienski/ awesome-video"	focusable=true
+9706	paragraph	""	
+9714	StaticText	"© "	
+9715	StaticText	"2026"	
+12011	StaticText	" "	
+9716	StaticText	"awesome.video"	
+9717	StaticText	" · content CC0, code MIT"	
+9718	navigation	"Site policies"	
+9729	StaticText	"built with the awesome-list framework"	
+13340	StaticText	"Sign in to favorite"	
+13341	StaticText	"Create an account or sign in to save your favorite resources."	
+13342	StaticText	"Sign in"	
+13334	image	""	
+-1000005591	InlineTextBox	"Toggle sidebar"	
+-1000005592	InlineTextBox	"AWESOME.VIDEO"	
+-1000005593	InlineTextBox	" home"	
+-1000005594	InlineTextBox	"Search 1,949 resources"	
+-1000005595	InlineTextBox	"Sign in"	
+-1000005596	InlineTextBox	", account menu"	
+9642	list	""	
+9996	link	"Browse"	focusable=true
+10000	sectionheader	""	
+10023	generic	""	
+10105	region	"Subcategories"	
+10116	generic	""	
+10273	generic	"Resources (35)"	focusable=true
+-1000006044	InlineTextBox	"── INDEX"	
+9655	StaticText	"awesome.video"	
+9657	StaticText	"A curated collection of awesome video resources, tools, and technologies for developers and content creators"	
+9659	StaticText	"INDEXED"	
+9661	StaticText	"1,949"	
+9663	StaticText	"9"	
+9664	StaticText	" categories"	
+11488	LineBreak	"\n"	
+9665	StaticText	"18"	
+9666	StaticText	" subcategories"	
+11489	LineBreak	"\n"	
+11490	generic	""	
+9669	heading	"EXPLORE"	level=2
+9671	link	"Community & Events"	focusable=true
+9674	link	"Encoding & Codecs"	focusable=true
+9677	link	"General Tools"	focusable=true
+9680	link	"Infrastructure & Delivery"	focusable=true
+9683	link	"Intro & Learning"	focusable=true
+9686	link	"Media Tools"	focusable=true
+9689	link	"Players & Clients"	focusable=true
+9692	link	"Protocols & Transport"	focusable=true
+9695	link	"Standards & Industry"	focusable=true
+9699	StaticText	"SOURCE"	
+9702	StaticText	"krzemienski"	
+9703	StaticText	"/"	
+9704	StaticText	"awesome-video"	
+9707	StaticText	"Open-source."	
+9708	link	"PRs welcome"	focusable=true
+9710	StaticText	"."	
+11517	LineBreak	"\n"	
+9711	StaticText	"Indexed automatically from "	
+9712	StaticText	"README.md"	
+9713	StaticText	"."	
+-1000006070	InlineTextBox	"© "	
+-1000006071	InlineTextBox	"2026"	
+-1000006072	InlineTextBox	" "	
+-1000006073	InlineTextBox	"awesome.video"	
+-1000006074	InlineTextBox	" · content CC0, code MIT"	
+9719	link	"About"	focusable=true
+9615	link	"Terms"	focusable=true
+9722	link	"Privacy"	focusable=true
+9724	link	"Code of Conduct"	focusable=true
+9726	link	"Issues ↗"	focusable=true
+9616	link	"Sitemap"	focusable=true
+-1000006081	InlineTextBox	"built with the awesome-list framework"	
+-1000006534	InlineTextBox	"Sign in to favorite"	
+-1000006535	InlineTextBox	"Create an account or "	
+-1000006536	InlineTextBox	"sign in to save your "	
+-1000006537	InlineTextBox	"favorite resources."	
+-1000006538	InlineTextBox	"Sign in"	
+9643	listitem	""	level=1
+9648	listitem	""	level=1
+11540	StaticText	"Browse"	
+10001	generic	""	
+10003	heading	"Encoding & Codecs"	level=1
+10004	region	"About this collection"	
+11547	StaticText	"35"	
+11548	StaticText	" "	
+11549	StaticText	"RESOURCES"	
+11550	StaticText	"KIND: "	
+11551	StaticText	"LIBRARIES"	
+11552	StaticText	"1"	
+11553	StaticText	" "	
+11554	StaticText	"SUBCATEGORY"	
+10011	button	"Close filters"	focusable=true expanded=true
+10024	generic	""	
+9868	combobox	"Limit Encoding & Codecs by subcategory"	focusable=true expanded=false
+9869	combobox	"Limit by resource kind"	focusable=true expanded=false
+10076	combobox	"Sort resources"	focusable=true expanded=false
+10080	generic	"View mode"	
+10106	heading	"Subcategories"	level=2
+10108	link	"Encoding Tools 28"	focusable=true
+10111	button	"Uncategorized 7"	focusable=true pressed="false"
+10260	generic	""	
+10275	heading	"Resources (35)"	focusable=true level=2
+13234	article	""	
+13235	article	""	
+13236	article	""	
+13237	article	""	
+13238	article	""	
+13239	article	""	
+13240	article	""	
+13241	article	""	
+13242	article	""	
+13243	article	""	
+13244	article	""	
+13245	article	""	
+13246	article	""	
+13247	article	""	
+13248	article	""	
+13249	article	""	
+13250	article	""	
+13251	article	""	
+13252	article	""	
+13253	article	""	
+13254	article	""	
+13255	article	""	
+13256	article	""	
+13257	article	""	
+11471	navigation	"Pagination"	
+-1000006045	InlineTextBox	"awesome.video"	
+-1000006046	InlineTextBox	"A curated collection of awesome video "	
+-1000006047	InlineTextBox	"resources, tools, and technologies for "	
+-1000006048	InlineTextBox	"developers and content creators"	
+-1000006049	InlineTextBox	"INDEXED"	
+-1000006050	InlineTextBox	"1,949"	
+-1000006051	InlineTextBox	"9"	
+-1000006052	InlineTextBox	" categories"	
+-1000006053	InlineTextBox	"\n"	
+-1000006054	InlineTextBox	"18"	
+-1000006055	InlineTextBox	" subcategories"	
+-1000006056	InlineTextBox	"\n"	
+9667	StaticText	"live"	
+9670	StaticText	"EXPLORE"	
+-1000006059	InlineTextBox	"SOURCE"	
+-1000006060	InlineTextBox	"krzemienski"	
+-1000006061	InlineTextBox	"/"	
+-1000006062	InlineTextBox	"awesome-video"	
+-1000006063	InlineTextBox	"Open-source."	
+9709	StaticText	"PRs welcome"	
+-1000006065	InlineTextBox	"."	
+-1000006066	InlineTextBox	"\n"	
+-1000006067	InlineTextBox	"Indexed automatically from "	
+-1000006068	InlineTextBox	"README.md"	
+-1000006069	InlineTextBox	"."	
+9720	StaticText	"About"	
+9721	StaticText	"Terms"	
+9723	StaticText	"Privacy"	
+9725	StaticText	"Conduct"	
+9727	StaticText	"Issues ↗"	
+9728	StaticText	"Sitemap"	
+9644	link	"Home"	focusable=true
+9649	link	"Encoding & Codecs"	disabled=true
+-1000005599	InlineTextBox	"Browse"	
+11542	StaticText	"CATEGORY · "	
+11543	StaticText	"ENCODING & CODECS"	
+11544	StaticText	"Encoding & Codecs"	
+10005	heading	"About this collection"	level=2
+10006	paragraph	""	
+-1000005609	InlineTextBox	"35"	
+-1000005610	InlineTextBox	" "	
+-1000005611	InlineTextBox	"RESOURCES"	
+-1000005612	InlineTextBox	"KIND: "	
+-1000005613	InlineTextBox	"LIBRARIES"	
+-1000005614	InlineTextBox	"1"	
+-1000005615	InlineTextBox	" "	
+-1000005616	InlineTextBox	"SUBCATEGORY"	
+11555	StaticText	"Close filters"	
+10025	image	""	
+9870	textbox	"Search in Encoding & Codecs"	focusable=true
+10032	MenuListPopup	""	
+10050	MenuListPopup	""	
+10077	generic	""	
+11557	StaticText	"VIEW"	
+10082	radiogroup	""	focusable=true
+11558	StaticText	"Subcategories"	
+11559	StaticText	"Encoding Tools"	
+11560	StaticText	"28"	
+11561	StaticText	"Uncategorized"	
+11562	StaticText	"7"	
+10261	button	"Filters"	focusable=true expanded=false
+11618	StaticText	"Resources (35)"	
+12783	heading	"Zulko/moviepy"	level=2
+12784	link	"Open in new tab"	focusable=true
+12796	generic	""	
+12802	heading	"Xuggler"	level=2
+12803	link	"Open in new tab"	focusable=true
+12815	generic	""	
+12821	heading	"Xabe.FFmpeg"	level=2
+12822	link	"Open in new tab"	focusable=true
+12834	generic	""	
+12840	heading	"WritingMinds/ffmpeg-android-java"	level=2
+12841	link	"Open in new tab"	focusable=true
+12853	generic	""	
+12859	heading	"video4j"	level=2
+12860	link	"Open in new tab"	focusable=true
+12872	generic	""	
+12878	heading	"vid.stab"	level=2
+12879	link	"Open in new tab"	focusable=true
+12891	generic	""	
+12897	heading	"vapoursynth/vapoursynth"	level=2
+12898	link	"Open in new tab"	focusable=true
+12910	generic	""	
+12916	heading	"twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11"	level=2
+12917	link	"Open in new tab"	focusable=true
+12929	generic	""	
+12935	heading	"scikit-video"	level=2
+12936	link	"Open in new tab"	focusable=true
+12948	generic	""	
+12954	heading	"sannies/mp4parser: A Java API to read, write and create MP4 files"	level=2
+12955	link	"Open in new tab"	focusable=true
+12967	generic	""	
+12973	heading	"PyAV"	level=2
+12974	link	"Open in new tab"	focusable=true
+12986	generic	""	
+12992	heading	"OpenShot Library (libopenshot)"	level=2
+12993	link	"Open in new tab"	focusable=true
+13005	generic	""	
+13011	heading	"nextbreakpoint/ffmpeg4java"	level=2
+13012	link	"Open in new tab"	focusable=true
+13024	generic	""	
+13030	heading	"mltframework/mlt"	level=2
+13031	link	"Open in new tab"	focusable=true
+13043	generic	""	
+13049	heading	"MLT Framework"	level=2
+13050	link	"Open in new tab"	focusable=true
+13062	generic	""	
+13068	heading	"libVLC"	level=2
+13069	link	"Open in new tab"	focusable=true
+13081	generic	""	
+13087	heading	"libmpeg2"	level=2
+13088	link	"Open in new tab"	focusable=true
+13100	generic	""	
+13106	heading	"Libav"	level=2
+13107	link	"Open in new tab"	focusable=true
+13119	generic	""	
+13125	heading	"kkroening/ffmpeg-python"	level=2
+13126	link	"Open in new tab"	focusable=true
+13138	generic	""	
+13144	heading	"JCodec"	level=2
+13145	link	"Open in new tab"	focusable=true
+13157	generic	""	
+13163	heading	"Intel oneAPI Video Processing Library (oneVPL)"	level=2
+13164	link	"Open in new tab"	focusable=true
+13176	generic	""	
+13182	heading	"gstreamer-rs"	level=2
+13183	link	"Open in new tab"	focusable=true
+13195	generic	""	
+13201	heading	"GStreamer"	level=2
+13202	link	"Open in new tab"	focusable=true
+13214	generic	""	
+13220	heading	"go-astiav"	level=2
+13221	link	"Open in new tab"	focusable=true
+13233	generic	""	
+11473	generic	""	disabled=true focusable=true
+11476	link	"Page 1, current page"	focusable=true
+11477	link	"Go to page 2"	focusable=true
+11478	link	"Next"	focusable=true
+12007	StaticText	"Page "	
+12008	StaticText	"1"	
+12009	StaticText	" of "	
+12010	StaticText	"2"	
+11483	status	""	
+-1000006057	InlineTextBox	"live"	
+-1000006058	InlineTextBox	"EXPLORE"	
+-1000006064	InlineTextBox	"PRs welcome"	
+-1000006075	InlineTextBox	"About"	
+-1000006076	InlineTextBox	"Terms"	
+-1000006077	InlineTextBox	"Privacy"	
+-1000006078	InlineTextBox	"Conduct"	
+-1000006079	InlineTextBox	"Issues ↗"	
+-1000006080	InlineTextBox	"Sitemap"	
+9645	StaticText	"Home"	
+9650	StaticText	"Encoding & Codecs"	
+-1000005600	InlineTextBox	"CATEGORY · "	
+-1000005601	InlineTextBox	"ENCODING & CODECS"	
+-1000005602	InlineTextBox	"Encoding & "	
+-1000005603	InlineTextBox	"Codecs"	
+11545	StaticText	"About this collection"	
+11546	StaticText	"Encoding & Codecs brings together 35 curated resources from across the video technology landscape. Notable topics include Encoding Tools."	
+-1000006116	InlineTextBox	"Close filters"	
+10029	generic	""	
+10036	option	"All subcategories"	focusable=true
+10039	option	"Uncategorized (7)"	focusable=true
+10042	option	"Encoding Tools (28)"	focusable=true
+10045	option	"Encoding Tools › FFMPEG (7)"	focusable=true
+10054	option	"All resource kinds"	focusable=true
+10057	option	"Tools"	focusable=true
+10060	option	"Libraries"	focusable=true
+10063	option	"Standards"	focusable=true
+10066	option	"Events"	focusable=true
+10069	option	"Protocols"	focusable=true
+10072	option	"Other"	focusable=true
+11556	StaticText	"Name Z-A"	
+-1000006114	InlineTextBox	"VIEW"	
+10083	radio	"Grid view"	focusable=true checked="false"
+10089	radio	"List view"	focusable=true checked="false"
+10097	radio	"Compact view"	focusable=true checked="true"
+-1000005618	InlineTextBox	"Subcategories"	
+-1000005619	InlineTextBox	"Encoding Tools"	
+-1000005620	InlineTextBox	"28"	
+-1000005621	InlineTextBox	"Uncategorized"	
+-1000005622	InlineTextBox	"7"	
+10262	image	""	
+11617	StaticText	"Filters"	
+-1000005623	InlineTextBox	"Resources (35)"	
+12778	link	"Zulko/moviepy"	focusable=true
+12782	image	""	
+12793	button	"Favorite to your account — sign in required: Zulko/moviepy"	focusable=true pressed="false"
+12794	button	"Bookmark on this device — no sign-in required: Zulko/moviepy"	focusable=true pressed="false"
+12797	link	"Xuggler"	focusable=true
+12801	image	""	
+12812	button	"Favorite to your account — sign in required: Xuggler"	focusable=true focused=true pressed="false"
+12813	button	"Remove bookmark saved on this device: Xuggler"	focusable=true pressed="true"
+12816	link	"Xabe.FFmpeg"	focusable=true
+12820	image	""	
+12831	button	"Favorite to your account — sign in required: Xabe.FFmpeg"	focusable=true pressed="false"
+12832	button	"Bookmark on this device — no sign-in required: Xabe.FFmpeg"	focusable=true pressed="false"
+12835	link	"WritingMinds/ffmpeg-android-java"	focusable=true
+12839	image	""	
+12850	button	"Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java"	focusable=true pressed="false"
+12851	button	"Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java"	focusable=true pressed="false"
+12854	link	"video4j"	focusable=true
+12858	image	""	
+12869	button	"Favorite to your account — sign in required: video4j"	focusable=true pressed="false"
+12870	button	"Bookmark on this device — no sign-in required: video4j"	focusable=true pressed="false"
+12873	link	"vid.stab"	focusable=true
+12877	image	""	
+12888	button	"Favorite to your account — sign in required: vid.stab"	focusable=true pressed="false"
+12889	button	"Bookmark on this device — no sign-in required: vid.stab"	focusable=true pressed="false"
+12892	link	"vapoursynth/vapoursynth"	focusable=true
+12896	image	""	
+12907	button	"Favorite to your account — sign in required: vapoursynth/vapoursynth"	focusable=true pressed="false"
+12908	button	"Bookmark on this device — no sign-in required: vapoursynth/vapoursynth"	focusable=true pressed="false"
+12911	link	"twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11"	focusable=true
+12915	image	""	
+12926	button	"Favorite to your account — sign in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11"	focusable=true pressed="false"
+12927	button	"Bookmark on this device — no sign-in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11"	focusable=true pressed="false"
+12930	link	"scikit-video"	focusable=true
+12934	image	""	
+12945	button	"Favorite to your account — sign in required: scikit-video"	focusable=true pressed="false"
+12946	button	"Bookmark on this device — no sign-in required: scikit-video"	focusable=true pressed="false"
+12949	link	"sannies/mp4parser: A Java API to read, write and create MP4 files"	focusable=true
+12953	image	""	
+12964	button	"Favorite to your account — sign in required: sannies/mp4parser: A Java API to read, write and create MP4 files"	focusable=true pressed="false"
+12965	button	"Bookmark on this device — no sign-in required: sannies/mp4parser: A Java API to read, write and create MP4 files"	focusable=true pressed="false"
+12968	link	"PyAV"	focusable=true
+12972	image	""	
+12983	button	"Favorite to your account — sign in required: PyAV"	focusable=true pressed="false"
+12984	button	"Bookmark on this device — no sign-in required: PyAV"	focusable=true pressed="false"
+12987	link	"OpenShot Library (libopenshot)"	focusable=true
+12991	image	""	
+13002	button	"Favorite to your account — sign in required: OpenShot Library (libopenshot)"	focusable=true pressed="false"
+13003	button	"Bookmark on this device — no sign-in required: OpenShot Library (libopenshot)"	focusable=true pressed="false"
+13006	link	"nextbreakpoint/ffmpeg4java"	focusable=true
+13010	image	""	
+13021	button	"Favorite to your account — sign in required: nextbreakpoint/ffmpeg4java"	focusable=true pressed="false"
+13022	button	"Bookmark on this device — no sign-in required: nextbreakpoint/ffmpeg4java"	focusable=true pressed="false"
+13025	link	"mltframework/mlt"	focusable=true
+13029	image	""	
+13040	button	"Favorite to your account — sign in required: mltframework/mlt"	focusable=true pressed="false"
+13041	button	"Bookmark on this device — no sign-in required: mltframework/mlt"	focusable=true pressed="false"
+13044	link	"MLT Framework"	focusable=true
+13048	image	""	
+13059	button	"Favorite to your account — sign in required: MLT Framework"	focusable=true pressed="false"
+13060	button	"Bookmark on this device — no sign-in required: MLT Framework"	focusable=true pressed="false"
+13063	link	"libVLC"	focusable=true
+13067	image	""	
+13078	button	"Favorite to your account — sign in required: libVLC"	focusable=true pressed="false"
+13079	button	"Bookmark on this device — no sign-in required: libVLC"	focusable=true pressed="false"
+13082	link	"libmpeg2"	focusable=true
+13086	image	""	
+13097	button	"Favorite to your account — sign in required: libmpeg2"	focusable=true pressed="false"
+13098	button	"Bookmark on this device — no sign-in required: libmpeg2"	focusable=true pressed="false"
+13101	link	"Libav"	focusable=true
+13105	image	""	
+13116	button	"Favorite to your account — sign in required: Libav"	focusable=true pressed="false"
+13117	button	"Bookmark on this device — no sign-in required: Libav"	focusable=true pressed="false"
+13120	link	"kkroening/ffmpeg-python"	focusable=true
+13124	image	""	
+13135	button	"Favorite to your account — sign in required: kkroening/ffmpeg-python"	focusable=true pressed="false"
+13136	button	"Bookmark on this device — no sign-in required: kkroening/ffmpeg-python"	focusable=true pressed="false"
+13139	link	"JCodec"	focusable=true
+13143	image	""	
+13154	button	"Favorite to your account — sign in required: JCodec"	focusable=true pressed="false"
+13155	button	"Bookmark on this device — no sign-in required: JCodec"	focusable=true pressed="false"
+13158	link	"Intel oneAPI Video Processing Library (oneVPL)"	focusable=true
+13162	image	""	
+13173	button	"Favorite to your account — sign in required: Intel oneAPI Video Processing Library (oneVPL)"	focusable=true pressed="false"
+13174	button	"Bookmark on this device — no sign-in required: Intel oneAPI Video Processing Library (oneVPL)"	focusable=true pressed="false"
+13177	link	"gstreamer-rs"	focusable=true
+13181	image	""	
+13192	button	"Favorite to your account — sign in required: gstreamer-rs"	focusable=true pressed="false"
+13193	button	"Bookmark on this device — no sign-in required: gstreamer-rs"	focusable=true pressed="false"
+13196	link	"GStreamer"	focusable=true
+13200	image	""	
+13211	button	"Favorite to your account — sign in required: GStreamer"	focusable=true pressed="false"
+13212	button	"Bookmark on this device — no sign-in required: GStreamer"	focusable=true pressed="false"
+13215	link	"go-astiav"	focusable=true
+13219	image	""	
+13230	button	"Favorite to your account — sign in required: go-astiav"	focusable=true pressed="false"
+13231	button	"Bookmark on this device — no sign-in required: go-astiav"	focusable=true pressed="false"
+11474	image	""	
+12003	StaticText	"Previous"	
+12004	StaticText	"1"	
+12005	StaticText	"2"	
+12006	StaticText	"Next"	
+11479	image	""	
+-1000006040	InlineTextBox	"Page "	
+-1000006041	InlineTextBox	"1"	
+-1000006042	InlineTextBox	" of "	
+-1000006043	InlineTextBox	"2"	
+-1000005597	InlineTextBox	"Home"	
+-1000005598	InlineTextBox	"Encoding & Codecs"	
+-1000005604	InlineTextBox	"About this collection"	
+-1000005605	InlineTextBox	"Encoding & Codecs brings together 35 "	
+-1000005606	InlineTextBox	"curated resources from across the video "	
+-1000005607	InlineTextBox	"technology landscape. Notable topics "	
+-1000005608	InlineTextBox	"include Encoding Tools."	
+-1000006113	InlineTextBox	"Name Z-A"	
+10084	image	""	
+10090	image	""	
+10098	image	""	
+-1000006115	InlineTextBox	"Filters"	
+13284	StaticText	"Zulko/moviepy"	
+12786	image	""	
+12791	image	""	
+13285	StaticText	"Xuggler"	
+12805	image	""	
+13321	image	""	
+13286	StaticText	"Xabe.FFmpeg"	
+12824	image	""	
+12829	image	""	
+13287	StaticText	"WritingMinds/ffmpeg-android-java"	
+12843	image	""	
+12848	image	""	
+13288	StaticText	"video4j"	
+12862	image	""	
+12867	image	""	
+13289	StaticText	"vid.stab"	
+12881	image	""	
+12886	image	""	
+13290	StaticText	"vapoursynth/vapoursynth"	
+12900	image	""	
+12905	image	""	
+13291	StaticText	"twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11"	
+12919	image	""	
+12924	image	""	
+13292	StaticText	"scikit-video"	
+12938	image	""	
+12943	image	""	
+13293	StaticText	"sannies/mp4parser: A Java API to read, write and create MP4 files"	
+12957	image	""	
+12962	image	""	
+13294	StaticText	"PyAV"	
+12976	image	""	
+12981	image	""	
+13295	StaticText	"OpenShot Library (libopenshot)"	
+12995	image	""	
+13000	image	""	
+13296	StaticText	"nextbreakpoint/ffmpeg4java"	
+13014	image	""	
+13019	image	""	
+13297	StaticText	"mltframework/mlt"	
+13033	image	""	
+13038	image	""	
+13298	StaticText	"MLT Framework"	
+13052	image	""	
+13057	image	""	
+13299	StaticText	"libVLC"	
+13071	image	""	
+13076	image	""	
+13300	StaticText	"libmpeg2"	
+13090	image	""	
+13095	image	""	
+13301	StaticText	"Libav"	
+13109	image	""	
+13114	image	""	
+13302	StaticText	"kkroening/ffmpeg-python"	
+13128	image	""	
+13133	image	""	
+13303	StaticText	"JCodec"	
+13147	image	""	
+13152	image	""	
+13304	StaticText	"Intel oneAPI Video Processing Library (oneVPL)"	
+13166	image	""	
+13171	image	""	
+13305	StaticText	"gstreamer-rs"	
+13185	image	""	
+13190	image	""	
+13306	StaticText	"GStreamer"	
+13204	image	""	
+13209	image	""	
+13307	StaticText	"go-astiav"	
+13223	image	""	
+13228	image	""	
+-1000006036	InlineTextBox	"Previous"	
+-1000006037	InlineTextBox	"1"	
+-1000006038	InlineTextBox	"2"	
+-1000006039	InlineTextBox	"Next"	
+-1000006463	InlineTextBox	"Zulko/moviep"	
+-1000006464	InlineTextBox	"y"	
+-1000006465	InlineTextBox	"Xuggler"	
+-1000006466	InlineTextBox	"Xabe.FFmpeg"	
+-1000006467	InlineTextBox	"WritingMinds/"	
+-1000006468	InlineTextBox	"ffmpeg-"	
+-1000006469	InlineTextBox	"…"	
+-1000006470	InlineTextBox	"android-java"	
+-1000006471	InlineTextBox	"video4j"	
+-1000006472	InlineTextBox	"vid.stab"	
+-1000006473	InlineTextBox	"vapoursynth/"	
+-1000006474	InlineTextBox	"vapoursynth"	
+-1000006475	InlineTextBox	"twitter/vireo: "	
+-1000006476	InlineTextBox	"Vireo is a "	
+-1000006477	InlineTextBox	"…"	
+-1000006478	InlineTextBox	"lightweight "	
+-1000006479	InlineTextBox	"and versatile "	
+-1000006480	InlineTextBox	"video "	
+-1000006481	InlineTextBox	"processing "	
+-1000006482	InlineTextBox	"library written "	
+-1000006483	InlineTextBox	"in C++11"	
+-1000006484	InlineTextBox	"scikit-video"	
+-1000006485	InlineTextBox	"sannies/mp4p"	
+-1000006486	InlineTextBox	"arser: A Java "	
+-1000006487	InlineTextBox	"arser: A Jav"	
+-1000006488	InlineTextBox	"…"	
+-1000006489	InlineTextBox	"API to read, "	
+-1000006490	InlineTextBox	"write and "	
+-1000006491	InlineTextBox	"create MP4 "	
+-1000006492	InlineTextBox	"files"	
+-1000006493	InlineTextBox	"PyAV"	
+-1000006494	InlineTextBox	"OpenShot "	
+-1000006495	InlineTextBox	"Library "	
+-1000006496	InlineTextBox	"…"	
+-1000006497	InlineTextBox	"(libopenshot)"	
+-1000006498	InlineTextBox	"nextbreakpoin"	
+-1000006499	InlineTextBox	"t/ffmpeg4java"	
+-1000006500	InlineTextBox	"mltframework"	
+-1000006501	InlineTextBox	"/mlt"	
+-1000006502	InlineTextBox	"MLT "	
+-1000006503	InlineTextBox	"Framework"	
+-1000006504	InlineTextBox	"libVLC"	
+-1000006505	InlineTextBox	"libmpeg2"	
+-1000006506	InlineTextBox	"Libav"	
+-1000006507	InlineTextBox	"kkroening/ffm"	
+-1000006508	InlineTextBox	"peg-python"	
+-1000006509	InlineTextBox	"JCodec"	
+-1000006510	InlineTextBox	"Intel oneAPI "	
+-1000006511	InlineTextBox	"Video "	
+-1000006512	InlineTextBox	"…"	
+-1000006513	InlineTextBox	"Processing "	
+-1000006514	InlineTextBox	"Library "	
+-1000006515	InlineTextBox	"(oneVPL)"	
+-1000006516	InlineTextBox	"gstreamer-rs"	
+-1000006517	InlineTextBox	"GStreamer"	
+-1000006518	InlineTextBox	"go-astiav"	

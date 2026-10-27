@@ -1,0 +1,17 @@
+{
+  "invalid": {
+    "error": "Enter a whole number between 1 and 16.",
+    "value": "abc"
+  },
+  "state": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=16&view=compact",
+    "notice": "Page 999 is not available; showing page 16 instead.Dismiss",
+    "width": 390,
+    "height": 844,
+    "touch": 1
+  },
+  "dismissed": {
+    "notice": false,
+    "focus": "taxonomy-results-region"
+  }
+}

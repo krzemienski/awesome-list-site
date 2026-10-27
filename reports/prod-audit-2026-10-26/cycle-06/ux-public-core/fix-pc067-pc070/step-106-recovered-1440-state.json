@@ -1,0 +1,13 @@
+{
+  "state": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=2",
+    "width": 1440,
+    "height": 900,
+    "touch": 0,
+    "active": "taxonomy-results-region"
+  },
+  "afterTab": {
+    "test": "link-view-details-108",
+    "label": "View details for dav1d"
+  }
+}

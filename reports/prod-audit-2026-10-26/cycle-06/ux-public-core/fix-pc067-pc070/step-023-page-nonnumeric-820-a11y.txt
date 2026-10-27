@@ -1,0 +1,358 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Filters & view" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Filters & view
+      - region "Subcategories" [ref=e24]:
+        - heading "Subcategories" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - link "Codecs 27" [ref=e27] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e28]: Codecs
+            - generic [ref=e29]: "27"
+          - link "Encoding Tools 225" [ref=e30] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e31]: Encoding Tools
+            - generic [ref=e32]: "225"
+          - button "Uncategorized 120" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: Uncategorized
+            - generic [ref=e35]: "120"
+      - generic "Resources (372)" [ref=e38]:
+        - heading "Resources (372)" [level=2] [ref=e40]
+        - generic [ref=e41]:
+          - article [ref=e42]:
+            - generic [ref=e43]:
+              - heading "A Large-Scale Comparison of x264, x265, and libvpx" [level=2] [ref=e44]:
+                - link "A Large-Scale Comparison of x264, x265, and libvpx" [ref=e45] [cursor=pointer]:
+                  - /url: /resource/1014
+              - link "Open in new tab" [ref=e46] [cursor=pointer]:
+                - /url: https://medium.com/netflix-techblog/a-large-scale-comparison-of-x264-x265-and-libvpx-a-sneak-peek-2e81e88f8b0f
+                - img
+            - 'button "Favorite to your account — sign in required: A Large-Scale Comparison of x264, x265, and libvpx" [ref=e48] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: A Large-Scale Comparison of x264, x265, and libvpx" [ref=e50] [cursor=pointer]':
+              - img
+          - article [ref=e52]:
+            - generic [ref=e53]:
+              - heading "Adobe Media Encoder" [level=2] [ref=e54]:
+                - link "Adobe Media Encoder" [ref=e55] [cursor=pointer]:
+                  - /url: /resource/324
+              - link "Open in new tab" [ref=e56] [cursor=pointer]:
+                - /url: https://www.adobe.com/products/media-encoder.html
+                - img
+            - 'button "Favorite to your account — sign in required: Adobe Media Encoder" [ref=e58] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Adobe Media Encoder" [ref=e60] [cursor=pointer]':
+              - img
+          - article [ref=e62]:
+            - generic [ref=e63]:
+              - 'heading "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [level=2] [ref=e64]':
+                - 'link "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e65] [cursor=pointer]':
+                  - /url: /resource/1498
+              - link "Open in new tab" [ref=e66] [cursor=pointer]:
+                - /url: https://github.com/AK1194/Video-Compression-motion-estimation-block-video-encoder
+                - img
+            - 'button "Favorite to your account — sign in required: AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e68] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e70] [cursor=pointer]':
+              - img
+          - article [ref=e72]:
+            - generic [ref=e73]:
+              - heading "Alliance for Open Media (AOMedia)" [level=2] [ref=e74]:
+                - link "Alliance for Open Media (AOMedia)" [ref=e75] [cursor=pointer]:
+                  - /url: /resource/1619
+              - link "Open in new tab" [ref=e76] [cursor=pointer]:
+                - /url: https://aomedia.org/
+                - img
+            - 'button "Favorite to your account — sign in required: Alliance for Open Media (AOMedia)" [ref=e78] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Alliance for Open Media (AOMedia)" [ref=e80] [cursor=pointer]':
+              - img
+          - article [ref=e82]:
+            - generic [ref=e83]:
+              - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=2] [ref=e84]:
+                - link "AMD Advanced Media Acceleration (AMA) SDK" [ref=e85] [cursor=pointer]:
+                  - /url: /resource/109
+              - link "Open in new tab" [ref=e86] [cursor=pointer]:
+                - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                - img
+            - 'button "Favorite to your account — sign in required: AMD Advanced Media Acceleration (AMA) SDK" [ref=e88] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AMD Advanced Media Acceleration (AMA) SDK" [ref=e90] [cursor=pointer]':
+              - img
+          - article [ref=e92]:
+            - generic [ref=e93]:
+              - heading "AMD Advanced Media Framework (AMF SDK)" [level=2] [ref=e94]:
+                - link "AMD Advanced Media Framework (AMF SDK)" [ref=e95] [cursor=pointer]:
+                  - /url: /resource/1885
+              - link "Open in new tab" [ref=e96] [cursor=pointer]:
+                - /url: https://github.com/GPUOpen-LibrariesAndSDKs/AMF
+                - img
+            - 'button "Favorite to your account — sign in required: AMD Advanced Media Framework (AMF SDK)" [ref=e98] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AMD Advanced Media Framework (AMF SDK)" [ref=e100] [cursor=pointer]':
+              - img
+          - article [ref=e102]:
+            - generic [ref=e103]:
+              - heading "AMF (Advanced Media Framework)" [level=2] [ref=e104]:
+                - link "AMF (Advanced Media Framework)" [ref=e105] [cursor=pointer]:
+                  - /url: /resource/463
+              - link "Open in new tab" [ref=e106] [cursor=pointer]:
+                - /url: https://github.com/GPUOpen-LibrariesAndSDKs/AMF/wiki/Guide-for-Video-CODEC-Encoder-App-Developers
+                - img
+            - 'button "Favorite to your account — sign in required: AMF (Advanced Media Framework)" [ref=e108] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AMF (Advanced Media Framework)" [ref=e110] [cursor=pointer]':
+              - img
+          - article [ref=e112]:
+            - generic [ref=e113]:
+              - heading "Android-Video-Trimmer" [level=2] [ref=e114]:
+                - link "Android-Video-Trimmer" [ref=e115] [cursor=pointer]:
+                  - /url: /resource/626
+              - link "Open in new tab" [ref=e116] [cursor=pointer]:
+                - /url: https://github.com/iknow4x/Android-Video-Trimmer
+                - img
+            - 'button "Favorite to your account — sign in required: Android-Video-Trimmer" [ref=e118] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Android-Video-Trimmer" [ref=e120] [cursor=pointer]':
+              - img
+          - article [ref=e122]:
+            - generic [ref=e123]:
+              - heading "aom - Git at Google" [level=2] [ref=e124]:
+                - link "aom - Git at Google" [ref=e125] [cursor=pointer]:
+                  - /url: /resource/1440
+              - link "Open in new tab" [ref=e126] [cursor=pointer]:
+                - /url: https://aomedia.googlesource.com/aom/
+                - img
+            - 'button "Favorite to your account — sign in required: aom - Git at Google" [ref=e128] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: aom - Git at Google" [ref=e130] [cursor=pointer]':
+              - img
+          - article [ref=e132]:
+            - generic [ref=e133]:
+              - heading "AOMedia AV1 Codec Build Instructions" [level=2] [ref=e134]:
+                - link "AOMedia AV1 Codec Build Instructions" [ref=e135] [cursor=pointer]:
+                  - /url: /resource/1719
+              - link "Open in new tab" [ref=e136] [cursor=pointer]:
+                - /url: https://aomedia.googlesource.com/aom/+/refs/heads/master/BUILD.md
+                - img
+            - 'button "Favorite to your account — sign in required: AOMedia AV1 Codec Build Instructions" [ref=e138] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AOMedia AV1 Codec Build Instructions" [ref=e140] [cursor=pointer]':
+              - img
+          - article [ref=e142]:
+            - generic [ref=e143]:
+              - 'heading "Apple Got It Wrong: Encoding Specs for HEVC in HLS" [level=2] [ref=e144]':
+                - 'link "Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e145] [cursor=pointer]':
+                  - /url: /resource/1016
+              - link "Open in new tab" [ref=e146] [cursor=pointer]:
+                - /url: https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=121878
+                - img
+            - 'button "Favorite to your account — sign in required: Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e148] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e150] [cursor=pointer]':
+              - img
+          - article [ref=e152]:
+            - generic [ref=e153]:
+              - heading "Ateme TITAN" [level=2] [ref=e154]:
+                - link "Ateme TITAN" [ref=e155] [cursor=pointer]:
+                  - /url: /resource/30
+              - link "Open in new tab" [ref=e156] [cursor=pointer]:
+                - /url: https://www.ateme.com/products/titan/
+                - img
+            - 'button "Favorite to your account — sign in required: Ateme TITAN" [ref=e158] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Ateme TITAN" [ref=e160] [cursor=pointer]':
+              - img
+          - article [ref=e162]:
+            - generic [ref=e163]:
+              - heading "AV1 vs HEVC – Bitmovin Compression Efficiency Results" [level=2] [ref=e164]:
+                - link "AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e165] [cursor=pointer]:
+                  - /url: /resource/1756
+              - link "Open in new tab" [ref=e166] [cursor=pointer]:
+                - /url: https://bitmovin.com/av1-showing-greater-compression-efficiency-than-hevc/
+                - img
+            - 'button "Favorite to your account — sign in required: AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e168] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e170] [cursor=pointer]':
+              - img
+          - article [ref=e172]:
+            - generic [ref=e173]:
+              - heading "BBC Dirac (SMPTE VC-2)" [level=2] [ref=e174]:
+                - link "BBC Dirac (SMPTE VC-2)" [ref=e175] [cursor=pointer]:
+                  - /url: /resource/1821
+              - link "Open in new tab" [ref=e176] [cursor=pointer]:
+                - /url: https://github.com/bbc/dirac-research
+                - img
+            - 'button "Favorite to your account — sign in required: BBC Dirac (SMPTE VC-2)" [ref=e178] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: BBC Dirac (SMPTE VC-2)" [ref=e180] [cursor=pointer]':
+              - img
+          - article [ref=e182]:
+            - generic [ref=e183]:
+              - heading "Beamr Content-Adaptive Bitrate Encoding" [level=2] [ref=e184]:
+                - link "Beamr Content-Adaptive Bitrate Encoding" [ref=e185] [cursor=pointer]:
+                  - /url: /resource/692
+              - link "Open in new tab" [ref=e186] [cursor=pointer]:
+                - /url: https://www.encoding.com/media-services-overview
+                - img
+            - 'button "Favorite to your account — sign in required: Beamr Content-Adaptive Bitrate Encoding" [ref=e188] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Beamr Content-Adaptive Bitrate Encoding" [ref=e190] [cursor=pointer]':
+              - img
+          - article [ref=e192]:
+            - generic [ref=e193]:
+              - heading "Bento" [level=2] [ref=e194]:
+                - link "Bento" [ref=e195] [cursor=pointer]:
+                  - /url: /resource/171
+              - link "Open in new tab" [ref=e196] [cursor=pointer]:
+                - /url: https://github.com/bento-video/bento
+                - img
+            - 'button "Favorite to your account — sign in required: Bento" [ref=e198] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Bento" [ref=e200] [cursor=pointer]':
+              - img
+          - article [ref=e202]:
+            - generic [ref=e203]:
+              - heading "Bitrate Viewer" [level=2] [ref=e204]:
+                - link "Bitrate Viewer" [ref=e205] [cursor=pointer]:
+                  - /url: /resource/299
+              - link "Open in new tab" [ref=e206] [cursor=pointer]:
+                - /url: https://www.winhoros.de/docs/bitrate-viewer/
+                - img
+            - 'button "Favorite to your account — sign in required: Bitrate Viewer" [ref=e208] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Bitrate Viewer" [ref=e210] [cursor=pointer]':
+              - img
+          - article [ref=e212]:
+            - generic [ref=e213]:
+              - heading "bloc97/Anime4K" [level=2] [ref=e214]:
+                - link "bloc97/Anime4K" [ref=e215] [cursor=pointer]:
+                  - /url: /resource/1159
+              - link "Open in new tab" [ref=e216] [cursor=pointer]:
+                - /url: https://github.com/bloc97/Anime4K
+                - img
+            - 'button "Favorite to your account — sign in required: bloc97/Anime4K" [ref=e218] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: bloc97/Anime4K" [ref=e220] [cursor=pointer]':
+              - img
+          - article [ref=e222]:
+            - generic [ref=e223]:
+              - heading "CineForm SDK" [level=2] [ref=e224]:
+                - link "CineForm SDK" [ref=e225] [cursor=pointer]:
+                  - /url: /resource/1936
+              - link "Open in new tab" [ref=e226] [cursor=pointer]:
+                - /url: https://gopro.github.io/cineform-sdk/
+                - img
+            - 'button "Favorite to your account — sign in required: CineForm SDK" [ref=e228] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: CineForm SDK" [ref=e230] [cursor=pointer]':
+              - img
+          - article [ref=e232]:
+            - generic [ref=e233]:
+              - heading "CircleHD Video Transcoding Service" [level=2] [ref=e234]:
+                - link "CircleHD Video Transcoding Service" [ref=e235] [cursor=pointer]:
+                  - /url: /resource/478
+              - link "Open in new tab" [ref=e236] [cursor=pointer]:
+                - /url: https://www.circlehd.com/products/video-transcoding-service/
+                - img
+            - 'button "Favorite to your account — sign in required: CircleHD Video Transcoding Service" [ref=e238] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: CircleHD Video Transcoding Service" [ref=e240] [cursor=pointer]':
+              - img
+          - article [ref=e242]:
+            - generic [ref=e243]:
+              - heading "Cisco Thor Video Codec" [level=2] [ref=e244]:
+                - link "Cisco Thor Video Codec" [ref=e245] [cursor=pointer]:
+                  - /url: /resource/1749
+              - link "Open in new tab" [ref=e246] [cursor=pointer]:
+                - /url: https://tools.ietf.org/html/draft-fuldseth-netvc-thor-00
+                - img
+            - 'button "Favorite to your account — sign in required: Cisco Thor Video Codec" [ref=e248] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Cisco Thor Video Codec" [ref=e250] [cursor=pointer]':
+              - img
+          - article [ref=e252]:
+            - generic [ref=e253]:
+              - heading "Codec Licensing and Web Video Streaming – StreamingMedia" [level=2] [ref=e254]:
+                - link "Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e255] [cursor=pointer]:
+                  - /url: /resource/1659
+              - link "Open in new tab" [ref=e256] [cursor=pointer]:
+                - /url: https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=130184
+                - img
+            - 'button "Favorite to your account — sign in required: Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e258] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e260] [cursor=pointer]':
+              - img
+          - article [ref=e262]:
+            - generic [ref=e263]:
+              - heading "CompressAI" [level=2] [ref=e264]:
+                - link "CompressAI" [ref=e265] [cursor=pointer]:
+                  - /url: /resource/218
+              - link "Open in new tab" [ref=e266] [cursor=pointer]:
+                - /url: https://arxiv.org/abs/2011.03029
+                - img
+            - 'button "Favorite to your account — sign in required: CompressAI" [ref=e268] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: CompressAI" [ref=e270] [cursor=pointer]':
+              - img
+          - article [ref=e272]:
+            - generic [ref=e273]:
+              - heading "CrafyVideoJS" [level=2] [ref=e274]:
+                - link "CrafyVideoJS" [ref=e275] [cursor=pointer]:
+                  - /url: /resource/559
+              - link "Open in new tab" [ref=e276] [cursor=pointer]:
+                - /url: https://github.com/chijete/CrafyVideoJS
+                - img
+            - 'button "Favorite to your account — sign in required: CrafyVideoJS" [ref=e278] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: CrafyVideoJS" [ref=e280] [cursor=pointer]':
+              - img
+        - navigation "Pagination" [ref=e283]:
+          - generic [ref=e284]:
+            - img
+            - text: Previous
+            - link "Page 1, current page" [ref=e285] [cursor=pointer]:
+              - /url: /category/encoding-codecs?view=compact
+              - text: "1"
+            - link "Go to page 2" [ref=e286] [cursor=pointer]:
+              - /url: /category/encoding-codecs?view=compact&page=2
+              - text: "2"
+            - generic [ref=e287]: …
+            - link "Go to page 16" [ref=e288] [cursor=pointer]:
+              - /url: /category/encoding-codecs?view=compact&page=16
+              - text: "16"
+            - link "Next" [ref=e289] [cursor=pointer]:
+              - /url: /category/encoding-codecs?view=compact&page=2
+              - text: Next
+              - img
+          - generic [ref=e290]:
+            - generic [ref=e291]: Page 1 of 16
+            - generic [ref=e292]:
+              - generic [ref=e293] [cursor=pointer]: Go to page
+              - textbox "Page number, 1 to 16" [active] [invalid] [ref=e294]: abc
+              - generic [ref=e295]: / 16
+          - status [ref=e296]: Enter a whole number between 1 and 16.
