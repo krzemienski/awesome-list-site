@@ -338,16 +338,23 @@ export function useBookmarkToggle(opts: ResourceToggleOptions) {
   // note, collections and queue state, not just the bookmark. Read before the
   // surface's optimistic flip, which may drop the row from the cache.
   const removedRef = useRef<RemovedBookmark | undefined>(undefined);
+  // When the bookmarks list isn't cached the row is read from the server, and
+  // the DELETE waits for that read so it can't remove the row first.
+  const snapshotRef = useRef<Promise<void> | undefined>(undefined);
+  const snapshotLostRef = useRef(false);
 
   const undoRemoval = async (removed: RemovedBookmark | undefined, showToast: ShowToast) => {
     try {
+      const lost = removed === undefined && snapshotLostRef.current;
       const { partial } = await restoreRemovedBookmark(opts.resourceId, removed);
       opts.onOptimistic(true);
       showToast(
-        partial
+        partial || lost
           ? {
               title: "Bookmark restored",
-              description: "Some collections or queue settings couldn't be restored.",
+              description: lost
+                ? "Its note and collections couldn't be restored."
+                : "Some collections or queue settings couldn't be restored.",
               variant: "destructive",
             }
           : { description: "Bookmark restored", duration: 2000 },
@@ -365,9 +372,20 @@ export function useBookmarkToggle(opts: ResourceToggleOptions) {
     ...opts,
     onOptimistic: (next, vars) => {
       if (!next) {
-        removedRef.current = queryClient
-          .getQueryData<(RemovedBookmark & { id: number | string })[]>(["/api/bookmarks"])
-          ?.find((entry) => String(entry.id) === String(opts.resourceId));
+        const sameRow = (entry: { id: number | string }) => String(entry.id) === String(opts.resourceId);
+        const cached = queryClient.getQueryData<(RemovedBookmark & { id: number | string })[]>(["/api/bookmarks"]);
+        removedRef.current = cached?.find(sameRow);
+        snapshotLostRef.current = false;
+        snapshotRef.current = undefined;
+        if (!cached) {
+          snapshotRef.current = apiRequest("/api/bookmarks", { credentials: "include" })
+            .then((rows: (RemovedBookmark & { id: number | string })[]) => {
+              removedRef.current = rows.find(sameRow);
+            })
+            .catch(() => {
+              snapshotLostRef.current = true;
+            });
+        }
       }
       opts.onOptimistic(next, vars);
     },
@@ -395,19 +413,22 @@ export function useBookmarkToggle(opts: ResourceToggleOptions) {
   }, {
     listKey: "/api/bookmarks",
     serverField: "isBookmarked",
-    buildRequest: (resourceId, vars) =>
-      vars.remove
-        ? apiRequest(`/api/bookmarks/${resourceId}`, {
-            method: "DELETE",
-            credentials: "include",
-          })
-        : apiRequest(`/api/bookmarks/${resourceId}`, {
-            method: "POST",
-            body: JSON.stringify(
-              vars.notes !== undefined ? { notes: vars.notes } : {},
-            ),
-            credentials: "include",
-          }),
+    buildRequest: async (resourceId, vars) => {
+      if (vars.remove) {
+        await snapshotRef.current;
+        return apiRequest(`/api/bookmarks/${resourceId}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      }
+      return apiRequest(`/api/bookmarks/${resourceId}`, {
+        method: "POST",
+        body: JSON.stringify(
+          vars.notes !== undefined ? { notes: vars.notes } : {},
+        ),
+        credentials: "include",
+      });
+    },
     signInTitle: "Sign in to bookmark",
     signInDescription:
       "Create an account or sign in to save resources to your bookmarks.",
