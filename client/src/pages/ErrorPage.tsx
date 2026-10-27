@@ -14,9 +14,11 @@ interface ErrorPageProps {
   error: Error | unknown;
   /** Refetch in place; without it Retry reloads the page. */
   onRetry?: () => void;
+  /** A refetch is in flight: Retry shows its busy state. */
+  retrying?: boolean;
 }
 
-export default function ErrorPage({ error, onRetry }: ErrorPageProps) {
+export default function ErrorPage({ error, onRetry, retrying }: ErrorPageProps) {
   // The raw message names internal request URLs; keep it in the console for
   // debugging rather than on the page.
   useEffect(() => {
@@ -32,6 +34,10 @@ export default function ErrorPage({ error, onRetry }: ErrorPageProps) {
   const onRetryRef = useRef(onRetry);
   onRetryRef.current = onRetry;
   const attemptsRef = useRef(0);
+  const handleManualRetry = () => {
+    attemptsRef.current = 0;
+    onRetry?.();
+  };
   useEffect(() => {
     if (!onRetryRef.current || !isNetworkFailure(error)) return;
     const retry = () => onRetryRef.current?.();
@@ -60,7 +66,7 @@ export default function ErrorPage({ error, onRetry }: ErrorPageProps) {
         label="Error · unavailable"
         title="Something went wrong"
         headingLevel={1}
-        actions={<RetryButton onRetry={onRetry ?? (() => window.location.reload())} testId="button-error-page-retry" />}
+        actions={<RetryButton onRetry={onRetry ? handleManualRetry : () => window.location.reload()} busy={retrying} testId="button-error-page-retry" />}
       >
         The catalog couldn&apos;t be loaded. This is usually a brief network or
         server problem. Please try again.
