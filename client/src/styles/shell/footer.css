@@ -51,24 +51,20 @@
 .app-footer .app-footer-stats { margin-top: 8px; color: var(--text-3); font-family: var(--font-mono); font-size: 11px; line-height: 1.7; }
 .app-footer-live { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; }
 
-/* EXPLORE rows paint the reference 13px text at an 8px rhythm; each link's
-   44px target overhangs its neighbours by the difference. */
+/* Each EXPLORE link owns its full 44px row so adjacent targets never overlap. */
 .app-footer-explore { display: flex; flex-direction: column; }
 .app-footer-explore > a {
   display: flex;
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  margin-block: -7.6px;
   color: var(--text-2);
   font-size: 13px;
   text-decoration: none;
   transition: color 140ms ease;
 }
-.app-footer-explore > a:first-child { margin-top: -11.6px; }
 .app-footer-explore > a:hover { color: var(--accent-ink); }
-/* The overhanging targets would draw an offset ring across the neighbouring
-   labels; keep it inside the focused row instead. */
+/* Keep the focus ring inside its row, clear of adjacent targets. */
 .app-footer .app-footer-explore > a:focus-visible { position: relative; outline-offset: -2px; }
 .app-footer-glyph { color: var(--text-3); }
 

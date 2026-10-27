@@ -1,0 +1,57 @@
+{
+  "viewport": {
+    "width": 390,
+    "dpr": 1,
+    "coarse": true,
+    "touchPoints": 1
+  },
+  "actions": [
+    {
+      "name": "Encoding & Codecs",
+      "edge": "bottom",
+      "x": 258.5,
+      "y": 433.328125,
+      "expected": "/category/encoding-codecs",
+      "hit": "/category/encoding-codecs",
+      "after": {
+        "url": "http://127.0.0.1:5165/category/encoding-codecs",
+        "h1": "Encoding & Codecs"
+      }
+    },
+    {
+      "name": "General Tools",
+      "edge": "top",
+      "x": 258.5,
+      "y": 437.328125,
+      "expected": "/category/general-tools",
+      "hit": "/category/general-tools",
+      "after": {
+        "url": "http://127.0.0.1:5165/category/general-tools",
+        "h1": "General Tools"
+      }
+    }
+  ],
+  "order": [
+    {
+      "name": "Community & Events",
+      "focusVisible": true
+    },
+    {
+      "name": "Encoding & Codecs",
+      "focusVisible": true
+    },
+    {
+      "name": "General Tools",
+      "focusVisible": true
+    }
+  ],
+  "reverse": {
+    "name": "Encoding & Codecs",
+    "focusVisible": true,
+    "outline": "rgb(255, 61, 82) solid 2px"
+  },
+  "enter": {
+    "url": "http://127.0.0.1:5165/category/encoding-codecs",
+    "h1": "Encoding & Codecs"
+  }
+}
