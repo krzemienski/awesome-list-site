@@ -312,7 +312,7 @@ function renderHealthRows(
       state: status === "failed" ? "bad" : status === "budget_stopped" || status === "cancelled" ? "warn" : "ok",
     };
   } else {
-    enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "ok" };
+    enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "unknown" };
   }
 
   return [database, github, link, enrichmentRow, aiRow];
