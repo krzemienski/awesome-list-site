@@ -174,13 +174,7 @@ export default function AIRecommendationsPanel({
 
   const authoritativeExcludedIds = new Set(
     feedbackStates
-      .filter((state) =>
-        state.feedback === "hidden"
-        || (isFromCache && (
-          state.feedback === "not_for_me"
-          || state.feedback === "already_known"
-        )),
-      )
+      .filter((state) => isRemovingFeedback(state.feedback))
       .map((state) => state.resourceId),
   );
   // C6-V2-06: cached cards are only held back until hidden choices are known
@@ -248,7 +242,7 @@ export default function AIRecommendationsPanel({
     feedback: RecommendationFeedbackValue | null,
   ) => {
     if (
-      feedback === "hidden"
+      isRemovingFeedback(feedback)
       && document.activeElement?.closest(`[data-testid^="recommendation-feedback-"]`)
     ) {
       const index = visibleRecommendations.findIndex((r) => r.resource.id === resourceId);
@@ -259,7 +253,7 @@ export default function AIRecommendationsPanel({
     }
     setLocallyHidden((current) => {
       const next = new Set(current);
-      if (feedback === "hidden") next.add(resourceId);
+      if (isRemovingFeedback(feedback)) next.add(resourceId);
       else next.delete(resourceId);
       return next;
     });
