@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
@@ -131,11 +131,17 @@ export function Paginator({
   const ids = { ...DEFAULT_TEST_IDS, ...testIds };
   const [jumpValue, setJumpValue] = useState(String(currentPage));
   const [jumpError, setJumpError] = useState<string | null>(null);
+  // Only text the user typed since the last commit may be committed. Enter
+  // resets the box to the shown page; when focus then leaves (a host moving
+  // focus to the new results), blur used to re-commit that stale number and
+  // snap the list back.
+  const jumpEditedRef = useRef(false);
 
   // Mirror the effective page into the jump box whenever it changes.
   useEffect(() => {
     setJumpValue(String(currentPage));
     setJumpError(null);
+    jumpEditedRef.current = false;
   }, [currentPage]);
 
   if (totalPages <= 1) return null;
@@ -148,6 +154,7 @@ export function Paginator({
   };
 
   const commitJump = () => {
+    if (!jumpEditedRef.current) return;
     const n = parsePageInput(jumpValue);
     if (n == null) {
       // BUG-022: visible validation feedback — never a silent reset.
@@ -155,6 +162,7 @@ export function Paginator({
       return;
     }
     const clamped = Math.min(Math.max(n, 1), totalPages);
+    jumpEditedRef.current = false;
     setJumpError(null);
     if (clamped !== currentPage) onNavigate(clamped);
     // C4-V5A-01: the box mirrors the shown page, not the last request. When
@@ -243,6 +251,7 @@ export function Paginator({
               inputMode="numeric"
               value={jumpValue}
               onChange={(e) => {
+                jumpEditedRef.current = true;
                 setJumpValue(e.target.value);
                 setJumpError(null);
               }}
