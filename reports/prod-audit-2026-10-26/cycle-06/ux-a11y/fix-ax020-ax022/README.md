@@ -12,6 +12,8 @@ Base: `520d6778369bc7ce495204cfcacc7e0533f941cc`. Branch: `fix/c6-ax020-advanced
 
 Merged `origin/main` at `2c4a00eed2085561e9170b2575b92837e48ac5da` into this fix branch. The additive CHANGELOG conflict preserves both the Advanced recovery entry and all upstream entries. Re-ran `npx tsc --noEmit` (exit 0, no diagnostics) and `npm run build` (exit 0), both unpiped. See `integration-checks.json` and `integration-build-output.txt`. The existing all-width browser proof was retained as explicitly authorized for this synchronization; it was not repeated solely for integration. This did not merge the PR or deploy.
 
+Subsequently merged `origin/main` at `d3bfce3c88a039cb6819b013a8754808efa49a1e` after PR #115. Preserved both the Advanced recovery and Profile validation CHANGELOG entries. The repeated unpiped typecheck and build both exited 0; receipts are `integration-d3bfce3c-checks.json` and `integration-d3bfce3c-build-output.txt`. Existing browser evidence and its limitations remain unchanged.
+
 ## Real runtime and failure method
 
 The existing Express/Vite app ran at `http://127.0.0.1:5167`, using the approved isolated loopback `awesome_c2_pubsec` database, development mode and `DISABLE_BACKGROUND_JOBS=1`. No production database, migration, seeding or paid work was used. Analytics consent was denied and `umami.disabled=1`.
