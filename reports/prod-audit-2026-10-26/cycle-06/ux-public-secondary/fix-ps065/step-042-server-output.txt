@@ -1,0 +1,80 @@
+1|c6-ps065-local-5165 [service] — ready — up 15m27s — pid 42077
+2|ready=true persist=false detached=false
+3|
+4|> rest-express@1.0.0 dev
+5|> NODE_ENV=development tsx server/index.ts
+6|
+7|07:17:59 INFO  [claude] Claude service initialized: Replit-managed Anthropic integration; models haiku=claude-haiku-4-5
+8|sonnet=claude-sonnet-4-5 opus=claude-opus-4-1; primary=claude-sonnet-4-5
+9|07:18:00 INFO  [startup] Serving on port 5165 mode=development
+10|07:18:00 INFO  [startup] Background jobs disabled (DISABLE_BACKGROUND_JOBS=1)
+11|07:20:00 INFO  [http] GET /api/awesome-list/nav status=200 ms=48 group=catalog rid=536545
+12|07:20:01 INFO  [http] GET /api/config status=200 ms=16 group=other rid=acfa50
+13|07:20:01 INFO  [http] GET /api/auth/user status=200 ms=51 group=auth-session rid=1d4b46
+14|07:20:01 INFO  [http] GET /api/awesome-list status=200 ms=59 group=catalog rid=d53eb2
+15|07:20:57 INFO  [http] GET /api/awesome-list/nav status=200 ms=36 group=catalog rid=6713e2
+16|07:20:58 INFO  [http] GET /api/config status=200 ms=47 group=other rid=d87f52
+17|07:20:58 INFO  [http] GET /api/awesome-list status=200 ms=213 group=catalog rid=49f46e
+18|07:20:58 INFO  [http] GET /api/auth/user status=200 ms=271 group=auth-session rid=def6cb
+19|07:22:08 INFO  [http] GET /api/awesome-list/listing status=200 ms=126 group=other rid=a2b511
+20|07:22:54 INFO  [http] GET /api/awesome-list/nav status=304 ms=58 group=catalog rid=6ce008
+21|07:22:54 INFO  [http] GET /api/auth/user status=304 ms=5 group=auth-session rid=acfc8e
+22|07:22:54 INFO  [http] GET /api/awesome-list status=304 ms=40 group=catalog rid=cf8470
+23|07:22:55 INFO  [http] GET /api/awesome-list/listing status=200 ms=3 group=other rid=6b7efc
+24|07:23:38 INFO  [http] GET /api/auth/user status=304 ms=27 group=auth-session rid=ff9441
+25|07:24:15 INFO  [http] GET /api/awesome-list/listing status=304 ms=148 group=other rid=84ebc4
+26|07:24:15 INFO  [http] GET /api/awesome-list/nav status=304 ms=18 group=catalog rid=5ce226
+27|07:24:15 INFO  [http] GET /api/auth/user status=304 ms=2 group=auth-session rid=52e5fa
+28|07:24:15 INFO  [http] GET /api/awesome-list status=304 ms=40 group=catalog rid=c668c9
+29|07:24:47 INFO  [http] GET /api/config status=200 ms=32 group=other rid=97d623
+30|07:24:47 INFO  [http] GET /api/auth/user status=200 ms=24 group=auth-session rid=366202
+31|07:24:47 INFO  [http] GET /api/awesome-list status=200 ms=43 group=catalog rid=c4c25f
+32|07:24:48 INFO  [http] GET /api/awesome-list/nav status=200 ms=19 group=catalog rid=519dfb
+33|07:24:48 INFO  [http] GET /api/auth/user status=304 ms=6 group=auth-session rid=4cc4a0
+34|07:25:35 INFO  [http] GET /api/awesome-list/listing status=200 ms=399 group=other rid=dc6bd1
+35|07:25:35 INFO  [http] GET /api/auth/user status=304 ms=65 group=auth-session rid=af1e01
+36|07:25:35 INFO  [http] GET /api/awesome-list/listing status=200 ms=60 group=other rid=c578c6
+37|07:25:48 INFO  [http] GET /api/awesome-list/nav status=304 ms=30 group=catalog rid=e40b72
+38|07:25:48 INFO  [http] GET /api/auth/user status=304 ms=26 group=auth-session rid=ed5fe2
+39|07:25:48 INFO  [http] GET /api/awesome-list status=304 ms=52 group=catalog rid=d69dd5
+40|07:25:48 INFO  [http] GET /api/awesome-list/listing status=304 ms=15 group=other rid=5619e0
+41|07:26:16 INFO  [http] GET /api/awesome-list/nav status=200 ms=27 group=catalog rid=ae91b2
+42|07:26:17 INFO  [http] GET /api/config status=200 ms=15 group=other rid=287ae0
+43|07:26:17 INFO  [http] GET /api/auth/user status=200 ms=35 group=auth-session rid=4592db
+44|07:26:17 INFO  [http] GET /api/awesome-list status=200 ms=42 group=catalog rid=99f59f
+45|07:27:06 INFO  [http] GET /api/awesome-list/listing status=200 ms=108 group=other rid=833472
+46|07:27:07 INFO  [http] GET /api/auth/user status=304 ms=8 group=auth-session rid=35dbc9
+47|07:27:07 INFO  [http] GET /api/awesome-list/listing status=200 ms=6 group=other rid=4a2d8a
+48|07:27:38 INFO  [http] GET /api/awesome-list/nav status=304 ms=58 group=catalog rid=d34a63
+49|07:27:38 INFO  [http] GET /api/auth/user status=304 ms=8 group=auth-session rid=900579
+50|07:27:38 INFO  [http] GET /api/awesome-list status=304 ms=35 group=catalog rid=3c5f89
+51|07:27:38 INFO  [http] GET /api/awesome-list/listing status=304 ms=3 group=other rid=f89dbd
+52|07:28:13 INFO  [http] GET /api/awesome-list/listing status=304 ms=37 group=other rid=ac8845
+53|07:28:13 INFO  [http] GET /api/auth/user status=304 ms=1 group=auth-session rid=f061a7
+54|07:28:13 INFO  [http] GET /api/auth/user status=304 ms=1 group=auth-session rid=96b7f0
+55|07:28:13 INFO  [http] GET /api/auth/user status=304 ms=2 group=auth-session rid=fe758d
+56|07:28:14 INFO  [http] GET /api/auth/user status=304 ms=2 group=auth-session rid=43d5af
+57|07:29:18 INFO  [http] GET /api/awesome-list/nav status=304 ms=42 group=catalog rid=154a34
+58|07:29:18 INFO  [http] GET /api/auth/user status=304 ms=2 group=auth-session rid=6c2f6f
+59|07:29:18 INFO  [http] GET /api/awesome-list status=304 ms=28 group=catalog rid=bb1add
+60|07:29:18 INFO  [http] GET /api/awesome-list/listing status=304 ms=4 group=other rid=34e5af
+61|07:29:18 INFO  [http] GET /api/auth/user status=304 ms=1 group=auth-session rid=e59ca0
+62|07:29:18 INFO  [http] GET /api/awesome-list/listing status=304 ms=2 group=other rid=fb35ea
+63|07:29:54 INFO  [http] GET /api/awesome-list/listing status=304 ms=45 group=other rid=96e039
+64|07:29:54 INFO  [http] GET /api/auth/user status=304 ms=3 group=auth-session rid=3fef28
+65|07:29:55 INFO  [http] GET /api/auth/user status=304 ms=2 group=auth-session rid=0eec85
+66|07:29:55 INFO  [http] GET /api/awesome-list/listing status=304 ms=3 group=other rid=52b7e5
+67|07:29:55 INFO  [http] GET /api/auth/user status=304 ms=4 group=auth-session rid=8273c8
+68|07:29:55 INFO  [http] GET /api/awesome-list/listing status=304 ms=2 group=other rid=470cbb
+69|07:30:26 INFO  [http] GET /api/awesome-list/listing status=304 ms=120 group=other rid=f7baed
+70|07:30:26 INFO  [http] GET /api/awesome-list/nav status=304 ms=127 group=catalog rid=ad7bc4
+71|07:30:26 INFO  [http] GET /api/auth/user status=304 ms=3 group=auth-session rid=5d3b8f
+72|07:30:26 INFO  [http] GET /api/auth/user status=304 ms=6 group=auth-session rid=e1b8b8
+73|07:30:26 INFO  [http] GET /api/awesome-list status=304 ms=49 group=catalog rid=ad315a
+74|07:30:26 INFO  [http] GET /api/awesome-list/listing status=304 ms=8 group=other rid=236518
+75|07:30:26 INFO  [http] GET /api/auth/user status=304 ms=7 group=auth-session rid=7e8e26
+76|07:30:26 INFO  [http] GET /api/awesome-list/listing status=304 ms=4 group=other rid=d5045f
+77|07:31:43 INFO  [http] GET /api/awesome-list/nav status=200 ms=40 group=catalog rid=b69452
+78|07:31:43 INFO  [http] GET /api/awesome-list/listing status=200 ms=35 group=other rid=a9d98a
+79|07:31:43 INFO  [http] GET /api/auth/user status=200 ms=2 group=auth-session rid=8127aa
+80|07:31:43 INFO  [http] GET /api/config status=200 ms=8 group=other rid=047cc1

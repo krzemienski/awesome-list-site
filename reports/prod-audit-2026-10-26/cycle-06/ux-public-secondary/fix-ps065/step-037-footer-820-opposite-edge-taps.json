@@ -1,0 +1,34 @@
+{
+  "viewport": {
+    "width": 820,
+    "coarse": true
+  },
+  "actions": [
+    {
+      "name": "Encoding & Codecs",
+      "edge": "top-center",
+      "x": 399.99609375,
+      "y": 654.9765625,
+      "expected": "/category/encoding-codecs",
+      "hit": "/category/encoding-codecs",
+      "before": "http://127.0.0.1:5165/about",
+      "after": {
+        "url": "http://127.0.0.1:5165/category/encoding-codecs",
+        "h1": "Encoding & Codecs"
+      }
+    },
+    {
+      "name": "General Tools",
+      "edge": "bottom-center",
+      "x": 399.99609375,
+      "y": 739.0078125,
+      "expected": "/category/general-tools",
+      "hit": "/category/general-tools",
+      "before": "http://127.0.0.1:5165/about",
+      "after": {
+        "url": "http://127.0.0.1:5165/category/general-tools",
+        "h1": "General Tools"
+      }
+    }
+  ]
+}

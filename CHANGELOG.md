@@ -6,6 +6,12 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Footer category target separation
+- Fixed C6-PS-065 by giving each Explore category link its full 44px layout
+  row instead of overlapping neighboring targets with negative margins.
+  Category typography, ordering, focus rings and responsive footer columns
+  are unchanged.
+
 ### Search and Advanced form field identifiers
 - Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
   Advanced explorer controls and export options, including Radix native
