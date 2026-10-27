@@ -164,6 +164,7 @@ const STATUS_VARIANTS: Record<string, string> = {
   running: "warn",
   warning: "warn",
   stale: "warn",
+  degraded: "warn",
   partial: "warn",
   budget_stopped: "warn",
   admin: "accent",
