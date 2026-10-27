@@ -49,6 +49,8 @@ const ACTION_STATUS: Record<string, string> = {
   updated: "completed",
   approved: "approved",
   rejected: "rejected",
+  pending: "pending",
+  archived: "completed",
   deleted: "completed",
   synced: "completed",
   imported: "completed",
