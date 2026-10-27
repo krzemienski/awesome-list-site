@@ -163,7 +163,7 @@ export default function AdminStats({
   const subcategoryCount = subcategories.data?.length;
   const pendingUnavailable = pending.isError;
   const value = (number: number | undefined) => (
-    number === undefined ? 0 : number.toLocaleString()
+    number === undefined ? "—" : number.toLocaleString()
   );
   const subcategoryValue = subcategories.isError ? "Error" : value(subcategoryCount);
   const activeUserValue = users.isError && activeUsers === undefined ? "Error" : value(activeUsers);
@@ -194,10 +194,10 @@ export default function AdminStats({
         value={value(stats?.totalPublic ?? stats?.resources)}
         sub={
           <>
-            {categories.isError
-              ? "category data unavailable"
-              : categoryCount === undefined
-                ? "across — categories"
+            {categories.isPending && categories.fetchStatus === "fetching"
+              ? "across — categories"
+              : categories.isError || categoryCount === undefined
+                ? "category data unavailable"
                 : `across ${categoryCount} categories`}
           </>
         }
