@@ -1,0 +1,88 @@
+- contentinfo [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - paragraph [ref=e4]: ── INDEX
+      - link "awesome.video home" [ref=e5] [cursor=pointer] [href="http://127.0.0.1:5165/"]:
+        - /url: /
+        - text: awesome.video
+      - paragraph [ref=e6]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+    - generic [ref=e8]:
+      - heading "INDEXED" [level=2] [ref=e9]
+      - paragraph [ref=e10]: 1,949
+      - paragraph [ref=e11]:
+        - text: 9 categories
+        - text: 18 subcategories
+        - generic [ref=e12]: live
+    - navigation "Explore categories" [ref=e14]:
+      - heading "EXPLORE" [level=2] [ref=e15]
+      - generic [ref=e16]:
+        - link "Community & Events" [ref=e17] [cursor=pointer] [href="http://127.0.0.1:5165/category/community-events"]:
+          - /url: /category/community-events
+          - generic [ref=e18]: ◈
+          - generic [ref=e19]: Community
+        - link "Encoding & Codecs" [ref=e20] [cursor=pointer] [href="http://127.0.0.1:5165/category/encoding-codecs"]:
+          - /url: /category/encoding-codecs
+          - generic [ref=e21]: ◇
+          - generic [ref=e22]: Encoding
+        - link "General Tools" [ref=e23] [cursor=pointer] [href="http://127.0.0.1:5165/category/general-tools"]:
+          - /url: /category/general-tools
+          - generic [ref=e24]: ◆
+          - generic [ref=e25]: General
+        - link "Infrastructure & Delivery" [ref=e26] [cursor=pointer] [href="http://127.0.0.1:5165/category/infrastructure-delivery"]:
+          - /url: /category/infrastructure-delivery
+          - generic [ref=e27]: ▣
+          - generic [ref=e28]: Infrastructure
+        - link "Intro & Learning" [ref=e29] [cursor=pointer] [href="http://127.0.0.1:5165/category/intro-learning"]:
+          - /url: /category/intro-learning
+          - generic [ref=e30]: ▤
+          - generic [ref=e31]: Intro
+        - link "Media Tools" [ref=e32] [cursor=pointer] [href="http://127.0.0.1:5165/category/media-tools"]:
+          - /url: /category/media-tools
+          - generic [ref=e33]: ▥
+          - generic [ref=e34]: Media
+        - link "Players & Clients" [ref=e35] [cursor=pointer] [href="http://127.0.0.1:5165/category/players-clients"]:
+          - /url: /category/players-clients
+          - generic [ref=e36]: ▶
+          - generic [ref=e37]: Players
+        - link "Protocols & Transport" [ref=e38] [cursor=pointer] [href="http://127.0.0.1:5165/category/protocols-transport"]:
+          - /url: /category/protocols-transport
+          - generic [ref=e39]: ⟁
+          - generic [ref=e40]: Protocols
+        - link "Standards & Industry" [ref=e41] [cursor=pointer] [href="http://127.0.0.1:5165/category/standards-industry"]:
+          - /url: /category/standards-industry
+          - generic [ref=e42]: ◉
+          - generic [ref=e43]: Standards
+    - generic [ref=e44]:
+      - heading "SOURCE" [level=2] [ref=e45]
+      - link "krzemienski/awesome-video" [ref=e46] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video"]:
+        - /url: https://github.com/krzemienski/awesome-video
+        - img [ref=e47]
+        - generic [ref=e49]:
+          - text: krzemienski
+          - generic [ref=e50]:
+            - text: /
+            - text: awesome-video
+        - generic [ref=e51]: ↗
+      - paragraph [ref=e52]:
+        - text: Open-source.
+        - link "PRs welcome" [ref=e53] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md"]:
+          - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+        - text: .
+        - text: Indexed automatically from README.md.
+  - generic [ref=e54]:
+    - generic [ref=e55]: © 2026 awesome.video · content CC0, code MIT
+    - navigation "Site policies" [ref=e56]:
+      - link "About" [ref=e57] [cursor=pointer] [href="http://127.0.0.1:5165/about"]:
+        - /url: /about
+      - link "Terms" [ref=e58] [cursor=pointer] [href="http://127.0.0.1:5165/terms"]:
+        - /url: /terms
+      - link "Privacy" [ref=e59] [cursor=pointer] [href="http://127.0.0.1:5165/privacy"]:
+        - /url: /privacy
+      - link "Code of Conduct" [ref=e60] [cursor=pointer] [href="http://127.0.0.1:5165/code-of-conduct"]:
+        - /url: /code-of-conduct
+        - text: Conduct
+      - link "Issues ↗" [ref=e61] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/issues"]:
+        - /url: https://github.com/krzemienski/awesome-video/issues
+      - link "Sitemap" [ref=e62] [cursor=pointer] [href="http://127.0.0.1:5165/sitemap.xml"]:
+        - /url: /sitemap.xml
+    - generic [ref=e63]: built with the awesome-list framework

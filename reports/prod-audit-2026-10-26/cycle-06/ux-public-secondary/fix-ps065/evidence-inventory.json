@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-10-27T07:38:30.449Z",
+  "capturedAt": "2026-10-27T07:43:01.555Z",
   "root": "reports/prod-audit-2026-10-26/cycle-06/ux-public-secondary/fix-ps065",
-  "count": 61,
-  "totalBytes": 2483496,
+  "count": 80,
+  "totalBytes": 3089981,
   "files": [
     {
       "file": "independent-1440-ax.txt",
@@ -308,7 +308,102 @@
       "file": "step-043-direct-proof-summary.json",
       "bytes": 12819,
       "sha256": "9e3e444035d9bf3de226a17434b900bedee0ec616108e1f10ebf295cda964605"
+    },
+    {
+      "file": "step-044-integrated-tsc.json",
+      "bytes": 343,
+      "sha256": "dbb16f20db4e015b6e35669ccf06fe4c5aaef89ac075314eabda37b9f79cb2f9"
+    },
+    {
+      "file": "step-045-integrated-build.json",
+      "bytes": 26126,
+      "sha256": "9f8bb260de08749f8aeedcfeb054c7e19a212bdf1a9ad2428b8c035658d8b46d"
+    },
+    {
+      "file": "step-046-integrated-1440-geometry.json",
+      "bytes": 28429,
+      "sha256": "6d8f27cce8682aa4e27f50951d48a697350a15051a9df5d1afa96c995b1d8944"
+    },
+    {
+      "file": "step-047-integrated-1440-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-048-integrated-1440.png",
+      "bytes": 91368,
+      "sha256": "a0f9f75d4ce56970c59d615fda8eeff3b489c8ed35fa908a682db23884e142e7"
+    },
+    {
+      "file": "step-049-integrated-1440-interactions.json",
+      "bytes": 1144,
+      "sha256": "96f769060cc726228fe8d75e15f81642390595bad1faeb2d81dcb36f7548f1b8"
+    },
+    {
+      "file": "step-050-integrated-1440-focus.png",
+      "bytes": 88236,
+      "sha256": "2e177d366cc3e46798c73b095edc7ea7fbbb45c838a8fd7a689cc88934d589f5"
+    },
+    {
+      "file": "step-051-integrated-820-geometry.json",
+      "bytes": 28575,
+      "sha256": "ff502906f19e2727ae9328b404e688752f65f9936040a05d5626c9be64274608"
+    },
+    {
+      "file": "step-052-integrated-820-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-053-integrated-820.png",
+      "bytes": 76075,
+      "sha256": "2a613262ad51c7266a5c7ff323426279468f3fdaf49234f12f56e515df77af00"
+    },
+    {
+      "file": "step-054-integrated-820-interactions.json",
+      "bytes": 1238,
+      "sha256": "ffeebe329d17d370fdaeb433b249a3b47371a71ae1c63e1c301fb847f16d83e0"
+    },
+    {
+      "file": "step-055-integrated-820-focus.png",
+      "bytes": 76038,
+      "sha256": "e3778e8140bd5b1f142e70cbae9e57bf61595343f7a6a40450f41eb069678659"
+    },
+    {
+      "file": "step-056-integrated-390-geometry.json",
+      "bytes": 27541,
+      "sha256": "04b0231ffda0ad2a4513f019f5daaed6f4f1bde40b9c0157bb4d055ec8c0c685"
+    },
+    {
+      "file": "step-057-integrated-390-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-058-integrated-390.png",
+      "bytes": 42887,
+      "sha256": "dc26e11e95b6fae8b34b4cf75b0668419c7b148677882f304af6fc5b169e63dc"
+    },
+    {
+      "file": "step-059-integrated-390-interactions.json",
+      "bytes": 1222,
+      "sha256": "79ac524b5db934e18b1a6565f27411c7edae7d00750fcfaf6a9a96c3ecea1105"
+    },
+    {
+      "file": "step-060-integrated-390-focus.png",
+      "bytes": 40145,
+      "sha256": "edd35f26c2e0e7fb669d91b567c2fe38f03cb66e82a420147f6fe6aa42497cee"
+    },
+    {
+      "file": "step-061-integrated-console-network.json",
+      "bytes": 54635,
+      "sha256": "bd9b9942556c5c15bb366a8d8d16ede2bcf19b7f3cc01295eed46c96a952b1d5"
+    },
+    {
+      "file": "step-062-integration-proof-summary.json",
+      "bytes": 8305,
+      "sha256": "1dc9188bf1f16b8821d24abac149a26ad12d86e96eb1b2fc8338711c6e9cd2e6"
     }
   ],
-  "note": "Inventory excludes itself. Direct evidence step-* is full assigned proof; independent-* is explicitly partial and its missing touch/keyboard/diagnostics coverage is not passed."
+  "note": "Inventory excludes itself. step044 onward records fresh checks/proof after additive current-main integration. independent-* remains partial, not upgraded to PASS."
 }
