@@ -85,6 +85,20 @@ function getResourceTags(resource: Resource): string[] {
   );
 }
 
+/**
+ * A checkbox and its label as one row. Below 1024px the shared Checkbox adds a
+ * 44px hit area centred on its 24px box, so each row is 44px tall and a tap
+ * lands on its own control, never the row above or below.
+ */
+function OptionRow({ id, text, checked, onCheckedChange }: { id: string; text: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
+  return (
+    <div className="flex items-center space-x-2 max-lg:min-h-11">
+      <Checkbox className="h-6 w-6" id={id} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
+      <label htmlFor={id} className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
+    </div>
+  );
+}
+
 export default function ExportTools({
   awesomeList,
   selectedCategory,
@@ -815,51 +829,21 @@ export default function ExportTools({
         {/* Content Options */}
         <div className="space-y-3">
           <label className="text-sm font-medium">Content Options</label>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                className="h-6 w-6"
-                id="descriptions"
-                checked={exportOptions.includeDescriptions}
-                onCheckedChange={(checked) => 
-                  setExportOptions(prev => ({ ...prev, includeDescriptions: !!checked }))
-                }
+          <div className="space-y-2 max-lg:space-y-0">
+            {([
+              ["descriptions", "includeDescriptions", "Include descriptions"],
+              ["tags", "includeTags", "Include tags"],
+              ["categories", "includeCategories", "Include categories"],
+              ["groupByCategory", "groupByCategory", "Group by category"],
+            ] as const).map(([id, key, text]) => (
+              <OptionRow
+                key={id}
+                id={id}
+                text={text}
+                checked={exportOptions[key]}
+                onCheckedChange={(checked) => setExportOptions(prev => ({ ...prev, [key]: checked }))}
               />
-              <label htmlFor="descriptions" className="text-sm">Include descriptions</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                className="h-6 w-6"
-                id="tags"
-                checked={exportOptions.includeTags}
-                onCheckedChange={(checked) => 
-                  setExportOptions(prev => ({ ...prev, includeTags: !!checked }))
-                }
-              />
-              <label htmlFor="tags" className="text-sm">Include tags</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                className="h-6 w-6"
-                id="categories"
-                checked={exportOptions.includeCategories}
-                onCheckedChange={(checked) => 
-                  setExportOptions(prev => ({ ...prev, includeCategories: !!checked }))
-                }
-              />
-              <label htmlFor="categories" className="text-sm">Include categories</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                className="h-6 w-6"
-                id="groupByCategory"
-                checked={exportOptions.groupByCategory}
-                onCheckedChange={(checked) => 
-                  setExportOptions(prev => ({ ...prev, groupByCategory: !!checked }))
-                }
-              />
-              <label htmlFor="groupByCategory" className="text-sm">Group by category</label>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -880,19 +864,15 @@ export default function ExportTools({
             </div>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-lg:gap-x-3 max-lg:gap-y-0 max-h-40 overflow-y-auto">
             {awesomeList.categories.map(category => (
-              <div key={category.name} className="flex items-center space-x-2">
-                <Checkbox
-                  className="h-6 w-6"
-                  id={`category-${category.name}`}
-                  checked={exportOptions.selectedCategories.includes(category.name)}
-                  onCheckedChange={() => toggleCategory(category.name)}
-                />
-                <label htmlFor={`category-${category.name}`} className="text-sm cursor-pointer">
-                  {category.name} ({categoryCounts[category.name] || 0})
-                </label>
-              </div>
+              <OptionRow
+                key={category.name}
+                id={`category-${category.name}`}
+                text={`${category.name} (${categoryCounts[category.name] || 0})`}
+                checked={exportOptions.selectedCategories.includes(category.name)}
+                onCheckedChange={() => toggleCategory(category.name)}
+              />
             ))}
           </div>
         </div>
