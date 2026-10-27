@@ -149,7 +149,7 @@ function UnavailableNotice({
   onRetry: () => void;
 }) {
   return (
-    <Alert variant={reason === "error" ? "destructive" : "default"} data-testid={`profile-${reason}`}>
+    <Alert variant={reason === "error" ? "destructive" : "default"} live={reason === "error" ? "assertive" : "polite"} data-testid={`profile-${reason}`}>
       <AlertTitle>
         {reason === "offline" ? "You’re offline" : `Couldn’t load your ${subject}`}
       </AlertTitle>

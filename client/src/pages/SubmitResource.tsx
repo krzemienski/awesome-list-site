@@ -678,7 +678,7 @@ export default function SubmitResource() {
 
                         {/* Duplicate URL Warning */}
                         {duplicateResource && (
-                          <Alert className="submit-inline-alert"> {/* DS-OK: status warn */}
+                          <Alert live="polite" className="submit-inline-alert"> {/* DS-OK: status warn */}
                             <AlertCircle className="submit-alert-icon" /> {/* DS-OK: status warn */}
                             <AlertTitle>Duplicate URL Detected</AlertTitle> {/* DS-OK: status warn */}
                             <AlertDescription>
