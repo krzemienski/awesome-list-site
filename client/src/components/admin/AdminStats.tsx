@@ -4,6 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import Stat from "@/components/admin/canonical/Stat";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { overviewCategoriesQuery } from "@/components/admin/AdminOverview";
 
 interface AdminStatsProps {
   stats?: {
@@ -133,11 +134,7 @@ export default function AdminStats({
     queryFn: getAllUsers,
     staleTime: 30_000,
   });
-  const categories = useQuery<CategorySummary[]>({
-    queryKey: ["/api/categories", "overview-stat"],
-    queryFn: () => apiRequest("/api/categories"),
-    staleTime: 60_000,
-  });
+  const categories = useQuery(overviewCategoriesQuery);
   const subcategories = useQuery<CategorySummary[]>({
     queryKey: ["/api/subcategories", "overview-stat"],
     queryFn: () => apiRequest("/api/subcategories"),
