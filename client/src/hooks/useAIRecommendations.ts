@@ -247,12 +247,10 @@ export function useAIRecommendations(
     }
   }, [cacheKey, cacheTime]);
 
-  // Keep concurrently mounted recommendation surfaces in sync without
-  // removing undoable "not for me" / "already known" cards from the surface
-  // where the choice was just made. Hidden cards disappear immediately; all
-  // other values update their selected state until the next refresh.
-  // Cards removed by "hidden", keyed by resource id with their position, so
-  // the toast's Undo (feedback cleared) can put the card back in place.
+  // Keep concurrently mounted recommendation surfaces' cached feedback in
+  // sync. The panel controls immediate visibility for every removing value.
+  // Only "hidden" is removed from this local list; its position is retained
+  // so the toast's Undo (feedback cleared) can put the card back in place.
   const hiddenCardsRef = useRef(new Map<number, { recommendation: RecommendationResult; index: number }>());
 
   useEffect(() => {
