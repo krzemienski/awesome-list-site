@@ -17,7 +17,11 @@ export const tagLabel = (value: string) =>
   /[A-Z]/.test(value) && value === value.toUpperCase() ? value.trim() : tagDisplayNameBranded(normalizeTag(value));
 const identity = (value: string) => value;
 export const options = (counts: FacetCount[] | undefined, selected: string | string[], labels?: Record<string, string>, toLabel = label, keyOf = identity) => {
-  const values = new Map((counts ?? []).map(c => [keyOf(c.value), { value: c.value, count: c.count }]));
+  // No facet data (a rejected request, or none loaded yet) has no counts to
+  // show; the selected values stay reachable through the active-filter chips
+  // instead of appearing here as raw slugs with a made-up zero.
+  if (!counts) return [];
+  const values = new Map(counts.map(c => [keyOf(c.value), { value: c.value, count: c.count }]));
   const selectedValues = Array.isArray(selected) ? selected : selected ? [selected] : [];
   // C3-V1-02: a selected value joins its facet row by identity (tags: the
   // canonical slug, so "?tags=AMD" is the facet's "amd"), keeping the
