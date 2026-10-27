@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { REMOVING_FEEDBACK_LABELS, isRemovingFeedback } from "@/components/ui/recommendation-feedback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -195,7 +196,7 @@ export default function AIRecommendationsPanel({
       )
     : [];
   const hiddenStates = feedbackStates.filter(
-    (state) => state.feedback === "hidden" && state.resource,
+    (state) => isRemovingFeedback(state.feedback) && state.resource,
   );
 
   // One view per panel load: a fresh device cache reused without a request,
@@ -439,7 +440,7 @@ export default function AIRecommendationsPanel({
           <summary className="cursor-pointer font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="inline-flex items-center gap-2">
               <EyeOff className="h-4 w-4" />
-              Hidden recommendations ({hiddenStates.length})
+              Hidden and dismissed recommendations ({hiddenStates.length})
             </span>
           </summary>
           <ul className="mt-3 space-y-2">
@@ -450,6 +451,9 @@ export default function AIRecommendationsPanel({
               >
                 <span className="min-w-0 break-words text-sm font-medium">
                   {state.resource?.title}
+                  <Badge variant="secondary" className="ml-2 align-middle">
+                    {REMOVING_FEEDBACK_LABELS[state.feedback]}
+                  </Badge>
                 </span>
                 <Button
                   size="sm"

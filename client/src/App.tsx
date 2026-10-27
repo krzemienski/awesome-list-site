@@ -200,13 +200,16 @@ interface RouteErrorBoundaryProps {
 
 interface RouteErrorBoundaryState {
   error: Error | null;
-  // R5-018 (run24): set when a retry is attempted while still offline so the
-  // card can say so instead of silently doing nothing (or dying in a reload).
-  stillOffline: boolean;
+  // R5-018 (run24): set when a retry could not reload so the card says why
+  // instead of silently doing nothing (or dying in a reload). "offline" is the
+  // browser reporting no network; "unreachable" is a browser that believes it
+  // is online but whose /api/health probe failed (server down, DNS, captive
+  // portal).
+  retryBlocked: "offline" | "unreachable" | null;
 }
 
 class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
-  state: RouteErrorBoundaryState = { error: null, stillOffline: false };
+  state: RouteErrorBoundaryState = { error: null, retryBlocked: null };
 
   static getDerivedStateFromError(error: Error): Partial<RouteErrorBoundaryState> {
     return { error };
@@ -280,7 +283,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
       window.clearTimeout(this.probeTimer);
-      this.setState({ error: null, stillOffline: false });
+      this.setState({ error: null, retryBlocked: null });
     }
   }
 
@@ -299,12 +302,12 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     // error page and kill the app session — surface an inline "still offline"
     // notice instead and keep the card (and app state) alive.
     if (navigator.onLine === false) {
-      this.setState({ stillOffline: true });
+      this.setState({ retryBlocked: "offline" });
       return;
     }
     if (!(await isServerReachable())) {
       if (!this.state.error) return;
-      this.setState({ stillOffline: true });
+      this.setState({ retryBlocked: "unreachable" });
       const delay = CONNECTIVITY_PROBE_BACKOFF_MS[this.probeAttempts++];
       if (delay !== undefined) {
         this.probeTimer = window.setTimeout(() => void this.reloadWhenReachable(), delay);
@@ -331,7 +334,17 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   };
 
   render() {
-    const { error } = this.state;
+    const { error, retryBlocked } = this.state;
+    const retryBlockedNote = retryBlocked && (
+      <p
+        className="max-w-md text-sm font-medium text-[var(--accent-ink)]"
+        data-testid={retryBlocked === "offline" ? "text-still-offline" : "text-server-unreachable"}
+      >
+        {retryBlocked === "offline"
+          ? "Still offline — reconnect and try again."
+          : "Can't reach the server right now. Try again in a moment."}
+      </p>
+    );
     if (!error) {
       // Do NOT clear the reload timestamp here: error-free renders happen
       // while Suspense is still fetching the chunk, so clearing on "clean
@@ -343,7 +356,8 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     if (isChunkLoadError(error)) {
       // R5-018 (run24): offline chunk failures get connection-specific copy;
       // online ones keep the deploy-rotation explanation.
-      const offline = navigator.onLine === false || this.state.stillOffline;
+      const offline = navigator.onLine === false || this.state.retryBlocked === "offline";
+      const unreachable = !offline && this.state.retryBlocked === "unreachable";
       return (
         <div
           className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
@@ -351,21 +365,20 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
           data-testid="route-error-boundary"
         >
           <h1 className="display-h text-xl">
-            {offline ? "Couldn't load this page — you appear to be offline" : "This page failed to load"}
+            {offline
+              ? "Couldn't load this page — you appear to be offline"
+              : unreachable
+                ? "Couldn't load this page — the server isn't responding"
+                : "This page failed to load"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
             {offline
               ? "Check your connection, then retry. The rest of the app is still available."
-              : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
+              : unreachable
+                ? "Your connection looks fine, but the site isn't answering. The rest of the app is still available."
+                : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
           </p>
-          {this.state.stillOffline && (
-            <p
-              className="max-w-md text-sm font-medium text-[var(--accent-ink)]"
-              data-testid="text-still-offline"
-            >
-              Still offline — reconnect and try again.
-            </p>
-          )}
+          {retryBlockedNote}
           <Button
             type="button"
             onClick={this.handleRetry}
@@ -387,6 +400,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         <p className="max-w-md text-sm text-muted-foreground">
           The rest of the site still works. You can retry this page or head back home.
         </p>
+        {retryBlockedNote}
         <div className="flex gap-3">
           <Button
             type="button"

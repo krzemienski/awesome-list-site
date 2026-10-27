@@ -52,7 +52,7 @@ export const AdminOpsTable = React.forwardRef<
         {scrollCue.showCue ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent"
           />
         ) : null}
         <div
