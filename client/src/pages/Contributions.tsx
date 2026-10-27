@@ -367,7 +367,7 @@ function ContributionCard({
         )}
 
         {item.status === "superseded" && (
-          <Alert>
+          <Alert live="off">
             <RefreshCw className="h-4 w-4" />
             <AlertTitle>This suggestion is no longer current</AlertTitle>
             <AlertDescription>
@@ -797,7 +797,7 @@ export default function Contributions() {
         </Card>
 
         {pageNotice && (
-          <Alert className="mb-4" data-testid="notice-contribution-page-adjusted">
+          <Alert live="polite" className="mb-4" data-testid="notice-contribution-page-adjusted">
             <RefreshCw className="h-4 w-4" />
             <AlertTitle>Page adjusted</AlertTitle>
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">

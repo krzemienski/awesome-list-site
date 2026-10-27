@@ -528,11 +528,12 @@ export function registerAiJobsRoutes(
       const limit = Number.isFinite(rawLimit)
         ? Math.min(Math.max(rawLimit, 1), 200)
         : 20;
-      const [jobs, total] = await Promise.all([
+      const [jobs, total, cheapestSavingRun] = await Promise.all([
         researchService.listJobs(limit),
         researchService.countJobs(),
+        researchService.cheapestSavingRun(),
       ]);
-      res.json({ jobs: jobs.map(stripJobAuthSecret), total });
+      res.json({ jobs: jobs.map(stripJobAuthSecret), total, cheapestSavingRun });
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to list research jobs', error: error.message });
     }

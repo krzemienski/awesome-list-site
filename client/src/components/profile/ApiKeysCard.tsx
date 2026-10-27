@@ -196,7 +196,7 @@ export default function ApiKeysCard() {
       </CardHeader>
       <CardContent className="space-y-6">
         {created && (
-          <Alert data-testid="panel-api-key-secret">
+          <Alert live="polite" data-testid="panel-api-key-secret">
             <AlertTitle>Copy your new key “{created.apiKey.name}” now</AlertTitle>
             <AlertDescription className="space-y-3">
               <p>

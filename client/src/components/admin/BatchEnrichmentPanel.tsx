@@ -737,7 +737,7 @@ export default function BatchEnrichmentPanel() {
             </Button>
             
             {hasActiveJob ? (
-              <Alert className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
+              <Alert live="off" className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   A job is currently running. Please wait for it to complete.
@@ -880,7 +880,7 @@ export default function BatchEnrichmentPanel() {
               retryTestId="button-retry-enrichment-jobs"
             />
           ) : jobs.length === 0 ? (
-            <Alert>
+            <Alert live="off">
               <Info className="h-4 w-4" />
               <AlertDescription>
                 No enrichment jobs found. Start your first job above.
