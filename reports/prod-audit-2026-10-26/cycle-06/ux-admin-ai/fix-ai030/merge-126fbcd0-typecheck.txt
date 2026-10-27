@@ -1,0 +1,4 @@
+tsc --noEmit exit: 0
+
+
+Wall time: 5.21 seconds

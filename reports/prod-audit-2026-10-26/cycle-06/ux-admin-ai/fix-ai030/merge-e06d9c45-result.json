@@ -1,0 +1,17 @@
+{
+  "finding": "C6-AI-030",
+  "pr": "https://github.com/krzemienski/awesome-list-site/pull/107",
+  "branch": "fix/c6-ai030-full-history",
+  "integratedMain": "e06d9c4537561ea19eeabc70639860cb42f08be3",
+  "priorBranchHead": "c6240ce6740506805acf3a7fe54196b7afc68a30",
+  "operation": "Merge origin/main into the fix branch; do not merge the PR or deploy.",
+  "conflictResolution": "The sole conflict was CHANGELOG.md. Preserved the C6-AI-030, AC-21 and C6-PS-064 entries under the existing October 27 heading; no content was discarded. ResearcherTab source was unchanged by this integration.",
+  "checks": [
+    { "command": "./node_modules/.bin/tsc --noEmit", "exitCode": 0, "piped": false, "evidence": "merge-e06d9c45-typecheck.txt:1-4" },
+    { "command": "npm run build", "exitCode": 0, "piped": false, "evidence": "merge-e06d9c45-build.txt:275-287" }
+  ],
+  "sourceHashes": "merge-e06d9c45-source-sha256.txt",
+  "buildMetadataNote": "Checks ran against the resolved merged working tree before its merge commit. BUILD_REVISION still names priorBranchHead; source hashes identify the checked source.",
+  "browserProof": "BLOCKED/UNVERIFIED, unchanged from browser-proof.json: no authorized local admin session; no sign-in, cookie transfer or auth bypass performed.",
+  "safety": "No PR merge or deployment. No test suites, test files, mocks, validation scripts/harnesses or paid AI work."
+}
