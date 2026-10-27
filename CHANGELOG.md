@@ -11,6 +11,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Invalid page text and unknown taxonomy routes retain their existing validation.
 - Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
 
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
 ### Link Health chart reduced motion
 - C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
   preference for all four line/dot series and tooltip transitions. Normal-motion
