@@ -11,6 +11,25 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Invalid page text and unknown taxonomy routes retain their existing validation.
 - Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
 
+### Link Health chart reduced motion
+- C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
+  preference for all four line/dot series and tooltip transitions. Normal-motion
+  animation is retained; authorized browser verification is pending.
+
+### Admin initial-stats availability (C6-AX-021)
+- Handle an initial offline stats query as unavailable instead of rendering a zero-resource dashboard with permanently pending activity. Reuse the existing offline state, focusable Retry, still-offline feedback, and reconnect behavior.
+- Keep genuine zero counts distinct from missing values; remove numeric fallback counts from the admin masthead and stat cards.
+- Local authenticated admin proof remains UNVERIFIED: no approved local owner session was available. The fix does not change authentication, analytics, APIs, or query retry policy.
+
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
+
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification
