@@ -279,6 +279,7 @@ function ResourceCard({
       className={cn(
         "resource-card card hoverable glow group relative",
         variant === "taxonomy" && "resource-card--taxonomy",
+        variant === "taxonomy" && showPersonalActions && "resource-card--personal",
         className
       )}
       onClick={onClick ? handleCardClick : undefined}

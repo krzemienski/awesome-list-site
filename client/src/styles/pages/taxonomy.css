@@ -416,6 +416,19 @@ button.taxonomy-child {
   visibility: hidden;
 }
 
+/* Cards that carry favorite/bookmark controls (tag pages) have them at the
+   right of the top row, where the tray would sit. The tray drops to its own
+   strip under that row, reserved at rest so showing it never reflows. */
+.taxonomy-page .resource-card--personal .resource-card__top {
+  margin-bottom: 58px !important;
+}
+
+.taxonomy-page .resource-card--personal .resource-card__reveal {
+  top: 72px;
+  left: 20px;
+  justify-content: flex-start;
+}
+
 /* Touch screens never hover, so the tray stays shown there; it sits in the
    empty band, so showing it costs no layout. */
 @media (hover: none) {
