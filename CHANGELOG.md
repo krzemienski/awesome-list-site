@@ -6,6 +6,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Link Health chart reduced motion
+- C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
+  preference for all four line/dot series and tooltip transitions. Normal-motion
+  animation is retained; authorized browser verification is pending.
+
 ### Admin initial-stats availability (C6-AX-021)
 - Handle an initial offline stats query as unavailable instead of rendering a zero-resource dashboard with permanently pending activity. Reuse the existing offline state, focusable Retry, still-offline feedback, and reconnect behavior.
 - Keep genuine zero counts distinct from missing values; remove numeric fallback counts from the admin masthead and stat cards.
