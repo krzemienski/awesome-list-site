@@ -64,6 +64,12 @@ export function formatCost(value: string | number | null | undefined): string {
 }
 
 /** Short qualifier for a cost that is not the Agent SDK's reported total. */
+/** Cheapest run that ended on its own and saved a discovery; costBasis null means an estimated cost. */
+export interface CheapestSavingRun {
+  costUsd: number;
+  costBasis: CostBasis | null;
+}
+
 export const COST_BASIS_NOTE: Record<CostBasis, string | null> = {
   reported: null,
   lower_bound: "lower bound",

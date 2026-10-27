@@ -908,6 +908,7 @@ export class GitHubSyncService {
               skipped: result.skipped,
               errors: result.errors.length,
               warnings: result.warnings.length,
+              validationErrors: result.validationErrors.length,
               validationPassed: result.validationPassed,
               resources: result.resources.map(r => ({ id: r.id, title: r.title, url: r.url })),
             },

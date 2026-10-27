@@ -445,15 +445,17 @@
 }
 
 @media (max-width: 640px) {
-  /* Keep search, the touch-operable filters toggle and Add on one row. */
+  /* Search, the touch-operable filters toggle and Add share one row while the
+     field keeps 160px; narrower than that (AC-13, 320px) the field takes its
+     own full-width row above the two buttons. */
   .admin-catalog-resources__header-actions {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     width: 100%;
   }
 
   .admin-catalog-resources__header-actions input {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 1 1 160px;
+    min-width: 160px;
   }
 
   .admin-catalog-resources__header,
