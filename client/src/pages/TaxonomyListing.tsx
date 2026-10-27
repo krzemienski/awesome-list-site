@@ -459,6 +459,9 @@ export default function TaxonomyListing({ level }: Props) {
     // Malformed page input retains its rejected URL; numeric pages wait for
     // their authoritative total before canonical recovery.
     if (pageNotFound) return;
+    // Let the clamp commit first: normalizing view/sort here would consume
+    // its replacement flag while the URL still names the unavailable page.
+    if (paginationReady && page > totalPages) return;
     if (page > 1 && !paginationReady && strictUrlPage(new URLSearchParams(window.location.search).get("page")) === page) return;
     if (current !== stateHref) {
       const shouldPush = urlSyncInitialized.current && !fromUrl && !replaceNextUrlSync.current && pushSnapshot.current !== snapshot;
@@ -470,7 +473,7 @@ export default function TaxonomyListing({ level }: Props) {
     urlSyncInitialized.current = true;
     syncedRoute.current = hydratedRoute;
     pushSnapshot.current = snapshot;
-  }, [hydratedRoute, level, location, page, pageNotFound, paginationReady, slug, snapshot, stateHref]);
+  }, [hydratedRoute, level, location, page, pageNotFound, paginationReady, slug, snapshot, stateHref, totalPages]);
 
   // An empty tile is a dead end: a subcategory with no approved resources, or
   // one the kind filter has ruled out. The crawler HTML hides them too.
