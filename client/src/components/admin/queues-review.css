@@ -178,6 +178,15 @@
   }
 }
 
+/* The header cell sits flush under the panel heading. On touch the checkbox's
+   44px hit area reaches 14px past the 16px box, so the cell needs that much
+   room or the heading covers the top of the target. */
+@media (max-width: 63.99rem) {
+  .queue-review-shell .admin-table-wrap .table th.queue-review-select-cell {
+    padding-block: 1rem;
+  }
+}
+
 /* Accent is reserved for the selection itself; an idle box is neutral ink. */
 .queue-review-select-cell [role="checkbox"][data-state="unchecked"] {
   border-color: var(--border-strong);
