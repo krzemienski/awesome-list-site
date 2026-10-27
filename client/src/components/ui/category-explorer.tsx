@@ -296,7 +296,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="h-10 w-10"
+                className="h-10 w-10 max-lg:h-11 max-lg:w-11"
                 id="subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
@@ -320,7 +320,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   <ChipButton
                     key={tag}
                     aria-pressed={selectedTags.includes(tag)}
-                    className="text-xs"
+                    className="text-xs max-lg:min-h-11"
                     onClick={() => toggleTag(tag)}
                     data-testid={`button-explorer-tag-${tag}`}
                   >
@@ -332,7 +332,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="min-h-10 px-2 text-xs"
+                    className="min-h-10 px-2 text-xs max-lg:min-h-11"
                     aria-expanded={showAllTags}
                     onClick={() => setShowAllTags(value => !value)}
                     data-testid="button-explorer-tags-toggle"
@@ -362,7 +362,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="min-h-10 px-2 text-xs"
+                className="min-h-10 px-2 text-xs max-lg:min-h-11"
               >
                 Clear all
               </Button>
@@ -404,7 +404,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           F1231: a real link, not a bordered p-0 ghost button. */}
                       <Link
                         href={`/category/${category.slug}`}
-                        className="inline-flex min-h-10 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+                        className="inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
                       >
                         {/* Raw text in a flex box is an anonymous item with
                             min-width:auto; the span lets unbroken names wrap. */}
@@ -475,7 +475,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-h-10 items-center text-foreground hover:text-primary transition-colors font-medium"
+                        className="inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
                         {/* C7-V2-04: the cue belongs on the links that really open a new tab. */}
@@ -516,7 +516,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               // long chip labels rigid — one wide chip overflowed the
                               // card and clipped past the tablet viewport edge. Chips
                               // now cap at the card width and wrap their text.
-                              className="min-h-10 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
+                              className="min-h-10 max-lg:min-h-11 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
                             >
                               {subcategory.name} ({getTotalResourceCount(subcategory)})
                             </Button>

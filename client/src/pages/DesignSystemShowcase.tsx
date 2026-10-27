@@ -441,10 +441,10 @@ export default function DesignSystemShowcase() {
             <div className="grid sm:grid-cols-2 gap-3">
               <Input placeholder="Search resources…" />
               <Textarea placeholder="Multi-line input…" className="min-h-[44px] h-[44px]" />
-              <label className="flex items-center gap-2 text-sm text-[color:var(--text-2)]">
+              <label className="flex min-h-11 items-center gap-2 text-sm text-[color:var(--text-2)]">
                 <Switch checked aria-label="Example switch" /> Switch
               </label>
-              <label className="flex items-center gap-2 text-sm text-[color:var(--text-2)]">
+              <label className="flex min-h-11 items-center gap-2 text-sm text-[color:var(--text-2)]">
                 <Checkbox checked aria-label="Example checkbox" /> Checkbox
               </label>
             </div>
