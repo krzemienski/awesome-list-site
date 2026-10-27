@@ -1,5 +1,5 @@
 import { homeHeading } from "@shared/page-headings";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
@@ -518,8 +518,18 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
 }
 
 function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resource[] }) {
+  const railRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const publish = () => rail.style.setProperty("--home-rail-h", `${rail.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(rail);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <aside className="home-index-rail">
+    <aside ref={railRef} className="home-index-rail">
       {featured.length > 0 ? (
         <div data-testid="home-featured-rail">
           <div className="eyebrow home-rail-eyebrow">── FEATURED</div>
