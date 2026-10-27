@@ -6,6 +6,9 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Research continuation usage accounting
+- Preserve prior rounds' turns, tokens and cost when a later continuation ends with an SDK error, including budget-cap stops.
+
 ### Reliable validation focus callbacks
 - Use a zero-delay timer for Profile name and notification timezone focus handoffs so background/headless browser throttling cannot leave focus on Save.
 

@@ -1426,8 +1426,8 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
 
     let result: Awaited<ReturnType<typeof runAgentQuery>> | undefined;
     let runError: unknown = null;
+    const rounds: NonNullable<typeof result>[] = [];
     try {
-      const rounds: NonNullable<typeof result>[] = [];
       while (true) {
         const usedTurns = rounds.reduce((sum, round) => sum + round.numTurns, 0);
         const usedCost = rounds.reduce((sum, round) => sum + round.totalCostUsd, 0);
@@ -1489,6 +1489,18 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       // logic must know the target was met.
       if (runCtx.targetReached && err && typeof err === 'object') {
         (err as { researchTargetReached?: boolean }).researchTargetReached = true;
+      }
+      const usage = agentUsageFromError(err);
+      if (usage && rounds.length > 0 && err && typeof err === 'object') {
+        // runAgentQuery attaches this trusted in-process usage payload to SDK errors.
+        const sdkError = err as { agentUsage?: typeof usage };
+        sdkError.agentUsage = {
+          ...usage,
+          numTurns: usage.numTurns + rounds.reduce((sum, round) => sum + round.numTurns, 0),
+          tokensIn: usage.tokensIn + rounds.reduce((sum, round) => sum + round.tokensIn, 0),
+          tokensOut: usage.tokensOut + rounds.reduce((sum, round) => sum + round.tokensOut, 0),
+          totalCostUsd: usage.totalCostUsd + rounds.reduce((sum, round) => sum + round.totalCostUsd, 0),
+        };
       }
       runError = err;
       throw err;
