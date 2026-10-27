@@ -40,6 +40,16 @@ import {
 import { db } from "../db";
 import { eq, and, asc, desc, inArray, getTableColumns, sql } from "drizzle-orm";
 
+/**
+ * The step the learner is on: a row of the first incomplete logical step (the
+ * same rule the UI's "Next:" uses), or of the last step once all are complete.
+ */
+function resolveCurrentStepId(steps: JourneyStep[], completedRowIds: ReadonlySet<number>): number | null {
+  const groups = groupLogicalJourneySteps(steps);
+  const target = groups.find(({ rows }) => !isLogicalJourneyStepComplete(rows, completedRowIds)) ?? groups[groups.length - 1];
+  return target ? Math.min(...target.rows.map((row) => row.id)) : null;
+}
+
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 import { type ResourceKind } from "../lib/resourceKinds";
 import { stripInternalResourceFields } from "../lib/publicResource";
@@ -770,7 +780,7 @@ export class LearningJourneyRepository {
       const [updated] = await tx
         .update(userJourneyProgress)
         .set({
-          currentStepId: stepIds[stepIds.length - 1],
+          currentStepId: resolveCurrentStepId(allSteps, completedSet),
           completedSteps,
           lastAccessedAt: new Date(),
           completedAt: allCompleted ? new Date() : null
