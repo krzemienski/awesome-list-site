@@ -6,8 +6,13 @@
   margin-top: 80px;
   border-top: var(--hairline-w) solid var(--border);
   padding: 48px 40px 42px;
-  /* The back-to-top lane (index.css) is never content. */
-  padding-inline-end: var(--shell-gutter-end);
+  /* The back-to-top lane (index.css) is never content. The centered grid
+     (max --content-max) ends at least a lane from the edge once the end
+     padding is at least 2*lane + pad + measure - width, capped at the lane. */
+  padding-inline-end: max(
+    40px,
+    min(var(--back-to-top-lane), calc(2 * var(--back-to-top-lane) + 40px + var(--content-max) - 100cqw))
+  );
   font-family: var(--font-body);
   color: var(--text);
 }
