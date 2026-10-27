@@ -22,6 +22,8 @@ type Props = {
   hideTaxonomyFacets?: boolean;
   /** The surface's own narrowing controls outside this panel, named when no facet applies. */
   otherControls: string[];
+  /** Fires when the mobile Filters sheet opens or closes. */
+  onSheetOpenChange?: (open: boolean) => void;
 };
 
 /**
@@ -92,8 +94,9 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
   </FacetGroup>;
 }
 
-export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls }: Props) {
-  const [open, setOpen] = useState(false);
+export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls, onSheetOpenChange }: Props) {
+  const [open, setOpenState] = useState(false);
+  const setOpen = (next: boolean) => { setOpenState(next); onSheetOpenChange?.(next); };
   const [tagSearch, setTagSearch] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   // The sheet stays open while facets are toggled so counts and results update

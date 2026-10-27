@@ -1,7 +1,7 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import "@/styles/pages/discovery.css";
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -55,6 +55,14 @@ export default function Search() {
   const lastTrackedSearchIntentRef = useRef("");
   const resultsRef = useRef<HTMLElement>(null);
   const pendingResultsFocusRef = useRef(false);
+  const resultsFocusTimerRef = useRef<number>();
+  // The mobile Filters sheet owns focus while open and returns it to its trigger on close.
+  const sheetOpenRef = useRef(false);
+  const onFiltersSheetChange = useCallback((open: boolean) => {
+    sheetOpenRef.current = open;
+    pendingResultsFocusRef.current = false;
+    window.clearTimeout(resultsFocusTimerRef.current);
+  }, []);
   const pendingAnalyticsRef = useRef<{
     signature: string;
     type: string;
@@ -234,9 +242,10 @@ export default function Search() {
   useEffect(() => {
     if (!pendingResultsFocusRef.current || query.isLoading || !data) return;
     pendingResultsFocusRef.current = false;
-    const timer = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
-    return () => window.clearTimeout(timer);
+    if (sheetOpenRef.current) return;
+    resultsFocusTimerRef.current = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
   }, [data, query.isLoading]);
+  useEffect(() => () => window.clearTimeout(resultsFocusTimerRef.current), []);
   const lastFacets = useRef<ResourceSearchFacets>();
   if (data?.facets) lastFacets.current = data.facets;
   // A link can name the category/subcategory by slug (?category=encoding-codecs,
@@ -289,7 +298,7 @@ export default function Search() {
     </header>
     <ActiveFilters state={filterState} onChange={update} onClear={() => clearFilters()} />
     {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => { setPageNotice(null); /* C6-SWEEP-04: the notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={facets} onChange={update} onClear={() => clearFilters()} otherControls={["search", "sort"]} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
+    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={facets} onChange={update} onClear={() => clearFilters()} onSheetOpenChange={onFiltersSheetChange} otherControls={["search", "sort"]} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
       {!shouldShowResults ? <StatePanel tone="empty" label={normalized ? "Query too short" : "No query"} title={normalized ? "Keep typing to search" : "Enter a query or choose filters"} inline testId="text-search-prompt" actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : facetNames.length > 0 ? `Narrow the catalog by ${orList(facetNames)}.` : "Type a word to search the catalog."}</StatePanel>
        : queryTooLong ? <StatePanel tone="empty" label="Query too long" title="Shorten your search" inline testId="search-query-too-long" actions={<Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button>}><span role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</span></StatePanel>
        : offline ? <StatePanel tone="error" label="Offline" title="You’re offline" inline testId="search-results-offline" actions={<RetryButton onRetry={retrySearch} handoffFocus={false} testId="button-retry-offline-search" />}>Search couldn’t reach the catalog because your device has no connection. Results will load on their own when you reconnect.{stillOffline && <p className="system-state-note" data-testid="text-search-still-offline">Still offline — reconnect and try again.</p>}</StatePanel>
