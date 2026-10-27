@@ -217,7 +217,7 @@ export default function Profile({ user }: ProfileProps) {
   const handleSaveName = () => {
     if (namesEmpty) {
       setNameError("Enter at least a first or last name.");
-      requestAnimationFrame(() => document.getElementById("edit-first-name")?.focus());
+      setTimeout(() => document.getElementById("edit-first-name")?.focus(), 0);
       return;
     }
     // Run21 R4-049/077: a zero-width-only name would render as an invisible
@@ -229,9 +229,9 @@ export default function Profile({ user }: ProfileProps) {
     // Only a genuinely empty field means "clear this name".
     if (firstNameInvisible || lastNameInvisible) {
       setNameError("Name must contain visible characters.");
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         document.getElementById(firstNameInvisible ? "edit-first-name" : "edit-last-name")?.focus();
-      });
+      }, 0);
       return;
     }
     setNameError(null);
