@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 import { CHART_ACCENT, CHART_AXIS_TEXT, CHART_DASH, CHART_GRID, CHART_INK } from "@/lib/charts/palette";
@@ -22,11 +23,36 @@ const TOOLTIP_STYLE = {
   color: "var(--text)",
 };
 
+// Tick text drops the year ("Aug 4, 2026, 08:18 AM" -> "Aug 4, 08:18 AM"); the
+// tooltip keeps the full label. Ticks sit level when each slot can hold the
+// widest one, otherwise they stand upright, where their boxes never overlap.
+const shortTick = (value: string) => value.replace(/,? ?\b20\d{2}\b,?/, "");
+const TICK_CHAR_PX = 7;
+const PLOT_INSET_PX = 60;
+const BASE_RIGHT_MARGIN_PX = 16;
+// Two rows of legend entries fit above the plot at phone width.
+const LEGEND_HEIGHT = 44;
+
 interface LinkHealthTrendChartProps {
   data: LinkHealthTrendPoint[];
 }
 
 export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps) {
+  const holder = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const node = holder.current;
+    if (!node) return;
+    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  const widest = Math.max(0, ...data.map((point) => shortTick(point.date).length)) * TICK_CHAR_PX;
+  // A level label is centred on its point, so the last one overhangs the plot
+  // by half its width; the right margin reserves that overhang.
+  const overhang = Math.ceil(widest / 2) + 4;
+  const rightMargin = Math.max(BASE_RIGHT_MARGIN_PX, overhang);
+  const level = (width - PLOT_INSET_PX - rightMargin) / Math.max(data.length, 1) >= widest + 12;
   return (
     <Card>
       <CardHeader>
@@ -39,12 +65,23 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div ref={holder}>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <LineChart data={data} margin={{ top: 4, right: level ? rightMargin : BASE_RIGHT_MARGIN_PX, bottom: 8, left: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
             {/* interval={0}: every check gets a label (the default interval dropped
-                the first of six); the angle keeps them apart at phone width. */}
-            <XAxis dataKey="date" stroke={CHART_GRID} tick={AXIS_TICK} interval={0} angle={-35} textAnchor="end" height={72} tickMargin={6} />
+                the first of six). */}
+            <XAxis
+              dataKey="date"
+              stroke={CHART_GRID}
+              tick={AXIS_TICK}
+              tickFormatter={shortTick}
+              interval={0}
+              angle={level ? 0 : -90}
+              textAnchor={level ? "middle" : "end"}
+              height={level ? 36 : widest + 16}
+              tickMargin={6}
+            />
             <YAxis
               stroke={CHART_GRID}
               tick={AXIS_TICK}
@@ -57,7 +94,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
               cursor={{ stroke: CHART_GRID }}
               formatter={(value) => (typeof value === "number" ? `${value.toFixed(1)}%` : value)}
             />
-            <Legend wrapperStyle={{ color: "var(--text-2)", fontSize: 12 }} />
+            <Legend verticalAlign="top" height={LEGEND_HEIGHT} wrapperStyle={{ color: "var(--text-2)", fontSize: 12 }} />
             {/* Ink ramp + one accent (docs/07-color.md): Broken is the series
                 an admin acts on, so it alone takes the accent; the others
                 step down the ink ramp and differ by dash pattern too.
@@ -101,6 +138,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
             />
           </LineChart>
         </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
