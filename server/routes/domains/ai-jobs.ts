@@ -42,6 +42,7 @@ import {
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { isUniqueViolation } from "../../errors/pgErrors";
 import { createLogger } from "../../lib/logger";
+import { resourceAuditLog } from "@shared/schema";
 
 const logger = createLogger("ai-jobs");
 
@@ -468,6 +469,26 @@ export function registerAiJobsRoutes(
         authTokenEncrypted: agentConfig.authTokenEncrypted,
         authTokenLast4: agentConfig.authTokenLast4,
         resolvedConfig,
+      });
+
+      // Research runs spend money and create public resources, so the launch
+      // belongs in the same admin audit trail as other privileged actions.
+      // resourceId/originalResourceId stay null: the run is not a resource.
+      await db.insert(resourceAuditLog).values({
+        action: 'research_started',
+        performedBy: userId ?? null,
+        changes: {
+          jobId,
+          model: agentConfig.model ?? resolvedConfig.orchestrator.model,
+          scoutModel: scout ?? resolvedConfig.scout.model,
+          categoryFocus: categoryFocus || null,
+          maxBudgetUsd: budget,
+          maxTurns: turns,
+          minDurationMs,
+          targetDiscoveries: target,
+          endpoint: resolvedConfig.endpoint.host,
+        },
+        notes: `Started research run #${jobId} (${agentConfig.model ?? resolvedConfig.orchestrator.model})`,
       });
 
       res.json({ success: true, jobId, message: 'Research job started', config: resolvedConfig });
