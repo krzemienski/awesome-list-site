@@ -639,7 +639,7 @@ function StepsDialog({
                             href={`/resource/${row.resourceId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-[32px] min-w-0 items-center gap-1 underline-offset-2 hover:underline"
+                            className="inline-flex min-h-11 min-[1025px]:min-h-[32px] min-w-0 items-center gap-1 underline-offset-2 hover:underline"
                             title={`${resourceLabel(row)} (#${row.resourceId})`}
                             aria-label={`Open ${resourceLabel(row)} in a new tab`}
                             data-testid={`step-resource-link-${row.id}`}
