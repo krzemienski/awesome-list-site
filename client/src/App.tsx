@@ -540,7 +540,7 @@ function Router({
   // one server-paged tree slice and opt into this query themselves only after
   // an in-page search, tag filter, or alternate sort is active.
   const corpusNeeded = needsCorpusRoute(location);
-  const { error } = useQuery({
+  const { error, refetch } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
@@ -560,7 +560,7 @@ function Router({
       <div className="page">
         <div className="grain" aria-hidden="true" />
         <RouteErrorBoundary location={location}>
-          <ErrorPage error={error} />
+          <ErrorPage error={error} onRetry={() => void refetch()} />
         </RouteErrorBoundary>
       </div>
     );
