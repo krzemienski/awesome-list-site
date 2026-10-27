@@ -106,3 +106,19 @@
 .admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"] {
   visibility: visible;
 }
+
+/* AO-19: the clear-search X is a 44px touch target, like the taxonomy search
+   clear (AC-08); desktop keeps the 32px button. */
+@media (hover: none), (pointer: coarse), (max-width: 64rem) {
+  .admin-ops-search .admin-users-search-clear {
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    right: 0;
+    width: 44px;
+  }
+
+  .admin-ops-search input.admin-users-search-input {
+    padding-right: 2.75rem;
+  }
+}

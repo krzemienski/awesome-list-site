@@ -218,7 +218,7 @@ export default function UsersTab() {
               // while the button is shown; the aria-label carries the full name.
               placeholder="Email or name…"
               aria-label="Search users by email or name"
-              className={searchInput ? "pl-8 pr-8" : "pl-8"}
+              className={searchInput ? "admin-users-search-input pl-8 pr-8" : "pl-8"}
               data-testid="input-user-search"
             />
             {searchInput && (
@@ -230,7 +230,7 @@ export default function UsersTab() {
                   setSearchInput("");
                   searchInputRef.current?.focus();
                 }}
-                className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="admin-users-search-clear absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label="Clear user search"
                 data-testid="button-clear-user-search"
               >
