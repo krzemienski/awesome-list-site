@@ -6,6 +6,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Curated Home card target sizing
+- C6-MEMBER-04: private Home curated-card title and tag links now meet the
+  same 44×44px minimum as shared resource cards at every width, with layout,
+  destinations and focus behavior unchanged.
+
 ### Shared resource-card target sizing (C6-MEMBER-02)
 - Give title, details, tag, tag-expansion and outbound-link actions a 44×44px
   minimum at every width, including taxonomy reveal trays. Existing labels,

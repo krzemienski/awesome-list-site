@@ -595,6 +595,13 @@
   line-height: 1.3;
 }
 
+.home-resource-title a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .home-resource-description {
   display: -webkit-box;
   min-height: 0;
@@ -615,6 +622,11 @@
 }
 
 .home-resource-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.25rem 0.625rem;
   font-size: 0.65625rem;
   letter-spacing: 0.0375rem;
@@ -641,16 +653,6 @@
   color: var(--accent-ink);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-@media (max-width: 1024px) {
-  .home-resource-tag {
-    display: inline-flex;
-    min-width: 44px;
-    min-height: 44px;
-    align-items: center;
-    justify-content: center;
-  }
 }
 
 .home-recent-table {
