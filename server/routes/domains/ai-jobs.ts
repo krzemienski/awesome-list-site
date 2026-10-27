@@ -531,7 +531,10 @@ export function registerAiJobsRoutes(
       const [jobs, total, cheapestSavingRun] = await Promise.all([
         researchService.listJobs(limit),
         researchService.countJobs(),
-        researchService.cheapestSavingRun(),
+        researchService.cheapestSavingRun().catch((error: unknown) => {
+          logger.error('Error computing cheapest saving run:', error);
+          return null;
+        }),
       ]);
       res.json({ jobs: jobs.map(stripJobAuthSecret), total, cheapestSavingRun });
     } catch (error: any) {
