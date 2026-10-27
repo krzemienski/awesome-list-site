@@ -442,9 +442,9 @@
 }
 
 @media (max-width: 640px) {
-  /* Search, the touch-operable filters toggle and Add share one row while the
-     field keeps 160px; narrower than that (AC-13, 320px) the field takes its
-     own full-width row above the two buttons. */
+  /* The actions wrap rather than squeeze the field below its 160px minimum.
+     At 320px the search field sits alone on a row (about 174px wide); at
+     390px the Add button wraps to a second row. */
   .admin-catalog-resources__header-actions {
     flex-wrap: wrap;
     width: 100%;

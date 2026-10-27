@@ -1616,7 +1616,10 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
    * count; cancelled and failed runs report a lower-bound cost and do not.
    */
   async cheapestSavingRun(): Promise<{ costUsd: number; costBasis: CostBasis | null } | null> {
-    const cost = sql`cast(${researchJobs.estimatedCostUsd} as numeric)`;
+    // The column is text; legacy or hand-edited rows may not be numeric, and
+    // a bare cast would fail the whole query. CASE keeps the cast from being
+    // evaluated for rows that fail the plain-decimal guard.
+    const cost = sql`(case when ${researchJobs.estimatedCostUsd} ~ '^[0-9]+(\.[0-9]+)?$' then cast(${researchJobs.estimatedCostUsd} as numeric) end)`;
     const [row] = await db
       .select({ costUsd: researchJobs.estimatedCostUsd, costBasis: researchJobs.costBasis })
       .from(researchJobs)
