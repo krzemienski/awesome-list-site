@@ -11,6 +11,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.
 - Browser verification remains blocked pending an authorized local admin session; the 1440, 820-touch, and 390-touch production journeys are unverified until deployment.
 
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
 ### Link Health chart reduced motion
 - C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
   preference for all four line/dot series and tooltip transitions. Normal-motion
