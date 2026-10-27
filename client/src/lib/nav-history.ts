@@ -229,7 +229,8 @@ export function useRouteFocus(location: string): void {
     const firstRun = lastPath.current === null;
     if (lastPath.current === location) return;
     lastPath.current = location;
-    // A first load moves focus only to a #fragment target, never to the h1.
+    // A first load without a #fragment moves nothing; with one, focus goes to
+    // its target, or to the h1 when no element has that id.
     if (firstRun && !fragmentId()) return;
     // A page that mounted in this same commit may already have focused its
     // search box (a clicked link is never a text field).
@@ -300,7 +301,7 @@ export function useRouteFocus(location: string): void {
 // fragment's element into view (waiting a few frames for it to render).
 export function useScrollToHash(ready: boolean): void {
   useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.slice(1));
+    const id = fragmentId();
     if (!ready || !id) return;
 
     let cancelled = false;
