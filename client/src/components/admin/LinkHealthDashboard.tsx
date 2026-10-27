@@ -109,6 +109,19 @@ const checkTime = (job: LinkHealthJob) =>
     ? { at: job.completedAt, finished: true }
     : { at: job.startedAt ?? job.createdAt, finished: false };
 
+// Whole minutes a finished scan ran, or null when it has no start or end time.
+const scanMinutes = (job: LinkHealthJob) =>
+  job.startedAt && job.completedAt
+    ? Math.max(1, Math.round((new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime()) / 60_000))
+    : null;
+
+const formatMinutes = (minutes: number) => {
+  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? '' : 's'}`;
+  if (minutes < 60) return plural(minutes, 'minute');
+  const rest = minutes % 60;
+  return `${plural(Math.floor(minutes / 60), 'hour')}${rest ? ` ${plural(rest, 'minute')}` : ''}`;
+};
+
 export default function LinkHealthDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -250,6 +263,7 @@ export default function LinkHealthDashboard() {
     .filter((job) => job.status === 'completed')
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   const summaryJob = isJobInProgress || isTerminalWithoutResults ? lastCompletedJob : latestJob;
+  const lastScanMinutes = lastCompletedJob ? scanMinutes(lastCompletedJob) : null;
   // A finished scan's problem counts come from the listed rows; otherwise they
   // are the totals saved on the job.
   const countsFromListedLinks = !isJobInProgress && !isTerminalWithoutResults;
@@ -916,7 +930,10 @@ export default function LinkHealthDashboard() {
             <AlertDialogDescription>
               This checks the URL of every approved resource in the catalog
               {approvedTotal != null ? ` (currently ${approvedTotal.toLocaleString()})` : ""} against the
-              live web. The job runs in the background and can take several minutes to complete.
+              live web. The job runs in the background.{" "}
+              {lastCompletedJob && lastScanMinutes !== null
+                ? `The last full scan (#${lastCompletedJob.id}, ${lastCompletedJob.checkedLinks.toLocaleString()} links) took ${formatMinutes(lastScanMinutes)}.`
+                : "How long it takes depends on the catalog size and how quickly each site answers; a large catalog can take over an hour."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
