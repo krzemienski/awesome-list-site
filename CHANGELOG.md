@@ -10,6 +10,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - C6-MEMBER-04: private Home curated-card title and tag links now meet the
   same 44×44px minimum as shared resource cards at every width, with layout,
   destinations and focus behavior unchanged.
+### Notification timezone validation focus
+- C6-MEMBER-03: invalid timezone submissions now focus the timezone input
+  after its associated inline error renders, instead of leaving keyboard users
+  on Save choices. Validation and valid-save behavior are unchanged.
 
 ### Shared resource-card target sizing (C6-MEMBER-02)
 - Give title, details, tag, tag-expansion and outbound-link actions a 44×44px
