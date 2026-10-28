@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -99,6 +99,19 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
+  // Both dialogs are controlled and have no AlertDialogTrigger, so Radix has
+  // nothing to return focus to. Remember the button that opened each one and
+  // restore it on close; otherwise focus is lost and lands on the neighbouring
+  // "Export" tab trigger, whose automatic activation switches tabs.
+  const seedOpenerRef = useRef<HTMLElement | null>(null);
+  const reseedOpenerRef = useRef<HTMLElement | null>(null);
+  const restoreOpenerFocus = (openerRef: { current: HTMLElement | null }) => (event: Event) => {
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (!opener?.isConnected) return;
+    event.preventDefault();
+    opener.focus({ preventScroll: true });
+  };
   // F01/F02: the outcome of the last run stays on screen (toasts vanish) and
   // never claims success when items failed or the run was rolled back.
   const [seedResult, setSeedResult] = useState<(SeedDatabaseResponse & { mode: "seed" | "reseed" }) | null>(null);
@@ -146,7 +159,8 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
     },
   });
 
-  const handleClearAndReseed = () => {
+  const handleClearAndReseed = (event: MouseEvent<HTMLElement>) => {
+    reseedOpenerRef.current = event.currentTarget;
     setReseedConfirmText("");
     setReseedDialogOpen(true);
   };
@@ -219,7 +233,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           <div className="admin-ops-database__seed-actions">
             <div className="admin-ops-database__seed-action">
               <Button
-                onClick={() => setSeedDialogOpen(true)}
+                onClick={(event) => {
+                  seedOpenerRef.current = event.currentTarget;
+                  setSeedDialogOpen(true);
+                }}
                 disabled={seedDatabaseMutation.isPending}
                 data-testid="button-seed-database"
               >
@@ -367,7 +384,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       </TableShell>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
-        <AlertDialogContent data-testid="dialog-seed-database">
+        <AlertDialogContent
+          data-testid="dialog-seed-database"
+          onCloseAutoFocus={restoreOpenerFocus(seedOpenerRef)}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Database className="h-5 w-5 text-primary" />
@@ -395,7 +415,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       </AlertDialog>
 
       <AlertDialog open={reseedDialogOpen} onOpenChange={setReseedDialogOpen}>
-        <AlertDialogContent data-testid="dialog-clear-reseed">
+        <AlertDialogContent
+          data-testid="dialog-clear-reseed"
+          onCloseAutoFocus={restoreOpenerFocus(reseedOpenerRef)}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
