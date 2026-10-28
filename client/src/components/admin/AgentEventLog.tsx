@@ -169,7 +169,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       <button
                         type="button"
                         onClick={() => toggle(ev.id)}
-                        className="shrink-0 inline-flex items-center justify-center min-h-6 min-w-6 text-muted-foreground hover:text-foreground"
+                        className="shrink-0 inline-flex items-center justify-center min-h-11 min-w-11 min-[1025px]:min-h-6 min-[1025px]:min-w-6 -my-1 text-muted-foreground hover:text-foreground"
                         aria-label={isOpen ? `Hide detail for event ${ev.seq}` : `Show detail for event ${ev.seq}`}
                         aria-expanded={isOpen}
                         data-testid={`button-toggle-detail-${ev.seq}`}
