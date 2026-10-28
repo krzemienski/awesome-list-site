@@ -201,11 +201,11 @@
   min-inline-size: 0;
 }
 
+/* Titles wrap instead of ellipsizing: the title is the only way to tell which
+   resource a row targets, and the tooltip is unreachable on touch. */
 .queue-review-item-title > span {
   min-inline-size: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .queue-review-item-title > span > a {
