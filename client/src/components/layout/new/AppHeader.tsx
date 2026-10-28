@@ -40,7 +40,7 @@ function shellBrand(siteName?: string): string {
 }
 
 // Catalog pages reached from Browse (bare /tag redirects to /categories).
-const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
+export const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
 
 // Same recursive sum as Home's navTotalCount; never fetch the full corpus.
 function totalCount(node: AwesomeListNavNode): number {
