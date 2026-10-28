@@ -1230,6 +1230,13 @@ class ResearchService {
       options.targetDiscoveries ?? null,
       options.minDurationMs ?? null,
     )
+      .then(async () => {
+        try {
+          await this.recordResearchFinished(job.id);
+        } catch (auditErr: unknown) {
+          logger.error({ jobId: job.id }, 'failed to record research_finished audit', auditErr instanceof Error ? auditErr.message : String(auditErr));
+        }
+      })
       .catch(async (err) => {
         const msg = err?.message || String(err);
         const failStatus = errorStatusOf(err);
@@ -1264,36 +1271,7 @@ class ResearchService {
             completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
           }).where(eq(researchJobs.id, job.id));
 
-          // Mirror the terminal state into the admin audit trail so a run's
-          // cost and outcome are reviewable next to its launch entry.
-          const [finished] = await db.select({
-            status: researchJobs.status,
-            model: researchJobs.model,
-            turnsUsed: researchJobs.turnsUsed,
-            estimatedCostUsd: researchJobs.estimatedCostUsd,
-            totalDiscoveries: researchJobs.totalDiscoveries,
-            startedBy: researchJobs.startedBy,
-            startedAt: researchJobs.startedAt,
-            completedAt: researchJobs.completedAt,
-          }).from(researchJobs).where(eq(researchJobs.id, job.id));
-          await db.insert(resourceAuditLog).values({
-            action: 'research_finished',
-            performedBy: finished?.startedBy ?? null,
-            changes: {
-              jobId: job.id,
-              model: finished?.model ?? null,
-              status: finished?.status ?? failStatus,
-              turnsUsed: finished?.turnsUsed ?? null,
-              estimatedCostUsd: finished?.estimatedCostUsd ?? null,
-              totalDiscoveries: finished?.totalDiscoveries ?? null,
-              startedAt: finished?.startedAt ?? null,
-              completedAt: finished?.completedAt ?? null,
-              durationMs: finished?.startedAt && finished?.completedAt
-                ? new Date(finished.completedAt).getTime() - new Date(finished.startedAt).getTime()
-                : null,
-            },
-            notes: `Research run #${job.id} finished (${finished?.status ?? failStatus})`,
-          });
+          await this.recordResearchFinished(job.id);
         } catch (persistErr: any) {
           logger.error({ jobId: job.id }, `failed to persist failure:`, persistErr?.message);
         }
@@ -1305,6 +1283,40 @@ class ResearchService {
       });
 
     return job.id;
+  }
+
+  private async recordResearchFinished(jobId: number): Promise<void> {
+    const [finished] = await db.select({
+      status: researchJobs.status,
+      model: researchJobs.model,
+      turnsUsed: researchJobs.turnsUsed,
+      estimatedCostUsd: researchJobs.estimatedCostUsd,
+      totalDiscoveries: researchJobs.totalDiscoveries,
+      startedBy: researchJobs.startedBy,
+      startedAt: researchJobs.startedAt,
+      completedAt: researchJobs.completedAt,
+    }).from(researchJobs).where(eq(researchJobs.id, jobId));
+
+    // Mirror every terminal state, including clean successful completion, so
+    // the run's cost and outcome are reviewable next to its launch entry.
+    await db.insert(resourceAuditLog).values({
+      action: 'research_finished',
+      performedBy: finished?.startedBy ?? null,
+      changes: {
+        jobId,
+        model: finished?.model ?? null,
+        status: finished?.status ?? null,
+        turnsUsed: finished?.turnsUsed ?? null,
+        estimatedCostUsd: finished?.estimatedCostUsd ?? null,
+        totalDiscoveries: finished?.totalDiscoveries ?? null,
+        startedAt: finished?.startedAt ?? null,
+        completedAt: finished?.completedAt ?? null,
+        durationMs: finished?.startedAt && finished?.completedAt
+          ? new Date(finished.completedAt).getTime() - new Date(finished.startedAt).getTime()
+          : null,
+      },
+      notes: `Research run #${jobId} finished (${finished?.status ?? 'unknown'})`,
+    });
   }
 
   private async runResearchLoop(
