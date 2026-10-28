@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef, useId, type ReactNode } from "rea
 import { useLocation, useSearch, Link } from "wouter";
 import {
   Home,
+  LayoutGrid,
   Plus,
   BookOpen,
   Zap,
@@ -29,6 +30,7 @@ import "@/styles/shell/sidebar.css";
 import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
 import { docsUrl } from "@/lib/docs-url";
+import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
@@ -806,6 +808,10 @@ export default function AppSidebar({
   };
   const activePath = normalizePath(location);
   const isActive = (path: string) => activePath === normalizePath(path);
+  const isBrowseSection = (path: string) =>
+    path === "/categories" &&
+    (location === "/" ||
+      BROWSE_ROUTE_PREFIXES.some((prefix) => location.startsWith(prefix)));
 
   const navItems = [
     { label: "Home", icon: Home, href: "/" },
@@ -958,6 +964,12 @@ export default function AppSidebar({
 
   const drawerNavItems = [
     { label: "Home", icon: Home, href: "/", testId: "nav-home" },
+    {
+      label: "Browse",
+      icon: LayoutGrid,
+      href: "/categories",
+      testId: "nav-browse",
+    },
     {
       label: "Submit",
       icon: Plus,
@@ -1207,8 +1219,14 @@ export default function AppSidebar({
                 navigate(item.href);
               }}
               data-testid={item.testId}
-              data-active={isActive(item.href) || undefined}
-              aria-current={isActive(item.href) ? "page" : undefined}
+              data-active={isActive(item.href) || isBrowseSection(item.href) || undefined}
+              aria-current={
+                isActive(item.href)
+                  ? "page"
+                  : isBrowseSection(item.href)
+                    ? "true"
+                    : undefined
+              }
               className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
             >
               <span className="flex items-center gap-[10px] min-w-0">
