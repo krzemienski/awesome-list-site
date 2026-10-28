@@ -6,6 +6,7 @@ import {
   lazy,
   Suspense,
   Component,
+  type ComponentProps,
   type ComponentType,
   type ReactNode,
 } from "react";
@@ -37,59 +38,94 @@ import { focusPageHeading } from "@/hooks/focus-handoff";
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
 
+/**
+ * React.lazy caches a rejected import for the life of the lazy object, so a
+ * route chunk that failed while offline would rethrow the same error on every
+ * re-render. Each route registers a reset here; RouteErrorBoundary calls
+ * retryFailedRouteImports() once the server is reachable again, and the next
+ * render imports the chunk afresh without a document reload. Resets are only
+ * triggered by that explicit recovery, never by a render, so a chunk that keeps
+ * failing cannot spin a retry loop.
+ */
+const routeImportResets = new Set<() => void>();
+
+function retryFailedRouteImports(): void {
+  routeImportResets.forEach((reset) => reset());
+}
+
+function lazyRoute<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  let rejected = false;
+  const create = () =>
+    lazy(() =>
+      factory().catch((error: unknown) => {
+        rejected = true;
+        throw error;
+      }),
+    );
+  let Inner = create();
+  routeImportResets.add(() => {
+    if (!rejected) return;
+    rejected = false;
+    Inner = create();
+  });
+  return function LazyRoute(props: ComponentProps<T>) {
+    return <Inner {...props} />;
+  };
+}
+
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
 // provider and the shell remain eager.
-const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
-const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
-const NotFound = lazy(() => import("@/pages/not-found"));
-const LazyHomeRoute = lazy(() => import("@/pages/Home"));
+const AdminGuard = lazyRoute(() => import("@/components/auth/AdminGuard"));
+const AuthGuard = lazyRoute(() => import("@/components/auth/AuthGuard"));
+const NotFound = lazyRoute(() => import("@/pages/not-found"));
+const LazyHomeRoute = lazyRoute(() => import("@/pages/Home"));
 // Backlog X-03: the Clerk SDK is not part of the anonymous entry. Auth pages
 // are route chunks, and the Clerk runtime mounts only once requested.
-const SignInPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignInPage })));
-const SignUpPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignUpPage })));
-const Logout = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.Logout })));
-const ClerkRuntime = lazy(() => import("@/components/auth/ClerkRuntime"));
+const SignInPage = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignInPage })));
+const SignUpPage = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignUpPage })));
+const Logout = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.Logout })));
+const ClerkRuntime = lazyRoute(() => import("@/components/auth/ClerkRuntime"));
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
 // chunk that regular visitors never download.
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminDashboard = lazyRoute(() => import("@/pages/AdminDashboard"));
 
 // Task 301: every page loads behind the shared Suspense +
 // RouteErrorBoundary below, so visitors do not parse route-specific
 // dependencies or role-gated code before they can use the shell. Home is also
 // a route chunk now; its anonymous SSR markup remains available immediately
 // while the browser hydrates that chunk only on the landing route.
-const Category = lazy(() => import("@/pages/Category"));
-const Subcategory = lazy(() => import("@/pages/Subcategory"));
-const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
-const TagLanding = lazy(() => import("@/pages/TagLanding"));
-const ResourceDetail = lazy(() => import("@/pages/ResourceDetail"));
-const Categories = lazy(() => import("@/pages/Categories"));
-const About = lazy(() => import("@/pages/About"));
-const Advanced = lazy(() => import("@/pages/Advanced"));
-const Profile = lazy(() => import("@/pages/Profile"));
-const Contributions = lazy(() => import("@/pages/Contributions"));
+const Category = lazyRoute(() => import("@/pages/Category"));
+const Subcategory = lazyRoute(() => import("@/pages/Subcategory"));
+const SubSubcategory = lazyRoute(() => import("@/pages/SubSubcategory"));
+const TagLanding = lazyRoute(() => import("@/pages/TagLanding"));
+const ResourceDetail = lazyRoute(() => import("@/pages/ResourceDetail"));
+const Categories = lazyRoute(() => import("@/pages/Categories"));
+const About = lazyRoute(() => import("@/pages/About"));
+const Advanced = lazyRoute(() => import("@/pages/Advanced"));
+const Profile = lazyRoute(() => import("@/pages/Profile"));
+const Contributions = lazyRoute(() => import("@/pages/Contributions"));
 
-const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
-const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
-const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
-const Journeys = lazy(() => import("@/pages/Journeys"));
-const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
+const BookmarksGate = lazyRoute(() => import("@/pages/BookmarksGate"));
+const PublicCollection = lazyRoute(() => import("@/pages/PublicCollection"));
+const SubmitResource = lazyRoute(() => import("@/pages/SubmitResource"));
+const Journeys = lazyRoute(() => import("@/pages/Journeys"));
+const JourneyDetail = lazyRoute(() => import("@/pages/JourneyDetail"));
 
-const ContinueLearning = lazy(() => import("@/pages/ContinueLearning"));
-const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
-const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
-const Recommendations = lazy(() => import("@/pages/Recommendations"));
-const Search = lazy(() => import("@/pages/Search"));
-const Settings = lazy(() => import("@/pages/Settings"));
-const Notifications = lazy(() => import("@/pages/Notifications"));
-const Onboarding = lazy(() => import("@/pages/Onboarding"));
-const Terms = lazy(() => import("@/pages/Terms"));
-const Privacy = lazy(() => import("@/pages/Privacy"));
-const CodeOfConduct = lazy(() => import("@/pages/CodeOfConduct"));
-const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
+const ContinueLearning = lazyRoute(() => import("@/pages/ContinueLearning"));
+const ThemeSettings = lazyRoute(() => import("@/pages/ThemeSettings"));
+const DesignSystemShowcase = lazyRoute(() => import("@/pages/DesignSystemShowcase"));
+const Recommendations = lazyRoute(() => import("@/pages/Recommendations"));
+const Search = lazyRoute(() => import("@/pages/Search"));
+const Settings = lazyRoute(() => import("@/pages/Settings"));
+const Notifications = lazyRoute(() => import("@/pages/Notifications"));
+const Onboarding = lazyRoute(() => import("@/pages/Onboarding"));
+const Terms = lazyRoute(() => import("@/pages/Terms"));
+const Privacy = lazyRoute(() => import("@/pages/Privacy"));
+const CodeOfConduct = lazyRoute(() => import("@/pages/CodeOfConduct"));
+const SearchDialog = lazyRoute(() => import("@/components/ui/search-dialog"));
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
@@ -206,10 +242,14 @@ interface RouteErrorBoundaryState {
   // is online but whose /api/health probe failed (server down, DNS, captive
   // portal).
   retryBlocked: "offline" | "unreachable" | null;
+  // The route chunk failed while the browser was offline. Once the server
+  // answers again the import is retried in place and the card never claims the
+  // site was updated.
+  failedOffline: boolean;
 }
 
 class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
-  state: RouteErrorBoundaryState = { error: null, retryBlocked: null };
+  state: RouteErrorBoundaryState = { error: null, retryBlocked: null, failedOffline: false };
 
   static getDerivedStateFromError(error: Error): Partial<RouteErrorBoundaryState> {
     return { error };
@@ -218,6 +258,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   componentDidCatch(error: Error) {
     trackSiteError(isChunkLoadError(error) ? "chunk_load_failed" : "route_crash");
     if (isChunkLoadError(error)) {
+      if (navigator.onLine === false) this.setState({ failedOffline: true });
       // One-shot auto-reload guarded by a TIMESTAMP, not a boolean flag.
       // A boolean cleared on "clean render" loops forever: the boundary
       // renders error-free while Suspense is still fetching the chunk, so
@@ -283,7 +324,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
       window.clearTimeout(this.probeTimer);
-      this.setState({ error: null, retryBlocked: null });
+      this.setState({ error: null, retryBlocked: null, failedOffline: false });
     }
   }
 
@@ -315,6 +356,14 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       return;
     }
     if (!this.state.error) return;
+    // A chunk that failed offline was never stale: retry the import in place
+    // (keeps app state, no document reload, so the 60s reload guard is not
+    // consumed). If it fails again online, componentDidCatch applies that guard.
+    if (this.state.failedOffline) {
+      retryFailedRouteImports();
+      this.setState({ error: null, retryBlocked: null, failedOffline: false });
+      return;
+    }
     // Stamp (not clear) the guard: this click IS a reload attempt, so if the
     // chunk still fails after it, the visitor lands back on this card instead
     // of burning an extra automatic reload first. (NB-001: never CLEAR the
@@ -358,6 +407,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       // online ones keep the deploy-rotation explanation.
       const offline = navigator.onLine === false || this.state.retryBlocked === "offline";
       const unreachable = !offline && this.state.retryBlocked === "unreachable";
+      const reconnected = this.state.failedOffline && !offline && !unreachable;
       return (
         <div
           className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
@@ -367,14 +417,18 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
           <h1 className="display-h text-xl">
             {offline
               ? "Couldn't load this page — you appear to be offline"
-              : unreachable
+              : reconnected
+                ? "Reconnected — loading this page"
+                : unreachable
                 ? "Couldn't load this page — the server isn't responding"
                 : "This page failed to load"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
             {offline
               ? "Check your connection, then retry. The rest of the app is still available."
-              : unreachable
+              : reconnected
+                ? "Your connection is back. This page will load in a moment."
+                : unreachable
                 ? "Your connection looks fine, but the site isn't answering. The rest of the app is still available."
                 : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
           </p>
@@ -384,7 +438,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
             onClick={this.handleRetry}
             data-testid="button-route-retry"
           >
-            {offline ? "Retry" : "Reload page"}
+            {offline || reconnected ? "Retry" : "Reload page"}
           </Button>
         </div>
       );
