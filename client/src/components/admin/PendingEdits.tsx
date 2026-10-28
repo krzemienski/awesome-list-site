@@ -347,11 +347,13 @@ export default function PendingEdits() {
             aria-busy={recheckState === 'checking'}
             onClick={() => {
               if (recheckState === 'checking') return;
+              setRecheckState('checking');
               if (!navigator.onLine) {
-                setRecheckState('offline');
+                // Clear first so a repeat press while still offline empties and
+                // refills the status text instead of re-setting the same value.
+                setTimeout(() => setRecheckState('offline'), 400);
                 return;
               }
-              setRecheckState('checking');
               const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
               // Query keys match per element, so the recent list's key is not
               // under ['/api/admin/resource-edits'] and needs its own refetch.
