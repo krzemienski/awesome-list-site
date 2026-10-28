@@ -762,7 +762,7 @@ class ResearchService {
 
     const searchPrimarySources = tool(
       'search_primary_sources',
-      'Search the public web for primary-source candidates. Returns real result URLs, titles and snippets; use this instead of the built-in WebSearch tool.',
+      'Search GitHub\'s official REST API for open-source primary-source candidates. Returns real repository URLs, names and descriptions; use this instead of the built-in WebSearch tool.',
       {
         query: z.string().optional().describe('REQUIRED: Narrow search query, at most 500 characters'),
         limit: z.union([z.number(), z.string()]).optional().describe('Max results to return (default 10, max 15)'),
@@ -1414,9 +1414,9 @@ class ResearchService {
 `You are a web research SCOUT for an "awesome video" curated list (video streaming, codecs, players, infrastructure, tools).
 
 The orchestrator will hand you a specific gap or set of search targets. Your job:
-1. Use the search_primary_sources tool for NARROW, specific web searches (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing. Do not use the built-in WebSearch tool.
+1. Use the search_primary_sources tool for NARROW, specific GitHub searches (protocol + use-case + "open source"), not broad "best X 2025" phrasing. Do not use the built-in WebSearch tool.
 2. MINE aggregators: a "Top 10…"/awesome-list/roundup is not itself a good result, but the individual tools/projects it names usually are — pull those names out and search each one's official site / GitHub repo.
-3. High-yield venues: "site:github.com <topic>", "<topic> site:news.ycombinator.com" (Show HN), Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org research with companion code, other awesome-* lists.
+3. High-yield GitHub queries: "<topic> in:name,description,readme", "<topic> topic:<topic>", "<topic> language:TypeScript", and "<topic> pushed:>2025-01-01". Mine repository READMEs and topic pages for related projects.
 4. Report back a concise, structured list of CONCRETE candidates. For each: the real URL (exactly as it appeared in results — never fabricate), the title, and a one-line description of what it offers. Prefer actively-maintained OSS, official docs from niche vendors, conference talks, and academic papers with code. Skip generic intros, vendor marketing, and SEO listicles.
 
 SEARCH BUDGET — STRICT: run AT MOST 3-4 web searches for one delegation, then STOP searching and return your consolidated candidate list as your final message. Do NOT keep searching to be thorough — the orchestrator needs control back to dedup and save. Returning 5-15 solid candidates from 3-4 searches is a success; running 8+ searches is a failure even if you find more.
