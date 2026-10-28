@@ -332,7 +332,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...invalidProps("budget")}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
             <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
-              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
+              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it."
+                : !(Number.isFinite(budgetN) && budgetN > 0) ? "Enter a positive amount in USD (blank = no cap)."
+                  : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
             {Number.isFinite(budgetN) && budgetN > 0 && budgetN < (cheapestSavingRun?.costUsd ?? LOW_BUDGET_USD) && (
               <p className={hint(true)} data-testid="text-budget-low">
