@@ -83,6 +83,8 @@ export class WebResearchService {
   private readonly MAX_CONTENT_LENGTH = 100000; // 100KB text
   private lastRequestTime = 0;
   private readonly MIN_REQUEST_DELAY = 500; // 500ms between requests
+  private lastSearchRequestTime = 0;
+  private readonly SEARCH_REQUEST_DELAY = 6500; // unauthenticated GitHub Search: 10 requests/minute
 
   private constructor() {}
 
@@ -93,42 +95,56 @@ export class WebResearchService {
     return WebResearchService.instance;
   }
 
-  /** Search the public web without depending on the Agent SDK's WebSearch tool. */
+  /** Search GitHub's official REST API without depending on the Agent SDK's WebSearch tool. */
   public async searchPrimarySources(query: string, limit = 10): Promise<WebSearchResult[]> {
     const q = query.trim();
     if (!q) throw new Error('query is required');
     if (q.length > 500) throw new Error('query must be at most 500 characters');
     const take = Number.isFinite(limit) ? Math.max(1, Math.min(15, Math.floor(limit))) : 10;
-    await this.applyRateLimit();
-    const url = `https://www.bing.com/search?format=rss&q=${encodeURIComponent(q)}`;
+    const now = Date.now();
+    const slot = Math.max(now, this.lastSearchRequestTime + this.SEARCH_REQUEST_DELAY);
+    const waitMs = slot - now;
+    // Reserve the slot before awaiting so parallel scouts cannot wake together.
+    this.lastSearchRequestTime = slot;
+    if (waitMs > 0) {
+      const { promise, resolve } = Promise.withResolvers<void>();
+      setTimeout(resolve, waitMs);
+      await promise;
+    }
+    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&per_page=${take}`;
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'AwesomeListBot/1.0 (Research; +https://awesome.video)',
-        'Accept': 'application/rss+xml, application/xml, text/xml',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
       },
       signal: AbortSignal.timeout(this.SCRAPE_TIMEOUT),
     });
     if (!response.ok) throw new Error(`search provider returned HTTP ${response.status}`);
-    const xml = await response.text();
-    const $ = cheerio.load(xml, { xmlMode: true });
+    const payload: unknown = await response.json();
+    if (typeof payload !== 'object' || payload === null) throw new Error('search provider returned a non-object response');
+    const items = 'items' in payload && Array.isArray(payload.items) ? payload.items : [];
     const results: WebSearchResult[] = [];
-    $('item').each((_, item) => {
-      if (results.length >= take) return false;
-      const link = $(item).children('link').first().text().trim();
-      if (!link) return;
+    for (const item of items) {
+      if (results.length >= take) break;
+      if (typeof item !== 'object' || item === null) continue;
+      const link = 'html_url' in item && typeof item.html_url === 'string' ? item.html_url : null;
+      if (!link) continue;
       try {
         const parsed = new URL(link);
-        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return;
+        if (parsed.protocol !== 'https:' || parsed.hostname !== 'github.com') continue;
+        const fullName = 'full_name' in item && typeof item.full_name === 'string' ? item.full_name : parsed.toString();
+        const description = 'description' in item && typeof item.description === 'string' ? item.description : '';
         results.push({
           url: parsed.toString(),
-          title: $(item).children('title').first().text().trim(),
-          snippet: $(item).children('description').first().text().trim(),
-          source: 'bing-rss',
+          title: fullName,
+          snippet: description,
+          source: 'github-api',
         });
       } catch {
         // Ignore malformed result links rather than failing the whole search.
       }
-    });
+    }
     return results;
   }
 
