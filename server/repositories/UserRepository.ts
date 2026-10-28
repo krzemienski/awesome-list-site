@@ -188,7 +188,9 @@ export class UserRepository {
     // Run16 BUG-087: sortable columns. The sort key is validated against an
     // explicit whitelist — anything else falls back to createdAt — so the raw
     // query-string value never reaches SQL. Case-insensitive text ordering,
-    // NULLS LAST so blank names/emails sink regardless of direction.
+    // NULLS LAST so blank names/emails sink regardless of direction. Every
+    // sort ends in users.id (unique) so LIMIT/OFFSET pages never overlap or
+    // skip rows when the primary key ties (role has only 2 values).
     const dirDesc = sortDir !== "asc";
     const textCol = (col: typeof users.email | typeof users.role) =>
       dirDesc
@@ -220,13 +222,13 @@ export class UserRepository {
           .select()
           .from(users)
           .where(searchFilter)
-          .orderBy(orderExpr)
+          .orderBy(orderExpr, asc(users.id))
           .limit(limit)
           .offset(offset)
       : await db
           .select()
           .from(users)
-          .orderBy(orderExpr)
+          .orderBy(orderExpr, asc(users.id))
           .limit(limit)
           .offset(offset);
 
