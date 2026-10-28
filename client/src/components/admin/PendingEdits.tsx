@@ -347,11 +347,13 @@ export default function PendingEdits() {
             aria-busy={recheckState === 'checking'}
             onClick={() => {
               if (recheckState === 'checking') return;
+              setRecheckState('checking');
               if (!navigator.onLine) {
-                setRecheckState('offline');
+                // Clear first so a repeat press while still offline empties and
+                // refills the status text instead of re-setting the same value.
+                setTimeout(() => setRecheckState('offline'), 400);
                 return;
               }
-              setRecheckState('checking');
               const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
               // Query keys match per element, so the recent list's key is not
               // under ['/api/admin/resource-edits'] and needs its own refetch.
@@ -379,13 +381,18 @@ export default function PendingEdits() {
             <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
-        <span className="sr-only" role="status" aria-live="polite">
+        <p
+          className={`system-state-note${recheckState === 'offline' ? ' font-medium text-[var(--accent-ink)]' : ''}`}
+          role="status"
+          aria-live="polite"
+          data-testid="text-pending-edits-recheck"
+        >
           {recheckState === 'checked'
             ? 'Checked — still no pending edits.'
             : recheckState === 'offline'
               ? "You're offline — couldn't check for new edits."
               : ''}
-        </span>
+        </p>
         <RecentResourceEdits />
       </section>
     );
