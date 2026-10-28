@@ -220,14 +220,27 @@
   gap: 8px;
 }
 
+/* Five columns never fit the ~390px desktop card or a phone, and the target's
+   only full-value path was a hover title that touch users cannot reach. The row
+   is always two lines: reference, who and when first; what and which below. The
+   target wraps (no ellipsis) so an admin reads the whole value at any width. */
 .admin-overview-canonical .admin-canonical-activity-row {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   min-width: 0;
-  gap: 10px;
+  gap: 2px 10px;
   border-block-end: var(--hairline-w) solid var(--border);
   padding: 6px 0;
   font-size: 0.78125rem;
+}
+
+/* Wraps to a full-width break after the first line (id, actor, time). */
+.admin-overview-canonical .admin-canonical-activity-row::after {
+  content: "";
+  order: 2;
+  flex-basis: 100%;
+  height: 0;
 }
 
 .admin-overview-canonical .admin-canonical-activity-id,
@@ -241,94 +254,43 @@
 /* Reference column is 38px for "TX#1"; live ids ("TX#25627") are wider, so
    38px is a floor rather than a fixed width that lets the id run into the actor. */
 .admin-overview-canonical .admin-canonical-activity-id {
+  order: 0;
   min-inline-size: 38px;
 }
 
 .admin-overview-canonical .admin-canonical-activity-actor {
-  flex: 0 1 auto;
+  flex: 1 1 0;
+  order: 1;
   min-width: 0;
-  overflow: hidden;
   /* Reference admin.jsx paints the actor in --accent; Stage 7 (one accent
      moment per surface) forbids six accent names per viewport, so the actor
-     is emphasised by weight in primary ink instead. */
+     is emphasised by weight in primary ink instead. Masked emails wrap rather
+     than ellipsizing to a single character. */
   color: var(--text);
   font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-overview-canonical .admin-canonical-activity-action {
-  /* Reference admin.jsx: action and time are plain flex items; only the target
-     truncates. Live rows carry long masked emails, which under the reference's
-     equal shrink squeezed the target to nothing and broke short actions
-     mid-word ("updat/ed") at 375. The action keeps its natural width up to 40%
-     of the row, wrapping at spaces beyond that ("recommendation feedback /
-     restored"); `anywhere` only applies to a single word wider than that cap,
-     so the row never overflows into a keyboard-unreachable scroll region. */
-  flex: 0 0 auto;
-  max-inline-size: 40%;
-  color: var(--text-2);
   overflow-wrap: anywhere;
 }
 
 .admin-overview-canonical .admin-canonical-activity-time {
-  flex: 0 0 auto;
+  order: 2;
   white-space: nowrap;
 }
 
-/* The actor (min-width 0, ellipsis) gives way first; the target keeps a
-   floor wide enough for a full six-digit resource id instead of collapsing
-   to "#1…". Longer targets ellipsize and carry the full value in title. */
+.admin-overview-canonical .admin-canonical-activity-action {
+  order: 3;
+  flex: 0 1 auto;
+  max-inline-size: 60%;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
 .admin-overview-canonical .admin-canonical-activity-target {
-  min-width: 8ch;
+  order: 4;
   flex: 1 1 0;
-  overflow: hidden;
+  min-width: 8ch;
   color: var(--text);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Five columns need ~340px. Narrower lists (375 phones) squeezed the actor
-   to 0px and still overflowed into a scroll region keyboard users cannot
-   reach, so the row splits: who and when first, what and which below. */
-.admin-overview-canonical .admin-canonical-activity-list {
-  container-type: inline-size;
-}
-
-@container (max-width: 340px) {
-  .admin-overview-canonical .admin-canonical-activity-row {
-    flex-wrap: wrap;
-    row-gap: 2px;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-actor {
-    flex: 1 1 0;
-    order: 1;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-id {
-    order: 0;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-time {
-    order: 2;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-action {
-    order: 3;
-    max-inline-size: 60%;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-target {
-    order: 4;
-  }
-
-  .admin-overview-canonical .admin-canonical-activity-row::after {
-    content: "";
-    order: 2;
-    flex-basis: 100%;
-    height: 0;
-  }
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .admin-overview-canonical .admin-canonical-health-list,
