@@ -379,13 +379,18 @@ export default function PendingEdits() {
             <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
-        <span className="sr-only" role="status" aria-live="polite">
+        <p
+          className={`system-state-note${recheckState === 'offline' ? ' font-medium text-[var(--accent-ink)]' : ''}`}
+          role="status"
+          aria-live="polite"
+          data-testid="text-pending-edits-recheck"
+        >
           {recheckState === 'checked'
             ? 'Checked — still no pending edits.'
             : recheckState === 'offline'
               ? "You're offline — couldn't check for new edits."
               : ''}
-        </span>
+        </p>
         <RecentResourceEdits />
       </section>
     );
