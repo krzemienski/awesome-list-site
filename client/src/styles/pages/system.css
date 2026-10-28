@@ -153,7 +153,12 @@
 
 @media (max-width: 639px) {
   .system-state {
-    padding: 48px 0;
+    padding: 48px 20px;
+  }
+
+  /* Inside the shell, .page-content-wrap already supplies the phone gutter. */
+  .app-shell-main .system-state {
+    padding-inline: 0;
   }
 
   .system-state-actions > * {
