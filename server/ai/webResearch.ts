@@ -93,6 +93,45 @@ export class WebResearchService {
     return WebResearchService.instance;
   }
 
+  /** Search the public web without depending on the Agent SDK's WebSearch tool. */
+  public async searchPrimarySources(query: string, limit = 10): Promise<WebSearchResult[]> {
+    const q = query.trim();
+    if (!q) throw new Error('query is required');
+    if (q.length > 500) throw new Error('query must be at most 500 characters');
+    const take = Number.isFinite(limit) ? Math.max(1, Math.min(15, Math.floor(limit))) : 10;
+    await this.applyRateLimit();
+    const url = `https://www.bing.com/search?format=rss&q=${encodeURIComponent(q)}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'AwesomeListBot/1.0 (Research; +https://awesome.video)',
+        'Accept': 'application/rss+xml, application/xml, text/xml',
+      },
+      signal: AbortSignal.timeout(this.SCRAPE_TIMEOUT),
+    });
+    if (!response.ok) throw new Error(`search provider returned HTTP ${response.status}`);
+    const xml = await response.text();
+    const $ = cheerio.load(xml, { xmlMode: true });
+    const results: WebSearchResult[] = [];
+    $('item').each((_, item) => {
+      if (results.length >= take) return false;
+      const link = $(item).children('link').first().text().trim();
+      if (!link) return;
+      try {
+        const parsed = new URL(link);
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return;
+        results.push({
+          url: parsed.toString(),
+          title: $(item).children('title').first().text().trim(),
+          snippet: $(item).children('description').first().text().trim(),
+          source: 'bing-rss',
+        });
+      } catch {
+        // Ignore malformed result links rather than failing the whole search.
+      }
+    });
+    return results;
+  }
+
   /**
    * Scrape a URL and extract content with caching
    */

@@ -42,6 +42,7 @@ import { isPlausiblePublicUrl } from '@shared/validation';
 import { invalidatePublicCache } from '../cache/publicCache';
 import { classifyKindForStorage } from '../lib/resourceKinds';
 import { createLogger } from "../lib/logger";
+import { webResearchService } from './webResearch';
 
 const logger = createLogger("research");
 
@@ -432,7 +433,7 @@ class ResearchService {
       ctx.emitter.emit({ actor: name, actorType: 'tool', eventType: 'tool_result', targetActor: 'orchestrator', summary: preview(out), durationMs: ms });
 
     // ── SCHEMA LENIENCY (July 24, 2026) ──────────────────────────────────
-    // All four research tools deliberately declare LENIENT input schemas
+    // Research tools deliberately declare LENIENT input schemas
     // (fields optional, numbers accept strings) and re-validate INSIDE the
     // handler. Reason: the Agent SDK zod-validates tool input BEFORE the
     // handler runs; a strict schema means a slightly-off call (observed with
@@ -759,7 +760,43 @@ class ResearchService {
       },
     );
 
-    return [checkDuplicate, saveDiscovery, coverageGaps, existingResources];
+    const searchPrimarySources = tool(
+      'search_primary_sources',
+      'Search the public web for primary-source candidates. Returns real result URLs, titles and snippets; use this instead of the built-in WebSearch tool.',
+      {
+        query: z.string().optional().describe('REQUIRED: Narrow search query, at most 500 characters'),
+        limit: z.union([z.number(), z.string()]).optional().describe('Max results to return (default 10, max 15)'),
+      },
+      async (rawInput) => {
+        const started = Date.now();
+        const query = looseString(rawInput?.query);
+        const limit = looseNumber(rawInput?.limit);
+        await emitCall('search_primary_sources', { query: query || rawInput?.query, limit: rawInput?.limit });
+        if (!query) {
+          const text = JSON.stringify({ results: [], error: 'Missing required field: query', guidance: 'Re-call search_primary_sources with a narrow query string.' });
+          await emitResult('search_primary_sources', text, Date.now() - started);
+          return { content: [{ type: 'text' as const, text }] };
+        }
+        try {
+          const results = await webResearchService.searchPrimarySources(query, Number.isFinite(limit) ? limit : 10);
+          const text = JSON.stringify({ query, results });
+          await emitResult('search_primary_sources', `${results.length} results`, Date.now() - started);
+          return { content: [{ type: 'text' as const, text }] };
+        } catch (err) {
+          logger.error({ jobId: ctx.jobId }, `search_primary_sources handler error:`, err);
+          const text = JSON.stringify({
+            results: [],
+            error: preview(err instanceof Error ? err.message : String(err), 300),
+            recoverable: true,
+            guidance: 'Retry once with a narrower query, then continue with other candidates. Do not stop or wait for recovery.',
+          });
+          await emitResult('search_primary_sources', text, Date.now() - started);
+          return { content: [{ type: 'text' as const, text }] };
+        }
+      },
+    );
+
+    return [checkDuplicate, saveDiscovery, coverageGaps, existingResources, searchPrimarySources];
   }
 
   /** Insert one discovery row + bump the job counter. Throws on failure — callers decide retry/queue. */
@@ -977,7 +1014,7 @@ class ResearchService {
         .where(and(
           eq(agentEvents.jobType, 'research'),
           eq(agentEvents.eventType, 'tool_call'),
-          eq(agentEvents.targetActor, 'WebSearch'),
+          inArray(agentEvents.targetActor, ['WebSearch', 'search_primary_sources']),
         ))
         .orderBy(sql`${agentEvents.id} DESC`)
         .limit(200),
@@ -1369,7 +1406,7 @@ class ResearchService {
     const scout: AgentDefinitionInput = {
       description: 'Web research scout. Runs targeted web searches and reports back concrete candidate resources (URL, title, one-line description) for the orchestrator to dedup and save.',
       model: scoutModel,
-      tools: ['WebSearch'],
+      tools: ['mcp__research__search_primary_sources'],
       // Belt-and-braces alongside the PreToolUse sync-delegation hook: pin the
       // scout to foreground execution at the definition level too.
       background: false,
@@ -1377,7 +1414,7 @@ class ResearchService {
 `You are a web research SCOUT for an "awesome video" curated list (video streaming, codecs, players, infrastructure, tools).
 
 The orchestrator will hand you a specific gap or set of search targets. Your job:
-1. Run NARROW, specific web searches for those targets (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing.
+1. Use the search_primary_sources tool for NARROW, specific web searches (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing. Do not use the built-in WebSearch tool.
 2. MINE aggregators: a "Top 10…"/awesome-list/roundup is not itself a good result, but the individual tools/projects it names usually are — pull those names out and search each one's official site / GitHub repo.
 3. High-yield venues: "site:github.com <topic>", "<topic> site:news.ycombinator.com" (Show HN), Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org research with companion code, other awesome-* lists.
 4. Report back a concise, structured list of CONCRETE candidates. For each: the real URL (exactly as it appeared in results — never fabricate), the title, and a one-line description of what it offers. Prefer actively-maintained OSS, official docs from niche vendors, conference talks, and academic papers with code. Skip generic intros, vendor marketing, and SEO listicles.
@@ -1451,6 +1488,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       'mcp__research__save_discovery',
       'mcp__research__get_coverage_gaps',
       'mcp__research__get_existing_resources',
+      'mcp__research__search_primary_sources',
       'Task',
       'Agent',
     ];
