@@ -205,6 +205,14 @@ export default function PendingEdits() {
     setRejectDialogOpen(true);
   };
 
+  const handleRejectOpenChange = (open: boolean) => {
+    setRejectDialogOpen(open);
+    if (!open) {
+      setRejectError(null);
+      setRejectionReason("");
+    }
+  };
+
   const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (editToApprove) {
@@ -684,10 +692,7 @@ export default function PendingEdits() {
       </AlertDialog>
 
       {/* Reject Dialog */}
-      <Dialog open={rejectDialogOpen} onOpenChange={(open) => {
-        setRejectDialogOpen(open);
-        if (!open) setRejectError(null);
-      }}>
+      <Dialog open={rejectDialogOpen} onOpenChange={handleRejectOpenChange}>
         <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <DialogHeader>
             <DialogTitle>Reject Edit Suggestion</DialogTitle>
@@ -721,11 +726,7 @@ export default function PendingEdits() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => {
-                setRejectDialogOpen(false);
-                setRejectionReason("");
-                setRejectError(null);
-              }}
+              onClick={() => handleRejectOpenChange(false)}
               data-testid="button-cancel-reject-edit"
             >
               Cancel
