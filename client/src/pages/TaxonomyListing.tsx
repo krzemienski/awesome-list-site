@@ -374,7 +374,11 @@ export default function TaxonomyListing({ level }: Props) {
   const currentFilterState = { tags, provider, format, skillLevel, sort, selection, kind };
   const currentFilterSignature = taxonomyFilterSignature(currentFilterState);
   const resultSetKey = (forPage: number) => JSON.stringify([currentFilterSignature, searchTerm, view, forPage]);
-  const notice = pageNotice?.resultSet === resultSetKey(page) ? pageNotice.message : null;
+  const currentResultSet = resultSetKey(page);
+  const notice = pageNotice?.resultSet === currentResultSet ? pageNotice.message : null;
+  useEffect(() => {
+    if (pageNotice && pageNotice.resultSet !== currentResultSet) setPageNotice(null);
+  }, [pageNotice, currentResultSet]);
   const requestResultsFocus = () => {
     pendingResultsFocusRef.current = true;
   };
