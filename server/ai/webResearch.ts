@@ -107,9 +107,7 @@ export class WebResearchService {
     // Reserve the slot before awaiting so parallel scouts cannot wake together.
     this.lastSearchRequestTime = slot;
     if (waitMs > 0) {
-      const { promise, resolve } = Promise.withResolvers<void>();
-      setTimeout(resolve, waitMs);
-      await promise;
+      await new Promise<void>((resolve) => setTimeout(resolve, waitMs));
     }
     const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&per_page=${take}`;
     const response = await fetch(url, {
