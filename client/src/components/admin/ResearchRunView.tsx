@@ -208,7 +208,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
 
   return (
     <MotionConfig reducedMotion="user">
-      <section className="research-run" aria-labelledby={`research-run-heading-${jobId}`} aria-busy={(jobQuery.isPending && !job) || undefined} data-testid="research-run-view" data-job-id={jobId}>
+      <section className="research-run" aria-labelledby={`research-run-heading-${jobId}`} data-testid="research-run-view" data-job-id={jobId}>
         <div className="research-run__head">
           <div className="min-w-0">
             <h3 id={`research-run-heading-${jobId}`} ref={headingRef} tabIndex={-1} className="text-base font-semibold">
