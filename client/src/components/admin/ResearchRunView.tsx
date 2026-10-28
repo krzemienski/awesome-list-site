@@ -208,7 +208,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
 
   return (
     <MotionConfig reducedMotion="user">
-      <section className="research-run" aria-labelledby={`research-run-heading-${jobId}`} data-testid="research-run-view" data-job-id={jobId}>
+      <section className="research-run" aria-labelledby={`research-run-heading-${jobId}`} aria-busy={(jobQuery.isPending && !job) || undefined} data-testid="research-run-view" data-job-id={jobId}>
         <div className="research-run__head">
           <div className="min-w-0">
             <h3 id={`research-run-heading-${jobId}`} ref={headingRef} tabIndex={-1} className="text-base font-semibold">
@@ -235,11 +235,11 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
         </p>
 
         {jobQuery.isPending && !job && (
-          <div className="space-y-3 py-2" role="status" aria-busy="true" data-testid="loading-research-run">
+          <div className="space-y-3 py-2" role="status" data-testid="loading-research-run">
             <span className="sr-only">Loading research run #{jobId}…</span>
-            <Skeleton className="h-10 w-full" aria-hidden="true" />
-            <Skeleton className="h-24 w-full" aria-hidden="true" />
-            <Skeleton className="h-10 w-full" aria-hidden="true" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-10 w-full" />
           </div>
         )}
         {jobQuery.isError && !job && (
