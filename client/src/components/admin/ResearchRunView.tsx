@@ -5,6 +5,7 @@ import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, History, Play, Re
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
@@ -233,6 +234,14 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           {announcement}
         </p>
 
+        {jobQuery.isPending && !job && (
+          <div className="space-y-3 py-2" role="status" aria-busy="true" data-testid="loading-research-run">
+            <span className="sr-only">Loading research run #{jobId}…</span>
+            <Skeleton className="h-10 w-full" aria-hidden="true" />
+            <Skeleton className="h-24 w-full" aria-hidden="true" />
+            <Skeleton className="h-10 w-full" aria-hidden="true" />
+          </div>
+        )}
         {jobQuery.isError && !job && (
           <div className="space-y-2">
             {jobQuery.error instanceof ApiError && jobQuery.error.status === 404 ? (
