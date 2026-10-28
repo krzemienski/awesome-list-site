@@ -166,7 +166,9 @@ export class AuditRepository {
     }
 
     return await query
-      .orderBy(desc(resourceAuditLog.createdAt))
+      // createdAt is not unique (bulk actions write several rows in one
+      // millisecond), so id breaks ties to keep LIMIT/OFFSET pages stable.
+      .orderBy(desc(resourceAuditLog.createdAt), desc(resourceAuditLog.id))
       .limit(limit)
       .offset(offset);
   }
