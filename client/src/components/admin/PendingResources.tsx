@@ -350,6 +350,22 @@ export default function PendingResources() {
     setRejectDialogOpen(true);
   };
 
+  const handleRejectOpenChange = (open: boolean) => {
+    setRejectDialogOpen(open);
+    if (!open) {
+      setRejectError(null);
+      setRejectionReason("");
+    }
+  };
+
+  const handleBulkRejectOpenChange = (open: boolean) => {
+    setBulkRejectDialogOpen(open);
+    if (!open) {
+      setBulkRejectError(null);
+      setBulkRejectionReason("");
+    }
+  };
+
   const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (resourceToApprove) {
@@ -951,10 +967,7 @@ export default function PendingResources() {
       </AlertDialog>
 
       {/* Reject Confirmation Dialog */}
-       <AlertDialog open={rejectDialogOpen} onOpenChange={(open) => {
-         setRejectDialogOpen(open);
-         if (!open) setRejectError(null);
-       }}>
+       <AlertDialog open={rejectDialogOpen} onOpenChange={handleRejectOpenChange}>
         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Resource?</AlertDialogTitle>
@@ -993,13 +1006,7 @@ export default function PendingResources() {
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setRejectionReason("");
-                setRejectError(null);
-              }}
-              data-testid="button-cancel-reject"
-            >
+            <AlertDialogCancel data-testid="button-cancel-reject">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -1054,13 +1061,7 @@ export default function PendingResources() {
        </AlertDialog>
 
        {/* Bulk Reject Dialog */}
-       <Dialog open={bulkRejectDialogOpen} onOpenChange={(open) => {
-         setBulkRejectDialogOpen(open);
-         if (!open) {
-           setBulkRejectError(null);
-           setBulkRejectionReason("");
-         }
-       }}>
+       <Dialog open={bulkRejectDialogOpen} onOpenChange={handleBulkRejectOpenChange}>
          <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <DialogHeader>
              <DialogTitle>{bulkRejectIds.length === 1 ? "Reject pending resource?" : "Reject pending resources?"}</DialogTitle>
@@ -1092,7 +1093,7 @@ export default function PendingResources() {
            <DialogFooter>
              <Button
                variant="outline"
-               onClick={() => setBulkRejectDialogOpen(false)}
+               onClick={() => handleBulkRejectOpenChange(false)}
                data-testid="button-cancel-bulk-reject"
              >
                Cancel
