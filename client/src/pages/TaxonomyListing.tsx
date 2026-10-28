@@ -179,7 +179,9 @@ export default function TaxonomyListing({ level }: Props) {
     const saved = safeGetItem("awesome-list-view-mode");
     return isLayoutViewMode(saved) ? saved : "grid";
   });
-  const [notice, setNotice] = useState<string | null>(null);
+  // Bound to the result set (filters, search, page) it describes, so it stops
+  // showing as soon as any of those change.
+  const [pageNotice, setPageNotice] = useState<{ message: string; resultSet: string } | null>(null);
   const initialGeneral =
     params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__";
   const [selection, setSelection] = useState(initialGeneral ? "__general__" : params.get("subcategory") ?? "all");
@@ -213,7 +215,7 @@ export default function TaxonomyListing({ level }: Props) {
       setKind(parseKindParam(params.get("kind")));
       setSort(normalizeSort(params.get("sortBy") || params.get("sort")));
       setPage(strictUrlPage(params.get("page")) ?? 1);
-      setNotice(null);
+      setPageNotice(null);
       const nextView = params.get("view");
       setView(isLayoutViewMode(nextView) ? nextView : "grid");
     }
@@ -371,6 +373,8 @@ export default function TaxonomyListing({ level }: Props) {
   } | null>(null);
   const currentFilterState = { tags, provider, format, skillLevel, sort, selection, kind };
   const currentFilterSignature = taxonomyFilterSignature(currentFilterState);
+  const resultSetKey = (forPage: number) => JSON.stringify([currentFilterSignature, searchTerm, view, forPage]);
+  const notice = pageNotice?.resultSet === resultSetKey(page) ? pageNotice.message : null;
   const requestResultsFocus = () => {
     pendingResultsFocusRef.current = true;
   };
@@ -438,7 +442,7 @@ export default function TaxonomyListing({ level }: Props) {
     if (!pageRejected && page > totalPages && paginationReady) {
       // Correct the URL in place: Back to it would only clamp again.
       replaceNextUrlSync.current = true;
-      setNotice(`Page ${page} is not available; showing page ${totalPages} instead.`);
+      setPageNotice({ message: `Page ${page} is not available; showing page ${totalPages} instead.`, resultSet: resultSetKey(totalPages) });
       setPage(totalPages);
     }
   }, [page, pageRejected, paginationReady, totalPages]);
@@ -730,7 +734,7 @@ export default function TaxonomyListing({ level }: Props) {
            {/* Below the category level the count stays screen-reader-only until
                something narrows the list; a scope selection narrows it too. */}
            <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 ref={resultsHeadingRef} tabIndex={-1} id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
-          {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => { setNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
+          {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => { setPageNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
           {invalidFilters ? <StatePanel tone="error" label="Invalid filters" title="These filters can’t be applied" inline testId="taxonomy-invalid-filters" actions={<Button variant="outline" onClick={clearInvalidFilters} data-testid="button-clear-invalid-filters">Clear invalid filters</Button>}>{invalidFilters.message}</StatePanel>
@@ -753,7 +757,7 @@ export default function TaxonomyListing({ level }: Props) {
             })}</div>}
           {/* Page navigation stays visible whenever the collection spans more
               than one page: it is primary navigation, not a filter tool. */}
-          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setNotice(`Page ${requested} is not available; showing page ${adjusted} instead.`)} /></div>}
+          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setPageNotice({ message: `Page ${requested} is not available; showing page ${adjusted} instead.`, resultSet: resultSetKey(adjusted) })} /></div>}
         </div>
       </div>
     </div>
