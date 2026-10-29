@@ -66,10 +66,11 @@ function HomeLayoutPreferenceControl({
             <RadioGroupItem
               id={`home-layout-${option.value}`}
               value={option.value}
+              aria-labelledby={`home-layout-${option.value}-label`}
               className="mt-0.5"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold">{option.label}</span>
+              <span id={`home-layout-${option.value}-label`} className="block text-sm font-semibold">{option.label}</span>
               <span className="mt-0.5 block text-xs text-[color:var(--text-2)]">
                 {option.description}
               </span>
