@@ -16,6 +16,7 @@
  *   - PATCH  /api/admin/users/:id/name
  *   - PUT    /api/admin/users/:id/role
  *   - DELETE /api/admin/users/:id
+ *   - POST   /api/admin/users/:id/link-clerk
  *   - GET    /api/admin/audit-logs
  *   - GET    /api/admin/pending-resources
  *   - POST   /api/admin/resources/:id(\d+)/approve
@@ -77,6 +78,7 @@ import { send429 } from "../../middleware/rateLimit";
 import { ConflictError } from "../../middleware/errors";
 import { buildValidationEnvelope } from "../../contracts/envelope";
 import { deleteClerkIdentity } from "../../lib/clerkAccountDeletion";
+import { linkClerkUserToRow } from "../../lib/clerkAccountLink";
 import type {
   UserRepository,
   ResourceRepository,
@@ -408,6 +410,30 @@ export function registerAdminContentRoutes(
       logger.error('Error deleting user:', error);
       res.status(500).json({ message: 'Failed to delete user' });
     }
+  }));
+
+  // POST /api/admin/users/:id/link-clerk — admin reconciliation for the JIT
+  // email collision (see server/lib/clerkAccountLink.ts): sets the Clerk
+  // user's externalId to this row's id when Clerk's verified primary email
+  // matches the row. Body: { clerkUserId: "user_..." }.
+  app.post('/api/admin/users/:id/link-clerk', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const clerkUserId = typeof req.body?.clerkUserId === 'string' ? req.body.clerkUserId : '';
+    if (!/^user_[A-Za-z0-9]{10,64}$/.test(clerkUserId)) {
+      return res.status(400).json({ message: 'clerkUserId must be a Clerk user id (user_...)' });
+    }
+    const target = await userRepo.getUser(req.params.id);
+    if (!target) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const result = await linkClerkUserToRow(target, clerkUserId);
+    if (!result.ok) {
+      const status = result.reason === 'clerk_user_not_found' ? 404 : 409;
+      return res.status(status).json({ message: 'Link refused', reason: result.reason });
+    }
+    logger.info('Clerk account linked to existing user', {
+      user: target.id, clerkUserId, changed: result.changed, actor: req.dbUser?.id,
+    });
+    res.json(result);
   }));
 
   // --- Audit Log Routes ---
