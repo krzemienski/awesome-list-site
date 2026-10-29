@@ -93,8 +93,8 @@ function getResourceTags(resource: Resource): string[] {
 function OptionRow({ id, name, text, checked, onCheckedChange }: { id: string; name: string; text: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
   return (
     <div className="flex items-center space-x-2 max-lg:min-h-11">
-      <Checkbox className="h-6 w-6" id={id} name={name} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
-      <label htmlFor={id} className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
+      <Checkbox className="h-6 w-6" id={id} name={name} aria-labelledby={`${id}-label`} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
+      <label id={`${id}-label`} htmlFor={id}className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
     </div>
   );
 }
@@ -870,7 +870,7 @@ export default function ExportTools({
             {awesomeList.categories.map(category => (
               <OptionRow
                 key={category.name}
-                id={`category-${category.name}`}
+                id={`category-${category.slug}`}
                 name={`export-category-${category.slug}`}
                 text={`${category.name} (${categoryCounts[category.name] || 0})`}
                 checked={exportOptions.selectedCategories.includes(category.name)}
