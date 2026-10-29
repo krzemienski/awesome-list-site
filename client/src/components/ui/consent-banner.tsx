@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useAppBottomInset } from "@/hooks/use-app-bottom-inset";
 import {
   ANALYTICS_VENDORS,
@@ -44,6 +49,11 @@ export default function ConsentBanner() {
       ? homeBoot?.consent !== null
       : getAnalyticsConsent() !== null,
   );
+  // Cookie settings is a modal dialog, separate from the first-visit banner:
+  // it shows the saved choice, lets the visitor change it, and Cancel/Escape
+  // leave that choice exactly as it was.
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [draft, setDraft] = useState<"granted" | "denied" | "">("");
   // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
   // banner grew tall enough to sit over the /login submit button. Track a
   // compact breakpoint so we can render a single-row, reduced-copy bar there.
@@ -158,18 +168,16 @@ export default function ConsentBanner() {
   // (or an Escape dismissal) can always be revisited in-product.
   useEffect(() => {
     const onOpen = () => {
-      const active = document.activeElement;
-      openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
-      setChoiceMade(false);
-      // Re-focus after the banner re-renders; it is pinned to the viewport
-      // bottom, so it is already on screen wherever the opener was.
-      setTimeout(() => bannerRef.current?.focus(), 0);
+      // The dialog preselects the saved choice; with none saved (the banner
+      // was dismissed with Escape) nothing is preselected and Save waits.
+      setDraft(getAnalyticsConsent() ?? "");
+      setSettingsOpen(true);
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
   }, []);
 
-  if (choiceMade || !hasAnalyticsVendors) return null;
+  if (!hasAnalyticsVendors) return null;
 
   const decide = (value: "granted" | "denied") => {
     setAnalyticsConsent(value);
@@ -192,13 +200,62 @@ export default function ConsentBanner() {
     }
   };
 
+  const settingsDialog = (
+    <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+      <DialogContent data-testid="cookie-settings-dialog">
+        <DialogHeader>
+          <DialogTitle>Cookie settings</DialogTitle>
+          <DialogDescription>
+            Analytics ({vendorList}) load only if you allow them. Your current choice is selected;
+            Cancel keeps it unchanged.{" "}
+            <Link href="/privacy" onClick={() => setSettingsOpen(false)} className="system-consent-banner__privacy-link" data-testid="cookie-settings-privacy-link">
+              Privacy Policy
+            </Link>
+          </DialogDescription>
+        </DialogHeader>
+        <RadioGroup
+          value={draft}
+          onValueChange={(v) => setDraft(v as "granted" | "denied")}
+          aria-label="Analytics cookies"
+          data-testid="cookie-settings-choice"
+        >
+          <div className="flex min-h-[44px] items-center gap-3">
+            <RadioGroupItem value="granted" id="cookie-settings-granted" data-testid="cookie-settings-granted" />
+            <Label htmlFor="cookie-settings-granted" className="flex-1 cursor-pointer py-2">Allow analytics</Label>
+          </div>
+          <div className="flex min-h-[44px] items-center gap-3">
+            <RadioGroupItem value="denied" id="cookie-settings-denied" data-testid="cookie-settings-denied" />
+            <Label htmlFor="cookie-settings-denied" className="flex-1 cursor-pointer py-2">Decline analytics</Label>
+          </div>
+        </RadioGroup>
+        <DialogFooter className="gap-2">
+          <Button variant="ghost" className="min-h-[44px]" onClick={() => setSettingsOpen(false)} data-testid="cookie-settings-cancel">Cancel</Button>
+          <Button
+            className="min-h-[44px]"
+            disabled={draft === ""}
+            onClick={() => {
+              if (draft === "") return;
+              if (draft !== getAnalyticsConsent()) decide(draft);
+              setSettingsOpen(false);
+            }}
+            data-testid="cookie-settings-save"
+          >
+            Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   // NB-003 (run18): condensed single-row bar for <360px viewports. Reduced
   // padding, trimmed copy and inline Accept/Decline buttons keep the banner
   // short (and max-h capped) so it no longer covers the centred /login submit
   // button at 320×568. The bar is in flow either way, so the form keeps its
   // own space; the compact variant just gives the page more of the viewport.
-  if (isCompact) {
-    return (
+
+  // One stable tree: the dialog stays mounted while the banner appears and
+  // disappears, so saving a choice never remounts it (and drops focus return).
+  const banner = choiceMade ? null : isCompact ? (
       <div
         ref={attachBanner}
         role="region"
@@ -239,10 +296,7 @@ export default function ConsentBanner() {
           </div>
         </div>
       </div>
-    );
-  }
-
-  return (
+  ) : (
     <div
       ref={attachBanner}
       role="region"
@@ -299,5 +353,12 @@ export default function ConsentBanner() {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {settingsDialog}
+      {banner}
+    </>
   );
 }
