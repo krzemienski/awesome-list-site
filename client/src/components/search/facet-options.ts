@@ -13,8 +13,14 @@ interface FacetCount { value: string; count: number }
 export const label = (value: string) => value === "unknown" ? "Not yet classified" : value;
 // C3-V1-02: an all-caps tag from the data ("AMD", via a card pill) keeps its
 // spelling; title-casing the slug would print "Amd".
-export const tagLabel = (value: string) =>
-  /[A-Z]/.test(value) && value === value.toUpperCase() ? value.trim() : tagDisplayNameBranded(normalizeTag(value));
+// A tag the URL spelled as a plural or mixed-case keeps the visitor's spelling:
+// the chip must not print a different word than the one in the address bar
+// ("bogus" folds to the slug "bogu").
+export const tagLabel = (value: string) => {
+  const trimmed = value.trim();
+  if (/[A-Z]/.test(trimmed) && trimmed === trimmed.toUpperCase()) return trimmed;
+  return normalizeTag(trimmed) === trimmed.toLowerCase() ? tagDisplayNameBranded(normalizeTag(trimmed)) : trimmed;
+};
 const identity = (value: string) => value;
 export const options = (counts: FacetCount[] | undefined, selected: string | string[], labels?: Record<string, string>, toLabel = label, keyOf = identity) => {
   // No facet data (a rejected request, or none loaded yet) has no counts to
