@@ -358,7 +358,7 @@ function ResourceCard({
         </ResourceLink>
       </h3>
       <p className="home-resource-description">{resource.description}</p>
-      <div className="home-resource-tags" aria-label={`Tags for ${resource.title}`}>
+      <div className="home-resource-tags" role="group" aria-label={`Tags for ${resource.title}`}>
         {tags.slice(0, 3).map((tag) => (
           <Link
             key={tag}

@@ -506,7 +506,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   <Collapsible open={isExpanded}>
                     <CollapsibleContent>
                       <div className="space-y-2 pt-3 border-t">
-                        <h4 className="text-sm font-medium text-muted-foreground">Subcategories:</h4>
+                        <p className="text-sm font-medium text-muted-foreground">Subcategories:</p>
                         <div className="flex flex-wrap gap-1">
                           {category.subcategories.map(subcategory => (
                             <Button
