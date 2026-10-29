@@ -428,7 +428,7 @@ export function registerAdminContentRoutes(
     const result = await linkClerkUserToRow(target, clerkUserId);
     if (!result.ok) {
       const status = result.reason === 'clerk_user_not_found' ? 404 : 409;
-      return res.status(status).json({ message: 'Link refused', reason: result.reason });
+      return res.status(status).json({ message: 'Link refused', reason: result.reason, emails: result.emails });
     }
     logger.info('Clerk account linked to existing user', {
       user: target.id, clerkUserId, changed: result.changed, actor: req.dbUser?.id,
