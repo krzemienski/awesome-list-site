@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/","width":1440,"height":900,"storageDisabled":"1","consent":[{"text":"Decline"}],"cookiesSignedIn":false}
+```

@@ -1,0 +1,11 @@
+- heading "Add step" [level=2, ref=e1]
+- LabelText "Title *" [ref=e8] clickable [cursor:pointer]
+- textbox "Title *" [ref=e9]: [QA-audit-1026] gap journey step
+- LabelText "Description" [ref=e10] clickable [cursor:pointer]
+- textbox "Description" [ref=e11]: Temporary QA-owned audit step; removed by exact ID after this run.
+- button "Pick resource" [ref=e2]
+- checkbox "Mark this step as optional" [checked=true, ref=e3]
+- LabelText "Mark this step as optional" [ref=e4] clickable [cursor:pointer]
+- button "Cancel" [ref=e5]
+- button "Add step" [ref=e6]
+- button "Close" [ref=e7]

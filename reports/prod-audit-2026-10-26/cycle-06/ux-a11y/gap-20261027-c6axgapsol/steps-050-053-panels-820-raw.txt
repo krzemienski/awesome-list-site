@@ -1,0 +1,328 @@
+✓ Request log cleared
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#overview
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [selected, ref=e19]
+    - tab "Approvals" [ref=e20]
+    - tab "Edits" [ref=e21]
+    - tab "Enrichment" [ref=e22]
+    - tab "Researcher" [ref=e23]
+    - tab "Export" [ref=e24]
+    - tab "Database" [ref=e25]
+    - tab "Resources" [ref=e26]
+    - tab "Categories" [ref=e27]
+    - tab "Subcategories" [ref=e28]
+    - tab "Users" [ref=e29]
+    - tab "GitHub" [ref=e30]
+    - tab "Link Health" [ref=e31]
+    - tab "Audit" [ref=e32]
+    - tab "Research" [ref=e33]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Overview" [ref=e12] focusable [tabindex]
+    - button "RESOURCES 3,826 across 10 categories" [ref=e15]
+    - button "SUBCATEGORIES 100 all canonical" [ref=e16]
+    - button "ACTIVE USERS 20 2 admins · 18 contributors" [ref=e17]
+    - button "PENDING APPROVALS 16 oldest 62d ago" [ref=e18]
+    - heading "Recent activity" [level=2, ref=e34]
+    - heading "System health" [level=2, ref=e35]
+    - heading "Top categories" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-050-overview-820.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#edits
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [selected, ref=e18]
+    - tab "Enrichment" [ref=e19]
+    - tab "Researcher" [ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Edits" [ref=e12] focusable [tabindex]
+    - region "Edit history" [ref=e15]
+      - heading "Edit history" [level=2, ref=e31]
+      - button "Check again" [ref=e32]
+      - region "Pending edits table, empty, scrollable" [ref=e33] focusable [tabindex]
+        - columnheader "RESOURCE" [ref=e40]
+        - columnheader "FIELD" [ref=e41]
+        - columnheader "EDITOR" [ref=e42]
+        - columnheader "WHEN" [ref=e43]
+        - columnheader "ACTIONS" [ref=e44]
+        - cell "No pending edits." [ref=e39]
+      - region "Recently resolved" [ref=e34]
+        - heading "Recently resolved" [level=3, ref=e37]
+        - region "Recently resolved edits table, scrollable" [ref=e38] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-051-edits-820.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#enrichment
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e31]
+    - link "Admin" [disabled, ref=e32]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [ref=e18]
+    - tab "Enrichment" [selected, ref=e19]
+    - tab "Researcher" [ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Enrichment" [ref=e12] focusable [tabindex]
+    - heading "Enrichment jobs" [level=2, ref=e35]
+    - button "Run job" [ref=e36]
+    - region "Enrichment jobs table, scrollable" [ref=e33] focusable [tabindex]
+      - columnheader "JOB" [ref=e67]
+      - columnheader "STATUS" [ref=e68]
+      - columnheader "STARTED" [ref=e69]
+      - columnheader "COMPLETED" [ref=e70]
+      - columnheader "ACTIONS" [ref=e71]
+      - cell "#34" [ref=e37]
+      - cell "CANCELLED" [ref=e38]
+      - cell "10/26/2026, 12:33:50 AM" [ref=e39]
+      - cell "10/26/2026, 12:34:47 AM" [ref=e40]
+      - cell "View logs for job #34" [ref=e41]
+        - button "View logs for job #34" [ref=e72]
+      - cell "#33" [ref=e42]
+      - cell "CANCELLED" [ref=e43]
+      - cell "10/26/2026, 12:30:14 AM" [ref=e44]
+      - cell "10/26/2026, 12:33:13 AM" [ref=e45]
+      - cell "View logs for job #33" [ref=e46]
+        - button "View logs for job #33" [ref=e73]
+      - cell "#32" [ref=e47]
+      - cell "COMPLETED" [ref=e48]
+      - cell "7/16/2026, 9:45:33 PM" [ref=e49]
+      - cell "7/16/2026, 9:45:33 PM" [ref=e50]
+      - cell "View logs for job #32" [ref=e51]
+        - button "View logs for job #32" [ref=e74]
+      - cell "#31" [ref=e52]
+      - cell "COMPLETED" [ref=e53]
+      - cell "7/16/2026, 9:45:32 PM" [ref=e54]
+      - cell "7/16/2026, 9:45:32 PM" [ref=e55]
+      - cell "View logs for job #31" [ref=e56]
+        - button "View logs for job #31" [ref=e75]
+      - cell "#30" [ref=e57]
+      - cell "COMPLETED" [ref=e58]
+      - cell "7/16/2026, 9:45:31 PM" [ref=e59]
+      - cell "7/16/2026, 9:45:32 PM" [ref=e60]
+      - cell "View logs for job #30" [ref=e61]
+        - button "View logs for job #30" [ref=e76]
+      - cell "#29" [ref=e62]
+      - cell "COMPLETED" [ref=e63]
+      - cell "7/16/2026, 9:41:27 PM" [ref=e64]
+      - cell "7/16/2026, 9:41:27 PM" [ref=e65]
+      - cell "View logs for job #29" [ref=e66]
+        - button "View logs for job #29" [ref=e77]
+    - button "Show all 33 jobs" [expanded=false, ref=e34]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-052-enrichment-820.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#researcher
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e31]
+    - link "Admin" [disabled, ref=e32]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [ref=e18]
+    - tab "Enrichment" [ref=e19]
+    - tab "Researcher" [selected, ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+    - heading "Run a research task" [level=3, ref=e33]
+    - region "Brief" [ref=e34]
+      - heading "Brief" [level=4, ref=e41]
+      - radiogroup "Research brief" [ref=e42] focusable [tabindex]
+        - LabelText "Auto-generate at launchA gap-aware brief built from the catalog and past runs." [ref=e55] clickable [cursor:pointer]
+        - LabelText "Write my ownDescribe what to search for, or start from a generated brief." [ref=e56] clickable [cursor:pointer]
+    - region "Focus" [ref=e35]
+      - heading "Focus" [level=4, ref=e43]
+      - combobox "Category focus" [expanded=false, ref=e44]: All categories
+        - generic "All categories" [ref=e57] clickable [cursor:pointer, onclick]
+    - region "Limits" [ref=e36]
+      - heading "Limits" [level=4, ref=e45]
+      - LabelText "Stop after (discoveries)" [ref=e46] clickable [cursor:pointer]
+      - spinbutton "Stop after (discoveries)" [ref=e47]
+      - LabelText "Budget cap (USD)" [ref=e48] clickable [cursor:pointer]
+      - spinbutton "Budget cap (USD)" [ref=e49]: 3
+      - LabelText "Max turns" [ref=e50] clickable [cursor:pointer]
+      - spinbutton "Max turns" [ref=e51]: 40
+    - region "Endpoint & model" [ref=e37]
+      - heading "Endpoint & model" [level=4, ref=e52]
+      - button "Override endpoint or models (optional)" [expanded=false, ref=e58]
+    - region "About to run on" [ref=e38]
+      - heading "About to run on" [level=4, ref=e53]
+      - button "Launch research run" [ref=e59]
+    - heading "Researcher jobs" [level=2, ref=e54]
+    - region "Researcher jobs table, scrollable" [ref=e39] focusable [tabindex]
+      - columnheader "STATUS" [ref=e97]
+      - columnheader "PROMPT" [ref=e98]
+      - columnheader "FOUND" [ref=e99]
+      - columnheader "APPROVED / REJECTED" [ref=e100]
+      - columnheader "COST" [ref=e101]
+      - columnheader "TURNS" [ref=e102]
+      - columnheader "CREATED" [ref=e103]
+      - cell "COMPLETED" [ref=e62]
+      - cell "Sustained production research requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. Find up to 25 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Evaluate at least 150 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Use scouts throughout for direct-source retrieval, URL verification, taxonomy comparison and candidate evaluation. Keep a written candidate ledger. Use at most 40 WebSearch calls in the entire run so the shared search budget cannot end the work; after that continue substantive direct official-source retrieval and evaluation with remaining tools. Do not finalize before 30 minutes, 450 substantive turns and 150 evaluated candidates. Never invent URLs/metadata and never idle-wait to pad runtime." [ref=e63]
+      - cell "0" [ref=e64]
+      - cell "0/0" [ref=e65]
+      - cell "$0.5650" [ref=e66]
+      - cell "13/600" [ref=e67]
+      - cell "Oct 27, 2026" [ref=e68]
+      - cell "COMPLETED" [ref=e69]
+      - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e70]
+      - cell "4" [ref=e71]
+      - cell "1/0" [ref=e72]
+      - cell "$5.4603" [ref=e73]
+      - cell "155/200" [ref=e74]
+      - cell "Oct 27, 2026" [ref=e75]
+      - cell "FAILED" [ref=e76]
+      - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e77]
+      - cell "0" [ref=e78]
+      - cell "0/0" [ref=e79]
+      - cell "$0.0000" [ref=e80]
+      - cell "1/200" [ref=e81]
+      - cell "Oct 27, 2026" [ref=e82]
+      - cell "COMPLETED" [ref=e83]
+      - cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e84]
+      - cell "9" [ref=e85]
+      - cell "0/0" [ref=e86]
+      - cell "$3.3100" [ref=e87]
+      - cell "41/200" [ref=e88]
+      - cell "Oct 27, 2026" [ref=e89]
+      - cell "COMPLETED" [ref=e90]
+      - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e91]
+      - cell "0" [ref=e92]
+      - cell "0/0" [ref=e93]
+      - cell "$1.1166" [ref=e94]
+      - cell "18/80" [ref=e95]
+      - cell "Oct 27, 2026" [ref=e96]
+    - button "Show more" [ref=e40]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-053-researcher-820.png
+
+[10579.1020] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.1021] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[10579.1022] GET https://awesome.video/api/categories (Fetch) 200
+[10579.1023] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.1024] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[10579.1025] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[10579.1026] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.1027] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[10579.1028] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10579.1029] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.1030] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[10579.1031] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[10579.1032] GET https://awesome.video/api/categories (Fetch) 200
+[10579.1034] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[10579.1035] GET https://awesome.video/api/admin/resource-edits (Fetch) 200
+[10579.1037] GET https://awesome.video/api/admin/resource-edits/recent (Fetch) 200
+[10579.1038] GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+[10579.1040] GET https://awesome.video/api/researcher/config (Fetch) 200
+[10579.1041] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+[10579.1042] GET https://awesome.video/api/researcher/discoveries (Fetch) 200
+
+

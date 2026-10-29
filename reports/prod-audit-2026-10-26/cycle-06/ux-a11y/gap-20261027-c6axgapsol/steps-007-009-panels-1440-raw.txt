@@ -1,0 +1,281 @@
+✓ Done
+
+https://awesome.video/admin#approvals
+
+Approvals
+
+https://awesome.video/admin#approvals
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e21]
+    - tab "Approvals" [selected, ref=e22]
+    - tab "Edits" [ref=e23]
+    - tab "Enrichment" [ref=e24]
+    - tab "Researcher" [ref=e25]
+    - tab "Export" [ref=e26]
+    - tab "Database" [ref=e27]
+    - tab "Resources" [ref=e28]
+    - tab "Categories" [ref=e29]
+    - tab "Subcategories" [ref=e30]
+    - tab "Users" [ref=e31]
+    - tab "GitHub" [ref=e32]
+    - tab "Link Health" [ref=e33]
+    - tab "Audit" [ref=e34]
+    - tab "Research" [ref=e35]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Approvals" [ref=e17] focusable [tabindex]
+    - region "Pending approvals" [ref=e20]
+      - heading "Pending approvals" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-007-approvals-1440.png
+
+✓ Done
+
+https://awesome.video/admin#edits
+
+Edit
+
+https://awesome.video/admin#edits
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e21]
+    - tab "Approvals" [ref=e22]
+    - tab "Edits" [selected, ref=e23]
+    - tab "Enrichment" [ref=e24]
+    - tab "Researcher" [ref=e25]
+    - tab "Export" [ref=e26]
+    - tab "Database" [ref=e27]
+    - tab "Resources" [ref=e28]
+    - tab "Categories" [ref=e29]
+    - tab "Subcategories" [ref=e30]
+    - tab "Users" [ref=e31]
+    - tab "GitHub" [ref=e32]
+    - tab "Link Health" [ref=e33]
+    - tab "Audit" [ref=e34]
+    - tab "Research" [ref=e35]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Edits" [ref=e17] focusable [tabindex]
+    - region "Edit history" [ref=e20]
+      - heading "Edit history" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-008-edits-1440.png
+
+✓ Done
+
+https://awesome.video/admin#enrichment
+
+Enrichment
+
+https://awesome.video/admin#enrichment
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [selected, ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Enrichment" [ref=e17] focusable [tabindex]
+    - heading "Enrichment jobs" [level=2, ref=e38]
+    - button "Run job" [disabled, ref=e39]
+    - region "Enrichment jobs table, scrollable" [ref=e37] focusable [tabindex]
+      - columnheader "JOB" [ref=e40]
+      - columnheader "STATUS" [ref=e41]
+      - columnheader "STARTED" [ref=e42]
+      - columnheader "COMPLETED" [ref=e43]
+      - columnheader "ACTIONS" [ref=e44]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-009-enrichment-1440.png
+
+[2330C73D3DB80E8F026D55F06C424FDB] OPTIONS https://i.replit.com/api/send (Other) 204
+[10579.179] POST https://i.replit.com/api/send (Fetch) 200
+[10579.197] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.198] GET https://awesome.video/api/config (Fetch) 200
+[10579.208] POST https://i.replit.com/api/send (Fetch) 200
+[10579.212] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.269] GET https://awesome.video/api/config (Fetch) 200
+[10579.270] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.334] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.335] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.336] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.338] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.339] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.341] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.342] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[10579.343] GET https://awesome.video/api/categories (Fetch) 200
+[10579.344] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.345] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[10579.346] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[10579.347] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.348] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[10579.349] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10579.350] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.351] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[10579.352] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[10579.353] GET https://awesome.video/api/categories (Fetch) 200
+[10579.354] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.355] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.357] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[10579.358] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.359] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.360] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.361] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.362] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.363] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.364] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.365] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.366] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.367] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.368] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.369] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.370] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.371] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.372] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.373] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.374] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.375] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.376] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.377] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.378] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.379] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.380] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.381] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.382] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.383] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.384] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.385] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.386] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.387] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.388] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.389] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.390] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.391] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.392] GET https://awesome.video/api/admin/pending-resources (Fetch)
+[10579.402] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.574] GET https://awesome.video/api/config (Fetch) 200
+[10579.575] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.638] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.639] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.640] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.642] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.643] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.645] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.646] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.648] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.649] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.650] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.651] GET https://awesome.video/api/admin/resource-edits (Fetch)
+[10579.662] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.711] GET https://awesome.video/api/config (Fetch) 200
+[10579.712] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.774] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.775] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.776] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.778] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.779] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.781] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.782] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.784] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.785] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.786] GET https://awesome.video/api/admin/resource-edits (Fetch) 200
+[10579.787] GET https://awesome.video/api/admin/resource-edits/recent (Fetch)
+[10579.788] GET https://awesome.video/api/health/ai (Fetch)
+[10579.789] GET https://awesome.video/api/enrichment/jobs (Fetch)
+[10579.790] GET https://awesome.video/api/admin/enrichment/coverage (Fetch)
+[10579.801] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.850] GET https://awesome.video/api/config (Fetch) 200
+[10579.851] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.913] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.914] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.915] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.917] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.918] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.920] GET https://awesome.video/api/health/ai (Fetch)
+[10579.921] GET https://awesome.video/api/enrichment/jobs (Fetch)
+[10579.922] GET https://awesome.video/api/admin/enrichment/coverage (Fetch)
+[10579.923] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.924] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.926] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.927] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+
+

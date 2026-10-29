@@ -1,0 +1,37 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Resources" [ref=e36] focusable [tabindex]
+    - navigation "Pagination" [ref=e37]
+- heading "Add New Resource" [level=2, ref=e2]
+- LabelText "Title *" [ref=e3] clickable [cursor:pointer]
+- textbox "Title *" [ref=e4]
+- LabelText "URL *" [ref=e5] clickable [cursor:pointer]
+- textbox "URL *" [ref=e6]
+- LabelText "Description" [ref=e7] clickable [cursor:pointer]
+- textbox "Description" [ref=e8]
+- LabelText "Category *" [ref=e9] clickable [cursor:pointer]
+- combobox "Category *" [expanded=false, required, ref=e10]: Select category
+- LabelText "Status" [ref=e11] clickable [cursor:pointer]
+- combobox "Status" [expanded=false, ref=e12]: Pending
+  - generic "Pending" [ref=e30] clickable [cursor:pointer, onclick]
+- LabelText "Subcategory" [ref=e13] clickable [cursor:pointer]
+- combobox "Subcategory" [expanded=false, disabled, ref=e14]: Select category first
+- LabelText "Sub-subcategory" [ref=e15] clickable [cursor:pointer]
+- combobox "Sub-subcategory" [expanded=false, disabled, ref=e16]: Select subcategory first
+- LabelText "Kind override" [ref=e17] clickable [cursor:pointer]
+- combobox "Kind override" [expanded=false, ref=e18]: Automatic (classified on save)
+  - generic "Automatic (classified on save)" [ref=e31] clickable [cursor:pointer, onclick]
+- LabelText "Curated placement" [ref=e19] clickable [cursor:pointer]
+- LabelText "Feature this resource" [ref=e20] clickable [cursor:pointer]
+  - checkbox "Curated placement Feature this resource" [checked=false, ref=e32]
+- LabelText "Format" [ref=e21] clickable [cursor:pointer]
+- combobox "Format" [expanded=false, ref=e22]: Not yet classified
+  - generic "Not yet classified" [ref=e33] clickable [cursor:pointer, onclick]
+- LabelText "Provider" [ref=e23] clickable [cursor:pointer]
+- combobox "Provider" [expanded=false, ref=e24]: Not yet classified
+  - generic "Not yet classified" [ref=e34] clickable [cursor:pointer, onclick]
+- LabelText "Skill level" [ref=e25] clickable [cursor:pointer]
+- combobox "Skill level" [expanded=false, ref=e26]: Not yet classified
+  - generic "Not yet classified" [ref=e35] clickable [cursor:pointer, onclick]
+- button "Cancel" [ref=e27]
+- button "Create Resource" [ref=e28]
+- button "Close" [ref=e29]

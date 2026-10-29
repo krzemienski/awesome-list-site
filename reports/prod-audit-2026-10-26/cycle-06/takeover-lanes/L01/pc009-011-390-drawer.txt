@@ -1,0 +1,16 @@
+=== 390
+✓ Done
+✓ Done
+✓ Done
+cat expanded ls="{\"encoding-codecs\":true}"
+✓ Done
+nested: focus="Collapse 3 nested groups in Codecs" url=https://awesome.video/ dlg=1
+  - link "All in Codecs" [ref=e38]
+  - link "AV1 22" [ref=e39]
+  - link "HEVC 18" [ref=e40]
+  - link "VP9 19" [ref=e41]
+  - link "Uncategorized 9" [ref=e42]
+  - link "Uncategorized 92 resources" [ref=e34]
+✓ Done
+AV1 -> https://awesome.video/sub-subcategory/av1 dlg=0
+"{\"h1\":\"AV1\",\"bc\":\"HOME / ENCODING & CODECS / CODECS / AV1\",\"cur\":[\"AV1\"]}"

@@ -1,0 +1,4 @@
+Contact: https://github.com/krzemienski/awesome-video/issues
+Expires: 2027-04-25T06:33:44.066Z
+Preferred-Languages: en
+Canonical: https://awesome.video/.well-known/security.txt

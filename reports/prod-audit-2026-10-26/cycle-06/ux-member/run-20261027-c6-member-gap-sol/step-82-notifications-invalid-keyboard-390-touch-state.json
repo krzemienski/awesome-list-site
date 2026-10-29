@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings#notification-settings",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 4626,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 primary min-w-[44px] ml-auto min-h-[44px]\" data-ds-variant=\"default\" aria-disabled=\"false\" aria-busy=\"false\">Save choices</button>",
+  "umami": "1",
+  "consent": "denied"
+}

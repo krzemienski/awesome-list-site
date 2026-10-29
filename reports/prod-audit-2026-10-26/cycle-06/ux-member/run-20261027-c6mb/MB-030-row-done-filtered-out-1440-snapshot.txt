@@ -1,0 +1,122 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - generic [ref=e4] focusable [tabindex]
+      - list [ref=e5] clickable [onclick]
+        - listitem [level=1, ref=e7] focusable [tabindex]
+          - StaticText "Queue status updated"
+          - button "Dismiss notification" [ref=e12]
+            - image
+      - generic [ref=e6] focusable [tabindex]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e8]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e9]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e10]
+          - link "Browse" [ref=e13]
+          - link "Submit" [ref=e14]
+          - link "About" [ref=e15]
+          - link "Docs ↗" [ref=e16]
+          - link "Admin" [ref=e17]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e11]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e18]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e68]
+              - listitem [level=1]
+                - link "Bookmarks" [disabled, ref=e69]
+          - sectionheader
+            - heading "Saved, then finished." [level=1, ref=e30]
+              - StaticText "Saved, then "
+              - emphasis
+            - paragraph
+              - StaticText "Turn bookmarks into a queue you can actually work through."
+            - button "New collection" [ref=e31]
+          - region "Library summary" [ref=e19]
+            - button "13 Active" [ref=e32]
+              - StaticText "13"
+              - StaticText "Active"
+            - button "12 Saved" [ref=e33]
+              - StaticText "12"
+              - StaticText "Saved"
+            - button "0 Watch next" [ref=e34]
+              - StaticText "0"
+              - StaticText "Watch next"
+            - button "0 In progress" [ref=e35]
+              - StaticText "0"
+              - StaticText "In progress"
+            - button "1 Done" [ref=e36]
+              - StaticText "1"
+              - StaticText "Done"
+            - button "0 Archived" [ref=e37]
+              - StaticText "0"
+              - StaticText "Archived"
+          - complementary "Bookmark collections"
+            - generic
+              - button "All saved 13" [ref=e62]
+              - button "[QA-audit-1026] c6 collection A2 1" [ref=e63]
+              - group "Reorder [QA-audit-1026] c6 collection A2"
+                - button "Move [QA-audit-1026] c6 collection A2 up" [disabled, ref=e70]
+                - button "Move [QA-audit-1026] c6 collection A2 down" [ref=e71]
+              - button "[QA-audit-1026] c6 collection B 0" [ref=e64]
+              - group "Reorder [QA-audit-1026] c6 collection B"
+                - button "Move [QA-audit-1026] c6 collection B up" [ref=e72]
+                - button "Move [QA-audit-1026] c6 collection B down" [disabled, ref=e73]
+          - region "Library filters" [ref=e20]
+            - LabelText [ref=e38] clickable [cursor:pointer]
+            - combobox "Queue status" [expanded=false, ref=e39]: In progress
+              - generic [ref=e65] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e40] clickable [cursor:pointer]
+            - combobox "Visibility" [expanded=false, ref=e41]: Active bookmarks
+              - generic [ref=e66] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e42] clickable [cursor:pointer]
+            - combobox "Sort" [expanded=false, ref=e43]: Newest saved
+              - generic [ref=e67] clickable [cursor:pointer, onclick]
+          - heading "Nothing matches this view" [level=2, ref=e21]
+          - StaticText "Try another collection, status, or archive filter."
+          - button "Clear filters" [ref=e22]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e23]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e24]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e25]
+            - heading "EXPLORE" [level=2, ref=e44]
+            - link "Community & Events" [ref=e45]
+            - link "Encoding & Codecs" [ref=e46]
+            - link "General Tools" [ref=e47]
+            - link "Infrastructure & Delivery" [ref=e48]
+            - link "Intro & Learning" [ref=e49]
+            - link "Media Tools" [ref=e50]
+            - link "Players & Clients" [ref=e51]
+            - link "Protocols & Transport" [ref=e52]
+            - link "Standards & Industry" [ref=e53]
+          - heading "SOURCE" [level=2, ref=e26]
+          - link "krzemienski/ awesome-video" [ref=e27]
+          - paragraph
+            - link "PRs welcome" [ref=e54]
+          - button "Contact maintainers" [ref=e28]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e29]
+            - link "About" [ref=e55]
+            - link "Terms" [ref=e56]
+            - link "Privacy" [ref=e57]
+            - link "Code of Conduct" [ref=e58]
+            - button "Cookie settings" [ref=e59]
+            - link "Issues ↗" [ref=e60]
+            - link "Sitemap" [ref=e61]

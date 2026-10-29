@@ -1,0 +1,36 @@
+✓ Done
+✓ Done
+== 1100 collapse focus="sidebar-expanded-navigation" railW=55
+✓ Done
+cat icon -> https://awesome.video/category/players-clients railStill=true
+✓ Done
+home icon -> https://awesome.video/
+"last Source: krzemienski/awesome-video bottom=888 vh=900 target=_blank"
+✓ Done
+✓ Done
+✓ Done
+== 1200 collapse focus="sidebar-expanded-navigation" railW=55
+✓ Done
+cat icon -> https://awesome.video/category/players-clients railStill=true
+✓ Done
+home icon -> https://awesome.video/
+"last Source: krzemienski/awesome-video bottom=888 vh=900 target=_blank"
+✓ Done
+✓ Done
+✓ Done
+== 1250 collapse focus="sidebar-expanded-navigation" railW=55
+✓ Done
+cat icon -> https://awesome.video/category/players-clients railStill=true
+✓ Done
+home icon -> https://awesome.video/
+"last Source: krzemienski/awesome-video bottom=888 vh=900 target=_blank"
+✓ Done
+✓ Done
+✓ Done
+== 1440 collapse focus="sidebar-expanded-navigation" railW=55
+✓ Done
+cat icon -> https://awesome.video/category/players-clients railStill=true
+✓ Done
+home icon -> https://awesome.video/
+"last Source: krzemienski/awesome-video bottom=888 vh=900 target=_blank"
+✓ Done

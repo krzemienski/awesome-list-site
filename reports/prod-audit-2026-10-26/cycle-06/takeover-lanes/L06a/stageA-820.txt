@@ -1,0 +1,70 @@
+✓ Done
+[820] url=https://awesome.video/admin
+✓ Done
+[820] RM01/03 offline-firstload text: null ; empty-row: null
+✓ Done
+[820] RM01 observer: "[]"
+[820] RM08 before: 
+✗ Element not found. Verify the selector is correct and the element exists in the DOM.
+✓ Done
+[820] RM08 after click:  region=0
+✗ Element not found. Verify the selector is correct and the element exists in the DOM.
+✓ Done
+[820] RM08 after 2nd click:  region=0
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+[820] RM07: "?page=1&limit=25&status=approved | ?page=1&limit=25&sort=newest&search=vvc&status=approved" :: "{\"ae\":\"Search…\",\"url\":\"?search=vvc\",\"hdr\":\"vvc\"}"
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+[820] RM09: "?page=1&limit=25&status=approved | ?page=1&limit=25&sort=newest&search=1va&status=approved" :: "{\"ae\":\"Search by title or URL...\",\"url\":\"?search=1va\",\"hdr\":\"1va\"}"
+✓ Done
+✓ Done
+[820] Filter by category=Community & Events => "?page=1&limit=25&sort=newest&search=1va&category=Community+%26+Events&status=approved" :: "?search=1va&category=Community+%26+Events" :: sel="Community & Events"
+✓ Done
+✓ Done
+[820] Filter by category=Encoding & Codecs => "?page=1&limit=25&sort=newest&search=1va&category=Encoding+%26+Codecs&status=approved" :: "?search=1va&category=Encoding+%26+Codecs" :: sel="Encoding & Codecs"
+✓ Done
+✓ Done
+[820] Filter by category=General Tools => "?page=1&limit=25&sort=newest&search=1va&category=General+Tools&status=approved" :: "?search=1va&category=General+Tools" :: sel="General Tools"
+✓ Done
+✓ Done
+[820] Filter by category=Infrastructure & Delivery => "?page=1&limit=25&sort=newest&search=1va&category=Infrastructure+%26+Delivery&status=approved" :: "?search=1va&category=Infrastructure+%26+Delivery" :: sel="Infrastructure & Delivery"
+✓ Done
+✓ Done
+[820] Filter by category=Intro & Learning => "?page=1&limit=25&sort=newest&search=1va&category=Intro+%26+Learning&status=approved" :: "?search=1va&category=Intro+%26+Learning" :: sel="Intro & Learning"
+✓ Done
+✓ Done
+[820] Filter by category=Media Tools => "?page=1&limit=25&sort=newest&search=1va&category=Media+Tools&status=approved" :: "?search=1va&category=Media+Tools" :: sel="Media Tools"
+✓ Done
+✓ Done
+[820] Filter by category=Players & Clients => "?page=1&limit=25&sort=newest&search=1va&category=Players+%26+Clients&status=approved" :: "?search=1va&category=Players+%26+Clients" :: sel="Players & Clients"
+✓ Done
+✓ Done
+[820] Filter by category=Protocols & Transport => "?page=1&limit=25&sort=newest&search=1va&category=Protocols+%26+Transport&status=approved" :: "?search=1va&category=Protocols+%26+Transport" :: sel="Protocols & Transport"
+✓ Done
+✓ Done
+[820] Filter by category=Standards & Industry => "?page=1&limit=25&sort=newest&search=1va&category=Standards+%26+Industry&status=approved" :: "?search=1va&category=Standards+%26+Industry" :: sel="Standards & Industry"
+✓ Done
+✓ Done
+[820] Filter by category=All Categories => "?page=1&limit=25&sort=newest&search=1va&status=approved" :: "?search=1va" :: sel="All Categories"
+✓ Done
+✓ Done
+[820] Filter by status=Pending => "?page=1&limit=25&sort=newest&search=1va&status=pending" :: "?search=1va&status=pending" :: sel="Pending"
+✓ Done
+✓ Done
+[820] Filter by status=Rejected => "?page=1&limit=25&sort=newest&search=1va&status=rejected" :: "?search=1va&status=rejected" :: sel="Rejected"
+✓ Done
+✓ Done
+[820] Filter by status=Withdrawn => "?page=1&limit=25&sort=newest&search=1va&status=withdrawn" :: "?search=1va&status=withdrawn" :: sel="Withdrawn"
+✓ Done
+✓ Done
+[820] Filter by status=All Status => "?page=1&limit=25&sort=newest&search=1va" :: "?search=1va&status=all" :: sel="All Status"
+✓ Done
+✓ Done
+[820] Filter by status=Approved => "" :: "?search=1va" :: sel="Approved"
+[820] DONE

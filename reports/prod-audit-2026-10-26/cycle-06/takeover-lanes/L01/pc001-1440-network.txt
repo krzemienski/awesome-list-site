@@ -1,0 +1,2 @@
+[83130.283] GET https://awesome.video/api/auth/user (Fetch) 200
+[83130.284] GET https://awesome.video/api/config (Fetch) 200

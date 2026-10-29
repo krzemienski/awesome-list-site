@@ -1,0 +1,1 @@
+"Run link health check?\n\nThis checks the URL of every approved resource in the catalog (currently 3,826) against the live web. The job runs in the background and can take several minutes to complete.\n\nCancel\nRun check"

@@ -1,0 +1,1938 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [ref=e43]
+              - listitem [level=1]
+                - link "Resources" [disabled, ref=e44]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e15]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e16]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e17]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [selected, ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Resources" [ref=e18] focusable [tabindex]
+            - article
+              - heading "Resources (100 of 3,825)" [level=2, ref=e36]
+                - StaticText "Resources (100 of 3,825)"
+              - generic
+                - StaticText "Manage every entry in the index · ★ 8 featured on the home page"
+              - textbox "Search…" [ref=e37]
+              - button "Show filters and tools" [expanded=false, ref=e38]
+                - StaticText "Show filters and tools"
+              - button "Add" [ref=e39]
+                - image
+                - StaticText "Add"
+              - region "Resources table, scrollable" [ref=e45] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID Select all resources on this page" [ref=e556]
+                        - StaticText "ID"
+                        - checkbox "Select all resources on this page" [checked=false, ref=e1062]
+                      - columnheader "TITLE" [ref=e557]
+                      - columnheader "CATEGORY" [ref=e558]
+                      - columnheader "TAGS" [ref=e559]
+                      - columnheader "FEATURED" [ref=e560]
+                      - columnheader "Actions" [ref=e561]
+                  - row
+                    - cell "189937 Select dash-test-vectors" [ref=e56]
+                      - StaticText "189937"
+                      - checkbox "Select dash-test-vectors" [checked=false, ref=e562]
+                    - cell "dash-test-vectors" [ref=e57]
+                      - StaticText "dash-test-vectors"
+                    - cell "Standards & Industry" [ref=e58]
+                    - cell
+                    - cell "Feature on the home page: dash-test-vectors" [ref=e59]
+                      - button "Feature on the home page: dash-test-vectors" [ref=e563]
+                        - StaticText "—"
+                    - cell "View dash-test-vectors Edit dash-test-vectors Delete dash-test-vectors" [ref=e60]
+                      - link "View dash-test-vectors" [ref=e564]
+                        - StaticText "View"
+                      - button "Edit dash-test-vectors" [ref=e565]
+                        - StaticText "Edit"
+                      - button "Delete dash-test-vectors" [ref=e566]
+                        - image
+                  - row
+                    - cell "189936 Select Build a Self-Hosted CDN with OpenResty Edge" [ref=e61]
+                      - StaticText "189936"
+                      - checkbox "Select Build a Self-Hosted CDN with OpenResty Edge" [checked=false, ref=e567]
+                    - cell "Build a Self-Hosted CDN with OpenResty Edge" [ref=e62]
+                      - StaticText "Build a Self-Hosted CDN with OpenResty Edge"
+                    - cell "Infrastructure & Delivery" [ref=e63]
+                    - cell
+                    - cell "Feature on the home page: Build a Self-Hosted CDN with OpenResty Edge" [ref=e64]
+                      - button "Feature on the home page: Build a Self-Hosted CDN with OpenResty Edge" [ref=e568]
+                        - StaticText "—"
+                    - cell "View Build a Self-Hosted CDN with OpenResty Edge Edit Build a Self-Hosted CDN with OpenResty Edge Delete Build a Self-Hosted CDN with OpenResty Edge" [ref=e65]
+                      - link "View Build a Self-Hosted CDN with OpenResty Edge" [ref=e569]
+                        - StaticText "View"
+                      - button "Edit Build a Self-Hosted CDN with OpenResty Edge" [ref=e570]
+                        - StaticText "Edit"
+                      - button "Delete Build a Self-Hosted CDN with OpenResty Edge" [ref=e571]
+                        - image
+                  - row
+                    - cell "189935 Select cXn" [ref=e66]
+                      - StaticText "189935"
+                      - checkbox "Select cXn" [checked=false, ref=e572]
+                    - cell "cXn" [ref=e67]
+                      - StaticText "cXn"
+                    - cell "Infrastructure & Delivery" [ref=e68]
+                    - cell
+                    - cell "Feature on the home page: cXn" [ref=e69]
+                      - button "Feature on the home page: cXn" [ref=e573]
+                        - StaticText "—"
+                    - cell "View cXn Edit cXn Delete cXn" [ref=e70]
+                      - link "View cXn" [ref=e574]
+                        - StaticText "View"
+                      - button "Edit cXn" [ref=e575]
+                        - StaticText "Edit"
+                      - button "Delete cXn" [ref=e576]
+                        - image
+                  - row
+                    - cell "189934 Select What Is HLS Streaming and How Do You Deploy It" [ref=e71]
+                      - StaticText "189934"
+                      - checkbox "Select What Is HLS Streaming and How Do You Deploy It" [checked=false, ref=e577]
+                    - cell "What Is HLS Streaming and How Do You Deploy It" [ref=e72]
+                      - StaticText "What Is HLS Streaming and How Do You Deploy It"
+                    - cell "Intro & Learning" [ref=e73]
+                    - cell
+                    - cell "Feature on the home page: What Is HLS Streaming and How Do You Deploy It" [ref=e74]
+                      - button "Feature on the home page: What Is HLS Streaming and How Do You Deploy It" [ref=e578]
+                        - StaticText "—"
+                    - cell "View What Is HLS Streaming and How Do You Deploy It Edit What Is HLS Streaming and How Do You Deploy It Delete What Is HLS Streaming and How Do You Deploy It" [ref=e75]
+                      - link "View What Is HLS Streaming and How Do You Deploy It" [ref=e579]
+                        - StaticText "View"
+                      - button "Edit What Is HLS Streaming and How Do You Deploy It" [ref=e580]
+                        - StaticText "Edit"
+                      - button "Delete What Is HLS Streaming and How Do You Deploy It" [ref=e581]
+                        - image
+                  - row
+                    - cell "189933 Select Deep Dive into HLS Protocol Architecture" [ref=e76]
+                      - StaticText "189933"
+                      - checkbox "Select Deep Dive into HLS Protocol Architecture" [checked=false, ref=e582]
+                    - cell "Deep Dive into HLS Protocol Architecture" [ref=e77]
+                      - StaticText "Deep Dive into HLS Protocol Architecture"
+                    - cell "Intro & Learning" [ref=e78]
+                    - cell
+                    - cell "Feature on the home page: Deep Dive into HLS Protocol Architecture" [ref=e79]
+                      - button "Feature on the home page: Deep Dive into HLS Protocol Architecture" [ref=e583]
+                        - StaticText "—"
+                    - cell "View Deep Dive into HLS Protocol Architecture Edit Deep Dive into HLS Protocol Architecture Delete Deep Dive into HLS Protocol Architecture" [ref=e80]
+                      - link "View Deep Dive into HLS Protocol Architecture" [ref=e584]
+                        - StaticText "View"
+                      - button "Edit Deep Dive into HLS Protocol Architecture" [ref=e585]
+                        - StaticText "Edit"
+                      - button "Delete Deep Dive into HLS Protocol Architecture" [ref=e586]
+                        - image
+                  - row
+                    - cell "189932 Select accessible-html5-video-player" [ref=e81]
+                      - StaticText "189932"
+                      - checkbox "Select accessible-html5-video-player" [checked=false, ref=e587]
+                    - cell "accessible-html5-video-player" [ref=e82]
+                      - StaticText "accessible-html5-video-player"
+                    - cell "Players & Clients" [ref=e83]
+                    - cell
+                    - cell "Feature on the home page: accessible-html5-video-player" [ref=e84]
+                      - button "Feature on the home page: accessible-html5-video-player" [ref=e588]
+                        - StaticText "—"
+                    - cell "View accessible-html5-video-player Edit accessible-html5-video-player Delete accessible-html5-video-player" [ref=e85]
+                      - link "View accessible-html5-video-player" [ref=e589]
+                        - StaticText "View"
+                      - button "Edit accessible-html5-video-player" [ref=e590]
+                        - StaticText "Edit"
+                      - button "Delete accessible-html5-video-player" [ref=e591]
+                        - image
+                  - row
+                    - cell "189931 Select videowall (info-beamer)" [ref=e86]
+                      - StaticText "189931"
+                      - checkbox "Select videowall (info-beamer)" [checked=false, ref=e592]
+                    - cell "videowall (info-beamer)" [ref=e87]
+                      - StaticText "videowall (info-beamer)"
+                    - cell "Players & Clients" [ref=e88]
+                    - cell
+                    - cell "Feature on the home page: videowall (info-beamer)" [ref=e89]
+                      - button "Feature on the home page: videowall (info-beamer)" [ref=e593]
+                        - StaticText "—"
+                    - cell "View videowall (info-beamer) Edit videowall (info-beamer) Delete videowall (info-beamer)" [ref=e90]
+                      - link "View videowall (info-beamer)" [ref=e594]
+                        - StaticText "View"
+                      - button "Edit videowall (info-beamer)" [ref=e595]
+                        - StaticText "Edit"
+                      - button "Delete videowall (info-beamer)" [ref=e596]
+                        - image
+                  - row
+                    - cell "189930 Select tv_wall_mapper" [ref=e91]
+                      - StaticText "189930"
+                      - checkbox "Select tv_wall_mapper" [checked=false, ref=e597]
+                    - cell "tv_wall_mapper" [ref=e92]
+                      - StaticText "tv_wall_mapper"
+                    - cell "Players & Clients" [ref=e93]
+                    - cell
+                    - cell "Feature on the home page: tv_wall_mapper" [ref=e94]
+                      - button "Feature on the home page: tv_wall_mapper" [ref=e598]
+                        - StaticText "—"
+                    - cell "View tv_wall_mapper Edit tv_wall_mapper Delete tv_wall_mapper" [ref=e95]
+                      - link "View tv_wall_mapper" [ref=e599]
+                        - StaticText "View"
+                      - button "Edit tv_wall_mapper" [ref=e600]
+                        - StaticText "Edit"
+                      - button "Delete tv_wall_mapper" [ref=e601]
+                        - image
+                  - row
+                    - cell "189929 Select ngw (Nano GStreamer Wrapper)" [ref=e96]
+                      - StaticText "189929"
+                      - checkbox "Select ngw (Nano GStreamer Wrapper)" [checked=false, ref=e602]
+                    - cell "ngw (Nano GStreamer Wrapper)" [ref=e97]
+                      - StaticText "ngw (Nano GStreamer Wrapper)"
+                    - cell "Players & Clients" [ref=e98]
+                    - cell
+                    - cell "Feature on the home page: ngw (Nano GStreamer Wrapper)" [ref=e99]
+                      - button "Feature on the home page: ngw (Nano GStreamer Wrapper)" [ref=e603]
+                        - StaticText "—"
+                    - cell "View ngw (Nano GStreamer Wrapper) Edit ngw (Nano GStreamer Wrapper) Delete ngw (Nano GStreamer Wrapper)" [ref=e100]
+                      - link "View ngw (Nano GStreamer Wrapper)" [ref=e604]
+                        - StaticText "View"
+                      - button "Edit ngw (Nano GStreamer Wrapper)" [ref=e605]
+                        - StaticText "Edit"
+                      - button "Delete ngw (Nano GStreamer Wrapper)" [ref=e606]
+                        - image
+                  - row
+                    - cell "189928 Select LIVI (Linux In-Vehicle Infotainment)" [ref=e101]
+                      - StaticText "189928"
+                      - checkbox "Select LIVI (Linux In-Vehicle Infotainment)" [checked=false, ref=e607]
+                    - cell "LIVI (Linux In-Vehicle Infotainment)" [ref=e102]
+                      - StaticText "LIVI (Linux In-Vehicle Infotainment)"
+                    - cell "Players & Clients" [ref=e103]
+                    - cell
+                    - cell "Feature on the home page: LIVI (Linux In-Vehicle Infotainment)" [ref=e104]
+                      - button "Feature on the home page: LIVI (Linux In-Vehicle Infotainment)" [ref=e608]
+                        - StaticText "—"
+                    - cell "View LIVI (Linux In-Vehicle Infotainment) Edit LIVI (Linux In-Vehicle Infotainment) Delete LIVI (Linux In-Vehicle Infotainment)" [ref=e105]
+                      - link "View LIVI (Linux In-Vehicle Infotainment)" [ref=e609]
+                        - StaticText "View"
+                      - button "Edit LIVI (Linux In-Vehicle Infotainment)" [ref=e610]
+                        - StaticText "Edit"
+                      - button "Delete LIVI (Linux In-Vehicle Infotainment)" [ref=e611]
+                        - image
+                  - row
+                    - cell "189927 Select mkv-web" [ref=e106]
+                      - StaticText "189927"
+                      - checkbox "Select mkv-web" [checked=false, ref=e612]
+                    - cell "mkv-web" [ref=e107]
+                      - StaticText "mkv-web"
+                    - cell "Media Tools" [ref=e108]
+                    - cell
+                    - cell "Feature on the home page: mkv-web" [ref=e109]
+                      - button "Feature on the home page: mkv-web" [ref=e613]
+                        - StaticText "—"
+                    - cell "View mkv-web Edit mkv-web Delete mkv-web" [ref=e110]
+                      - link "View mkv-web" [ref=e614]
+                        - StaticText "View"
+                      - button "Edit mkv-web" [ref=e615]
+                        - StaticText "Edit"
+                      - button "Delete mkv-web" [ref=e616]
+                        - image
+                  - row
+                    - cell "189926 Select Shaka Packager" [ref=e111]
+                      - StaticText "189926"
+                      - checkbox "Select Shaka Packager" [checked=false, ref=e617]
+                    - cell "Shaka Packager" [ref=e112]
+                      - StaticText "Shaka Packager"
+                    - cell "General Tools" [ref=e113]
+                    - cell
+                    - cell "Feature on the home page: Shaka Packager" [ref=e114]
+                      - button "Feature on the home page: Shaka Packager" [ref=e618]
+                        - StaticText "—"
+                    - cell "View Shaka Packager Edit Shaka Packager Delete Shaka Packager" [ref=e115]
+                      - link "View Shaka Packager" [ref=e619]
+                        - StaticText "View"
+                      - button "Edit Shaka Packager" [ref=e620]
+                        - StaticText "Edit"
+                      - button "Delete Shaka Packager" [ref=e621]
+                        - image
+                  - row
+                    - cell "189925 Select ll-dash-server" [ref=e116]
+                      - StaticText "189925"
+                      - checkbox "Select ll-dash-server" [checked=false, ref=e622]
+                    - cell "ll-dash-server" [ref=e117]
+                      - StaticText "ll-dash-server"
+                    - cell "Protocols & Transport" [ref=e118]
+                    - cell
+                    - cell "Feature on the home page: ll-dash-server" [ref=e119]
+                      - button "Feature on the home page: ll-dash-server" [ref=e623]
+                        - StaticText "—"
+                    - cell "View ll-dash-server Edit ll-dash-server Delete ll-dash-server" [ref=e120]
+                      - link "View ll-dash-server" [ref=e624]
+                        - StaticText "View"
+                      - button "Edit ll-dash-server" [ref=e625]
+                        - StaticText "Edit"
+                      - button "Delete ll-dash-server" [ref=e626]
+                        - image
+                  - row
+                    - cell "189924 Select low-latency-dash-ffmpeg" [ref=e121]
+                      - StaticText "189924"
+                      - checkbox "Select low-latency-dash-ffmpeg" [checked=false, ref=e627]
+                    - cell "low-latency-dash-ffmpeg" [ref=e122]
+                      - StaticText "low-latency-dash-ffmpeg"
+                    - cell "Protocols & Transport" [ref=e123]
+                    - cell
+                    - cell "Feature on the home page: low-latency-dash-ffmpeg" [ref=e124]
+                      - button "Feature on the home page: low-latency-dash-ffmpeg" [ref=e628]
+                        - StaticText "—"
+                    - cell "View low-latency-dash-ffmpeg Edit low-latency-dash-ffmpeg Delete low-latency-dash-ffmpeg" [ref=e125]
+                      - link "View low-latency-dash-ffmpeg" [ref=e629]
+                        - StaticText "View"
+                      - button "Edit low-latency-dash-ffmpeg" [ref=e630]
+                        - StaticText "Edit"
+                      - button "Delete low-latency-dash-ffmpeg" [ref=e631]
+                        - image
+                  - row
+                    - cell "189923 Select simple-lossless-encoder (libjxl)" [ref=e126]
+                      - StaticText "189923"
+                      - checkbox "Select simple-lossless-encoder (libjxl)" [checked=false, ref=e632]
+                    - cell "simple-lossless-encoder (libjxl)" [ref=e127]
+                      - StaticText "simple-lossless-encoder (libjxl)"
+                    - cell "Encoding & Codecs" [ref=e128]
+                    - cell
+                    - cell "Feature on the home page: simple-lossless-encoder (libjxl)" [ref=e129]
+                      - button "Feature on the home page: simple-lossless-encoder (libjxl)" [ref=e633]
+                        - StaticText "—"
+                    - cell "View simple-lossless-encoder (libjxl) Edit simple-lossless-encoder (libjxl) Delete simple-lossless-encoder (libjxl)" [ref=e130]
+                      - link "View simple-lossless-encoder (libjxl)" [ref=e634]
+                        - StaticText "View"
+                      - button "Edit simple-lossless-encoder (libjxl)" [ref=e635]
+                        - StaticText "Edit"
+                      - button "Delete simple-lossless-encoder (libjxl)" [ref=e636]
+                        - image
+                  - row
+                    - cell "189922 Select hevc.js" [ref=e131]
+                      - StaticText "189922"
+                      - checkbox "Select hevc.js" [checked=false, ref=e637]
+                    - cell "hevc.js" [ref=e132]
+                      - StaticText "hevc.js"
+                    - cell "Encoding & Codecs" [ref=e133]
+                    - cell
+                    - cell "Feature on the home page: hevc.js" [ref=e134]
+                      - button "Feature on the home page: hevc.js" [ref=e638]
+                        - StaticText "—"
+                    - cell "View hevc.js Edit hevc.js Delete hevc.js" [ref=e135]
+                      - link "View hevc.js" [ref=e639]
+                        - StaticText "View"
+                      - button "Edit hevc.js" [ref=e640]
+                        - StaticText "Edit"
+                      - button "Delete hevc.js" [ref=e641]
+                        - image
+                  - row
+                    - cell "189921 Select nano-hevc" [ref=e136]
+                      - StaticText "189921"
+                      - checkbox "Select nano-hevc" [checked=false, ref=e642]
+                    - cell "nano-hevc" [ref=e137]
+                      - StaticText "nano-hevc"
+                    - cell "Encoding & Codecs" [ref=e138]
+                    - cell
+                    - cell "Feature on the home page: nano-hevc" [ref=e139]
+                      - button "Feature on the home page: nano-hevc" [ref=e643]
+                        - StaticText "—"
+                    - cell "View nano-hevc Edit nano-hevc Delete nano-hevc" [ref=e140]
+                      - link "View nano-hevc" [ref=e644]
+                        - StaticText "View"
+                      - button "Edit nano-hevc" [ref=e645]
+                        - StaticText "Edit"
+                      - button "Delete nano-hevc" [ref=e646]
+                        - image
+                  - row
+                    - cell "189920 Select enhancr" [ref=e141]
+                      - StaticText "189920"
+                      - checkbox "Select enhancr" [checked=false, ref=e647]
+                    - cell "enhancr" [ref=e142]
+                      - StaticText "enhancr"
+                    - cell "Media Tools" [ref=e143]
+                    - cell
+                    - cell "Feature on the home page: enhancr" [ref=e144]
+                      - button "Feature on the home page: enhancr" [ref=e648]
+                        - StaticText "—"
+                    - cell "View enhancr Edit enhancr Delete enhancr" [ref=e145]
+                      - link "View enhancr" [ref=e649]
+                        - StaticText "View"
+                      - button "Edit enhancr" [ref=e650]
+                        - StaticText "Edit"
+                      - button "Delete enhancr" [ref=e651]
+                        - image
+                  - row
+                    - cell "189919 Select REAL-Video-Enhancer" [ref=e146]
+                      - StaticText "189919"
+                      - checkbox "Select REAL-Video-Enhancer" [checked=false, ref=e652]
+                    - cell "REAL-Video-Enhancer" [ref=e147]
+                      - StaticText "REAL-Video-Enhancer"
+                    - cell "Media Tools" [ref=e148]
+                    - cell
+                    - cell "Feature on the home page: REAL-Video-Enhancer" [ref=e149]
+                      - button "Feature on the home page: REAL-Video-Enhancer" [ref=e653]
+                        - StaticText "—"
+                    - cell "View REAL-Video-Enhancer Edit REAL-Video-Enhancer Delete REAL-Video-Enhancer" [ref=e150]
+                      - link "View REAL-Video-Enhancer" [ref=e654]
+                        - StaticText "View"
+                      - button "Edit REAL-Video-Enhancer" [ref=e655]
+                        - StaticText "Edit"
+                      - button "Delete REAL-Video-Enhancer" [ref=e656]
+                        - image
+                  - row
+                    - cell "189918 Select ComfyUI-VideoColorGrading" [ref=e151]
+                      - StaticText "189918"
+                      - checkbox "Select ComfyUI-VideoColorGrading" [checked=false, ref=e657]
+                    - cell "ComfyUI-VideoColorGrading" [ref=e152]
+                      - StaticText "ComfyUI-VideoColorGrading"
+                    - cell "Media Tools" [ref=e153]
+                    - cell
+                    - cell "Feature on the home page: ComfyUI-VideoColorGrading" [ref=e154]
+                      - button "Feature on the home page: ComfyUI-VideoColorGrading" [ref=e658]
+                        - StaticText "—"
+                    - cell "View ComfyUI-VideoColorGrading Edit ComfyUI-VideoColorGrading Delete ComfyUI-VideoColorGrading" [ref=e155]
+                      - link "View ComfyUI-VideoColorGrading" [ref=e659]
+                        - StaticText "View"
+                      - button "Edit ComfyUI-VideoColorGrading" [ref=e660]
+                        - StaticText "Edit"
+                      - button "Delete ComfyUI-VideoColorGrading" [ref=e661]
+                        - image
+                  - row
+                    - cell "189917 Select VQMTK: Video Quality Metrics Toolkit" [ref=e156]
+                      - StaticText "189917"
+                      - checkbox "Select VQMTK: Video Quality Metrics Toolkit" [checked=false, ref=e662]
+                    - cell "VQMTK: Video Quality Metrics Toolkit" [ref=e157]
+                      - StaticText "VQMTK: Video Quality Metrics Toolkit"
+                    - cell "Media Tools" [ref=e158]
+                    - cell
+                    - cell "Feature on the home page: VQMTK: Video Quality Metrics Toolkit" [ref=e159]
+                      - button "Feature on the home page: VQMTK: Video Quality Metrics Toolkit" [ref=e663]
+                        - StaticText "—"
+                    - cell "View VQMTK: Video Quality Metrics Toolkit Edit VQMTK: Video Quality Metrics Toolkit Delete VQMTK: Video Quality Metrics Toolkit" [ref=e160]
+                      - link "View VQMTK: Video Quality Metrics Toolkit" [ref=e664]
+                        - StaticText "View"
+                      - button "Edit VQMTK: Video Quality Metrics Toolkit" [ref=e665]
+                        - StaticText "Edit"
+                      - button "Delete VQMTK: Video Quality Metrics Toolkit" [ref=e666]
+                        - image
+                  - row
+                    - cell "189916 Select nr-vqa-consumervideo" [ref=e161]
+                      - StaticText "189916"
+                      - checkbox "Select nr-vqa-consumervideo" [checked=false, ref=e667]
+                    - cell "nr-vqa-consumervideo" [ref=e162]
+                      - StaticText "nr-vqa-consumervideo"
+                    - cell "Media Tools" [ref=e163]
+                    - cell
+                    - cell "Feature on the home page: nr-vqa-consumervideo" [ref=e164]
+                      - button "Feature on the home page: nr-vqa-consumervideo" [ref=e668]
+                        - StaticText "—"
+                    - cell "View nr-vqa-consumervideo Edit nr-vqa-consumervideo Delete nr-vqa-consumervideo" [ref=e165]
+                      - link "View nr-vqa-consumervideo" [ref=e669]
+                        - StaticText "View"
+                      - button "Edit nr-vqa-consumervideo" [ref=e670]
+                        - StaticText "Edit"
+                      - button "Delete nr-vqa-consumervideo" [ref=e671]
+                        - image
+                  - row
+                    - cell "189915 Select From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e166]
+                      - StaticText "189915"
+                      - checkbox "Select From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [checked=false, ref=e672]
+                    - cell "From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e167]
+                      - StaticText "From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon"
+                    - cell "Intro & Learning" [ref=e168]
+                    - cell
+                    - cell "Feature on the home page: From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e169]
+                      - button "Feature on the home page: From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e673]
+                        - StaticText "—"
+                    - cell "View From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon Edit From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon Delete From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e170]
+                      - link "View From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e674]
+                        - StaticText "View"
+                      - button "Edit From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e675]
+                        - StaticText "Edit"
+                      - button "Delete From ExoPlayer2 to Media3: Rebuilding Android Playback at Patreon" [ref=e676]
+                        - image
+                  - row
+                    - cell "189914 Select ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e171]
+                      - StaticText "189914"
+                      - checkbox "Select ExoPlayer Architecture & DRM (System Design Lesson)" [checked=false, ref=e677]
+                    - cell "ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e172]
+                      - StaticText "ExoPlayer Architecture & DRM (System Design Lesson)"
+                    - cell "Intro & Learning" [ref=e173]
+                    - cell
+                    - cell "Feature on the home page: ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e174]
+                      - button "Feature on the home page: ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e678]
+                        - StaticText "—"
+                    - cell "View ExoPlayer Architecture & DRM (System Design Lesson) Edit ExoPlayer Architecture & DRM (System Design Lesson) Delete ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e175]
+                      - link "View ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e679]
+                        - StaticText "View"
+                      - button "Edit ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e680]
+                        - StaticText "Edit"
+                      - button "Delete ExoPlayer Architecture & DRM (System Design Lesson)" [ref=e681]
+                        - image
+                  - row
+                    - cell "189913 Select ExoPlayer/Media3 Deep Architecture Wiki" [ref=e176]
+                      - StaticText "189913"
+                      - checkbox "Select ExoPlayer/Media3 Deep Architecture Wiki" [checked=false, ref=e682]
+                    - cell "ExoPlayer/Media3 Deep Architecture Wiki" [ref=e177]
+                      - StaticText "ExoPlayer/Media3 Deep Architecture Wiki"
+                    - cell "Intro & Learning" [ref=e178]
+                    - cell
+                    - cell "Feature on the home page: ExoPlayer/Media3 Deep Architecture Wiki" [ref=e179]
+                      - button "Feature on the home page: ExoPlayer/Media3 Deep Architecture Wiki" [ref=e683]
+                        - StaticText "—"
+                    - cell "View ExoPlayer/Media3 Deep Architecture Wiki Edit ExoPlayer/Media3 Deep Architecture Wiki Delete ExoPlayer/Media3 Deep Architecture Wiki" [ref=e180]
+                      - link "View ExoPlayer/Media3 Deep Architecture Wiki" [ref=e684]
+                        - StaticText "View"
+                      - button "Edit ExoPlayer/Media3 Deep Architecture Wiki" [ref=e685]
+                        - StaticText "Edit"
+                      - button "Delete ExoPlayer/Media3 Deep Architecture Wiki" [ref=e686]
+                        - image
+                  - row
+                    - cell "189912 Select FOSDEM 2025 Video Archive" [ref=e181]
+                      - StaticText "189912"
+                      - checkbox "Select FOSDEM 2025 Video Archive" [checked=false, ref=e687]
+                    - cell "FOSDEM 2025 Video Archive" [ref=e182]
+                      - StaticText "FOSDEM 2025 Video Archive"
+                    - cell "Intro & Learning" [ref=e183]
+                    - cell
+                    - cell "Feature on the home page: FOSDEM 2025 Video Archive" [ref=e184]
+                      - button "Feature on the home page: FOSDEM 2025 Video Archive" [ref=e688]
+                        - StaticText "—"
+                    - cell "View FOSDEM 2025 Video Archive Edit FOSDEM 2025 Video Archive Delete FOSDEM 2025 Video Archive" [ref=e185]
+                      - link "View FOSDEM 2025 Video Archive" [ref=e689]
+                        - StaticText "View"
+                      - button "Edit FOSDEM 2025 Video Archive" [ref=e690]
+                        - StaticText "Edit"
+                      - button "Delete FOSDEM 2025 Video Archive" [ref=e691]
+                        - image
+                  - row
+                    - cell "189911 Select FOSDEM 2025 Open Media Devroom Schedule" [ref=e186]
+                      - StaticText "189911"
+                      - checkbox "Select FOSDEM 2025 Open Media Devroom Schedule" [checked=false, ref=e692]
+                    - cell "FOSDEM 2025 Open Media Devroom Schedule" [ref=e187]
+                      - StaticText "FOSDEM 2025 Open Media Devroom Schedule"
+                    - cell "Intro & Learning" [ref=e188]
+                    - cell
+                    - cell "Feature on the home page: FOSDEM 2025 Open Media Devroom Schedule" [ref=e189]
+                      - button "Feature on the home page: FOSDEM 2025 Open Media Devroom Schedule" [ref=e693]
+                        - StaticText "—"
+                    - cell "View FOSDEM 2025 Open Media Devroom Schedule Edit FOSDEM 2025 Open Media Devroom Schedule Delete FOSDEM 2025 Open Media Devroom Schedule" [ref=e190]
+                      - link "View FOSDEM 2025 Open Media Devroom Schedule" [ref=e694]
+                        - StaticText "View"
+                      - button "Edit FOSDEM 2025 Open Media Devroom Schedule" [ref=e695]
+                        - StaticText "Edit"
+                      - button "Delete FOSDEM 2025 Open Media Devroom Schedule" [ref=e696]
+                        - image
+                  - row
+                    - cell "189910 Select ffmpeg-gui (vegnuli)" [ref=e191]
+                      - StaticText "189910"
+                      - checkbox "Select ffmpeg-gui (vegnuli)" [checked=false, ref=e697]
+                    - cell "ffmpeg-gui (vegnuli)" [ref=e192]
+                      - StaticText "ffmpeg-gui (vegnuli)"
+                    - cell "General Tools" [ref=e193]
+                    - cell
+                    - cell "Feature on the home page: ffmpeg-gui (vegnuli)" [ref=e194]
+                      - button "Feature on the home page: ffmpeg-gui (vegnuli)" [ref=e698]
+                        - StaticText "—"
+                    - cell "View ffmpeg-gui (vegnuli) Edit ffmpeg-gui (vegnuli) Delete ffmpeg-gui (vegnuli)" [ref=e195]
+                      - link "View ffmpeg-gui (vegnuli)" [ref=e699]
+                        - StaticText "View"
+                      - button "Edit ffmpeg-gui (vegnuli)" [ref=e700]
+                        - StaticText "Edit"
+                      - button "Delete ffmpeg-gui (vegnuli)" [ref=e701]
+                        - image
+                  - row
+                    - cell "189909 Select FFMpegGUI" [ref=e196]
+                      - StaticText "189909"
+                      - checkbox "Select FFMpegGUI" [checked=false, ref=e702]
+                    - cell "FFMpegGUI" [ref=e197]
+                      - StaticText "FFMpegGUI"
+                    - cell "General Tools" [ref=e198]
+                    - cell
+                    - cell "Feature on the home page: FFMpegGUI" [ref=e199]
+                      - button "Feature on the home page: FFMpegGUI" [ref=e703]
+                        - StaticText "—"
+                    - cell "View FFMpegGUI Edit FFMpegGUI Delete FFMpegGUI" [ref=e200]
+                      - link "View FFMpegGUI" [ref=e704]
+                        - StaticText "View"
+                      - button "Edit FFMpegGUI" [ref=e705]
+                        - StaticText "Edit"
+                      - button "Delete FFMpegGUI" [ref=e706]
+                        - image
+                  - row
+                    - cell "189908 Select varnish-rs" [ref=e201]
+                      - StaticText "189908"
+                      - checkbox "Select varnish-rs" [checked=false, ref=e707]
+                    - cell "varnish-rs" [ref=e202]
+                      - StaticText "varnish-rs"
+                    - cell "Infrastructure & Delivery" [ref=e203]
+                    - cell
+                    - cell "Feature on the home page: varnish-rs" [ref=e204]
+                      - button "Feature on the home page: varnish-rs" [ref=e708]
+                        - StaticText "—"
+                    - cell "View varnish-rs Edit varnish-rs Delete varnish-rs" [ref=e205]
+                      - link "View varnish-rs" [ref=e709]
+                        - StaticText "View"
+                      - button "Edit varnish-rs" [ref=e710]
+                        - StaticText "Edit"
+                      - button "Delete varnish-rs" [ref=e711]
+                        - image
+                  - row
+                    - cell "189907 Select Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e206]
+                      - StaticText "189907"
+                      - checkbox "Select Building Your Own Scalable Video Streaming Server (Part 1)" [checked=false, ref=e712]
+                    - cell "Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e207]
+                      - StaticText "Building Your Own Scalable Video Streaming Server (Part 1)"
+                    - cell "Intro & Learning" [ref=e208]
+                    - cell
+                    - cell "Feature on the home page: Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e209]
+                      - button "Feature on the home page: Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e713]
+                        - StaticText "—"
+                    - cell "View Building Your Own Scalable Video Streaming Server (Part 1) Edit Building Your Own Scalable Video Streaming Server (Part 1) Delete Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e210]
+                      - link "View Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e714]
+                        - StaticText "View"
+                      - button "Edit Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e715]
+                        - StaticText "Edit"
+                      - button "Delete Building Your Own Scalable Video Streaming Server (Part 1)" [ref=e716]
+                        - image
+                  - row
+                    - cell "189906 Select Doom9 – New and Alternative Video Codecs" [ref=e211]
+                      - StaticText "189906"
+                      - checkbox "Select Doom9 – New and Alternative Video Codecs" [checked=false, ref=e717]
+                    - cell "Doom9 – New and Alternative Video Codecs" [ref=e212]
+                      - StaticText "Doom9 – New and Alternative Video Codecs"
+                    - cell "Intro & Learning" [ref=e213]
+                    - cell
+                    - cell "Feature on the home page: Doom9 – New and Alternative Video Codecs" [ref=e214]
+                      - button "Feature on the home page: Doom9 – New and Alternative Video Codecs" [ref=e718]
+                        - StaticText "—"
+                    - cell "View Doom9 – New and Alternative Video Codecs Edit Doom9 – New and Alternative Video Codecs Delete Doom9 – New and Alternative Video Codecs" [ref=e215]
+                      - link "View Doom9 – New and Alternative Video Codecs" [ref=e719]
+                        - StaticText "View"
+                      - button "Edit Doom9 – New and Alternative Video Codecs" [ref=e720]
+                        - StaticText "Edit"
+                      - button "Delete Doom9 – New and Alternative Video Codecs" [ref=e721]
+                        - image
+                  - row
+                    - cell "189905 Select AVForums" [ref=e216]
+                      - StaticText "189905"
+                      - checkbox "Select AVForums" [checked=false, ref=e722]
+                    - cell "AVForums" [ref=e217]
+                      - StaticText "AVForums"
+                    - cell "Intro & Learning" [ref=e218]
+                    - cell
+                    - cell "Feature on the home page: AVForums" [ref=e219]
+                      - button "Feature on the home page: AVForums" [ref=e723]
+                        - StaticText "—"
+                    - cell "View AVForums Edit AVForums Delete AVForums" [ref=e220]
+                      - link "View AVForums" [ref=e724]
+                        - StaticText "View"
+                      - button "Edit AVForums" [ref=e725]
+                        - StaticText "Edit"
+                      - button "Delete AVForums" [ref=e726]
+                        - image
+                  - row
+                    - cell "189904 Select pi-player" [ref=e221]
+                      - StaticText "189904"
+                      - checkbox "Select pi-player" [checked=false, ref=e727]
+                    - cell "pi-player" [ref=e222]
+                      - StaticText "pi-player"
+                    - cell "Players & Clients" [ref=e223]
+                    - cell
+                    - cell "Feature on the home page: pi-player" [ref=e224]
+                      - button "Feature on the home page: pi-player" [ref=e728]
+                        - StaticText "—"
+                    - cell "View pi-player Edit pi-player Delete pi-player" [ref=e225]
+                      - link "View pi-player" [ref=e729]
+                        - StaticText "View"
+                      - button "Edit pi-player" [ref=e730]
+                        - StaticText "Edit"
+                      - button "Delete pi-player" [ref=e731]
+                        - image
+                  - row
+                    - cell "189903 Select video-player (Pi 5 KMSDRM)" [ref=e226]
+                      - StaticText "189903"
+                      - checkbox "Select video-player (Pi 5 KMSDRM)" [checked=false, ref=e732]
+                    - cell "video-player (Pi 5 KMSDRM)" [ref=e227]
+                      - StaticText "video-player (Pi 5 KMSDRM)"
+                    - cell "Players & Clients" [ref=e228]
+                    - cell
+                    - cell "Feature on the home page: video-player (Pi 5 KMSDRM)" [ref=e229]
+                      - button "Feature on the home page: video-player (Pi 5 KMSDRM)" [ref=e733]
+                        - StaticText "—"
+                    - cell "View video-player (Pi 5 KMSDRM) Edit video-player (Pi 5 KMSDRM) Delete video-player (Pi 5 KMSDRM)" [ref=e230]
+                      - link "View video-player (Pi 5 KMSDRM)" [ref=e734]
+                        - StaticText "View"
+                      - button "Edit video-player (Pi 5 KMSDRM)" [ref=e735]
+                        - StaticText "Edit"
+                      - button "Delete video-player (Pi 5 KMSDRM)" [ref=e736]
+                        - image
+                  - row
+                    - cell "189902 Select HPlayer" [ref=e231]
+                      - StaticText "189902"
+                      - checkbox "Select HPlayer" [checked=false, ref=e737]
+                    - cell "HPlayer" [ref=e232]
+                      - StaticText "HPlayer"
+                    - cell "Players & Clients" [ref=e233]
+                    - cell
+                    - cell "Feature on the home page: HPlayer" [ref=e234]
+                      - button "Feature on the home page: HPlayer" [ref=e738]
+                        - StaticText "—"
+                    - cell "View HPlayer Edit HPlayer Delete HPlayer" [ref=e235]
+                      - link "View HPlayer" [ref=e739]
+                        - StaticText "View"
+                      - button "Edit HPlayer" [ref=e740]
+                        - StaticText "Edit"
+                      - button "Delete HPlayer" [ref=e741]
+                        - image
+                  - row
+                    - cell "189901 Select FFmpegAndroid-AutoBuild" [ref=e236]
+                      - StaticText "189901"
+                      - checkbox "Select FFmpegAndroid-AutoBuild" [checked=false, ref=e742]
+                    - cell "FFmpegAndroid-AutoBuild" [ref=e237]
+                      - StaticText "FFmpegAndroid-AutoBuild"
+                    - cell "General Tools" [ref=e238]
+                    - cell
+                    - cell "Feature on the home page: FFmpegAndroid-AutoBuild" [ref=e239]
+                      - button "Feature on the home page: FFmpegAndroid-AutoBuild" [ref=e743]
+                        - StaticText "—"
+                    - cell "View FFmpegAndroid-AutoBuild Edit FFmpegAndroid-AutoBuild Delete FFmpegAndroid-AutoBuild" [ref=e240]
+                      - link "View FFmpegAndroid-AutoBuild" [ref=e744]
+                        - StaticText "View"
+                      - button "Edit FFmpegAndroid-AutoBuild" [ref=e745]
+                        - StaticText "Edit"
+                      - button "Delete FFmpegAndroid-AutoBuild" [ref=e746]
+                        - image
+                  - row
+                    - cell "189900 Select ffmpeg-kit-builders" [ref=e241]
+                      - StaticText "189900"
+                      - checkbox "Select ffmpeg-kit-builders" [checked=false, ref=e747]
+                    - cell "ffmpeg-kit-builders" [ref=e242]
+                      - StaticText "ffmpeg-kit-builders"
+                    - cell "General Tools" [ref=e243]
+                    - cell
+                    - cell "Feature on the home page: ffmpeg-kit-builders" [ref=e244]
+                      - button "Feature on the home page: ffmpeg-kit-builders" [ref=e748]
+                        - StaticText "—"
+                    - cell "View ffmpeg-kit-builders Edit ffmpeg-kit-builders Delete ffmpeg-kit-builders" [ref=e245]
+                      - link "View ffmpeg-kit-builders" [ref=e749]
+                        - StaticText "View"
+                      - button "Edit ffmpeg-kit-builders" [ref=e750]
+                        - StaticText "Edit"
+                      - button "Delete ffmpeg-kit-builders" [ref=e751]
+                        - image
+                  - row
+                    - cell "189899 Select oplayer" [ref=e246]
+                      - StaticText "189899"
+                      - checkbox "Select oplayer" [checked=false, ref=e752]
+                    - cell "oplayer" [ref=e247]
+                      - StaticText "oplayer"
+                    - cell "Players & Clients" [ref=e248]
+                    - cell
+                    - cell "Feature on the home page: oplayer" [ref=e249]
+                      - button "Feature on the home page: oplayer" [ref=e753]
+                        - StaticText "—"
+                    - cell "View oplayer Edit oplayer Delete oplayer" [ref=e250]
+                      - link "View oplayer" [ref=e754]
+                        - StaticText "View"
+                      - button "Edit oplayer" [ref=e755]
+                        - StaticText "Edit"
+                      - button "Delete oplayer" [ref=e756]
+                        - image
+                  - row
+                    - cell "189898 Select Vime" [ref=e251]
+                      - StaticText "189898"
+                      - checkbox "Select Vime" [checked=false, ref=e757]
+                    - cell "Vime" [ref=e252]
+                      - StaticText "Vime"
+                    - cell "Players & Clients" [ref=e253]
+                    - cell
+                    - cell "Feature on the home page: Vime" [ref=e254]
+                      - button "Feature on the home page: Vime" [ref=e758]
+                        - StaticText "—"
+                    - cell "View Vime Edit Vime Delete Vime" [ref=e255]
+                      - link "View Vime" [ref=e759]
+                        - StaticText "View"
+                      - button "Edit Vime" [ref=e760]
+                        - StaticText "Edit"
+                      - button "Delete Vime" [ref=e761]
+                        - image
+                  - row
+                    - cell "189897 Select scte35-reader" [ref=e256]
+                      - StaticText "189897"
+                      - checkbox "Select scte35-reader" [checked=false, ref=e762]
+                    - cell "scte35-reader" [ref=e257]
+                      - StaticText "scte35-reader"
+                    - cell "Standards & Industry" [ref=e258]
+                    - cell
+                    - cell "Feature on the home page: scte35-reader" [ref=e259]
+                      - button "Feature on the home page: scte35-reader" [ref=e763]
+                        - StaticText "—"
+                    - cell "View scte35-reader Edit scte35-reader Delete scte35-reader" [ref=e260]
+                      - link "View scte35-reader" [ref=e764]
+                        - StaticText "View"
+                      - button "Edit scte35-reader" [ref=e765]
+                        - StaticText "Edit"
+                      - button "Delete scte35-reader" [ref=e766]
+                        - image
+                  - row
+                    - cell "189896 Select threefive" [ref=e261]
+                      - StaticText "189896"
+                      - checkbox "Select threefive" [checked=false, ref=e767]
+                    - cell "threefive" [ref=e262]
+                      - StaticText "threefive"
+                    - cell "Standards & Industry" [ref=e263]
+                    - cell
+                    - cell "Feature on the home page: threefive" [ref=e264]
+                      - button "Feature on the home page: threefive" [ref=e768]
+                        - StaticText "—"
+                    - cell "View threefive Edit threefive Delete threefive" [ref=e265]
+                      - link "View threefive" [ref=e769]
+                        - StaticText "View"
+                      - button "Edit threefive" [ref=e770]
+                        - StaticText "Edit"
+                      - button "Delete threefive" [ref=e771]
+                        - image
+                  - row
+                    - cell "189895 Select pymp4decrypt" [ref=e266]
+                      - StaticText "189895"
+                      - checkbox "Select pymp4decrypt" [checked=false, ref=e772]
+                    - cell "pymp4decrypt" [ref=e267]
+                      - StaticText "pymp4decrypt"
+                    - cell "Standards & Industry" [ref=e268]
+                    - cell
+                    - cell "Feature on the home page: pymp4decrypt" [ref=e269]
+                      - button "Feature on the home page: pymp4decrypt" [ref=e773]
+                        - StaticText "—"
+                    - cell "View pymp4decrypt Edit pymp4decrypt Delete pymp4decrypt" [ref=e270]
+                      - link "View pymp4decrypt" [ref=e774]
+                        - StaticText "View"
+                      - button "Edit pymp4decrypt" [ref=e775]
+                        - StaticText "Edit"
+                      - button "Delete pymp4decrypt" [ref=e776]
+                        - image
+                  - row
+                    - cell "189894 Select go-m3u8" [ref=e271]
+                      - StaticText "189894"
+                      - checkbox "Select go-m3u8" [checked=false, ref=e777]
+                    - cell "go-m3u8" [ref=e272]
+                      - StaticText "go-m3u8"
+                    - cell "Protocols & Transport" [ref=e273]
+                    - cell
+                    - cell "Feature on the home page: go-m3u8" [ref=e274]
+                      - button "Feature on the home page: go-m3u8" [ref=e778]
+                        - StaticText "—"
+                    - cell "View go-m3u8 Edit go-m3u8 Delete go-m3u8" [ref=e275]
+                      - link "View go-m3u8" [ref=e779]
+                        - StaticText "View"
+                      - button "Edit go-m3u8" [ref=e780]
+                        - StaticText "Edit"
+                      - button "Delete go-m3u8" [ref=e781]
+                        - image
+                  - row
+                    - cell "189893 Select 2srt2ass-cpp" [ref=e276]
+                      - StaticText "189893"
+                      - checkbox "Select 2srt2ass-cpp" [checked=false, ref=e782]
+                    - cell "2srt2ass-cpp" [ref=e277]
+                      - StaticText "2srt2ass-cpp"
+                    - cell "Media Tools" [ref=e278]
+                    - cell
+                    - cell "Feature on the home page: 2srt2ass-cpp" [ref=e279]
+                      - button "Feature on the home page: 2srt2ass-cpp" [ref=e783]
+                        - StaticText "—"
+                    - cell "View 2srt2ass-cpp Edit 2srt2ass-cpp Delete 2srt2ass-cpp" [ref=e280]
+                      - link "View 2srt2ass-cpp" [ref=e784]
+                        - StaticText "View"
+                      - button "Edit 2srt2ass-cpp" [ref=e785]
+                        - StaticText "Edit"
+                      - button "Delete 2srt2ass-cpp" [ref=e786]
+                        - image
+                  - row
+                    - cell "189892 Select subtitle-translator" [ref=e281]
+                      - StaticText "189892"
+                      - checkbox "Select subtitle-translator" [checked=false, ref=e787]
+                    - cell "subtitle-translator" [ref=e282]
+                      - StaticText "subtitle-translator"
+                    - cell "Media Tools" [ref=e283]
+                    - cell
+                    - cell "Feature on the home page: subtitle-translator" [ref=e284]
+                      - button "Feature on the home page: subtitle-translator" [ref=e788]
+                        - StaticText "—"
+                    - cell "View subtitle-translator Edit subtitle-translator Delete subtitle-translator" [ref=e285]
+                      - link "View subtitle-translator" [ref=e789]
+                        - StaticText "View"
+                      - button "Edit subtitle-translator" [ref=e790]
+                        - StaticText "Edit"
+                      - button "Delete subtitle-translator" [ref=e791]
+                        - image
+                  - row
+                    - cell "189891 Select spectre" [ref=e286]
+                      - StaticText "189891"
+                      - checkbox "Select spectre" [checked=false, ref=e792]
+                    - cell "spectre" [ref=e287]
+                      - StaticText "spectre"
+                    - cell "Media Tools" [ref=e288]
+                    - cell
+                    - cell "Feature on the home page: spectre" [ref=e289]
+                      - button "Feature on the home page: spectre" [ref=e793]
+                        - StaticText "—"
+                    - cell "View spectre Edit spectre Delete spectre" [ref=e290]
+                      - link "View spectre" [ref=e794]
+                        - StaticText "View"
+                      - button "Edit spectre" [ref=e795]
+                        - StaticText "Edit"
+                      - button "Delete spectre" [ref=e796]
+                        - image
+                  - row
+                    - cell "189890 Select Panako" [ref=e291]
+                      - StaticText "189890"
+                      - checkbox "Select Panako" [checked=false, ref=e797]
+                    - cell "Panako" [ref=e292]
+                      - StaticText "Panako"
+                    - cell "Media Tools" [ref=e293]
+                    - cell
+                    - cell "Feature on the home page: Panako" [ref=e294]
+                      - button "Feature on the home page: Panako" [ref=e798]
+                        - StaticText "—"
+                    - cell "View Panako Edit Panako Delete Panako" [ref=e295]
+                      - link "View Panako" [ref=e799]
+                        - StaticText "View"
+                      - button "Edit Panako" [ref=e800]
+                        - StaticText "Edit"
+                      - button "Delete Panako" [ref=e801]
+                        - image
+                  - row
+                    - cell "189889 Select Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e296]
+                      - StaticText "189889"
+                      - checkbox "Select Olaf (Overly Lightweight Acoustic Fingerprinting)" [checked=false, ref=e802]
+                    - cell "Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e297]
+                      - StaticText "Olaf (Overly Lightweight Acoustic Fingerprinting)"
+                    - cell "Media Tools" [ref=e298]
+                    - cell
+                    - cell "Feature on the home page: Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e299]
+                      - button "Feature on the home page: Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e803]
+                        - StaticText "—"
+                    - cell "View Olaf (Overly Lightweight Acoustic Fingerprinting) Edit Olaf (Overly Lightweight Acoustic Fingerprinting) Delete Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e300]
+                      - link "View Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e804]
+                        - StaticText "View"
+                      - button "Edit Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e805]
+                        - StaticText "Edit"
+                      - button "Delete Olaf (Overly Lightweight Acoustic Fingerprinting)" [ref=e806]
+                        - image
+                  - row
+                    - cell "189888 Select live-stream-from-desktop" [ref=e301]
+                      - StaticText "189888"
+                      - checkbox "Select live-stream-from-desktop" [checked=false, ref=e807]
+                    - cell "live-stream-from-desktop" [ref=e302]
+                      - StaticText "live-stream-from-desktop"
+                    - cell "General Tools" [ref=e303]
+                    - cell
+                    - cell "Feature on the home page: live-stream-from-desktop" [ref=e304]
+                      - button "Feature on the home page: live-stream-from-desktop" [ref=e808]
+                        - StaticText "—"
+                    - cell "View live-stream-from-desktop Edit live-stream-from-desktop Delete live-stream-from-desktop" [ref=e305]
+                      - link "View live-stream-from-desktop" [ref=e809]
+                        - StaticText "View"
+                      - button "Edit live-stream-from-desktop" [ref=e810]
+                        - StaticText "Edit"
+                      - button "Delete live-stream-from-desktop" [ref=e811]
+                        - image
+                  - row
+                    - cell "189887 Select DemoVideos" [ref=e306]
+                      - StaticText "189887"
+                      - checkbox "Select DemoVideos" [checked=false, ref=e812]
+                    - cell "DemoVideos" [ref=e307]
+                      - StaticText "DemoVideos"
+                    - cell "General Tools" [ref=e308]
+                    - cell
+                    - cell "Feature on the home page: DemoVideos" [ref=e309]
+                      - button "Feature on the home page: DemoVideos" [ref=e813]
+                        - StaticText "—"
+                    - cell "View DemoVideos Edit DemoVideos Delete DemoVideos" [ref=e310]
+                      - link "View DemoVideos" [ref=e814]
+                        - StaticText "View"
+                      - button "Edit DemoVideos" [ref=e815]
+                        - StaticText "Edit"
+                      - button "Delete DemoVideos" [ref=e816]
+                        - image
+                  - row
+                    - cell "189886 Select ffmpeg-cli-wrapper (Kotlin)" [ref=e311]
+                      - StaticText "189886"
+                      - checkbox "Select ffmpeg-cli-wrapper (Kotlin)" [checked=false, ref=e817]
+                    - cell "ffmpeg-cli-wrapper (Kotlin)" [ref=e312]
+                      - StaticText "ffmpeg-cli-wrapper (Kotlin)"
+                    - cell "General Tools" [ref=e313]
+                    - cell
+                    - cell "Feature on the home page: ffmpeg-cli-wrapper (Kotlin)" [ref=e314]
+                      - button "Feature on the home page: ffmpeg-cli-wrapper (Kotlin)" [ref=e818]
+                        - StaticText "—"
+                    - cell "View ffmpeg-cli-wrapper (Kotlin) Edit ffmpeg-cli-wrapper (Kotlin) Delete ffmpeg-cli-wrapper (Kotlin)" [ref=e315]
+                      - link "View ffmpeg-cli-wrapper (Kotlin)" [ref=e819]
+                        - StaticText "View"
+                      - button "Edit ffmpeg-cli-wrapper (Kotlin)" [ref=e820]
+                        - StaticText "Edit"
+                      - button "Delete ffmpeg-cli-wrapper (Kotlin)" [ref=e821]
+                        - image
+                  - row
+                    - cell "189885 Select OpenReel Video" [ref=e316]
+                      - StaticText "189885"
+                      - checkbox "Select OpenReel Video" [checked=false, ref=e822]
+                    - cell "OpenReel Video" [ref=e317]
+                      - StaticText "OpenReel Video"
+                    - cell "Media Tools" [ref=e318]
+                    - cell
+                    - cell "Feature on the home page: OpenReel Video" [ref=e319]
+                      - button "Feature on the home page: OpenReel Video" [ref=e823]
+                        - StaticText "—"
+                    - cell "View OpenReel Video Edit OpenReel Video Delete OpenReel Video" [ref=e320]
+                      - link "View OpenReel Video" [ref=e824]
+                        - StaticText "View"
+                      - button "Edit OpenReel Video" [ref=e825]
+                        - StaticText "Edit"
+                      - button "Delete OpenReel Video" [ref=e826]
+                        - image
+                  - row
+                    - cell "189884 Select aws-batch-with-FFmpeg" [ref=e321]
+                      - StaticText "189884"
+                      - checkbox "Select aws-batch-with-FFmpeg" [checked=false, ref=e827]
+                    - cell "aws-batch-with-FFmpeg" [ref=e322]
+                      - StaticText "aws-batch-with-FFmpeg"
+                    - cell "Media Tools" [ref=e323]
+                    - cell
+                    - cell "Feature on the home page: aws-batch-with-FFmpeg" [ref=e324]
+                      - button "Feature on the home page: aws-batch-with-FFmpeg" [ref=e828]
+                        - StaticText "—"
+                    - cell "View aws-batch-with-FFmpeg Edit aws-batch-with-FFmpeg Delete aws-batch-with-FFmpeg" [ref=e325]
+                      - link "View aws-batch-with-FFmpeg" [ref=e829]
+                        - StaticText "View"
+                      - button "Edit aws-batch-with-FFmpeg" [ref=e830]
+                        - StaticText "Edit"
+                      - button "Delete aws-batch-with-FFmpeg" [ref=e831]
+                        - image
+                  - row
+                    - cell "189883 Select AI-Youtube-Shorts-Generator" [ref=e326]
+                      - StaticText "189883"
+                      - checkbox "Select AI-Youtube-Shorts-Generator" [checked=false, ref=e832]
+                    - cell "AI-Youtube-Shorts-Generator" [ref=e327]
+                      - StaticText "AI-Youtube-Shorts-Generator"
+                    - cell "Media Tools" [ref=e328]
+                    - cell
+                    - cell "Feature on the home page: AI-Youtube-Shorts-Generator" [ref=e329]
+                      - button "Feature on the home page: AI-Youtube-Shorts-Generator" [ref=e833]
+                        - StaticText "—"
+                    - cell "View AI-Youtube-Shorts-Generator Edit AI-Youtube-Shorts-Generator Delete AI-Youtube-Shorts-Generator" [ref=e330]
+                      - link "View AI-Youtube-Shorts-Generator" [ref=e834]
+                        - StaticText "View"
+                      - button "Edit AI-Youtube-Shorts-Generator" [ref=e835]
+                        - StaticText "Edit"
+                      - button "Delete AI-Youtube-Shorts-Generator" [ref=e836]
+                        - image
+                  - row
+                    - cell "189882 Select genai-video-super-resolution" [ref=e331]
+                      - StaticText "189882"
+                      - checkbox "Select genai-video-super-resolution" [checked=false, ref=e837]
+                    - cell "genai-video-super-resolution" [ref=e332]
+                      - StaticText "genai-video-super-resolution"
+                    - cell "Media Tools" [ref=e333]
+                    - cell
+                    - cell "Feature on the home page: genai-video-super-resolution" [ref=e334]
+                      - button "Feature on the home page: genai-video-super-resolution" [ref=e838]
+                        - StaticText "—"
+                    - cell "View genai-video-super-resolution Edit genai-video-super-resolution Delete genai-video-super-resolution" [ref=e335]
+                      - link "View genai-video-super-resolution" [ref=e839]
+                        - StaticText "View"
+                      - button "Edit genai-video-super-resolution" [ref=e840]
+                        - StaticText "Edit"
+                      - button "Delete genai-video-super-resolution" [ref=e841]
+                        - image
+                  - row
+                    - cell "189881 Select ExifTool" [ref=e336]
+                      - StaticText "189881"
+                      - checkbox "Select ExifTool" [checked=false, ref=e842]
+                    - cell "ExifTool" [ref=e337]
+                      - StaticText "ExifTool"
+                    - cell "Media Tools" [ref=e338]
+                    - cell
+                    - cell "Feature on the home page: ExifTool" [ref=e339]
+                      - button "Feature on the home page: ExifTool" [ref=e843]
+                        - StaticText "—"
+                    - cell "View ExifTool Edit ExifTool Delete ExifTool" [ref=e340]
+                      - link "View ExifTool" [ref=e844]
+                        - StaticText "View"
+                      - button "Edit ExifTool" [ref=e845]
+                        - StaticText "Edit"
+                      - button "Delete ExifTool" [ref=e846]
+                        - image
+                  - row
+                    - cell "189880 Select LL-HLS-WebTorrent" [ref=e341]
+                      - StaticText "189880"
+                      - checkbox "Select LL-HLS-WebTorrent" [checked=false, ref=e847]
+                    - cell "LL-HLS-WebTorrent" [ref=e342]
+                      - StaticText "LL-HLS-WebTorrent"
+                    - cell "Infrastructure & Delivery" [ref=e343]
+                    - cell
+                    - cell "Feature on the home page: LL-HLS-WebTorrent" [ref=e344]
+                      - button "Feature on the home page: LL-HLS-WebTorrent" [ref=e848]
+                        - StaticText "—"
+                    - cell "View LL-HLS-WebTorrent Edit LL-HLS-WebTorrent Delete LL-HLS-WebTorrent" [ref=e345]
+                      - link "View LL-HLS-WebTorrent" [ref=e849]
+                        - StaticText "View"
+                      - button "Edit LL-HLS-WebTorrent" [ref=e850]
+                        - StaticText "Edit"
+                      - button "Delete LL-HLS-WebTorrent" [ref=e851]
+                        - image
+                  - row
+                    - cell "189879 Select RTSP-Client-Server" [ref=e346]
+                      - StaticText "189879"
+                      - checkbox "Select RTSP-Client-Server" [checked=false, ref=e852]
+                    - cell "RTSP-Client-Server" [ref=e347]
+                      - StaticText "RTSP-Client-Server"
+                    - cell "General Tools" [ref=e348]
+                    - cell
+                    - cell "Feature on the home page: RTSP-Client-Server" [ref=e349]
+                      - button "Feature on the home page: RTSP-Client-Server" [ref=e853]
+                        - StaticText "—"
+                    - cell "View RTSP-Client-Server Edit RTSP-Client-Server Delete RTSP-Client-Server" [ref=e350]
+                      - link "View RTSP-Client-Server" [ref=e854]
+                        - StaticText "View"
+                      - button "Edit RTSP-Client-Server" [ref=e855]
+                        - StaticText "Edit"
+                      - button "Delete RTSP-Client-Server" [ref=e856]
+                        - image
+                  - row
+                    - cell "189878 Select µStreamer (ustreamer)" [ref=e351]
+                      - StaticText "189878"
+                      - checkbox "Select µStreamer (ustreamer)" [checked=false, ref=e857]
+                    - cell "µStreamer (ustreamer)" [ref=e352]
+                      - StaticText "µStreamer (ustreamer)"
+                    - cell "General Tools" [ref=e353]
+                    - cell
+                    - cell "Feature on the home page: µStreamer (ustreamer)" [ref=e354]
+                      - button "Feature on the home page: µStreamer (ustreamer)" [ref=e858]
+                        - StaticText "—"
+                    - cell "View µStreamer (ustreamer) Edit µStreamer (ustreamer) Delete µStreamer (ustreamer)" [ref=e355]
+                      - link "View µStreamer (ustreamer)" [ref=e859]
+                        - StaticText "View"
+                      - button "Edit µStreamer (ustreamer)" [ref=e860]
+                        - StaticText "Edit"
+                      - button "Delete µStreamer (ustreamer)" [ref=e861]
+                        - image
+                  - row
+                    - cell "189877 Select whammy" [ref=e356]
+                      - StaticText "189877"
+                      - checkbox "Select whammy" [checked=false, ref=e862]
+                    - cell "whammy" [ref=e357]
+                      - StaticText "whammy"
+                    - cell "General Tools" [ref=e358]
+                    - cell
+                    - cell "Feature on the home page: whammy" [ref=e359]
+                      - button "Feature on the home page: whammy" [ref=e863]
+                        - StaticText "—"
+                    - cell "View whammy Edit whammy Delete whammy" [ref=e360]
+                      - link "View whammy" [ref=e864]
+                        - StaticText "View"
+                      - button "Edit whammy" [ref=e865]
+                        - StaticText "Edit"
+                      - button "Delete whammy" [ref=e866]
+                        - image
+                  - row
+                    - cell "189876 Select Puffer (Stanford research study)" [ref=e361]
+                      - StaticText "189876"
+                      - checkbox "Select Puffer (Stanford research study)" [checked=false, ref=e867]
+                    - cell "Puffer (Stanford research study)" [ref=e362]
+                      - StaticText "Puffer (Stanford research study)"
+                    - cell "General Tools" [ref=e363]
+                    - cell
+                    - cell "Feature on the home page: Puffer (Stanford research study)" [ref=e364]
+                      - button "Feature on the home page: Puffer (Stanford research study)" [ref=e868]
+                        - StaticText "—"
+                    - cell "View Puffer (Stanford research study) Edit Puffer (Stanford research study) Delete Puffer (Stanford research study)" [ref=e365]
+                      - link "View Puffer (Stanford research study)" [ref=e869]
+                        - StaticText "View"
+                      - button "Edit Puffer (Stanford research study)" [ref=e870]
+                        - StaticText "Edit"
+                      - button "Delete Puffer (Stanford research study)" [ref=e871]
+                        - image
+                  - row
+                    - cell "189875 Select YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e366]
+                      - StaticText "189875"
+                      - checkbox "Select YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [checked=false, ref=e872]
+                    - cell "YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e367]
+                      - StaticText "YTLive: A Dataset of Real-World YouTube Live Streaming Sessions"
+                    - cell "General Tools" [ref=e368]
+                    - cell
+                    - cell "Feature on the home page: YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e369]
+                      - button "Feature on the home page: YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e873]
+                        - StaticText "—"
+                    - cell "View YTLive: A Dataset of Real-World YouTube Live Streaming Sessions Edit YTLive: A Dataset of Real-World YouTube Live Streaming Sessions Delete YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e370]
+                      - link "View YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e874]
+                        - StaticText "View"
+                      - button "Edit YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e875]
+                        - StaticText "Edit"
+                      - button "Delete YTLive: A Dataset of Real-World YouTube Live Streaming Sessions" [ref=e876]
+                        - image
+                  - row
+                    - cell "189874 Select GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e371]
+                      - StaticText "189874"
+                      - checkbox "Select GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [checked=false, ref=e877]
+                    - cell "GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e372]
+                      - StaticText "GREEM: Measuring Energy Consumption of Video Encoding/Decoding"
+                    - cell "General Tools" [ref=e373]
+                    - cell
+                    - cell "Feature on the home page: GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e374]
+                      - button "Feature on the home page: GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e878]
+                        - StaticText "—"
+                    - cell "View GREEM: Measuring Energy Consumption of Video Encoding/Decoding Edit GREEM: Measuring Energy Consumption of Video Encoding/Decoding Delete GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e375]
+                      - link "View GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e879]
+                        - StaticText "View"
+                      - button "Edit GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e880]
+                        - StaticText "Edit"
+                      - button "Delete GREEM: Measuring Energy Consumption of Video Encoding/Decoding" [ref=e881]
+                        - image
+                  - row
+                    - cell "189873 Select Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e376]
+                      - StaticText "189873"
+                      - checkbox "Select Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [checked=false, ref=e882]
+                    - cell "Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e377]
+                      - StaticText "Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding"
+                    - cell "Encoding & Codecs" [ref=e378]
+                    - cell
+                    - cell "Feature on the home page: Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e379]
+                      - button "Feature on the home page: Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e883]
+                        - StaticText "—"
+                    - cell "View Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding Edit Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding Delete Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e380]
+                      - link "View Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e884]
+                        - StaticText "View"
+                      - button "Edit Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e885]
+                        - StaticText "Edit"
+                      - button "Delete Evaluation of GPU Video Encoders for Low-Latency Real-Time 4K UHD Encoding" [ref=e886]
+                        - image
+                  - row
+                    - cell "189872 Select Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e381]
+                      - StaticText "189872"
+                      - checkbox "Select Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [checked=false, ref=e887]
+                    - cell "Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e382]
+                      - StaticText "Towards Practical Real-Time Neural Video Compression (DCVC-RT)"
+                    - cell "General Tools" [ref=e383]
+                    - cell
+                    - cell "Feature on the home page: Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e384]
+                      - button "Feature on the home page: Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e888]
+                        - StaticText "—"
+                    - cell "View Towards Practical Real-Time Neural Video Compression (DCVC-RT) Edit Towards Practical Real-Time Neural Video Compression (DCVC-RT) Delete Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e385]
+                      - link "View Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e889]
+                        - StaticText "View"
+                      - button "Edit Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e890]
+                        - StaticText "Edit"
+                      - button "Delete Towards Practical Real-Time Neural Video Compression (DCVC-RT)" [ref=e891]
+                        - image
+                  - row
+                    - cell "189871 Select Testing DRM Playback Across Device Families" [ref=e386]
+                      - StaticText "189871"
+                      - checkbox "Select Testing DRM Playback Across Device Families" [checked=false, ref=e892]
+                    - cell "Testing DRM Playback Across Device Families" [ref=e387]
+                      - StaticText "Testing DRM Playback Across Device Families"
+                    - cell "General Tools" [ref=e388]
+                    - cell
+                    - cell "Feature on the home page: Testing DRM Playback Across Device Families" [ref=e389]
+                      - button "Feature on the home page: Testing DRM Playback Across Device Families" [ref=e893]
+                        - StaticText "—"
+                    - cell "View Testing DRM Playback Across Device Families Edit Testing DRM Playback Across Device Families Delete Testing DRM Playback Across Device Families" [ref=e390]
+                      - link "View Testing DRM Playback Across Device Families" [ref=e894]
+                        - StaticText "View"
+                      - button "Edit Testing DRM Playback Across Device Families" [ref=e895]
+                        - StaticText "Edit"
+                      - button "Delete Testing DRM Playback Across Device Families" [ref=e896]
+                        - image
+                  - row
+                    - cell "189870 Select Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e391]
+                      - StaticText "189870"
+                      - checkbox "Select Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [checked=false, ref=e897]
+                    - cell "Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e392]
+                      - StaticText "Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations"
+                    - cell "General Tools" [ref=e393]
+                    - cell
+                    - cell "Feature on the home page: Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e394]
+                      - button "Feature on the home page: Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e898]
+                        - StaticText "—"
+                    - cell "View Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations Edit Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations Delete Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e395]
+                      - link "View Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e899]
+                        - StaticText "View"
+                      - button "Edit Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e900]
+                        - StaticText "Edit"
+                      - button "Delete Your DRM Can Watch You Too: Privacy Implications of Browser EME Widevine Implementations" [ref=e901]
+                        - image
+                  - row
+                    - cell "189869 Select widevine-l3-decryptor" [ref=e396]
+                      - StaticText "189869"
+                      - checkbox "Select widevine-l3-decryptor" [checked=false, ref=e902]
+                    - cell "widevine-l3-decryptor" [ref=e397]
+                      - StaticText "widevine-l3-decryptor"
+                    - cell "General Tools" [ref=e398]
+                    - cell
+                    - cell "Feature on the home page: widevine-l3-decryptor" [ref=e399]
+                      - button "Feature on the home page: widevine-l3-decryptor" [ref=e903]
+                        - StaticText "—"
+                    - cell "View widevine-l3-decryptor Edit widevine-l3-decryptor Delete widevine-l3-decryptor" [ref=e400]
+                      - link "View widevine-l3-decryptor" [ref=e904]
+                        - StaticText "View"
+                      - button "Edit widevine-l3-decryptor" [ref=e905]
+                        - StaticText "Edit"
+                      - button "Delete widevine-l3-decryptor" [ref=e906]
+                        - image
+                  - row
+                    - cell "189868 Select fairplay-ksm" [ref=e401]
+                      - StaticText "189868"
+                      - checkbox "Select fairplay-ksm" [checked=false, ref=e907]
+                    - cell "fairplay-ksm" [ref=e402]
+                      - StaticText "fairplay-ksm"
+                    - cell "General Tools" [ref=e403]
+                    - cell
+                    - cell "Feature on the home page: fairplay-ksm" [ref=e404]
+                      - button "Feature on the home page: fairplay-ksm" [ref=e908]
+                        - StaticText "—"
+                    - cell "View fairplay-ksm Edit fairplay-ksm Delete fairplay-ksm" [ref=e405]
+                      - link "View fairplay-ksm" [ref=e909]
+                        - StaticText "View"
+                      - button "Edit fairplay-ksm" [ref=e910]
+                        - StaticText "Edit"
+                      - button "Delete fairplay-ksm" [ref=e911]
+                        - image
+                  - row
+                    - cell "189867 Select FairPlay-iOS-Demo" [ref=e406]
+                      - StaticText "189867"
+                      - checkbox "Select FairPlay-iOS-Demo" [checked=false, ref=e912]
+                    - cell "FairPlay-iOS-Demo" [ref=e407]
+                      - StaticText "FairPlay-iOS-Demo"
+                    - cell "General Tools" [ref=e408]
+                    - cell
+                    - cell "Feature on the home page: FairPlay-iOS-Demo" [ref=e409]
+                      - button "Feature on the home page: FairPlay-iOS-Demo" [ref=e913]
+                        - StaticText "—"
+                    - cell "View FairPlay-iOS-Demo Edit FairPlay-iOS-Demo Delete FairPlay-iOS-Demo" [ref=e410]
+                      - link "View FairPlay-iOS-Demo" [ref=e914]
+                        - StaticText "View"
+                      - button "Edit FairPlay-iOS-Demo" [ref=e915]
+                        - StaticText "Edit"
+                      - button "Delete FairPlay-iOS-Demo" [ref=e916]
+                        - image
+                  - row
+                    - cell "189866 Select Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e411]
+                      - StaticText "189866"
+                      - checkbox "Select Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [checked=false, ref=e917]
+                    - cell "Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e412]
+                      - StaticText "Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure"
+                    - cell "Intro & Learning" [ref=e413]
+                    - cell
+                    - cell "Feature on the home page: Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e414]
+                      - button "Feature on the home page: Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e918]
+                        - StaticText "—"
+                    - cell "View Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure Edit Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure Delete Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e415]
+                      - link "View Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e919]
+                        - StaticText "View"
+                      - button "Edit Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e920]
+                        - StaticText "Edit"
+                      - button "Delete Building a Live Streaming Platform: Twitch's Real-time Video Infrastructure" [ref=e921]
+                        - image
+                  - row
+                    - cell "189865 Select The State of the Video Codec Market 2025" [ref=e416]
+                      - StaticText "189865"
+                      - checkbox "Select The State of the Video Codec Market 2025" [checked=false, ref=e922]
+                    - cell "The State of the Video Codec Market 2025" [ref=e417]
+                      - StaticText "The State of the Video Codec Market 2025"
+                    - cell "Intro & Learning" [ref=e418]
+                    - cell
+                    - cell "Feature on the home page: The State of the Video Codec Market 2025" [ref=e419]
+                      - button "Feature on the home page: The State of the Video Codec Market 2025" [ref=e923]
+                        - StaticText "—"
+                    - cell "View The State of the Video Codec Market 2025 Edit The State of the Video Codec Market 2025 Delete The State of the Video Codec Market 2025" [ref=e420]
+                      - link "View The State of the Video Codec Market 2025" [ref=e924]
+                        - StaticText "View"
+                      - button "Edit The State of the Video Codec Market 2025" [ref=e925]
+                        - StaticText "Edit"
+                      - button "Delete The State of the Video Codec Market 2025" [ref=e926]
+                        - image
+                  - row
+                    - cell "189864 Select opus-js" [ref=e421]
+                      - StaticText "189864"
+                      - checkbox "Select opus-js" [checked=false, ref=e927]
+                    - cell "opus-js" [ref=e422]
+                      - StaticText "opus-js"
+                    - cell "Encoding & Codecs" [ref=e423]
+                    - cell
+                    - cell "Feature on the home page: opus-js" [ref=e424]
+                      - button "Feature on the home page: opus-js" [ref=e928]
+                        - StaticText "—"
+                    - cell "View opus-js Edit opus-js Delete opus-js" [ref=e425]
+                      - link "View opus-js" [ref=e929]
+                        - StaticText "View"
+                      - button "Edit opus-js" [ref=e930]
+                        - StaticText "Edit"
+                      - button "Delete opus-js" [ref=e931]
+                        - image
+                  - row
+                    - cell "189863 Select Opus (xiph/opus)" [ref=e426]
+                      - StaticText "189863"
+                      - checkbox "Select Opus (xiph/opus)" [checked=false, ref=e932]
+                    - cell "Opus (xiph/opus)" [ref=e427]
+                      - StaticText "Opus (xiph/opus)"
+                    - cell "Encoding & Codecs" [ref=e428]
+                    - cell
+                    - cell "Feature on the home page: Opus (xiph/opus)" [ref=e429]
+                      - button "Feature on the home page: Opus (xiph/opus)" [ref=e933]
+                        - StaticText "—"
+                    - cell "View Opus (xiph/opus) Edit Opus (xiph/opus) Delete Opus (xiph/opus)" [ref=e430]
+                      - link "View Opus (xiph/opus)" [ref=e934]
+                        - StaticText "View"
+                      - button "Edit Opus (xiph/opus)" [ref=e935]
+                        - StaticText "Edit"
+                      - button "Delete Opus (xiph/opus)" [ref=e936]
+                        - image
+                  - row
+                    - cell "189862 Select dav1d.wasm" [ref=e431]
+                      - StaticText "189862"
+                      - checkbox "Select dav1d.wasm" [checked=false, ref=e937]
+                    - cell "dav1d.wasm" [ref=e432]
+                      - StaticText "dav1d.wasm"
+                    - cell "Encoding & Codecs" [ref=e433]
+                    - cell
+                    - cell "Feature on the home page: dav1d.wasm" [ref=e434]
+                      - button "Feature on the home page: dav1d.wasm" [ref=e938]
+                        - StaticText "—"
+                    - cell "View dav1d.wasm Edit dav1d.wasm Delete dav1d.wasm" [ref=e435]
+                      - link "View dav1d.wasm" [ref=e939]
+                        - StaticText "View"
+                      - button "Edit dav1d.wasm" [ref=e940]
+                        - StaticText "Edit"
+                      - button "Delete dav1d.wasm" [ref=e941]
+                        - image
+                  - row
+                    - cell "189861 Select ComposeMediaPlayer" [ref=e436]
+                      - StaticText "189861"
+                      - checkbox "Select ComposeMediaPlayer" [checked=false, ref=e942]
+                    - cell "ComposeMediaPlayer" [ref=e437]
+                      - StaticText "ComposeMediaPlayer"
+                    - cell "Players & Clients" [ref=e438]
+                    - cell
+                    - cell "Feature on the home page: ComposeMediaPlayer" [ref=e439]
+                      - button "Feature on the home page: ComposeMediaPlayer" [ref=e943]
+                        - StaticText "—"
+                    - cell "View ComposeMediaPlayer Edit ComposeMediaPlayer Delete ComposeMediaPlayer" [ref=e440]
+                      - link "View ComposeMediaPlayer" [ref=e944]
+                        - StaticText "View"
+                      - button "Edit ComposeMediaPlayer" [ref=e945]
+                        - StaticText "Edit"
+                      - button "Delete ComposeMediaPlayer" [ref=e946]
+                        - image
+                  - row
+                    - cell "189860 Select openrv-web" [ref=e441]
+                      - StaticText "189860"
+                      - checkbox "Select openrv-web" [checked=false, ref=e947]
+                    - cell "openrv-web" [ref=e442]
+                      - StaticText "openrv-web"
+                    - cell "Media Tools" [ref=e443]
+                    - cell
+                    - cell "Feature on the home page: openrv-web" [ref=e444]
+                      - button "Feature on the home page: openrv-web" [ref=e948]
+                        - StaticText "—"
+                    - cell "View openrv-web Edit openrv-web Delete openrv-web" [ref=e445]
+                      - link "View openrv-web" [ref=e949]
+                        - StaticText "View"
+                      - button "Edit openrv-web" [ref=e950]
+                        - StaticText "Edit"
+                      - button "Delete openrv-web" [ref=e951]
+                        - image
+                  - row
+                    - cell "189859 Select av1-codec-comparison" [ref=e446]
+                      - StaticText "189859"
+                      - checkbox "Select av1-codec-comparison" [checked=false, ref=e952]
+                    - cell "av1-codec-comparison" [ref=e447]
+                      - StaticText "av1-codec-comparison"
+                    - cell "Encoding & Codecs" [ref=e448]
+                    - cell
+                    - cell "Feature on the home page: av1-codec-comparison" [ref=e449]
+                      - button "Feature on the home page: av1-codec-comparison" [ref=e953]
+                        - StaticText "—"
+                    - cell "View av1-codec-comparison Edit av1-codec-comparison Delete av1-codec-comparison" [ref=e450]
+                      - link "View av1-codec-comparison" [ref=e954]
+                        - StaticText "View"
+                      - button "Edit av1-codec-comparison" [ref=e955]
+                        - StaticText "Edit"
+                      - button "Delete av1-codec-comparison" [ref=e956]
+                        - image
+                  - row
+                    - cell "189858 Select Dolby.io Media APIs — Developer Tools" [ref=e451]
+                      - StaticText "189858"
+                      - checkbox "Select Dolby.io Media APIs — Developer Tools" [checked=false, ref=e957]
+                    - cell "Dolby.io Media APIs — Developer Tools" [ref=e452]
+                      - StaticText "Dolby.io Media APIs — Developer Tools"
+                    - cell "Standards & Industry" [ref=e453]
+                    - cell
+                    - cell "Feature on the home page: Dolby.io Media APIs — Developer Tools" [ref=e454]
+                      - button "Feature on the home page: Dolby.io Media APIs — Developer Tools" [ref=e958]
+                        - StaticText "—"
+                    - cell "View Dolby.io Media APIs — Developer Tools Edit Dolby.io Media APIs — Developer Tools Delete Dolby.io Media APIs — Developer Tools" [ref=e455]
+                      - link "View Dolby.io Media APIs — Developer Tools" [ref=e959]
+                        - StaticText "View"
+                      - button "Edit Dolby.io Media APIs — Developer Tools" [ref=e960]
+                        - StaticText "Edit"
+                      - button "Delete Dolby.io Media APIs — Developer Tools" [ref=e961]
+                        - image
+                  - row
+                    - cell "189857 Select Dolby Vision for Games — Pipeline Developer Docs" [ref=e456]
+                      - StaticText "189857"
+                      - checkbox "Select Dolby Vision for Games — Pipeline Developer Docs" [checked=false, ref=e962]
+                    - cell "Dolby Vision for Games — Pipeline Developer Docs" [ref=e457]
+                      - StaticText "Dolby Vision for Games — Pipeline Developer Docs"
+                    - cell "Standards & Industry" [ref=e458]
+                    - cell
+                    - cell "Feature on the home page: Dolby Vision for Games — Pipeline Developer Docs" [ref=e459]
+                      - button "Feature on the home page: Dolby Vision for Games — Pipeline Developer Docs" [ref=e963]
+                        - StaticText "—"
+                    - cell "View Dolby Vision for Games — Pipeline Developer Docs Edit Dolby Vision for Games — Pipeline Developer Docs Delete Dolby Vision for Games — Pipeline Developer Docs" [ref=e460]
+                      - link "View Dolby Vision for Games — Pipeline Developer Docs" [ref=e964]
+                        - StaticText "View"
+                      - button "Edit Dolby Vision for Games — Pipeline Developer Docs" [ref=e965]
+                        - StaticText "Edit"
+                      - button "Delete Dolby Vision for Games — Pipeline Developer Docs" [ref=e966]
+                        - image
+                  - row
+                    - cell "189856 Select vast-player" [ref=e461]
+                      - StaticText "189856"
+                      - checkbox "Select vast-player" [checked=false, ref=e967]
+                    - cell "vast-player" [ref=e462]
+                      - StaticText "vast-player"
+                    - cell "Media Tools" [ref=e463]
+                    - cell
+                    - cell "Feature on the home page: vast-player" [ref=e464]
+                      - button "Feature on the home page: vast-player" [ref=e968]
+                        - StaticText "—"
+                    - cell "View vast-player Edit vast-player Delete vast-player" [ref=e465]
+                      - link "View vast-player" [ref=e969]
+                        - StaticText "View"
+                      - button "Edit vast-player" [ref=e970]
+                        - StaticText "Edit"
+                      - button "Delete vast-player" [ref=e971]
+                        - image
+                  - row
+                    - cell "189855 Select vast-vmap" [ref=e466]
+                      - StaticText "189855"
+                      - checkbox "Select vast-vmap" [checked=false, ref=e972]
+                    - cell "vast-vmap" [ref=e467]
+                      - StaticText "vast-vmap"
+                    - cell "Media Tools" [ref=e468]
+                    - cell
+                    - cell "Feature on the home page: vast-vmap" [ref=e469]
+                      - button "Feature on the home page: vast-vmap" [ref=e973]
+                        - StaticText "—"
+                    - cell "View vast-vmap Edit vast-vmap Delete vast-vmap" [ref=e470]
+                      - link "View vast-vmap" [ref=e974]
+                        - StaticText "View"
+                      - button "Edit vast-vmap" [ref=e975]
+                        - StaticText "Edit"
+                      - button "Delete vast-vmap" [ref=e976]
+                        - image
+                  - row
+                    - cell "189854 Select Google IMA/DAI HTML5 SDK Samples" [ref=e471]
+                      - StaticText "189854"
+                      - checkbox "Select Google IMA/DAI HTML5 SDK Samples" [checked=false, ref=e977]
+                    - cell "Google IMA/DAI HTML5 SDK Samples" [ref=e472]
+                      - StaticText "Google IMA/DAI HTML5 SDK Samples"
+                    - cell "Media Tools" [ref=e473]
+                    - cell
+                    - cell "Feature on the home page: Google IMA/DAI HTML5 SDK Samples" [ref=e474]
+                      - button "Feature on the home page: Google IMA/DAI HTML5 SDK Samples" [ref=e978]
+                        - StaticText "—"
+                    - cell "View Google IMA/DAI HTML5 SDK Samples Edit Google IMA/DAI HTML5 SDK Samples Delete Google IMA/DAI HTML5 SDK Samples" [ref=e475]
+                      - link "View Google IMA/DAI HTML5 SDK Samples" [ref=e979]
+                        - StaticText "View"
+                      - button "Edit Google IMA/DAI HTML5 SDK Samples" [ref=e980]
+                        - StaticText "Edit"
+                      - button "Delete Google IMA/DAI HTML5 SDK Samples" [ref=e981]
+                        - image
+                  - row
+                    - cell "189853 Select videojs-hlsjs-plugin" [ref=e476]
+                      - StaticText "189853"
+                      - checkbox "Select videojs-hlsjs-plugin" [checked=false, ref=e982]
+                    - cell "videojs-hlsjs-plugin" [ref=e477]
+                      - StaticText "videojs-hlsjs-plugin"
+                    - cell "Protocols & Transport" [ref=e478]
+                    - cell
+                    - cell "Feature on the home page: videojs-hlsjs-plugin" [ref=e479]
+                      - button "Feature on the home page: videojs-hlsjs-plugin" [ref=e983]
+                        - StaticText "—"
+                    - cell "View videojs-hlsjs-plugin Edit videojs-hlsjs-plugin Delete videojs-hlsjs-plugin" [ref=e480]
+                      - link "View videojs-hlsjs-plugin" [ref=e984]
+                        - StaticText "View"
+                      - button "Edit videojs-hlsjs-plugin" [ref=e985]
+                        - StaticText "Edit"
+                      - button "Delete videojs-hlsjs-plugin" [ref=e986]
+                        - image
+                  - row
+                    - cell "189852 Select rust-av" [ref=e481]
+                      - StaticText "189852"
+                      - checkbox "Select rust-av" [checked=false, ref=e987]
+                    - cell "rust-av" [ref=e482]
+                      - StaticText "rust-av"
+                    - cell "Players & Clients" [ref=e483]
+                    - cell
+                    - cell "Feature on the home page: rust-av" [ref=e484]
+                      - button "Feature on the home page: rust-av" [ref=e988]
+                        - StaticText "—"
+                    - cell "View rust-av Edit rust-av Delete rust-av" [ref=e485]
+                      - link "View rust-av" [ref=e989]
+                        - StaticText "View"
+                      - button "Edit rust-av" [ref=e990]
+                        - StaticText "Edit"
+                      - button "Delete rust-av" [ref=e991]
+                        - image
+                  - row
+                    - cell "189851 Select ffmpeg-VideoPlayer-Rust_Slint" [ref=e486]
+                      - StaticText "189851"
+                      - checkbox "Select ffmpeg-VideoPlayer-Rust_Slint" [checked=false, ref=e992]
+                    - cell "ffmpeg-VideoPlayer-Rust_Slint" [ref=e487]
+                      - StaticText "ffmpeg-VideoPlayer-Rust_Slint"
+                    - cell "Players & Clients" [ref=e488]
+                    - cell
+                    - cell "Feature on the home page: ffmpeg-VideoPlayer-Rust_Slint" [ref=e489]
+                      - button "Feature on the home page: ffmpeg-VideoPlayer-Rust_Slint" [ref=e993]
+                        - StaticText "—"
+                    - cell "View ffmpeg-VideoPlayer-Rust_Slint Edit ffmpeg-VideoPlayer-Rust_Slint Delete ffmpeg-VideoPlayer-Rust_Slint" [ref=e490]
+                      - link "View ffmpeg-VideoPlayer-Rust_Slint" [ref=e994]
+                        - StaticText "View"
+                      - button "Edit ffmpeg-VideoPlayer-Rust_Slint" [ref=e995]
+                        - StaticText "Edit"
+                      - button "Delete ffmpeg-VideoPlayer-Rust_Slint" [ref=e996]
+                        - image
+                  - row
+                    - cell "189850 Select N_m3u8DL-RE" [ref=e491]
+                      - StaticText "189850"
+                      - checkbox "Select N_m3u8DL-RE" [checked=false, ref=e997]
+                    - cell "N_m3u8DL-RE" [ref=e492]
+                      - StaticText "N_m3u8DL-RE"
+                    - cell "Protocols & Transport" [ref=e493]
+                    - cell
+                    - cell "Feature on the home page: N_m3u8DL-RE" [ref=e494]
+                      - button "Feature on the home page: N_m3u8DL-RE" [ref=e998]
+                        - StaticText "—"
+                    - cell "View N_m3u8DL-RE Edit N_m3u8DL-RE Delete N_m3u8DL-RE" [ref=e495]
+                      - link "View N_m3u8DL-RE" [ref=e999]
+                        - StaticText "View"
+                      - button "Edit N_m3u8DL-RE" [ref=e1000]
+                        - StaticText "Edit"
+                      - button "Delete N_m3u8DL-RE" [ref=e1001]
+                        - image
+                  - row
+                    - cell "189849 Select cmcdv2-hls-plugin" [ref=e496]
+                      - StaticText "189849"
+                      - checkbox "Select cmcdv2-hls-plugin" [checked=false, ref=e1002]
+                    - cell "cmcdv2-hls-plugin" [ref=e497]
+                      - StaticText "cmcdv2-hls-plugin"
+                    - cell "Protocols & Transport" [ref=e498]
+                    - cell
+                    - cell "Feature on the home page: cmcdv2-hls-plugin" [ref=e499]
+                      - button "Feature on the home page: cmcdv2-hls-plugin" [ref=e1003]
+                        - StaticText "—"
+                    - cell "View cmcdv2-hls-plugin Edit cmcdv2-hls-plugin Delete cmcdv2-hls-plugin" [ref=e500]
+                      - link "View cmcdv2-hls-plugin" [ref=e1004]
+                        - StaticText "View"
+                      - button "Edit cmcdv2-hls-plugin" [ref=e1005]
+                        - StaticText "Edit"
+                      - button "Delete cmcdv2-hls-plugin" [ref=e1006]
+                        - image
+                  - row
+                    - cell "189848 Select hlsvalidator" [ref=e501]
+                      - StaticText "189848"
+                      - checkbox "Select hlsvalidator" [checked=false, ref=e1007]
+                    - cell "hlsvalidator" [ref=e502]
+                      - StaticText "hlsvalidator"
+                    - cell "Protocols & Transport" [ref=e503]
+                    - cell
+                    - cell "Feature on the home page: hlsvalidator" [ref=e504]
+                      - button "Feature on the home page: hlsvalidator" [ref=e1008]
+                        - StaticText "—"
+                    - cell "View hlsvalidator Edit hlsvalidator Delete hlsvalidator" [ref=e505]
+                      - link "View hlsvalidator" [ref=e1009]
+                        - StaticText "View"
+                      - button "Edit hlsvalidator" [ref=e1010]
+                        - StaticText "Edit"
+                      - button "Delete hlsvalidator" [ref=e1011]
+                        - image
+                  - row
+                    - cell "189847 Select HLS-Tools (Apple official bundle mirror)" [ref=e506]
+                      - StaticText "189847"
+                      - checkbox "Select HLS-Tools (Apple official bundle mirror)" [checked=false, ref=e1012]
+                    - cell "HLS-Tools (Apple official bundle mirror)" [ref=e507]
+                      - StaticText "HLS-Tools (Apple official bundle mirror)"
+                    - cell "Protocols & Transport" [ref=e508]
+                    - cell
+                    - cell "Feature on the home page: HLS-Tools (Apple official bundle mirror)" [ref=e509]
+                      - button "Feature on the home page: HLS-Tools (Apple official bundle mirror)" [ref=e1013]
+                        - StaticText "—"
+                    - cell "View HLS-Tools (Apple official bundle mirror) Edit HLS-Tools (Apple official bundle mirror) Delete HLS-Tools (Apple official bundle mirror)" [ref=e510]
+                      - link "View HLS-Tools (Apple official bundle mirror)" [ref=e1014]
+                        - StaticText "View"
+                      - button "Edit HLS-Tools (Apple official bundle mirror)" [ref=e1015]
+                        - StaticText "Edit"
+                      - button "Delete HLS-Tools (Apple official bundle mirror)" [ref=e1016]
+                        - image
+                  - row
+                    - cell "189846 Select dash-analyzer" [ref=e511]
+                      - StaticText "189846"
+                      - checkbox "Select dash-analyzer" [checked=false, ref=e1017]
+                    - cell "dash-analyzer" [ref=e512]
+                      - StaticText "dash-analyzer"
+                    - cell "Protocols & Transport" [ref=e513]
+                    - cell
+                    - cell "Feature on the home page: dash-analyzer" [ref=e514]
+                      - button "Feature on the home page: dash-analyzer" [ref=e1018]
+                        - StaticText "—"
+                    - cell "View dash-analyzer Edit dash-analyzer Delete dash-analyzer" [ref=e515]
+                      - link "View dash-analyzer" [ref=e1019]
+                        - StaticText "View"
+                      - button "Edit dash-analyzer" [ref=e1020]
+                        - StaticText "Edit"
+                      - button "Delete dash-analyzer" [ref=e1021]
+                        - image
+                  - row
+                    - cell "189845 Select edash-packager" [ref=e516]
+                      - StaticText "189845"
+                      - checkbox "Select edash-packager" [checked=false, ref=e1022]
+                    - cell "edash-packager" [ref=e517]
+                      - StaticText "edash-packager"
+                    - cell "Protocols & Transport" [ref=e518]
+                    - cell
+                    - cell "Feature on the home page: edash-packager" [ref=e519]
+                      - button "Feature on the home page: edash-packager" [ref=e1023]
+                        - StaticText "—"
+                    - cell "View edash-packager Edit edash-packager Delete edash-packager" [ref=e520]
+                      - link "View edash-packager" [ref=e1024]
+                        - StaticText "View"
+                      - button "Edit edash-packager" [ref=e1025]
+                        - StaticText "Edit"
+                      - button "Delete edash-packager" [ref=e1026]
+                        - image
+                  - row
+                    - cell "189844 Select FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e521]
+                      - StaticText "189844"
+                      - checkbox "Select FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [checked=false, ref=e1027]
+                    - cell "FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e522]
+                      - StaticText "FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)"
+                    - cell "Intro & Learning" [ref=e523]
+                    - cell
+                    - cell "Feature on the home page: FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e524]
+                      - button "Feature on the home page: FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e1028]
+                        - StaticText "—"
+                    - cell "View FFmpeg Encoding and Decoding APIs (DeepWiki technical reference) Edit FFmpeg Encoding and Decoding APIs (DeepWiki technical reference) Delete FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e525]
+                      - link "View FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e1029]
+                        - StaticText "View"
+                      - button "Edit FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e1030]
+                        - StaticText "Edit"
+                      - button "Delete FFmpeg Encoding and Decoding APIs (DeepWiki technical reference)" [ref=e1031]
+                        - image
+                  - row
+                    - cell "189843 Select Hybrid Live Streaming (Thijs Lowette)" [ref=e526]
+                      - StaticText "189843"
+                      - checkbox "Select Hybrid Live Streaming (Thijs Lowette)" [checked=false, ref=e1032]
+                    - cell "Hybrid Live Streaming (Thijs Lowette)" [ref=e527]
+                      - StaticText "Hybrid Live Streaming (Thijs Lowette)"
+                    - cell "Intro & Learning" [ref=e528]
+                    - cell
+                    - cell "Feature on the home page: Hybrid Live Streaming (Thijs Lowette)" [ref=e529]
+                      - button "Feature on the home page: Hybrid Live Streaming (Thijs Lowette)" [ref=e1033]
+                        - StaticText "—"
+                    - cell "View Hybrid Live Streaming (Thijs Lowette) Edit Hybrid Live Streaming (Thijs Lowette) Delete Hybrid Live Streaming (Thijs Lowette)" [ref=e530]
+                      - link "View Hybrid Live Streaming (Thijs Lowette)" [ref=e1034]
+                        - StaticText "View"
+                      - button "Edit Hybrid Live Streaming (Thijs Lowette)" [ref=e1035]
+                        - StaticText "Edit"
+                      - button "Delete Hybrid Live Streaming (Thijs Lowette)" [ref=e1036]
+                        - image
+                  - row
+                    - cell "189842 Select Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e531]
+                      - StaticText "189842"
+                      - checkbox "Select Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [checked=false, ref=e1037]
+                    - cell "Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e532]
+                      - StaticText "Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale"
+                    - cell "Intro & Learning" [ref=e533]
+                    - cell
+                    - cell "Feature on the home page: Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e534]
+                      - button "Feature on the home page: Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e1038]
+                        - StaticText "—"
+                    - cell "View Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale Edit Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale Delete Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e535]
+                      - link "View Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e1039]
+                        - StaticText "View"
+                      - button "Edit Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e1040]
+                        - StaticText "Edit"
+                      - button "Delete Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e1041]
+                        - image
+                  - row
+                    - cell "189841 Select Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e536]
+                      - StaticText "189841"
+                      - checkbox "Select Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [checked=false, ref=e1042]
+                    - cell "Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e537]
+                      - StaticText "Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)"
+                    - cell "Intro & Learning" [ref=e538]
+                    - cell
+                    - cell "Feature on the home page: Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e539]
+                      - button "Feature on the home page: Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e1043]
+                        - StaticText "—"
+                    - cell "View Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1) Edit Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1) Delete Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e540]
+                      - link "View Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e1044]
+                        - StaticText "View"
+                      - button "Edit Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e1045]
+                        - StaticText "Edit"
+                      - button "Delete Building Your First Video Pipeline: FFmpeg & MediaMTX Basics (Part 1)" [ref=e1046]
+                        - image
+                  - row
+                    - cell "189840 Select ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e541]
+                      - StaticText "189840"
+                      - checkbox "Select ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [checked=false, ref=e1047]
+                    - cell "ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e542]
+                      - StaticText "ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)"
+                    - cell "Standards & Industry" [ref=e543]
+                    - cell
+                    - cell "Feature on the home page: ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e544]
+                      - button "Feature on the home page: ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e1048]
+                        - StaticText "—"
+                    - cell "View ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI) Edit ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI) Delete ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e545]
+                      - link "View ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e1049]
+                        - StaticText "View"
+                      - button "Edit ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e1050]
+                        - StaticText "Edit"
+                      - button "Delete ANSI/SCTE 224-2021: Event Scheduling and Notification Interface (ESNI)" [ref=e1051]
+                        - image
+                  - row
+                    - cell "189839 Select svelte-video-player-kit" [ref=e546]
+                      - StaticText "189839"
+                      - checkbox "Select svelte-video-player-kit" [checked=false, ref=e1052]
+                    - cell "svelte-video-player-kit" [ref=e547]
+                      - StaticText "svelte-video-player-kit"
+                    - cell "Players & Clients" [ref=e548]
+                    - cell
+                    - cell "Feature on the home page: svelte-video-player-kit" [ref=e549]
+                      - button "Feature on the home page: svelte-video-player-kit" [ref=e1053]
+                        - StaticText "—"
+                    - cell "View svelte-video-player-kit Edit svelte-video-player-kit Delete svelte-video-player-kit" [ref=e550]
+                      - link "View svelte-video-player-kit" [ref=e1054]
+                        - StaticText "View"
+                      - button "Edit svelte-video-player-kit" [ref=e1055]
+                        - StaticText "Edit"
+                      - button "Delete svelte-video-player-kit" [ref=e1056]
+                        - image
+                  - row
+                    - cell "189838 Select Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e551]
+                      - StaticText "189838"
+                      - checkbox "Select Demuxed Podcast Ep.3: Accessibility for the Future" [checked=false, ref=e1057]
+                    - cell "Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e552]
+                      - StaticText "Demuxed Podcast Ep.3: Accessibility for the Future"
+                    - cell "Standards & Industry" [ref=e553]
+                    - cell
+                    - cell "Feature on the home page: Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e554]
+                      - button "Feature on the home page: Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e1058]
+                        - StaticText "—"
+                    - cell "View Demuxed Podcast Ep.3: Accessibility for the Future Edit Demuxed Podcast Ep.3: Accessibility for the Future Delete Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e555]
+                      - link "View Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e1059]
+                        - StaticText "View"
+                      - button "Edit Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e1060]
+                        - StaticText "Edit"
+                      - button "Delete Demuxed Podcast Ep.3: Accessibility for the Future" [ref=e1061]
+                        - image
+              - StaticText "Showing 201 - 300 of 3,825 resources"
+              - combobox "Rows per page" [expanded=false, ref=e40]: 100 / page
+                - generic [ref=e46] clickable [cursor:pointer, onclick]
+                  - StaticText "100 / page"
+              - navigation "Pagination" [ref=e41]
+                - link "Previous" [ref=e47]
+                  - image
+                  - StaticText "Previous"
+                - link "Go to page 1" [ref=e48]
+                  - StaticText "1"
+                - link "Go to page 2" [ref=e49]
+                  - StaticText "2"
+                - link "Page 3, current page" [ref=e50]
+                  - StaticText "3"
+                - link "Go to page 4" [ref=e51]
+                  - StaticText "4"
+                - link "Go to page 39" [ref=e52]
+                  - StaticText "39"
+                - link "Next" [ref=e53]
+                  - StaticText "Next"
+                  - image
+                - StaticText "Page "
+                - StaticText "3"
+                - StaticText " of "
+                - StaticText "39"
+                - LabelText [ref=e54] clickable [cursor:pointer]
+                  - StaticText "Go to page"
+                - textbox "Page number, 1 to 39" [ref=e55]: abc
+                  - StaticText "abc"
+                - status
+                  - StaticText "Enter a whole number between 1 and 39."
+    - button "Back to top" [ref=e4]
+      - image

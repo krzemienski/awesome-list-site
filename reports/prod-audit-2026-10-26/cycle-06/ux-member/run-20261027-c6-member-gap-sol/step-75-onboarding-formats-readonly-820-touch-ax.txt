@@ -1,0 +1,179 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Learning Preferences" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e39]:
+                  - paragraph [ref=e40]: Optional setup
+                  - heading "How do you like to learn?" [active] [level=1] [ref=e41]
+                - button "Save and browse later" [ref=e42] [cursor=pointer]
+              - generic "Step 4 of 5" [ref=e43]:
+                - generic [ref=e44]:
+                  - generic [ref=e45]: Step 4 of 5
+                  - generic [ref=e46]: Formats
+                - progressbar "Onboarding progress" [ref=e47]
+              - article [ref=e49]:
+                - group "How do you like to learn?" [ref=e52]:
+                  - generic [ref=e53]: How do you like to learn?
+                  - paragraph [ref=e54]: Choose at least one format. These map to the catalog’s curated resource formats.
+                  - generic [ref=e55]:
+                    - generic [ref=e56] [cursor=pointer]:
+                      - checkbox "Videos" [checked] [ref=e57]:
+                        - generic:
+                          - img
+                      - generic [ref=e58]: Videos
+                    - generic [ref=e59] [cursor=pointer]:
+                      - checkbox "Courses" [ref=e60]
+                      - generic [ref=e61]: Courses
+                    - generic [ref=e62] [cursor=pointer]:
+                      - checkbox "Articles" [ref=e63]
+                      - generic [ref=e64]: Articles
+                    - generic [ref=e65] [cursor=pointer]:
+                      - checkbox "Books" [ref=e66]
+                      - generic [ref=e67]: Books
+                    - generic [ref=e68] [cursor=pointer]:
+                      - checkbox "Specifications" [ref=e69]
+                      - generic [ref=e70]: Specifications
+                    - generic [ref=e71] [cursor=pointer]:
+                      - checkbox "Hands-on tools" [ref=e72]
+                      - generic [ref=e73]: Hands-on tools
+                    - generic [ref=e74] [cursor=pointer]:
+                      - checkbox "Libraries and SDKs" [ref=e75]
+                      - generic [ref=e76]: Libraries and SDKs
+                    - generic [ref=e77] [cursor=pointer]:
+                      - checkbox "Community resources" [ref=e78]
+                      - generic [ref=e79]: Community resources
+              - generic [ref=e80]:
+                - button "Back" [ref=e81] [cursor=pointer]:
+                  - img
+                  - text: Back
+                - button "Continue" [ref=e82] [cursor=pointer]:
+                  - text: Continue
+                  - img
+        - contentinfo [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - paragraph [ref=e86]: ── INDEX
+              - link "awesome.video home" [ref=e87] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e88]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e90]:
+              - heading "INDEXED" [level=2] [ref=e91]
+              - paragraph [ref=e92]: 3,826
+              - paragraph [ref=e93]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e94]: live
+            - navigation "Explore categories" [ref=e96]:
+              - heading "EXPLORE" [level=2] [ref=e97]
+              - generic [ref=e98]:
+                - link "Community & Events" [ref=e99] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e100]: ◈
+                  - generic [ref=e101]: Community
+                - link "Encoding & Codecs" [ref=e102] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e103]: ◇
+                  - generic [ref=e104]: Encoding
+                - link "General Tools" [ref=e105] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e106]: ◆
+                  - generic [ref=e107]: General
+                - link "Infrastructure & Delivery" [ref=e108] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e109]: ▣
+                  - generic [ref=e110]: Infrastructure
+                - link "Intro & Learning" [ref=e111] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e112]: ▤
+                  - generic [ref=e113]: Intro
+                - link "Media Tools" [ref=e114] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e115]: ▥
+                  - generic [ref=e116]: Media
+                - link "Players & Clients" [ref=e117] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e118]: ▶
+                  - generic [ref=e119]: Players
+                - link "Protocols & Transport" [ref=e120] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e121]: ⟁
+                  - generic [ref=e122]: Protocols
+                - link "Standards & Industry" [ref=e123] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e124]: ◉
+                  - generic [ref=e125]: Standards
+            - generic [ref=e126]:
+              - heading "SOURCE" [level=2] [ref=e127]
+              - link "krzemienski/awesome-video" [ref=e128] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e129]
+                - generic [ref=e131]:
+                  - text: krzemienski
+                  - generic [ref=e132]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e133]: ↗
+              - paragraph [ref=e134]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e135] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e137] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e138]:
+            - generic [ref=e139]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e140]:
+              - link "About" [ref=e141] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e142] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e143] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e144] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e145] [cursor=pointer]
+              - link "Issues ↗" [ref=e146] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e147] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e148]: built with the awesome-list framework

@@ -1,0 +1,31 @@
+=== 820x1180 inner="820x1180"
+✓ Done
+✓ Done
+dialogs=1
+"[{\"open\":false,\"sumH\":44}]"
+✓ Done
+"[]"
+✓ Done
+/submit -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done
+✓ Done
+/journeys -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done
+✓ Done
+/advanced -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done
+✓ Done
+/settings/theme -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done
+✓ Done
+/?context=account -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done
+✓ Done
+/about -> https://awesome.video/ dialogs=0
+✓ Done
+✓ Done

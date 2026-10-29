@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/sign-in?redirect_url=%2Fbookmarks","title":"Sign In — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":820,"online":true,"focus":{"tag":"BUTTON","id":"radix-:r0:","label":null,"text":"Sign inSign in, account menu","rect":{"x":708.703125,"y":7.5,"width":87.296875,"height":44,"top":7.5,"right":796,"bottom":51.5,"left":708.703125}},"headings":[{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Sign in","label":null,"current":"page"}],"status":["Loading sign-in…"],"analyticsDisabled":"1"}
+```

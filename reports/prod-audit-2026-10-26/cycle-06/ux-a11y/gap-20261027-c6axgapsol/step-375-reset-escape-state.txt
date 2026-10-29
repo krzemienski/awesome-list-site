@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/settings\",\"focus\":\"BUTTON\",\"testid\":\"button-reset-learning-preferences\",\"alertdialog\":false,\"online\":true}"

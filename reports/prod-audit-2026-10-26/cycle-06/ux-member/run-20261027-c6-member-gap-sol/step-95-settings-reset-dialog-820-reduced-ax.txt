@@ -1,0 +1,432 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - img
+                      - text: Back
+                    - heading [level=1]: Settings
+                    - paragraph: Manage your preferences and account. Pick a section below.
+                  - generic:
+                    - link:
+                      - /url: /settings/theme
+                      - article:
+                        - img
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Appearance
+                            - img
+                          - paragraph: Switch design system, accent color, and font.
+                    - link:
+                      - /url: /profile
+                      - article:
+                        - img
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Account
+                            - img
+                          - paragraph: View your profile, submissions, favorites, and progress.
+                    - link:
+                      - /url: /profile?tab=security
+                      - article:
+                        - img
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Security
+                            - img
+                          - paragraph: Change your password from the Security tab on your profile.
+                    - link:
+                      - /url: /bookmarks
+                      - article:
+                        - img
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Bookmarks
+                            - img
+                          - paragraph: Review the resources you've saved for later.
+                    - link:
+                      - /url: /recommendations
+                      - article:
+                        - img
+                        - generic:
+                          - generic:
+                            - heading [level=2]: Recommendations
+                            - img
+                          - paragraph: Personalized resource suggestions based on your interests.
+                  - region:
+                    - article:
+                      - generic:
+                        - generic: Home layout
+                        - generic: Choose the default view you see on the Home page.
+                      - generic:
+                        - group:
+                          - generic: Home layout
+                          - paragraph: Choose how the home page opens for you.
+                          - radiogroup:
+                            - generic:
+                              - radio [checked]:
+                                - generic:
+                                  - img
+                              - generic:
+                                - generic: Index
+                                - generic: The full catalog, organized for browsing.
+                            - generic:
+                              - radio
+                              - generic:
+                                - generic: Curated
+                                - generic: A focused home feed with recent and featured picks.
+                  - region:
+                    - article:
+                      - generic:
+                        - generic:
+                          - img
+                          - text: Learning preferences
+                        - generic: Review the same profile used by optional onboarding. These values shape only surfaces explicitly labeled personalized and are not sent to analytics.
+                      - generic:
+                        - generic:
+                          - group:
+                            - generic: Skill level
+                            - paragraph: Choose the closest match. You can change this at any time.
+                            - radiogroup:
+                              - generic:
+                                - radio [checked]:
+                                  - generic:
+                                    - img
+                                - generic:
+                                  - generic: Beginner
+                                  - generic: I’m building a foundation in video technology.
+                              - generic:
+                                - radio
+                                - generic:
+                                  - generic: Intermediate
+                                  - generic: I know the basics and want to go deeper.
+                              - generic:
+                                - radio
+                                - generic:
+                                  - generic: Advanced
+                                  - generic: I work with video systems and want specialist material.
+                          - group:
+                            - generic: Topics
+                            - paragraph: These choices come directly from the current Awesome Video taxonomy. Choose one or more.
+                            - generic:
+                              - generic:
+                                - checkbox
+                                - generic: Community & Events
+                              - generic:
+                                - checkbox [checked]:
+                                  - generic:
+                                    - img
+                                - generic: Encoding & Codecs
+                              - generic:
+                                - checkbox
+                                - generic: General Tools
+                              - generic:
+                                - checkbox
+                                - generic: Infrastructure & Delivery
+                              - generic:
+                                - checkbox
+                                - generic: Intro & Learning
+                              - generic:
+                                - checkbox
+                                - generic: Media Tools
+                              - generic:
+                                - checkbox
+                                - generic: Players & Clients
+                              - generic:
+                                - checkbox
+                                - generic: Protocols & Transport
+                              - generic:
+                                - checkbox
+                                - generic: Standards & Industry
+                          - group:
+                            - generic: Learning goals
+                            - paragraph: Pick every goal that matters right now.
+                            - generic:
+                              - generic:
+                                - checkbox [checked]:
+                                  - generic:
+                                    - img
+                                - generic: Learn the fundamentals
+                              - generic:
+                                - checkbox
+                                - generic: Build video applications
+                              - generic:
+                                - checkbox
+                                - generic: Improve streaming experiences
+                              - generic:
+                                - checkbox
+                                - generic: Optimize encoding and quality
+                              - generic:
+                                - checkbox
+                                - generic: Operate video infrastructure
+                              - generic:
+                                - checkbox
+                                - generic: Keep up with standards and tools
+                          - group:
+                            - generic: Preferred formats
+                            - paragraph: Choose at least one format. These map to the catalog’s curated resource formats.
+                            - generic:
+                              - generic:
+                                - checkbox [checked]:
+                                  - generic:
+                                    - img
+                                - generic: Videos
+                              - generic:
+                                - checkbox
+                                - generic: Courses
+                              - generic:
+                                - checkbox
+                                - generic: Articles
+                              - generic:
+                                - checkbox
+                                - generic: Books
+                              - generic:
+                                - checkbox
+                                - generic: Specifications
+                              - generic:
+                                - checkbox
+                                - generic: Hands-on tools
+                              - generic:
+                                - checkbox
+                                - generic: Libraries and SDKs
+                              - generic:
+                                - checkbox
+                                - generic: Community resources
+                          - group:
+                            - generic: Available time
+                            - paragraph: This helps us favor resources that fit your learning rhythm.
+                            - radiogroup:
+                              - generic:
+                                - radio
+                                - generic: A little most days
+                              - generic:
+                                - radio
+                                - generic: One focused session each week
+                              - generic:
+                                - radio [checked]:
+                                  - generic:
+                                    - img
+                                - generic: Whenever time allows
+                            - generic:
+                              - heading [level=3]: What changes after you save
+                              - paragraph: Your choices shape surfaces explicitly labeled personalized, including Personalized Recommendations. They do not change public catalog or search results, and preference values are not sent to analytics.
+                        - generic:
+                          - button [expanded]:
+                            - img
+                            - text: Reset preferences
+                          - button: Save learning preferences
+                  - region:
+                    - article:
+                      - generic:
+                        - generic:
+                          - img
+                          - text: Notifications
+                        - generic: Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in.
+                      - generic:
+                        - generic:
+                          - generic:
+                            - checkbox
+                            - generic:
+                              - img
+                            - generic:
+                              - generic: Email digest
+                              - generic: A considered digest, never a stream.
+                            - generic: "Off"
+                          - generic:
+                            - checkbox
+                            - generic:
+                              - img
+                            - generic:
+                              - generic: In-app updates
+                              - generic: A small inbox inside your account.
+                            - generic: "Off"
+                        - generic:
+                          - img
+                          - paragraph: These channels are independent. Delivery content excludes private notes, learning history, and external URLs.
+                        - region:
+                          - heading [level=3]: Digest sections
+                          - generic:
+                            - generic:
+                              - checkbox [checked]
+                              - text: New resources
+                            - generic:
+                              - checkbox [checked]
+                              - text: Watch next
+                            - generic:
+                              - checkbox [checked]
+                              - text: Journey steps
+                        - generic:
+                          - generic:
+                            - text: Cadence
+                            - combobox
+                          - generic:
+                            - text: Time zone
+                            - textbox: America/New_York
+                        - generic:
+                          - button:
+                            - img
+                            - text: Pause for 7 days
+                          - button [disabled]: Unsubscribe all
+                          - button: Save choices
+                        - region:
+                          - generic:
+                            - generic:
+                              - heading [level=3]:
+                                - img
+                                - text: Preview
+                              - paragraph: This uses the same rules as delivery.
+                            - generic: 2 items
+                          - generic:
+                            - link:
+                              - /url: /resource/190359
+                              - text: New for you
+                              - generic: PyTorchVideoCompression
+                              - generic: New in Encoding & Codecs
+                            - link:
+                              - /url: /journey/9#step-1
+                              - text: Continue your journey
+                              - generic: Live Streaming Fundamentals
+                              - generic: Next in Advanced Live Streaming Architecture
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 3,826
+                  - paragraph:
+                    - text: 9 categories 99 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+                  - generic:
+                    - button:
+                      - img
+                      - text: Contact maintainers
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - button: Cookie settings
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+      - button:
+        - img
+  - alertdialog "Reset learning preferences?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Reset learning preferences?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: This clears your skill level, topics, goals, formats, and schedule. It does not delete your account, bookmarks, or learning progress.
+    - generic [ref=e6]:
+      - button "Cancel" [active] [ref=e7] [cursor=pointer]
+      - button "Reset preferences" [ref=e8] [cursor=pointer]

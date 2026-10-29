@@ -1,0 +1,625 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - main
+        - navigation "Breadcrumb" [ref=e8]
+          - list
+            - listitem [level=1]
+              - link "Home" [ref=e37]
+            - listitem [level=1]
+              - link "Admin" [disabled, ref=e38]
+        - StaticText "Authorized admin area"
+        - StaticText "ADMIN CONSOLE · "
+        - StaticText "ADMIN USER"
+        - heading "Operations dashboard" [level=1, ref=e9]
+          - StaticText "Operations "
+          - emphasis
+            - StaticText "dashboard"
+        - paragraph
+          - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+        - button "Settings" [expanded=false, ref=e10]
+          - image
+          - StaticText "Settings"
+        - button "New entry: add a resource" [ref=e11]
+          - image
+          - StaticText "New entry"
+        - status
+        - generic
+          - button "Scroll tabs left" [ref=e13]
+          - tablist "Admin sections" [ref=e14] focusable [tabindex]
+            - tab "Overview" [ref=e16]
+              - StaticText "Overview"
+            - tab "Approvals" [ref=e17]
+              - StaticText "Approvals"
+            - tab "Edits" [ref=e18]
+              - StaticText "Edits"
+            - tab "Enrichment" [ref=e19]
+              - StaticText "Enrichment"
+            - tab "Researcher" [ref=e20]
+              - StaticText "Researcher"
+            - tab "Export" [ref=e21]
+              - StaticText "Export"
+            - tab "Database" [ref=e22]
+              - StaticText "Database"
+            - tab "Resources" [selected, ref=e23]
+              - StaticText "Resources"
+            - tab "Categories" [ref=e24]
+              - StaticText "Categories"
+            - tab "Subcategories" [ref=e25]
+              - StaticText "Subcategories"
+            - tab "Users" [ref=e26]
+              - StaticText "Users"
+            - tab "GitHub" [ref=e27]
+              - StaticText "GitHub"
+            - tab "Link Health" [ref=e28]
+              - StaticText "Link Health"
+            - tab "Audit" [ref=e29]
+              - StaticText "Audit"
+            - tab "Research" [ref=e30]
+              - StaticText "Research"
+          - button "Scroll tabs right" [ref=e15]
+        - tabpanel "Resources" [ref=e12] focusable [tabindex]
+          - article
+            - heading "Resources (25 of 3,825)" [level=2, ref=e31]
+              - StaticText "Resources (25 of 3,825)"
+            - generic
+              - StaticText "Manage every entry in the index · ★ 8 featured on the home page"
+            - textbox "Search…" [ref=e32]
+            - button "Show filters and tools" [expanded=false, ref=e33]
+            - button "Add" [ref=e34]
+              - image
+              - StaticText "Add"
+            - region "Resources table, scrollable" [ref=e39] focusable [tabindex]
+              - table
+                - rowgroup
+                  - row
+                    - columnheader "ID Select all resources on this page" [ref=e197]
+                      - StaticText "ID"
+                      - checkbox "Select all resources on this page" [checked=false, ref=e328]
+                    - columnheader "TITLE" [ref=e198]
+                    - columnheader "CATEGORY" [ref=e199]
+                    - columnheader "TAGS" [ref=e200]
+                    - columnheader "FEATURED" [ref=e201]
+                    - columnheader "Actions" [ref=e202]
+                - row
+                  - cell "190342 Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e47]
+                    - StaticText "190342"
+                    - checkbox "Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [checked=false, ref=e203]
+                  - cell "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e48]
+                    - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+                  - cell "Infrastructure & Delivery" [ref=e49]
+                  - cell "RTMP RTSP" [ref=e50]
+                    - StaticText "RTMP"
+                    - StaticText "RTSP"
+                  - cell "Feature on the home page: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e51]
+                    - button "Feature on the home page: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e204]
+                      - StaticText "—"
+                  - cell "View MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) Edit MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) Delete MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e52]
+                    - link "View MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e205]
+                      - StaticText "View"
+                    - button "Edit MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e206]
+                      - StaticText "Edit"
+                    - button "Delete MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e207]
+                      - image
+                - row
+                  - cell "190152 Select AV1 Encoding with libsvtav1 on Qencode" [ref=e53]
+                    - StaticText "190152"
+                    - checkbox "Select AV1 Encoding with libsvtav1 on Qencode" [checked=false, ref=e208]
+                  - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e54]
+                    - StaticText "AV1 Encoding with libsvtav1 on Qencode"
+                  - cell "Encoding & Codecs" [ref=e55]
+                  - cell "AV1 SVT-AV1" [ref=e56]
+                    - StaticText "AV1"
+                    - StaticText "SVT-AV1"
+                  - cell "Feature on the home page: AV1 Encoding with libsvtav1 on Qencode" [ref=e57]
+                    - button "Feature on the home page: AV1 Encoding with libsvtav1 on Qencode" [ref=e209]
+                      - StaticText "—"
+                  - cell "View AV1 Encoding with libsvtav1 on Qencode Edit AV1 Encoding with libsvtav1 on Qencode Delete AV1 Encoding with libsvtav1 on Qencode" [ref=e58]
+                    - link "View AV1 Encoding with libsvtav1 on Qencode" [ref=e210]
+                      - StaticText "View"
+                    - button "Edit AV1 Encoding with libsvtav1 on Qencode" [ref=e211]
+                      - StaticText "Edit"
+                    - button "Delete AV1 Encoding with libsvtav1 on Qencode" [ref=e212]
+                      - image
+                - row
+                  - cell "190151 Select MirrorFly IM Software" [ref=e59]
+                    - StaticText "190151"
+                    - checkbox "Select MirrorFly IM Software" [checked=false, ref=e213]
+                  - cell "MirrorFly IM Software" [ref=e60]
+                    - StaticText "MirrorFly IM Software"
+                  - cell "Intro & Learning" [ref=e61]
+                  - cell "INSTANT MESSAGING SOFTWARE INSTANT MESSAGING SOLUTION" [ref=e62]
+                    - StaticText "INSTANT MESSAGING SOFTWARE"
+                    - StaticText "INSTANT MESSAGING SOLUTION"
+                  - cell "Feature on the home page: MirrorFly IM Software" [ref=e63]
+                    - button "Feature on the home page: MirrorFly IM Software" [ref=e214]
+                      - StaticText "—"
+                  - cell "View MirrorFly IM Software Edit MirrorFly IM Software Delete MirrorFly IM Software" [ref=e64]
+                    - link "View MirrorFly IM Software" [ref=e215]
+                      - StaticText "View"
+                    - button "Edit MirrorFly IM Software" [ref=e216]
+                      - StaticText "Edit"
+                    - button "Delete MirrorFly IM Software" [ref=e217]
+                      - image
+                - row
+                  - cell "190135 Select MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e65]
+                    - StaticText "190135"
+                    - checkbox "Select MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [checked=false, ref=e218]
+                  - cell "MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e66]
+                    - StaticText "MLVC: Multi-platform Learned Video Codec for Real-World Deployment"
+                  - cell "Encoding & Codecs" [ref=e67]
+                  - cell "LEARNED VIDEO CODEC NEURAL CODEC" [ref=e68]
+                    - StaticText "LEARNED VIDEO CODEC"
+                    - StaticText "NEURAL CODEC"
+                  - cell "Feature on the home page: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e69]
+                    - button "Feature on the home page: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e219]
+                      - StaticText "—"
+                  - cell "View MLVC: Multi-platform Learned Video Codec for Real-World Deployment Edit MLVC: Multi-platform Learned Video Codec for Real-World Deployment Delete MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e70]
+                    - link "View MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e220]
+                      - StaticText "View"
+                    - button "Edit MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e221]
+                      - StaticText "Edit"
+                    - button "Delete MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e222]
+                      - image
+                - row
+                  - cell "190134 Select Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e71]
+                    - StaticText "190134"
+                    - checkbox "Select Encoder-Quantization-Motion (EQM) Video Quality Metric" [checked=false, ref=e223]
+                  - cell "Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e72]
+                    - StaticText "Encoder-Quantization-Motion (EQM) Video Quality Metric"
+                  - cell "Media Tools" [ref=e73]
+                  - cell "VIDEO QUALITY METRIC QUANTIZATION PARAMETER" [ref=e74]
+                    - StaticText "VIDEO QUALITY METRIC"
+                    - StaticText "QUANTIZATION PARAMETER"
+                  - cell "Feature on the home page: Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e75]
+                    - button "Feature on the home page: Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e224]
+                      - StaticText "—"
+                  - cell "View Encoder-Quantization-Motion (EQM) Video Quality Metric Edit Encoder-Quantization-Motion (EQM) Video Quality Metric Delete Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e76]
+                    - link "View Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e225]
+                      - StaticText "View"
+                    - button "Edit Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e226]
+                      - StaticText "Edit"
+                    - button "Delete Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e227]
+                      - image
+                - row
+                  - cell "190133 Select Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e77]
+                    - StaticText "190133"
+                    - checkbox "Select Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [checked=false, ref=e228]
+                  - cell "Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e78]
+                    - StaticText "Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)"
+                  - cell "Media Tools" [ref=e79]
+                  - cell "VMAF VIDEO QUALITY METRICS" [ref=e80]
+                    - StaticText "VMAF"
+                    - StaticText "VIDEO QUALITY METRICS"
+                  - cell "Feature on the home page: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e81]
+                    - button "Feature on the home page: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e229]
+                      - StaticText "—"
+                  - cell "View Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) Edit Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) Delete Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e82]
+                    - link "View Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e230]
+                      - StaticText "View"
+                    - button "Edit Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e231]
+                      - StaticText "Edit"
+                    - button "Delete Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e232]
+                      - image
+                - row
+                  - cell "190132 Select GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e83]
+                    - StaticText "190132"
+                    - checkbox "Select GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [checked=false, ref=e233]
+                  - cell "GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e84]
+                    - StaticText "GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality"
+                  - cell "Media Tools" [ref=e85]
+                  - cell "AI-GENERATED VIDEO QUALITY ASSESSMENT" [ref=e86]
+                    - StaticText "AI-GENERATED VIDEO"
+                    - StaticText "QUALITY ASSESSMENT"
+                  - cell "Feature on the home page: GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e87]
+                    - button "Feature on the home page: GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e234]
+                      - StaticText "—"
+                  - cell "View GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality Edit GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality Delete GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e88]
+                    - link "View GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e235]
+                      - StaticText "View"
+                    - button "Edit GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e236]
+                      - StaticText "Edit"
+                    - button "Delete GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e237]
+                      - image
+                - row
+                  - cell "190131 Select VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e89]
+                    - StaticText "190131"
+                    - checkbox "Select VQA² (Visual Question Answering for Video Quality Assessment)" [checked=false, ref=e238]
+                  - cell "VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e90]
+                    - StaticText "VQA² (Visual Question Answering for Video Quality Assessment)"
+                  - cell "Media Tools" [ref=e91]
+                  - cell "VIDEO QUALITY ASSESSMENT VISUAL QUESTION ANSWERING" [ref=e92]
+                    - StaticText "VIDEO QUALITY ASSESSMENT"
+                    - StaticText "VISUAL QUESTION ANSWERING"
+                  - cell "Feature on the home page: VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e93]
+                    - button "Feature on the home page: VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e239]
+                      - StaticText "—"
+                  - cell "View VQA² (Visual Question Answering for Video Quality Assessment) Edit VQA² (Visual Question Answering for Video Quality Assessment) Delete VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e94]
+                    - link "View VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e240]
+                      - StaticText "View"
+                    - button "Edit VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e241]
+                      - StaticText "Edit"
+                    - button "Delete VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e242]
+                      - image
+                - row
+                  - cell "190130 Select webrtc-externals" [ref=e95]
+                    - StaticText "190130"
+                    - checkbox "Select webrtc-externals" [checked=false, ref=e243]
+                  - cell "webrtc-externals" [ref=e96]
+                    - StaticText "webrtc-externals"
+                  - cell "Players & Clients" [ref=e97]
+                  - cell "WEBRTC BROWSER EXTENSION" [ref=e98]
+                    - StaticText "WEBRTC"
+                    - StaticText "BROWSER EXTENSION"
+                  - cell "Feature on the home page: webrtc-externals" [ref=e99]
+                    - button "Feature on the home page: webrtc-externals" [ref=e244]
+                      - StaticText "—"
+                  - cell "View webrtc-externals Edit webrtc-externals Delete webrtc-externals" [ref=e100]
+                    - link "View webrtc-externals" [ref=e245]
+                      - StaticText "View"
+                    - button "Edit webrtc-externals" [ref=e246]
+                      - StaticText "Edit"
+                    - button "Delete webrtc-externals" [ref=e247]
+                      - image
+                - row
+                  - cell "190129 Select webrtc-internals-exporter" [ref=e101]
+                    - StaticText "190129"
+                    - checkbox "Select webrtc-internals-exporter" [checked=false, ref=e248]
+                  - cell "webrtc-internals-exporter" [ref=e102]
+                    - StaticText "webrtc-internals-exporter"
+                  - cell "Players & Clients" [ref=e103]
+                  - cell "WEBRTC PROMETHEUS" [ref=e104]
+                    - StaticText "WEBRTC"
+                    - StaticText "PROMETHEUS"
+                  - cell "Feature on the home page: webrtc-internals-exporter" [ref=e105]
+                    - button "Feature on the home page: webrtc-internals-exporter" [ref=e249]
+                      - StaticText "—"
+                  - cell "View webrtc-internals-exporter Edit webrtc-internals-exporter Delete webrtc-internals-exporter" [ref=e106]
+                    - link "View webrtc-internals-exporter" [ref=e250]
+                      - StaticText "View"
+                    - button "Edit webrtc-internals-exporter" [ref=e251]
+                      - StaticText "Edit"
+                    - button "Delete webrtc-internals-exporter" [ref=e252]
+                      - image
+                - row
+                  - cell "190128 Select auto-transcode-watcher" [ref=e107]
+                    - StaticText "190128"
+                    - checkbox "Select auto-transcode-watcher" [checked=false, ref=e253]
+                  - cell "auto-transcode-watcher" [ref=e108]
+                    - StaticText "auto-transcode-watcher"
+                  - cell "Encoding & Codecs" [ref=e109]
+                  - cell "FFMPEG TRANSCODING" [ref=e110]
+                    - StaticText "FFMPEG"
+                    - StaticText "TRANSCODING"
+                  - cell "Feature on the home page: auto-transcode-watcher" [ref=e111]
+                    - button "Feature on the home page: auto-transcode-watcher" [ref=e254]
+                      - StaticText "—"
+                  - cell "View auto-transcode-watcher Edit auto-transcode-watcher Delete auto-transcode-watcher" [ref=e112]
+                    - link "View auto-transcode-watcher" [ref=e255]
+                      - StaticText "View"
+                    - button "Edit auto-transcode-watcher" [ref=e256]
+                      - StaticText "Edit"
+                    - button "Delete auto-transcode-watcher" [ref=e257]
+                      - image
+                - row
+                  - cell "190127 Select Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e113]
+                    - StaticText "190127"
+                    - checkbox "Select Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [checked=false, ref=e258]
+                  - cell "Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e114]
+                    - StaticText "Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services"
+                  - cell "General Tools" [ref=e115]
+                  - cell "DRM CONTENT PROTECTION" [ref=e116]
+                    - StaticText "DRM"
+                    - StaticText "CONTENT PROTECTION"
+                  - cell "Feature on the home page: Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e117]
+                    - button "Feature on the home page: Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e259]
+                      - StaticText "—"
+                  - cell "View Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services Edit Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services Delete Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e118]
+                    - link "View Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e260]
+                      - StaticText "View"
+                    - button "Edit Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e261]
+                      - StaticText "Edit"
+                    - button "Delete Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e262]
+                      - image
+                - row
+                  - cell "190126 Select On the Current State of Interoperable Content Protection for OTT" [ref=e119]
+                    - StaticText "190126"
+                    - checkbox "Select On the Current State of Interoperable Content Protection for OTT" [checked=false, ref=e263]
+                  - cell "On the Current State of Interoperable Content Protection for OTT" [ref=e120]
+                    - StaticText "On the Current State of Interoperable Content Protection for OTT"
+                  - cell "General Tools" [ref=e121]
+                  - cell "DRM CPIX" [ref=e122]
+                    - StaticText "DRM"
+                    - StaticText "CPIX"
+                  - cell "Feature on the home page: On the Current State of Interoperable Content Protection for OTT" [ref=e123]
+                    - button "Feature on the home page: On the Current State of Interoperable Content Protection for OTT" [ref=e264]
+                      - StaticText "—"
+                  - cell "View On the Current State of Interoperable Content Protection for OTT Edit On the Current State of Interoperable Content Protection for OTT Delete On the Current State of Interoperable Content Protection for OTT" [ref=e124]
+                    - link "View On the Current State of Interoperable Content Protection for OTT" [ref=e265]
+                      - StaticText "View"
+                    - button "Edit On the Current State of Interoperable Content Protection for OTT" [ref=e266]
+                      - StaticText "Edit"
+                    - button "Delete On the Current State of Interoperable Content Protection for OTT" [ref=e267]
+                      - image
+                - row
+                  - cell "190125 Select AV1-discuss Mailing List" [ref=e125]
+                    - StaticText "190125"
+                    - checkbox "Select AV1-discuss Mailing List" [checked=false, ref=e268]
+                  - cell "AV1-discuss Mailing List" [ref=e126]
+                    - StaticText "AV1-discuss Mailing List"
+                  - cell "General Tools" [ref=e127]
+                  - cell "AV1 MAILING-LIST" [ref=e128]
+                    - StaticText "AV1"
+                    - StaticText "MAILING-LIST"
+                  - cell "Feature on the home page: AV1-discuss Mailing List" [ref=e129]
+                    - button "Feature on the home page: AV1-discuss Mailing List" [ref=e269]
+                      - StaticText "—"
+                  - cell "View AV1-discuss Mailing List Edit AV1-discuss Mailing List Delete AV1-discuss Mailing List" [ref=e130]
+                    - link "View AV1-discuss Mailing List" [ref=e270]
+                      - StaticText "View"
+                    - button "Edit AV1-discuss Mailing List" [ref=e271]
+                      - StaticText "Edit"
+                    - button "Delete AV1-discuss Mailing List" [ref=e272]
+                      - image
+                - row
+                  - cell "190124 Select Jitsi Community Forum" [ref=e131]
+                    - StaticText "190124"
+                    - checkbox "Select Jitsi Community Forum" [checked=false, ref=e273]
+                  - cell "Jitsi Community Forum" [ref=e132]
+                    - StaticText "Jitsi Community Forum"
+                  - cell "General Tools" [ref=e133]
+                  - cell "WEBRTC JITSI" [ref=e134]
+                    - StaticText "WEBRTC"
+                    - StaticText "JITSI"
+                  - cell "Feature on the home page: Jitsi Community Forum" [ref=e135]
+                    - button "Feature on the home page: Jitsi Community Forum" [ref=e274]
+                      - StaticText "—"
+                  - cell "View Jitsi Community Forum Edit Jitsi Community Forum Delete Jitsi Community Forum" [ref=e136]
+                    - link "View Jitsi Community Forum" [ref=e275]
+                      - StaticText "View"
+                    - button "Edit Jitsi Community Forum" [ref=e276]
+                      - StaticText "Edit"
+                    - button "Delete Jitsi Community Forum" [ref=e277]
+                      - image
+                - row
+                  - cell "190123 Select AOMedia Community Wiki" [ref=e137]
+                    - StaticText "190123"
+                    - checkbox "Select AOMedia Community Wiki" [checked=false, ref=e278]
+                  - cell "AOMedia Community Wiki" [ref=e138]
+                    - StaticText "AOMedia Community Wiki"
+                  - cell "General Tools" [ref=e139]
+                  - cell "AV1 AOMEDIA" [ref=e140]
+                    - StaticText "AV1"
+                    - StaticText "AOMEDIA"
+                  - cell "Feature on the home page: AOMedia Community Wiki" [ref=e141]
+                    - button "Feature on the home page: AOMedia Community Wiki" [ref=e279]
+                      - StaticText "—"
+                  - cell "View AOMedia Community Wiki Edit AOMedia Community Wiki Delete AOMedia Community Wiki" [ref=e142]
+                    - link "View AOMedia Community Wiki" [ref=e280]
+                      - StaticText "View"
+                    - button "Edit AOMedia Community Wiki" [ref=e281]
+                      - StaticText "Edit"
+                    - button "Delete AOMedia Community Wiki" [ref=e282]
+                      - image
+                - row
+                  - cell "190122 Select Hydrogenaudio Forums" [ref=e143]
+                    - StaticText "190122"
+                    - checkbox "Select Hydrogenaudio Forums" [checked=false, ref=e283]
+                  - cell "Hydrogenaudio Forums" [ref=e144]
+                    - StaticText "Hydrogenaudio Forums"
+                  - cell "General Tools" [ref=e145]
+                  - cell "AUDIO-CODEC COMMUNITY-FORUM" [ref=e146]
+                    - StaticText "AUDIO-CODEC"
+                    - StaticText "COMMUNITY-FORUM"
+                  - cell "Feature on the home page: Hydrogenaudio Forums" [ref=e147]
+                    - button "Feature on the home page: Hydrogenaudio Forums" [ref=e284]
+                      - StaticText "—"
+                  - cell "View Hydrogenaudio Forums Edit Hydrogenaudio Forums Delete Hydrogenaudio Forums" [ref=e148]
+                    - link "View Hydrogenaudio Forums" [ref=e285]
+                      - StaticText "View"
+                    - button "Edit Hydrogenaudio Forums" [ref=e286]
+                      - StaticText "Edit"
+                    - button "Delete Hydrogenaudio Forums" [ref=e287]
+                      - image
+                - row
+                  - cell "190121 Select vvDecPlayer" [ref=e149]
+                    - StaticText "190121"
+                    - checkbox "Select vvDecPlayer" [checked=false, ref=e288]
+                  - cell "vvDecPlayer" [ref=e150]
+                    - StaticText "vvDecPlayer"
+                  - cell "Players & Clients" [ref=e151]
+                  - cell "VVC H.266" [ref=e152]
+                    - StaticText "VVC"
+                    - StaticText "H.266"
+                  - cell "Feature on the home page: vvDecPlayer" [ref=e153]
+                    - button "Feature on the home page: vvDecPlayer" [ref=e289]
+                      - StaticText "—"
+                  - cell "View vvDecPlayer Edit vvDecPlayer Delete vvDecPlayer" [ref=e154]
+                    - link "View vvDecPlayer" [ref=e290]
+                      - StaticText "View"
+                    - button "Edit vvDecPlayer" [ref=e291]
+                      - StaticText "Edit"
+                    - button "Delete vvDecPlayer" [ref=e292]
+                      - image
+                - row
+                  - cell "190120 Select Refract" [ref=e155]
+                    - StaticText "190120"
+                    - checkbox "Select Refract" [checked=false, ref=e293]
+                  - cell "Refract" [ref=e156]
+                    - StaticText "Refract"
+                  - cell "Encoding & Codecs" [ref=e157]
+                  - cell "AVIF JPEG-XL" [ref=e158]
+                    - StaticText "AVIF"
+                    - StaticText "JPEG-XL"
+                  - cell "Feature on the home page: Refract" [ref=e159]
+                    - button "Feature on the home page: Refract" [ref=e294]
+                      - StaticText "—"
+                  - cell "View Refract Edit Refract Delete Refract" [ref=e160]
+                    - link "View Refract" [ref=e295]
+                      - StaticText "View"
+                    - button "Edit Refract" [ref=e296]
+                      - StaticText "Edit"
+                    - button "Delete Refract" [ref=e297]
+                      - image
+                - row
+                  - cell "190119 Select GStreamerVideoMetrics" [ref=e161]
+                    - StaticText "190119"
+                    - checkbox "Select GStreamerVideoMetrics" [checked=false, ref=e298]
+                  - cell "GStreamerVideoMetrics" [ref=e162]
+                    - StaticText "GStreamerVideoMetrics"
+                  - cell "General Tools" [ref=e163]
+                  - cell "GSTREAMER RTMP" [ref=e164]
+                    - StaticText "GSTREAMER"
+                    - StaticText "RTMP"
+                  - cell "Feature on the home page: GStreamerVideoMetrics" [ref=e165]
+                    - button "Feature on the home page: GStreamerVideoMetrics" [ref=e299]
+                      - StaticText "—"
+                  - cell "View GStreamerVideoMetrics Edit GStreamerVideoMetrics Delete GStreamerVideoMetrics" [ref=e166]
+                    - link "View GStreamerVideoMetrics" [ref=e300]
+                      - StaticText "View"
+                    - button "Edit GStreamerVideoMetrics" [ref=e301]
+                      - StaticText "Edit"
+                    - button "Delete GStreamerVideoMetrics" [ref=e302]
+                      - image
+                - row
+                  - cell "190118 Select csplayready" [ref=e167]
+                    - StaticText "190118"
+                    - checkbox "Select csplayready" [checked=false, ref=e303]
+                  - cell "csplayready" [ref=e168]
+                    - StaticText "csplayready"
+                  - cell "General Tools" [ref=e169]
+                  - cell "PLAYREADY DRM" [ref=e170]
+                    - StaticText "PLAYREADY"
+                    - StaticText "DRM"
+                  - cell "Feature on the home page: csplayready" [ref=e171]
+                    - button "Feature on the home page: csplayready" [ref=e304]
+                      - StaticText "—"
+                  - cell "View csplayready Edit csplayready Delete csplayready" [ref=e172]
+                    - link "View csplayready" [ref=e305]
+                      - StaticText "View"
+                    - button "Edit csplayready" [ref=e306]
+                      - StaticText "Edit"
+                    - button "Delete csplayready" [ref=e307]
+                      - image
+                - row
+                  - cell "190117 Select NextPlayer" [ref=e173]
+                    - StaticText "190117"
+                    - checkbox "Select NextPlayer" [checked=false, ref=e308]
+                  - cell "NextPlayer" [ref=e174]
+                    - StaticText "NextPlayer"
+                  - cell "Players & Clients" [ref=e175]
+                  - cell "ANDROID H.265" [ref=e176]
+                    - StaticText "ANDROID"
+                    - StaticText "H.265"
+                  - cell "Feature on the home page: NextPlayer" [ref=e177]
+                    - button "Feature on the home page: NextPlayer" [ref=e309]
+                      - StaticText "—"
+                  - cell "View NextPlayer Edit NextPlayer Delete NextPlayer" [ref=e178]
+                    - link "View NextPlayer" [ref=e310]
+                      - StaticText "View"
+                    - button "Edit NextPlayer" [ref=e311]
+                      - StaticText "Edit"
+                    - button "Delete NextPlayer" [ref=e312]
+                      - image
+                - row
+                  - cell "190116 Select pAV0NE" [ref=e179]
+                    - StaticText "190116"
+                    - checkbox "Select pAV0NE" [checked=false, ref=e313]
+                  - cell "pAV0NE" [ref=e180]
+                    - StaticText "pAV0NE"
+                  - cell "Players & Clients" [ref=e181]
+                  - cell "AV1 EXOPLAYER" [ref=e182]
+                    - StaticText "AV1"
+                    - StaticText "EXOPLAYER"
+                  - cell "Feature on the home page: pAV0NE" [ref=e183]
+                    - button "Feature on the home page: pAV0NE" [ref=e314]
+                      - StaticText "—"
+                  - cell "View pAV0NE Edit pAV0NE Delete pAV0NE" [ref=e184]
+                    - link "View pAV0NE" [ref=e315]
+                      - StaticText "View"
+                    - button "Edit pAV0NE" [ref=e316]
+                      - StaticText "Edit"
+                    - button "Delete pAV0NE" [ref=e317]
+                      - image
+                - row
+                  - cell "190115 Select multiflux" [ref=e185]
+                    - StaticText "190115"
+                    - checkbox "Select multiflux" [checked=false, ref=e318]
+                  - cell "multiflux" [ref=e186]
+                    - StaticText "multiflux"
+                  - cell "Infrastructure & Delivery" [ref=e187]
+                  - cell "CLOUDFLARE WORKERS MULTISTREAMING" [ref=e188]
+                    - StaticText "CLOUDFLARE WORKERS"
+                    - StaticText "MULTISTREAMING"
+                  - cell "Feature on the home page: multiflux" [ref=e189]
+                    - button "Feature on the home page: multiflux" [ref=e319]
+                      - StaticText "—"
+                  - cell "View multiflux Edit multiflux Delete multiflux" [ref=e190]
+                    - link "View multiflux" [ref=e320]
+                      - StaticText "View"
+                    - button "Edit multiflux" [ref=e321]
+                      - StaticText "Edit"
+                    - button "Delete multiflux" [ref=e322]
+                      - image
+                - row
+                  - cell "190114 Select TV-Workers" [ref=e191]
+                    - StaticText "190114"
+                    - checkbox "Select TV-Workers" [checked=false, ref=e323]
+                  - cell "TV-Workers" [ref=e192]
+                    - StaticText "TV-Workers"
+                  - cell "Infrastructure & Delivery" [ref=e193]
+                  - cell "HLS IPTV" [ref=e194]
+                    - StaticText "HLS"
+                    - StaticText "IPTV"
+                  - cell "Feature on the home page: TV-Workers" [ref=e195]
+                    - button "Feature on the home page: TV-Workers" [ref=e324]
+                      - StaticText "—"
+                  - cell "View TV-Workers Edit TV-Workers Delete TV-Workers" [ref=e196]
+                    - link "View TV-Workers" [ref=e325]
+                      - StaticText "View"
+                    - button "Edit TV-Workers" [ref=e326]
+                      - StaticText "Edit"
+                    - button "Delete TV-Workers" [ref=e327]
+                      - image
+            - paragraph
+              - StaticText "Swipe the table sideways to see category, tags, featured, and actions."
+            - StaticText "Showing 1 - 25 of 3,825 resources"
+            - combobox "Rows per page" [expanded=false, ref=e35]: 25 / page
+              - generic [ref=e40] clickable [cursor:pointer, onclick]
+                - StaticText "25 / page"
+            - navigation "Pagination" [ref=e36]
+              - generic [disabled]
+                - image
+                - StaticText "Previous"
+              - link "Page 1, current page" [ref=e41]
+                - StaticText "1"
+              - link "Go to page 2" [ref=e42]
+                - StaticText "2"
+              - link "Go to page 153" [ref=e43]
+                - StaticText "153"
+              - link "Next" [ref=e44]
+                - StaticText "Next"
+                - image
+              - StaticText "Page "
+              - StaticText "1"
+              - StaticText " of "
+              - StaticText "153"
+              - LabelText [ref=e45] clickable [cursor:pointer]
+                - StaticText "Go to page"
+              - textbox "Page number, 1 to 153" [ref=e46]: 1
+                - StaticText "1"
+              - status

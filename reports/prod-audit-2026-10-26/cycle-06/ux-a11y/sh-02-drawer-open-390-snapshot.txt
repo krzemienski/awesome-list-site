@@ -1,0 +1,70 @@
+- generic
+  - dialog "Sidebar"
+    - heading "Sidebar" [level=2, ref=e1]
+    - paragraph
+      - StaticText "Displays the sidebar navigation."
+    - navigation "Sidebar" [ref=e2]
+      - link "AWESOME.VIDEO home, 3,825 resources" [ref=e4]
+        - StaticText "AWESOME.VIDEO"
+        - StaticText "home,"
+        - StaticText "3,825 resources"
+      - form
+        - searchbox "Search resources" [ref=e21]
+      - navigation "Primary" [ref=e5]
+        - link "Home" [ref=e17]
+          - image
+          - StaticText "Home"
+        - link "Submit" [ref=e18]
+          - image
+          - StaticText "Submit"
+        - link "About" [ref=e19]
+          - image
+          - StaticText "About"
+        - link "Admin" [ref=e20]
+          - image
+          - StaticText "Admin"
+      - StaticText "CATEGORIES"
+      - button "Community & Events 129 resources" [expanded=false, ref=e6]
+        - StaticText "Community & Events"
+        - StaticText "129"
+        - image
+      - button "Encoding & Codecs 579 resources" [expanded=false, ref=e7]
+        - StaticText "Encoding & Codecs"
+        - StaticText "579"
+        - image
+      - button "General Tools 514 resources" [expanded=false, ref=e8]
+        - StaticText "General Tools"
+        - StaticText "514"
+        - image
+      - button "Infrastructure & Delivery 353 resources" [expanded=false, ref=e9]
+        - StaticText "Infrastructure & Delivery"
+        - StaticText "353"
+        - image
+      - button "Intro & Learning 297 resources" [expanded=false, ref=e10]
+        - StaticText "Intro & Learning"
+        - StaticText "297"
+        - image
+      - button "Media Tools 704 resources" [expanded=false, ref=e11]
+        - StaticText "Media Tools"
+        - StaticText "704"
+        - image
+      - button "Players & Clients 447 resources" [expanded=false, ref=e12]
+        - StaticText "Players & Clients"
+        - StaticText "447"
+        - image
+      - button "Protocols & Transport 467 resources" [expanded=false, ref=e13]
+        - StaticText "Protocols & Transport"
+        - StaticText "467"
+        - image
+      - button "Standards & Industry 335 resources" [expanded=false, ref=e14]
+        - StaticText "Standards & Industry"
+        - StaticText "335"
+        - image
+      - StaticText "3,825 indexed"
+      - StaticText " · live"
+      - link "Docs ↗" [ref=e15]
+      - link "Source: krzemienski/awesome-video" [ref=e16]
+      - group
+        - DisclosureTriangle "More navigation" [expanded=false]
+    - button "Close sidebar" [ref=e3]
+      - StaticText "Close"

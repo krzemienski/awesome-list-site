@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/bookmarks","title":"Bookmarks — Awesome Video","width":390,"height":844,"touch":true,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BUTTON","id":"radix-:r0:","label":null,"text":"Sign inSign in, account menu","rect":{"x":326,"y":5.5,"width":44,"height":44,"top":5.5,"right":370,"bottom":49.5,"left":326}},"headings":[{"text":"Saved, for now.","id":""},{"text":"Sign in to keep these everywhere","id":""},{"text":"FFmpeg","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Bookmarks","label":null,"current":"page"},{"text":"","label":"Remove bookmark saved on this device: FFmpeg","current":null}],"status":[],"analyticsDisabled":"1"}
+```

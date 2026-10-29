@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Encoding & Codecs",
+    "rect": {
+      "x": 288.65625,
+      "y": 723.140625,
+      "width": 216.671875,
+      "height": 44,
+      "top": 723.140625,
+      "right": 505.328125,
+      "bottom": 767.140625,
+      "left": 288.65625
+    },
+    "probe": {
+      "x": 396.9921875,
+      "y": 725.140625,
+      "hit": "Encoding & Codecs",
+      "href": "/category/encoding-codecs"
+    }
+  },
+  {
+    "name": "General Tools",
+    "rect": {
+      "x": 288.65625,
+      "y": 751.953125,
+      "width": 216.671875,
+      "height": 44,
+      "top": 751.953125,
+      "right": 505.328125,
+      "bottom": 795.953125,
+      "left": 288.65625
+    },
+    "probe": {
+      "x": 396.9921875,
+      "y": 753.953125,
+      "hit": "General Tools",
+      "href": "/category/general-tools"
+    }
+  },
+  {
+    "name": "Infrastructure & Delivery",
+    "rect": {
+      "x": 288.65625,
+      "y": 780.765625,
+      "width": 216.671875,
+      "height": 44,
+      "top": 780.765625,
+      "right": 505.328125,
+      "bottom": 824.765625,
+      "left": 288.65625
+    },
+    "probe": {
+      "x": 396.9921875,
+      "y": 782.765625,
+      "hit": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery"
+    }
+  }
+]

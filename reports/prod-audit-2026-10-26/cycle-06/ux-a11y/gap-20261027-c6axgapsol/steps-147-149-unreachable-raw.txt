@@ -1,0 +1,61 @@
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - alert
+    - StaticText "ERROR · UNAVAILABLE"
+    - heading "Something went wrong" [level=1, ref=e3]
+    - StaticText "The catalog couldn't be loaded. This is usually a brief network or server problem. Please try again."
+    - button "Retry" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-147-unreachable-1440.png
+
+✓ Done
+
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - alert
+    - StaticText "ERROR · UNAVAILABLE"
+    - heading "Something went wrong" [level=1, ref=e3]
+    - StaticText "The catalog couldn't be loaded. This is usually a brief network or server problem. Please try again."
+    - button "Retry" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-148-unreachable-820.png
+
+✓ Done
+
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - alert
+    - StaticText "ERROR · UNAVAILABLE"
+    - heading "Something went wrong" [level=1, ref=e3]
+    - StaticText "The catalog couldn't be loaded. This is usually a brief network or server problem. Please try again."
+    - button "Retry" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-149-unreachable-390.png
+
+[48639.234] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.304] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.564] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.567] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.568] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.569] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.570] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.571] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.572] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.573] GET https://awesome.video/api/awesome-list (Fetch)
+
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+

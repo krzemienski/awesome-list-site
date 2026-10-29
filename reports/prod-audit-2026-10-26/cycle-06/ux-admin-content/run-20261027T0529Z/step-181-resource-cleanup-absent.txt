@@ -1,0 +1,133 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list [ref=e4] clickable [onclick]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [ref=e43]
+              - listitem [level=1]
+                - link "Resources" [disabled, ref=e44]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e15]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e16]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e17]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [selected, ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Resources" [ref=e18] focusable [tabindex]
+            - article
+              - heading "Resources (0 of 0)" [level=2, ref=e36]
+                - StaticText "Resources (0 of 0)"
+              - generic
+                - StaticText "Manage every entry in the index · ★ 8 featured on the home page · Filters applied"
+              - textbox "Search…" [ref=e37]: [QA-audit-1026]
+                - StaticText "[QA-audit-1026]"
+              - button "Hide filters and tools" [expanded=true, ref=e38]
+                - StaticText "Hide filters and tools"
+              - button "Add" [ref=e39]
+                - image
+                - StaticText "Add"
+              - region "Resource filters and tools" [ref=e40]
+                - generic
+                  - image
+                  - textbox "Search by title or URL..." [ref=e53]: [QA-audit-1026]
+                    - StaticText "[QA-audit-1026]"
+                - combobox "Filter by category" [expanded=false, ref=e45]: All Categories
+                  - image
+                  - StaticText "All Categories"
+                - combobox "Filter by status" [expanded=false, ref=e46]: Rejected
+                  - generic [ref=e54] clickable [cursor:pointer, onclick]
+                    - StaticText "Rejected"
+                - combobox "Sort resources" [expanded=false, ref=e47]: Newest first
+                  - generic [ref=e55] clickable [cursor:pointer, onclick]
+                    - StaticText "Newest first"
+                - button "★ Featured only" [ref=e48]
+                - button "Search" [ref=e49]
+                  - image
+                - button "Clear filters" [ref=e50]
+                  - image
+              - region "Resources table, scrollable" [ref=e51] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID Select all resources on this page" [ref=e57]
+                        - StaticText "ID"
+                        - checkbox "Select all resources on this page" [checked=false, disabled, ref=e64]
+                      - columnheader "TITLE" [ref=e58]
+                      - columnheader "CATEGORY" [ref=e59]
+                      - columnheader "TAGS" [ref=e60]
+                      - columnheader "FEATURED" [ref=e61]
+                      - columnheader "Actions" [ref=e62]
+                  - row
+                    - cell "No resources match the current search or filters. Clear filters" [ref=e56]
+                      - StaticText "No resources match the current search or filters."
+                      - button "Clear filters" [ref=e63]
+              - StaticText "0 resources"
+              - combobox "Rows per page" [expanded=false, ref=e41]: 25 / page
+                - generic [ref=e52] clickable [cursor:pointer, onclick]
+                  - StaticText "25 / page"

@@ -1,0 +1,10 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - region "Bulk bookmark actions" [ref=e5]
+  - alertdialog "Delete “[QA-audit-1026] c6 collection A2”?"
+    - heading "Delete “[QA-audit-1026] c6 collection A2”?" [level=2, ref=e2]
+    - button "Cancel" [ref=e3]
+    - button "Delete collection" [ref=e4]

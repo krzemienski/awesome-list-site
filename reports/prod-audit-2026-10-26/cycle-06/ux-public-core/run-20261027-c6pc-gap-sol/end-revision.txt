@@ -1,0 +1,2 @@
+2026-10-27 end-of-run single curl /api/version: {"revision":"520d6778369bc7ce495204cfcacc7e0533f941cc"}
+Isolated production context c6pc-gap-20261027-sol, page 56. Fallback isolated session c6pc-gap-sol-fallback. No content-row mutations, no sign-out, no paid jobs, no mocks/test files/harnesses.

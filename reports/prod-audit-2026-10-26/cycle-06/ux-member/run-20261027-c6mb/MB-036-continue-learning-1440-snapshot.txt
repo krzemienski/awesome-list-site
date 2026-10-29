@@ -1,0 +1,105 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e60]
+              - listitem [level=1]
+                - link "Continue Learning" [disabled, ref=e61]
+          - sectionheader
+            - heading "Continue Learning" [level=1, ref=e24]
+            - paragraph
+          - region "Resume a journey" [ref=e14]
+            - heading "Resume a journey" [level=2, ref=e25]
+            - StaticText "Ordered by your latest activity"
+            - article
+              - StaticText "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+              - progressbar "Advanced Live Streaming Architecture progress: 0%": 0
+              - button "Resume next step: Advanced Live Streaming Architecture" [ref=e54]
+            - article
+              - StaticText "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+              - progressbar "Video Streaming Fundamentals progress: 67%": 67
+              - button "Resume next step: Video Streaming Fundamentals" [ref=e55]
+            - article
+              - StaticText "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach."
+              - progressbar "DRM & Content Protection progress: 0%": 0
+              - button "Resume next step: DRM & Content Protection" [ref=e56]
+            - article
+              - StaticText "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+              - progressbar "FFmpeg Mastery progress: 0%": 0
+              - button "Resume next step: FFmpeg Mastery" [ref=e57]
+          - region "Recently opened resources" [ref=e15]
+            - heading "Recently opened resources" [level=2, ref=e26]
+            - link "Standards & Industry 25 minutes ago Audacity" [ref=e27]
+            - link "Infrastructure & Delivery about 3 hours ago MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e28]
+            - link "General Tools about 5 hours ago AV1-discuss Mailing List" [ref=e29]
+            - link "Encoding & Codecs about 22 hours ago AV1 Encoding with libsvtav1 on Qencode" [ref=e30]
+            - link "Encoding & Codecs 1 day ago FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC" [ref=e31]
+              - StaticText "FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC"
+            - link "Encoding & Codecs 14 days ago FFmpeg" [ref=e32]
+            - link "General Tools 18 days ago 100-4K (BVI-1004K) Test Sequence Dataset" [ref=e33]
+            - link "Intro & Learning 18 days ago Video Encoding 101: A Beginner's Guide to Key Concepts" [ref=e34]
+              - StaticText "Video Encoding 101: A Beginner's Guide to Key Concepts"
+          - region "Completed journeys" [ref=e16]
+            - heading "Completed journeys" [level=2, ref=e35]
+            - article
+              - heading "Building Your First Streaming Platform" [level=3, ref=e58]
+              - link "Review" [ref=e59]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e17]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e18]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e19]
+            - heading "EXPLORE" [level=2, ref=e36]
+            - link "Community & Events" [ref=e37]
+            - link "Encoding & Codecs" [ref=e38]
+            - link "General Tools" [ref=e39]
+            - link "Infrastructure & Delivery" [ref=e40]
+            - link "Intro & Learning" [ref=e41]
+            - link "Media Tools" [ref=e42]
+            - link "Players & Clients" [ref=e43]
+            - link "Protocols & Transport" [ref=e44]
+            - link "Standards & Industry" [ref=e45]
+          - heading "SOURCE" [level=2, ref=e20]
+          - link "krzemienski/ awesome-video" [ref=e21]
+          - paragraph
+            - link "PRs welcome" [ref=e46]
+          - button "Contact maintainers" [ref=e22]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e23]
+            - link "About" [ref=e47]
+            - link "Terms" [ref=e48]
+            - link "Privacy" [ref=e49]
+            - link "Code of Conduct" [ref=e50]
+            - button "Cookie settings" [ref=e51]
+            - link "Issues ↗" [ref=e52]
+            - link "Sitemap" [ref=e53]

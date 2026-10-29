@@ -1,0 +1,5 @@
+Fix C6-AO-024 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-ao024-reseed-confirmation. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-admin-ops/findings.md and database evidence. Clear & Re-seed must enable only when the confirmation is exactly trimmed uppercase RESEED. Lowercase/mixed case and other text stay disabled; surrounding whitespace is trimmed as inventory specifies. Never execute the destructive action during proof. Scope DatabaseTab confirmation predicate only, no API or other dialog changes.
+
+Run tsc --noEmit and npm run build unpiped. Use authorized local admin proof only if already available, otherwise mark it BLOCKED for post-deploy production verification at 1440, 820 touch and 390 touch. Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks and UNVERIFIED evidence. No test files/mocks/validation harnesses. Never merge.

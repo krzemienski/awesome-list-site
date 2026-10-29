@@ -1,0 +1,277 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - generic [ref=e31]:
+        - main [ref=e32]:
+          - generic [ref=e33]:
+            - navigation "Breadcrumb" [ref=e34]:
+              - list [ref=e35]:
+                - listitem [ref=e36]:
+                  - link "Home" [ref=e37] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e38]:
+                  - img [ref=e39]
+                - listitem:
+                  - link "Profile" [disabled]
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e44]: AU
+                - generic [ref=e45]:
+                  - generic [ref=e46]: // Profile
+                  - heading "Admin User Edit display name" [level=1] [ref=e47]:
+                    - generic [ref=e48]: Admin User
+                    - button "Edit display name" [ref=e49] [cursor=pointer]:
+                      - img
+                  - generic [ref=e50]:
+                    - generic [ref=e51]:
+                      - img [ref=e52]
+                      - generic [ref=e55]: admin@example.com
+                    - generic [ref=e56]:
+                      - img [ref=e57]
+                      - text: Joined 11 months ago
+                    - generic [ref=e59]: beginner
+                - generic [ref=e60]:
+                  - button "Settings" [ref=e61] [cursor=pointer]:
+                    - img
+                    - text: Settings
+                  - button "Sign out" [ref=e62] [cursor=pointer]:
+                    - img
+                    - text: Sign out
+                  - button "Sign out all devices" [ref=e63] [cursor=pointer]:
+                    - img
+                    - text: Sign out all devices
+              - generic [ref=e64]:
+                - article [ref=e65]:
+                  - generic [ref=e66]:
+                    - img [ref=e67]
+                    - generic [ref=e69]:
+                      - paragraph [ref=e70]: "2"
+                      - paragraph [ref=e71]: Favorites
+                - article [ref=e72]:
+                  - generic [ref=e73]:
+                    - img [ref=e74]
+                    - generic [ref=e76]:
+                      - paragraph [ref=e77]: "12"
+                      - paragraph [ref=e78]: Bookmarks
+                - article [ref=e79]:
+                  - generic [ref=e80]:
+                    - img [ref=e81]
+                    - generic [ref=e87]:
+                      - paragraph [ref=e88]: 1d
+                      - paragraph [ref=e89]: Learning Streak
+                      - paragraph [ref=e90]: Consecutive days signed in
+                - article [ref=e91]:
+                  - generic [ref=e92]:
+                    - img [ref=e93]
+                    - generic [ref=e97]:
+                      - paragraph [ref=e98]: "1"
+                      - paragraph [ref=e99]: Journeys Completed
+                      - paragraph [ref=e100]: Learning journeys finished
+              - generic [ref=e101]:
+                - tablist [ref=e102]:
+                  - tab "Overview" [ref=e103] [cursor=pointer]
+                  - tab "Favorites" [ref=e104] [cursor=pointer]
+                  - tab "Bookmarks" [ref=e105] [cursor=pointer]
+                  - tab "Submissions" [ref=e106] [cursor=pointer]
+                  - tab "Security" [active] [selected] [ref=e107] [cursor=pointer]
+                - tabpanel "Security" [ref=e108]:
+                  - generic [ref=e109]:
+                    - article [ref=e110]:
+                      - generic [ref=e111]:
+                        - generic [ref=e112]:
+                          - img [ref=e113]
+                          - text: Password & security
+                        - generic [ref=e116]: You're signed in with the owner password, so there is no account password, device list or connected sign-in method to manage here. To end owner sessions everywhere, use Sign out all devices at the top of this page. App API keys are managed separately, below.
+                    - article [ref=e117]:
+                      - generic [ref=e118]:
+                        - generic [ref=e119]:
+                          - img [ref=e120]
+                          - text: API keys
+                        - generic [ref=e123]:
+                          - text: Keys for programmatic, read-only access to this site's public API (send
+                          - code [ref=e124]: "Authorization: Bearer <key>"
+                          - text: ). They are separate from your sign-in account above. Each key's secret is shown once, when you create it.
+                      - generic [ref=e125]:
+                        - generic [ref=e126]:
+                          - generic [ref=e127]:
+                            - generic [ref=e128]:
+                              - text: Key name
+                              - textbox "Key name" [ref=e129]:
+                                - /placeholder: e.g. My reading-list script
+                            - generic [ref=e130]:
+                              - text: Expires
+                              - combobox "Expires" [ref=e131] [cursor=pointer]:
+                                - generic: 90 days
+                                - img [ref=e132]
+                              - combobox [ref=e134] [cursor=pointer]
+                          - button "Create key" [disabled]
+                        - region "Your keys" [ref=e135]:
+                          - heading "Your keys" [level=3] [ref=e136]
+                          - list [ref=e137]:
+                            - listitem [ref=e138]:
+                              - generic [ref=e139]:
+                                - generic [ref=e140]:
+                                  - generic [ref=e141]: "[QA-audit-1026] c6 key1y"
+                                  - generic [ref=e142]: Revoked
+                                - paragraph [ref=e143]: Created about 1 hour ago · Revoked about 1 hour ago · Never used
+                            - listitem [ref=e144]:
+                              - generic [ref=e145]:
+                                - generic [ref=e146]:
+                                  - generic [ref=e147]: "[QA-audit-1026] c6 key90"
+                                  - generic [ref=e148]: Revoked
+                                - paragraph [ref=e149]: Created about 1 hour ago · Revoked about 1 hour ago · Never used
+                            - listitem [ref=e150]:
+                              - generic [ref=e151]:
+                                - generic [ref=e152]:
+                                  - generic [ref=e153]: "[QA-audit-1026] c6 key30"
+                                  - generic [ref=e154]: Revoked
+                                - paragraph [ref=e155]: Created about 1 hour ago · Revoked about 1 hour ago · Last used about 1 hour ago
+                            - listitem [ref=e156]:
+                              - generic [ref=e157]:
+                                - generic [ref=e158]:
+                                  - generic [ref=e159]: "[QA-audit-1026] c6 key30"
+                                  - generic [ref=e160]: Revoked
+                                - paragraph [ref=e161]: Created about 1 hour ago · Revoked about 1 hour ago · Never used
+                            - listitem [ref=e162]:
+                              - generic [ref=e163]:
+                                - generic [ref=e164]:
+                                  - generic [ref=e165]: "[QA-audit-1026] c4 key"
+                                  - generic [ref=e166]: Revoked
+                                - paragraph [ref=e167]: Created about 6 hours ago · Revoked about 6 hours ago · Never used
+                            - listitem [ref=e168]:
+                              - generic [ref=e169]:
+                                - generic [ref=e170]:
+                                  - generic [ref=e171]: __qa_test_578_api_key_1791282860771
+                                  - generic [ref=e172]: Revoked
+                                - paragraph [ref=e173]: Created 21 days ago · Revoked 21 days ago · Last used 21 days ago
+                    - article [ref=e174]:
+                      - generic [ref=e175]:
+                        - generic [ref=e176]: Delete account & data
+                        - generic [ref=e177]: Request permanent deletion of your account and personal data. Requests are handled privately by a maintainer — nothing is posted publicly.
+                      - generic [ref=e178]:
+                        - paragraph [ref=e179]: Approved resources you submitted stay in the directory but are detached from your identity.
+                        - button "Request account deletion" [ref=e180] [cursor=pointer]
+        - contentinfo [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - paragraph [ref=e184]: ── INDEX
+              - link "awesome.video home" [ref=e185] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e186]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e188]:
+              - heading "INDEXED" [level=2] [ref=e189]
+              - paragraph [ref=e190]: 3,826
+              - paragraph [ref=e191]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e192]: live
+            - navigation "Explore categories" [ref=e194]:
+              - heading "EXPLORE" [level=2] [ref=e195]
+              - generic [ref=e196]:
+                - link "Community & Events" [ref=e197] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e198]: ◈
+                  - generic [ref=e199]: Community
+                - link "Encoding & Codecs" [ref=e200] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e201]: ◇
+                  - generic [ref=e202]: Encoding
+                - link "General Tools" [ref=e203] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e204]: ◆
+                  - generic [ref=e205]: General
+                - link "Infrastructure & Delivery" [ref=e206] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e207]: ▣
+                  - generic [ref=e208]: Infrastructure
+                - link "Intro & Learning" [ref=e209] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e210]: ▤
+                  - generic [ref=e211]: Intro
+                - link "Media Tools" [ref=e212] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e213]: ▥
+                  - generic [ref=e214]: Media
+                - link "Players & Clients" [ref=e215] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e216]: ▶
+                  - generic [ref=e217]: Players
+                - link "Protocols & Transport" [ref=e218] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e219]: ⟁
+                  - generic [ref=e220]: Protocols
+                - link "Standards & Industry" [ref=e221] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e222]: ◉
+                  - generic [ref=e223]: Standards
+            - generic [ref=e224]:
+              - heading "SOURCE" [level=2] [ref=e225]
+              - link "krzemienski/awesome-video" [ref=e226] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e227]
+                - generic [ref=e229]:
+                  - text: krzemienski
+                  - generic [ref=e230]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e231]: ↗
+              - paragraph [ref=e232]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e233] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e235] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e236]:
+            - generic [ref=e237]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e238]:
+              - link "About" [ref=e239] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e240] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e241] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e242] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e243] [cursor=pointer]
+              - link "Issues ↗" [ref=e244] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e245] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e246]: built with the awesome-list framework

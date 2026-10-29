@@ -1,0 +1,245 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - button "Scroll tabs left" [ref=e59] [cursor=pointer]:
+                  - img [ref=e60]
+                - tablist "Admin sections" [ref=e62]:
+                  - tab "Overview" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Overview
+                  - tab "Approvals" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Approvals
+                  - tab "Edits" [ref=e72] [cursor=pointer]:
+                    - img [ref=e73]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Researcher
+                  - tab "Export" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Export
+                  - tab "Database" [ref=e83] [cursor=pointer]:
+                    - img [ref=e84]
+                    - text: Database
+                  - tab "Resources" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Resources
+                  - tab "Categories" [ref=e91] [cursor=pointer]:
+                    - img [ref=e92]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e93] [cursor=pointer]:
+                    - img [ref=e94]
+                    - text: Subcategories
+                  - tab "Users" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Users
+                  - tab "GitHub" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Link Health
+                  - tab "Audit" [ref=e108] [cursor=pointer]:
+                    - img [ref=e109]
+                    - text: Audit
+                  - tab "Research" [ref=e110] [cursor=pointer]:
+                    - img [ref=e111]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e113] [cursor=pointer]:
+                  - img [ref=e114]
+              - tabpanel "Researcher" [ref=e116]:
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - 'region "Research run #77" [ref=e120]':
+                      - generic [ref=e121]:
+                        - generic [ref=e122]:
+                          - 'heading "Research run #77" [level=3] [ref=e123]'
+                          - paragraph [ref=e124]: All categories · running for 14:38
+                        - generic [ref=e125]:
+                          - generic [ref=e126]:
+                            - img [ref=e127]
+                            - text: Running
+                          - button "Cancel run" [ref=e129] [cursor=pointer]:
+                            - img
+                            - text: Cancel run
+                      - paragraph [ref=e130]
+                      - status [ref=e131]:
+                        - img [ref=e132]
+                        - text: Live updates failed; showing the last good data and retrying.
+                      - generic [ref=e137]:
+                        - list "Run phases" [ref=e138]:
+                          - listitem [ref=e139]:
+                            - generic [ref=e142]:
+                              - text: Planning
+                              - generic [ref=e143]: 03:38:14 AM
+                            - generic [ref=e144]: (current)
+                          - listitem [ref=e145]:
+                            - img [ref=e147]
+                            - generic [ref=e149]:
+                              - text: Scouting
+                              - generic [ref=e150]: 03:38:32 AM
+                            - generic [ref=e151]: (done)
+                          - listitem [ref=e152]:
+                            - generic [ref=e154]: Verifying
+                            - generic [ref=e156]: (not reached)
+                          - listitem [ref=e157]:
+                            - generic [ref=e159]: Saving
+                            - generic [ref=e161]: (not reached)
+                          - listitem [ref=e162]:
+                            - generic [ref=e164]: Done
+                            - generic [ref=e166]: (not reached)
+                        - generic [ref=e167]:
+                          - heading "Scouts 1 started · 1 searching" [level=4] [ref=e168]:
+                            - img [ref=e169]
+                            - text: Scouts
+                            - generic [ref=e172]: 1 started · 1 searching
+                          - list "Scouts" [ref=e173]:
+                            - listitem [ref=e174]:
+                              - generic [ref=e175]:
+                                - generic [ref=e176]: Scout 1
+                                - generic [ref=e177]: Searching
+                              - paragraph [ref=e178]: List taxonomy subcategories
+                      - generic [ref=e180]:
+                        - generic [ref=e181]:
+                          - term [ref=e182]: Discoveries
+                          - definition [ref=e183]: 0 of 25 saved
+                          - progressbar "Discoveries saved against the target" [ref=e184]
+                        - generic [ref=e186]:
+                          - term [ref=e187]: Turns
+                          - definition [ref=e188]: counted at the end · cap 600
+                        - generic [ref=e189]:
+                          - term [ref=e190]: Spend
+                          - definition [ref=e191]: reported at the end · cap $8.00
+                      - region "Discoveries so far" [ref=e192]:
+                        - heading "Discoveries so far" [level=4] [ref=e193]
+                        - paragraph [ref=e194]: Saved discoveries appear here as the agent finds them.
+                      - 'button "Run details: raw event log and agent graph" [ref=e196] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e197]:
+                      - generic [ref=e199]:
+                        - heading "Researcher jobs" [level=2] [ref=e200]
+                        - paragraph [ref=e201]: Latest 5 of 77 research runs
+                      - generic [ref=e202]:
+                        - region "Researcher jobs table, scrollable" [ref=e203]:
+                          - table [ref=e204]:
+                            - rowgroup [ref=e205]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e206]:
+                                - columnheader "Status" [ref=e207]
+                                - columnheader "Prompt" [ref=e208]
+                                - columnheader "Found" [ref=e209]
+                                - columnheader "Approved / Rejected" [ref=e210]
+                                - columnheader "Cost" [ref=e211]
+                                - columnheader "Turns" [ref=e212]
+                                - columnheader "Created" [ref=e213]
+                            - rowgroup [ref=e214]:
+                              - row [ref=e215]:
+                                - cell "processing" [ref=e216]:
+                                  - generic [ref=e217]: processing
+                                - cell [ref=e218]
+                                - cell "0" [ref=e219]
+                                - cell "0/0" [ref=e220]
+                                - cell "$0.0000" [ref=e221]
+                                - cell "0/600" [ref=e222]
+                                - cell "Oct 27, 2026" [ref=e223]
+                              - row [ref=e224]:
+                                - cell "completed" [ref=e225]:
+                                  - generic [ref=e226]: completed
+                                - cell [ref=e227]
+                                - cell "0" [ref=e228]
+                                - cell "0/0" [ref=e229]
+                                - cell "$0.7600" [ref=e230]
+                                - cell "28/600" [ref=e231]
+                                - cell "Oct 27, 2026" [ref=e232]
+                              - row [ref=e233]:
+                                - cell "completed" [ref=e234]:
+                                  - generic [ref=e235]: completed
+                                - cell [ref=e236]
+                                - cell "0" [ref=e237]
+                                - cell "0/0" [ref=e238]
+                                - cell "$1.2973" [ref=e239]
+                                - cell "93/600" [ref=e240]
+                                - cell "Oct 27, 2026" [ref=e241]
+                              - row [ref=e242]:
+                                - cell "completed" [ref=e243]:
+                                  - generic [ref=e244]: completed
+                                - cell [ref=e245]
+                                - cell "0" [ref=e246]
+                                - cell "0/0" [ref=e247]
+                                - cell "$0.5650" [ref=e248]
+                                - cell "13/600" [ref=e249]
+                                - cell "Oct 27, 2026" [ref=e250]
+                              - row [ref=e251]:
+                                - cell "completed" [ref=e252]:
+                                  - generic [ref=e253]: completed
+                                - cell [ref=e254]
+                                - cell "4" [ref=e255]
+                                - cell "1/0" [ref=e256]
+                                - cell "$5.4603" [ref=e257]
+                                - cell "155/200" [ref=e258]
+                                - cell "Oct 27, 2026" [ref=e259]
+                        - button "Show more" [ref=e261] [cursor=pointer]
+                  - group [ref=e262]:
+                    - generic "All pending discoveries & full job history" [ref=e263] [cursor=pointer]

@@ -1,0 +1,1 @@
+"{\"focus\":\"Source: krzemienski/awesome-video\",\"text\":\"↗\",\"rect\":{\"x\":5.5,\"y\":844,\"width\":44,\"height\":44,\"top\":844,\"right\":49.5,\"bottom\":888,\"left\":5.5},\"w\":1100}"

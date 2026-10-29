@@ -1,0 +1,81 @@
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - link "Skip to main content" [ref=e3]
+  - generic
+    - banner
+      - button "Toggle sidebar" [ref=e4]
+        - StaticText "Toggle sidebar"
+      - link "AWESOME.VIDEO home" [ref=e5]
+        - StaticText "AWESOME.VIDEO"
+        - StaticText " home"
+      - button "Search 3,826 resources" [ref=e6]
+        - StaticText "Search 3,826 resources"
+      - button "Sign in, account menu" [expanded=false, ref=e7]
+        - StaticText "Sign in"
+        - StaticText ", account menu"
+    - main
+      - navigation "Breadcrumb" [ref=e8]
+        - list
+          - listitem [level=1]
+            - link "Home" [ref=e36]
+          - listitem [level=1]
+            - link "Advanced Search" [disabled, ref=e37]
+      - alert
+        - heading "This page failed to load" [level=1, ref=e16]
+        - paragraph
+          - StaticText "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."
+        - button "Reload page" [ref=e17]
+    - contentinfo
+      - StaticText "── INDEX"
+      - link "awesome.video home" [ref=e9]
+        - StaticText "awesome.video"
+      - paragraph
+        - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+      - heading "INDEXED" [level=2, ref=e10]
+      - paragraph
+        - StaticText "3,826"
+      - paragraph
+        - StaticText "9 categories"
+        - LineBreak "\n"
+        - StaticText "99 subcategories"
+        - LineBreak "\n"
+        - StaticText "live"
+      - navigation "Explore categories" [ref=e11]
+        - heading "EXPLORE" [level=2, ref=e18]
+        - link "Community & Events" [ref=e19]
+        - link "Encoding & Codecs" [ref=e20]
+        - link "General Tools" [ref=e21]
+        - link "Infrastructure & Delivery" [ref=e22]
+        - link "Intro & Learning" [ref=e23]
+        - link "Media Tools" [ref=e24]
+        - link "Players & Clients" [ref=e25]
+        - link "Protocols & Transport" [ref=e26]
+        - link "Standards & Industry" [ref=e27]
+      - heading "SOURCE" [level=2, ref=e12]
+      - link "krzemienski/ awesome-video" [ref=e13]
+        - StaticText "krzemienski"
+        - StaticText "/"
+        - StaticText "awesome-video"
+      - paragraph
+        - StaticText "Open-source."
+        - link "PRs welcome" [ref=e28]
+        - StaticText "."
+        - LineBreak "\n"
+        - StaticText "Indexed automatically from README.md."
+      - button "Contact maintainers" [ref=e14]
+      - StaticText "© "
+      - StaticText "2026"
+      - StaticText " "
+      - StaticText "awesome.video"
+      - StaticText " · content CC0, code MIT"
+      - navigation "Site policies" [ref=e15]
+        - link "About" [ref=e29]
+        - link "Terms" [ref=e30]
+        - link "Privacy" [ref=e31]
+        - link "Code of Conduct" [ref=e32]
+          - StaticText "Conduct"
+        - button "Cookie settings" [ref=e33]
+        - link "Issues ↗" [ref=e34]
+        - link "Sitemap" [ref=e35]
+      - StaticText "built with the awesome-list framework"

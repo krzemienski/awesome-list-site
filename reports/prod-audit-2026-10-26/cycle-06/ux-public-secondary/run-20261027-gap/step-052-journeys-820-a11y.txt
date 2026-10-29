@@ -1,0 +1,245 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem:
+                  - link "Learning Journeys" [disabled]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - img [ref=e42]
+                  - text: Discovery · Learning paths
+                - heading "Learning Journeys" [active] [level=1] [ref=e44]
+                - paragraph [ref=e45]: Explore structured learning paths to master new skills step by step
+              - generic [ref=e46]:
+                - generic [ref=e47]:
+                  - generic [ref=e48]: "Filter by category:"
+                  - combobox "Filter by category" [ref=e49] [cursor=pointer]:
+                    - generic: All Categories
+                    - img [ref=e50]
+                - generic [ref=e52]: 5 journeys available
+              - generic [ref=e53]:
+                - article [ref=e54]:
+                  - generic [ref=e55]:
+                    - generic [ref=e56]:
+                      - img [ref=e58]
+                      - generic [ref=e60]:
+                        - img [ref=e61]
+                        - text: intermediate
+                    - heading "Building Your First Streaming Platform" [level=2] [ref=e64]:
+                      - link "Building Your First Streaming Platform" [ref=e65] [cursor=pointer]:
+                        - /url: /journey/7
+                    - generic [ref=e66]: "Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of managed versus self-hosted infrastructure."
+                  - generic [ref=e69]:
+                    - generic [ref=e70]:
+                      - img [ref=e71]
+                      - text: 15-20 hours
+                    - generic [ref=e74]: Infrastructure & Delivery
+                    - generic [ref=e75]: 6 steps
+                  - 'button "Start Journey: Building Your First Streaming Platform" [ref=e77] [cursor=pointer]':
+                    - img
+                    - generic [ref=e78]: Start Journey
+                - article [ref=e79]:
+                  - generic [ref=e80]:
+                    - generic [ref=e81]:
+                      - img [ref=e83]
+                      - generic [ref=e85]:
+                        - img [ref=e86]
+                        - text: advanced
+                    - heading "Advanced Live Streaming Architecture" [level=2] [ref=e89]:
+                      - link "Advanced Live Streaming Architecture" [ref=e90] [cursor=pointer]:
+                        - /url: /journey/9
+                    - generic [ref=e91]: "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+                  - generic [ref=e94]:
+                    - generic [ref=e95]:
+                      - img [ref=e96]
+                      - text: 20-25 hours
+                    - generic [ref=e99]: Protocols & Transport
+                    - generic [ref=e100]: 6 steps
+                  - 'button "Start Journey: Advanced Live Streaming Architecture" [ref=e102] [cursor=pointer]':
+                    - img
+                    - generic [ref=e103]: Start Journey
+                - article [ref=e104]:
+                  - generic [ref=e105]:
+                    - generic [ref=e106]:
+                      - img [ref=e108]
+                      - generic [ref=e110]:
+                        - img [ref=e111]
+                        - text: advanced
+                    - heading "DRM & Content Protection" [level=2] [ref=e114]:
+                      - link "DRM & Content Protection" [ref=e115] [cursor=pointer]:
+                        - /url: /journey/10
+                    - generic [ref=e116]: "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach."
+                  - generic [ref=e119]:
+                    - generic [ref=e120]:
+                      - img [ref=e121]
+                      - text: 10-12 hours
+                    - generic [ref=e124]: General Tools
+                    - generic [ref=e125]: 6 steps
+                  - 'button "Start Journey: DRM & Content Protection" [ref=e127] [cursor=pointer]':
+                    - img
+                    - generic [ref=e128]: Start Journey
+                - article [ref=e129]:
+                  - generic [ref=e130]:
+                    - generic [ref=e131]:
+                      - img [ref=e133]
+                      - generic [ref=e135]:
+                        - img [ref=e136]
+                        - text: intermediate
+                    - heading "FFmpeg Mastery" [level=2] [ref=e139]:
+                      - link "FFmpeg Mastery" [ref=e140] [cursor=pointer]:
+                        - /url: /journey/8
+                    - generic [ref=e141]: "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+                  - generic [ref=e144]:
+                    - generic [ref=e145]:
+                      - img [ref=e146]
+                      - text: 12-15 hours
+                    - generic [ref=e149]: Encoding & Codecs
+                    - generic [ref=e150]: 6 steps
+                  - 'button "Start Journey: FFmpeg Mastery" [ref=e152] [cursor=pointer]':
+                    - img
+                    - generic [ref=e153]: Start Journey
+                - article [ref=e154]:
+                  - generic [ref=e155]:
+                    - generic [ref=e156]:
+                      - img [ref=e158]
+                      - generic [ref=e160]:
+                        - img [ref=e161]
+                        - text: beginner
+                    - heading "Video Streaming Fundamentals" [level=2] [ref=e164]:
+                      - link "Video Streaming Fundamentals" [ref=e165] [cursor=pointer]:
+                        - /url: /journey/6
+                    - generic [ref=e166]: "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+                  - generic [ref=e169]:
+                    - generic [ref=e170]:
+                      - img [ref=e171]
+                      - text: 8-10 hours
+                    - generic [ref=e174]: Intro & Learning
+                    - generic [ref=e175]: 6 steps
+                  - 'button "Start Journey: Video Streaming Fundamentals" [ref=e177] [cursor=pointer]':
+                    - img
+                    - generic [ref=e178]: Start Journey
+        - contentinfo [ref=e179]:
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - paragraph [ref=e182]: ── INDEX
+              - link "awesome.video home" [ref=e183] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e184]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e186]:
+              - heading "INDEXED" [level=2] [ref=e187]
+              - paragraph [ref=e188]: 3,825
+              - paragraph [ref=e189]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e190]: live
+            - navigation "Explore categories" [ref=e192]:
+              - heading "EXPLORE" [level=2] [ref=e193]
+              - generic [ref=e194]:
+                - link "Community & Events" [ref=e195] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e196]: ◈
+                  - generic [ref=e197]: Community
+                - link "Encoding & Codecs" [ref=e198] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e199]: ◇
+                  - generic [ref=e200]: Encoding
+                - link "General Tools" [ref=e201] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e202]: ◆
+                  - generic [ref=e203]: General
+                - link "Infrastructure & Delivery" [ref=e204] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e205]: ▣
+                  - generic [ref=e206]: Infrastructure
+                - link "Intro & Learning" [ref=e207] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e208]: ▤
+                  - generic [ref=e209]: Intro
+                - link "Media Tools" [ref=e210] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e211]: ▥
+                  - generic [ref=e212]: Media
+                - link "Players & Clients" [ref=e213] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e214]: ▶
+                  - generic [ref=e215]: Players
+                - link "Protocols & Transport" [ref=e216] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e217]: ⟁
+                  - generic [ref=e218]: Protocols
+                - link "Standards & Industry" [ref=e219] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e220]: ◉
+                  - generic [ref=e221]: Standards
+            - generic [ref=e222]:
+              - heading "SOURCE" [level=2] [ref=e223]
+              - link "krzemienski/awesome-video" [ref=e224] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e225]
+                - generic [ref=e227]:
+                  - text: krzemienski
+                  - generic [ref=e228]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e229]: ↗
+              - paragraph [ref=e230]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e231] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e233] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e234]:
+            - generic [ref=e235]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e236]:
+              - link "About" [ref=e237] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e238] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e239] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e240] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e241] [cursor=pointer]
+              - link "Issues ↗" [ref=e242] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e243] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e244]: built with the awesome-list framework

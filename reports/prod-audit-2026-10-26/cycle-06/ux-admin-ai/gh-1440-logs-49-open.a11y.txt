@@ -1,0 +1,29 @@
+- generic
+  - dialog "Sync Job #49"
+    - heading "Sync Job #49" [level=2, ref=e1]
+      - StaticText "Sync Job #49"
+    - paragraph
+      - StaticText "Export · Jul 20, 2026, 02:42 PM · krzemienski/awesome-video"
+    - DescriptionList
+      - term "Status"
+      - definition
+        - StaticText "COMPLETED"
+      - term "Resources added"
+      - definition
+        - StaticText "+2283"
+      - term "Resources updated"
+      - definition
+        - StaticText "~0"
+      - term "Resources removed"
+      - definition
+        - StaticText "-0"
+      - term "Total resources"
+      - definition
+        - StaticText "2283"
+      - term "Commit message"
+      - definition
+        - StaticText "Initial awesome list export"
+      - link "View commit on GitHub" [ref=e3]
+    - button "Close" [ref=e2]
+      - image
+      - StaticText "Close"

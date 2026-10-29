@@ -1,0 +1,62 @@
+[
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=20&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=20&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=20&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  }
+]

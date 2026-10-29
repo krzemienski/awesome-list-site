@@ -1,0 +1,1 @@
+"{\"w\":390,\"seen\":[{\"s\":\"Loading activity…\",\"t\":877},{\"s\":\"Loading categories…\",\"t\":877},{\"s\":\"checking…\",\"t\":877}],\"res\":[{\"u\":\"/api/categories\",\"start\":876,\"end\":877},{\"u\":\"/api/admin/audit-logs?limit=6&offset=0\",\"start\":876,\"end\":1339},{\"u\":\"/api/categories\",\"start\":876,\"end\":878}]}"

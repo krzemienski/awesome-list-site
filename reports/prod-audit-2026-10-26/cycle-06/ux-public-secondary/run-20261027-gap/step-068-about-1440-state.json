@@ -1,0 +1,753 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    1440,
+    900
+  ],
+  "coarse": false,
+  "faq": [
+    {
+      "name": "What is Awesome Video?",
+      "expanded": "true"
+    },
+    {
+      "name": "Is Awesome Video free to use?",
+      "expanded": "true"
+    },
+    {
+      "name": "How are resources curated?",
+      "expanded": "true"
+    },
+    {
+      "name": "What topics does Awesome Video cover?",
+      "expanded": "true"
+    },
+    {
+      "name": "How do I suggest a new resource?",
+      "expanded": "true"
+    },
+    {
+      "name": "What are the best video codecs for developers?",
+      "expanded": "true"
+    },
+    {
+      "name": "What are the best free video encoding tools?",
+      "expanded": "true"
+    },
+    {
+      "name": "What streaming protocols should I use?",
+      "expanded": "true"
+    },
+    {
+      "name": "What are the best open-source video players for the web?",
+      "expanded": "true"
+    },
+    {
+      "name": "How do I get started with video development?",
+      "expanded": "true"
+    }
+  ],
+  "focus": "<a data-testid=\"footer-home\" aria-label=\"awesome.video home\" href=\"/\" class=\"display-h app-footer-name\">awesome.video</a>",
+  "targets": [
+    {
+      "name": "Skip to main content",
+      "rect": {
+        "x": 8,
+        "y": -4166,
+        "width": 156.234375,
+        "height": 44,
+        "top": -4166,
+        "right": 164.234375,
+        "bottom": -4122,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "rect": {
+        "x": 24,
+        "y": 15.5,
+        "width": 147.203125,
+        "height": 28,
+        "top": 15.5,
+        "right": 171.203125,
+        "bottom": 43.5,
+        "left": 24
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch 3,825 resources…\n⌘K",
+      "rect": {
+        "x": 823.65625,
+        "y": 7.5,
+        "width": 244.578125,
+        "height": 44,
+        "top": 7.5,
+        "right": 1068.234375,
+        "bottom": 51.5,
+        "left": 823.65625
+      },
+      "class": "header-search-trigger"
+    },
+    {
+      "name": "Browse",
+      "rect": {
+        "x": 1082.234375,
+        "y": 17.5,
+        "width": 46.375,
+        "height": 24,
+        "top": 17.5,
+        "right": 1128.609375,
+        "bottom": 41.5,
+        "left": 1082.234375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "Submit",
+      "rect": {
+        "x": 1146.609375,
+        "y": 17.5,
+        "width": 43.515625,
+        "height": 24,
+        "top": 17.5,
+        "right": 1190.125,
+        "bottom": 41.5,
+        "left": 1146.609375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "About",
+      "rect": {
+        "x": 1208.125,
+        "y": 17.5,
+        "width": 37.359375,
+        "height": 24,
+        "top": 17.5,
+        "right": 1245.484375,
+        "bottom": 41.5,
+        "left": 1208.125
+      },
+      "class": "nav-link active"
+    },
+    {
+      "name": "Docs ↗",
+      "rect": {
+        "x": 1263.484375,
+        "y": 17.5,
+        "width": 45.21875,
+        "height": 24,
+        "top": 17.5,
+        "right": 1308.703125,
+        "bottom": 41.5,
+        "left": 1263.484375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "rect": {
+        "x": 1322.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 1410,
+        "bottom": 51.5,
+        "left": 1322.703125
+      },
+      "class": "user-pill"
+    },
+    {
+      "name": "Home",
+      "rect": {
+        "x": 39,
+        "y": -3959,
+        "width": 39.234375,
+        "height": 20,
+        "top": -3959,
+        "right": 78.234375,
+        "bottom": -3939,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Nick Krzemienski on GitHub",
+      "rect": {
+        "x": 65,
+        "y": -2967.578125,
+        "width": 710,
+        "height": 24,
+        "top": -2967.578125,
+        "right": 775,
+        "bottom": -2943.578125,
+        "left": 65
+      },
+      "class": "about-inline-link"
+    },
+    {
+      "name": "Profile → Security → Delete account & data",
+      "rect": {
+        "x": 65,
+        "y": -2924.578125,
+        "width": 543.40625,
+        "height": 40.09375,
+        "top": -2924.578125,
+        "right": 608.40625,
+        "bottom": -2884.484375,
+        "left": 65
+      },
+      "class": "about-inline-link about-inline-link-text"
+    },
+    {
+      "name": "open an issue on the project's GitHub repository",
+      "rect": {
+        "x": 65,
+        "y": -2839.296875,
+        "width": 515.1875,
+        "height": 40.09375,
+        "top": -2839.296875,
+        "right": 580.1875,
+        "bottom": -2799.203125,
+        "left": 65
+      },
+      "class": "about-inline-link about-inline-link-text"
+    },
+    {
+      "name": "Terms of Use",
+      "rect": {
+        "x": 141.21875,
+        "y": -2777.109375,
+        "width": 89.203125,
+        "height": 17,
+        "top": -2777.109375,
+        "right": 230.421875,
+        "bottom": -2760.109375,
+        "left": 141.21875
+      },
+      "class": "about-inline-link about-inline-link-text"
+    },
+    {
+      "name": "Privacy Policy",
+      "rect": {
+        "x": 263.015625,
+        "y": -2777.109375,
+        "width": 93.8125,
+        "height": 17,
+        "top": -2777.109375,
+        "right": 356.828125,
+        "bottom": -2760.109375,
+        "left": 263.015625
+      },
+      "class": "about-inline-link about-inline-link-text"
+    },
+    {
+      "name": "awesome-video\n\nA curated list of awesome streaming video tools, frameworks, libraries, and learning resources. Every resource on this site is sourced from and kept in sync with this repository.\n\nThe source list\nCC0-1.0",
+      "rect": {
+        "x": 65,
+        "y": -2623.03125,
+        "width": 347,
+        "height": 252.65625,
+        "top": -2623.03125,
+        "right": 412,
+        "bottom": -2370.375,
+        "left": 65
+      },
+      "class": "about-source-link about-card"
+    },
+    {
+      "name": "awesome-list-site\n\nThe open-source platform that powers this site — it transforms any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.\n\nThe engine\nMIT",
+      "rect": {
+        "x": 428,
+        "y": -2623.03125,
+        "width": 347,
+        "height": 252.65625,
+        "top": -2623.03125,
+        "right": 775,
+        "bottom": -2370.375,
+        "left": 428
+      },
+      "class": "about-source-link about-card"
+    },
+    {
+      "name": "Nick Krzemienski\nMaintainer",
+      "rect": {
+        "x": 65,
+        "y": -1309.515625,
+        "width": 226,
+        "height": 70.890625,
+        "top": -1309.515625,
+        "right": 291,
+        "bottom": -1238.625,
+        "left": 65
+      },
+      "class": "about-credit-link about-card"
+    },
+    {
+      "name": "shadcn/ui\nComponents",
+      "rect": {
+        "x": 307,
+        "y": -1309.515625,
+        "width": 226,
+        "height": 70.890625,
+        "top": -1309.515625,
+        "right": 533,
+        "bottom": -1238.625,
+        "left": 307
+      },
+      "class": "about-credit-link about-card"
+    },
+    {
+      "name": "Tailwind CSS\nStyling",
+      "rect": {
+        "x": 549,
+        "y": -1309.515625,
+        "width": 226,
+        "height": 70.890625,
+        "top": -1309.515625,
+        "right": 775,
+        "bottom": -1238.625,
+        "left": 549
+      },
+      "class": "about-credit-link about-card"
+    },
+    {
+      "name": "What is Awesome Video?",
+      "rect": {
+        "x": 65,
+        "y": -1091.640625,
+        "width": 710,
+        "height": 56,
+        "top": -1091.640625,
+        "right": 775,
+        "bottom": -1035.640625,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "Is Awesome Video free to use?",
+      "rect": {
+        "x": 65,
+        "y": -901.171875,
+        "width": 710,
+        "height": 56,
+        "top": -901.171875,
+        "right": 775,
+        "bottom": -845.171875,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "How are resources curated?",
+      "rect": {
+        "x": 65,
+        "y": -756.890625,
+        "width": 710,
+        "height": 56,
+        "top": -756.890625,
+        "right": 775,
+        "bottom": -700.890625,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "What topics does Awesome Video cover?",
+      "rect": {
+        "x": 65,
+        "y": -589.515625,
+        "width": 710,
+        "height": 56,
+        "top": -589.515625,
+        "right": 775,
+        "bottom": -533.515625,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "How do I suggest a new resource?",
+      "rect": {
+        "x": 65,
+        "y": -422.140625,
+        "width": 710,
+        "height": 56,
+        "top": -422.140625,
+        "right": 775,
+        "bottom": -366.140625,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "What are the best video codecs for developers?",
+      "rect": {
+        "x": 65,
+        "y": -300.953125,
+        "width": 710,
+        "height": 56,
+        "top": -300.953125,
+        "right": 775,
+        "bottom": -244.953125,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "What are the best free video encoding tools?",
+      "rect": {
+        "x": 65,
+        "y": -110.484375,
+        "width": 710,
+        "height": 56,
+        "top": -110.484375,
+        "right": 775,
+        "bottom": -54.484375,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "What streaming protocols should I use?",
+      "rect": {
+        "x": 65,
+        "y": 79.984375,
+        "width": 710,
+        "height": 56,
+        "top": 79.984375,
+        "right": 775,
+        "bottom": 135.984375,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "What are the best open-source video players for the web?",
+      "rect": {
+        "x": 65,
+        "y": 270.453125,
+        "width": 710,
+        "height": 56,
+        "top": 270.453125,
+        "right": 775,
+        "bottom": 326.453125,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "How do I get started with video development?",
+      "rect": {
+        "x": 65,
+        "y": 436.828125,
+        "width": 710,
+        "height": 56,
+        "top": 436.828125,
+        "right": 775,
+        "bottom": 492.828125,
+        "left": 65
+      },
+      "class": "btn ghost about-faq-trigger"
+    },
+    {
+      "name": "awesome.video home",
+      "rect": {
+        "x": 97,
+        "y": 858.296875,
+        "width": 278.640625,
+        "height": 42,
+        "top": 858.296875,
+        "right": 375.640625,
+        "bottom": 900.296875,
+        "left": 97
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "rect": {
+        "x": 812.46875,
+        "y": 848.703125,
+        "width": 238.265625,
+        "height": 44,
+        "top": 848.703125,
+        "right": 1050.734375,
+        "bottom": 892.703125,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "rect": {
+        "x": 812.46875,
+        "y": 877.515625,
+        "width": 238.265625,
+        "height": 44,
+        "top": 877.515625,
+        "right": 1050.734375,
+        "bottom": 921.515625,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "rect": {
+        "x": 812.46875,
+        "y": 906.328125,
+        "width": 238.265625,
+        "height": 44,
+        "top": 906.328125,
+        "right": 1050.734375,
+        "bottom": 950.328125,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "rect": {
+        "x": 812.46875,
+        "y": 935.140625,
+        "width": 238.265625,
+        "height": 44,
+        "top": 935.140625,
+        "right": 1050.734375,
+        "bottom": 979.140625,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "rect": {
+        "x": 812.46875,
+        "y": 963.953125,
+        "width": 238.265625,
+        "height": 44,
+        "top": 963.953125,
+        "right": 1050.734375,
+        "bottom": 1007.953125,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "rect": {
+        "x": 812.46875,
+        "y": 992.765625,
+        "width": 238.265625,
+        "height": 44,
+        "top": 992.765625,
+        "right": 1050.734375,
+        "bottom": 1036.765625,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "rect": {
+        "x": 812.46875,
+        "y": 1021.578125,
+        "width": 238.265625,
+        "height": 44,
+        "top": 1021.578125,
+        "right": 1050.734375,
+        "bottom": 1065.578125,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "rect": {
+        "x": 812.46875,
+        "y": 1050.390625,
+        "width": 238.265625,
+        "height": 44,
+        "top": 1050.390625,
+        "right": 1050.734375,
+        "bottom": 1094.390625,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "rect": {
+        "x": 812.46875,
+        "y": 1079.203125,
+        "width": 238.265625,
+        "height": 44,
+        "top": 1079.203125,
+        "right": 1050.734375,
+        "bottom": 1123.203125,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "rect": {
+        "x": 1098.734375,
+        "y": 860.296875,
+        "width": 238.265625,
+        "height": 60.375,
+        "top": 860.296875,
+        "right": 1337,
+        "bottom": 920.671875,
+        "left": 1098.734375
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "rect": {
+        "x": 1177.09375,
+        "y": 932.671875,
+        "width": 73,
+        "height": 24,
+        "top": 932.671875,
+        "right": 1250.09375,
+        "bottom": 956.671875,
+        "left": 1177.09375
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "rect": {
+        "x": 1098.734375,
+        "y": 987.0625,
+        "width": 238.265625,
+        "height": 44,
+        "top": 987.0625,
+        "right": 1337,
+        "bottom": 1031.0625,
+        "left": 1098.734375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs"
+    },
+    {
+      "name": "About",
+      "rect": {
+        "x": 512.140625,
+        "y": 1160.609375,
+        "width": 34.65625,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 546.796875,
+        "bottom": 1204.609375,
+        "left": 512.140625
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "rect": {
+        "x": 560.796875,
+        "y": 1160.609375,
+        "width": 34.65625,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 595.453125,
+        "bottom": 1204.609375,
+        "left": 560.796875
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "rect": {
+        "x": 609.453125,
+        "y": 1160.609375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 657.96875,
+        "bottom": 1204.609375,
+        "left": 609.453125
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "rect": {
+        "x": 671.96875,
+        "y": 1160.609375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 720.484375,
+        "bottom": 1204.609375,
+        "left": 671.96875
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "rect": {
+        "x": 734.484375,
+        "y": 1160.609375,
+        "width": 103.953125,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 838.4375,
+        "bottom": 1204.609375,
+        "left": 734.484375
+      },
+      "class": "btn ghost footer-cookie-settings"
+    },
+    {
+      "name": "Issues ↗",
+      "rect": {
+        "x": 852.4375,
+        "y": 1160.609375,
+        "width": 55.46875,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 907.90625,
+        "bottom": 1204.609375,
+        "left": 852.4375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "rect": {
+        "x": 921.90625,
+        "y": 1160.609375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1160.609375,
+        "right": 970.421875,
+        "bottom": 1204.609375,
+        "left": 921.90625
+      },
+      "class": ""
+    },
+    {
+      "name": "Back to top",
+      "rect": {
+        "x": 1378,
+        "y": 844,
+        "width": 44,
+        "height": 44,
+        "top": 844,
+        "right": 1422,
+        "bottom": 888,
+        "left": 1378
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
+    }
+  ]
+}

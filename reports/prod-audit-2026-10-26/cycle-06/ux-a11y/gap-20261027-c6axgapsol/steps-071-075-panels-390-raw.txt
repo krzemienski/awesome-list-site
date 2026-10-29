@@ -1,0 +1,257 @@
+✓ Request log cleared
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#overview
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [selected, ref=e19]
+    - tab "Approvals" [ref=e20]
+    - tab "Edits" [ref=e21]
+    - tab "Enrichment" [ref=e22]
+    - tab "Researcher" [ref=e23]
+    - tab "Export" [ref=e24]
+    - tab "Database" [ref=e25]
+    - tab "Resources" [ref=e26]
+    - tab "Categories" [ref=e27]
+    - tab "Subcategories" [ref=e28]
+    - tab "Users" [ref=e29]
+    - tab "GitHub" [ref=e30]
+    - tab "Link Health" [ref=e31]
+    - tab "Audit" [ref=e32]
+    - tab "Research" [ref=e33]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Overview" [ref=e12] focusable [tabindex]
+    - button "RESOURCES 3,826 across 10 categories" [ref=e15]
+    - button "SUBCATEGORIES 100 all canonical" [ref=e16]
+    - button "ACTIVE USERS 20 2 admins · 18 contributors" [ref=e17]
+    - button "PENDING APPROVALS 16 oldest 62d ago" [ref=e18]
+    - heading "Recent activity" [level=2, ref=e34]
+    - heading "System health" [level=2, ref=e35]
+    - heading "Top categories" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-071-overview-390.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#approvals
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e33]
+    - link "Admin" [disabled, ref=e34]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e17]
+    - tab "Approvals" [selected, ref=e18]
+    - tab "Edits" [ref=e19]
+    - tab "Enrichment" [ref=e20]
+    - tab "Researcher" [ref=e21]
+    - tab "Export" [ref=e22]
+    - tab "Database" [ref=e23]
+    - tab "Resources" [ref=e24]
+    - tab "Categories" [ref=e25]
+    - tab "Subcategories" [ref=e26]
+    - tab "Users" [ref=e27]
+    - tab "GitHub" [ref=e28]
+    - tab "Link Health" [ref=e29]
+    - tab "Audit" [ref=e30]
+    - tab "Research" [ref=e31]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Approvals" [ref=e12] focusable [tabindex]
+    - region "Pending approvals" [ref=e16]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-072-approvals-390.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#edits
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e36]
+    - link "Admin" [disabled, ref=e37]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e17]
+    - tab "Approvals" [ref=e18]
+    - tab "Edits" [selected, ref=e19]
+    - tab "Enrichment" [ref=e20]
+    - tab "Researcher" [ref=e21]
+    - tab "Export" [ref=e22]
+    - tab "Database" [ref=e23]
+    - tab "Resources" [ref=e24]
+    - tab "Categories" [ref=e25]
+    - tab "Subcategories" [ref=e26]
+    - tab "Users" [ref=e27]
+    - tab "GitHub" [ref=e28]
+    - tab "Link Health" [ref=e29]
+    - tab "Audit" [ref=e30]
+    - tab "Research" [ref=e31]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Edits" [ref=e12] focusable [tabindex]
+    - region "Edit history" [ref=e16]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-073-edits-390.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#enrichment
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e31]
+    - link "Admin" [disabled, ref=e32]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [ref=e18]
+    - tab "Enrichment" [selected, ref=e19]
+    - tab "Researcher" [ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Enrichment" [ref=e12] focusable [tabindex]
+    - heading "Enrichment jobs" [level=2, ref=e35]
+    - button "Run job" [ref=e36]
+    - region "Enrichment jobs table, scrollable" [ref=e33] focusable [tabindex]
+    - button "Show all 33 jobs" [expanded=false, ref=e34]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-074-enrichment-390.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#researcher
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e31]
+    - link "Admin" [disabled, ref=e32]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [ref=e18]
+    - tab "Enrichment" [ref=e19]
+    - tab "Researcher" [selected, ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+    - heading "Run a research task" [level=3, ref=e33]
+    - region "Brief" [ref=e34]
+    - region "Focus" [ref=e35]
+    - region "Limits" [ref=e36]
+    - region "Endpoint & model" [ref=e37]
+    - region "About to run on" [ref=e38]
+    - heading "Researcher jobs" [level=2, ref=e54]
+    - region "Researcher jobs table, scrollable" [ref=e39] focusable [tabindex]
+    - button "Show more" [ref=e40]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-075-researcher-390.png
+
+[10579.1092] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.1093] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[10579.1094] GET https://awesome.video/api/categories (Fetch) 200
+[10579.1095] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.1096] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[10579.1097] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[10579.1098] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.1099] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[10579.1100] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10579.1101] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.1102] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[10579.1103] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[10579.1104] GET https://awesome.video/api/categories (Fetch) 200
+[10579.1106] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[10579.1109] GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+[10579.1111] GET https://awesome.video/api/researcher/config (Fetch) 200
+[10579.1112] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+
+

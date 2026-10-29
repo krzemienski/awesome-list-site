@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks",
+  "width": 1440,
+  "height": 900,
+  "dpr": 1,
+  "coarse": false,
+  "touchPoints": 0,
+  "scrollY": 13,
+  "active": "<button type=\"button\" role=\"checkbox\" aria-checked=\"true\" data-state=\"checked\" value=\"on\" class=\"peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opac",
+  "umami": "1",
+  "consent": "denied"
+}

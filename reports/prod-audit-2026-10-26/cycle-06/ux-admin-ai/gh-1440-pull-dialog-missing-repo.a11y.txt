@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Import from GitHub?"
+    - heading "Import from GitHub?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This pulls the resource list from krzemienski/awesome-video-definitely-not-a-repo-qa and updates the database to match. The preview at Oct 27, 2026, 02:47 AM could not plan this import: Repository not found (or not public): krzemienski/awesome-video-definitely-not-a-repo-qa. A Pull would stop the same way, so Start Import stays off. Check the target, then run Preview import again."
+    - button "Cancel" [ref=e2]
+    - button "Start Import" [disabled, ref=e3]

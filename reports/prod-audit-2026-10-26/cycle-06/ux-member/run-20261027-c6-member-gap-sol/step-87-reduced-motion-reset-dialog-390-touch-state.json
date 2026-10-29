@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings#notification-settings",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 3704,
+  "active": "<button type=\"button\" data-ds-variant=\"outline\" class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] mt-2 sm:mt-0\">Cancel</button>",
+  "umami": "1",
+  "consent": "denied"
+}

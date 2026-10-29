@@ -1,0 +1,1234 @@
+{
+  "url": "https://awesome.video/advanced?tab=recommendations",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": true,
+  "reduced": true,
+  "overflow": -6,
+  "focus": "<summary aria-label=\"Why this? pAV0NE\" class=\"-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring\"><span class=\"inline-flex items-center gap-2\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-lightbulb h-4 w-4 text-primary\"><path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"></path><path d=\"M9 18h6\"></path><path d=\"M10 22h4\"></path></svg>Why this?</span></summary>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,826 resources\nSearch\n⌘K",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Explorer",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 40,
+        "y": 199.1875,
+        "width": 162.453125,
+        "height": 44,
+        "top": 199.1875,
+        "right": 202.453125,
+        "bottom": 243.1875,
+        "left": 40
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Metrics",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 202.453125,
+        "y": 199.1875,
+        "width": 157.59375,
+        "height": 44,
+        "top": 199.1875,
+        "right": 360.046875,
+        "bottom": 243.1875,
+        "left": 202.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Export",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 360.046875,
+        "y": 199.1875,
+        "width": 151.40625,
+        "height": 44,
+        "top": 199.1875,
+        "right": 511.453125,
+        "bottom": 243.1875,
+        "left": 360.046875
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "AI Recommendations",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 511.453125,
+        "y": 199.1875,
+        "width": 242.546875,
+        "height": 44,
+        "top": 199.1875,
+        "right": 754,
+        "bottom": 243.1875,
+        "left": 511.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Why this? pAV0NE",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 70,
+        "y": 686.1875,
+        "width": 289,
+        "height": 44,
+        "top": 686.1875,
+        "right": 359,
+        "bottom": 730.1875,
+        "left": 70
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: pAV0NE (opens in new tab)",
+      "href": "https://github.com/federicoserraino/pAV0NE",
+      "role": "A",
+      "rect": {
+        "x": 57,
+        "y": 839.1875,
+        "width": 315,
+        "height": 44,
+        "top": 839.1875,
+        "right": 372,
+        "bottom": 883.1875,
+        "left": 57
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? AV1-discuss Mailing List",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 435,
+        "y": 666.1875,
+        "width": 289,
+        "height": 44,
+        "top": 666.1875,
+        "right": 724,
+        "bottom": 710.1875,
+        "left": 435
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: AV1-discuss Mailing List (opens in new tab)",
+      "href": "https://groups.google.com/a/aomedia.org/forum/#!forum/av1-discuss",
+      "role": "A",
+      "rect": {
+        "x": 422,
+        "y": 839.1875,
+        "width": 315,
+        "height": 44,
+        "top": 839.1875,
+        "right": 737,
+        "bottom": 883.1875,
+        "left": 422
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? MLVC: Multi-platform Learned Video Codec for Real-World Deployment",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 70,
+        "y": 1138.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1138.1875,
+        "right": 359,
+        "bottom": 1182.1875,
+        "left": 70
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: MLVC: Multi-platform Learned Video Codec for Real-World Deployment (opens in new tab)",
+      "href": "https://arxiv.org/abs/2606.28027",
+      "role": "A",
+      "rect": {
+        "x": 57,
+        "y": 1239.1875,
+        "width": 315,
+        "height": 44,
+        "top": 1239.1875,
+        "right": 372,
+        "bottom": 1283.1875,
+        "left": 57
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? 100-4K (BVI-1004K) Test Sequence Dataset",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 435,
+        "y": 1138.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1138.1875,
+        "right": 724,
+        "bottom": 1182.1875,
+        "left": 435
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: 100-4K (BVI-1004K) Test Sequence Dataset (opens in new tab)",
+      "href": "https://angkats.github.io/Dataset-1004K/",
+      "role": "A",
+      "rect": {
+        "x": 422,
+        "y": 1239.1875,
+        "width": 315,
+        "height": 44,
+        "top": 1239.1875,
+        "right": 737,
+        "bottom": 1283.1875,
+        "left": 422
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? vvDecPlayer",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 70,
+        "y": 1514.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1514.1875,
+        "right": 359,
+        "bottom": 1558.1875,
+        "left": 70
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: vvDecPlayer (opens in new tab)",
+      "href": "https://github.com/bitmovin/vvDecPlayer",
+      "role": "A",
+      "rect": {
+        "x": 57,
+        "y": 1615.1875,
+        "width": 315,
+        "height": 44,
+        "top": 1615.1875,
+        "right": 372,
+        "bottom": 1659.1875,
+        "left": 57
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? NextPlayer",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 435,
+        "y": 1514.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1514.1875,
+        "right": 724,
+        "bottom": 1558.1875,
+        "left": 435
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: NextPlayer (opens in new tab)",
+      "href": "https://github.com/anilbeesetti/nextplayer",
+      "role": "A",
+      "rect": {
+        "x": 422,
+        "y": 1615.1875,
+        "width": 315,
+        "height": 44,
+        "top": 1615.1875,
+        "right": 737,
+        "bottom": 1659.1875,
+        "left": 422
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 70,
+        "y": 1914.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1914.1875,
+        "right": 359,
+        "bottom": 1958.1875,
+        "left": 70
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) (opens in new tab)",
+      "href": "https://arxiv.org/abs/2511.00969",
+      "role": "A",
+      "rect": {
+        "x": 57,
+        "y": 2015.1875,
+        "width": 315,
+        "height": 44,
+        "top": 2015.1875,
+        "right": 372,
+        "bottom": 2059.1875,
+        "left": 57
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? multiflux",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 435,
+        "y": 1890.1875,
+        "width": 289,
+        "height": 44,
+        "top": 1890.1875,
+        "right": 724,
+        "bottom": 1934.1875,
+        "left": 435
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: multiflux (opens in new tab)",
+      "href": "https://github.com/mackenly/multiflux",
+      "role": "A",
+      "rect": {
+        "x": 422,
+        "y": 2015.1875,
+        "width": 315,
+        "height": 44,
+        "top": 2015.1875,
+        "right": 737,
+        "bottom": 2059.1875,
+        "left": 422
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 70,
+        "y": 2314.1875,
+        "width": 289,
+        "height": 44,
+        "top": 2314.1875,
+        "right": 359,
+        "bottom": 2358.1875,
+        "left": 70
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC (opens in new tab)",
+      "href": "https://archive.fosdem.org/2023/schedule/event/om_vvc/",
+      "role": "A",
+      "rect": {
+        "x": 57,
+        "y": 2415.1875,
+        "width": 315,
+        "height": 44,
+        "top": 2415.1875,
+        "right": 372,
+        "bottom": 2459.1875,
+        "left": 57
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Why this? AV1 Encoding with libsvtav1 on Qencode",
+      "href": null,
+      "role": "SUMMARY",
+      "rect": {
+        "x": 435,
+        "y": 2290.1875,
+        "width": 289,
+        "height": 44,
+        "top": 2290.1875,
+        "right": 724,
+        "bottom": 2334.1875,
+        "left": 435
+      },
+      "class": "-my-2 flex min-h-11 cursor-pointer list-none items-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    },
+    {
+      "name": "View resource: AV1 Encoding with libsvtav1 on Qencode (opens in new tab)",
+      "href": "https://docs.qencode.com/tutorials/transcoding/codecs/using-av1-codec/",
+      "role": "A",
+      "rect": {
+        "x": 422,
+        "y": 2415.1875,
+        "width": 315,
+        "height": 44,
+        "top": 2415.1875,
+        "right": 737,
+        "bottom": 2459.1875,
+        "left": 422
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "Sign in to personalize",
+      "href": "/sign-in?redirect_url=%2Fadvanced%3Ftab%3Drecommendations",
+      "role": "A",
+      "rect": {
+        "x": 404.796875,
+        "y": 2525.1875,
+        "width": 167.171875,
+        "height": 44,
+        "top": 2525.1875,
+        "right": 571.96875,
+        "bottom": 2569.1875,
+        "left": 404.796875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]"
+    },
+    {
+      "name": "Refreshing…",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 583.96875,
+        "y": 2525.1875,
+        "width": 145.03125,
+        "height": 44,
+        "top": 2525.1875,
+        "right": 729,
+        "bottom": 2569.1875,
+        "left": 583.96875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Browse All Resources",
+      "href": "/categories",
+      "role": "A",
+      "rect": {
+        "x": 231.359375,
+        "y": 2743.96875,
+        "width": 170.015625,
+        "height": 44,
+        "top": 2743.96875,
+        "right": 401.375,
+        "bottom": 2787.96875,
+        "left": 231.359375
+      },
+      "class": "discovery-tools-cta-primary"
+    },
+    {
+      "name": "Explore Categories",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 409.375,
+        "y": 2743.96875,
+        "width": 153.25,
+        "height": 44,
+        "top": 2743.96875,
+        "right": 562.625,
+        "bottom": 2787.96875,
+        "left": 409.375
+      },
+      "class": "discovery-tools-cta-secondary"
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 40,
+        "y": 3017.96875,
+        "width": 195.046875,
+        "height": 44,
+        "top": 3017.96875,
+        "right": 235.046875,
+        "bottom": 3061.96875,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3194.75,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3194.75,
+        "right": 505.328125,
+        "bottom": 3238.75,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3223.5625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3223.5625,
+        "right": 505.328125,
+        "bottom": 3267.5625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3252.375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3252.375,
+        "right": 505.328125,
+        "bottom": 3296.375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3281.1875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3281.1875,
+        "right": 505.328125,
+        "bottom": 3325.1875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3310,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3310,
+        "right": 505.328125,
+        "bottom": 3354,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3338.8125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3338.8125,
+        "right": 505.328125,
+        "bottom": 3382.8125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3367.625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3367.625,
+        "right": 505.328125,
+        "bottom": 3411.625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3396.4375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3396.4375,
+        "right": 505.328125,
+        "bottom": 3440.4375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 288.65625,
+        "y": 3425.25,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3425.25,
+        "right": 505.328125,
+        "bottom": 3469.25,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 537.328125,
+        "y": 3206.34375,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 3206.34375,
+        "right": 754,
+        "bottom": 3266.71875,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 615.6875,
+        "y": 3278.71875,
+        "width": 73,
+        "height": 24,
+        "top": 3278.71875,
+        "right": 688.6875,
+        "bottom": 3302.71875,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 537.328125,
+        "y": 3333.109375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3333.109375,
+        "right": 754,
+        "bottom": 3377.109375,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 40,
+        "y": 3550.65625,
+        "width": 44,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 84,
+        "bottom": 3594.65625,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 98,
+        "y": 3550.65625,
+        "width": 44,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 142,
+        "bottom": 3594.65625,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 156,
+        "y": 3550.65625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 204.515625,
+        "bottom": 3594.65625,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 218.515625,
+        "y": 3550.65625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 267.03125,
+        "bottom": 3594.65625,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 281.03125,
+        "y": 3550.65625,
+        "width": 103.953125,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 384.984375,
+        "bottom": 3594.65625,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 398.984375,
+        "y": 3550.65625,
+        "width": 55.46875,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 454.453125,
+        "bottom": 3594.65625,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 468.453125,
+        "y": 3550.65625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3550.65625,
+        "right": 516.96875,
+        "bottom": 3594.65625,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ],
+  "network": [
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/Advanced-FUe5A6rH.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/page-headings-DjR-ExUC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tabs-D1zzd93y.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chip-button-Cj4pYKU5.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/collapsible-Bui8YgbC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/url-filter-state-hUMXr8Zj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tags-D5fI2uuo.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/filter-BaEjNb1k.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tag-loQr9huG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/progress-DGcD0s24.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/users-CEk8-QMW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/folder-tree-CwppIlrT.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/trending-up-DWWVMpda.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/circle-check-big-oJSX82cd.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/file-text-BYi6ry2B.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/ai-recommendations-panel-Bm9QdUIL.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/alert-DSm2PGKH.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/analytics-recommendations-bJi1ylMk.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/thumbs-up-BogcikQA.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/circle-alert-Cw300bgL.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/wifi-off-BlBoDENM.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chart-column-CU_OOeFN.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/discovery-tools-Cl7Wg0ka.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/tags",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/favicon.ico",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    }
+  ]
+}

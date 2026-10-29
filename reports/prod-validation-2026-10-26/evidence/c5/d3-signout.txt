@@ -1,0 +1,15 @@
+== before
+curl jar /api/admin/stats 200
+"browser auth true role=admin"
+== /logout
+"/ | alert=none"
+"browser auth after false"
+console errors 0 page errors 0
+== server side
+old cookie /api/admin/stats 200
+{"user":{"id":"d460f5e7-a085-4083-96a2-2f20dc9315c4","email":"admin@example.com","name":"Admin User","avatar":null,"role
+== hard reloads after sign-out
+W=1440 /profile→/sign-in?redirect_url=%2Fprofile ; /contributions→/sign-in?redirect_url=%2Fcontributions ; /notifications→/sign-in?redirect_url=%2Fnotifications ; /admin→/sign-in?redirect_url=%2Fadmin ; /admin/users→/sign-in?redirect_url=%2Fadmin%2Fusers ; /admin#users→/sign-in?redirect_url=%2Fadmin%23users ; 
+W=820 /profile→/sign-in?redirect_url=%2Fprofile ; /contributions→/sign-in?redirect_url=%2Fcontributions ; /notifications→/sign-in?redirect_url=%2Fnotifications ; /admin→/sign-in?redirect_url=%2Fadmin ; /admin/users→/sign-in?redirect_url=%2Fadmin%2Fusers ; /admin#users→/sign-in?redirect_url=%2Fadmin%23users ; 
+W=390 /profile→/sign-in?redirect_url=%2Fprofile ; /contributions→/sign-in?redirect_url=%2Fcontributions ; /notifications→/sign-in?redirect_url=%2Fnotifications ; /admin→/sign-in?redirect_url=%2Fadmin ; /admin/users→/sign-in?redirect_url=%2Fadmin%2Fusers ; /admin#users→/sign-in?redirect_url=%2Fadmin%23users ; 
+console errors 0 page errors 0

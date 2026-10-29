@@ -1,0 +1,16 @@
+2026-10-27T19:58:19Z
+DELETE /api/admin/resources/190365 403
+GET /api/resources/190365 200
+GET /resource/190365 (page) 200
+link-reports open: {"reports":[],"openCount":0}
+link-reports resolved: {"reports":[],"openCount":0}
+link-reports dismissed: {"reports":[{"resourceId":190365,"userId":"<REDACTED>","status":"dismissed","note":"[QA-audit-1026] L10b dismissed-state probe","createdAt":"2026-10-27T19:53:21.685Z","handledAt":"2026-10-27T19:53:38.022Z","resourceTitle":"[QA-audit-1026] L10b link report probe","resourceUrl":"https://example.com/qa-audit-1026-l10b","reporterEmail":"<REDACTED>","reporterFirstName":"Admin","reporterLastName":"User"}],"openCount":0}
+catalog sum 3827 Community & Events [130]
+{"approvedTotal":3827,"tagged":1089,"untagged":2738,"coveragePct":28.5}[22400.4776] DELETE https://awesome.video/api/admin/resources/190365 (Fetch) 200
+2026-10-27T19:59:01Z
+GET /api/resources/190365 404
+link-reports open: {"reports":[],"openCount":0}
+link-reports resolved: {"reports":[],"openCount":0}
+link-reports dismissed: {"reports":[],"openCount":0}
+catalog sum 3826 Community & Events [129]
+{"approvedTotal":3826,"tagged":1089,"untagged":2737,"coveragePct":28.5}

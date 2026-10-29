@@ -1,0 +1,2 @@
+chrome-devtools isolatedContext L01a, Slow 3G, 1440x900, initScript MutationObserver on .av-sidebar-shell: [{"t":4587,"n":17,"c":0,"err":false,"empty":false},{"t":4600,"n":0,"c":9,"err":false,"empty":false}]  (n=skeleton spans, c=category rows)
+820 persistent sidebar, Slow 3G: [{"t":4600,"n":17,"c":0},{"t":4618,"n":0,"c":9}]

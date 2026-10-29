@@ -1,0 +1,482 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e11]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e12]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e13]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=true, ref=e14]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - main
+        - StaticText "INDEX · 3,825 ENTRIES"
+        - generic "Content types in this index"
+          - button "Tools & SDKs, 1,836 resources" [ref=e25]
+            - StaticText "Tools & SDKs"
+            - StaticText "1,836"
+          - button "Libraries, 745 resources" [ref=e26]
+            - StaticText "Libraries"
+            - StaticText "745"
+          - button "Standards, 278 resources" [ref=e27]
+            - StaticText "Standards"
+            - StaticText "278"
+          - button "Events, 142 resources" [ref=e28]
+            - StaticText "Events"
+            - StaticText "142"
+          - button "Protocols, 124 resources" [ref=e29]
+            - StaticText "Protocols"
+            - StaticText "124"
+          - StaticText "other — "
+          - StaticText "700"
+          - StaticText " resources"
+        - heading "Awesome Video Resources" [level=1, ref=e15]
+          - StaticText "Awesome Video Resources"
+        - search
+          - searchbox "Search the catalog" [ref=e30]
+          - button "Search" [ref=e31]
+        - generic "Catalog statistics"
+          - StaticText "RESOURCES"
+          - StaticText "3,825"
+          - StaticText "+1 this week"
+          - StaticText "CATEGORIES"
+          - StaticText "9"
+          - StaticText "99 subcategories"
+          - StaticText "NESTED GROUPS"
+          - StaticText "32"
+          - StaticText "L3 depth"
+          - StaticText "FEATURED"
+          - StaticText "8"
+          - StaticText "hand-picked"
+        - region "Hand-picked highlights" [ref=e16]
+          - StaticText "── FEATURED"
+          - heading "Hand-picked highlights" [level=2, ref=e32]
+            - StaticText "Hand-picked highlights"
+          - article [ref=e33] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "Shaka Packager" [level=3, ref=e135]
+              - link "Shaka Packager" [ref=e149]
+                - StaticText "Shaka Packager"
+            - paragraph
+              - StaticText "An open source tool by Google for packaging media content (e.g., creating MPD/manifest and segments) with support for encryption (Widevine, PlayReady, FairPlay). It's often used to prepare content for DASH and HLS with CMAF and DRM, complementing encoding pipelines."
+          - article [ref=e34] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "OBS Studio" [level=3, ref=e136]
+              - link "OBS Studio" [ref=e150]
+                - StaticText "OBS Studio"
+            - paragraph
+              - StaticText "OBS Studio - Free and open source software for live streaming and screen recording"
+          - article [ref=e35] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "FFmpeg Encoding Course" [level=3, ref=e137]
+              - link "FFmpeg Encoding Course" [ref=e151]
+                - StaticText "FFmpeg Encoding Course"
+            - paragraph
+              - StaticText "An introduction to FFmpeg and its tools."
+          - article [ref=e36] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "Secure Reliable Transport (SRT) Protocol Specification" [level=3, ref=e138]
+              - link "Secure Reliable Transport (SRT) Protocol Specification" [ref=e152]
+                - StaticText "Secure Reliable Transport (SRT) Protocol Specification"
+            - paragraph
+              - StaticText "An Internet Draft from the IETF detailing the SRT protocol, an open-source video transport protocol that utilizes UDP for low-latency and reliable video streaming. This document is essential for developers seeking an in-depth understanding of SRT's technical specifications."
+            - generic "Tags for Secure Reliable Transport (SRT) Protocol Specification"
+              - link "#SRT" [ref=e153]
+                - StaticText "#SRT"
+              - link "#UDP" [ref=e154]
+                - StaticText "#UDP"
+              - link "#VIDEO TRANSPORT" [ref=e155]
+                - StaticText "#VIDEO TRANSPORT"
+        - heading "Categories" [level=2, ref=e17]
+        - generic
+          - link "Community & Events, 129 resources" [ref=e37]
+            - heading "Community & Events" [level=3, ref=e139]
+            - StaticText "129"
+          - StaticText "Example: AOSP and AAOS Meetup Archive — "
+          - StaticText "A comprehensive archive of meetings focused on the Android Open Source Project (AOSP) and Android Automotive…"
+          - link "Community Groups +2 58" [ref=e38]
+            - StaticText "Community Groups"
+            - generic
+              - StaticText "+2"
+            - StaticText "58"
+          - link "Events & Conferences +2 71" [ref=e39]
+            - StaticText "Events & Conferences"
+            - generic
+              - StaticText "+2"
+            - StaticText "71"
+        - generic
+          - link "Encoding & Codecs, 579 resources" [ref=e40]
+            - heading "Encoding & Codecs" [level=3, ref=e140]
+            - StaticText "579"
+          - StaticText "Example: Adobe Media Encoder — "
+          - StaticText "Adobe Media Encoder is a professional video encoding software that integrates seamlessly with Adobe's suite…"
+          - link "Benchmarking & Performance Tools for Codecs 18" [ref=e41]
+            - StaticText "Benchmarking & Performance Tools for Codecs"
+            - StaticText "18"
+          - link "Cloud-Based Encoding Solutions 18" [ref=e42]
+            - StaticText "Cloud-Based Encoding Solutions"
+            - StaticText "18"
+          - link "Codecs +3 68" [ref=e43]
+            - StaticText "Codecs"
+            - generic
+              - StaticText "+3"
+            - StaticText "68"
+          - link "Comparative Analysis of Codecs 19" [ref=e44]
+            - StaticText "Comparative Analysis of Codecs"
+            - StaticText "19"
+          - link "Containerization & Packaging Tools +1 35" [ref=e45]
+            - StaticText "Containerization & Packaging Tools"
+            - generic
+              - StaticText "+1"
+            - StaticText "35"
+          - link "Encoding Tools +1 136" [ref=e46]
+            - StaticText "Encoding Tools"
+            - generic
+              - StaticText "+1"
+            - StaticText "136"
+          - link "+ 10 more →" [ref=e47]
+            - StaticText "+ 10 more →"
+        - generic
+          - link "General Tools, 514 resources" [ref=e48]
+            - heading "General Tools" [level=3, ref=e141]
+            - StaticText "514"
+          - StaticText "Example: AutoVideo — "
+          - StaticText "AutoVideo is a Python system designed for automated video action recognition. It features a modular…"
+          - link "API Libraries & SDKs 25" [ref=e49]
+            - StaticText "API Libraries & SDKs"
+            - StaticText "25"
+          - link "Build Scripts & Automation 33" [ref=e50]
+            - StaticText "Build Scripts & Automation"
+            - StaticText "33"
+          - link "Case Studies & Best Practices in DRM 33" [ref=e51]
+            - StaticText "Case Studies & Best Practices in DRM"
+            - StaticText "33"
+          - link "Command-line Utilities & Wrappers 21" [ref=e52]
+            - StaticText "Command-line Utilities & Wrappers"
+            - StaticText "21"
+          - link "Community & Collaboration Platforms 19" [ref=e53]
+            - StaticText "Community & Collaboration Platforms"
+            - StaticText "19"
+          - link "Cross-Platform Media Tools 23" [ref=e54]
+            - StaticText "Cross-Platform Media Tools"
+            - StaticText "23"
+          - link "+ 13 more →" [ref=e55]
+            - StaticText "+ 13 more →"
+        - generic
+          - link "Infrastructure & Delivery, 353 resources" [ref=e56]
+            - heading "Infrastructure & Delivery" [level=3, ref=e142]
+            - StaticText "353"
+          - StaticText "Example: Amazon CloudFront Streaming Tutorials — "
+          - StaticText "Amazon CloudFront offers detailed tutorials and best practices for implementing video streaming workflows…"
+          - link "CDN Integration & Distribution +1 25" [ref=e57]
+            - StaticText "CDN Integration & Distribution"
+            - generic
+              - StaticText "+1"
+            - StaticText "25"
+          - link "Cloud & CDN +1 22" [ref=e58]
+            - StaticText "Cloud & CDN"
+            - generic
+              - StaticText "+1"
+            - StaticText "22"
+          - link "Edge Computing & Caching Solutions 29" [ref=e59]
+            - StaticText "Edge Computing & Caching Solutions"
+            - StaticText "29"
+          - link "Live Streaming Servers 24" [ref=e60]
+            - StaticText "Live Streaming Servers"
+            - StaticText "24"
+          - link "Multi-CDN Management 22" [ref=e61]
+            - StaticText "Multi-CDN Management"
+            - StaticText "22"
+          - link "Peer-to-Peer Streaming Solutions 23" [ref=e62]
+            - StaticText "Peer-to-Peer Streaming Solutions"
+            - StaticText "23"
+          - link "+ 4 more →" [ref=e63]
+            - StaticText "+ 4 more →"
+        - generic
+          - link "Intro & Learning, 297 resources" [ref=e64]
+            - heading "Intro & Learning" [level=3, ref=e143]
+            - StaticText "297"
+          - StaticText "Example: A Brief History of Video Coding — "
+          - StaticText "Authored by Marco Jacobs and Jonah Probell, this document provides a detailed account of the history of video…"
+          - link "Books & Courses 26" [ref=e65]
+            - StaticText "Books & Courses"
+            - StaticText "26"
+          - link "Case Studies & Whitepapers 21" [ref=e66]
+            - StaticText "Case Studies & Whitepapers"
+            - StaticText "21"
+          - link "Community Blogs & Forums 29" [ref=e67]
+            - StaticText "Community Blogs & Forums"
+            - StaticText "29"
+          - link "Encoding & Transcoding Guides 13" [ref=e68]
+            - StaticText "Encoding & Transcoding Guides"
+            - StaticText "13"
+          - link "Learning Resources 19" [ref=e69]
+            - StaticText "Learning Resources"
+            - StaticText "19"
+          - link "Player Development Documentation 18" [ref=e70]
+            - StaticText "Player Development Documentation"
+            - StaticText "18"
+          - link "+ 3 more →" [ref=e71]
+            - StaticText "+ 3 more →"
+        - generic
+          - link "Media Tools, 704 resources" [ref=e72]
+            - heading "Media Tools" [level=3, ref=e144]
+            - StaticText "704"
+          - StaticText "Example: 3DLUT Creator — "
+          - StaticText "A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique…"
+          - link "AI & Machine Learning Tools 35" [ref=e73]
+            - StaticText "AI & Machine Learning Tools"
+            - StaticText "35"
+          - link "Ads & QoE +2 83" [ref=e74]
+            - StaticText "Ads & QoE"
+            - generic
+              - StaticText "+2"
+            - StaticText "83"
+          - link "Audio & Subtitles +2 89" [ref=e75]
+            - StaticText "Audio & Subtitles"
+            - generic
+              - StaticText "+2"
+            - StaticText "89"
+          - link "Audio Analysis & Processing 33" [ref=e76]
+            - StaticText "Audio Analysis & Processing"
+            - StaticText "33"
+          - link "Batch Processing & Automation 14" [ref=e77]
+            - StaticText "Batch Processing & Automation"
+            - StaticText "14"
+          - link "Color Grading & Correction Tools 23" [ref=e78]
+            - StaticText "Color Grading & Correction Tools"
+            - StaticText "23"
+          - link "+ 10 more →" [ref=e79]
+            - StaticText "+ 10 more →"
+        - generic
+          - link "Players & Clients, 447 resources" [ref=e80]
+            - heading "Players & Clients" [level=3, ref=e145]
+            - StaticText "447"
+          - StaticText "Example: Advantech Video Solutions — "
+          - StaticText "Advantech offers a range of industrial-grade video solutions, including high-quality, real-time video…"
+          - link "Browser Extensions 20" [ref=e81]
+            - StaticText "Browser Extensions"
+            - StaticText "20"
+          - link "Desktop Players 19" [ref=e82]
+            - StaticText "Desktop Players"
+            - StaticText "19"
+          - link "Embedded Players 29" [ref=e83]
+            - StaticText "Embedded Players"
+            - StaticText "29"
+          - link "Frameworks & UI Components 26" [ref=e84]
+            - StaticText "Frameworks & UI Components"
+            - StaticText "26"
+          - link "Hardware Players +1 46" [ref=e85]
+            - StaticText "Hardware Players"
+            - generic
+              - StaticText "+1"
+            - StaticText "46"
+          - link "Mobile & Web Players +3 83" [ref=e86]
+            - StaticText "Mobile & Web Players"
+            - generic
+              - StaticText "+3"
+            - StaticText "83"
+          - link "+ 4 more →" [ref=e87]
+            - StaticText "+ 4 more →"
+        - generic
+          - link "Protocols & Transport, 467 resources" [ref=e88]
+            - heading "Protocols & Transport" [level=3, ref=e146]
+            - StaticText "467"
+          - StaticText "Example: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared — "
+          - StaticText "A detailed comparison of RTMP, WebRTC, and HLS protocols, highlighting their differences in latency…"
+          - link "Adaptive Bitrate Algorithms & Tools 22" [ref=e89]
+            - StaticText "Adaptive Bitrate Algorithms & Tools"
+            - StaticText "22"
+          - link "Adaptive Streaming +2 123" [ref=e90]
+            - StaticText "Adaptive Streaming"
+            - generic
+              - StaticText "+2"
+            - StaticText "123"
+          - link "CMAF & fMP4 Packaging 24" [ref=e91]
+            - StaticText "CMAF & fMP4 Packaging"
+            - StaticText "24"
+          - link "DASH Manifest Tools 24" [ref=e92]
+            - StaticText "DASH Manifest Tools"
+            - StaticText "24"
+          - link "DASH Tools 28" [ref=e93]
+            - StaticText "DASH Tools"
+            - StaticText "28"
+          - link "HLS Manifest Parsers & Generators 21" [ref=e94]
+            - StaticText "HLS Manifest Parsers & Generators"
+            - StaticText "21"
+          - link "+ 3 more →" [ref=e95]
+            - StaticText "+ 3 more →"
+        - generic
+          - link "Standards & Industry, 335 resources" [ref=e96]
+            - heading "Standards & Industry" [level=3, ref=e147]
+            - StaticText "335"
+          - StaticText "Example: Academy Color Encoding System (ACES) — "
+          - StaticText "A standardized color management and interchange system for motion pictures and television. ACES defines…"
+          - link "Adaptive Streaming Standards 26" [ref=e97]
+            - StaticText "Adaptive Streaming Standards"
+            - StaticText "26"
+          - link "Best Practices & Guidelines +1 34" [ref=e98]
+            - StaticText "Best Practices & Guidelines"
+            - generic
+              - StaticText "+1"
+            - StaticText "34"
+          - link "Closed Captioning & Subtitling Standards 31" [ref=e99]
+            - StaticText "Closed Captioning & Subtitling Standards"
+            - StaticText "31"
+          - link "DRM & Content Protection Standards 21" [ref=e100]
+            - StaticText "DRM & Content Protection Standards"
+            - StaticText "21"
+          - link "Industry Forums & Standards Bodies 16" [ref=e101]
+            - StaticText "Industry Forums & Standards Bodies"
+            - StaticText "16"
+          - link "Specs & Standards +2 40" [ref=e102]
+            - StaticText "Specs & Standards"
+            - generic
+              - StaticText "+2"
+            - StaticText "40"
+          - link "+ 2 more →" [ref=e103]
+            - StaticText "+ 2 more →"
+        - complementary
+          - StaticText "── FEATURED"
+          - link "Shaka Packager Media Tools" [ref=e104]
+            - StaticText "Shaka Packager"
+            - StaticText "Media Tools"
+          - link "OBS Studio Infrastructure & Delivery" [ref=e105]
+            - StaticText "OBS Studio"
+            - StaticText "Infrastructure & Delivery"
+          - link "FFmpeg Encoding Course Intro & Learning" [ref=e106]
+            - StaticText "FFmpeg Encoding Course"
+            - StaticText "Intro & Learning"
+          - link "Secure Reliable Transport (SRT) Protocol Specification Protocols & Transport" [ref=e107]
+            - StaticText "Secure Reliable Transport (SRT) Protocol Specification"
+            - StaticText "Protocols & Transport"
+          - link "AV1 Video Codec Standards & Industry" [ref=e108]
+            - StaticText "AV1 Video Codec"
+            - StaticText "Standards & Industry"
+          - link "Demuxed 2024 Community & Events" [ref=e109]
+            - StaticText "Demuxed 2024"
+            - StaticText "Community & Events"
+          - link "FFmpeg Encoding & Codecs" [ref=e110]
+            - StaticText "FFmpeg"
+            - StaticText "Encoding & Codecs"
+          - link "Video.js Players & Clients" [ref=e111]
+            - StaticText "Video.js"
+            - StaticText "Players & Clients"
+          - StaticText "── RECENTLY INDEXED"
+          - link "01 MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) Infrastructure & Delivery · RTMP" [ref=e112]
+            - StaticText "01"
+            - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+            - StaticText "Infrastructure & Delivery"
+            - StaticText " · RTMP"
+          - link "02 MirrorFly IM Software Intro & Learning · instant messaging software" [ref=e113]
+            - StaticText "02"
+            - StaticText "MirrorFly IM Software"
+            - StaticText "Intro & Learning"
+            - StaticText " · instant messaging software"
+          - link "03 AV1 Encoding with libsvtav1 on Qencode Encoding & Codecs · av1" [ref=e114]
+            - StaticText "03"
+            - StaticText "AV1 Encoding with libsvtav1 on Qencode"
+            - StaticText "Encoding & Codecs"
+            - StaticText " · av1"
+          - link "04 MLVC: Multi-platform Learned Video Codec for Real-World Deployment Encoding & Codecs · learned video codec" [ref=e115]
+            - StaticText "04"
+            - StaticText "MLVC: Multi-platform Learned Video Codec for Real-World Deployment"
+            - StaticText "Encoding & Codecs"
+            - StaticText " · learned video codec"
+          - link "05 Encoder-Quantization-Motion (EQM) Video Quality Metric Media Tools · video quality metric" [ref=e116]
+            - StaticText "05"
+            - StaticText "Encoder-Quantization-Motion (EQM) Video Quality Metric"
+            - StaticText "Media Tools"
+            - StaticText " · video quality metric"
+          - generic
+            - StaticText "── CONTRIBUTE"
+            - paragraph
+              - StaticText "Know a tool, spec, or event that belongs here? Submissions are reviewed weekly."
+            - link "Submit a resource" [ref=e148]
+      - contentinfo
+        - StaticText "── INDEX"
+        - link "awesome.video home" [ref=e18]
+          - StaticText "awesome.video"
+        - paragraph
+          - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+        - heading "INDEXED" [level=2, ref=e19]
+        - paragraph
+          - StaticText "3,825"
+        - paragraph
+          - StaticText "9 categories"
+          - LineBreak "\n"
+          - StaticText "99 subcategories"
+          - LineBreak "\n"
+          - StaticText "live"
+        - navigation "Explore categories" [ref=e20]
+          - heading "EXPLORE" [level=2, ref=e117]
+          - link "Community & Events" [ref=e118]
+          - link "Encoding & Codecs" [ref=e119]
+          - link "General Tools" [ref=e120]
+          - link "Infrastructure & Delivery" [ref=e121]
+          - link "Intro & Learning" [ref=e122]
+          - link "Media Tools" [ref=e123]
+          - link "Players & Clients" [ref=e124]
+          - link "Protocols & Transport" [ref=e125]
+          - link "Standards & Industry" [ref=e126]
+        - heading "SOURCE" [level=2, ref=e21]
+        - link "krzemienski/ awesome-video" [ref=e22]
+          - StaticText "krzemienski"
+          - StaticText "/"
+          - StaticText "awesome-video"
+        - paragraph
+          - StaticText "Open-source."
+          - link "PRs welcome" [ref=e127]
+          - StaticText "."
+          - LineBreak "\n"
+          - StaticText "Indexed automatically from README.md."
+        - button "Contact maintainers" [ref=e23]
+        - StaticText "© "
+        - StaticText "2026"
+        - StaticText " "
+        - StaticText "awesome.video"
+        - StaticText " · content CC0, code MIT"
+        - navigation "Site policies" [ref=e24]
+          - link "About" [ref=e128]
+          - link "Terms" [ref=e129]
+          - link "Privacy" [ref=e130]
+          - link "Code of Conduct" [ref=e131]
+            - StaticText "Conduct"
+          - button "Cookie settings" [ref=e132]
+          - link "Issues ↗" [ref=e133]
+          - link "Sitemap" [ref=e134]
+        - StaticText "built with the awesome-list framework"
+  - menu "Admin, account menu"
+    - paragraph
+      - StaticText "Admin User"
+    - paragraph
+      - StaticText "admin@example.com"
+    - separator
+    - menuitem "Profile" [ref=e4]
+      - image
+      - StaticText "Profile"
+    - menuitem "Bookmarks" [ref=e5]
+      - image
+      - StaticText "Bookmarks"
+    - menuitem "Notifications" [ref=e6]
+      - image
+      - StaticText "Notifications"
+    - menuitem "Settings" [ref=e7]
+      - image
+      - StaticText "Settings"
+    - menuitem "Theme Settings" [ref=e8]
+      - image
+      - StaticText "Theme Settings"
+    - menuitem "Admin" [ref=e9]
+      - image
+      - StaticText "Admin"
+    - separator
+    - menuitem "Sign out" [ref=e10]
+      - image
+      - StaticText "Sign out"

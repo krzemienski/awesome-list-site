@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings/theme",
+  "width": 1440,
+  "height": 900,
+  "dpr": 1,
+  "coarse": false,
+  "touchPoints": 0,
+  "scrollY": 0,
+  "active": "<h1 class=\"page-title theme-page__title\" data-route-focus=\"\" tabindex=\"-1\">Theme Settings</h1>",
+  "umami": "1",
+  "consent": "denied"
+}

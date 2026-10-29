@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/search","title":"Search — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":814,"online":true,"focus":{"tag":"INPUT","id":"","label":"Search resources","text":"","rect":{"x":40,"y":177.953125,"width":526.46875,"height":44,"top":177.953125,"right":566.46875,"bottom":221.953125,"left":40}},"headings":[{"text":"Search","id":""},{"text":"Enter a query or choose filters","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Search","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

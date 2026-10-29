@@ -1,0 +1,8 @@
+uid=1082_0 RootWebArea "awesome.video" url="chrome-error://chromewebdata/"
+  uid=1082_1 heading "Press space to play" level="1"
+  uid=1082_2 "Try:"
+  uid=1082_3 "Checking the network cables, modem, and router"
+  uid=1082_4 "Reconnecting to Wi-Fi"
+  uid=1082_5 "ERR_INTERNET_DISCONNECTED"
+  uid=1082_6 application "Dino game, press space to play" description="Dino game. A pixelated dinosaur dodges cacti and pterodactyls as it runs across a desolate landscape. When you hear an audio cue, press space to jump over obstacles."
+    uid=1082_7 generic live="assertive" relevant="additions text"

@@ -1,0 +1,143 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - generic [ref=e4] focusable [tabindex]
+      - list [ref=e5] clickable [onclick]
+        - listitem [level=1, ref=e7] focusable [tabindex]
+          - StaticText "Name updated"
+          - StaticText "Your display name has been saved."
+          - button "Dismiss notification" [ref=e12]
+            - image
+      - generic [ref=e6] focusable [tabindex]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e8]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e9]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e10]
+          - link "Browse" [ref=e13]
+          - link "Submit" [ref=e14]
+          - link "About" [ref=e15]
+          - link "Docs ↗" [ref=e16]
+          - link "Admin" [ref=e17]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e11]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e18]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e56]
+              - listitem [level=1]
+                - link "Profile" [disabled, ref=e57]
+          - StaticText "AU"
+          - heading "Admin User Edit display name" [level=1, ref=e19]
+            - StaticText "Admin User"
+            - button "Edit display name" [ref=e32]
+              - image
+          - image
+          - StaticText "admin@example.com"
+          - image
+          - StaticText "Joined "
+          - StaticText "11 months ago"
+          - StaticText "Beginner"
+          - button "Settings" [ref=e20]
+            - image
+            - StaticText "Settings"
+          - button "Sign out" [ref=e21]
+            - image
+            - StaticText "Sign out"
+          - button "Sign out all devices" [expanded=false, ref=e22]
+            - image
+            - StaticText "Sign out all devices"
+          - article
+            - image
+            - paragraph
+              - StaticText "2"
+            - paragraph
+              - StaticText "Favorites"
+          - article
+            - image
+            - paragraph
+              - StaticText "13"
+            - paragraph
+              - StaticText "Bookmarks"
+          - article
+            - image
+            - paragraph
+              - StaticText "1d"
+            - paragraph
+              - StaticText "Learning Streak"
+            - paragraph
+              - StaticText "Consecutive days signed in"
+          - article
+            - image
+            - paragraph
+              - StaticText "1"
+            - paragraph
+              - StaticText "Journeys Completed"
+            - paragraph
+              - StaticText "Learning journeys finished"
+          - tablist [ref=e23] focusable [tabindex]
+            - tab "Overview" [ref=e33]
+            - tab "Favorites" [selected, ref=e34]
+            - tab "Bookmarks" [ref=e35]
+            - tab "Submissions" [ref=e36]
+            - tab "Security" [ref=e37]
+          - tabpanel "Favorites" [ref=e24] focusable [tabindex]
+            - article
+              - image
+              - StaticText "Your Favorites"
+              - StaticText "Resources you've marked as favorites"
+              - heading "Alliance for Open Media (AOMedia)" [level=4, ref=e58]
+                - link "Alliance for Open Media (AOMedia)" [ref=e64]
+              - button "Remove from favorites: Alliance for Open Media (AOMedia)" [ref=e59]
+              - link "Open Alliance for Open Media (AOMedia) in a new tab" [ref=e60]
+              - StaticText "ENCODING & CODECS"
+              - StaticText "Added "
+              - StaticText "3 minutes ago"
+              - heading "Audacity" [level=4, ref=e61]
+                - link "Audacity" [ref=e65]
+              - button "Remove from favorites: Audacity" [ref=e62]
+              - link "Open Audacity in a new tab" [ref=e63]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e25]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e26]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e27]
+            - heading "EXPLORE" [level=2, ref=e38]
+            - link "Community & Events" [ref=e39]
+            - link "Encoding & Codecs" [ref=e40]
+            - link "General Tools" [ref=e41]
+            - link "Infrastructure & Delivery" [ref=e42]
+            - link "Intro & Learning" [ref=e43]
+            - link "Media Tools" [ref=e44]
+            - link "Players & Clients" [ref=e45]
+            - link "Protocols & Transport" [ref=e46]
+            - link "Standards & Industry" [ref=e47]
+          - heading "SOURCE" [level=2, ref=e28]
+          - link "krzemienski/ awesome-video" [ref=e29]
+          - paragraph
+            - link "PRs welcome" [ref=e48]
+          - button "Contact maintainers" [ref=e30]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e31]
+            - link "About" [ref=e49]
+            - link "Terms" [ref=e50]
+            - link "Privacy" [ref=e51]
+            - link "Code of Conduct" [ref=e52]
+            - button "Cookie settings" [ref=e53]
+            - link "Issues ↗" [ref=e54]
+            - link "Sitemap" [ref=e55]

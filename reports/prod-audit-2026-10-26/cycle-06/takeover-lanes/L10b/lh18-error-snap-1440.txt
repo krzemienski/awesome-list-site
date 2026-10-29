@@ -1,0 +1,247 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e5]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "Link Health" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,826 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e18]
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [selected, ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Link Health" [ref=e17] focusable [tabindex]
+            - generic
+              - generic "Link health status summary"
+                - generic
+                  - StaticText "Healthy"
+                  - StaticText "3,809"
+                - generic
+                  - StaticText "Redirect"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Broken"
+                  - StaticText "11"
+                - generic
+                  - StaticText "Timeout"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Suspect"
+                  - StaticText "2"
+              - paragraph
+                - StaticText "Counts are from scan #8 (Aug 4, 2026, 08:18 PM) for resources still in the catalog. When it finished, the scan recorded 12 broken; 11 of those resources are still listed."
+              - article
+                - heading "Member reports Dismissed" [level=2, ref=e39]
+                  - StaticText "Member reports"
+                  - combobox "Report status" [expanded=false, ref=e41]: Dismissed
+                    - generic [ref=e46] clickable [cursor:pointer, onclick]
+                      - StaticText "Dismissed"
+                - StaticText "Links that signed-in members reported as broken from a resource page."
+                - alert
+                  - paragraph
+                    - StaticText "Couldn't load member link reports"
+                  - StaticText "Could not reach the server. Please check your connection and try again."
+                  - button "Retry" [ref=e42]
+                - list "dismissed member reports"
+              - generic
+                - sectionheader
+                  - heading "Recent failures" [level=2, ref=e43]
+                  - paragraph
+                    - StaticText "Broken, DNS and timeout failures plus links flagged for review from the last sweep"
+                  - button "Run full check" [ref=e44]
+                - region "Recent failures table, scrollable" [ref=e45] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "RESOURCE" [ref=e99]
+                        - columnheader "URL" [ref=e100]
+                        - columnheader "STATUS" [ref=e101]
+                        - columnheader "LAST CHECKED" [ref=e102]
+                    - row
+                      - cell "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders Encoding & Codecs" [ref=e47]
+                        - link "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders" [ref=e103]
+                        - StaticText "Encoding & Codecs"
+                      - cell "https://iphome.hhi.de/marpe/download/spie-2017.pdf dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate" [ref=e48]
+                        - link "https://iphome.hhi.de/marpe/download/spie-2017.pdf" [ref=e104]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e49]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e50]
+                    - row
+                      - cell "RTC.ON Conference Community & Events" [ref=e51]
+                        - link "RTC.ON Conference" [ref=e105]
+                        - StaticText "Community & Events"
+                      - cell "https://rtcon.live/ redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)" [ref=e52]
+                        - link "https://rtcon.live/" [ref=e106]
+                        - StaticText "redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)"
+                      - cell "SUSPECT" [ref=e53]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e54]
+                    - row
+                      - cell "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery Intro & Learning" [ref=e55]
+                        - link "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery" [ref=e107]
+                        - StaticText "Intro & Learning"
+                      - cell "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf dead: 404 confirmed under browser UA" [ref=e56]
+                        - link "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf" [ref=e108]
+                        - StaticText "dead: 404 confirmed under browser UA"
+                      - cell "BROKEN" [ref=e57]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e58]
+                    - row
+                      - cell "RIST VidTrans2018 Technical Poster Protocols & Transport" [ref=e59]
+                        - link "RIST VidTrans2018 Technical Poster" [ref=e109]
+                        - StaticText "Protocols & Transport"
+                      - cell "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf dead: 404 confirmed under browser UA" [ref=e60]
+                        - link "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf" [ref=e110]
+                        - StaticText "dead: 404 confirmed under browser UA"
+                      - cell "BROKEN" [ref=e61]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e62]
+                    - row
+                      - cell "JVET VVC Trac — Conformance Bitstream Tracker General Tools" [ref=e63]
+                        - link "JVET VVC Trac — Conformance Bitstream Tracker" [ref=e111]
+                        - StaticText "General Tools"
+                      - cell "https://jvet.hhi.fraunhofer.de/trac/vvc/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate" [ref=e64]
+                        - link "https://jvet.hhi.fraunhofer.de/trac/vvc/" [ref=e112]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e65]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e66]
+                    - row
+                      - cell "HEVC Format Range Extensions (RExt) — Fraunhofer HHI Encoding & Codecs" [ref=e67]
+                        - link "HEVC Format Range Extensions (RExt) — Fraunhofer HHI" [ref=e113]
+                        - StaticText "Encoding & Codecs"
+                      - cell "https://hevc.hhi.fraunhofer.de/rext dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate" [ref=e68]
+                        - link "https://hevc.hhi.fraunhofer.de/rext" [ref=e114]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e69]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e70]
+                    - row
+                      - cell "FOMS 2024 session notes — Common Media Library Community & Events" [ref=e71]
+                        - link "FOMS 2024 session notes — Common Media Library" [ref=e115]
+                        - StaticText "Community & Events"
+                      - cell "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary dead: 404 confirmed under browser UA" [ref=e72]
+                        - link "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary" [ref=e116]
+                        - StaticText "dead: 404 confirmed under browser UA"
+                      - cell "BROKEN" [ref=e73]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e74]
+                    - row
+                      - cell "CTA-5001-C: WAVE Content Specification Standards & Industry" [ref=e75]
+                        - link "CTA-5001-C: WAVE Content Specification" [ref=e117]
+                        - StaticText "Standards & Industry"
+                      - cell "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf dead: 404 confirmed under browser UA" [ref=e76]
+                        - link "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf" [ref=e118]
+                        - StaticText "dead: 404 confirmed under browser UA"
+                      - cell "BROKEN" [ref=e77]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e78]
+                    - row
+                      - cell "Dolby Vision Profiles and Levels Explained Standards & Industry" [ref=e79]
+                        - link "Dolby Vision Profiles and Levels Explained" [ref=e119]
+                        - StaticText "Standards & Industry"
+                      - cell "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate" [ref=e80]
+                        - link "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US" [ref=e120]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e81]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e82]
+                    - row
+                      - cell "Dolby Vision Profile 8/9 FAQ Standards & Industry" [ref=e83]
+                        - link "Dolby Vision Profile 8/9 FAQ" [ref=e121]
+                        - StaticText "Standards & Industry"
+                      - cell "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate" [ref=e84]
+                        - link "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US" [ref=e122]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e85]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e86]
+                    - row
+                      - cell "CTA-5005 WAVE Content Specification Protocols & Transport" [ref=e87]
+                        - link "CTA-5005 WAVE Content Specification" [ref=e123]
+                        - StaticText "Protocols & Transport"
+                      - cell "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf dead: 404 confirmed under browser UA" [ref=e88]
+                        - link "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf" [ref=e124]
+                        - StaticText "dead: 404 confirmed under browser UA"
+                      - cell "BROKEN" [ref=e89]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e90]
+                    - row
+                      - cell "JVET VVC Test Model (VTM) Reference Software Encoding & Codecs" [ref=e91]
+                        - link "JVET VVC Test Model (VTM) Reference Software" [ref=e125]
+                        - StaticText "Encoding & Codecs"
+                      - cell "https://jvet.hhi.fraunhofer.de/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate" [ref=e92]
+                        - link "https://jvet.hhi.fraunhofer.de/" [ref=e126]
+                        - StaticText "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate"
+                      - cell "BROKEN" [ref=e93]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e94]
+                    - row
+                      - cell "Popcorn.js Players & Clients" [ref=e95]
+                        - link "Popcorn.js" [ref=e127]
+                        - StaticText "Players & Clients"
+                      - cell "https://popcornjs.org/ redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)" [ref=e96]
+                        - link "https://popcornjs.org/" [ref=e128]
+                        - StaticText "redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)"
+                      - cell "SUSPECT" [ref=e97]
+                      - cell "Aug 4, 2026, 08:18 PM" [ref=e98]
+              - button "More" [expanded=false, ref=e40]

@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?tags=UDP","title":"Awesome Video — 3825+ Curated Video & Streaming Resources","width":1440,"height":900,"scrollX":0,"scrollY":1323,"bodyWidth":1434,"online":true,"focus":{"tag":"BUTTON","id":"","label":null,"text":"Clear all"},"headings":[{"text":"Awesome Video Resources","id":""},{"text":"Hand-picked highlights","id":""},{"text":"Nine domains, one taxonomy","id":""},{"text":"Fresh from the index","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":["Filter by TagsClear allTagsopen-source160video-streaming118streaming103ffmpeg83video-processing82live-streaming73video-encoding68hls64video-player58encoding56video-technology51drm50standard43webassembly42webrtc39android38cross-platform38vid"],"pressed":[{"text":"Home","label":null}],"status":[],"analyticsDisabled":"1"}
+```

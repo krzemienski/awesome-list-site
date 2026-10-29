@@ -1,0 +1,486 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Researcher" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - 'region "Research run #73" [ref=e117]':
+                      - generic [ref=e118]:
+                        - generic [ref=e119]:
+                          - 'heading "Research run #73" [level=3] [ref=e120]'
+                          - paragraph [ref=e121]: All categories · ran for 10:55
+                        - generic [ref=e123]:
+                          - img [ref=e124]
+                          - text: Completed
+                      - paragraph [ref=e127]
+                      - generic [ref=e128]:
+                        - list "Run phases" [ref=e129]:
+                          - listitem [ref=e130]:
+                            - img [ref=e132]
+                            - generic [ref=e134]:
+                              - text: Planning
+                              - generic [ref=e135]: 02:31:21 AM
+                            - generic [ref=e136]: (done)
+                          - listitem [ref=e137]:
+                            - img [ref=e139]
+                            - generic [ref=e141]:
+                              - text: Scouting
+                              - generic [ref=e142]: 02:31:55 AM
+                            - generic [ref=e143]: (done)
+                          - listitem [ref=e144]:
+                            - img [ref=e146]
+                            - generic [ref=e148]:
+                              - text: Verifying
+                              - generic [ref=e149]: 02:33:18 AM
+                            - generic [ref=e150]: (done)
+                          - listitem [ref=e151]:
+                            - img [ref=e153]
+                            - generic [ref=e155]:
+                              - text: Saving
+                              - generic [ref=e156]: 02:33:46 AM
+                            - generic [ref=e157]: (done)
+                          - listitem [ref=e158]:
+                            - generic [ref=e161]:
+                              - text: Done
+                              - generic [ref=e162]: 02:42:17 AM
+                            - generic [ref=e163]: (current)
+                        - generic [ref=e164]:
+                          - heading "Scouts 22 started" [level=4] [ref=e165]:
+                            - img [ref=e166]
+                            - text: Scouts
+                            - generic [ref=e169]: 22 started
+                          - list "Scouts" [ref=e170]:
+                            - listitem [ref=e171]:
+                              - generic [ref=e172]:
+                                - generic [ref=e173]: Scout 1
+                                - generic [ref=e174]: Reported
+                              - paragraph [ref=e175]: Scout neural codecs quality
+                              - paragraph [ref=e176]: 10 searches · 0 candidates · 18s
+                            - listitem [ref=e177]:
+                              - generic [ref=e178]:
+                                - generic [ref=e179]: Scout 2
+                                - generic [ref=e180]: Reported
+                              - paragraph [ref=e181]: Scout WebRTC observability tools
+                              - paragraph [ref=e182]: 14 searches · 0 candidates · 30s
+                            - listitem [ref=e183]:
+                              - generic [ref=e184]:
+                                - generic [ref=e185]: Scout 3
+                                - generic [ref=e186]: Reported
+                              - paragraph [ref=e187]: Scout DCVC neural codecs
+                              - paragraph [ref=e188]: 5 searches · 10 candidates · 37s
+                            - listitem [ref=e189]:
+                              - generic [ref=e190]:
+                                - generic [ref=e191]: Scout 4
+                                - generic [ref=e192]: Reported
+                              - paragraph [ref=e193]: Scout quality metrics WebRTC
+                              - paragraph [ref=e194]: 8 searches · 0 candidates · 36s
+                            - listitem [ref=e195]:
+                              - generic [ref=e196]:
+                                - generic [ref=e197]: Scout 5
+                                - generic [ref=e198]: Reported
+                              - paragraph [ref=e199]: Scout packaging and audio tools
+                              - paragraph [ref=e200]: 12 searches · 0 candidates · 34s
+                            - listitem [ref=e201]:
+                              - generic [ref=e202]:
+                                - generic [ref=e203]: Scout 6
+                                - generic [ref=e204]: Reported
+                              - paragraph [ref=e205]: Scout codec benchmarks test fixtures
+                              - paragraph [ref=e206]: 20 searches · 0 candidates · 38s
+                            - listitem [ref=e207]:
+                              - generic [ref=e208]:
+                                - generic [ref=e209]: Scout 7
+                                - generic [ref=e210]: Reported
+                              - paragraph [ref=e211]: Verify URLs via curl
+                              - paragraph [ref=e212]: 10 searches · 5 candidates · 41s
+                            - listitem [ref=e213]:
+                              - generic [ref=e214]:
+                                - generic [ref=e215]: Scout 8
+                                - generic [ref=e216]: Reported
+                              - paragraph [ref=e217]: GitHub API gap search
+                              - paragraph [ref=e218]: 9 searches · 0 candidates · 111s
+                            - listitem [ref=e219]:
+                              - generic [ref=e220]:
+                                - generic [ref=e221]: Scout 9
+                                - generic [ref=e222]: Reported
+                              - paragraph [ref=e223]: Curl GitHub API
+                              - paragraph [ref=e224]: 0 searches · 0 candidates · 22s
+                            - listitem [ref=e225]:
+                              - generic [ref=e226]:
+                                - generic [ref=e227]: Scout 10
+                                - generic [ref=e228]: Reported
+                              - paragraph [ref=e229]: Shell curl GitHub
+                              - paragraph [ref=e230]: 0 searches · 0 candidates · 29s
+                            - listitem [ref=e231]:
+                              - generic [ref=e232]:
+                                - generic [ref=e233]: Scout 11
+                                - generic [ref=e234]: Reported
+                              - paragraph [ref=e235]: Retry short web searches
+                              - paragraph [ref=e236]: 4 searches · 0 candidates · 5s
+                            - listitem [ref=e237]:
+                              - generic [ref=e238]:
+                                - generic [ref=e239]: Scout 12
+                                - generic [ref=e240]: Reported
+                              - paragraph [ref=e241]: Query arXiv API directly
+                              - paragraph [ref=e242]: 6 searches · 1 candidate · 10s
+                            - listitem [ref=e243]:
+                              - generic [ref=e244]:
+                                - generic [ref=e245]: Scout 13
+                                - generic [ref=e246]: Reported
+                              - paragraph [ref=e247]: Query known project pages
+                              - paragraph [ref=e248]: 8 searches · 0 candidates · 10s
+                            - listitem [ref=e249]:
+                              - generic [ref=e250]:
+                                - generic [ref=e251]: Scout 14
+                                - generic [ref=e252]: Reported
+                              - paragraph [ref=e253]: Search podcasts and forums
+                              - paragraph [ref=e254]: 10 searches · 0 candidates · 28s
+                            - listitem [ref=e255]:
+                              - generic [ref=e256]:
+                                - generic [ref=e257]: Scout 15
+                                - generic [ref=e258]: Reported
+                              - paragraph [ref=e259]: Scout audio and packaging
+                              - paragraph [ref=e260]: 11 searches · 0 candidates · 24s
+                            - listitem [ref=e261]:
+                              - generic [ref=e262]:
+                                - generic [ref=e263]: Scout 16
+                                - generic [ref=e264]: Reported
+                              - paragraph [ref=e265]: Scout standards and players
+                              - paragraph [ref=e266]: 4 searches · 0 candidates · 24s
+                            - listitem [ref=e267]:
+                              - generic [ref=e268]:
+                                - generic [ref=e269]: Scout 17
+                                - generic [ref=e270]: Reported
+                              - paragraph [ref=e271]: Scout fresh video tools
+                              - paragraph [ref=e272]: 11 searches · 0 candidates · 13s
+                            - listitem [ref=e273]:
+                              - generic [ref=e274]:
+                                - generic [ref=e275]: Scout 18
+                                - generic [ref=e276]: Reported
+                              - paragraph [ref=e277]: Scout ACM and papers
+                              - paragraph [ref=e278]: 4 searches · 0 candidates · 20s
+                            - listitem [ref=e279]:
+                              - generic [ref=e280]:
+                                - generic [ref=e281]: Scout 19
+                                - generic [ref=e282]: Reported
+                              - paragraph [ref=e283]: Scout smart TV player docs
+                              - paragraph [ref=e284]: 10 searches · 0 candidates · 10s
+                            - listitem [ref=e285]:
+                              - generic [ref=e286]:
+                                - generic [ref=e287]: Scout 20
+                                - generic [ref=e288]: Reported
+                              - paragraph [ref=e289]: Scout standards and metrics docs
+                              - paragraph [ref=e290]: 4 searches · 0 candidates · 33s
+                            - listitem [ref=e291]:
+                              - generic [ref=e292]:
+                                - generic [ref=e293]: Scout 21
+                                - generic [ref=e294]: Reported
+                              - paragraph [ref=e295]: Scout packaging origin HDR
+                              - paragraph [ref=e296]: 10 searches · 0 candidates · 24s
+                            - listitem [ref=e297]:
+                              - generic [ref=e298]:
+                                - generic [ref=e299]: Scout 22
+                                - generic [ref=e300]: Reported
+                              - paragraph [ref=e301]: Scout ffmpeg automation QoE
+                              - paragraph [ref=e302]: 4 searches · 0 candidates · 20s
+                      - generic [ref=e303]:
+                        - generic [ref=e304]:
+                          - term [ref=e305]: Discoveries
+                          - definition [ref=e306]: 4 of 10 saved
+                          - progressbar "Discoveries saved against the target" [ref=e307]
+                        - generic [ref=e309]:
+                          - term [ref=e310]: Turns
+                          - definition [ref=e311]: 155 of 200
+                          - progressbar "Turns used against the cap" [ref=e312]
+                        - generic [ref=e314]:
+                          - term [ref=e315]: Spend
+                          - definition [ref=e316]: $5.4603 of $8.00
+                          - progressbar "Spend against the budget cap" [ref=e317]
+                      - note [ref=e319]:
+                        - img [ref=e320]
+                        - paragraph [ref=e324]: Run finished with 4 saved discoveries. Review them below.
+                      - region "Review discoveries · 3 pending" [ref=e325]:
+                        - heading "Review discoveries · 3 pending" [level=4] [ref=e326]
+                        - list "Discoveries from this run" [ref=e327]:
+                          - listitem [ref=e328]:
+                            - generic [ref=e329]:
+                              - generic [ref=e330]:
+                                - generic [ref=e331]: Neural Video Compression with Feature Modulation (DCVC-FM)
+                                - generic [ref=e332]:
+                                  - img [ref=e333]
+                                  - text: Pending
+                                - generic [ref=e336]:
+                                  - img [ref=e337]
+                                  - text: Link OK
+                              - link "https://arxiv.org/abs/2402.08545" [active] [ref=e340] [cursor=pointer]:
+                                - /url: https://arxiv.org/abs/2402.08545
+                                - generic [ref=e341]: https://arxiv.org/abs/2402.08545
+                                - img [ref=e342]
+                              - paragraph [ref=e346]: arXiv paper for DCVC-FM, a Microsoft Research neural video codec that modulates temporal features to improve compression efficiency in the DCVC family.
+                              - generic [ref=e347]:
+                                - generic [ref=e348]: Encoding & Codecs
+                                - generic [ref=e349]: Next-Generation Codecs AV1 VVC
+                                - generic [ref=e350]: 78% confidence
+                            - generic [ref=e351]:
+                              - 'button "Approve discovery: Neural Video Compression with Feature Modulation (DCVC-FM)" [ref=e352] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: Neural Video Compression with Feature Modulation (DCVC-FM)" [ref=e353] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e354]:
+                            - generic [ref=e355]:
+                              - generic [ref=e356]:
+                                - generic [ref=e357]: Neural Video Compression with Diverse Contexts (CVPR 2024)
+                                - generic [ref=e358]:
+                                  - img [ref=e359]
+                                  - text: Pending
+                                - generic [ref=e362]:
+                                  - img [ref=e363]
+                                  - text: Link check failed
+                              - link "https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf" [ref=e367] [cursor=pointer]:
+                                - /url: https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf
+                                - generic [ref=e368]: https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf
+                                - img [ref=e369]
+                              - paragraph [ref=e373]: Official CVPR 2024 paper on DCVC-DC, a neural video codec that conditions entropy coding on diverse spatial and temporal contexts to improve compression over earlier DCVC models.
+                              - generic [ref=e374]:
+                                - generic [ref=e375]: Encoding & Codecs
+                                - generic [ref=e376]: Next-Generation Codecs AV1 VVC
+                                - generic [ref=e377]: 80% confidence
+                            - generic [ref=e378]:
+                              - 'button "Approve discovery: Neural Video Compression with Diverse Contexts (CVPR 2024)" [ref=e379] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: Neural Video Compression with Diverse Contexts (CVPR 2024)" [ref=e380] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e381]:
+                            - generic [ref=e382]:
+                              - generic [ref=e383]:
+                                - generic [ref=e384]: Towards Practical Real-Time Neural Video Compression (CVPR 2025)
+                                - generic [ref=e385]:
+                                  - img [ref=e386]
+                                  - text: Pending
+                                - generic [ref=e389]:
+                                  - img [ref=e390]
+                                  - text: Link OK
+                              - link "https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf" [ref=e393] [cursor=pointer]:
+                                - /url: https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf
+                                - generic [ref=e394]: https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf
+                                - img [ref=e395]
+                              - paragraph [ref=e399]: CVPR 2025 paper on DCVC-RT, a practical real-time neural video codec with integerized models and implicit temporal modeling that encodes and decodes 1080p above 100 fps.
+                              - generic [ref=e400]:
+                                - generic [ref=e401]: Encoding & Codecs
+                                - generic [ref=e402]: Real-Time Encoding Solutions
+                                - generic [ref=e403]: 82% confidence
+                            - generic [ref=e404]:
+                              - 'button "Approve discovery: Towards Practical Real-Time Neural Video Compression (CVPR 2025)" [ref=e405] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: Towards Practical Real-Time Neural Video Compression (CVPR 2025)" [ref=e406] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e407]:
+                            - generic [ref=e408]:
+                              - generic [ref=e409]:
+                                - generic [ref=e410]: PyTorchVideoCompression
+                                - generic [ref=e411]:
+                                  - img [ref=e412]
+                                  - text: Approved
+                                - generic [ref=e414]:
+                                  - img [ref=e415]
+                                  - text: Link OK
+                                - generic "Last push 4/24/2024" [ref=e418]:
+                                  - img [ref=e419]
+                                  - text: "394"
+                              - link "https://github.com/ZhihaoHu/PyTorchVideoCompression" [ref=e421] [cursor=pointer]:
+                                - /url: https://github.com/ZhihaoHu/PyTorchVideoCompression
+                                - generic [ref=e422]: https://github.com/ZhihaoHu/PyTorchVideoCompression
+                                - img [ref=e423]
+                              - paragraph [ref=e427]: PyTorch implementations of learned video compression methods (DVC, FVC, DCVC and related neural codecs) with training and inference code used as a common research baseline.
+                              - generic [ref=e428]:
+                                - generic [ref=e429]: Encoding & Codecs
+                                - generic [ref=e430]: Next-Generation Codecs AV1 VVC
+                                - generic [ref=e431]: 78% confidence
+                        - generic [ref=e432]:
+                          - button "Review later — go to job history" [ref=e433] [cursor=pointer]:
+                            - img
+                            - text: Review later — go to job history
+                          - button "Start another run" [ref=e434] [cursor=pointer]:
+                            - img
+                            - text: Start another run
+                      - 'button "Run details: raw event log and agent graph" [ref=e436] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e437]:
+                      - generic [ref=e439]:
+                        - heading "Researcher jobs" [level=2] [ref=e440]
+                        - paragraph [ref=e441]: Latest 5 of 77 research runs
+                      - generic [ref=e442]:
+                        - region "Researcher jobs table, scrollable" [ref=e443]:
+                          - table [ref=e444]:
+                            - rowgroup [ref=e445]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e446]:
+                                - columnheader "Status" [ref=e447]
+                                - columnheader "Prompt" [ref=e448]
+                                - columnheader "Found" [ref=e449]
+                                - columnheader "Approved / Rejected" [ref=e450]
+                                - columnheader "Cost" [ref=e451]
+                                - columnheader "Turns" [ref=e452]
+                                - columnheader "Created" [ref=e453]
+                            - rowgroup [ref=e454]:
+                              - row [ref=e455]:
+                                - cell "processing" [ref=e456]:
+                                  - generic [ref=e457]: processing
+                                - cell [ref=e458]
+                                - cell "0" [ref=e459]
+                                - cell "0/0" [ref=e460]
+                                - cell "$0.0000" [ref=e461]
+                                - cell "0/600" [ref=e462]
+                                - cell "Oct 27, 2026" [ref=e463]
+                              - row [ref=e464]:
+                                - cell "completed" [ref=e465]:
+                                  - generic [ref=e466]: completed
+                                - cell [ref=e467]
+                                - cell "0" [ref=e468]
+                                - cell "0/0" [ref=e469]
+                                - cell "$0.7600" [ref=e470]
+                                - cell "28/600" [ref=e471]
+                                - cell "Oct 27, 2026" [ref=e472]
+                              - row [ref=e473]:
+                                - cell "completed" [ref=e474]:
+                                  - generic [ref=e475]: completed
+                                - cell [ref=e476]
+                                - cell "0" [ref=e477]
+                                - cell "0/0" [ref=e478]
+                                - cell "$1.2973" [ref=e479]
+                                - cell "93/600" [ref=e480]
+                                - cell "Oct 27, 2026" [ref=e481]
+                              - row [ref=e482]:
+                                - cell "completed" [ref=e483]:
+                                  - generic [ref=e484]: completed
+                                - cell [ref=e485]
+                                - cell "0" [ref=e486]
+                                - cell "0/0" [ref=e487]
+                                - cell "$0.5650" [ref=e488]
+                                - cell "13/600" [ref=e489]
+                                - cell "Oct 27, 2026" [ref=e490]
+                              - row [ref=e491]:
+                                - cell "completed" [ref=e492]:
+                                  - generic [ref=e493]: completed
+                                - cell [ref=e494]
+                                - cell "4" [ref=e495]
+                                - cell "1/0" [ref=e496]
+                                - cell "$5.4603" [ref=e497]
+                                - cell "155/200" [ref=e498]
+                                - cell "Oct 27, 2026" [ref=e499]
+                        - button "Show more" [ref=e501] [cursor=pointer]
+                  - group [ref=e502]:
+                    - generic "All pending discoveries & full job history" [ref=e503] [cursor=pointer]
+    - button "Back to top" [ref=e504] [cursor=pointer]:
+      - img

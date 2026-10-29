@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/settings/theme","title":"Theme Settings — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":814,"online":true,"focus":{"tag":"H1","id":"","label":null,"text":"Theme Settings","rect":{"x":40,"y":207.59375,"width":714,"height":40.59375,"top":207.59375,"right":754,"bottom":248.1875,"left":40}},"headings":[{"text":"Theme Settings","id":""},{"text":"Design System","id":""},{"text":"Accent","id":""},{"text":"Font","id":""},{"text":"Live Preview","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Theme","label":null,"current":"page"},{"text":"Appearance","label":null,"current":"page"}],"status":["Active: Editorial · Crimson","Theme choices are saved on this device."],"analyticsDisabled":"1"}
+```

@@ -1,0 +1,17 @@
+uid=1122_0 RootWebArea "About — Awesome Video" url="https://awesome.video/about"
+  uid=1150_0 dialog "Contact maintainers" description="Send a message to the maintainers. Submissions are stored for review; this form does not promise email delivery."
+    uid=1150_1 heading "Contact maintainers" level="2"
+    uid=1150_2 "Send a message to the maintainers. Submissions are stored for review; this form does not promise email delivery."
+    uid=1150_3 form
+      uid=1150_4 "NAME"
+      uid=1150_5 textbox "NAME" focusable focused required
+      uid=1150_6 "EMAIL"
+      uid=1150_7 textbox "EMAIL" required
+      uid=1150_8 "SUBJECT"
+      uid=1150_9 textbox "SUBJECT" required
+      uid=1150_10 "MESSAGE"
+      uid=1150_11 textbox "MESSAGE" multiline required
+      uid=1150_12 "Your name, reply address, and message are stored so maintainers can review and respond."
+      uid=1150_13 button "Cancel"
+      uid=1150_14 button "Submit message"
+    uid=1150_15 button "Close"

@@ -1,0 +1,104 @@
+✓ Sign In — Awesome Video
+  https://awesome.video/sign-in?redirect_url=%2Fadmin%2Funknown-c6-gap
+
+- heading "Welcome back" [level=1, ref=e1]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e3]
+- link "Learning journeys" [ref=e4]
+- link "About" [ref=e5]
+- link "Create an account" [ref=e6]
+- link "Submit a resource" [ref=e7]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-187-guest-404-390.png
+
+✓ Done
+
+https://awesome.video/sign-in?redirect_url=%2Fadmin%2Funknown-c6-gap
+
+- heading "Welcome back" [level=1, ref=e1]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e3]
+- link "Learning journeys" [ref=e4]
+- link "About" [ref=e5]
+- link "Create an account" [ref=e6]
+- link "Submit a resource" [ref=e7]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-188-guest-404-820.png
+
+✓ Done
+
+https://awesome.video/sign-in?redirect_url=%2Fadmin%2Funknown-c6-gap
+
+- heading "Welcome back" [level=1, ref=e1]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e3]
+- link "Learning journeys" [ref=e4]
+- link "About" [ref=e5]
+- link "Create an account" [ref=e6]
+- link "Submit a resource" [ref=e7]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-189-guest-404-1440.png
+
+[48639.234] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.292] GET https://awesome.video/api/config (Fetch) 200
+[48639.293] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.304] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.333] GET https://awesome.video/api/tags (Fetch) 200
+[48639.528] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.529] GET https://awesome.video/api/config (Fetch) 200
+[48639.564] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.566] GET https://awesome.video/api/tags (Fetch) 200
+[48639.567] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.568] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.569] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.570] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.571] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.572] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.573] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.574] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.575] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.576] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.771] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.772] GET https://awesome.video/api/config (Fetch) 200
+[48639.807] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.809] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.810] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.811] GET https://awesome.video/api/health (Fetch) 200
+[48639.821] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.822] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.1022] GET https://awesome.video/api/config (Fetch) 200
+[48639.1023] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.1034] GET https://awesome.video/api/tags (Fetch) 200
+[48639.1041] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.1098] GET https://awesome.video/api/config (Fetch) 200
+[48639.1099] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.1108] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[48639.1119] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.1171] GET https://awesome.video/api/config (Fetch) 200
+[48639.1172] GET https://awesome.video/api/auth/user (Fetch) 200
+[48639.1183] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[48639.1193] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] Route render error: {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] Route render error: {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+

@@ -1,0 +1,165 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - generic [ref=e4] focusable [tabindex]
+      - list [ref=e5] clickable [onclick]
+        - listitem [level=1, ref=e7] focusable [tabindex]
+          - StaticText "Public access revoked"
+          - button "Dismiss notification" [ref=e12]
+            - image
+      - generic [ref=e6] focusable [tabindex]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e8]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e9]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e10]
+          - link "Browse" [ref=e13]
+          - link "Submit" [ref=e14]
+          - link "About" [ref=e15]
+          - link "Docs ↗" [ref=e16]
+          - link "Admin" [ref=e17]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e11]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e18]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e84]
+              - listitem [level=1]
+                - link "Bookmarks" [disabled, ref=e85]
+          - sectionheader
+            - heading "Saved, then finished." [level=1, ref=e30]
+              - StaticText "Saved, then "
+              - emphasis
+            - paragraph
+              - StaticText "Turn bookmarks into a queue you can actually work through."
+            - button "New collection" [ref=e31]
+          - region "Library summary" [ref=e19]
+            - button "13 Active" [ref=e32]
+              - StaticText "13"
+              - StaticText "Active"
+            - button "13 Saved" [ref=e33]
+              - StaticText "13"
+              - StaticText "Saved"
+            - button "0 Watch next" [ref=e34]
+              - StaticText "0"
+              - StaticText "Watch next"
+            - button "0 In progress" [ref=e35]
+              - StaticText "0"
+              - StaticText "In progress"
+            - button "0 Done" [ref=e36]
+              - StaticText "0"
+              - StaticText "Done"
+            - button "0 Archived" [ref=e37]
+              - StaticText "0"
+              - StaticText "Archived"
+          - complementary "Bookmark collections"
+            - generic
+              - button "All saved 13" [ref=e73]
+              - button "[QA-audit-1026] c6 collection A2 1" [ref=e74]
+              - group "Reorder [QA-audit-1026] c6 collection A2"
+                - button "Move [QA-audit-1026] c6 collection A2 up" [disabled, ref=e86]
+                - button "Move [QA-audit-1026] c6 collection A2 down" [ref=e87]
+              - button "[QA-audit-1026] c6 collection B 0" [ref=e75]
+              - group "Reorder [QA-audit-1026] c6 collection B"
+                - button "Move [QA-audit-1026] c6 collection B up" [ref=e88]
+                - button "Move [QA-audit-1026] c6 collection B down" [disabled, ref=e89]
+          - region "Selected collection controls" [ref=e20]
+            - heading "[QA-audit-1026] c6 collection A2" [level=2, ref=e38]
+            - paragraph
+              - StaticText "1 saved resource"
+            - button "Rename" [ref=e39]
+            - button "Archive" [ref=e40]
+            - button "Publish link" [ref=e41]
+            - button "Delete" [ref=e42]
+          - region "Library filters" [ref=e21]
+            - LabelText [ref=e43] clickable [cursor:pointer]
+              - StaticText "Queue status"
+            - combobox "Queue status" [expanded=false, ref=e44]: All statuses
+              - generic [ref=e76] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e45] clickable [cursor:pointer]
+              - StaticText "Visibility"
+            - combobox "Visibility" [expanded=false, ref=e46]: Active bookmarks
+              - generic [ref=e77] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e47] clickable [cursor:pointer]
+              - StaticText "Sort"
+            - combobox "Sort" [expanded=false, ref=e48]: Newest saved
+              - generic [ref=e78] clickable [cursor:pointer, onclick]
+          - region "Bulk bookmark actions" [ref=e22]
+            - LabelText [ref=e49] clickable [cursor:pointer]
+              - checkbox "Select all visible bookmarks" [checked=false, ref=e79]
+              - StaticText "Select all shown"
+            - paragraph
+              - StaticText "0 bookmarks selected"
+          - article
+            - LabelText [ref=e50] clickable [cursor:pointer]
+              - checkbox "Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [checked=false, ref=e80]
+              - StaticText "Select "
+              - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+            - combobox "Queue status for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [expanded=false, ref=e51]: Saved
+              - generic [ref=e81] clickable [cursor:pointer, onclick]
+            - button "Note: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e52]
+              - StaticText "Note"
+            - button "Archive: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e53]
+              - StaticText "Archive"
+            - article [ref=e54] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e90]
+                - button "Remove bookmark: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e91]
+                - button "View or edit bookmark notes: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e92]
+              - heading "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [level=2, ref=e82]
+                - link "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e93]
+              - paragraph
+              - StaticText "[QA-audit-1026] c6 edited note"
+              - generic
+                - StaticText "Page Title: MediaMTX – Download the Media Streaming Server for Live Video"
+              - generic
+                - StaticText "Page Description: Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more."
+              - link "View details for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e83]
+              - StaticText "INFRASTRUCTURE & DELIVERY"
+              - generic
+                - link "Open Link MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)" [ref=e94]
+                - button "Suggest an edit: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e95]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e23]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e24]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e25]
+            - heading "EXPLORE" [level=2, ref=e55]
+            - link "Community & Events" [ref=e56]
+            - link "Encoding & Codecs" [ref=e57]
+            - link "General Tools" [ref=e58]
+            - link "Infrastructure & Delivery" [ref=e59]
+            - link "Intro & Learning" [ref=e60]
+            - link "Media Tools" [ref=e61]
+            - link "Players & Clients" [ref=e62]
+            - link "Protocols & Transport" [ref=e63]
+            - link "Standards & Industry" [ref=e64]
+          - heading "SOURCE" [level=2, ref=e26]
+          - link "krzemienski/ awesome-video" [ref=e27]
+          - paragraph
+            - link "PRs welcome" [ref=e65]
+          - button "Contact maintainers" [ref=e28]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e29]
+            - link "About" [ref=e66]
+            - link "Terms" [ref=e67]
+            - link "Privacy" [ref=e68]
+            - link "Code of Conduct" [ref=e69]
+            - button "Cookie settings" [ref=e70]
+            - link "Issues ↗" [ref=e71]
+            - link "Sitemap" [ref=e72]

@@ -1,0 +1,287 @@
+[
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "failureText": "net::ERR_FAILED"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "status": 307
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/user/preferences",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "status": 307
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/database-backups",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/validation-status",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/link-health/status",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  }
+]

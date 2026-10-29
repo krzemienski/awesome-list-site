@@ -1,0 +1,220 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subcategories"
+  uid=270_0 region "Notifications (F8)"
+    uid=270_1 list
+  uid=270_2 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=270_4 banner
+    uid=270_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=270_8 button "Search 3,825 resources"
+    uid=270_9 navigation "Primary"
+      uid=270_10 link "Browse" url="https://awesome.video/categories"
+      uid=270_12 link "Submit" url="https://awesome.video/submit"
+      uid=270_14 link "About" url="https://awesome.video/about"
+      uid=270_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=270_18 link "Admin" url="https://awesome.video/admin"
+    uid=270_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=270_21 main
+    uid=270_22 navigation "Breadcrumb"
+      uid=270_23 link "Home" url="https://awesome.video/"
+      uid=270_25 "Admin"
+    uid=270_26 "Authorized admin area"
+    uid=270_27 "ADMIN CONSOLE · "
+    uid=270_28 "ADMIN USER"
+    uid=270_29 heading "Operations dashboard" level="1"
+    uid=270_30 "Manage the "
+    uid=270_31 "3,825"
+    uid=270_32 " resources, jobs, and contributors that keep the index alive."
+    uid=270_33 button "Settings" expandable haspopup="menu"
+    uid=270_34 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=270_35 status atomic live="polite" relevant="additions text"
+    uid=270_36 tablist "Admin sections" orientation="horizontal"
+      uid=270_37 tab "Overview" selectable
+      uid=270_38 tab "Approvals" selectable
+      uid=270_39 tab "Edits" selectable
+      uid=270_40 tab "Enrichment" selectable
+      uid=270_41 tab "Researcher" selectable
+      uid=270_42 tab "Export" selectable
+      uid=270_43 tab "Database" selectable
+      uid=270_44 tab "Resources" selectable
+      uid=270_45 tab "Categories" selectable
+      uid=270_46 tab "Subcategories" selectable selected
+      uid=270_47 tab "Users" selectable
+      uid=270_48 tab "GitHub" selectable
+      uid=270_49 tab "Link Health" selectable
+      uid=270_50 tab "Audit" selectable
+      uid=270_51 tab "Research" selectable
+    uid=270_52 button "Scroll tabs right"
+    uid=270_53 tabpanel "Subcategories"
+      uid=270_54 "Subcategories"
+      uid=270_55 "100 second-level groupings"
+      uid=270_56 button "Search" expandable
+      uid=270_57 button "Add subcategory"
+      uid=270_58 region "Subcategories table, scrollable"
+        uid=270_59 "NAME"
+        uid=270_60 "SLUG"
+        uid=270_61 "PARENT"
+        uid=270_62 "RESOURCES"
+        uid=270_63 "Community Groups"
+        uid=270_64 "community-groups"
+        uid=270_65 "Community & Events"
+        uid=270_66 "59"
+        uid=270_67 button "Edit Community Groups"
+        uid=270_68 button "Delete Community Groups unavailable: 59 resources still assigned" disableable disabled
+        uid=270_69 "Events & Conferences"
+        uid=270_70 "events-conferences"
+        uid=270_71 "Community & Events"
+        uid=270_72 "72"
+        uid=270_73 button "Edit Events & Conferences"
+        uid=270_74 button "Delete Events & Conferences unavailable: 72 resources still assigned" disableable disabled
+        uid=270_75 "Benchmarking & Performance Tools for Codecs"
+        uid=270_76 "benchmarking-performance-tools-for-codecs"
+        uid=270_77 "Encoding & Codecs"
+        uid=270_78 "18"
+        uid=270_79 button "Edit Benchmarking & Performance Tools for Codecs"
+        uid=270_80 button "Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" disableable disabled
+        uid=270_81 "Cloud-Based Encoding Solutions"
+        uid=270_82 "cloud-based-encoding-solutions"
+        uid=270_83 "Encoding & Codecs"
+        uid=270_84 "19"
+        uid=270_85 button "Edit Cloud-Based Encoding Solutions"
+        uid=270_86 button "Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" disableable disabled
+        uid=270_87 "Codecs"
+        uid=270_88 "codecs"
+        uid=270_89 "Encoding & Codecs"
+        uid=270_90 "69"
+        uid=270_91 button "Edit Codecs"
+        uid=270_92 button "Delete Codecs unavailable: 69 resources still assigned" disableable disabled
+        uid=270_93 "Comparative Analysis of Codecs"
+        uid=270_94 "comparative-analysis-of-codecs"
+        uid=270_95 "Encoding & Codecs"
+        uid=270_96 "19"
+        uid=270_97 button "Edit Comparative Analysis of Codecs"
+        uid=270_98 button "Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" disableable disabled
+        uid=270_99 "Containerization & Packaging Tools"
+        uid=270_100 "containerization-packaging-tools"
+        uid=270_101 "Encoding & Codecs"
+        uid=270_102 "36"
+        uid=270_103 button "Edit Containerization & Packaging Tools"
+        uid=270_104 button "Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" disableable disabled
+        uid=270_105 "Encoding Tools"
+        uid=270_106 "encoding-tools"
+        uid=270_107 "Encoding & Codecs"
+        uid=270_108 "143"
+        uid=270_109 button "Edit Encoding Tools"
+        uid=270_110 button "Delete Encoding Tools unavailable: 143 resources still assigned" disableable disabled
+        uid=270_111 "FFmpeg-Based Tools"
+        uid=270_112 "ffmpeg-based-tools"
+        uid=270_113 "Encoding & Codecs"
+        uid=270_114 "19"
+        uid=270_115 button "Edit FFmpeg-Based Tools"
+        uid=270_116 button "Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" disableable disabled
+        uid=270_117 "Hardware Accelerated Transcoding"
+        uid=270_118 "hardware-accelerated-transcoding"
+        uid=270_119 "Encoding & Codecs"
+        uid=270_120 "25"
+        uid=270_121 button "Edit Hardware Accelerated Transcoding"
+        uid=270_122 button "Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" disableable disabled
+        uid=270_123 "Hardware Codecs & Acceleration"
+        uid=270_124 "hardware-codecs-acceleration"
+        uid=270_125 "Encoding & Codecs"
+        uid=270_126 "24"
+        uid=270_127 button "Edit Hardware Codecs & Acceleration"
+        uid=270_128 button "Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" disableable disabled
+        uid=270_129 "Multi-format Packaging Tools"
+        uid=270_130 "multi-format-packaging-tools"
+        uid=270_131 "Encoding & Codecs"
+        uid=270_132 "13"
+        uid=270_133 button "Edit Multi-format Packaging Tools"
+        uid=270_134 button "Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" disableable disabled
+        uid=270_135 "Next-Generation Codecs AV1 VVC"
+        uid=270_136 "next-generation-codecs-av1-vvc"
+        uid=270_137 "Encoding & Codecs"
+        uid=270_138 "19"
+        uid=270_139 button "Edit Next-Generation Codecs AV1 VVC"
+        uid=270_140 button "Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" disableable disabled
+        uid=270_141 "Open Source Encoder Projects"
+        uid=270_142 "open-source-encoder-projects"
+        uid=270_143 "Encoding & Codecs"
+        uid=270_144 "28"
+        uid=270_145 button "Edit Open Source Encoder Projects"
+        uid=270_146 button "Delete Open Source Encoder Projects unavailable: 28 resources still assigned" disableable disabled
+        uid=270_147 "Real-Time Encoding Solutions"
+        uid=270_148 "real-time-encoding-solutions"
+        uid=270_149 "Encoding & Codecs"
+        uid=270_150 "18"
+        uid=270_151 button "Edit Real-Time Encoding Solutions"
+        uid=270_152 button "Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" disableable disabled
+        uid=270_153 "Scripting & Automation Tools"
+        uid=270_154 "scripting-automation-tools"
+        uid=270_155 "Encoding & Codecs"
+        uid=270_156 "17"
+        uid=270_157 button "Edit Scripting & Automation Tools"
+        uid=270_158 button "Delete Scripting & Automation Tools unavailable: 17 resources still assigned" disableable disabled
+        uid=270_159 "Software Codecs"
+        uid=270_160 "software-codecs"
+        uid=270_161 "Encoding & Codecs"
+        uid=270_162 "18"
+        uid=270_163 button "Edit Software Codecs"
+        uid=270_164 button "Delete Software Codecs unavailable: 18 resources still assigned" disableable disabled
+        uid=270_165 "Software Transcoding Tools"
+        uid=270_166 "software-transcoding-tools"
+        uid=270_167 "Encoding & Codecs"
+        uid=270_168 "15"
+        uid=270_169 button "Edit Software Transcoding Tools"
+        uid=270_170 button "Delete Software Transcoding Tools unavailable: 15 resources still assigned" disableable disabled
+        uid=270_171 "API Libraries & SDKs"
+        uid=270_172 "api-libraries-sdks"
+        uid=270_173 "General Tools"
+        uid=270_174 "25"
+        uid=270_175 button "Edit API Libraries & SDKs"
+        uid=270_176 button "Delete API Libraries & SDKs unavailable: 25 resources still assigned" disableable disabled
+        uid=270_177 "Build Scripts & Automation"
+        uid=270_178 "build-scripts-automation"
+        uid=270_179 "General Tools"
+        uid=270_180 "33"
+        uid=270_181 button "Edit Build Scripts & Automation"
+        uid=270_182 button "Delete Build Scripts & Automation unavailable: 33 resources still assigned" disableable disabled
+        uid=270_183 "Case Studies & Best Practices in DRM"
+        uid=270_184 "case-studies-best-practices-in-drm"
+        uid=270_185 "General Tools"
+        uid=270_186 "33"
+        uid=270_187 button "Edit Case Studies & Best Practices in DRM"
+        uid=270_188 button "Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" disableable disabled
+        uid=270_189 "Command-line Utilities & Wrappers"
+        uid=270_190 "command-line-utilities-wrappers"
+        uid=270_191 "General Tools"
+        uid=270_192 "21"
+        uid=270_193 button "Edit Command-line Utilities & Wrappers"
+        uid=270_194 button "Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" disableable disabled
+        uid=270_195 "Community & Collaboration Platforms"
+        uid=270_196 "community-collaboration-platforms"
+        uid=270_197 "General Tools"
+        uid=270_198 "19"
+        uid=270_199 button "Edit Community & Collaboration Platforms"
+        uid=270_200 button "Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" disableable disabled
+        uid=270_201 "Cross-Platform Media Tools"
+        uid=270_202 "cross-platform-media-tools"
+        uid=270_203 "General Tools"
+        uid=270_204 "23"
+        uid=270_205 button "Edit Cross-Platform Media Tools"
+        uid=270_206 button "Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" disableable disabled
+      uid=270_207 "Rows per page:"
+      uid=270_208 combobox "Items per page" expandable haspopup="listbox" value="24"
+      uid=270_209 navigation "Pagination"
+        uid=270_210 generic disableable disabled
+          uid=270_211 "Previous"
+        uid=270_212 link "Page 1, current page" url="https://awesome.video/admin#subcategories"
+          uid=270_213 "1"
+        uid=270_214 link "Go to page 2" url="https://awesome.video/admin?page=2#subcategories"
+          uid=270_215 "2"
+        uid=270_216 link "Go to page 3" url="https://awesome.video/admin?page=3#subcategories"
+          uid=270_217 "3"
+        uid=270_218 link "Go to page 4" url="https://awesome.video/admin?page=4#subcategories"
+          uid=270_219 "4"
+        uid=270_220 link "Go to page 5" url="https://awesome.video/admin?page=5#subcategories"
+          uid=270_221 "5"
+        uid=270_222 link "Next" url="https://awesome.video/admin?page=2#subcategories"
+        uid=270_224 "Page "
+        uid=270_225 "1"
+        uid=270_226 " of "
+        uid=270_227 "5"
+        uid=270_228 status atomic live="polite" relevant="additions text"

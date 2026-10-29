@@ -1,0 +1,806 @@
+# Tasks
+- [ ] C6-PC-001: Global shell — Bootstrap identity, public config and navigation
+- [ ] C6-PC-002: Header — Activate AWESOME.VIDEO brand
+- [ ] C6-PC-003: Header/drawer — Toggle sidebar; close by link, backdrop and Escape
+- [ ] C6-PC-004: Header search — Open palette by button, Ctrl/Cmd+K and `/` outside fields
+- [ ] C6-PC-005: Header primary nav — Use Browse, Submit, About, Docs and conditional Admin
+- [ ] C6-PC-006: Account menu, guest — Open Sign in, Theme Settings and Saved resources
+- [ ] C6-PC-007: Account menu, member — Open Profile, Bookmarks, Notifications, Settings, Theme, conditional Admin, Sign out
+- [ ] C6-PC-008: Sidebar navigation — Use Home and More navigation links
+- [ ] C6-PC-009: Sidebar taxonomy — Expand/collapse a category and choose All in category
+- [ ] C6-PC-010: Sidebar taxonomy — Open subcategory and nested disclosure
+- [ ] C6-PC-011: Sidebar taxonomy — Choose sub-subcategory and Uncategorized links
+- [ ] C6-PC-012: Compact rail — Collapse/expand rail; use Home, category and source icons
+- [ ] C6-PC-013: Mobile drawer — Submit search and use Home/Submit/About/Admin/More links
+- [ ] C6-PC-014: Sidebar data states — Load nav; retry nav failure; render genuine empty tree
+- [ ] C6-PC-015: Breadcrumbs — Use screen-reader breadcrumb links and resource ancestor disclosure
+- [ ] C6-PC-016: Back to top — Scroll past 600px and activate Back to top
+- [ ] C6-PC-017: Footer navigation — Use footer Home and category links
+- [ ] C6-PC-018: Footer source links — Open repository, PRs welcome, docs and Issues
+- [ ] C6-PC-019: Footer policy/contact — Open About, Terms, Privacy, Conduct, Sitemap, Cookie settings and conditional contact links
+- [ ] C6-PC-020: Analytics consent — Accept, Decline, open Privacy, dismiss with Escape, reopen settings
+- [ ] C6-PC-021: Search palette — Close via Escape, close button, Ctrl/Cmd+K and navigation
+- [ ] C6-PC-022: Empty search palette — Choose category, featured resource and page jumps
+- [ ] C6-PC-023: Search palette results — Query and choose resource, category, page or View all
+- [ ] C6-PC-024: Recent searches — Select recent query and Clear recents
+- [ ] C6-PC-025: Palette states — Trigger loading, error/Retry, offline, no results, over-limit and auxiliary failures
+- [ ] C6-PC-026: `/` Home data states — Load index/curated home and recover failures
+- [ ] C6-PC-027: Home layout — Switch Index/Curated via preference or `?layout=`
+- [ ] C6-PC-028: Home search — Submit visible catalog search with blank and nonblank queries
+- [ ] C6-PC-029: Home kind strip — Toggle Tools, Libraries, Standards, Events and Protocols
+- [ ] C6-PC-030: Home tag/sort filters — Open tag popover, search/select tags, sort, remove chips and Clear all
+- [ ] C6-PC-031: Home category index — Open category, subcategory and +N more links
+- [ ] C6-PC-032: Home resource cards — Open title/details and external Open Link
+- [ ] C6-PC-033: Home resource tags — Activate tag pill and +N more/Show fewer
+- [ ] C6-PC-034: Home rail and CTAs — Open recent/featured cards and Submit resource
+- [ ] C6-PC-035: Home account context — Use Continue setup, Not now, recommendation heading, sign-in and Browse recommendations
+- [ ] C6-PC-036: `/categories` — Change sort among A–Z, Z–A, most and fewest resources
+- [ ] C6-PC-037: `/categories` cards and states — Open category cards; retry error; render empty
+- [ ] C6-PC-038: Taxonomy navigation — Use Browse back, breadcrumbs, child tiles, siblings and parent tile
+- [ ] C6-PC-039: Taxonomy tools — Toggle Filters & view and search within collection
+- [ ] C6-PC-040: Taxonomy scope — Select child/Uncategorized and toggle Uncategorized tile
+- [ ] C6-PC-041: Taxonomy kind/sort — Change resource kind and Default/A–Z/Z–A sort
+- [ ] C6-PC-042: Taxonomy facets — Toggle provider, format, skill and tags in sidebar/sheet; search tags; Clear all
+- [ ] C6-PC-043: Taxonomy views/cards — Switch Grid/List/Compact and use title, details, external, tag and personal actions
+- [ ] C6-PC-044: Taxonomy active filters — Remove scope/search/facet chips; Clear all; accept fuzzy suggestion; remove invalid/unknown filters
+- [ ] C6-PC-045: Taxonomy pagination — Use Previous/Next, numbered links and typed page jump incl. Enter/blur
+- [ ] C6-PC-046: Taxonomy states — Exercise loading, listing/facet errors, offline, invalid filters, 404 and empty/populated results
+- [ ] C6-PC-047: `/tag/:slug` navigation — Use Back to Home and Search all resources
+- [ ] C6-PC-048: Tag related topics — Open inline related links and All related topics fragment
+- [ ] C6-PC-049: Tag resource cards — Use title/details/external, favorite, bookmark, edit and tag actions
+- [ ] C6-PC-050: Tag pagination/states — Use page links and typed jump; trigger loading, error, offline, empty and out-of-range
+- [ ] C6-PC-051: `/resource/:id` Back — Activate Back with and without in-app history
+- [ ] C6-PC-052: Resource taxonomy/tags — Open category, subcategory, sub-subcategory and tag chips
+- [ ] C6-PC-053: Resource external links — Use primary visit and Canonical URL
+- [ ] C6-PC-054: Resource Favorite — Add/remove favorite and trigger failure/auth states
+- [ ] C6-PC-055: Resource Bookmark — Save/remove; edit notes; select collections; Undo
+- [ ] C6-PC-056: Resource Share — Share through native sheet, cancellation and clipboard fallback
+- [ ] C6-PC-057: Resource Suggest Edit — Open auth wall, then edit title/URL/description/taxonomy and submit
+- [ ] C6-PC-058: Resource Report broken link — Open report, add optional note, cancel and submit
+- [ ] C6-PC-059: Resource discovery links — Open related resources, More like this, collection, tag and search links
+- [ ] C6-PC-060: Resource metadata/admin — Inspect image failure, classifications, dates and admin Edit in Admin
+- [ ] C6-PC-061: Resource states — Exercise loading, error/Retry, offline/reconnect and malformed/missing IDs
+- [ ] C6-PC-062: Route/chunk errors — Force chunk failure, offline retry, auto-reload failure and route crash
+- [ ] C6-PC-063: 404 surface — Open suggestion, Browse categories and Go home
+- [ ] C6-PC-064: Legacy/alias routes — Follow login/register/signup/auth, explore, bare resource/category/tag/journey, favorites/account, subsubcategory, iostvos and nested category aliases
+- [ ] C6-PC-065: `/collection/:shareId` — Load shared collection, open read-only cards, retry error/offline and render empty/404
+- [ ] C6-PC-066: Guest `/bookmarks` — Start empty, save resources, retry failed/offline loads and upgrade to account
+- [ ] C6-PS-001: `/search` initial state — Load with no query or sub-2-char query
+- [ ] C6-PS-002: Search input — Type, pause, press Escape, press pristine `/`
+- [ ] C6-PS-003: Search sort — Change each relevance/date/title sort option
+- [ ] C6-PS-004: Search taxonomy facets — Select category, subcategory and sub-subcategory
+- [ ] C6-PS-005: Search other facets/sheet — Toggle provider, format, skill and tags; search tags; open/close mobile Filters
+- [ ] C6-PS-006: Active filters — Remove individual chips and Clear all incl. unsupported sort
+- [ ] C6-PS-007: Search result cards — Open title, View Details, Open Link, favorite/bookmark/edit and tag pills
+- [ ] C6-PS-008: Search pagination — Use Previous/Next, numbers and typed jump
+- [ ] C6-PS-009: Empty results recovery — Use Clear filters/search, Browse categories, Advanced and popular category links
+- [ ] C6-PS-010: Fuzzy suggestion — Accept Did you mean suggestion
+- [ ] C6-PS-011: Search states — Exercise loading, offline Retry/reconnect, server error, invalid filters and over-limit query
+- [ ] C6-PS-012: `/advanced` tabs — Switch Explorer, Metrics, Export and AI Recommendations; navigate Back/Forward
+- [ ] C6-PS-013: Explorer controls — Search, sort by name/count/activity, toggle Show subcategories
+- [ ] C6-PS-014: Explorer tags — Toggle tags, Show all/fewer and Clear all
+- [ ] C6-PS-015: Explorer cards — Collapse/expand category, open category and external preview links
+- [ ] C6-PS-016: Metrics — Switch Overview/Categories and inspect values
+- [ ] C6-PS-017: Export format selection — Choose six showcase format cards and matching select
+- [ ] C6-PS-018: Export content options — Toggle descriptions, tags, categories and grouping
+- [ ] C6-PS-019: Export categories — Select All, Clear All and toggle individual categories
+- [ ] C6-PS-020: Export downloads — Download each format and repeat/double-click
+- [ ] C6-PS-021: Advanced states — Exercise loading, catalog error/Retry, offline and empty corpus
+- [ ] C6-PS-022: Advanced CTA — Use Browse All Resources and Explore Categories
+- [ ] C6-PS-023: `/journeys` filter — Filter category and Clear filter on empty
+- [ ] C6-PS-024: Journey cards — Open title and Start/Continue/Completed Review
+- [ ] C6-PS-025: Journey detail access — Use Back to Journeys and guest login link
+- [ ] C6-PS-026: Journey detail enrollment — Start from detail page
+- [ ] C6-PS-027: Journey resources — Open internal resource and external source
+- [ ] C6-PS-028: Journey progress — Mark complete, undo, complete all, and toggle offline/rapidly
+- [ ] C6-PS-029: Journey states — Exercise loading, error/Retry, offline, missing journey and zero-step content
+- [ ] C6-PS-030: `/continue-learning` guest — Use Sign in and Browse journeys as guest
+- [ ] C6-PS-031: Continue active journeys — Resume next step; handle unavailable journey
+- [ ] C6-PS-032: Continue other sections — Open recent resource, completed review and suggested journey
+- [ ] C6-PS-033: Continue states — Render no history, loading, error/Retry and offline
+- [ ] C6-PS-034: Guest `/recommendations` — Open popular resource cards and sign-in CTA
+- [ ] C6-PS-035: Recommendation preferences — Edit learning preferences and Refresh
+- [ ] C6-PS-036: Recommendation cards — Expand Why this and View resource
+- [ ] C6-PS-037: Recommendation feedback — Toggle Helpful, Not for me, Already know and Hide; Undo/Restore
+- [ ] C6-PS-038: Recommendation states — Trigger initial loading, error, offline pause, stale cache, empty and feedback-sync failure
+- [ ] C6-PS-039: `/about` maintainer/contact — Open maintainer GitHub, deletion path and configured contact
+- [ ] C6-PS-040: About sources/credits — Open awesome-video, awesome-list-site, shadcn/ui and Tailwind links
+- [ ] C6-PS-041: About FAQ — Toggle each FAQ and revisit with keyboard
+- [ ] C6-PS-042: `/terms`, `/privacy`, `/code-of-conduct` — Follow legal body links and Open cookie settings
+- [ ] C6-PS-043: `/settings/theme` — Select each design system, accent and font; retry account save
+- [ ] C6-PS-044: `/design-system` — Switch systems/accents and return to Theme Settings
+- [ ] C6-PS-045: `/settings` signed out — Use Back, Appearance and sign-in prompt; change Home layout
+- [ ] C6-PS-046: `/sign-in` and auth aliases — Complete Clerk sign-in and follow legacy login/forgot/reset/auth routes
+- [ ] C6-PS-047: `/sign-up` — Complete Clerk sign-up
+- [ ] C6-PS-048: `/sign-in?admin` — Submit empty, wrong, valid and rate-limited admin password
+- [ ] C6-PS-049: Auth unavailable/stale session — Load Clerk offline/timeout, Retry while offline, reconnect
+- [ ] C6-PS-050: `/logout` and sign-out failure — Load logout and force verification failure
+- [ ] C6-PS-051: Protected-page guards — Hard-load profile/contributions/notifications/onboarding/admin as guest and non-admin
+- [ ] C6-PS-052: Public machine/document surfaces — Fetch `/robots.txt`, `/llms.txt`, `/sitemap.xml`, OG images, security.txt and manifest
+- [ ] C6-PS-053: Developer docs — Open `/api/docs` and `/api/openapi.json`
+- [ ] C6-PS-054: Optional contact variants — Open contact from palette/footer, validate fields, cancel and submit; use email/issues/discussions
+- [ ] C6-PS-055: Public read API — Call `/api/public/resources`, `/api/public/resources/:id`, `/api/public/categories`, `/api/public/tags`, `/api/public/me`
+- [ ] C6-PS-056: General health/version — Read `/api/version`, `/api/health`, `/api/health/live`, `/api/health/ready`, `/api/health/ai`
+- [ ] C6-PS-057: **C5-UNVERIFIED: Reduced motion** — Re-drive all secondary pages with reduced motion
+- [ ] C6-PS-058: **C5-UNVERIFIED: Full keyboard walk** — Tab and activate through every secondary page and dialog
+- [ ] C6-PS-059: **C5-UNVERIFIED: Target sweeps at 820 and 1440 for every page** — Measure every visible interactive element on secondary pages
+- [ ] C6-PS-060: **C5-UNVERIFIED: `/advanced` Metrics and Export downloads** — Open Metrics then execute all export downloads
+- [ ] C6-PS-061: **C5-UNVERIFIED: PS-14 re-measure** — Re-measure Clerk Use phone on `/sign-in`
+- [ ] C6-PS-062: **C5-UNVERIFIED: Sitemap and robots sample** — Compare sitemap URLs and robots rules with live pages
+- [ ] C6-PS-063: **C5-UNVERIFIED: Footer `PRs welcome` link (73×24, inline)** — Measure and rule on the inline link
+- [ ] C6-AX-001: Global semantics — Use skip link and inspect landmarks/headings
+- [ ] C6-AX-002: First load, no fragment — Load each page without hash
+- [ ] C6-AX-003: Fragment navigation — Open direct fragment and keyboard-activate same-page fragment
+- [ ] C6-AX-004: Browser history — Follow fragment → another page → Back, then Forward
+- [ ] C6-AX-005: Drawer/rail keyboard — Open drawer, traverse controls, close backdrop/Escape; collapse/expand rail
+- [ ] C6-AX-006: Dialogs and filter sheet — Open, toggle values, use Escape/Done and destructive cancel dialogs
+- [ ] C6-AX-007: Resource cards — Perform full Tab-key walk of grid/list/compact cards
+- [ ] C6-AX-008: Theme and preference radios — Use arrows/Home/End on system, accent, font, home layout and learning preferences
+- [ ] C6-AX-009: Settings keyboard walks — Walk full settings and notification preferences at desktop and touch widths
+- [ ] C6-AX-010: Target sizes — Measure visible controls across public, member and admin surfaces
+- [ ] C6-AX-011: Contrast — Render all accents and both design systems on core page types
+- [ ] C6-AX-012: Reduced motion — Enable reduced motion and use cards, tabs, pagination, smooth anchors and disclosures
+- [ ] C6-AX-013: Offline/reconnect — Go offline on each page type, Retry while offline, then reconnect
+- [ ] C6-AX-014: Error auto-recovery — Measure app ErrorPage automatic network recovery timing
+- [ ] C6-AX-015: Loading/empty semantics — Compare skeleton, loading, empty and unavailable regions with screen reader
+- [ ] C6-AX-016: Live feedback — Trigger favorite, bookmark, recommendation, validation and save toasts
+- [ ] C6-AX-017: Screen-reader speech — Drive representative pages with an actual screen reader
+- [ ] C6-AX-018: Real input modality — Repeat critical touch flows on real coarse pointer rather than emulation
+- [ ] C6-AX-019: Accessible names/states — Inspect repeated cards, tabs, progress bars, switches, tables and disclosure controls
+- [ ] C6-MB-001: Sign-in/guest merge — Sign in with on-device saves, duplicates, missing and failing resources
+- [ ] C6-MB-002: `/profile` tabs — Switch Overview, Favorites, Bookmarks, Submissions, Security and Back/Forward
+- [ ] C6-MB-003: Profile display name — Open editor, submit empty/invisible/valid names, cancel and save
+- [ ] C6-MB-004: Profile session controls — Open Settings, Sign out and Sign out all devices with confirm/cancel
+- [ ] C6-MB-005: Profile overview — Inspect progress, streak, current path and estimated time
+- [ ] C6-MB-006: Continue preview — Open dashboard, Resume, open recent or Explore journeys
+- [ ] C6-MB-007: Profile recommendations — Refresh, open cards and feedback, open hidden restore
+- [ ] C6-MB-008: Favorites tab — Add/remove favorite, open title/external and recover empty/error
+- [ ] C6-MB-009: Profile bookmarks tab — Remove/edit notes, open title/external and recover empty/error
+- [ ] C6-MB-010: Submissions summary — Open contribution dashboard
+- [ ] C6-MB-011: Account security — Open Manage account security
+- [ ] C6-MB-012: API keys create/reveal — Name key, choose expiry, create, copy and dismiss secret
+- [ ] C6-MB-013: API keys list/revoke — Inspect empty/populated/expired keys, cancel/confirm revoke and handle error
+- [ ] C6-MB-014: Account deletion — Open/cancel/confirm deletion request and handle failure
+- [ ] C6-MB-015: Deletion withdrawal — Withdraw pending request
+- [ ] C6-MB-016: `/bookmarks` summary — Use Active, Saved, Watch next, In progress, Done and Archived cards
+- [ ] C6-MB-017: Collection filtering — Use All saved, individual collection and mobile Collection select
+- [ ] C6-MB-018: Collection create/rename — Create, rename, submit blank and cancel
+- [ ] C6-MB-019: Collection reorder — Move collections up/down including edges
+- [ ] C6-MB-020: Collection archive/restore — Archive and restore selected collection
+- [ ] C6-MB-021: Collection sharing — Publish link, copy link and unpublish
+- [ ] C6-MB-022: Collection deletion — Open/cancel/confirm delete
+- [ ] C6-MB-023: Library filters — Change Queue status, Visibility and Sort
+- [ ] C6-MB-024: Bookmark selection — Select all shown and individual cards; clear selection
+- [ ] C6-MB-025: Bulk queue status — Choose status and Apply
+- [ ] C6-MB-026: Bulk Move to collection — Choose destination and Move
+- [ ] C6-MB-027: Bulk personal tags — Add and Remove same tag
+- [ ] C6-MB-028: Bulk archive/restore — Archive active selections and restore archived selections
+- [ ] C6-MB-029: Bookmark notes — Open Note, edit ≤500 chars, save and cancel
+- [ ] C6-MB-030: Bookmark card actions — Change queue status, archive/restore, and use resource title/details/external/favorite/bookmark
+- [ ] C6-MB-031: Library states — Exercise loading, error/Retry, offline, empty library, empty collection and no matches
+- [ ] C6-MB-032: Guest-to-member library — Reach cap, go offline, then sign in and inspect merged library
+- [ ] C6-MB-033: Journey listing enrollment — Start fresh journey from listing
+- [ ] C6-MB-034: Journey detail enrollment — Start fresh journey from detail
+- [ ] C6-MB-035: Journey completion state — Complete all steps and undo every step
+- [ ] C6-MB-036: Continue-learning flows — Resume, open recent and suggested content
+- [ ] C6-MB-037: Helpful feedback — Select/deselect Helpful and trigger save failure
+- [ ] C6-MB-038: Not for me / Already know — Apply both states, reload and inspect recovery
+- [ ] C6-MB-039: Hide feedback — Hide, Undo immediately and Restore later
+- [ ] C6-MB-040: Recommendation preferences — Edit preferences and refresh results
+- [ ] C6-MB-041: `/contributions` filters — Search, filter type/status, and sort
+- [ ] C6-MB-042: Contribution cards — Expand edit changes, open submitted URL/public resource, inspect rejected/superseded states
+- [ ] C6-MB-043: Contribution withdrawal — Open/cancel/confirm withdraw and handle 409
+- [ ] C6-MB-044: Contribution states — Use pagination and render loading, error, offline, no contributions and no matches
+- [ ] C6-MB-045: `/submit` form fields — Edit title, URL, description, category, subcategory, sub-subcategory and tags
+- [ ] C6-MB-046: Submit URL checks — Enter duplicate, reserved, malformed and server-rejected URLs
+- [ ] C6-MB-047: Submit draft/cancel — Restore draft, edit across tabs, Cancel and confirm/keep editing
+- [ ] C6-MB-048: Submit success — Submit valid resource and open contributions
+- [ ] C6-MB-049: Submit auth states — Load while auth pending/failing/signed out and retry auth
+- [ ] C6-MB-050: Populated notification inbox — Open each notification kind and Mark read
+- [ ] C6-MB-051: Inbox bulk/states — Mark all read and exercise empty, loading, error/offline and mutation failure
+- [ ] C6-MB-052: Notification preferences — Toggle Email digest/In-app and three sections; change cadence/timezone
+- [ ] C6-MB-053: Pause/resume notifications — Pause for 7 days and Resume now
+- [ ] C6-MB-054: Unsubscribe all — Disable both channels in one quick action
+- [ ] C6-MB-055: Save choices — Save valid changes and trigger server failure
+- [ ] C6-MB-056: Digest preview — Open preview links and render loading/error/empty
+- [ ] C6-MB-057: Digest unsubscribe link — GET token page then POST confirmation; revisit used/invalid link
+- [ ] C6-MB-058: `/settings` hub — Open Appearance, Account, Security, Bookmarks and Recommendations
+- [ ] C6-MB-059: Home layout preference — Select Index/Curated as member and guest
+- [ ] C6-MB-060: Learning preferences fields — Change skill, topics, goals, formats and time
+- [ ] C6-MB-061: Save learning preferences — Save complete profile
+- [ ] C6-MB-062: Reset learning preferences — Cancel/confirm reset and handle failure
+- [ ] C6-MB-063: Learning states — Render loading, load error, no saved preferences and editor
+- [ ] C6-MB-064: Theme account writes — Change system and accent as member, force conflict/offline and retry
+- [ ] C6-MB-065: Font override — Choose every font and system default, reload and switch tabs
+- [ ] C6-MB-066: Onboarding step 1 — Choose Beginner, Intermediate or Advanced and Continue
+- [ ] C6-MB-067: Onboarding step 2 — Toggle topics, attempt zero and choose valid topics
+- [ ] C6-MB-068: Onboarding step 3 — Toggle goals, attempt zero and choose valid goals
+- [ ] C6-MB-069: Onboarding step 4 — Toggle formats, attempt zero and choose valid formats
+- [ ] C6-MB-070: Onboarding step 5 — Select time commitment and Save preferences
+- [ ] C6-MB-071: Onboarding navigation/draft — Continue, Back, browser Back/Forward and reload mid-flow
+- [ ] C6-MB-072: Onboarding skip/completion — Save and browse later, revisit completed onboarding and complete again
+- [ ] C6-MB-073: Onboarding states — Trigger preference/category load failure and save failure
+- [ ] C6-MB-074: Public API key consumption — Use created key against public API and docs
+- [ ] C6-MB-075: **C5-UNVERIFIED: Offline handling** — Take member queries and each mutation offline, then reconnect
+- [ ] C6-MB-076: **C5-UNVERIFIED: Reduced motion** — Use all member surfaces with reduced motion
+- [ ] C6-MB-077: **C5-UNVERIFIED: Touch was checked by emulation only** — Repeat member controls on real touch input
+- [ ] C6-MB-078: **C5-UNVERIFIED: Keyboard walk at 820/390** — Walk every settings and member page at touch widths
+- [ ] C6-MB-079: **C5-UNVERIFIED: Clerk member session out of reach** — Exercise actual non-owner Clerk member auth and return
+- [ ] C6-MB-080: **C5-UNVERIFIED: #82 tag-card actions not re-driven** — Re-drive every action on `/tag/hls` cards at touch widths
+- [ ] C6-MB-081: Member API aliases/compatibility — Exercise canonical and legacy contribution/bookmark/recommendation routes used by older surfaces
+- [ ] SH-01: Global desktop header — Activate `Admin`
+- [ ] SH-02: Global sidebar — Activate `Admin`
+- [ ] SH-03: Account menu — Open menu, then activate `Admin`
+- [ ] SH-04: Account menu / owner session — Activate `Sign out`
+- [ ] SH-05: `/sign-in?admin` — Submit correct owner password
+- [ ] SH-06: `/sign-in?admin` — Submit incorrect password
+- [ ] SH-07: `/sign-in?admin` — Submit after rate limit is reached
+- [ ] SH-08: `/sign-in?admin` — Submit while offline
+- [ ] SH-09: `/admin` guard — Load while `GET /api/auth/user` is pending
+- [ ] SH-10: `/admin` signed out — Activate `Sign in to continue →`
+- [ ] SH-11: `/admin` signed-in non-admin — Activate `Back to home →`
+- [ ] SH-12: `/admin` expired session — Activate `Sign in to continue →` after a protected 401
+- [ ] SH-13: `/admin` initial stats — Open with `GET /api/admin/stats` pending
+- [ ] SH-14: `/admin` initial stats failure — Activate dashboard `Retry`
+- [ ] SH-15: `/admin/<unknown>` — Open an unknown admin section
+- [ ] SH-16: `/admin/:section`, hash, aliases — Open every canonical section and aliases `link-health`, `sub-subcategories`, `sub-subcats`, `github-sync`
+- [ ] SH-17: `/admin#<tab>` and `?tab=` — Change hash/query, then use Back/Forward
+- [ ] SH-18: Admin tab strip overflow — Activate `Scroll tabs left`
+- [ ] SH-19: Admin tab strip overflow — Activate `Scroll tabs right`
+- [ ] SH-20: Admin tab strip — Use arrow keys, Enter, and Space
+- [ ] SH-21: Strip `Overview` — Activate tab
+- [ ] SH-22: Strip `Approvals` — Activate tab
+- [ ] SH-23: Strip `Edits` — Activate tab
+- [ ] SH-24: Strip `Enrichment` — Activate tab
+- [ ] SH-25: Strip `Researcher` — Activate tab
+- [ ] SH-26: Strip `Export` — Activate tab
+- [ ] SH-27: Strip `Database` — Activate tab
+- [ ] SH-28: Strip `Resources` — Activate tab
+- [ ] SH-29: Strip `Categories` — Activate tab
+- [ ] SH-30: Strip `Subcategories` — Activate tab, including return from Sub-Subcats
+- [ ] SH-31: Strip `Users` — Activate tab
+- [ ] SH-32: Strip `GitHub` — Activate tab
+- [ ] SH-33: Strip `Link Health` — Activate tab
+- [ ] SH-34: Strip `Audit` — Activate tab
+- [ ] SH-35: Strip `Research` — Activate tab
+- [ ] SH-36: Masthead `Settings` — Open/close the Settings menu
+- [ ] SH-37: Settings menu — Activate `Theme settings`
+- [ ] SH-38: Settings menu, pending count > 0 — Activate `Pending approvals`
+- [ ] SH-39: Settings menu, rejected count > 0 — Activate `Rejected resources`
+- [ ] SH-40: Settings menu — Activate `Sub-Subcats`
+- [ ] SH-41: Settings menu — Activate `Journeys`
+- [ ] SH-42: Settings menu — Activate `Digests`
+- [ ] SH-43: Masthead `New entry` — Activate twice, including while Resources is already open
+- [ ] SH-44: Entire admin shell — Sweep auth, tab, menu, focus, scroll, and motion states at real coarse pointer
+- [ ] OV-01: `/admin#overview` Resources card — Activate card or its keyboard equivalent
+- [ ] OV-02: Overview Subcategories card — Activate card
+- [ ] OV-03: Overview Active users card — Activate card
+- [ ] OV-04: Overview Pending approvals card — Activate card
+- [ ] OV-05: Overview metric strip — Trigger partial source failure, then `Retry`
+- [ ] OV-06: Overview Recent activity — Load activity
+- [ ] OV-07: Overview Recent activity — Activate `Retry` after failure
+- [ ] OV-08: Overview Recent activity — Load with no audit rows
+- [ ] OV-09: Overview Recent activity — Inspect populated six-row feed
+- [ ] OV-10: Overview System health — Inspect all populated health rows
+- [ ] OV-11: Overview System health — Trigger one and all health-source failures, then `Retry`
+- [ ] OV-12: Overview Top categories — Load categories
+- [ ] OV-13: Overview Top categories — Activate `Retry` after failure
+- [ ] OV-14: Overview Top categories — Load with no approved-resource categories
+- [ ] OV-15: Overview Top categories — Inspect top-five populated ranking
+- [ ] AP-01: `/admin#approvals` — Load queue
+- [ ] AP-02: Approvals queue — Activate `Retry` after a failed load
+- [ ] AP-03: Approvals queue offline — Activate `Retry`
+- [ ] AP-04: Approvals empty queue — Activate `Check again`, including offline
+- [ ] AP-05: Approvals populated queue — Inspect table and poll update
+- [ ] AP-06: Approvals table header — Toggle `Select all pending resources`
+- [ ] AP-07: Approvals row — Toggle row checkbox
+- [ ] AP-08: Approvals toolbar — Open `Bulk reject (N)`
+- [ ] AP-09: Bulk-reject dialog — Enter short and valid rejection reasons
+- [ ] AP-10: Bulk-reject dialog — Cancel via button, X, or Escape
+- [ ] AP-11: Bulk-reject confirmation — Confirm selected rejection
+- [ ] AP-12: Approvals toolbar — Open `Approve selected (N)` or `Approve all`
+- [ ] AP-13: Bulk-approve dialog — Cancel
+- [ ] AP-14: Bulk-approve confirmation — Confirm approval
+- [ ] AP-15: Approvals bulk outcome — Inspect success and partial-failure result banner
+- [ ] AP-16: Approvals row title — Open external URL icon
+- [ ] AP-17: Approvals row — Open `Review`
+- [ ] AP-18: Resource Details — Activate valid URL
+- [ ] AP-19: Resource Details — Inspect malformed URL and missing description states
+- [ ] AP-20: Resource Details — Activate `Close`, X, or Escape
+- [ ] AP-21: Approvals row — Open `Approve`, then cancel
+- [ ] AP-22: Approvals row approve confirmation — Confirm approval
+- [ ] AP-23: Approvals row — Open `Reject`, edit reason, then cancel
+- [ ] AP-24: Approvals row reject confirmation — Confirm rejection
+- [ ] AP-25: Approvals table — Swipe and keyboard-scroll horizontally at narrow widths
+- [ ] ED-01: `/admin#edits` — Load edit queue
+- [ ] ED-02: Edit queue — Activate `Retry` after failure
+- [ ] ED-03: Edit queue offline — Activate `Retry`
+- [ ] ED-04: Edit queue empty — Activate `Check again`, including offline
+- [ ] ED-05: Edit queue populated — Inspect pending rows and polling
+- [ ] ED-06: Edit row resource title — Activate internal resource link
+- [ ] ED-07: Edit row external-link icon — Activate external resource URL
+- [ ] ED-08: Edit row — Open `Diff`
+- [ ] ED-09: Edit Details conflict state — Inspect conflict detected after resource changed
+- [ ] ED-10: Edit Details — Activate resource URL
+- [ ] ED-11: Edit Details — Activate `Close`, X, or Escape
+- [ ] ED-12: Edit row — Open ordinary `Approve`
+- [ ] ED-13: Edit row conflict — Open `Approve` on conflicted suggestion
+- [ ] ED-14: Approve Edit dialog — Cancel
+- [ ] ED-15: Approve Edit confirmation — Confirm `Approve & Merge`
+- [ ] ED-16: Approve Edit dialog — Inspect failed approval state
+- [ ] ED-17: Edit row — Open `Reject`
+- [ ] ED-18: Reject Edit dialog — Enter short and valid reasons
+- [ ] ED-19: Reject Edit dialog — Cancel
+- [ ] ED-20: Reject Edit confirmation — Confirm rejection
+- [ ] ED-21: Reject Edit dialog — Inspect failed rejection state
+- [ ] ED-22: Edit table — Swipe and keyboard-scroll horizontally
+- [ ] RM-01: `/admin#resources` — Initial load
+- [ ] RM-02: Resources table — Activate `Retry` after load failure
+- [ ] RM-03: Resources offline — Request another page, then use `Stay on page N` or `Retry`
+- [ ] RM-04: Resources empty catalog — Load with zero total
+- [ ] RM-05: Resources filtered-empty — Activate inline `Clear filters`
+- [ ] RM-06: Resources populated table — Inspect rows, counts, tags, status, and horizontal overflow
+- [ ] RM-07: Resources header — Type in `Search…`
+- [ ] RM-08: Resources header — Toggle `Show/Hide filters and tools`
+- [ ] RM-09: Resource filters — Type in `Search by title or URL...`
+- [ ] RM-10: Resource filters — Choose each category including `All Categories`
+- [ ] RM-11: Resource filters — Choose Approved/Pending/Rejected/Withdrawn/All Status
+- [ ] RM-12: Resource sort — Choose `Newest first`
+- [ ] RM-13: Resource sort — Choose `Oldest first`
+- [ ] RM-14: Resource sort — Choose `Title A–Z`
+- [ ] RM-15: Resource sort — Choose `Title Z–A`
+- [ ] RM-16: Resource filters — Toggle `★ Featured only`
+- [ ] RM-17: Resource filters — Activate Search submit button or Enter
+- [ ] RM-18: Resource filters — Activate `Clear filters` icon
+- [ ] RM-19: Resources header checkbox — Toggle `Select all resources on this page`
+- [ ] RM-20: Resource row — Toggle row checkbox
+- [ ] RM-21: Resource selection bar — Activate `Clear Selection`
+- [ ] RM-22: Resource selection bar — Open bulk `Approve`
+- [ ] RM-23: Bulk Approve dialog — Cancel
+- [ ] RM-24: Bulk Approve confirmation — Confirm approval
+- [ ] RM-25: Resource selection bar — Open bulk `Reject`
+- [ ] RM-26: Bulk Reject dialog — Enter short and valid reasons
+- [ ] RM-27: Bulk Reject dialog — Cancel
+- [ ] RM-28: Bulk Reject confirmation — Confirm rejection
+- [ ] RM-29: Resource selection bar — Open bulk `Delete`
+- [ ] RM-30: Bulk Delete dialog — Cancel
+- [ ] RM-31: Bulk Delete confirmation — Confirm deletion
+- [ ] RM-32: Resource row Featured cell — Toggle star on a QA row and induce failure
+- [ ] RM-33: Resource row — Activate `View`
+- [ ] RM-34: Resource row — Activate `Edit`
+- [ ] RM-35: Resource row — Activate `Delete`
+- [ ] RM-36: Delete Resource dialog — Cancel
+- [ ] RM-37: Delete Resource confirmation — Delete the auditor's own QA row by ID
+- [ ] RM-38: Delete Resource confirmation — Delete a pre-existing production resource
+- [ ] RM-39: Resources pagination — Choose 25, 50, and 100 rows per page
+- [ ] RM-40: Resources paginator — Use Previous, Next, and numbered page links
+- [ ] RM-41: Resources page-number input — Type a page and press Enter
+- [ ] RM-42: Resources page-number input — Commit on blur; try invalid and out-of-range values
+- [ ] RM-43: Resources deep links — Open `?create=1`, `?resourceId=N`, `?status=rejected`, and `?page=N`, then reload
+- [ ] RM-44: Edit Resource — Change `Title *`
+- [ ] RM-45: Edit Resource — Change `URL *`, including duplicate URL
+- [ ] RM-46: Edit Resource — Change `Description`
+- [ ] RM-47: Edit Resource — Change `Category`
+- [ ] RM-48: Edit Resource — Change `Status` among Approved/Pending/Rejected
+- [ ] RM-49: Edit Resource, rejected status — Edit `Rejection reason *`
+- [ ] RM-50: Edit Resource — Change `Subcategory`
+- [ ] RM-51: Edit Resource — Change `Sub-subcategory`
+- [ ] RM-52: Edit Resource — Change `Kind override`, including Automatic
+- [ ] RM-53: Edit Resource — Toggle `Curated placement`
+- [ ] RM-54: Edit Resource — Change `Format`
+- [ ] RM-55: Edit Resource — Change `Provider`
+- [ ] RM-56: Edit Resource — Change `Skill level`
+- [ ] RM-57: Edit Resource footer — Activate `Save Changes` on a QA row
+- [ ] RM-58: Edit Resource footer — Activate `Cancel`
+- [ ] RM-59: Add Resource — Edit `Title *`
+- [ ] RM-60: Add Resource — Edit `URL *`, including duplicate URL
+- [ ] RM-61: Add Resource — Edit `Description`
+- [ ] RM-62: Add Resource — Choose required `Category *`
+- [ ] RM-63: Add Resource — Choose `Status`
+- [ ] RM-64: Add Resource — Choose `Subcategory`
+- [ ] RM-65: Add Resource — Choose `Sub-subcategory`
+- [ ] RM-66: Add Resource — Choose `Kind override`
+- [ ] RM-67: Add Resource — Toggle `Feature this resource`
+- [ ] RM-68: Add Resource — Choose `Format`
+- [ ] RM-69: Add Resource — Choose `Provider`
+- [ ] RM-70: Add Resource — Choose `Skill level`
+- [ ] RM-71: Add Resource footer — Activate `Create Resource` with `[QA-audit-1026]` title
+- [ ] RM-72: Add Resource footer — Activate `Cancel`
+- [ ] RM-73: Create/Edit Resource — Exercise client validation, pending, and server-failure states
+- [ ] RM-74: Edit Resource footer — Activate `Save Changes` on a pre-existing production resource
+- [ ] CAT-01: `/admin#categories` — Load category list
+- [ ] CAT-02: Categories — Activate `Retry` after list failure
+- [ ] CAT-03: Categories — Search with no matches
+- [ ] CAT-04: Categories — Inspect populated rows
+- [ ] CAT-05: Categories header — Toggle `Search`/`Hide search`
+- [ ] CAT-06: Categories search — Type name/slug query
+- [ ] CAT-07: Categories search — Activate `Clear search`
+- [ ] CAT-08: Categories header — Open `Add category`
+- [ ] CAT-09: Create Category — Edit `Name *`
+- [ ] CAT-10: Create Category — Edit `Slug *` after auto-generation
+- [ ] CAT-11: Create Category footer — Submit with `[QA-audit-1026]` name
+- [ ] CAT-12: Create Category footer — Cancel
+- [ ] CAT-13: Create Category — Submit empty name and duplicate slug
+- [ ] CAT-14: Category row — Activate `Edit`
+- [ ] CAT-15: Edit Category — Change `Name *`
+- [ ] CAT-16: Edit Category — Change `Slug *`
+- [ ] CAT-17: Edit Category footer — Save a QA category
+- [ ] CAT-18: Edit Category footer — Cancel
+- [ ] CAT-19: Edit Category — Submit empty name or duplicate slug
+- [ ] CAT-20: Category row delete flow — Open, cancel, then delete own empty QA category
+- [ ] CAT-21: Category row delete confirmation — Delete a pre-existing category
+- [ ] CAT-22: Categories pagination — Change rows per page and use numbered/Previous/Next/jump controls
+- [ ] CAT-23: Edit Category footer — Save a pre-existing category
+- [ ] SC-01: `/admin#subcategories` — Load subcategories
+- [ ] SC-02: Subcategories — Activate `Retry` after list failure
+- [ ] SC-03: Subcategories — Search with no matches
+- [ ] SC-04: Subcategories — Inspect populated rows
+- [ ] SC-05: Subcategories header — Toggle `Search`/`Hide search`
+- [ ] SC-06: Subcategories search — Type name/slug query
+- [ ] SC-07: Subcategories search — Activate `Clear search`
+- [ ] SC-08: Subcategories header — Open `Add subcategory`
+- [ ] SC-09: Create Subcategory — Choose `Parent Category *`
+- [ ] SC-10: Create Subcategory — Edit `Name *`
+- [ ] SC-11: Create Subcategory — Edit `Slug *`
+- [ ] SC-12: Create Subcategory footer — Submit with `[QA-audit-1026]` name
+- [ ] SC-13: Create Subcategory footer — Cancel
+- [ ] SC-14: Create Subcategory — Submit missing parent/name or duplicate slug
+- [ ] SC-15: Subcategory row — Activate `Edit`
+- [ ] SC-16: Edit Subcategory — Change `Name *`
+- [ ] SC-17: Edit Subcategory — Change `Slug *`
+- [ ] SC-18: Edit Subcategory — Change `Parent Category *`
+- [ ] SC-19: Edit Subcategory footer — Save a QA subcategory
+- [ ] SC-20: Edit Subcategory footer — Cancel
+- [ ] SC-21: Edit Subcategory — Submit invalid fields or duplicate slug
+- [ ] SC-22: Subcategory row delete flow — Open, cancel, then delete own empty QA subcategory
+- [ ] SC-23: Subcategory row delete confirmation — Delete a pre-existing subcategory
+- [ ] SC-24: Subcategories pagination and parent errors — Use 24-row page control/paginator; activate parent-load `Retry`
+- [ ] SC-25: Edit Subcategory footer — Save a pre-existing subcategory
+- [ ] SSC-01: `/admin/subsubcategories` or Settings → Sub-Subcats — Load list
+- [ ] SSC-02: Sub-Subcategories — Activate `Retry` after list failure
+- [ ] SSC-03: Sub-Subcategories — Search with no matches
+- [ ] SSC-04: Sub-Subcategories — Inspect populated rows
+- [ ] SSC-05: Sub-Subcategories header — Toggle `Search`/`Hide search`
+- [ ] SSC-06: Sub-Subcategories search — Type name/slug query
+- [ ] SSC-07: Sub-Subcategories search — Activate `Clear search`
+- [ ] SSC-08: Sub-Subcategories header — Open `Add sub-subcategory`
+- [ ] SSC-09: Create Sub-Subcategory — Choose `Parent Category *`
+- [ ] SSC-10: Create Sub-Subcategory — Choose `Parent Subcategory *`
+- [ ] SSC-11: Create Sub-Subcategory — Edit `Name *`
+- [ ] SSC-12: Create Sub-Subcategory — Edit `Slug *`
+- [ ] SSC-13: Create Sub-Subcategory footer — Submit with `[QA-audit-1026]` name
+- [ ] SSC-14: Create Sub-Subcategory footer — Cancel
+- [ ] SSC-15: Create Sub-Subcategory — Submit missing parents/name or duplicate slug
+- [ ] SSC-16: Sub-Subcategory row — Activate `Edit`
+- [ ] SSC-17: Edit Sub-Subcategory — Change `Name *`
+- [ ] SSC-18: Edit Sub-Subcategory — Change `Slug *`
+- [ ] SSC-19: Edit Sub-Subcategory — Change parent Category, then parent Subcategory
+- [ ] SSC-20: Edit Sub-Subcategory footer — Save a QA row
+- [ ] SSC-21: Edit Sub-Subcategory footer — Cancel
+- [ ] SSC-22: Edit Sub-Subcategory — Submit invalid fields or duplicate slug
+- [ ] SSC-23: Sub-Subcategory row delete flow — Open, cancel, then delete own empty QA row
+- [ ] SSC-24: Sub-Subcategory row delete confirmation — Delete a pre-existing row
+- [ ] SSC-25: Sub-Subcategories pagination and parent errors — Change page size/use paginator; activate parent-load `Retry`
+- [ ] SSC-26: Edit Sub-Subcategory footer — Save a pre-existing row
+- [ ] JN-01: `/admin/journeys` — Load journeys
+- [ ] JN-02: Journeys list — Activate `Retry` after failure
+- [ ] JN-03: Journeys list — Load with no journeys
+- [ ] JN-04: Journeys list — Inspect populated journeys
+- [ ] JN-05: Journey row — Activate `Steps`
+- [ ] JN-06: Journey Steps dialog — Load steps
+- [ ] JN-07: Journey Steps dialog — Activate `Retry` after request failure
+- [ ] JN-08: Journey Steps dialog offline — Activate `Retry`
+- [ ] JN-09: Journey Steps dialog — Open journey with zero steps
+- [ ] JN-10: Journey Steps dialog — Inspect populated grouped steps
+- [ ] JN-11: Journey Steps dialog — Open `Add step`
+- [ ] JN-12: Step editor — Edit `Title *`, including blank
+- [ ] JN-13: Step editor — Edit `Description`
+- [ ] JN-14: Step editor resource picker — Toggle `Pick resource`/`Change`/`Close picker`
+- [ ] JN-15: Resource picker — Type a title search
+- [ ] JN-16: Resource picker results — Choose a resource
+- [ ] JN-17: Resource picker selected badge — Activate `Clear resource`
+- [ ] JN-18: Resource picker — Exercise no-results, error, offline, and `Retry`
+- [ ] JN-19: Step editor — Toggle `Mark this step as optional`
+- [ ] JN-20: Add Step footer — Confirm `Add step` on a real journey
+- [ ] JN-21: Step editor footer — Cancel Add/Edit
+- [ ] JN-22: Journey step — Activate `Move … up`
+- [ ] JN-23: Journey step — Activate `Move … down`
+- [ ] JN-24: Linked journey resource — Activate resource link
+- [ ] JN-25: Multi-resource step — Open remove-resource, cancel, or confirm removal
+- [ ] JN-26: Journey step — Open `Edit`, change fields, and save
+- [ ] JN-27: Journey step — Open `Delete`, cancel, or confirm
+- [ ] JN-28: Journey step mutations — Inspect failure copy on a non-production fixture
+- [ ] JN-29: Journey manager and step dialogs — Complete keyboard, 44px-target, focus-return, and reduced-motion sweep
+- [ ] EN-01: `/admin#enrichment` stats — Inspect Last enriched, Queue, and Avg cost
+- [ ] EN-02: Enrichment jobs — Initial load
+- [ ] EN-03: Enrichment jobs — Activate `Retry` after list failure
+- [ ] EN-04: Enrichment jobs — Load with no jobs
+- [ ] EN-05: Enrichment jobs — Inspect populated table
+- [ ] EN-06: Enrichment `Job controls & monitoring` — Expand/collapse details
+- [ ] EN-07: Enrichment jobs — Toggle `Show all N jobs`/`Show fewer`
+- [ ] EN-08: Enrichment Run job controls — Open Run job from header or Job Control
+- [ ] EN-09: Job Control — Choose `All Resources` or `Unenriched Only`
+- [ ] EN-10: Job Control — Enter batch size 1–50
+- [ ] EN-11: Job Control — Enter blank, fractional, 0, negative, or >50 batch size
+- [ ] EN-12: Job Control — Toggle advanced enrichment settings
+- [ ] EN-13: Advanced enrichment — Edit `Model`
+- [ ] EN-14: Advanced enrichment — Edit `Base URL`
+- [ ] EN-15: Advanced enrichment — Edit `Auth Token`
+- [ ] EN-16: Start Enrichment confirmation — Cancel
+- [ ] EN-17: Start Enrichment confirmation — Confirm `Start enrichment`
+- [ ] EN-18: Start Enrichment confirmation — Open with zero resources matching filter
+- [ ] EN-19: Enrichment launch guards — Inspect active job, loading jobs, and failed jobs states
+- [ ] EN-20: Start Enrichment confirmation — Inspect failed start on non-production
+- [ ] EN-21: Enrichment active job — Observe pending/processing progress
+- [ ] EN-22: Active enrichment job — Open `Cancel`
+- [ ] EN-23: Cancel Enrichment dialog — Choose `Keep running`
+- [ ] EN-24: Cancel Enrichment confirmation — Confirm cancellation
+- [ ] EN-25: Cancel Enrichment dialog — Inspect cancellation failure on non-production
+- [ ] EN-26: Enrichment job row — Open `Logs`
+- [ ] EN-27: Enrichment Job Details — Load selected job
+- [ ] EN-28: Enrichment Job Details — Activate `Retry` after detail failure
+- [ ] EN-29: Enrichment Job Details — Inspect populated configuration/statistics/resources/errors and close
+- [ ] EN-30: Job Details Agent Graph and Agent Events — Inspect loading, waiting, empty, populated, and failed states
+- [ ] EN-31: Agent Events — Expand/collapse a structured event and navigate by keyboard
+- [ ] RS-01: `/admin#researcher` Brief step — Choose `Auto-generate at launch`
+- [ ] RS-02: Researcher Brief step — Choose `Write my own`
+- [ ] RS-03: Custom brief — Activate `Start from a generated brief`
+- [ ] RS-04: Custom brief — Edit `Research brief`
+- [ ] RS-05: Researcher Focus step — Choose category or `All categories`
+- [x] RS-06: Researcher Limits — Edit `Stop after (discoveries)`
+- [x] RS-07: Researcher Limits — Edit `Budget cap (USD)`
+- [x] RS-08: Researcher Limits — Edit `Max turns`
+- [x] RS-09: Researcher Endpoint & model — Toggle advanced settings
+- [x] RS-10: Advanced researcher — Edit `Orchestrator model`
+- [ ] RS-11: Advanced researcher — Edit `Scout model`
+- [ ] RS-12: Advanced researcher — Edit `Base URL`
+- [ ] RS-13: Advanced researcher — Edit `Auth token`
+- [ ] RS-14: Advanced researcher plain HTTP — Toggle insecure-transport acknowledgement
+- [x] RS-15: Researcher config preview — Change overrides and observe resolution
+- [ ] RS-16: Researcher config preview — Trigger `GET /api/researcher/config` failure
+- [x] RS-17: Researcher config preview — Inspect current populated/preflight-blocked summaries
+- [ ] RS-18: Researcher active-run notice — Activate `Follow run #N`
+- [ ] RS-19: Researcher launch — Submit invalid brief/limits
+- [x] RS-20: Researcher launch — Open `Launch research run` with valid form
+- [ ] RS-21: Launch confirmation — Cancel
+- [x] RS-22: Launch confirmation — Confirm `Launch`
+- [ ] RS-23: Researcher launch guards — Inspect loading/failed jobs, active run, preflight failure, and stale preview states
+- [ ] RS-24: Launch confirmation — Inspect failed launch on non-production
+- [ ] RS-25: Research run view — Open `?jobId=N` while detail loads
+- [ ] RS-26: Research run view missing ID — Open nonexistent `?jobId=N`, then `Start another run`
+- [ ] RS-27: Research run view — Activate `Retry` after non-404 detail failure
+- [ ] RS-28: Active research run — Observe phase timeline and discovery/turn/spend meters
+- [ ] RS-29: Active research run — Open `Cancel run`
+- [ ] RS-30: Cancel Research Run dialog — Dismiss/keep run
+- [ ] RS-31: Cancel Research Run confirmation — Confirm cancellation
+- [ ] RS-32: Research run polling — Interrupt job/events/discoveries poll after good data
+- [ ] RS-33: Research run completed — Inspect completion outcome and review focus
+- [ ] RS-34: Research run failed/cancelled — Inspect terminal failure/cancel outcome
+- [ ] RS-35: Research run budget stopped — Activate `Relaunch with a higher cap`
+- [ ] RS-36: Research run discoveries — Observe active-empty and ended-empty states
+- [ ] RS-37: Research run discoveries — Activate `Retry` after discovery-load failure
+- [ ] RS-38: Research run discovery — Inspect populated item and open external URL
+- [ ] RS-39: Discovery review (run, pending table, job details) — Confirm `Approve`
+- [ ] RS-40: Discovery review — Open `Reject`, edit optional reason, then Cancel
+- [ ] RS-41: Reject Discovery confirmation — Confirm rejection
+- [ ] RS-42: Ended research run — Activate `Done` or `Review later — go to job history`
+- [ ] RS-43: Research run view — Activate `Start another run`
+- [x] RS-44: Research run details — Toggle raw event log and agent graph region
+- [ ] RS-45: Research run detail tabs — Switch `Event log` and `Agent graph`; expand an event
+- [ ] RS-46: Researcher canonical jobs — Exercise loading/error/empty/populated states and `Show more`/`Load more`
+- [ ] RS-47: `All pending discoveries & full job history` — Expand details and switch `Review Discoveries`/`Job History`
+- [ ] RS-48: Pending discoveries — Exercise loading/error/empty/populated states
+- [ ] RS-49: Pending discoveries — Open `Approve All`, then Cancel
+- [ ] RS-50: Approve All confirmation — Confirm bulk approval
+- [ ] RS-51: Full Job History — Use `Load more`, open row Details, or open active-job Cancel
+- [ ] RS-52: Research Job Details dialog — Inspect loading/error/populated discoveries/log/graph states and close
+- [ ] RS-53: Researcher end-to-end input/motion/offline sweep — Keyboard-walk launch, run, discovery, history, and dialog controls at 820/390
+- [ ] GH-01: `/admin#github` repository card — Load `GET /api/config`
+- [ ] GH-02: GitHub repository config — Activate `Retry` after config failure
+- [ ] GH-03: GitHub repository config — Load with no configured repository
+- [ ] GH-04: GitHub repository card — Open `Pull` with valid target
+- [ ] GH-05: GitHub Pull confirmation — Cancel
+- [ ] GH-06: GitHub Pull confirmation — Confirm `Start Import`
+- [ ] GH-07: GitHub repository card — Open `Sync now` with valid target
+- [ ] GH-08: GitHub Sync confirmation — Cancel
+- [ ] GH-09: GitHub Sync confirmation — Confirm `Start Export`
+- [ ] GH-10: GitHub `More` — Toggle More/Less
+- [ ] GH-11: Target Repository editor — Enter valid `owner/repository` or GitHub URL
+- [ ] GH-12: Target Repository editor — Enter invalid repository
+- [ ] GH-13: Target Repository editor — Activate `Reset to configured repository`
+- [ ] GH-14: GitHub Sync Status — Observe loading and no-activity states
+- [ ] GH-15: GitHub Sync Status — Inspect pending, processing, completed, failed, partial, and committed-despite-error rows
+- [ ] GH-16: GitHub Sync Status — Activate `Retry` after queue failure
+- [ ] GH-17: GitHub Sync jobs history — Activate `Retry` after history failure
+- [ ] GH-18: Last sync / history detail — Activate `View Commit on GitHub`
+- [ ] GH-19: Sync jobs row — Open `Logs`
+- [ ] GH-20: Sync job details — Inspect partial/failed errors, then close
+- [ ] GH-21: Sync jobs history — Load successful empty history
+- [ ] GH-22: Sync jobs history — Inspect populated rows and More/Less full-list behavior
+- [ ] GH-23: GitHub dry-run API (no current UI control in 480a3ace) — `POST /api/admin/import-github` with `{repoUrl, dryRun:true, strictMode}` variants
+- [ ] RW-01: `/admin#research` — Load research notes
+- [ ] RW-02: Research workspace — Activate `Retry` after notes failure
+- [ ] RW-03: Research workspace — Load with no jobs
+- [ ] RW-04: Research workspace — Inspect populated notes
+- [ ] RW-05: Research note — Open note
+- [ ] RW-06: Research note dialog — Load selected job detail
+- [ ] RW-07: Research note dialog — Activate `Retry` after detail failure
+- [ ] RW-08: Research note dialog — Activate `Review candidates for job #N`
+- [ ] RW-09: Research note dialog — Close via X/Escape
+- [ ] EX-01: `/admin#export` `Validation controls` — Expand/collapse details
+- [ ] EX-02: Export validation controls — Open `Run Validation`
+- [ ] EX-03: Export job confirmation — Cancel validation
+- [ ] EX-04: Export job confirmation — Confirm `Run validation`
+- [ ] EX-05: Export validation controls — Open `Run Link Check`
+- [ ] EX-06: Export job confirmation — Cancel link check
+- [ ] EX-07: Export job confirmation — Confirm `Run link check`
+- [ ] EX-08: Export link-check panel — Observe pending/processing/completed/failed/cancelled states
+- [ ] EX-09: Export link-check panel — Activate `Retry` after status failure
+- [ ] EX-10: Export link-check panel — Activate `Open Link Health for problem links`
+- [ ] EX-11: Export active link check — Activate `Cancel link check`
+- [ ] EX-12: Export JSON Snapshot card — Activate `Download`
+- [ ] EX-13: Export CSV card — Activate `Download`
+- [ ] EX-14: Export README.md card — Activate `Generate`
+- [ ] EX-15: Export OPML card — Activate `Download`
+- [ ] EX-16: All four export cards — Exercise offline and live 5xx failures for JSON/CSV/Markdown/OPML
+- [ ] EX-17: `Export history & validation results` — Expand/collapse details
+- [ ] EX-18: Export history pagination — Activate `Previous exports`
+- [ ] EX-19: Export history pagination — Activate `Next exports`
+- [ ] EX-20: Export history — Exercise loading, error+Retry, zero-total, empty-page, and populated states
+- [ ] EX-21: Validation Results — Load with no stored awesome-lint result
+- [ ] EX-22: Validation Results — Inspect populated valid/invalid summaries
+- [ ] EX-23: Validation Results — Toggle `Errors (N)`
+- [ ] EX-24: Validation Results — Toggle `Warnings (N)`
+- [ ] EX-25: Full database backup — Activate `Create backup`
+- [ ] EX-26: Full database backup list — Exercise loading, error+Retry, unconfigured, empty, and populated states
+- [ ] EX-27: Latest database backup — Toggle `Show contents`/`Hide contents`
+- [ ] DB-01: `/admin#database` stats — Observe loading and populated Tables/Rows/Disk/Migrations
+- [ ] DB-02: Database `Database seeding` — Expand/collapse details
+- [ ] DB-03: Database seeding — Open `Seed Database`
+- [ ] DB-04: Seed Database confirmation — Cancel
+- [ ] DB-05: Seed Database confirmation — Confirm `Seed Database`
+- [ ] DB-06: Database seeding — Open `Clear & Re-seed`
+- [ ] DB-07: Clear & Re-seed dialog — Type incorrect text, lowercase `reseed`, then exact `RESEED`
+- [ ] DB-08: Clear & Re-seed dialog — Cancel
+- [ ] DB-09: Clear & Re-seed confirmation — Confirm with exact `RESEED`
+- [ ] DB-10: Database seed result — Inspect success result on non-production
+- [ ] DB-11: Database seed result — Inspect partial-failure result on non-production
+- [ ] DB-12: Database seed result — Inspect request failure on non-production
+- [ ] DB-13: Database Tables panel — Inspect populated PostgreSQL table stats
+- [ ] DB-14: Database Tables panel — Observe missing stats/empty tableStats and upstream stats failure
+- [ ] US-01: `/admin/users` — Load users
+- [ ] US-02: Users table — Activate `Retry` after failure
+- [ ] US-03: Users table — Load empty catalog and zero search matches
+- [ ] US-04: Users table — Inspect populated rows
+- [ ] US-05: Users header — Toggle `Row actions`/`Hide row actions`
+- [ ] US-06: Users search — Type email or name
+- [ ] US-07: Users search — Activate `Clear user search`
+- [ ] US-08: Users header — Activate `Export CSV`
+- [ ] US-09: Users header — Inspect `Invite unavailable` disabled control
+- [ ] US-10: Users table — Activate `Sort by Name` repeatedly
+- [ ] US-11: Users table — Activate `Sort by Email` repeatedly
+- [ ] US-12: Users table — Activate `Sort by Role` repeatedly
+- [ ] US-13: Users table — Activate `Sort by Joined` repeatedly
+- [ ] US-14: User row email — Toggle Reveal/Mask email
+- [ ] US-15: Other user row — Activate `Edit` role
+- [ ] US-16: Role selector — Close without choosing
+- [ ] US-17: Role selector — Choose `User` or `Admin`
+- [ ] US-18: Change user role dialog — Cancel
+- [ ] US-19: Change user role confirmation — Confirm `Change Role`
+- [ ] US-20: Current admin row — Inspect self role/delete controls
+- [ ] US-21: Other user row — Activate `Delete`
+- [ ] US-22: Delete user dialog — Cancel
+- [ ] US-23: Delete user confirmation — Confirm `Delete User`
+- [ ] US-24: Users pagination — Activate Previous and Next at middle and edge pages
+- [ ] US-25: Users table — Swipe horizontally at 390/820 and reach Edit
+- [ ] LH-01: `/admin/linkhealth` — Initial load
+- [ ] LH-02: Link Health — Trigger failures in status/history/problem links/coverage, then `Retry`
+- [ ] LH-03: Link Health — Load before any scan completes
+- [ ] LH-04: Link Health — Inspect populated completed scan
+- [ ] LH-05: Link Health — Open any `Run Link Check`/`Run Check Now`/`Run full check` control
+- [ ] LH-06: Run Link Health confirmation — Cancel
+- [ ] LH-07: Run Link Health confirmation — Confirm `Run check`
+- [ ] LH-08: Link Health active scan — Observe pending/processing progress and polling
+- [ ] LH-09: Link Health active scan — Open `Cancel scan`
+- [ ] LH-10: Cancel scan dialog — Choose `Keep scanning`
+- [ ] LH-11: Cancel scan confirmation — Confirm `Cancel scan`
+- [ ] LH-12: Link Health failed/cancelled scan — Inspect terminal reason and open `Run scan again`
+- [ ] LH-13: Link Health count tiles — Observe no-result state
+- [ ] LH-14: Link Health counts/status — Observe previous-completed snapshot and `degraded` status
+- [ ] LH-15: Member link reports — Choose `Open` status
+- [ ] LH-16: Member link reports — Choose `Resolved` status
+- [ ] LH-17: Member link reports — Choose `Dismissed` status
+- [ ] LH-18: Member link reports — Exercise loading and error+Retry
+- [ ] LH-19: Member link reports — Load empty Open/Resolved/Dismissed lists
+- [ ] LH-20: Member link report row — Open resource title and external resource URL
+- [ ] LH-21: Open member link report — Activate `Resolve`
+- [ ] LH-22: Open member link report — Activate `Dismiss`
+- [ ] LH-23: Link Health Recent failures — Load with no failures, before a scan, and during a scan
+- [ ] LH-24: Link Health Recent failures — Open a populated resource title and external URL
+- [ ] LH-25: Link Health `More` — Toggle More/Less
+- [ ] LH-26: Link Health Summary — Activate `Run Check Now`
+- [ ] LH-27: Link Health Trends — Observe chart loading, populated tooltip/legend, and 390 below-fold layout
+- [ ] LH-28: Problem Links filter — Choose All Issues, Broken Links, Timeouts, Redirects, and Suspect
+- [ ] LH-29: Problem Links — Exercise loading, unavailable, and filtered-empty states
+- [ ] LH-30: Problem Links populated table — Scroll both axes and open resource/external links
+- [ ] LH-31: Member link reports — Inspect failed resolve/dismiss on non-production
+- [ ] LH-32: Link Health and reports — Complete keyboard, real-touch, reduced-motion, and horizontal/vertical sweep
+- [ ] DG-01: `/admin/digests` — Load delivery health
+- [ ] DG-02: Digest delivery health — Activate `Retry` after initial failure
+- [ ] DG-03: Digest delivery health — Fail a poll after a good snapshot
+- [ ] DG-04: Digest delivery health — Activate `Refresh`
+- [ ] DG-05: Digest delivery health — Inspect populated transport, queue, totals, and failure codes
+- [ ] DG-06: Digest jobs by channel/status — Load with no digest jobs
+- [ ] DG-07: Recent digest failures — Load with no recent failure codes
+- [ ] AU-01: `/admin#audit` — Load audit log
+- [ ] AU-02: Audit log — Activate `Retry` after failure
+- [ ] AU-03: Audit log — Load with no matching entries
+- [ ] AU-04: Audit log — Inspect populated rows
+- [ ] AU-05: Audit header — Toggle audit tools
+- [ ] AU-06: Audit Resource ID filter — Enter blank or positive int4 ID and submit
+- [ ] AU-07: Audit Resource ID filter — Enter 0, nonnumeric, negative, or >int4 value
+- [ ] AU-08: Audit tools — Choose 25/50/100/200 rows and apply
+- [ ] AU-09: Audit tools — Activate Search button or Enter
+- [ ] AU-10: Audit active filter — Activate `Clear`
+- [ ] AU-11: Audit tools — Activate `Refresh`
+- [ ] AU-12: Audit pagination — Activate `Previous`
+- [ ] AU-13: Audit pagination — Activate `Next`
+- [ ] AU-14: Audit row — Activate row via click, Enter, or Space
+- [ ] AU-15: Audit row ID cell — Activate `View details for audit entry N`
+- [ ] AU-16: Audit entry dialog — Close via X/Escape
+- [ ] AU-17: Audit status chips — Inspect create/update/delete, auth.*, recommendation invalid, unknown, and degraded rows
+- [ ] AU-18: Contact submissions — Load inbox
+- [ ] AU-19: Contact submissions 404 — Activate `Retry`
+- [ ] AU-20: Contact submissions failure — Activate `Retry` after non-404 failure
+- [ ] AU-21: Contact submissions — Load successful empty inbox
+- [ ] AU-22: Contact submissions — Inspect populated inbox
+- [ ] AU-23: Contact submissions pagination — Activate Previous and Next
+- [ ] AU-24: Contact submission row — Open via click, Enter, or Space
+- [ ] AU-25: Contact submission detail — Toggle `Reveal/Mask reply-to email`
+- [ ] AU-26: Contact submission detail revealed email — Activate `mailto:` link
+- [ ] AU-27: Contact submission detail — Close via X/Escape
+- [ ] Confirmation pass 1: re-drive all 760 interactions on one unchanged production revision with zero findings and zero application console errors
+- [ ] Confirmation pass 2: re-drive all 760 interactions on the same unchanged production revision with zero findings and zero application console errors
+- [ ] Re-read every run-owned QA row and confirm deletion/absence; reconcile collections, bookmarks, favorites and stats against baseline
+- [ ] Re-mint the owner cookie before 12:19Z using shell expansion only; never print it and never sign out
+- [ ] Resolve or record owner decisions: session rotation, PC-12 MirrorFly 190151, AI-16 RTMPRTSPHTTP, Replit exclude-search for Umami
+- [ ] FINAL-1: prove production serves latest main with commit, deploy log and code marker
+- [ ] FINAL-2: prove the final full cycle has zero FAIL at all three widths and zero console errors
+- [ ] FINAL-3: close the original A–D researcher/discovery/analytics finish lines with production evidence or explicit owner-gated OPEN status
+- [ ] FINAL-4: close every path #29 marked unverified or record why it cannot be triggered
+- [ ] FINAL-5: prove npm run type-check and lint for every touched file
+- [ ] FINAL-6: confirm no scripts, tests, gates or CI jobs were added by this run
+- [ ] FINAL-7: prove production cleanup has zero run-owned QA rows/users and expected approved-resource count
+- [ ] FINAL-8: report research/enrichment spend and prove it is within $30
+- [ ] FINAL-9: finish the production audit document in the original report shape
+- [ ] FINAL-10: deliver the standalone final report with deployed commit, cycle count, fixes/PRs, researcher proof, earlier-verification root cause, OPEN owner steps, spend and follow-ups
+- [ ] Write reports/prod-audit-2026-10-26/VERDICT.md with coverage counts, FAIL/BLOCKED register, evidence index and criteria-proof table
+- [x] Researcher preflight: identify two available models, host, credential source, per-run budget and expected cost without printing secrets
+- [/] Run researcher model A for at least 30 minutes on production; monitor turns, tool calls, cost and audit logs
+- [ ] Run researcher model B for at least 30 minutes on production; monitor turns, tool calls, cost and audit logs
+- [x] Review and save real discoveries from both researcher runs; verify saved content, source URLs and run/model attribution
+- [x] Approve one run-owned discovery and verify it appears on the public production site without admin/vendor requests; then reconcile audit logs
+- [x] Prove all AI-related researcher surfaces and audit-log entries for both runs; fix any failure immediately and re-drive the affected flow
+- [x] Reconcile total research/enrichment spend against the $30 cap and record run ids, models, turns, duration, cost and saved discovery ids
+- [ ] C6-PS-064: add missing id/name metadata to Search and Advanced form fields, then revalidate Search and Advanced at all required widths
+- [ ] C6-PC-067: restore Favorite and Bookmark parity on Taxonomy grid cards and revalidate all views
+- [x] C6-PC-068: clearing Taxonomy collection search must remove the URL filter and restore unfiltered results
+- [ ] C6-PC-069: out-of-range Taxonomy pagination must show dismissible clamp recovery instead of silent clamp or generic 404
+- [ ] C6-PC-070: Taxonomy offline recovery must place keyboard focus on meaningful recovered content
+- [ ] C6-AC-021: Create/Edit Subcategory missing parent must focus and mark the parent combobox with associated inline feedback
+- [ ] C6-AX-020: Advanced offline catalog failure must use offline-specific copy and explicit still-offline Retry feedback
+- [ ] C6-AX-021: Admin initial stats offline failure must not present unmeasured zeros and must provide a focusable Retry
+- [ ] C6-AX-022: Advanced automatic offline recovery must hand focus to the recovered H1
+- [ ] C6-AI-030: Done and Review later must expand full researcher job history with selected run highlighted and focused
+- [ ] C6-AO-022: Markdown export failure toast must identify Markdown at every width
+- [ ] C6-AO-023: Export history offline failure must show error and Retry rather than false empty state
+- [ ] C6-AO-024: Clear and Re-seed must enable only for exact trimmed uppercase RESEED
+- [ ] C6-AO-025: Users offline search must not silently relabel stale rows under a new query; show stale/error and Retry
+- [ ] C6-AO-026: Link Health trends must suppress chart animation under reduced motion
+- [ ] C6-PS-065: footer Explore 44px link targets must not overlap adjacent rows or misroute touch clicks
+- [ ] C6-AX-023: Taxonomy List and Compact external links must include each resource name in their accessible name
+- [ ] C6-MEMBER-01: invalid profile-name submission must focus the invalid name input
+- [ ] C6-MEMBER-02: Tag resource-card actions must meet 44x44 minimum targets at all required widths
+- [x] C6-MEMBER-CLEANUP: remove the remaining QA favorite and re-read it absent without affecting real favorites
+- [ ] C6-MEMBER-03: invalid timezone Save must focus the timezone input at 390 and 820
+- [ ] C6-MEMBER-04: private Home curated-card titles and tag pills must meet 44px minimum targets without changing shared cards

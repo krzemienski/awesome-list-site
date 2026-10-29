@@ -1,0 +1,278 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - generic [ref=e4] focusable [tabindex]
+      - list [ref=e5] clickable [onclick]
+        - listitem [level=1, ref=e7] focusable [tabindex]
+          - StaticText "Marked as already known"
+          - StaticText "It will stay out of future recommendations until restored."
+          - button "Undo" [ref=e12]
+          - button "Dismiss notification" [ref=e13]
+            - image
+      - generic [ref=e6] focusable [tabindex]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e8]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e9]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e10]
+          - link "Browse" [ref=e14]
+          - link "Submit" [ref=e15]
+          - link "About" [ref=e16]
+          - link "Docs ↗" [ref=e17]
+          - link "Admin" [ref=e18]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e11]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e19]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e67]
+              - listitem [level=1]
+                - link "Recommendations" [disabled, ref=e68]
+          - sectionheader
+            - heading "Personalized Recommendations" [level=1, ref=e27]
+            - paragraph
+              - StaticText "Get personalized resource recommendations based on your interests and learning goals."
+          - article
+            - StaticText "Using your saved learning profile"
+            - StaticText "These results use your saved topics, goals, formats, skill level, and available time."
+            - StaticText "BEGINNER"
+            - StaticText "ENCODING & CODECS"
+            - StaticText "LEARN THE FUNDAMENTALS"
+            - StaticText "VIDEOS"
+            - StaticText "WHENEVER TIME ALLOWS"
+            - link "Edit learning preferences" [ref=e28]
+            - button "Refresh recommendations" [ref=e29]
+              - image
+              - StaticText "Refresh recommendations"
+          - generic
+            - heading "Your personalized recommendations" [level=2, ref=e30]
+              - image
+              - StaticText "Your personalized recommendations"
+            - paragraph
+              - StaticText "9 resources selected from real profile and catalog signals."
+            - article
+              - heading "Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [level=3, ref=e49]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "93"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "AI RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Comparative Analysis of Codecs"
+              - paragraph
+              - group "Feedback for Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications"
+                - button "Helpful: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e69]
+                - button "Not for me: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e70]
+                - button "Already know this: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e71]
+                - button "Hide: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e72]
+              - link "View resource: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications (opens in new tab)" [ref=e50]
+            - article
+              - heading "OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [level=3, ref=e51]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "89"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "RULE RANKED"
+              - group
+                - DisclosureTriangle "Why this? OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [expanded=false]
+              - StaticText "#"
+              - StaticText "Hardware Codecs & Acceleration"
+              - paragraph
+              - group "Feedback for OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)"
+                - button "Helpful: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e73]
+                - button "Not for me: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e74]
+                - button "Already know this: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e75]
+                - button "Hide: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e76]
+              - link "View resource: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3) (opens in new tab)" [ref=e52]
+            - article
+              - heading "Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [level=3, ref=e53]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "89"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "RULE RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Real-Time Encoding Solutions"
+              - paragraph
+              - group "Feedback for Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding"
+                - button "Helpful: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e77]
+                - button "Not for me: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e78]
+                - button "Already know this: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e79]
+                - button "Hide: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e80]
+              - link "View resource: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding (opens in new tab)" [ref=e54]
+            - article
+              - heading "video-toolbox-rs" [level=3, ref=e55]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "89"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "RULE RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Hardware Codecs & Acceleration"
+              - paragraph
+              - group "Feedback for video-toolbox-rs"
+                - button "Helpful: video-toolbox-rs" [ref=e81]
+                - button "Not for me: video-toolbox-rs" [ref=e82]
+                - button "Already know this: video-toolbox-rs" [ref=e83]
+                - button "Hide: video-toolbox-rs" [ref=e84]
+              - link "View resource: video-toolbox-rs (opens in new tab)" [ref=e56]
+            - article
+              - heading "distributed-transcoder" [level=3, ref=e57]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "88"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "AI RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Scripting & Automation Tools"
+              - paragraph
+              - group "Feedback for distributed-transcoder"
+                - button "Helpful: distributed-transcoder" [ref=e85]
+                - button "Not for me: distributed-transcoder" [ref=e86]
+                - button "Already know this: distributed-transcoder" [ref=e87]
+                - button "Hide: distributed-transcoder" [ref=e88]
+              - link "View resource: distributed-transcoder (opens in new tab)" [ref=e58]
+            - article
+              - heading "Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [level=3, ref=e59]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "82"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "AI RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Hardware Codecs & Acceleration"
+              - paragraph
+              - group "Feedback for Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming"
+                - button "Helpful: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e89]
+                - button "Not for me: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e90]
+                - button "Already know this: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e91]
+                - button "Hide: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e92]
+              - link "View resource: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming (opens in new tab)" [ref=e60]
+            - article
+              - heading "Applying Objective Quality Metrics to Video-Codec Comparison" [level=3, ref=e61]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "80"
+              - StaticText "% · "
+              - StaticText "HIGH"
+              - image
+              - StaticText "AI RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Benchmarking & Performance Tools for Codecs"
+              - paragraph
+              - group "Feedback for Applying Objective Quality Metrics to Video-Codec Comparison"
+                - button "Helpful: Applying Objective Quality Metrics to Video-Codec Comparison" [ref=e93]
+                - button "Not for me: Applying Objective Quality Metrics to Video-Codec Comparison" [ref=e94]
+                - button "Already know this: Applying Objective Quality Metrics to Video-Codec Comparison" [ref=e95]
+                - button "Hide: Applying Objective Quality Metrics to Video-Codec Comparison" [ref=e96]
+              - link "View resource: Applying Objective Quality Metrics to Video-Codec Comparison (opens in new tab)" [ref=e62]
+            - article
+              - heading "Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration" [level=3, ref=e63]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "78"
+              - StaticText "% · "
+              - StaticText "MEDIUM"
+              - image
+              - StaticText "AI RANKED"
+              - group
+              - StaticText "#"
+              - StaticText "Benchmarking & Performance Tools for Codecs"
+              - paragraph
+              - group "Feedback for Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration"
+                - button "Helpful: Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration" [ref=e97]
+                - button "Not for me: Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration" [ref=e98]
+                - button "Already know this: Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration" [ref=e99]
+                - button "Hide: Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration" [ref=e100]
+              - link "View resource: Benchmarking Conventional and Learned Video Codecs with a Low-Delay Configuration (opens in new tab)" [ref=e64]
+            - article
+              - heading "CompressAI-Vision: Video Compression for Machines Benchmark" [level=3, ref=e65]
+              - paragraph
+              - StaticText "ENCODING & CODECS"
+              - image
+              - StaticText "75"
+              - StaticText "% · "
+              - StaticText "MEDIUM"
+              - image
+              - StaticText "AI RANKED"
+              - group
+                - DisclosureTriangle "Why this? CompressAI-Vision: Video Compression for Machines Benchmark" [expanded=false]
+              - StaticText "#"
+              - StaticText "Comparative Analysis of Codecs"
+              - paragraph
+              - group "Feedback for CompressAI-Vision: Video Compression for Machines Benchmark"
+                - button "Helpful: CompressAI-Vision: Video Compression for Machines Benchmark" [ref=e101]
+                - button "Not for me: CompressAI-Vision: Video Compression for Machines Benchmark" [ref=e102]
+                - button "Already know this: CompressAI-Vision: Video Compression for Machines Benchmark" [ref=e103]
+                - button "Hide: CompressAI-Vision: Video Compression for Machines Benchmark" [ref=e104]
+              - link "View resource: CompressAI-Vision: Video Compression for Machines Benchmark (opens in new tab)" [ref=e66]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e20]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e21]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e22]
+            - heading "EXPLORE" [level=2, ref=e31]
+            - link "Community & Events" [ref=e32]
+            - link "Encoding & Codecs" [ref=e33]
+            - link "General Tools" [ref=e34]
+            - link "Infrastructure & Delivery" [ref=e35]
+            - link "Intro & Learning" [ref=e36]
+            - link "Media Tools" [ref=e37]
+            - link "Players & Clients" [ref=e38]
+            - link "Protocols & Transport" [ref=e39]
+            - link "Standards & Industry" [ref=e40]
+          - heading "SOURCE" [level=2, ref=e23]
+          - link "krzemienski/ awesome-video" [ref=e24]
+          - paragraph
+            - link "PRs welcome" [ref=e41]
+          - button "Contact maintainers" [ref=e25]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e26]
+            - link "About" [ref=e42]
+            - link "Terms" [ref=e43]
+            - link "Privacy" [ref=e44]
+            - link "Code of Conduct" [ref=e45]
+            - button "Cookie settings" [ref=e46]
+            - link "Issues ↗" [ref=e47]
+            - link "Sitemap" [ref=e48]

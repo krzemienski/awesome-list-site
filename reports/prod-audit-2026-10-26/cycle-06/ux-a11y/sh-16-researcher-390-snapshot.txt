@@ -1,0 +1,155 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - main
+        - navigation "Breadcrumb" [ref=e8]
+          - list
+            - listitem [level=1]
+              - link "Home" [ref=e31]
+            - listitem [level=1]
+              - link "Admin" [ref=e32]
+            - listitem [level=1]
+              - link "Researcher" [disabled, ref=e33]
+        - StaticText "Authorized admin area"
+        - StaticText "ADMIN CONSOLE · "
+        - StaticText "ADMIN USER"
+        - heading "Operations dashboard" [level=1, ref=e9]
+          - StaticText "Operations "
+          - emphasis
+            - StaticText "dashboard"
+        - paragraph
+          - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+        - button "Settings" [expanded=false, ref=e10]
+          - image
+          - StaticText "Settings"
+        - button "New entry: add a resource" [ref=e11]
+          - image
+          - StaticText "New entry"
+        - status
+        - generic
+          - button "Scroll tabs left" [ref=e13]
+          - tablist "Admin sections" [ref=e14] focusable [tabindex]
+            - tab "Overview" [ref=e16]
+              - StaticText "Overview"
+            - tab "Approvals" [ref=e17]
+              - StaticText "Approvals"
+            - tab "Edits" [ref=e18]
+              - StaticText "Edits"
+            - tab "Enrichment" [ref=e19]
+              - StaticText "Enrichment"
+            - tab "Researcher" [selected, ref=e20]
+              - StaticText "Researcher"
+            - tab "Export" [ref=e21]
+              - StaticText "Export"
+            - tab "Database" [ref=e22]
+              - StaticText "Database"
+            - tab "Resources" [ref=e23]
+              - StaticText "Resources"
+            - tab "Categories" [ref=e24]
+              - StaticText "Categories"
+            - tab "Subcategories" [ref=e25]
+              - StaticText "Subcategories"
+            - tab "Users" [ref=e26]
+              - StaticText "Users"
+            - tab "GitHub" [ref=e27]
+              - StaticText "GitHub"
+            - tab "Link Health" [ref=e28]
+              - StaticText "Link Health"
+            - tab "Audit" [ref=e29]
+              - StaticText "Audit"
+            - tab "Research" [ref=e30]
+              - StaticText "Research"
+          - button "Scroll tabs right" [ref=e15]
+        - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+          - generic
+            - heading "Run a research task" [level=3, ref=e34]
+            - paragraph
+              - StaticText "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+            - region "Brief" [ref=e35]
+              - heading "Brief" [level=4, ref=e41]
+              - StaticText "Auto-generated at launch"
+              - radiogroup "Research brief" [ref=e42] focusable [tabindex]
+                - LabelText [ref=e56] clickable [cursor:pointer]
+                  - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked=true, ref=e60]
+                    - image
+                  - StaticText "Auto-generate at launch"
+                  - StaticText "A gap-aware brief built from the catalog and past runs."
+                - LabelText [ref=e57] clickable [cursor:pointer]
+                  - radio "Write my own Describe what to search for, or start from a generated brief." [checked=false, ref=e61]
+                  - StaticText "Write my own"
+                  - StaticText "Describe what to search for, or start from a generated brief."
+            - region "Focus" [ref=e36]
+              - heading "Focus" [level=4, ref=e43]
+              - StaticText "All categories"
+              - combobox "Category focus" [expanded=false, ref=e44]: All categories
+                - generic [ref=e58] clickable [cursor:pointer, onclick]
+                  - StaticText "All categories"
+            - region "Limits" [ref=e37]
+              - heading "Limits" [level=4, ref=e45]
+              - StaticText "no target · $3.00 cap · 40 turns"
+              - LabelText [ref=e46] clickable [cursor:pointer]
+                - StaticText "Stop after (discoveries)"
+              - spinbutton "Stop after (discoveries)" [ref=e47]
+              - paragraph
+                - StaticText "No target — runs until the budget or turns end."
+              - LabelText [ref=e48] clickable [cursor:pointer]
+                - StaticText "Budget cap (USD)"
+              - spinbutton "Budget cap (USD)" [ref=e49]: 3
+                - StaticText "3.00"
+              - paragraph
+                - StaticText "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."
+              - LabelText [ref=e50] clickable [cursor:pointer]
+                - StaticText "Max turns"
+              - spinbutton "Max turns" [ref=e51]: 40
+                - StaticText "40"
+              - paragraph
+                - StaticText "Positive whole number (blank = no cap)."
+              - paragraph
+                - StaticText "Cost depends on scope — check the jobs table after your first run. Discoveries are deduplicated against the catalog."
+            - region "Endpoint & model" [ref=e38]
+              - heading "Endpoint & model" [level=4, ref=e52]
+              - StaticText "Server configuration"
+              - button "Override endpoint or models (optional)" [expanded=false, ref=e59]
+                - StaticText "Override endpoint or models (optional)"
+                - image
+            - region "About to run on" [ref=e39]
+              - heading "About to run on" [level=4, ref=e53]
+              - paragraph
+                - StaticText "Resolving endpoint and models…"
+              - button "Launch research run" [disabled, ref=e54]
+                - image
+                - StaticText "Launch research run"
+              - paragraph
+                - StaticText "Checking for an active run…"
+            - generic
+              - sectionheader
+                - heading "Researcher jobs" [level=2, ref=e55]
+                - paragraph
+                  - StaticText "Recent agentic research runs"
+              - region "Researcher jobs table, scrollable" [ref=e40] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "STATUS" [ref=e62]
+                      - columnheader "PROMPT" [ref=e63]
+                      - columnheader "FOUND" [ref=e64]
+                      - columnheader "APPROVED / REJECTED" [ref=e65]
+                      - columnheader "COST" [ref=e66]
+                      - columnheader "TURNS" [ref=e67]
+                      - columnheader "CREATED" [ref=e68]
+            - group
+              - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]

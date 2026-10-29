@@ -1,0 +1,4 @@
+modelRoles:
+  default: kimi-code/k3.1-pro
+  task: omniroute/gc/grok-4.7:auto
+  smol: omniroute/glm/glm-5.3:auto

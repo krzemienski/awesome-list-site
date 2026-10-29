@@ -1,0 +1,14 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Subcategories" [ref=e13] focusable [tabindex]
+    - navigation "Pagination" [ref=e14]
+- heading "Create Subcategory" [level=2, ref=e3]
+- LabelText "Parent Category *" [ref=e4] clickable [cursor:pointer]
+- combobox "Parent Category *" [expanded=false, ref=e5]: [QA-audit-1026] c6 race create2 winner
+  - generic "[QA-audit-1026] c6 race create2 winner" [ref=e10] clickable [cursor:pointer, onclick]
+- LabelText "Name *" [ref=e11] clickable [cursor:pointer]
+- textbox "Name *" [ref=e12]: [QA-audit-1026] c6 duplicate subcategory 2
+- LabelText "Slug *" [ref=e6] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e7]: qa-audit-1026-c6-duplicate-subcategory-2
+- button "Cancel" [ref=e8]
+- button "Creating..." [disabled, ref=e9]
+- button "Close" [ref=e2]

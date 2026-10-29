@@ -1,0 +1,413 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - generic [ref=e23]:
+        - main [ref=e24]:
+          - generic [ref=e25]:
+            - navigation "Breadcrumb" [ref=e26]:
+              - list [ref=e27]:
+                - listitem [ref=e28]:
+                  - link "Home" [ref=e29] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e30]:
+                  - img [ref=e31]
+                - listitem:
+                  - link "Settings" [disabled]
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - link "Back" [ref=e35] [cursor=pointer]:
+                  - /url: /
+                  - img [ref=e36]
+                  - text: Back
+                - heading "Settings" [level=1] [ref=e38]
+                - paragraph [ref=e39]: Manage your preferences and account. Pick a section below.
+              - generic [ref=e40]:
+                - link [ref=e41] [cursor=pointer]:
+                  - /url: /settings/theme
+                  - article [ref=e42]:
+                    - img [ref=e43]
+                    - generic [ref=e49]:
+                      - generic [ref=e50]:
+                        - heading "Appearance" [level=2] [ref=e51]
+                        - img [ref=e52]
+                      - paragraph [ref=e54]: Switch design system, accent color, and font.
+                - link [ref=e55] [cursor=pointer]:
+                  - /url: /profile
+                  - article [ref=e56]:
+                    - img [ref=e57]
+                    - generic [ref=e60]:
+                      - generic [ref=e61]:
+                        - heading "Account" [level=2] [ref=e62]
+                        - img [ref=e63]
+                      - paragraph [ref=e65]: View your profile, submissions, favorites, and progress.
+                - link [ref=e66] [cursor=pointer]:
+                  - /url: /profile?tab=security
+                  - article [ref=e67]:
+                    - img [ref=e68]
+                    - generic [ref=e71]:
+                      - generic [ref=e72]:
+                        - heading "Security" [level=2] [ref=e73]
+                        - img [ref=e74]
+                      - paragraph [ref=e76]: Change your password from the Security tab on your profile.
+                - link [ref=e77] [cursor=pointer]:
+                  - /url: /bookmarks
+                  - article [ref=e78]:
+                    - img [ref=e79]
+                    - generic [ref=e81]:
+                      - generic [ref=e82]:
+                        - heading "Bookmarks" [level=2] [ref=e83]
+                        - img [ref=e84]
+                      - paragraph [ref=e86]: Review the resources you've saved for later.
+                - link [ref=e87] [cursor=pointer]:
+                  - /url: /recommendations
+                  - article [ref=e88]:
+                    - img [ref=e89]
+                    - generic [ref=e91]:
+                      - generic [ref=e92]:
+                        - heading "Recommendations" [level=2] [ref=e93]
+                        - img [ref=e94]
+                      - paragraph [ref=e96]: Personalized resource suggestions based on your interests.
+              - region "Home layout" [ref=e97]:
+                - article [ref=e98]:
+                  - generic [ref=e99]:
+                    - generic [ref=e100]: Home layout
+                    - generic [ref=e101]: Choose the default view you see on the Home page.
+                  - group "Home layout" [ref=e103]:
+                    - generic [ref=e104]: Home layout
+                    - paragraph [ref=e105]: Choose how the home page opens for you.
+                    - radiogroup "Home layout" [ref=e106]:
+                      - generic [ref=e107] [cursor=pointer]:
+                        - radio "Index The full catalog, organized for browsing." [checked] [ref=e108]:
+                          - img [ref=e110]
+                        - generic [ref=e112]:
+                          - generic [ref=e113]: Index
+                          - generic [ref=e114]: The full catalog, organized for browsing.
+                      - generic [ref=e115] [cursor=pointer]:
+                        - radio "Curated A focused home feed with recent and featured picks." [ref=e116]
+                        - generic [ref=e117]:
+                          - generic [ref=e118]: Curated
+                          - generic [ref=e119]: A focused home feed with recent and featured picks.
+              - region "Learning preferences" [ref=e120]:
+                - article [ref=e121]:
+                  - generic [ref=e122]:
+                    - generic [ref=e123]:
+                      - img [ref=e124]
+                      - text: Learning preferences
+                    - generic [ref=e125]: Review the same profile used by optional onboarding. These values shape only surfaces explicitly labeled personalized and are not sent to analytics.
+                  - generic [ref=e126]:
+                    - generic [ref=e127]:
+                      - group "Skill level" [ref=e128]:
+                        - generic [ref=e129]: Skill level
+                        - paragraph [ref=e130]: Choose the closest match. You can change this at any time.
+                        - radiogroup [ref=e131]:
+                          - generic [ref=e132] [cursor=pointer]:
+                            - radio "Beginner I’m building a foundation in video technology." [checked] [ref=e133]:
+                              - img [ref=e135]
+                            - generic [ref=e137]:
+                              - generic [ref=e138]: Beginner
+                              - generic [ref=e139]: I’m building a foundation in video technology.
+                          - generic [ref=e140] [cursor=pointer]:
+                            - radio "Intermediate I know the basics and want to go deeper." [ref=e141]
+                            - generic [ref=e142]:
+                              - generic [ref=e143]: Intermediate
+                              - generic [ref=e144]: I know the basics and want to go deeper.
+                          - generic [ref=e145] [cursor=pointer]:
+                            - radio "Advanced I work with video systems and want specialist material." [ref=e146]
+                            - generic [ref=e147]:
+                              - generic [ref=e148]: Advanced
+                              - generic [ref=e149]: I work with video systems and want specialist material.
+                      - group "Topics" [ref=e150]:
+                        - generic [ref=e151]: Topics
+                        - paragraph [ref=e152]: These choices come directly from the current Awesome Video taxonomy. Choose one or more.
+                        - generic [ref=e153]:
+                          - generic [ref=e154] [cursor=pointer]:
+                            - checkbox "Community & Events" [ref=e155]
+                            - generic [ref=e156]: Community & Events
+                          - generic [ref=e157] [cursor=pointer]:
+                            - checkbox "Encoding & Codecs" [checked] [ref=e158]:
+                              - generic:
+                                - img
+                            - generic [ref=e159]: Encoding & Codecs
+                          - generic [ref=e160] [cursor=pointer]:
+                            - checkbox "General Tools" [ref=e161]
+                            - generic [ref=e162]: General Tools
+                          - generic [ref=e163] [cursor=pointer]:
+                            - checkbox "Infrastructure & Delivery" [ref=e164]
+                            - generic [ref=e165]: Infrastructure & Delivery
+                          - generic [ref=e166] [cursor=pointer]:
+                            - checkbox "Intro & Learning" [ref=e167]
+                            - generic [ref=e168]: Intro & Learning
+                          - generic [ref=e169] [cursor=pointer]:
+                            - checkbox "Media Tools" [ref=e170]
+                            - generic [ref=e171]: Media Tools
+                          - generic [ref=e172] [cursor=pointer]:
+                            - checkbox "Players & Clients" [ref=e173]
+                            - generic [ref=e174]: Players & Clients
+                          - generic [ref=e175] [cursor=pointer]:
+                            - checkbox "Protocols & Transport" [ref=e176]
+                            - generic [ref=e177]: Protocols & Transport
+                          - generic [ref=e178] [cursor=pointer]:
+                            - checkbox "Standards & Industry" [ref=e179]
+                            - generic [ref=e180]: Standards & Industry
+                      - group "Learning goals" [ref=e181]:
+                        - generic [ref=e182]: Learning goals
+                        - paragraph [ref=e183]: Pick every goal that matters right now.
+                        - generic [ref=e184]:
+                          - generic [ref=e185] [cursor=pointer]:
+                            - checkbox "Learn the fundamentals" [checked] [ref=e186]:
+                              - generic:
+                                - img
+                            - generic [ref=e187]: Learn the fundamentals
+                          - generic [ref=e188] [cursor=pointer]:
+                            - checkbox "Build video applications" [ref=e189]
+                            - generic [ref=e190]: Build video applications
+                          - generic [ref=e191] [cursor=pointer]:
+                            - checkbox "Improve streaming experiences" [ref=e192]
+                            - generic [ref=e193]: Improve streaming experiences
+                          - generic [ref=e194] [cursor=pointer]:
+                            - checkbox "Optimize encoding and quality" [ref=e195]
+                            - generic [ref=e196]: Optimize encoding and quality
+                          - generic [ref=e197] [cursor=pointer]:
+                            - checkbox "Operate video infrastructure" [ref=e198]
+                            - generic [ref=e199]: Operate video infrastructure
+                          - generic [ref=e200] [cursor=pointer]:
+                            - checkbox "Keep up with standards and tools" [ref=e201]
+                            - generic [ref=e202]: Keep up with standards and tools
+                      - group "Preferred formats" [ref=e203]:
+                        - generic [ref=e204]: Preferred formats
+                        - paragraph [ref=e205]: Choose at least one format. These map to the catalog’s curated resource formats.
+                        - generic [ref=e206]:
+                          - generic [ref=e207] [cursor=pointer]:
+                            - checkbox "Videos" [checked] [ref=e208]:
+                              - generic:
+                                - img
+                            - generic [ref=e209]: Videos
+                          - generic [ref=e210] [cursor=pointer]:
+                            - checkbox "Courses" [ref=e211]
+                            - generic [ref=e212]: Courses
+                          - generic [ref=e213] [cursor=pointer]:
+                            - checkbox "Articles" [ref=e214]
+                            - generic [ref=e215]: Articles
+                          - generic [ref=e216] [cursor=pointer]:
+                            - checkbox "Books" [ref=e217]
+                            - generic [ref=e218]: Books
+                          - generic [ref=e219] [cursor=pointer]:
+                            - checkbox "Specifications" [ref=e220]
+                            - generic [ref=e221]: Specifications
+                          - generic [ref=e222] [cursor=pointer]:
+                            - checkbox "Hands-on tools" [ref=e223]
+                            - generic [ref=e224]: Hands-on tools
+                          - generic [ref=e225] [cursor=pointer]:
+                            - checkbox "Libraries and SDKs" [ref=e226]
+                            - generic [ref=e227]: Libraries and SDKs
+                          - generic [ref=e228] [cursor=pointer]:
+                            - checkbox "Community resources" [ref=e229]
+                            - generic [ref=e230]: Community resources
+                      - group "Available time" [ref=e231]:
+                        - generic [ref=e232]: Available time
+                        - paragraph [ref=e233]: This helps us favor resources that fit your learning rhythm.
+                        - radiogroup [ref=e234]:
+                          - generic [ref=e235] [cursor=pointer]:
+                            - radio "A little most days" [ref=e236]
+                            - generic [ref=e237]: A little most days
+                          - generic [ref=e238] [cursor=pointer]:
+                            - radio "One focused session each week" [ref=e239]
+                            - generic [ref=e240]: One focused session each week
+                          - generic [ref=e241] [cursor=pointer]:
+                            - radio "Whenever time allows" [checked] [ref=e242]:
+                              - img [ref=e244]
+                            - generic [ref=e246]: Whenever time allows
+                        - generic [ref=e247]:
+                          - heading "What changes after you save" [level=3] [ref=e248]
+                          - paragraph [ref=e249]: Your choices shape surfaces explicitly labeled personalized, including Personalized Recommendations. They do not change public catalog or search results, and preference values are not sent to analytics.
+                    - generic [ref=e250]:
+                      - button "Reset preferences" [ref=e251] [cursor=pointer]:
+                        - img
+                        - text: Reset preferences
+                      - button "Save learning preferences" [ref=e252] [cursor=pointer]
+              - region "Notifications" [ref=e253]:
+                - article [ref=e254]:
+                  - generic [ref=e255]:
+                    - generic [ref=e256]:
+                      - img [ref=e257]
+                      - text: Notifications
+                    - generic [ref=e260]: Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in.
+                  - generic [ref=e261]:
+                    - generic [ref=e262]:
+                      - generic [ref=e263] [cursor=pointer]:
+                        - checkbox "Email digest A considered digest, never a stream. Off" [active] [ref=e264]
+                        - img [ref=e266]
+                        - generic [ref=e269]:
+                          - generic [ref=e270]: Email digest
+                          - generic [ref=e271]: A considered digest, never a stream.
+                        - generic [ref=e272]: "Off"
+                      - generic [ref=e273] [cursor=pointer]:
+                        - checkbox "In-app updates A small inbox inside your account. Off" [ref=e274]
+                        - img [ref=e276]
+                        - generic [ref=e279]:
+                          - generic [ref=e280]: In-app updates
+                          - generic [ref=e281]: A small inbox inside your account.
+                        - generic [ref=e282]: "Off"
+                    - generic [ref=e283]:
+                      - img [ref=e284]
+                      - paragraph [ref=e287]: These channels are independent. Delivery content excludes private notes, learning history, and external URLs.
+                    - region "Digest sections" [ref=e288]:
+                      - heading "Digest sections" [level=3] [ref=e289]
+                      - generic [ref=e290]:
+                        - generic [ref=e291]:
+                          - checkbox "New resources" [checked] [ref=e292]
+                          - text: New resources
+                        - generic [ref=e293]:
+                          - checkbox "Watch next" [checked] [ref=e294]
+                          - text: Watch next
+                        - generic [ref=e295]:
+                          - checkbox "Journey steps" [checked] [ref=e296]
+                          - text: Journey steps
+                    - generic [ref=e297]:
+                      - generic [ref=e298]:
+                        - text: Cadence
+                        - combobox "Cadence" [ref=e299] [cursor=pointer]:
+                          - option "Weekly" [selected]
+                          - option "Every 2 weeks"
+                          - option "Monthly"
+                      - generic [ref=e300]:
+                        - text: Time zone
+                        - textbox "Time zone" [ref=e301]: America/New_York
+                    - generic [ref=e302]:
+                      - button "Pause for 7 days" [ref=e303] [cursor=pointer]:
+                        - img
+                        - text: Pause for 7 days
+                      - button "Unsubscribe all" [disabled] [ref=e304]
+                      - button "Save choices" [ref=e305] [cursor=pointer]
+                    - region "Preview" [ref=e306]:
+                      - generic [ref=e307]:
+                        - generic [ref=e308]:
+                          - heading "Preview" [level=3] [ref=e309]:
+                            - img [ref=e310]
+                            - text: Preview
+                          - paragraph [ref=e313]: This uses the same rules as delivery.
+                        - generic [ref=e314]: 2 items
+                      - generic [ref=e315]:
+                        - link "New for you PyTorchVideoCompression New in Encoding & Codecs" [ref=e316] [cursor=pointer]:
+                          - /url: /resource/190359
+                          - text: New for you
+                          - generic [ref=e317]: PyTorchVideoCompression
+                          - generic [ref=e318]: New in Encoding & Codecs
+                        - link "Continue your journey Live Streaming Fundamentals Next in Advanced Live Streaming Architecture" [ref=e319] [cursor=pointer]:
+                          - /url: /journey/9#step-1
+                          - text: Continue your journey
+                          - generic [ref=e320]: Live Streaming Fundamentals
+                          - generic [ref=e321]: Next in Advanced Live Streaming Architecture
+        - contentinfo [ref=e322]:
+          - generic [ref=e323]:
+            - generic [ref=e324]:
+              - paragraph [ref=e325]: ── INDEX
+              - link "awesome.video home" [ref=e326] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e327]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e329]:
+              - heading "INDEXED" [level=2] [ref=e330]
+              - paragraph [ref=e331]: 3,826
+              - paragraph [ref=e332]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e333]: live
+            - navigation "Explore categories" [ref=e335]:
+              - heading "EXPLORE" [level=2] [ref=e336]
+              - generic [ref=e337]:
+                - link "Community & Events" [ref=e338] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e339]: ◈
+                  - generic [ref=e340]: Community
+                - link "Encoding & Codecs" [ref=e341] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e342]: ◇
+                  - generic [ref=e343]: Encoding
+                - link "General Tools" [ref=e344] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e345]: ◆
+                  - generic [ref=e346]: General
+                - link "Infrastructure & Delivery" [ref=e347] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e348]: ▣
+                  - generic [ref=e349]: Infrastructure
+                - link "Intro & Learning" [ref=e350] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e351]: ▤
+                  - generic [ref=e352]: Intro
+                - link "Media Tools" [ref=e353] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e354]: ▥
+                  - generic [ref=e355]: Media
+                - link "Players & Clients" [ref=e356] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e357]: ▶
+                  - generic [ref=e358]: Players
+                - link "Protocols & Transport" [ref=e359] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e360]: ⟁
+                  - generic [ref=e361]: Protocols
+                - link "Standards & Industry" [ref=e362] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e363]: ◉
+                  - generic [ref=e364]: Standards
+            - generic [ref=e365]:
+              - heading "SOURCE" [level=2] [ref=e366]
+              - link "krzemienski/awesome-video" [ref=e367] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e368]
+                - generic [ref=e370]:
+                  - text: krzemienski
+                  - generic [ref=e371]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e372]: ↗
+              - paragraph [ref=e373]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e374] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e376] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e377]:
+            - generic [ref=e378]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e379]:
+              - link "About" [ref=e380] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e381] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e382] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e383] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e384] [cursor=pointer]
+              - link "Issues ↗" [ref=e385] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e386] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e387]: built with the awesome-list framework
+    - button "Back to top" [ref=e388] [cursor=pointer]:
+      - img

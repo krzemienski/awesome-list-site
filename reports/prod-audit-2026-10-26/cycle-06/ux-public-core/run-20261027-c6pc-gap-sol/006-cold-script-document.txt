@@ -1,0 +1,226 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+Emulating color scheme: dark
+## Request https://awesome.video/search?q=%3Cscript%3E
+Status: 200
+### Request Headers
+- upgrade-insecure-requests:1
+- user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36
+- :authority:awesome.video
+- :method:GET
+- :path:/search?q=%3Cscript%3E
+- :scheme:https
+- accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+- accept-encoding:gzip, deflate, br, zstd
+- accept-language:en-US,en;q=0.9
+- cookie:[REDACTED]
+- priority:u=0, i
+- sec-fetch-dest:document
+- sec-fetch-mode:navigate
+- sec-fetch-site:none
+- sec-fetch-user:?1
+### Response Headers
+- accept-ranges:bytes
+- alt-svc:h3=":443"; ma=2592000
+- cache-control:no-store
+- content-security-policy:default-src 'self'; script-src 'self' 'nonce-EmR6+gC4ZUENZQmgd9KvRw==' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+- content-type:text/html; charset=UTF-8
+- cross-origin-opener-policy:same-origin-allow-popups
+- cross-origin-resource-policy:same-origin
+- date:Tue, 27 Oct 2026 06:30:17 GMT
+- permissions-policy:camera=(), microphone=(), geolocation=()
+- referrer-policy:strict-origin
+- server:Google Frontend
+- strict-transport-security:max-age=63072000; includeSubDomains
+- via:1.1 google
+- x-cloud-trace-context:3251abd3bcff344c9cda10cb572054be
+- x-content-type-options:nosniff
+- x-frame-options:DENY
+### Response Body
+<!DOCTYPE html>
+<html lang="en" class="dark" data-product-profile="public-discovery">
+  <head>
+    <!--OG_META_INJECTED-->
+    <title data-react-helmet="true">Search: &lt;script&gt; — Awesome Video</title>
+    <meta name="description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+    <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" data-react-helmet="true" />
+    <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+    <meta property="og:type" content="website" data-react-helmet="true" />
+    <meta property="og:site_name" content="Awesome Video" data-react-helmet="true" />
+    <meta property="og:locale" content="en_US" data-react-helmet="true" />
+    <meta property="og:title" content="Search: &lt;script&gt; — Awesome Video" data-react-helmet="true" />
+    <meta property="og:description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+    <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsearch" data-react-helmet="true" />
+    <meta property="og:image:secure_url" content="https://awesome.video/og-image.png?path=%2Fsearch" data-react-helmet="true" />
+    <meta property="og:image:type" content="image/png" data-react-helmet="true" />
+    <meta property="og:image:width" content="1200" data-react-helmet="true" />
+    <meta property="og:image:height" content="630" data-react-helmet="true" />
+    <meta property="og:image:alt" content="Awesome Video — curated video development resources" data-react-helmet="true" />
+    <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+    <meta name="twitter:site" content="@awesome_video" data-react-helmet="true" />
+    <meta name="twitter:title" content="Search: &lt;script&gt; — Awesome Video" data-react-helmet="true" />
+    <meta name="twitter:description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+    <meta name="twitter:image" content="https://awesome.video/og-image.png?path=%2Fsearch" data-react-helmet="true" />
+    <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" data-react-helmet="true" />
+    <meta name="theme-color" content="#ff3d52" data-react-helmet="true" />
+    <meta name="msapplication-TileColor" content="#ff3d52" data-react-helmet="true" />
+    <meta name="application-name" content="Awesome Video" data-react-helmet="true" />
+    <meta name="apple-mobile-web-app-title" content="Awesome Video" data-react-helmet="true" />
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script nonce="EmR6+gC4ZUENZQmgd9KvRw==">
+      // BUG-021 (run24): strip query params carrying real markup payloads from
+      // the address bar BEFORE any other boot script runs. The app never
+      // renders raw query strings as HTML, but the payload sat in the URL bar
+      // (shareable/copyable) and flowed into analytics page_path. Runs
+      // pre-React via replaceState so no history entry keeps the payload.
+      //
+      // ONE coherent policy (audit2 BUG-009): scrub ONLY strings that could
+      // parse as actual HTML markup if injected raw — a tag-open sequence.
+      // Per the HTML5 tokenizer, "<" starts markup only when immediately
+      // followed by a letter, "/", "!" or "?", so prose like "a < b > c" or
+      // "javascript: the good parts" is plain text and searches normally.
+      // Bare scheme/attribute text (javascript:, onerror=, data:text/html) is
+      // inert without a markup context: every reflection sink HTML-escapes
+      // (React text nodes + the server-rendered fallback), and query text is
+      // never assigned to href/src — so it is no longer scrubbed.
+      //
+      // audit2 BUG-024: the check runs across RECURSIVE percent-decodings
+      // (URLSearchParams already decoded once; loop up to 5 more passes) so
+      // double-/triple-encoded payloads (%253Cscript…) can't slip through.
+      (function () {
+        try {
+          if (!location.search || location.search.length < 2) return;
+          var MARKUP = /<[a-z!\/?]/i;
+          var params = new URLSearchParams(location.search);
+          var dirty = false;
+          var names = [];
+          var removed = [];
+          params.forEach(function (v, k) { names.push(k); });
+          for (var i = 0; i < names.length; i++) {
+            var k = names[i];
+            var probe = k + '=' + (params.get(k) || '');
+            var hit = MARKUP.test(probe);
+            for (var d = 0; d < 5 && !hit; d++) {
+              var next;
+              try { next = decodeURIComponent(probe); } catch (_) { break; }
+              if (next === probe) break;
+              probe = next;
+              hit = MARKUP.test(probe);
+            }
+            if (hit) {
+              params.delete(k);
+              if (removed.indexOf(k) === -1) removed.push(k);
+              dirty = true;
+            }
+          }
+          if (dirty) {
+            // BUG-032/BUG-064 (run27): stripping is the right security call,
+            // but doing it SILENTLY made /search?q=<img…> render the full
+            // catalog and /?tags=<script nonce="EmR6+gC4ZUENZQmgd9KvRw==">… render unfiltered with no hint the
+            // link was altered. Record what was dropped so the app can show
+            // an explicit "part of this link was ignored" notice after boot.
+            window.__scrubbedParams = removed;
+            var qs = params.toString();
+            history.replaceState(
+              history.state,
+              '',
+              location.pathname + (qs ? '?' + qs : '') + location.hash
+            );
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style nonce="EmR6+gC4ZUENZQmgd9KvRw==">
+      #home-layout-boot-skeleton { display: none; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #home-layout-boot-skeleton {
+        display: block; min-height: 100vh; background: var(--bg); padding: 40px 20px;
+      }
+      html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner {
+        display: none !important;
+      }
+    </style>
+    <script nonce="EmR6+gC4ZUENZQmgd9KvRw==">
+      // Browser-only legacy preference bridge. These markers alter paint only;
+      // React still hydrates the exact server DOM and clears them after its
+      // state has committed.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var params = new URLSearchParams(location.search);
+          var hasLayoutOverride = params.has('layout');
+          var hasLayoutCookie = /(?:^|;\s*)awesome-video-home-layout=(?:index|curated)(?:;|$)/.test(document.cookie);
+          var legacyLayout = localStorage.getItem('awesome-video-home-layout');
+          if (location.pathname === '/' && !hasLayoutOverride && !hasLayoutCookie && legacyLayout === 'curated') {
+            root.setAttribute('data-home-layout-pending', 'true');
+            // React normally clears this after it has committed curated
+            // markup. If the app bundle cannot run, never leave the only
+            // usable document hidden indefinitely.
+            window.setTimeout(function () {
+              root.removeAttribute('data-home-layout-pending');
+            }, 4000);
+          }
+          var hasConsentCookie = /(?:^|;\s*)analytics-consent=(?:granted|denied)(?:;|$)/.test(document.cookie);
+          var legacyConsent = localStorage.getItem('analytics-consent');
+          if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
+            root.setAttribute('data-consent-known', 'true');
+          }
+        } catch (_) {}
+      })();
+    </script>
+
+    <script nonce="EmR6+gC4ZUENZQmgd9KvRw==">
+      // BUG-001 (run19): kick off the awesome-list fetch before the JS bundle
+      // is even parsed. fetchStaticAwesomeList() consumes this promise (one
+      // shot) so warm loads don't serialize bundle-parse -> fetch. The catch
+      // only silences unhandled-rejection noise; consumers handle errors.
+      (function () {
+          // The nav tree (~few KB) is needed by chrome on every page. Default
+          // taxonomy views prefetch one 24-card listing slice; the full corpus
+          // remains reserved for Advanced browse and taxonomy filter modes.
+        try {
+          // Exact Home SSR already embeds the request-local nav cache. Avoid
+          // racing it with the legacy early request; non-SSR routes preserve
+          // their existing prefetch behavior.
+          if (document.documentElement.getAttribute('data-home-ssr') !== 'true') {
+            var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
+            window.__awesomeListNavEarlyFetch = n;
+            n.catch(function () {});
+          }
+        } catch (e) {}
+        try {
+          var pth = location.pathname;
+          var taxonomyMatch = pth.match(/^\/(category|subcategory|sub-subcategory)\/([^/]+)$/);
+          var tagMatch = pth.match(/^\/tag\/([^/]+)$/);
+          var searchParams = new URLSearchParams(location.search);
+          var needsCorpus = pth === '/advanced' || (
+       ... <truncated>

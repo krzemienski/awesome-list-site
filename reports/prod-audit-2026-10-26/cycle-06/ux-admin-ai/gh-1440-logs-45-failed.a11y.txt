@@ -1,0 +1,29 @@
+- generic
+  - dialog "Sync Job #45"
+    - heading "Sync Job #45" [level=2, ref=e1]
+      - StaticText "Sync Job #45"
+    - paragraph
+      - StaticText "Export · Jul 17, 2026, 08:32 AM · krzemienski/awesome-video"
+    - DescriptionList
+      - term "Status"
+      - definition
+        - StaticText "FAILED"
+      - term "Resources added"
+      - definition
+        - StaticText "+0"
+      - term "Resources updated"
+      - definition
+        - StaticText "~0"
+      - term "Resources removed"
+      - definition
+        - StaticText "-0"
+      - term "Total resources"
+      - definition
+        - StaticText "0"
+      - alert
+        - term "Error"
+        - definition
+          - StaticText "Export failed: timeout exceeded when trying to connect"
+    - button "Close" [ref=e2]
+      - image
+      - StaticText "Close"

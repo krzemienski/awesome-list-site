@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"dialog":[{"rect":{"x":0,"y":0,"width":360,"height":1180,"top":0,"right":360,"bottom":1180,"left":0},"scrollHeight":1180}],"done":[{"rect":{"x":24,"y":1124,"width":311,"height":44,"top":1124,"right":335,"bottom":1168,"left":24},"after":"Close"}],"buttons":[{"name":"Clear all","w":76.390625,"h":44},{"name":"AV1 1","w":311,"h":44},{"name":"Done","w":311,"h":44},{"name":"Close","w":44,"h":44}]}
+```

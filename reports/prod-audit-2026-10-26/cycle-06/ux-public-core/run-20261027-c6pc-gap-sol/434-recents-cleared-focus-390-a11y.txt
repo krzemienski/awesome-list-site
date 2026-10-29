@@ -1,0 +1,23 @@
+uid=1091_0 RootWebArea "Search: webrtc — Awesome Video" url="https://awesome.video/search?q=webrtc"
+  uid=1097_11 main
+    uid=1097_22 region "Search results"
+      uid=1105_0 navigation "Pagination"
+        uid=1105_1 status atomic live="polite" relevant="additions text"
+  uid=1111_0 dialog "Search Resources" description="Search resources, categories, and pages in the awesome video collection."
+    uid=1111_1 heading "Search Resources" level="2"
+    uid=1111_2 "Search resources, categories, and pages in the awesome video collection."
+    uid=1111_3 generic
+      uid=1111_4 combobox "Search resources, categories, and pages" autocomplete="list" expandable expanded focusable focused haspopup="listbox"
+      uid=1111_5 button "esc Close search"
+      uid=1111_6 listbox "Suggestions" orientation="vertical"
+      uid=1111_8 contentinfo
+        uid=1111_9 "↑↓"
+        uid=1111_10 " navigate"
+        uid=1111_11 "↵"
+        uid=1111_12 " open"
+        uid=1111_13 "esc"
+        uid=1111_14 " close"
+        uid=1111_15 generic live="polite" relevant="additions text"
+          uid=1111_16 "14"
+          uid=1111_17 " suggestion"
+          uid=1111_18 "s"

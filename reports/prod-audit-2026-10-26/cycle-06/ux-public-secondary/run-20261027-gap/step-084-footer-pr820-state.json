@@ -1,0 +1,89 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": true,
+  "link": {
+    "rect": {
+      "x": 611.046875,
+      "y": 777.109375,
+      "width": 71.25,
+      "height": 24,
+      "top": 777.109375,
+      "right": 682.296875,
+      "bottom": 801.109375,
+      "left": 611.046875
+    },
+    "display": "inline-flex",
+    "parent": "Open-source. PRs welcome.\nIndexed automatically from README.md."
+  },
+  "nearby": [
+    {
+      "name": "Encoding & Codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 723.140625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 723.140625,
+        "right": 505.328125,
+        "bottom": 767.140625,
+        "left": 288.65625
+      }
+    },
+    {
+      "name": "General Tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 751.953125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 751.953125,
+        "right": 505.328125,
+        "bottom": 795.953125,
+        "left": 288.65625
+      }
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 780.765625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 780.765625,
+        "right": 505.328125,
+        "bottom": 824.765625,
+        "left": 288.65625
+      }
+    },
+    {
+      "name": "Intro & Learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 809.578125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 809.578125,
+        "right": 505.328125,
+        "bottom": 853.578125,
+        "left": 288.65625
+      }
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "rect": {
+        "x": 537.328125,
+        "y": 705.921875,
+        "width": 216.671875,
+        "height": 59.1875,
+        "top": 705.921875,
+        "right": 754,
+        "bottom": 765.109375,
+        "left": 537.328125
+      }
+    }
+  ]
+}

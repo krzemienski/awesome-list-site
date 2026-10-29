@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/category/encoding-codecs?page=4","title":"You're offline — Awesome Video","width":820,"height":1180,"scrollY":186,"bodyWidth":814,"online":false,"focus":{"tag":"BUTTON","id":"","label":null,"text":"Retry","rect":{"x":471.484375,"y":164.546875,"width":91.015625,"height":44,"top":164.546875,"right":562.5,"bottom":208.546875,"left":471.484375}},"headings":[{"text":"You're offline","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"All in Encoding & Codecs →","label":null,"current":"page"},{"text":"Encoding & Codecs","label":null,"current":"page"}],"status":["OfflineYou're offlineThis page couldn't load because your device has no connection. It will load on its own when you reconnect.Still offline — reconnect and try again.Retry"],"analyticsDisabled":"1"}
+```

@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/categories?sort=name-desc","title":"All Categories — Awesome Video","width":1440,"height":900,"scrollX":0,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"BUTTON","id":"categories-sort","label":null,"text":"Name (Z–A)"},"headings":[{"text":"All Categories","id":""},{"text":"Standards & Industry","id":""},{"text":"Protocols & Transport","id":""},{"text":"Players & Clients","id":""},{"text":"Media Tools","id":""},{"text":"Intro & Learning","id":""},{"text":"Infrastructure & Delivery","id":""},{"text":"General Tools","id":""},{"text":"Encoding & Codecs","id":""},{"text":"Community & Events","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":[],"pressed":[{"text":"Browse","label":null},{"text":"Browse","label":null}],"status":[],"analyticsDisabled":"1"}
+```

@@ -23,13 +23,13 @@ Never use the DATABASE_URL from memory or `.env` (historically production Neon).
 cd <checkout> && BUILD_REVISION=$(git rev-parse HEAD) \
 DOTENV_CONFIG_PATH=/Users/nick/Desktop/awesome-list-site/.env \
 DATABASE_URL=postgresql://localhost:5432/<db> PORT=<port> NODE_ENV=development DISABLE_BACKGROUND_JOBS=1 \
-ANTHROPIC_MODEL=cc/claude-opus-5 VITE_SITE_URL=https://awesome.video VITE_POSTHOG_HOST=https://us.i.posthog.com \
+ANTHROPIC_MODEL=cc/Codex-opus-5 VITE_SITE_URL=https://awesome.video VITE_POSTHOG_HOST=https://us.i.posthog.com \
 CONTACT_ENABLED=true VITE_CONTACT_VARIANT=b CONTACT_ISSUES_URL=https://github.com/krzemienski/awesome-video/issues \
 VITE_AMPLITUDE_API_KEY=f5338474e281eac273d5ec975dd13c45 VITE_MIXPANEL_TOKEN=47cf526a041e2df05ad1ab433d96d8b2 \
 VITE_POSTHOG_KEY=phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8 \
 env -u ANTHROPIC_BASE_URL -u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_API_KEY -u ANTHROPIC_DEFAULT_OPUS_MODEL -u ANTHROPIC_DEFAULT_SONNET_MODEL -u ANTHROPIC_DEFAULT_HAIKU_MODEL -u ANTHROPIC_DEFAULT_FABLE_MODEL \
-ANTHROPIC_BASE_URL=https://router.hack.ski ANTHROPIC_DEFAULT_OPUS_MODEL=cc/claude-opus-5 ANTHROPIC_DEFAULT_SONNET_MODEL=cc/claude-sonnet-5 \
-ANTHROPIC_DEFAULT_HAIKU_MODEL=cc/claude-haiku-4-5-20251001 ANTHROPIC_DEFAULT_FABLE_MODEL=cc/claude-fable-5 \
+ANTHROPIC_BASE_URL=https://router.hack.ski ANTHROPIC_DEFAULT_OPUS_MODEL=cc/Codex-opus-5 ANTHROPIC_DEFAULT_SONNET_MODEL=cc/Codex-sonnet-5 \
+ANTHROPIC_DEFAULT_HAIKU_MODEL=cc/Codex-haiku-4-5-20251001 ANTHROPIC_DEFAULT_FABLE_MODEL=cc/Codex-fable-5 \
 ./node_modules/.bin/tsx server/index.ts > /tmp/aw-verify-<port>.log 2>&1
 ```
 

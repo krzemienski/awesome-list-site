@@ -1,0 +1,287 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: AU
+                    - generic:
+                      - generic: // Profile
+                      - heading [level=1]:
+                        - generic: Admin User
+                        - button:
+                          - img
+                      - generic:
+                        - generic:
+                          - img
+                          - generic: admin@example.com
+                        - generic:
+                          - img
+                          - text: Joined 11 months ago
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: Sign out
+                      - button:
+                        - img
+                        - text: Sign out all devices
+                  - generic:
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: "2"
+                          - paragraph: Favorites
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: "12"
+                          - paragraph: Bookmarks
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: —
+                          - paragraph: Learning Streak
+                          - paragraph: Consecutive days signed in
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: —
+                          - paragraph: Journeys Completed
+                          - paragraph: Learning journeys finished
+                  - generic:
+                    - tablist:
+                      - tab: Overview
+                      - tab: Favorites
+                      - tab: Bookmarks
+                      - tab: Submissions
+                      - tab [selected]: Security
+                    - tabpanel:
+                      - generic:
+                        - article:
+                          - generic:
+                            - generic:
+                              - img
+                              - text: Password & security
+                            - generic: You're signed in with the owner password, so there is no account password, device list or connected sign-in method to manage here. To end owner sessions everywhere, use Sign out all devices at the top of this page. App API keys are managed separately, below.
+                        - article:
+                          - generic:
+                            - generic:
+                              - img
+                              - text: API keys
+                            - generic:
+                              - text: Keys for programmatic, read-only access to this site's public API (send
+                              - code: "Authorization: Bearer <key>"
+                              - text: ). They are separate from your sign-in account above. Each key's secret is shown once, when you create it.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - text: Key name
+                                  - textbox:
+                                    - /placeholder: e.g. My reading-list script
+                                - generic:
+                                  - text: Expires
+                                  - combobox:
+                                    - generic: 90 days
+                                    - img
+                                  - combobox
+                              - button [disabled]: Create key
+                            - region:
+                              - heading [level=3]: Your keys
+                              - list:
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] gap key one-year"
+                                      - generic: Active
+                                    - paragraph: Created 1 minute ago · Expires in 12 months · Last used less than a minute ago
+                                  - button: Revoke
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] c6 key1y"
+                                      - generic: Revoked
+                                    - paragraph: Created about 1 hour ago · Revoked about 1 hour ago · Never used
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] c6 key90"
+                                      - generic: Revoked
+                                    - paragraph: Created about 1 hour ago · Revoked about 1 hour ago · Never used
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] c6 key30"
+                                      - generic: Revoked
+                                    - paragraph: Created about 1 hour ago · Revoked about 1 hour ago · Last used about 1 hour ago
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] c6 key30"
+                                      - generic: Revoked
+                                    - paragraph: Created about 2 hours ago · Revoked about 1 hour ago · Never used
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: "[QA-audit-1026] c4 key"
+                                      - generic: Revoked
+                                    - paragraph: Created about 7 hours ago · Revoked about 7 hours ago · Never used
+                                - listitem:
+                                  - generic:
+                                    - generic:
+                                      - generic: __qa_test_578_api_key_1791282860771
+                                      - generic: Revoked
+                                    - paragraph: Created 21 days ago · Revoked 21 days ago · Last used 21 days ago
+                        - article:
+                          - generic:
+                            - generic: Delete account & data
+                            - generic: Request permanent deletion of your account and personal data. Requests are handled privately by a maintainer — nothing is posted publicly.
+                          - generic:
+                            - paragraph: Approved resources you submitted stay in the directory but are detached from your identity.
+                            - button: Request account deletion
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 3,826
+                  - paragraph:
+                    - text: 9 categories 99 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+                  - generic:
+                    - button:
+                      - img
+                      - text: Contact maintainers
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - button: Cookie settings
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+  - alertdialog "Revoke “[QA-audit-1026] gap key one-year”?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Revoke “[QA-audit-1026] gap key one-year”?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Anything using this key stops working immediately. This can't be undone; create a new key if you need access again.
+    - generic [ref=e6]:
+      - button "Cancel" [active] [ref=e7] [cursor=pointer]
+      - button "Revoke key" [ref=e8] [cursor=pointer]

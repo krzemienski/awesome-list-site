@@ -1,0 +1,653 @@
+{
+  "title": "Awesome Video",
+  "description": "A curated list of awesome video tools, frameworks, libraries, and learning resources",
+  "exportDate": "2026-10-27T19:06:16.040Z",
+  "totalResources": 129,
+  "resources": [
+    {
+      "title": "2025 NAB Show: CineCentral",
+      "url": "https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ACM Mile-High Video",
+      "url": "https://www.mile-high.video/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ACM Mile-High Video 2025",
+      "url": "https://www.mile-high.video/technical-program",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ACM MMSys 2026",
+      "url": "https://2026.acmmmsys.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ACM MMSys 2026 — Call for Papers",
+      "url": "https://2026.acmmmsys.org/call-for-papers",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ACM NOSSDAV 2026 — Workshop on Network and OS Support for Digital A/V",
+      "url": "https://nossdav.org/2026/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "AOSP and AAOS Meetup Archive",
+      "url": "https://aospandaaos.github.io/meetup.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Apple Developer Forums - Media Technologies",
+      "url": "https://developer.apple.com/forums/topics/media-technologies/streaming",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Atlanta Tech Resources",
+      "url": "https://github.com/citizen00147/atlanta-tech-resources",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Awesome Tech Communities",
+      "url": "https://github.com/MartinRosenberg/Awesome-Tech-Communities",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Bay Area Tech Meetups",
+      "url": "https://github.com/elizabethsiegle/Bay_Area_tech_meetups",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Bitmovin Community Site",
+      "url": "https://bitmovin.com/blog/video-technology-developers/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "BOS Video Technology Meetup",
+      "url": "https://www.meetup.com/bos-video-technology/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Brightcove Global Streaming Technology Summit 2023",
+      "url": "https://webinar.brightcovegallery.com/bcovkorea2023-en",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Canon Video Forums",
+      "url": "https://community.usa.canon.com/t5/Video/ct-p/videosolutions",
+      "category": "Community & Events"
+    },
+    {
+      "title": "CNCF Community Groups",
+      "url": "https://github.com/cncf/communitygroups",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Codec Developers - Google Groups",
+      "url": "https://groups.google.com/a/webmproject.org/g/codec-devel",
+      "category": "Community & Events"
+    },
+    {
+      "title": "CommCon",
+      "url": "https://commcon.xyz/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "compress.cafe — Encoding Community Resources",
+      "url": "https://compress.cafe/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ConferenceXP",
+      "url": "https://github.com/conferencexp/conferencexp",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Creative COW",
+      "url": "https://creativecow.net/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2017",
+      "url": "https://www.youtube.com/watch?v=PSdhW-R9u6s&list=PLkyaYNWEKcOfntbMd6KtHhF7qpL9hj6of",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2018",
+      "url": "https://www.youtube.com/watch?v=bfK_f7GBA8s&list=PLkyaYNWEKcOfARqEht42i1P4kBemzEV2V",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2019",
+      "url": "https://m.youtube.com/playlist?list=PLkyaYNWEKcOf_C_6W45abNvXMb40xUUqh",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2021",
+      "url": "https://www.youtube.com/playlist?list=PLkyaYNWEKcOfD1GYFxFbZXDP03XM-cZPg",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2022",
+      "url": "https://www.youtube.com/playlist?list=PLkyaYNWEKcOf98lZxnCcL6y7ZIVU3oSYO",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2024",
+      "url": "https://2024.demuxed.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2025 (London) — Schedule",
+      "url": "https://2025.demuxed.com/live",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2025 Lightning Talks",
+      "url": "https://www.youtube.com/watch?v=6bgPl4DFzzg",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed 2025 — program and talk archive",
+      "url": "https://2025.demuxed.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed Conference",
+      "url": "https://www.demuxed.com/about",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed Meetups Directory",
+      "url": "https://www.demuxed.com/meetups",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed Podcast",
+      "url": "https://www.demuxed.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Demuxed — Global video engineering meetups index",
+      "url": "https://2017.demuxed.com/meetups/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Denver Video Technology Meetup",
+      "url": "https://www.meetup.com/Denver-Digital-Video/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Digital Video Forum – The Digital FAQ",
+      "url": "https://www.digitalfaq.com/forum/video/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Digital Video Information Network (DVinfo.net)",
+      "url": "https://www.dvinfo.net/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Digital Video Talk Forum",
+      "url": "https://www.dpreview.com/forums/1045",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Digital Video Talk Forum on DPReview",
+      "url": "https://www.dpreview.com/forums/1009",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Doom9 — Encoder tuning: 2nd generation guide to aomenc-av1",
+      "url": "https://forum.doom9.org/showthread.php?t=183906",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Doom9's Forum",
+      "url": "https://forum.doom9.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Doom9's Forum - Video Encoding Section",
+      "url": "https://forum.doom9.org/forumdisplay.php?f=17",
+      "category": "Community & Events"
+    },
+    {
+      "title": "DV Info Net Forums",
+      "url": "https://www.dvinfo.net/forum/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "DVXuser Forums",
+      "url": "https://www.dvxuser.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "EBU Production Technology Seminar 2026",
+      "url": "https://tech.ebu.ch/events/pts2026",
+      "category": "Community & Events"
+    },
+    {
+      "title": "encode.moe Encoding Guide",
+      "url": "https://guide.encode.moe/encoding/preparation.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FFmpeg IRC channels (#ffmpeg, #ffmpeg-devel on Libera.Chat)",
+      "url": "https://ffmpeg.org/contact.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FFmpeg Mailing Lists & IRC (Official)",
+      "url": "https://ffmpeg.org/mailing-list-faq.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FOMS 2024 session notes — Common Media Library",
+      "url": "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FOMS 2025 — Foundations of Open Media Software workshop",
+      "url": "https://www.foms-workshop.org/foms2025/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FOSDEM 2026 Open Media Devroom Schedule",
+      "url": "https://fosdem.org/2026/schedule/track/open-media-devroom/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "FOSDEM 2026: Decentralized Public Broadcast with Streamplace",
+      "url": "https://fosdem.org/2026/schedule/event/PN7WCS-decentralized_public_broadcast_with_streamplace/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Future of Video: Business of Streaming",
+      "url": "https://www.parksassociates.com/event/future-of-video",
+      "category": "Community & Events"
+    },
+    {
+      "title": "GITEX Asia 2025",
+      "url": "https://gitexasia.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Google Cloud Next 2025",
+      "url": "https://www.itpro.com/cloud/live/google-cloud-next-2025-all-the-news-and-updates-live",
+      "category": "Community & Events"
+    },
+    {
+      "title": "GStreamer Discourse Forum",
+      "url": "https://discourse.gstreamer.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Hybrid Meetup Platform",
+      "url": "https://github.com/montevideo-tech/hybrid-meetup-platform",
+      "category": "Community & Events"
+    },
+    {
+      "title": "IEEE ICIP AOMedia Industry Workshop",
+      "url": "https://2025.ieeeicip.org/aomedia-industry-workshop",
+      "category": "Community & Events"
+    },
+    {
+      "title": "InfoComm 2025",
+      "url": "https://www.infocommshow.org/infocomm-2025",
+      "category": "Community & Events"
+    },
+    {
+      "title": "ISE Broadcast AV Summit",
+      "url": "https://iseurope.org/content-programme/broadcast-av-summit",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Kaltura Community Forums",
+      "url": "https://forum.kaltura.org/c/community-forums/21",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Kodi Community Forum",
+      "url": "https://forum.kodi.tv/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Level1Techs Forums - Encoding/Compression Video and Audio Mega Thread",
+      "url": "https://forum.level1techs.com/t/encoding-compression-video-and-audio-mega-thread/210653",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Lex Fridman Podcast #496 — FFmpeg/VLC Engineers",
+      "url": "https://lexfridman.com/ffmpeg-transcript/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Los Angeles Video Technology",
+      "url": "https://www.meetup.com/los-angeles-video-technology/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "MacRumors Forums - Digital Video Section",
+      "url": "https://forums.macrumors.com/forums/digital-video.80/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Microsoft Build 2025",
+      "url": "https://build.microsoft.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "MonteVIDEO Tech Meetup",
+      "url": "https://montevideotech.dev/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Montevideo Video Tech Summer Camp",
+      "url": "https://www.qualabs.com/community",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Movie Studio Zen Forum - Technology Forums",
+      "url": "https://www.moviestudiozen.com/forum/technology-forums",
+      "category": "Community & Events"
+    },
+    {
+      "title": "NAB Show 2025",
+      "url": "https://www.tvtechnology.com/features/welcome-to-the-2025-nab-show-where-the-future-is-now",
+      "category": "Community & Events"
+    },
+    {
+      "title": "OBS Forums",
+      "url": "https://obsproject.com/forum/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "OTT.X Webinars",
+      "url": "https://ottx.org/webinars/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "P2P Audiovisual Resource Pages and Links",
+      "url": "https://wiki.p2pfoundation.net/P2P_Audiovisual_Resource_Pages_and_Links",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Paris Video Tech",
+      "url": "https://www.parisvideotech.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Picture Coding Symposium — Complete Paper Index (dblp)",
+      "url": "https://dblp.org/db/conf/pcs/index.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Proceedings of ACM MMSys 2026",
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3793853",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Proceedings of the 4th ACM Mile-High Video Conference (MHV '25)",
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3715675",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Proceedings of the 5th ACM Mile-High Video Conference (2026)",
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3789239",
+      "category": "Community & Events"
+    },
+    {
+      "title": "r/AV1 Subreddit",
+      "url": "https://www.reddit.com/r/AV1/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Reddit r/videostreaming",
+      "url": "https://www.reddit.com/r/videostreaming/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Resource Pages and Links to the P2P Audiovisual Net",
+      "url": "https://wiki.p2pfoundation.net/Resource_Pages_and_Links_to_the_P2P_Audiovisual_Net",
+      "category": "Community & Events"
+    },
+    {
+      "title": "RIST Forum Events",
+      "url": "https://www.rist.tv/events",
+      "category": "Community & Events"
+    },
+    {
+      "title": "RTC.ON Conference",
+      "url": "https://rtcon.swmansion.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SEGMENTS:2023 by Streaming Video Technology Alliance",
+      "url": "https://web.archive.org/web/20230521170721/https://www.businesswire.com/news/home/20230516005279/en/Streaming-Video-Technology-Alliance-Introduces-New-Industry-Conference-SEGMENTS2023",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SF Video Technology Meetup",
+      "url": "https://www.meetup.com/sf-video-technology/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SIGGRAPH 2025",
+      "url": "https://www.siggraph.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Silicon Valley Video Summit 2025",
+      "url": "https://svgplay.sportsvideo.org/silicon-valley-video-summit-2025",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SMPTE Events",
+      "url": "https://www.smpte.org/events",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SMPTE Media Technology Summit 2026",
+      "url": "https://summit.smpte.org/2026",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Media Conferences",
+      "url": "https://www.streamingmedia.com/conferences/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Media Connect 2023",
+      "url": "https://www.streamingmediaglobal.com/Articles/ReadArticle.aspx?ArticleID=161593",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Media Connect 2025",
+      "url": "https://www.streamingmedia.com/Conferences/Connect2025-May/Default.aspx",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Media Connect February 2025",
+      "url": "https://www.streamingmedia.com/conferences/connect2025/default.aspx",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Media University Workshops",
+      "url": "https://www.streamingmedia.com/Conferences/StreamingMediaUniversity/Schedule.aspx",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Tech Sweden",
+      "url": "https://streamingtech.se/index.html",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Video Industry Events Calendar",
+      "url": "https://www.svta.org/streaming-video-industry-events/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Video Technology Alliance (SVTA) Events",
+      "url": "https://www.svta.org/svta-calendar/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Video Technology Alliance (SVTA) Special Events",
+      "url": "https://www.svta.org/svta-special-events/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming Video Technology Alliance Q1 2025 Member Meeting",
+      "url": "https://www.svta.org/2025/03/07/streaming-video-technology-alliance-tucson-first-quarterly-member-meeting-2025/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Streaming+ at NATPE Global 2025",
+      "url": "https://global.natpe.com/2025/streamingplus/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SVT-AV1 (GitLab)",
+      "url": "https://gitlab.com/AOMediaCodec/SVT-AV1",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SVTA STREAMups",
+      "url": "https://www.svta.org/streaming-video-alliance-streamups-and-meetups/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "SVTA Webinars (SVTA University)",
+      "url": "https://university.svta.org/svta-webinars/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Tech Community Slacks (curated list)",
+      "url": "https://github.com/thisdot/tech-community-slacks",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Tech Meetups",
+      "url": "https://github.com/thisdot/tech-meetups",
+      "category": "Community & Events"
+    },
+    {
+      "title": "The Video Consortium Gatherings and Workshops",
+      "url": "https://videoconsortium.org/events",
+      "category": "Community & Events"
+    },
+    {
+      "title": "The Video Insiders Podcast",
+      "url": "https://thevideoinsiders.simplecast.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "The Video Insiders — codec/encoding podcast",
+      "url": "https://podcasts.apple.com/us/podcast/the-video-insiders/id1444571837",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Twitch Developer Forums",
+      "url": "https://discuss.dev.twitch.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "TwitchCon",
+      "url": "https://www.twitchcon.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "TwitchCon 2025",
+      "url": "https://en.wikipedia.org/wiki/TwitchCon",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VidCon",
+      "url": "https://vidcon.com",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VidCon 2025",
+      "url": "https://en.wikipedia.org/wiki/VidCon",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Video Dev — video engineers community hub",
+      "url": "https://www.video-dev.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Video Services Forum (VSF)",
+      "url": "https://en.wikipedia.org/wiki/Video_Services_Forum",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Video Tech NYC",
+      "url": "https://www.meetup.com/video-tech-nyc/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "video-dev Slack Community",
+      "url": "https://university.svta.org/industry-resource/video-dev-slack/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Videography",
+      "url": "https://www.reddit.com/r/Videography/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VideoHelp Forum",
+      "url": "https://forum.videohelp.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Videomaker Community",
+      "url": "https://www.videomaker.com/l/connect/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VideoTech 2023 Conference",
+      "url": "https://vtconf.com/en/archive/2023/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VideoTech 2025",
+      "url": "https://vtconf.com/en/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VidTrans (Video Services Forum)",
+      "url": "https://vsf.tv/events",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VidTrans 2026 Conference Agenda",
+      "url": "https://vsf.tv/vidtrans26/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "VidTrans Conference (VSF)",
+      "url": "https://vidtrans.org/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Voices of Video (NETINT) — video engineering podcast",
+      "url": "https://voicesofvideo.netint.com/join-the-conversation",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Wowza Community",
+      "url": "https://community.wowza.com/",
+      "category": "Community & Events"
+    },
+    {
+      "title": "Wowza Community Slack",
+      "url": "https://www.wowza.com/slack",
+      "category": "Community & Events"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?sort=name-desc","title":"Awesome Video — 3826+ Curated Video & Streaming Resources","width":820,"height":1180,"touch":true,"scrollY":4630,"bodyWidth":814,"online":true,"focus":{"tag":"H1","id":"","label":null,"text":"Awesome Video Resources","rect":{"x":280,"y":-4376.40625,"width":474,"height":109.21875,"top":-4376.40625,"right":754,"bottom":-4267.1875,"left":280}},"headings":[{"text":"Awesome Video Resources","id":""},{"text":"Hand-picked highlights","id":""},{"text":"Nine domains, one taxonomy","id":""},{"text":"Fresh from the index","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Home","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

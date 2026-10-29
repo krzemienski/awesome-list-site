@@ -1,0 +1,20 @@
+== /api/auth/user
+{"user":{"id":"d460f5e7-a085-4083-96a2-2f20dc9315c4","email":"<R>","name":"Admin User","avatar":null,"role":"admin","createdAt":"2025-11-18T16:40:48.993Z","deletionRequestedAt":null,"authMethod":"owner_password"},"isAuthenticated":true}
+== /api/favorites
+[{"id":186357,"title":"Alliance for Open Media (AOMedia)","url":"https://aomedia.org/","description":"An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image formats and tools.","category":"Encoding & Codecs","subcategory":null,"subSubcategory":null,"resourceFormat":"unknown","provider":"unknown","skillLevel":"unknown","kind":"standards","status":"approved","createdAt":"2026-01-20T20:31:02.213Z","resourceId":186357,"favoritedAt":"2026-10-27T06:33:07.542Z","metadata":{"tags":["codec","AV1","open-source","video c
+== /api/bookmarks
+[{"id":184751,"title":"2025 NAB Show: CineCentral","url":"https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique","description":"The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production.","category":"Community & Events","subcategory":"Events & Conferences","subSubcategory":null,"resourceF
+== /api/collections
+[]
+== /api/notification-preferences
+{"emailDigestEnabled":false,"inAppEnabled":false,"includeNewResources":true,"includeWatchNext":true,"includeJourneyStep":true,"cadence":"weekly","timezone":"America/New_York","pausedUntil":null,"emailOptedInAt":"2026-10-27T07:16:48.676Z","emailUnsubscribedAt":"2026-10-27T07:17:24.297Z","inAppOptedInAt":"2026-10-27T07:16:48.676Z","updatedAt":"2026-10-27T07:18:27.990Z"}
+== /api/user/preferences
+{"preferences":{"id":10,"userId":"d460f5e7-a085-4083-96a2-2f20dc9315c4","preferredCategories":["Encoding & Codecs"],"skillLevel":"beginner","learningGoals":["learn-fundamentals"],"preferredResourceTypes":["video"],"timeCommitment":"flexible","homeLayout":"index","onboardingStatus":"completed","onboardingStep":5,"onboardingCompletedAt":"2026-10-27T07:24:04.463Z","onboardingDismissedAt":null,"themeSystem":"editorial","themeAccent":"crimson","revision":58,"createdAt":"2026-10-06T10:29:42.445Z","updatedAt":"2026-10-27T07:43:15.783Z"},"homeLayout":"index","theme":{"systemId":"editorial","accentId":
+== /api/user/api-keys
+{"apiKeys":[{"id":"02b82cac-21a0-4fd3-a8d6-d5759173c171","userId":"d460f5e7-a085-4083-96a2-2f20dc9315c4","name":"[QA-audit-1026] gap key ninety-confirmed","scopes":[],"createdAt":"2026-10-27T08:41:29.708Z","lastUsedAt":null,"expiresAt":"2027-01-25T08:41:29.689Z","revokedAt":"2026-10-27T08:41:30.137Z"},{"id":"1cf6ff31-aae6-4190-893b-552fa985c17e","userId":"d460f5e7-a085-4083-96a2-2f20dc9315c4","name":"[QA-audit-1026] gap key90","scopes":[],"createdAt":"2026-10-27T08:40:21.564Z","lastUsedAt":null,"expiresAt":"2026-11-26T08:40:21.549Z","revokedAt":"2026-10-27T08:40:21.962Z"},{"id":"24c9a91c-9369-
+== /api/user/progress
+{"totalResources":3826,"completedResources":1,"currentPath":"Advanced Live Streaming Architecture","streakDays":1,"totalTimeSpent":"23h 30m","skillLevel":"beginner"}
+== /api/notifications?limit=50
+{"notifications":[],"unreadCount":0}
+== /api/user/contributions?limit=1
+{"items":[{"id":190364,"kind":"resource","status":"withdrawn","title":"[QA-audit-1026] MDN VideoFrame clone audit","submittedAt":"2026-10-27T08:31:21.540Z","changedAt":"2026-10-27T08:31:48.155Z","canWithdraw":false,"rejectionReason":null,"publicResource":null,"submission":{"url":"https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame/clone","description":"[QA-audit-1026] Official MDN reference for VideoFrame.clone(), including returned shared-media frame, InvalidStateError and dedicated-worker availability. Run-owned QA submission for immediate withdrawal.","category":"Media Tools","subca

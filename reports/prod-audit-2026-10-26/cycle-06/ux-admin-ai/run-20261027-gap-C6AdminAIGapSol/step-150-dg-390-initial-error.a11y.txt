@@ -1,0 +1,126 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - navigation "Breadcrumb" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "Home" [ref=e29] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e30]:
+                - img [ref=e31]
+              - listitem [ref=e33]:
+                - link "Admin" [ref=e34] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e35]:
+                - img [ref=e36]
+              - listitem:
+                - link "Digests" [disabled]
+          - generic [ref=e38]: Authorized admin area
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e45]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e46]:
+                  - text: Operations
+                  - emphasis [ref=e47]: dashboard
+                - paragraph [ref=e48]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e49]:
+                - button "Settings, Digests section open" [ref=e50] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                  - generic [ref=e51]: · Digests
+                - 'button "New entry: add a resource" [ref=e52] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e53]: Digests section open
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - tablist "Admin sections" [ref=e56]:
+                  - tab "Overview" [ref=e57] [cursor=pointer]:
+                    - img [ref=e58]
+                    - text: Overview
+                  - tab "Approvals" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Approvals
+                  - tab "Edits" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e68] [cursor=pointer]:
+                    - img [ref=e69]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Researcher
+                  - tab "Export" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Export
+                  - tab "Database" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Database
+                  - tab "Resources" [ref=e82] [cursor=pointer]:
+                    - img [ref=e83]
+                    - text: Resources
+                  - tab "Categories" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Subcategories
+                  - tab "Users" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Users
+                  - tab "GitHub" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Link Health
+                  - tab "Audit" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Audit
+                  - tab "Research" [ref=e104] [cursor=pointer]:
+                    - img [ref=e105]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e107] [cursor=pointer]:
+                  - img [ref=e108]
+              - tabpanel "Digests" [ref=e110]:
+                - article [ref=e111]:
+                  - generic [ref=e112]:
+                    - generic [ref=e113]:
+                      - img [ref=e114]
+                      - text: Digest delivery health
+                    - paragraph [ref=e116]: Aggregate transport and queue signals only. No message contents, user data, recipient identifiers, or secret tokens are shown.
+                    - generic [ref=e117]:
+                      - paragraph [ref=e118]: Refreshes every 30s
+                      - button "Refresh" [ref=e119] [cursor=pointer]:
+                        - img
+                        - text: Refresh
+                  - alert [ref=e121]:
+                    - img [ref=e122]
+                    - paragraph [ref=e124]: Couldn't load digest delivery health
+                    - generic [ref=e125]:
+                      - generic [ref=e126]: Could not reach the server. Please check your connection and try again.
+                      - button "Retry" [ref=e127] [cursor=pointer]:
+                        - img
+                        - text: Retry

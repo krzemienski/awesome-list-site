@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/profile?tab=security",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"default\" type=\"submit\" data-testid=\"button-save-name\">Save</button>",
+  "umami": "1",
+  "consent": "denied"
+}

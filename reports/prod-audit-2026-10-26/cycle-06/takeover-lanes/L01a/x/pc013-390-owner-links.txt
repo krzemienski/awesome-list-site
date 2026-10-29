@@ -1,0 +1,2 @@
+"{\"vw\":390,\"dlg\":true,\"links\":[[\"Home\",\"/\",null,138,44],[\"Submit\",\"/submit\",null,186,44],[\"About\",\"/about\",\"page\",235,44],[\"Admin\",\"/admin\",null,283,44],[\"Docs ↗\",\"https://github.com/krzemienski/awesome-video/tree/master/docs\",null,815,44],[\"Home dashboard\",\"/?context=account\",null,799,44]]}"
+390 drawer Admin -> "{\"p\":\"/admin\",\"dlg\":false,\"h1\":\"Operations dashboard\"}"

@@ -1,0 +1,4 @@
+# C7 MB04-1 (recommendation feedback) — partial, 1440 only
+Worker: sonnet abad12eb08c5fd24d. Revision 31d0acce. 0 findings. MB-037 partial (Helpful set/unset; a failed PUT reverts with "Feedback wasn't saved"); MB-038 PASS@1440 (not_for_me/already_known, dismissed section, Restore); MB-039 partial (Hide + Undo). MB-040 undriven; 820/390 undriven.
+LEAD ROOT CAUSE for the "feedback churn" and PS04a-1's stray "helpful" read: the lead ran PS04a-1 and MB04-1 at the same time on the SAME owner account's recommendation feedback (card 190088). Both anomalies are lead-scheduling collisions, not product defects. RULE: only one worker at a time may write a given piece of owner-account state (recommendation feedback, bookmarks, favorites, collections, preferences).
+Owner feedback re-read [] at ~16:44Z; preferences unchanged (revision 65).

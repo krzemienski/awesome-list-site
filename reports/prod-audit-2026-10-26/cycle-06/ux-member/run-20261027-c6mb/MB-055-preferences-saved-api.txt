@@ -1,0 +1,1 @@
+"{\"emailDigestEnabled\":true,\"inAppEnabled\":true,\"includeNewResources\":true,\"includeWatchNext\":true,\"includeJourneyStep\":true,\"cadence\":\"monthly\",\"timezone\":\"UTC\",\"pausedUntil\":null,\"emailOptedInAt\":\"2026-10-27T07:16:48.676Z\",\"emailUnsubscribedAt\":null,\"inAppOptedInAt\":\"2026-10-27T07:16:48.676Z\",\"updatedAt\":\"2026-10-27T07:16:48.676Z\"}"

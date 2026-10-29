@@ -1,0 +1,4 @@
+In-page fetch with location=/search?q=%3Cscript%3E (Referer carries it): /api/version 403, /api/resources 403 (body "403 Forbidden").
+replaceState to q=hls / a%3Cb / %3Cb%3Ehi / %3Cimg%3E: /api/version 200. Only %3Cscript%3E: 403.
+curl same API without that Referer: 200.
+UI: /search?q=<script> shows "Search failed - Something went wrong while searching. Please try again. Retry". Hard load of the URL ends on /search with the query dropped.

@@ -1,0 +1,5 @@
+[5406.504] GET https://awesome.video/api/researcher/config (Fetch) 200
+[5406.522] GET https://awesome.video/api/researcher/config?model=cc%2Fqa-orchestrator-override (Fetch) 200
+[5406.523] GET https://awesome.video/api/researcher/config?model=cc%2Fqa-orchestrator-override&scoutModel=cc%2Fqa-scout-override (Fetch) 200
+[5406.526] GET https://awesome.video/api/researcher/config?model=cc%2Fqa-orchestrator-override&scoutModel=cc%2Fqa-scout-override&baseUrl=https%3A%2F%2Fexample.com (Fetch) 200
+[5406.528] GET https://awesome.video/api/researcher/config?model=cc%2Fqa-orchestrator-override&scoutModel=cc%2Fqa-scout-override&baseUrl=http%3A%2F%2Fexample.com&hasAuthToken=1 (Fetch) 200

@@ -1,0 +1,592 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e15]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e16]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e17]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [selected, ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Researcher" [ref=e18] focusable [tabindex]
+            - generic
+              - heading "Run a research task" [level=3, ref=e39]
+              - paragraph
+                - StaticText "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+              - region "Brief" [ref=e40]
+                - heading "Brief" [level=4, ref=e49]
+                - StaticText "Auto-generated at launch"
+                - radiogroup "Research brief" [ref=e50] focusable [tabindex]
+                  - LabelText [ref=e65] clickable [cursor:pointer]
+                    - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked=true, ref=e71]
+                      - image
+                    - StaticText "Auto-generate at launch"
+                    - StaticText "A gap-aware brief built from the catalog and past runs."
+                  - LabelText [ref=e66] clickable [cursor:pointer]
+                    - radio "Write my own Describe what to search for, or start from a generated brief." [checked=false, ref=e72]
+                    - StaticText "Write my own"
+                    - StaticText "Describe what to search for, or start from a generated brief."
+              - region "Focus" [ref=e41]
+                - heading "Focus" [level=4, ref=e51]
+                - StaticText "All categories"
+                - combobox "Category focus" [expanded=false, ref=e52]: All categories
+                  - generic [ref=e67] clickable [cursor:pointer, onclick]
+                    - StaticText "All categories"
+              - region "Limits" [ref=e42]
+                - heading "Limits" [level=4, ref=e53]
+                - StaticText "no target · $3.00 cap · 40 turns"
+                - LabelText [ref=e54] clickable [cursor:pointer]
+                  - StaticText "Stop after (discoveries)"
+                - spinbutton "Stop after (discoveries)" [ref=e55]
+                - paragraph
+                  - StaticText "No target — runs until the budget or turns end."
+                - LabelText [ref=e56] clickable [cursor:pointer]
+                  - StaticText "Budget cap (USD)"
+                - spinbutton "Budget cap (USD)" [ref=e57]: 3
+                  - StaticText "3.00"
+                - paragraph
+                  - StaticText "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."
+                - LabelText [ref=e58] clickable [cursor:pointer]
+                  - StaticText "Max turns"
+                - spinbutton "Max turns" [ref=e59]: 40
+                  - StaticText "40"
+                - paragraph
+                  - StaticText "Positive whole number (blank = no cap)."
+                - paragraph
+                  - StaticText "Past runs cost $0.15–$55.10. Discoveries are deduplicated against the 3,825 catalog resources."
+              - region "Endpoint & model" [ref=e43]
+                - heading "Endpoint & model" [level=4, ref=e60]
+                - StaticText "Server configuration"
+                - button "Override endpoint or models (optional)" [expanded=false, ref=e68]
+                  - StaticText "Override endpoint or models (optional)"
+                  - image
+              - region "About to run on" [ref=e44]
+                - heading "About to run on" [level=4, ref=e61]
+                - DescriptionList
+                  - term "Endpoint"
+                  - definition
+                    - StaticText "router.hack.ski · ANTHROPIC_BASE_URL"
+                  - term "Credential"
+                  - definition
+                    - StaticText "router via ANTHROPIC_BASE_URL"
+                  - term "Orchestrator model"
+                  - definition
+                    - StaticText "cc/claude-opus-5 · ANTHROPIC_MODEL"
+                  - term "Scout model"
+                  - definition
+                    - StaticText "cc/claude-haiku-4-5-20251001 · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL"
+                - button "Launch research run" [ref=e69]
+                  - image
+                  - StaticText "Launch research run"
+              - generic
+                - sectionheader
+                  - heading "Researcher jobs" [level=2, ref=e62]
+                  - paragraph
+                    - StaticText "Latest 5 of 70 research runs"
+                - region "Researcher jobs table, scrollable" [ref=e45] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "STATUS" [ref=e108]
+                        - columnheader "PROMPT" [ref=e109]
+                        - columnheader "FOUND" [ref=e110]
+                        - columnheader "APPROVED / REJECTED" [ref=e111]
+                        - columnheader "COST" [ref=e112]
+                        - columnheader "TURNS" [ref=e113]
+                        - columnheader "CREATED" [ref=e114]
+                    - row
+                      - cell "COMPLETED" [ref=e73]
+                      - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e74]
+                      - cell "0" [ref=e75]
+                      - cell "0/0" [ref=e76]
+                        - StaticText "0/0"
+                      - cell "$1.1166" [ref=e77]
+                      - cell "18/80" [ref=e78]
+                        - StaticText "18/80"
+                      - cell "Oct 27, 2026" [ref=e79]
+                    - row
+                      - cell "COMPLETED" [ref=e80]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e81]
+                      - cell "0" [ref=e82]
+                      - cell "0/0" [ref=e83]
+                        - StaticText "0/0"
+                      - cell "$0.4199" [ref=e84]
+                      - cell "10/80" [ref=e85]
+                        - StaticText "10/80"
+                      - cell "Oct 27, 2026" [ref=e86]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e87]
+                      - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e88]
+                      - cell "0" [ref=e89]
+                      - cell "0/0" [ref=e90]
+                        - StaticText "0/0"
+                      - cell "$0.3062" [ref=e91]
+                      - cell "3/10" [ref=e92]
+                        - StaticText "3/10"
+                      - cell "Oct 26, 2026" [ref=e93]
+                    - row
+                      - cell "COMPLETED" [ref=e94]
+                      - cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e95]
+                      - cell "0" [ref=e96]
+                      - cell "0/0" [ref=e97]
+                        - StaticText "0/0"
+                      - cell "$0.1508" [ref=e98]
+                      - cell "1/8" [ref=e99]
+                        - StaticText "1/8"
+                      - cell "Oct 26, 2026" [ref=e100]
+                    - row
+                      - cell "CANCELLED" [ref=e101]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Community finds. Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e102]
+                      - cell "0" [ref=e103]
+                      - cell "0/0" [ref=e104]
+                        - StaticText "0/0"
+                      - cell "$0.2753 lower bound" [ref=e105]
+                        - StaticText "$0.2753"
+                        - StaticText "lower bound"
+                      - cell "3/40" [ref=e106]
+                        - StaticText "3/40"
+                      - cell "Oct 26, 2026" [ref=e107]
+                - button "Show more" [ref=e46]
+              - group
+                - DisclosureTriangle "All pending discoveries & full job history" [expanded=true]
+                - tablist [ref=e47] focusable [tabindex]
+                  - tab "Review Discoveries" [ref=e63]
+                    - image
+                    - StaticText "Review Discoveries"
+                  - tab "Job History" [selected, ref=e64]
+                    - image
+                    - StaticText "Job History"
+                - tabpanel "Job History" [ref=e48] focusable [tabindex]
+                  - article
+                    - StaticText "Research Job History"
+                    - StaticText "Showing latest 20 of 70 research jobs"
+                    - table
+                      - rowgroup
+                        - row
+                          - columnheader "ID" [ref=e295]
+                          - columnheader "STATUS" [ref=e296]
+                          - columnheader "PROMPT" [ref=e297]
+                          - columnheader "FOUND" [ref=e298]
+                          - columnheader "APPROVED / REJECTED" [ref=e299]
+                          - columnheader "COST" [ref=e300]
+                          - columnheader "TURNS" [ref=e301]
+                          - columnheader "CREATED" [ref=e302]
+                          - columnheader "ACTIONS" [ref=e303]
+                      - row
+                        - cell "#70" [ref=e115]
+                          - StaticText "#70"
+                        - cell "COMPLETED" [ref=e116]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e117]
+                        - cell "0" [ref=e118]
+                        - cell "0 / 0" [ref=e119]
+                          - StaticText "0 / 0"
+                        - cell "$1.1166" [ref=e120]
+                        - cell "18/80" [ref=e121]
+                          - StaticText "18/80"
+                        - cell "Oct 27, 2026" [ref=e122]
+                        - cell "View details for job #70" [ref=e123]
+                          - button "View details for job #70" [ref=e304]
+                            - image
+                      - row
+                        - cell "#69" [ref=e124]
+                          - StaticText "#69"
+                        - cell "COMPLETED" [ref=e125]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e126]
+                        - cell "0" [ref=e127]
+                        - cell "0 / 0" [ref=e128]
+                          - StaticText "0 / 0"
+                        - cell "$0.4199" [ref=e129]
+                        - cell "10/80" [ref=e130]
+                          - StaticText "10/80"
+                        - cell "Oct 27, 2026" [ref=e131]
+                        - cell "View details for job #69" [ref=e132]
+                          - button "View details for job #69" [ref=e305]
+                            - image
+                      - row
+                        - cell "#68" [ref=e133]
+                          - StaticText "#68"
+                        - cell "STOPPED AT BUDGET" [ref=e134]
+                          - image
+                          - StaticText "STOPPED AT BUDGET"
+                        - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e135]
+                        - cell "0" [ref=e136]
+                        - cell "0 / 0" [ref=e137]
+                          - StaticText "0 / 0"
+                        - cell "$0.3062" [ref=e138]
+                        - cell "3/10" [ref=e139]
+                          - StaticText "3/10"
+                        - cell "Oct 26, 2026" [ref=e140]
+                        - cell "View details for job #68" [ref=e141]
+                          - button "View details for job #68" [ref=e306]
+                            - image
+                      - row
+                        - cell "#67" [ref=e142]
+                          - StaticText "#67"
+                        - cell "COMPLETED" [ref=e143]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e144]
+                        - cell "0" [ref=e145]
+                        - cell "0 / 0" [ref=e146]
+                          - StaticText "0 / 0"
+                        - cell "$0.1508" [ref=e147]
+                        - cell "1/8" [ref=e148]
+                          - StaticText "1/8"
+                        - cell "Oct 26, 2026" [ref=e149]
+                        - cell "View details for job #67" [ref=e150]
+                          - button "View details for job #67" [ref=e307]
+                            - image
+                      - row
+                        - cell "#66" [ref=e151]
+                          - StaticText "#66"
+                        - cell "CANCELLED" [ref=e152]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Community finds. Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e153]
+                        - cell "0" [ref=e154]
+                        - cell "—" [ref=e155]
+                        - cell "$0.2753 lower bound" [ref=e156]
+                          - StaticText "$0.2753"
+                          - StaticText "lower bound"
+                        - cell "3/40" [ref=e157]
+                          - StaticText "3/40"
+                        - cell "Oct 26, 2026" [ref=e158]
+                        - cell "View details for job #66" [ref=e159]
+                          - button "View details for job #66" [ref=e308]
+                            - image
+                      - row
+                        - cell "#65" [ref=e160]
+                          - StaticText "#65"
+                        - cell "STOPPED AT BUDGET" [ref=e161]
+                          - image
+                          - StaticText "STOPPED AT BUDGET"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Curated-list mining. Bias this run toward mining other curated lists: awesome-* repos, roundups, \"top N tools\" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one's official site or repo. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e162]
+                        - cell "0" [ref=e163]
+                        - cell "0 / 0" [ref=e164]
+                          - StaticText "0 / 0"
+                        - cell "$0.3213" [ref=e165]
+                        - cell "3/40" [ref=e166]
+                          - StaticText "3/40"
+                        - cell "Oct 26, 2026" [ref=e167]
+                        - cell "View details for job #65" [ref=e168]
+                          - button "View details for job #65" [ref=e309]
+                            - image
+                      - row
+                        - cell "#64" [ref=e169]
+                          - StaticText "#64"
+                        - cell "COMPLETED" [ref=e170]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Vendor & engineering blogs. Bias this run toward deep technical blog posts and niche vendor documentation (engineering blogs of streaming platforms, codec vendors, CDN providers) — NOT marketing pages. Search \"<gap topic> engineering blog\" and \"site:<vendor domain> <topic>\". TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" - \"shot boundary detection open source github alternative PySceneDetect\" - \"p2p-media-loader github WebTorrent HLS streaming\" - \"open source P2P video streaming WebRTC CDN github\" - \"MediaInfo alternative open source video metadata extraction tool github\" - \"SCTE-35 open source parser github marker insertion tool\" - \"low-latency ABR algorithm streaming arxiv paper github code\" - \"low-latency HLS DASH open source tool github WebRTC to HLS bridge\" - \"OCIO ACES color science open source waveform vectorscope video QC github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e171]
+                        - cell "2" [ref=e172]
+                        - cell "1 / 1" [ref=e173]
+                          - StaticText "1 / 1"
+                        - cell "$1.3245" [ref=e174]
+                        - cell "9/40" [ref=e175]
+                          - StaticText "9/40"
+                        - cell "Oct 26, 2026" [ref=e176]
+                        - cell "View details for job #64" [ref=e177]
+                          - button "View details for job #64" [ref=e310]
+                            - image
+                      - row
+                        - cell "#63" [ref=e178]
+                          - StaticText "#63"
+                        - cell "COMPLETED" [ref=e179]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - General Tools › Community & Collaboration Platforms (10 existing) - Media Tools › Video Analytics & Benchmarking (10 existing) - Players & Clients › Desktop Players (10 existing) - Protocols & Transport › DASH Manifest Tools (10 existing) - Encoding & Codecs › Benchmarking & Performance Tools for Codecs (11 existing) - Encoding & Codecs › Comparative Analysis of Codecs (11 existing) - Encoding & Codecs › Open Source Encoder Projects (11 existing) - General Tools › Case Studies & Best Practices in DRM (11 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"open-source EBU R128 loudness normalization tool video github\" - \"open-source video stabilization tool github gyroscope feature-tracking\" - \"LG webOS TV app open source sample framework github OR Android TV Google TV open source video player SDK\" - \"Samsung Tizen TV app development open source sample framework github\" - \"hardware video player device open source firmware Raspberry Pi dedicated player github\" - \"EBU R128 loudness normalization tool video github open source\" - \"video waveform vectorscope histogram analysis tool open source github\" - \"open-source video streaming cloud infrastructure Terraform modules IaC video pipeline github\" - \"open-source video stabilization github gyroscope feature-tracking\" - \"open-source 3D LUT apply convert tool CUBE format github video\" - \"build video player from scratch Media Source Extensions MSE tutorial github\" - \"video transcoding pipeline kubernetes microservices tutorial github\" - \"ProRes DNxHD open source encoder decoder github (not ffmpeg gui wrapper)\" - \"image sequence to video converter open source DPX EXR TIFF github VFX pipeline\" - \"3D LUT video open source github tool apply\" - \"video player UI component library Unity Unreal engine open source github\" - \"open source DRM key management key rotation server github video streaming\" - \"ClearKey DRM open source implementation github test tool\" - \"HDR tone mapping algorithm open source implementation github\" - \"ISO/IEC JTC1 SC29 MPEG working group document output\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1159), arxiv.org (32), dl.acm.org (17), tech.ebu.ch (11), dashif.org (8), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e180]
+                        - cell "173" [ref=e181]
+                        - cell "173 / 0" [ref=e182]
+                          - StaticText "173 / 0"
+                        - cell "$40.5425" [ref=e183]
+                        - cell "625/∞" [ref=e184]
+                          - StaticText "625/∞"
+                        - cell "Jul 30, 2026" [ref=e185]
+                        - cell "View details for job #63" [ref=e186]
+                          - button "View details for job #63" [ref=e311]
+                            - image
+                      - row
+                        - cell "#62" [ref=e187]
+                          - StaticText "#62"
+                        - cell "COMPLETED" [ref=e188]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Conference talks & videos. Bias this run toward conference material: Demuxed, IBC, NAB, Mile High Video, Streaming Media, FOSDEM open-media devroom. Hunt talk pages/recordings AND the specific projects speakers present — both are savable when they fill a gap. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Intro & Learning › Community Blogs & Forums (9 existing) - Intro & Learning › Video Streaming Tutorials (9 existing) - Media Tools › Conversion & Format Tools (9 existing) - Players & Clients › Embedded Players (9 existing) - Players & Clients › Frameworks & UI Components (9 existing) - Protocols & Transport › DASH Tools (9 existing) - Protocols & Transport › HLS Manifest Parsers & Generators (9 existing) - Standards & Industry › Adaptive Streaming Standards (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"site:github.com sprite sheet generator video thumbnails preview\" - \"site:github.com awesome hls dash streaming list\" - \"site:github.com awesome ffmpeg webrtc list\" - \"site:github.com self-hosted video conversion web app ffmpeg\" - \"site:github.com video converter GUI open source 2025\" - \"site:github.com HDR to SDR tone mapping tool ffmpeg\" - \"site:github.com ACES OCIO color pipeline tool\" - \"site:github.com film emulation color grading open source LUT\" - \"site:github.com \"3D LUT\" generator color grading tool 2025\" - \"site:github.com video scene change detection script ffmpeg\" - \"site:github.com video storyboard vtt thumbnail preview generator ffmpeg\" - \"site:github.com waveform generator audio video script\" - \"site:github.com sprite sheet generator video thumbnails ffmpeg\" - \"site:github.com Tauri video editor player app cross-platform\" - \"site:github.com wang-bin mdk-sdk cross-platform media player SDK\" - \"\"video streaming\" engineering blog Twitch OR Cloudflare Stream OR Fastly technical deep dive\" - \"low latency streaming engineering blog personal 2025\" - \"video codec engineering blog site:substack.com OR site:hashnode.dev\" - \"\"how HLS works\" deep dive technical blog\" - \"ACM MMSys 2025 paper github artifact video streaming\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1052), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e189]
+                        - cell "179" [ref=e190]
+                        - cell "179 / 0" [ref=e191]
+                          - StaticText "179 / 0"
+                        - cell "$41.7846" [ref=e192]
+                        - cell "639/∞" [ref=e193]
+                          - StaticText "639/∞"
+                        - cell "Jul 30, 2026" [ref=e194]
+                        - cell "View details for job #62" [ref=e195]
+                          - button "View details for job #62" [ref=e312]
+                            - image
+                      - row
+                        - cell "#61" [ref=e196]
+                          - StaticText "#61"
+                        - cell "COMPLETED" [ref=e197]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: GitHub deep-dive. Bias this run toward GitHub: have the scout run \"site:github.com <gap topic>\" searches, mine GitHub topic pages, and chase tools named in the READMEs/awesome sections of known projects. Target actively-maintained repos (recent pushes, real documentation) that fill the gaps below. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Open Source Encoder Projects (8 existing) - Protocols & Transport › DASH Manifest Tools (8 existing) - Standards & Industry › Industry Forums & Standards Bodies (8 existing) - Encoding & Codecs › Multi-format Packaging Tools (9 existing) - General Tools › Command-line Utilities & Wrappers (9 existing) - General Tools › Community & Collaboration Platforms (9 existing) - General Tools › Cross-Platform Media Tools (9 existing) - General Tools › Independent & Hobbyist Projects (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"OpenH264 Cisco blog encoder open source\" - \"Xeve Xevd MPEG-5 EVC reference encoder open source\" - \"JPEG XL libjxl engineering blog post encoder\" - \"site:blog.cloudflare.com AV1 encoder open source\" - \"Bitmovin blog DASH manifest generation engineering\" - \"Unified Streaming blog CMAF DASH HLS packaging technical\" - \"Shaka Packager blog technical deep-dive CMAF multi-DRM\" - \"site:eyevinntechnology.medium.com CMAF packaging DASH\" - \"\"I wrote a video codec\" OR \"wrote my own video codec\" personal blog\" - \"GStreamer plugin new project github 2025 2026 cross-platform\" - \"AIMS Alliance IP Media Solutions IAB Tech Lab VAST video standards Trusted Partner Network\" - \"Video Services Forum VSF technical recommendations broadcast streaming\" - \"MovieLabs 2030 vision specifications common media format\" - \"Alliance for Open Media governance members codec\" - \"\"shaka-packager\" wrapper OR alternative github python go multi format HLS DASH\" - \"ffmpeg wrapper CLI tool github 2025 batch encoding automation rust go\" - \"\"writing a video encoder\" OR \"encoder from scratch\" blog technical\" - \"Xiph.org blog Daala Opus encoder engineering\" - \"Two Orioles dav1d rav1d blog AV1 encoder\" - \"site:blogs.igalia.com codec encoder\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (950), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e198]
+                        - cell "113" [ref=e199]
+                        - cell "113 / 0" [ref=e200]
+                          - StaticText "113 / 0"
+                        - cell "$28.2090" [ref=e201]
+                        - cell "475/∞" [ref=e202]
+                          - StaticText "475/∞"
+                        - cell "Jul 29, 2026" [ref=e203]
+                        - cell "View details for job #61" [ref=e204]
+                          - button "View details for job #61" [ref=e313]
+                            - image
+                      - row
+                        - cell "#60" [ref=e205]
+                          - StaticText "#60"
+                        - cell "CANCELLED" [ref=e206]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Community finds. Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Open Source Encoder Projects (8 existing) - Protocols & Transport › DASH Manifest Tools (8 existing) - Standards & Industry › Industry Forums & Standards Bodies (8 existing) - Encoding & Codecs › Multi-format Packaging Tools (9 existing) - General Tools › Command-line Utilities & Wrappers (9 existing) - General Tools › Community & Collaboration Platforms (9 existing) - General Tools › Cross-Platform Media Tools (9 existing) - General Tools › Independent & Hobbyist Projects (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"ffmpeg wrapper CLI tool github 2025 batch encoding automation rust go\" - \"\"writing a video encoder\" OR \"encoder from scratch\" blog technical\" - \"Xiph.org blog Daala Opus encoder engineering\" - \"Two Orioles dav1d rav1d blog AV1 encoder\" - \"site:blogs.igalia.com codec encoder\" - \"\"building an H.264 decoder\" OR \"toy video codec\" github hobby project\" - \"\"writing a video decoder from scratch\" github blog\" - \"\"multi-period\" DASH manifest stitching tool github OR \"DASH-IF\" conformance manifest generator\" - \"\"low latency DASH\" MPD chunked github implementation CMAF\" - \"GPAC MP4Box wrapper cli tool github packaging automation\" - \"\"CMAF packager\" github open source multi-DRM 2025\" - \"SMPTE standards working group site OR HDR10+ Technologies official OR W3C Media WebRTC working group\" - \"ATSC 3.0 Advanced Television Systems Committee official site\" - \"AOMedia Alliance for Open Media official site working groups\" - \"Video Services Forum VSF standards official site\" - \"\"adaptive bitrate\" simulation DASH manifest github arxiv testbed\" - \"\"DASH dataset\" MPD segments github research reproducibility adaptive streaming\" - \"\"JPEG XL\" new open source encoder project github 2025 2026\" - \"AV2 AOMedia open source reference encoder github libaom-av2\" - \"\"neural image codec\" OR \"learned image compression\" github implementation CVPR 2025 2026\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (950), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e207]
+                        - cell "0" [ref=e208]
+                        - cell "—" [ref=e209]
+                        - cell "—" [ref=e210]
+                        - cell "—" [ref=e211]
+                        - cell "Jul 29, 2026" [ref=e212]
+                        - cell "View details for job #60" [ref=e213]
+                          - button "View details for job #60" [ref=e314]
+                            - image
+                      - row
+                        - cell "#59" [ref=e214]
+                          - StaticText "#59"
+                        - cell "CANCELLED" [ref=e215]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Curated-list mining. Bias this run toward mining other curated lists: awesome-* repos, roundups, \"top N tools\" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one's official site or repo. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Open Source Encoder Projects (8 existing) - Protocols & Transport › DASH Manifest Tools (8 existing) - Standards & Industry › Industry Forums & Standards Bodies (8 existing) - Encoding & Codecs › Multi-format Packaging Tools (9 existing) - General Tools › Command-line Utilities & Wrappers (9 existing) - General Tools › Community & Collaboration Platforms (9 existing) - General Tools › Cross-Platform Media Tools (9 existing) - General Tools › Independent & Hobbyist Projects (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"adaptive bitrate\" simulation DASH manifest github arxiv testbed\" - \"\"DASH dataset\" MPD segments github research reproducibility adaptive streaming\" - \"\"JPEG XL\" new open source encoder project github 2025 2026\" - \"AV2 AOMedia open source reference encoder github libaom-av2\" - \"\"neural image codec\" OR \"learned image compression\" github implementation CVPR 2025 2026\" - \"\"learned video compression\" arxiv 2026 github code implementation\" - \"video codec engineer personal blog post 2025 bitstream encoding\" - \"FOSDEM 2025 open media devroom talk recording AV1\" - \"Samsung HDR10+ developer documentation OR Warner Bros Discovery tech blog streaming\" - \"VidTrans 2026 conference agenda OR Content Delivery Summit 2025 2026\" - \"Demuxed talk SRT OR RIST low latency streaming transport\" - \"SRT protocol OR RIST protocol github open source implementation library\" - \"DASH manifest editor inspector tool npm github\" - \"DASH MPD parser library github rust python go\" - \"O'Reilly OR Packt book video streaming architecture encoding 2024 2025\" - \"MIT OpenCourseWare OR Stanford video coding compression course materials\" - \"dav1d AV1 decoder developer blog post VideoLAN\" - \"site:youtube.com \"Demuxed 2025\" talk\" - \"Phil Cluff OR Will Law streaming blog post 2025\" - \"giannirosato.com blog AV1 SVT-AV1-PSY post\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (950), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e216]
+                        - cell "0" [ref=e217]
+                        - cell "—" [ref=e218]
+                        - cell "—" [ref=e219]
+                        - cell "—" [ref=e220]
+                        - cell "Jul 29, 2026" [ref=e221]
+                        - cell "View details for job #59" [ref=e222]
+                          - button "View details for job #59" [ref=e315]
+                            - image
+                      - row
+                        - cell "#58" [ref=e223]
+                          - StaticText "#58"
+                        - cell "CANCELLED" [ref=e224]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Vendor & engineering blogs. Bias this run toward deep technical blog posts and niche vendor documentation (engineering blogs of streaming platforms, codec vendors, CDN providers) — NOT marketing pages. Search \"<gap topic> engineering blog\" and \"site:<vendor domain> <topic>\". TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Open Source Encoder Projects (8 existing) - Protocols & Transport › DASH Manifest Tools (8 existing) - Standards & Industry › Industry Forums & Standards Bodies (8 existing) - Encoding & Codecs › Multi-format Packaging Tools (9 existing) - General Tools › Command-line Utilities & Wrappers (9 existing) - General Tools › Community & Collaboration Platforms (9 existing) - General Tools › Cross-Platform Media Tools (9 existing) - General Tools › Independent & Hobbyist Projects (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"video codec engineer personal blog post 2025 bitstream encoding\" - \"FOSDEM 2025 open media devroom talk recording AV1\" - \"Samsung HDR10+ developer documentation OR Warner Bros Discovery tech blog streaming\" - \"VidTrans 2026 conference agenda OR Content Delivery Summit 2025 2026\" - \"Demuxed talk SRT OR RIST low latency streaming transport\" - \"SRT protocol OR RIST protocol github open source implementation library\" - \"DASH manifest editor inspector tool npm github\" - \"DASH MPD parser library github rust python go\" - \"O'Reilly OR Packt book video streaming architecture encoding 2024 2025\" - \"MIT OpenCourseWare OR Stanford video coding compression course materials\" - \"dav1d AV1 decoder developer blog post VideoLAN\" - \"site:youtube.com \"Demuxed 2025\" talk\" - \"Phil Cluff OR Will Law streaming blog post 2025\" - \"giannirosato.com blog AV1 SVT-AV1-PSY post\" - \"LCEVC open source SDK github v-nova AV2 codec AOM open source encoder\" - \"video encoding streaming course university free materials github\" - \"Kotlin Multiplatform video player github Flutter React Native video player library\" - \"Demuxed talk DRM content protection Widevine PlayReady FairPlay\" - \"open source Widevine CDM github DRM implementation\" - \"LCEVC open source encoder github FFV1 UtVideo lossless codec\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (950), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e225]
+                        - cell "0" [ref=e226]
+                        - cell "—" [ref=e227]
+                        - cell "—" [ref=e228]
+                        - cell "—" [ref=e229]
+                        - cell "Jul 29, 2026" [ref=e230]
+                        - cell "View details for job #58" [ref=e231]
+                          - button "View details for job #58" [ref=e316]
+                            - image
+                      - row
+                        - cell "#57" [ref=e232]
+                          - StaticText "#57"
+                        - cell "CANCELLED" [ref=e233]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Open Source Encoder Projects (8 existing) - Protocols & Transport › DASH Manifest Tools (8 existing) - Standards & Industry › Industry Forums & Standards Bodies (8 existing) - Encoding & Codecs › Multi-format Packaging Tools (9 existing) - General Tools › Command-line Utilities & Wrappers (9 existing) - General Tools › Community & Collaboration Platforms (9 existing) - General Tools › Cross-Platform Media Tools (9 existing) - General Tools › Independent & Hobbyist Projects (9 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"video codec engineer personal blog post 2025 bitstream encoding\" - \"FOSDEM 2025 open media devroom talk recording AV1\" - \"Samsung HDR10+ developer documentation OR Warner Bros Discovery tech blog streaming\" - \"VidTrans 2026 conference agenda OR Content Delivery Summit 2025 2026\" - \"Demuxed talk SRT OR RIST low latency streaming transport\" - \"SRT protocol OR RIST protocol github open source implementation library\" - \"DASH manifest editor inspector tool npm github\" - \"DASH MPD parser library github rust python go\" - \"O'Reilly OR Packt book video streaming architecture encoding 2024 2025\" - \"MIT OpenCourseWare OR Stanford video coding compression course materials\" - \"dav1d AV1 decoder developer blog post VideoLAN\" - \"site:youtube.com \"Demuxed 2025\" talk\" - \"Phil Cluff OR Will Law streaming blog post 2025\" - \"giannirosato.com blog AV1 SVT-AV1-PSY post\" - \"LCEVC open source SDK github v-nova AV2 codec AOM open source encoder\" - \"video encoding streaming course university free materials github\" - \"Kotlin Multiplatform video player github Flutter React Native video player library\" - \"Demuxed talk DRM content protection Widevine PlayReady FairPlay\" - \"open source Widevine CDM github DRM implementation\" - \"LCEVC open source encoder github FFV1 UtVideo lossless codec\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (950), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e234]
+                        - cell "0" [ref=e235]
+                        - cell "—" [ref=e236]
+                        - cell "—" [ref=e237]
+                        - cell "—" [ref=e238]
+                        - cell "Jul 29, 2026" [ref=e239]
+                        - cell "View details for job #57" [ref=e240]
+                          - button "View details for job #57" [ref=e317]
+                            - image
+                      - row
+                        - cell "#56" [ref=e241]
+                          - StaticText "#56"
+                        - cell "CANCELLED" [ref=e242]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Conference talks & videos. Bias this run toward conference material: Demuxed, IBC, NAB, Mile High Video, Streaming Media, FOSDEM open-media devroom. Hunt talk pages/recordings AND the specific projects speakers present — both are savable when they fill a gap. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Intro & Learning › Community Blogs & Forums (5 existing) - Players & Clients › Web Players (7 existing) - Protocols & Transport › DASH Tools (7 existing) - Standards & Industry › Vendors & HDR (7 existing) - Encoding & Codecs › Open Source Encoder Projects (8 existing) - General Tools › DRM Solutions & Implementations (8 existing) - Intro & Learning › Books & Courses (8 existing) - Players & Clients › Mobile Players (8 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"open access textbook video compression fundamentals PDF free download\" - \"ffmpeg concat batch script github utility subtitle burn-in\" - \"video watermarking script open source github ffmpeg\" - \"Dolby Vision profile 5 to profile 8.1 conversion tool github\" - \"HDR10 metadata inject tool github\" - \"DASH low latency chunked transfer encoding tool github reference client\" - \"DASH conformance test suite github MPEG-DASH\" - \"media-chrome web component video player github\" - \"vidstack player github web component video\" - \"free online course video coding standards MPEG HEVC VVC 2025\" - \"FairPlay Streaming packaging open source tool github\" - \"Shaka Player DRM license server demo github open source\" - \"open source DRM license server implementation github Widevine PlayReady\" - \"videohelp.com forum encoding guides\" - \"hydrogenaud.io forum video codec x264 x265 discussion\" - \"doom9 forum video encoding site:forum.doom9.org\" - \"streaminglearningcenter.com Jan Ozer blog\" - \"open source video editor alternative Shotcut Kdenlive github new\" - \"audio waveform analysis library github video\" - \"VP9 encoder optimization tool github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (943), arxiv.org (28), dl.acm.org (14), tech.ebu.ch (11), dashif.org (8), crates.io (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6), cdn.cta.tech (5), university.svta.org (5) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, crates.io, developer.apple.com, wiki.x266.mov Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e243]
+                        - cell "30 pre-cancel" [ref=e244]
+                          - generic
+                            - StaticText "30"
+                            - StaticText "pre-cancel"
+                        - cell "30 / 0" [ref=e245]
+                          - StaticText "30 / 0"
+                        - cell "—" [ref=e246]
+                        - cell "—" [ref=e247]
+                        - cell "Jul 29, 2026" [ref=e248]
+                        - cell "View details for job #56" [ref=e249]
+                          - button "View details for job #56" [ref=e318]
+                            - image
+                      - row
+                        - cell "#55" [ref=e250]
+                          - StaticText "#55"
+                        - cell "CANCELLED" [ref=e251]
+                          - image
+                          - StaticText "CANCELLED"
+                        - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e252]
+                        - cell "135 pre-cancel" [ref=e253]
+                          - generic
+                            - StaticText "135"
+                            - StaticText "pre-cancel"
+                        - cell "135 / 0" [ref=e254]
+                          - StaticText "135 / 0"
+                        - cell "—" [ref=e255]
+                        - cell "—" [ref=e256]
+                        - cell "Jul 29, 2026" [ref=e257]
+                        - cell "View details for job #55" [ref=e258]
+                          - button "View details for job #55" [ref=e319]
+                            - image
+                      - row
+                        - cell "#54" [ref=e259]
+                          - StaticText "#54"
+                        - cell "COMPLETED" [ref=e260]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e261]
+                        - cell "304" [ref=e262]
+                        - cell "304 / 0" [ref=e263]
+                          - StaticText "304 / 0"
+                        - cell "$0.0000" [ref=e264]
+                        - cell "0/∞" [ref=e265]
+                          - StaticText "0/∞"
+                        - cell "Jul 29, 2026" [ref=e266]
+                        - cell "View details for job #54" [ref=e267]
+                          - button "View details for job #54" [ref=e320]
+                            - image
+                      - row
+                        - cell "#53" [ref=e268]
+                          - StaticText "#53"
+                        - cell "COMPLETED" [ref=e269]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e270]
+                        - cell "152" [ref=e271]
+                        - cell "151 / 1" [ref=e272]
+                          - StaticText "151 / 1"
+                        - cell "$55.0971" [ref=e273]
+                        - cell "419/∞" [ref=e274]
+                          - StaticText "419/∞"
+                        - cell "Jul 29, 2026" [ref=e275]
+                        - cell "View details for job #53" [ref=e276]
+                          - button "View details for job #53" [ref=e321]
+                            - image
+                      - row
+                        - cell "#52" [ref=e277]
+                          - StaticText "#52"
+                        - cell "COMPLETED" [ref=e278]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e279]
+                        - cell "125" [ref=e280]
+                        - cell "125 / 0" [ref=e281]
+                          - StaticText "125 / 0"
+                        - cell "$39.7923" [ref=e282]
+                        - cell "370/∞" [ref=e283]
+                          - StaticText "370/∞"
+                        - cell "Jul 26, 2026" [ref=e284]
+                        - cell "View details for job #52" [ref=e285]
+                          - button "View details for job #52" [ref=e322]
+                            - image
+                      - row
+                        - cell "#51" [ref=e286]
+                          - StaticText "#51"
+                        - cell "FAILED" [ref=e287]
+                          - image
+                          - StaticText "FAILED"
+                        - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e288]
+                        - cell "40" [ref=e289]
+                        - cell "40 / 0" [ref=e290]
+                          - StaticText "40 / 0"
+                        - cell "$0.0000" [ref=e291]
+                        - cell "0/∞" [ref=e292]
+                          - StaticText "0/∞"
+                        - cell "Jul 25, 2026" [ref=e293]
+                        - cell "View details for job #51" [ref=e294]
+                          - button "View details for job #51" [ref=e323]
+                            - image
+                      - row
+                        - cell
+                          - note
+                            - image
+                            - generic
+                              - StaticText "Job #51: Claude Code returned an error result: API Error: 530 {\"type\":\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1033/\",\"title\":\"Error 1033: Cloudflare Tunnel error\",\"status\":530,\"detail\":\"The host is configured as a Cloudflare Tunnel, but Cloudflare is currently unable to reach it.\",\"instance\":\"a20a32b19b1dc9f2\",\"error_code\":1033,\"error_name\":\"tunnel_error\",\"error_category\":\"config\",\"ray_id\":\"a20a32b19b1dc9f2\",\"timestamp\":\"2026-07-25T09:39:32Z\",\"zone\":\"nickel-instructional-anticipated-accurate.trycloudflare.com\",\"cloudflare_error\":true,\"retryable\":true,\"retry_after\":120,\"owner_action_required\":true,\"what_you_should_do\":\"**Wait and retry.** The tunnel may be temporarily disconnected. Try again in a few minutes.\",\"footer\":\"This error was generated by Cloudflare on behalf of the website owner.\"}. This is a server-side issue, usually temporary — try again in a moment. If it persists, check your inference gateway (rgiw7uw.abc-tunnel.us)."
+                    - button "Load more (20 of 70) in Job History" [ref=e70]
+                      - StaticText "Load more (20 of 70)"
+    - button "Back to top" [ref=e4]
+      - image

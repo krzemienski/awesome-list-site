@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/contributions?type=resource&status=rejected&sort=oldest",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 969,
+  "active": "<button type=\"button\" role=\"combobox\" aria-expanded=\"false\" aria-autocomplete=\"none\" dir=\"ltr\" data-state=\"closed\" class=\"select flex items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&amp;&gt;span]:line-clamp-1 min-h-11\" aria-label=\"Sort contributions\" data-testid=\"select-contribution-sort\"><span style=\"pointer-events: none;\">Olde",
+  "umami": "1",
+  "consent": "denied"
+}

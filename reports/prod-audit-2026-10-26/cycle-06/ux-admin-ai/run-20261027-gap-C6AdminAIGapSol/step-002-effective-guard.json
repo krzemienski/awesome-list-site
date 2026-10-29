@@ -1,0 +1,11 @@
+{
+  "guard": "page fetch/XHR/sendBeacon blocks same-origin non-GET API before dispatch; init script persists through navigation",
+  "proof": [
+    {
+      "url": "/api/version",
+      "method": "POST"
+    }
+  ],
+  "consent": "denied",
+  "umami": "1"
+}

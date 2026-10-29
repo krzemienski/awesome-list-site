@@ -1,0 +1,183 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - img
+                    - text: SUBMIT A RESOURCE
+                  - heading [level=1]: Add to the index
+                  - paragraph: Submit a tool, library, paper, or talk. We hand-review every entry before it lands in the catalog.
+                  - article:
+                    - generic:
+                      - generic:
+                        - group:
+                          - generic:
+                            - generic: Title
+                            - textbox:
+                              - /placeholder: e.g. ffmpeg-python
+                              - text: "[QA-audit-1026] gap draft"
+                          - generic:
+                            - generic: URL
+                            - textbox:
+                              - /placeholder: https://github.com/...
+                              - text: https://example.com/qa-audit-1026-gap
+                          - generic:
+                            - generic:
+                              - generic: Category
+                              - combobox:
+                                - generic: General Tools
+                                - img
+                              - combobox
+                            - generic:
+                              - generic: Tags
+                              - textbox:
+                                - /placeholder: comma,separated
+                          - generic:
+                            - generic: Subcategory (Optional)
+                            - combobox:
+                              - generic: Select a subcategory
+                              - img
+                            - combobox
+                          - generic:
+                            - generic: Description
+                            - textbox:
+                              - /placeholder: What does this do? Why is it useful?
+                              - text: Run-owned QA audit resource for safe submission and withdrawal verification only.
+                        - generic:
+                          - button: Cancel
+                          - button: Submit for review
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 3,826
+                  - paragraph:
+                    - text: 9 categories 99 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+                  - generic:
+                    - button:
+                      - img
+                      - text: Contact maintainers
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - button: Cookie settings
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+  - alertdialog "Discard your unsaved submission?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Discard your unsaved submission?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: You have unsaved changes in this form. Leaving now will discard everything you've entered.
+    - generic [ref=e6]:
+      - button "Keep editing" [active] [ref=e7] [cursor=pointer]
+      - button "Discard" [ref=e8] [cursor=pointer]

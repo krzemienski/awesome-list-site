@@ -1,0 +1,1 @@
+"{\"value\":\"-3\",\"invalid\":\"true\",\"alerts\":[\"Batch size must be a whole number between 1 and 50.\"],\"buttons\":[{\"text\":\"Run job\",\"disabled\":true},{\"text\":\"Start Enrichment\",\"disabled\":true}]}"

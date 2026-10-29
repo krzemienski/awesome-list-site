@@ -1,0 +1,174 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e43]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [selected, ref=e24]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e25]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e26]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e27]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e28]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e29]
+                - StaticText "Export"
+              - tab "Database" [ref=e30]
+                - StaticText "Database"
+              - tab "Resources" [ref=e31]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e32]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e33]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e34]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e35]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e36]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e37]
+                - StaticText "Audit"
+              - tab "Research" [ref=e38]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Overview" [ref=e17] focusable [tabindex]
+            - button "RESOURCES 3,825 across 9 categories" [ref=e20]
+              - StaticText "RESOURCES"
+              - StaticText "3,825"
+              - StaticText "across 9 categories"
+            - button "SUBCATEGORIES 99 all canonical" [ref=e21]
+              - StaticText "SUBCATEGORIES"
+              - StaticText "99"
+              - StaticText "all canonical"
+            - button "ACTIVE USERS 20 2 admins · 18 contributors" [ref=e22]
+              - StaticText "ACTIVE USERS"
+              - StaticText "20"
+              - StaticText "2 admins · 18 contributors"
+            - button "PENDING APPROVALS 16 oldest 62d ago" [ref=e23]
+              - StaticText "PENDING APPROVALS"
+              - StaticText "16"
+              - StaticText "oldest 62d ago"
+            - generic
+              - heading "Recent activity" [level=2, ref=e39]
+              - paragraph
+                - StaticText "Latest 6 events"
+              - StaticText "TX#"
+              - StaticText "27503"
+              - StaticText "a•••@example.com"
+              - StaticText "categories.exported"
+              - StaticText "Admin exported the category tree (OPML, 3825 resources)"
+              - StaticText "2m ago"
+              - StaticText "TX#"
+              - StaticText "27502"
+              - StaticText "a•••@example.com"
+              - StaticText "catalog.exported"
+              - StaticText "Admin exported 3825 catalog rows as awesome-list markdown"
+              - StaticText "2m ago"
+              - StaticText "TX#"
+              - StaticText "27501"
+              - StaticText "a•••@example.com"
+              - StaticText "resources.exported"
+              - StaticText "Admin exported 4017 resources (CSV)"
+              - StaticText "2m ago"
+              - StaticText "TX#"
+              - StaticText "27500"
+              - StaticText "a•••@example.com"
+              - StaticText "database.exported"
+              - StaticText "Admin exported non-restorable catalog JSON snapshot (4017 resources, 133 user summaries)"
+              - StaticText "2m ago"
+              - StaticText "TX#"
+              - StaticText "27499"
+              - StaticText "a•••@example.com"
+              - StaticText "categories.exported"
+              - StaticText "Admin exported the category tree (OPML, 3825 resources)"
+              - StaticText "2h ago"
+              - StaticText "TX#"
+              - StaticText "27498"
+              - StaticText "a•••@example.com"
+              - StaticText "database.exported"
+              - StaticText "Admin exported non-restorable catalog JSON snapshot (4017 resources, 133 user summaries)"
+              - StaticText "2h ago"
+            - generic
+              - heading "System health" [level=2, ref=e40]
+              - paragraph
+                - StaticText "Some systems are still working"
+              - image "Database: ok"
+              - StaticText "Database"
+              - StaticText "ready · 146ms"
+              - image "GitHub sync: ok"
+              - StaticText "GitHub sync"
+              - StaticText "Completed · 98d ago"
+              - image "Link checker: warn"
+              - StaticText "Link checker"
+              - StaticText "last 83d ago · 12 broken"
+              - image "Enrichment queue: warn"
+              - StaticText "Enrichment queue"
+              - StaticText "last run cancelled before finishing · 25h ago"
+              - image "Researcher API: ok"
+              - StaticText "Researcher API"
+              - StaticText "healthy"
+            - generic
+              - heading "Top categories" [level=2, ref=e41]
+              - paragraph
+                - StaticText "By resource count"
+              - StaticText "Media Tools"
+              - strong
+                - StaticText "704"
+              - StaticText "Encoding & Codecs"
+              - strong
+                - StaticText "579"
+              - StaticText "General Tools"
+              - strong
+                - StaticText "514"
+              - StaticText "Protocols & Transport"
+              - strong
+                - StaticText "467"
+              - StaticText "Players & Clients"
+              - strong
+                - StaticText "447"

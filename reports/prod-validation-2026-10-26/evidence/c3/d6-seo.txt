@@ -1,0 +1,12 @@
+/ 200  | - | https://awesome.video/ | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/category/encoding-codecs 200  | - | https://awesome.video/category/encoding-codecs | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/resource/184847 200  | - | https://awesome.video/resource/184847 | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/tag/hls 200  | - | https://awesome.video/tag/hls | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/search?q=ffmpeg 200  | - | - | noindex, nofollow
+/category/encoding-codecs?tag=hls 200  | - | https://awesome.video/category/encoding-codecs | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/category/nope-zzz 404  | - | - | noindex, nofollow
+/tag/zzz-none-qq 404  | - | - | noindex, nofollow
+/resource/999999998 404  | - | - | noindex, nofollow
+/sub-subcategory/iostvos 301 https://awesome.video/sub-subcategory/ios-tvos | - | - | -
+/sub-subcategory/ios-tvos 200  | - | https://awesome.video/sub-subcategory/ios-tvos | index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+/category/encoding-codecs?page=999 404  | - | - | noindex, nofollow

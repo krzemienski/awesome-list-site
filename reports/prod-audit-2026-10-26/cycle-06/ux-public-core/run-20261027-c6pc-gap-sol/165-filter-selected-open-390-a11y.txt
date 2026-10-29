@@ -1,0 +1,19 @@
+uid=639_0 RootWebArea "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video" url="https://awesome.video/category/encoding-codecs?tags=av1"
+  uid=639_12 main
+    uid=654_66 generic "Resources (579)" busy
+      uid=654_504 navigation "Pagination"
+        uid=654_521 status atomic live="polite" relevant="additions text"
+  uid=657_0 dialog "Filters" description="1 filter applied."
+    uid=657_1 heading "Filters" level="2"
+    uid=657_2 paragraph live="polite" relevant="additions text"
+      uid=657_3 "1 filter applied."
+    uid=657_4 "Narrow results"
+    uid=657_5 "Counts update for this combination."
+    uid=662_0 button "Clear all"
+    uid=657_6 "TAGS"
+    uid=657_7 textbox "Search tags" value="av1"
+    uid=657_22 button "AV1, 7 results" focusable focused pressed
+    uid=659_0 button "Libsvtav1, 1 result"
+    uid=659_1 button "Svt AV1, 1 result"
+    uid=657_34 button "Done"
+    uid=657_35 button "Close"

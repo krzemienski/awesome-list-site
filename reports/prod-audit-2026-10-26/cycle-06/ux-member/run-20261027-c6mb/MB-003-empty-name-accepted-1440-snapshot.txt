@@ -1,0 +1,141 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list [ref=e4] clickable [onclick]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e54]
+              - listitem [level=1]
+                - link "Profile" [disabled, ref=e55]
+          - StaticText "AU"
+          - heading "Admin User Edit display name" [level=1, ref=e15]
+            - StaticText "Admin User"
+            - button "Edit display name" [ref=e28]
+              - image
+          - image
+          - StaticText "admin@example.com"
+          - image
+          - StaticText "Joined "
+          - StaticText "11 months ago"
+          - StaticText "Beginner"
+          - button "Settings" [ref=e16]
+            - image
+            - StaticText "Settings"
+          - button "Sign out" [ref=e17]
+            - image
+            - StaticText "Sign out"
+          - button "Sign out all devices" [expanded=false, ref=e18]
+            - image
+            - StaticText "Sign out all devices"
+          - article
+            - image
+            - paragraph
+              - StaticText "2"
+            - paragraph
+              - StaticText "Favorites"
+          - article
+            - image
+            - paragraph
+              - StaticText "12"
+            - paragraph
+              - StaticText "Bookmarks"
+          - article
+            - image
+            - paragraph
+              - StaticText "Start your streak — come back tomorrow!"
+            - paragraph
+              - StaticText "Learning Streak"
+          - article
+            - image
+            - paragraph
+              - StaticText "1"
+            - paragraph
+              - StaticText "Journeys Completed"
+            - paragraph
+              - StaticText "Learning journeys finished"
+          - tablist [ref=e19] focusable [tabindex]
+            - tab "Overview" [ref=e29]
+            - tab "Favorites" [ref=e30]
+            - tab "Bookmarks" [ref=e31]
+            - tab "Submissions" [ref=e32]
+            - tab "Security" [selected, ref=e33]
+          - tabpanel "Security" [ref=e20] focusable [tabindex]
+            - article
+              - StaticText "Password & security"
+              - StaticText "You're signed in with the owner password, so there is no account password, device list or connected sign-in method to manage here. To end owner sessions everywhere, use Sign out all devices at the top of this page. App API keys are managed separately, below."
+            - article
+              - StaticText "API keys"
+              - generic
+                - StaticText "Keys for programmatic, read-only access to this site's public API (send "
+                - code
+                  - StaticText "Authorization: Bearer <key>"
+                - StaticText "). They are separate from your sign-in account above. Each key's secret is shown once, when you create it."
+              - form
+                - generic
+                  - LabelText [ref=e60] clickable [cursor:pointer]
+                  - textbox "Key name" [ref=e61]
+                - LabelText [ref=e56] clickable [cursor:pointer]
+                - combobox "Expires" [expanded=false, ref=e57]: 90 days
+                  - generic [ref=e62] clickable [cursor:pointer, onclick]
+                - button "Create key" [disabled, ref=e58]
+              - region "Your keys" [ref=e52]
+                - heading "Your keys" [level=3, ref=e59]
+            - article
+              - button "Request account deletion" [ref=e53]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e21]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e22]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e23]
+            - heading "EXPLORE" [level=2, ref=e34]
+            - link "Community & Events" [ref=e35]
+            - link "Encoding & Codecs" [ref=e36]
+            - link "General Tools" [ref=e37]
+            - link "Infrastructure & Delivery" [ref=e38]
+            - link "Intro & Learning" [ref=e39]
+            - link "Media Tools" [ref=e40]
+            - link "Players & Clients" [ref=e41]
+            - link "Protocols & Transport" [ref=e42]
+            - link "Standards & Industry" [ref=e43]
+          - heading "SOURCE" [level=2, ref=e24]
+          - link "krzemienski/ awesome-video" [ref=e25]
+          - paragraph
+            - link "PRs welcome" [ref=e44]
+          - button "Contact maintainers" [ref=e26]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e27]
+            - link "About" [ref=e45]
+            - link "Terms" [ref=e46]
+            - link "Privacy" [ref=e47]
+            - link "Code of Conduct" [ref=e48]
+            - button "Cookie settings" [ref=e49]
+            - link "Issues ↗" [ref=e50]
+            - link "Sitemap" [ref=e51]

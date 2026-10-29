@@ -1,0 +1,295 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - 'region "Research run #75" [ref=e121]':
+                      - generic [ref=e122]:
+                        - generic [ref=e123]:
+                          - 'heading "Research run #75" [level=3] [ref=e124]'
+                          - paragraph [ref=e125]: All categories · running for 5:01
+                        - generic [ref=e126]:
+                          - generic [ref=e127]:
+                            - img [ref=e128]
+                            - text: Running
+                          - button "Cancel run" [ref=e130] [cursor=pointer]:
+                            - img
+                            - text: Cancel run
+                      - paragraph [ref=e131]
+                      - generic [ref=e132]:
+                        - list "Run phases" [ref=e133]:
+                          - listitem [ref=e134]:
+                            - generic [ref=e137]:
+                              - text: Planning
+                              - generic [ref=e138]: 03:12:18 AM
+                            - generic [ref=e139]: (current)
+                          - listitem [ref=e140]:
+                            - img [ref=e142]
+                            - generic [ref=e144]:
+                              - text: Scouting
+                              - generic [ref=e145]: 03:13:02 AM
+                            - generic [ref=e146]: (done)
+                          - listitem [ref=e147]:
+                            - img [ref=e149]
+                            - generic [ref=e151]:
+                              - text: Verifying
+                              - generic [ref=e152]: 03:13:34 AM
+                            - generic [ref=e153]: (done)
+                          - listitem [ref=e154]:
+                            - generic [ref=e156]: Saving
+                            - generic [ref=e158]: (not reached)
+                          - listitem [ref=e159]:
+                            - generic [ref=e161]: Done
+                            - generic [ref=e163]: (not reached)
+                        - generic [ref=e164]:
+                          - heading "Scouts 8 started" [level=4] [ref=e165]:
+                            - img [ref=e166]
+                            - text: Scouts
+                            - generic [ref=e169]: 8 started
+                          - list "Scouts" [ref=e170]:
+                            - listitem [ref=e171]:
+                              - generic [ref=e172]:
+                                - generic [ref=e173]: Scout 1
+                                - generic [ref=e174]: Reported
+                              - paragraph [ref=e175]: Find technical packaging gaps
+                              - paragraph [ref=e176]: 3 searches · 0 candidates · 23s
+                            - listitem [ref=e177]:
+                              - generic [ref=e178]:
+                                - generic [ref=e179]: Scout 2
+                                - generic [ref=e180]: Reported
+                              - paragraph [ref=e181]: Find deep transcoding guides
+                              - paragraph [ref=e182]: 3 searches · 0 candidates · 24s
+                            - listitem [ref=e183]:
+                              - generic [ref=e184]:
+                                - generic [ref=e185]: Scout 3
+                                - generic [ref=e186]: Reported
+                              - paragraph [ref=e187]: Research batch automation gap
+                              - paragraph [ref=e188]: 2 searches · 0 candidates · 17s
+                            - listitem [ref=e189]:
+                              - generic [ref=e190]:
+                                - generic [ref=e191]: Scout 4
+                                - generic [ref=e192]: Reported
+                              - paragraph [ref=e193]: Research stream monitoring gap
+                              - paragraph [ref=e194]: 2 searches · 0 candidates · 16s
+                            - listitem [ref=e195]:
+                              - generic [ref=e196]:
+                                - generic [ref=e197]: Scout 5
+                                - generic [ref=e198]: Reported
+                              - paragraph [ref=e199]: Find specialized utility documentation
+                              - paragraph [ref=e200]: 2 searches · 0 candidates · 14s
+                            - listitem [ref=e201]:
+                              - generic [ref=e202]:
+                                - generic [ref=e203]: Scout 6
+                                - generic [ref=e204]: Reported
+                              - paragraph [ref=e205]: Find DRM interoperability tests
+                              - paragraph [ref=e206]: 2 searches · 0 candidates · 16s
+                            - listitem [ref=e207]:
+                              - generic [ref=e208]:
+                                - generic [ref=e209]: Scout 7
+                                - generic [ref=e210]: Reported
+                              - paragraph [ref=e211]: Find codec benchmark methodology
+                              - paragraph [ref=e212]: 3 searches · 0 candidates · 22s
+                            - listitem [ref=e213]:
+                              - generic [ref=e214]:
+                                - generic [ref=e215]: Scout 8
+                                - generic [ref=e216]: Reported
+                              - paragraph [ref=e217]: Find containerized GPU diagnostics
+                              - paragraph [ref=e218]: 3 searches · 0 candidates · 21s
+                      - generic [ref=e219]:
+                        - generic [ref=e220]:
+                          - term [ref=e221]: Discoveries
+                          - definition [ref=e222]: 0 of 25 saved
+                          - progressbar "Discoveries saved against the target" [ref=e223]
+                        - generic [ref=e225]:
+                          - term [ref=e226]: Turns
+                          - definition [ref=e227]: counted at the end · cap 600
+                        - generic [ref=e228]:
+                          - term [ref=e229]: Spend
+                          - definition [ref=e230]: reported at the end · cap $8.00
+                      - region "Discoveries so far" [ref=e231]:
+                        - heading "Discoveries so far" [level=4] [ref=e232]
+                        - paragraph [ref=e233]: Saved discoveries appear here as the agent finds them.
+                      - 'button "Run details: raw event log and agent graph" [ref=e235] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e236]:
+                      - generic [ref=e238]:
+                        - heading "Researcher jobs" [level=2] [ref=e239]
+                        - paragraph [ref=e240]: Latest 5 of 75 research runs
+                      - generic [ref=e241]:
+                        - region "Researcher jobs table, scrollable" [ref=e242]:
+                          - table [ref=e243]:
+                            - rowgroup [ref=e244]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e245]:
+                                - columnheader "Status" [ref=e246]
+                                - columnheader "Prompt" [ref=e247]
+                                - columnheader "Found" [ref=e248]
+                                - columnheader "Approved / Rejected" [ref=e249]
+                                - columnheader "Cost" [ref=e250]
+                                - columnheader "Turns" [ref=e251]
+                                - columnheader "Created" [ref=e252]
+                            - rowgroup [ref=e253]:
+                              - row [ref=e254]:
+                                - cell "processing" [ref=e255]:
+                                  - generic [ref=e256]: processing
+                                - cell [ref=e257]
+                                - cell "0" [ref=e258]
+                                - cell "0/0" [ref=e259]
+                                - cell "$0.0000" [ref=e260]
+                                - cell "0/600" [ref=e261]
+                                - cell "Oct 27, 2026" [ref=e262]
+                              - row [ref=e263]:
+                                - cell "completed" [ref=e264]:
+                                  - generic [ref=e265]: completed
+                                - cell [ref=e266]
+                                - cell "0" [ref=e267]
+                                - cell "0/0" [ref=e268]
+                                - cell "$0.5650" [ref=e269]
+                                - cell "13/600" [ref=e270]
+                                - cell "Oct 27, 2026" [ref=e271]
+                              - row [ref=e272]:
+                                - cell "completed" [ref=e273]:
+                                  - generic [ref=e274]: completed
+                                - cell [ref=e275]
+                                - cell "4" [ref=e276]
+                                - cell "1/0" [ref=e277]
+                                - cell "$5.4603" [ref=e278]
+                                - cell "155/200" [ref=e279]
+                                - cell "Oct 27, 2026" [ref=e280]
+                              - row [ref=e281]:
+                                - cell "failed" [ref=e282]:
+                                  - generic [ref=e283]: failed
+                                - cell [ref=e284]
+                                - cell "0" [ref=e285]
+                                - cell "0/0" [ref=e286]
+                                - cell "$0.0000" [ref=e287]
+                                - cell "1/200" [ref=e288]
+                                - cell "Oct 27, 2026" [ref=e289]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e290]':
+                                - cell "completed" [ref=e291]:
+                                  - generic [ref=e292]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e293]'
+                                - cell "9" [ref=e294]
+                                - cell "0/0" [ref=e295]
+                                - cell "$3.3100" [ref=e296]
+                                - cell "41/200" [ref=e297]
+                                - cell "Oct 27, 2026" [ref=e298]
+                        - button "Show more" [ref=e300] [cursor=pointer]
+                  - group [ref=e301]:
+                    - generic "All pending discoveries & full job history" [ref=e302] [cursor=pointer]

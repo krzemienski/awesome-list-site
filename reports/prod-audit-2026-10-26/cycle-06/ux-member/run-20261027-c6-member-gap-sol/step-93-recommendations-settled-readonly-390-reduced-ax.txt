@@ -1,0 +1,514 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - generic [ref=e23]:
+        - main [ref=e24]:
+          - generic [ref=e25]:
+            - navigation "Breadcrumb" [ref=e26]:
+              - list [ref=e27]:
+                - listitem [ref=e28]:
+                  - link "Home" [ref=e29] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e30]:
+                  - img [ref=e31]
+                - listitem:
+                  - link "Recommendations" [disabled]
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - generic [ref=e35]:
+                  - img [ref=e36]
+                  - heading "Personalized Recommendations" [level=1] [ref=e38]
+                - paragraph [ref=e39]: Get personalized resource recommendations based on your interests and learning goals.
+              - generic [ref=e41]:
+                - article [ref=e42]:
+                  - generic [ref=e43]:
+                    - generic [ref=e44]: Using your saved learning profile
+                    - generic [ref=e45]: These results use your saved topics, goals, formats, skill level, and available time.
+                  - generic [ref=e46]:
+                    - generic [ref=e47]:
+                      - generic [ref=e48]: beginner
+                      - generic [ref=e49]: Encoding & Codecs
+                      - generic [ref=e50]: Learn the fundamentals
+                      - generic [ref=e51]: Videos
+                      - generic [ref=e52]: Whenever time allows
+                    - generic [ref=e53]:
+                      - link "Edit learning preferences" [ref=e54] [cursor=pointer]:
+                        - /url: /settings#learning-preferences
+                      - button "Refreshing…" [disabled] [ref=e55]:
+                        - img
+                        - text: Refreshing…
+                - status [ref=e56]:
+                  - img [ref=e57]
+                  - generic [ref=e62]: Showing your last useful recommendations
+                  - generic [ref=e63]:
+                    - paragraph [ref=e64]: These saved results may be out of date. Last updated 10/27/2026, 4:02:35 AM.
+                    - button "Try again" [ref=e65] [cursor=pointer]
+                - generic [ref=e66]:
+                  - generic [ref=e67]:
+                    - heading "Your personalized recommendations" [level=2] [ref=e68]:
+                      - img [ref=e69]
+                      - text: Your personalized recommendations
+                    - paragraph [ref=e73]: 9 resources selected from real profile and catalog signals.
+                  - generic [ref=e74]:
+                    - article [ref=e75]:
+                      - generic [ref=e76]:
+                        - generic [ref=e77]:
+                          - heading "A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [level=3] [ref=e78]
+                          - paragraph [ref=e79]: Cross-codec (AV1/HEVC/VVC/AVM/VP9) energy efficiency and compression review across software and hardware decoders.
+                        - generic [ref=e80]:
+                          - generic [ref=e81]: Encoding & Codecs
+                          - generic [ref=e82]:
+                            - img [ref=e83]
+                            - text: 95% · High
+                          - generic [ref=e86]:
+                            - img [ref=e87]
+                            - text: AI ranked
+                        - group [ref=e97]:
+                          - generic "Why this? A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e98] [cursor=pointer]:
+                            - generic [ref=e99]:
+                              - img [ref=e100]
+                              - text: Why this?
+                        - generic [ref=e103]: "#Comparative Analysis of Codecs"
+                        - generic [ref=e104]:
+                          - generic [ref=e105]:
+                            - paragraph [ref=e106]: Shape future recommendations
+                            - group "Feedback for A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e108]:
+                              - 'button "Helpful: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e109] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e110] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e111] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders" [ref=e112] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders (opens in new tab)" [ref=e113] [cursor=pointer]':
+                            - /url: https://arxiv.org/html/2402.09001v1
+                            - img
+                            - text: View resource
+                    - article [ref=e114]:
+                      - generic [ref=e115]:
+                        - generic [ref=e116]:
+                          - heading "Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [level=3] [ref=e117]
+                          - paragraph [ref=e118]: IEEE paper benchmarking five codec encoders (VVC, HEVC, H.264, AV1, VP9) specifically for low-delay video applications.
+                        - generic [ref=e119]:
+                          - generic [ref=e120]: Encoding & Codecs
+                          - generic [ref=e121]:
+                            - img [ref=e122]
+                            - text: 92% · High
+                          - generic [ref=e125]:
+                            - img [ref=e126]
+                            - text: AI ranked
+                        - group [ref=e136]:
+                          - generic "Why this? Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e137] [cursor=pointer]:
+                            - generic [ref=e138]:
+                              - img [ref=e139]
+                              - text: Why this?
+                        - generic [ref=e142]: "#Comparative Analysis of Codecs"
+                        - generic [ref=e143]:
+                          - generic [ref=e144]:
+                            - paragraph [ref=e145]: Shape future recommendations
+                            - group "Feedback for Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e147]:
+                              - 'button "Helpful: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e148] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e149] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e150] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications" [ref=e151] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications (opens in new tab)" [ref=e152] [cursor=pointer]':
+                            - /url: https://ieeexplore.ieee.org/document/9264275/
+                            - img
+                            - text: View resource
+                    - article [ref=e153]:
+                      - generic [ref=e154]:
+                        - generic [ref=e155]:
+                          - 'heading "OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [level=3] [ref=e156]'
+                          - paragraph [ref=e157]: Independent open reimplementation with training+eval code of the whole Microsoft DCVC learned video codec family (prior official releases were eval-only).
+                        - generic [ref=e158]:
+                          - generic [ref=e159]: Encoding & Codecs
+                          - generic [ref=e160]:
+                            - img [ref=e161]
+                            - text: 89% · High
+                          - generic [ref=e164]:
+                            - img [ref=e165]
+                            - text: AI ranked
+                        - group [ref=e175]:
+                          - 'generic "Why this? OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e176] [cursor=pointer]':
+                            - generic [ref=e177]:
+                              - img [ref=e178]
+                              - text: Why this?
+                        - generic [ref=e181]: "#Open Source Encoder Projects"
+                        - generic [ref=e182]:
+                          - generic [ref=e183]:
+                            - paragraph [ref=e184]: Shape future recommendations
+                            - 'group "Feedback for OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e186]':
+                              - 'button "Helpful: OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e187] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e188] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e189] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series" [ref=e190] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series (opens in new tab)" [ref=e191] [cursor=pointer]':
+                            - /url: https://arxiv.org/pdf/2508.04491
+                            - img
+                            - text: View resource
+                    - article [ref=e192]:
+                      - generic [ref=e193]:
+                        - generic [ref=e194]:
+                          - 'heading "OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [level=3] [ref=e195]'
+                          - paragraph [ref=e196]: ACM paper presenting an open-source hardware library targeting 8K UHD AVS3 chip design for video coding.
+                        - generic [ref=e197]:
+                          - generic [ref=e198]: Encoding & Codecs
+                          - generic [ref=e199]:
+                            - img [ref=e200]
+                            - text: 89% · High
+                          - generic [ref=e203]:
+                            - img [ref=e204]
+                            - text: Rule ranked
+                        - group [ref=e206]:
+                          - 'generic "Why this? OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e207] [cursor=pointer]':
+                            - generic [ref=e208]:
+                              - img [ref=e209]
+                              - text: Why this?
+                        - generic [ref=e212]: "#Hardware Codecs & Acceleration"
+                        - generic [ref=e213]:
+                          - generic [ref=e214]:
+                            - paragraph [ref=e215]: Shape future recommendations
+                            - 'group "Feedback for OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e217]':
+                              - 'button "Helpful: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e218] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e219] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e220] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)" [ref=e221] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3) (opens in new tab)" [ref=e222] [cursor=pointer]':
+                            - /url: https://dl.acm.org/doi/pdf/10.1145/3503161.3548543
+                            - img
+                            - text: View resource
+                    - article [ref=e223]:
+                      - generic [ref=e224]:
+                        - generic [ref=e225]:
+                          - heading "Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [level=3] [ref=e226]
+                          - paragraph [ref=e227]: Academic paper on frame-level rate control for VVC, building on VVenC rate-capping for real-time-oriented bit allocation.
+                        - generic [ref=e228]:
+                          - generic [ref=e229]: Encoding & Codecs
+                          - generic [ref=e230]:
+                            - img [ref=e231]
+                            - text: 89% · High
+                          - generic [ref=e234]:
+                            - img [ref=e235]
+                            - text: Rule ranked
+                        - group [ref=e237]:
+                          - generic "Why this? Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e238] [cursor=pointer]:
+                            - generic [ref=e239]:
+                              - img [ref=e240]
+                              - text: Why this?
+                        - generic [ref=e243]: "#Real-Time Encoding Solutions"
+                        - generic [ref=e244]:
+                          - generic [ref=e245]:
+                            - paragraph [ref=e246]: Shape future recommendations
+                            - group "Feedback for Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e248]:
+                              - 'button "Helpful: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e249] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e250] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e251] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding" [ref=e252] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding (opens in new tab)" [ref=e253] [cursor=pointer]':
+                            - /url: https://arxiv.org/pdf/2602.06242
+                            - img
+                            - text: View resource
+                    - article [ref=e254]:
+                      - generic [ref=e255]:
+                        - generic [ref=e256]:
+                          - heading "PyTorchVideoCompression" [level=3] [ref=e257]
+                          - paragraph [ref=e258]: PyTorch implementations of learned video compression methods (DVC, FVC, DCVC and related neural codecs) with training and inference code used as a common research baseline.
+                        - generic [ref=e259]:
+                          - generic [ref=e260]: Encoding & Codecs
+                          - generic [ref=e261]:
+                            - img [ref=e262]
+                            - text: 88% · High
+                          - generic [ref=e265]:
+                            - img [ref=e266]
+                            - text: AI ranked
+                        - group [ref=e276]:
+                          - generic "Why this? PyTorchVideoCompression" [ref=e277] [cursor=pointer]:
+                            - generic [ref=e278]:
+                              - img [ref=e279]
+                              - text: Why this?
+                        - generic [ref=e282]: "#Next-Generation Codecs AV1 VVC"
+                        - generic [ref=e283]:
+                          - generic [ref=e284]:
+                            - paragraph [ref=e285]: Shape future recommendations
+                            - group "Feedback for PyTorchVideoCompression" [ref=e287]:
+                              - 'button "Helpful: PyTorchVideoCompression" [ref=e288] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: PyTorchVideoCompression" [ref=e289] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: PyTorchVideoCompression" [ref=e290] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: PyTorchVideoCompression" [ref=e291] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: PyTorchVideoCompression (opens in new tab)" [ref=e292] [cursor=pointer]':
+                            - /url: https://github.com/ZhihaoHu/PyTorchVideoCompression
+                            - img
+                            - text: View resource
+                    - article [ref=e293]:
+                      - generic [ref=e294]:
+                        - generic [ref=e295]:
+                          - 'heading "MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [level=3] [ref=e296]'
+                          - paragraph [ref=e297]: Academic paper on a neural video codec targeting competitive compression, real-time speed, and cross-platform (Apple/Intel/Qualcomm NPU) inference.
+                        - generic [ref=e298]:
+                          - generic [ref=e299]: Encoding & Codecs
+                          - generic [ref=e300]:
+                            - img [ref=e301]
+                            - text: 86% · High
+                          - generic [ref=e304]:
+                            - img [ref=e305]
+                            - text: AI ranked
+                        - group [ref=e315]:
+                          - 'generic "Why this? MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e316] [cursor=pointer]':
+                            - generic [ref=e317]:
+                              - img [ref=e318]
+                              - text: Why this?
+                        - generic [ref=e321]: "#Comparative Analysis of Codecs"
+                        - generic [ref=e322]:
+                          - generic [ref=e323]:
+                            - paragraph [ref=e324]: Shape future recommendations
+                            - 'group "Feedback for MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e326]':
+                              - 'button "Helpful: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e327] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e328] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e329] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e330] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: MLVC: Multi-platform Learned Video Codec for Real-World Deployment (opens in new tab)" [ref=e331] [cursor=pointer]':
+                            - /url: https://arxiv.org/abs/2606.28027
+                            - img
+                            - text: View resource
+                    - article [ref=e332]:
+                      - generic [ref=e333]:
+                        - generic [ref=e334]:
+                          - 'heading "Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [level=3] [ref=e335]'
+                          - paragraph [ref=e336]: Ultra-low-complexity overfitted/coordinate-based learned video codec using ~800 parameters, with companion open-source implementation.
+                        - generic [ref=e337]:
+                          - generic [ref=e338]: Encoding & Codecs
+                          - generic [ref=e339]:
+                            - img [ref=e340]
+                            - text: 85% · High
+                          - generic [ref=e343]:
+                            - img [ref=e344]
+                            - text: AI ranked
+                        - group [ref=e354]:
+                          - 'generic "Why this? Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e355] [cursor=pointer]':
+                            - generic [ref=e356]:
+                              - img [ref=e357]
+                              - text: Why this?
+                        - generic [ref=e360]: "#Open Source Encoder Projects"
+                        - generic [ref=e361]:
+                          - generic [ref=e362]:
+                            - paragraph [ref=e363]: Shape future recommendations
+                            - 'group "Feedback for Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e365]':
+                              - 'button "Helpful: Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e366] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e367] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e368] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec" [ref=e369] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec (opens in new tab)" [ref=e370] [cursor=pointer]':
+                            - /url: https://arxiv.org/pdf/2402.03179
+                            - img
+                            - text: View resource
+                    - article [ref=e371]:
+                      - generic [ref=e372]:
+                        - generic [ref=e373]:
+                          - heading "Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [level=3] [ref=e374]
+                          - paragraph [ref=e375]: Academic evaluation of NVIDIA/Intel GPU and Snapdragon hardware video encoders for UHD live-streaming applications.
+                        - generic [ref=e376]:
+                          - generic [ref=e377]: Encoding & Codecs
+                          - generic [ref=e378]:
+                            - img [ref=e379]
+                            - text: 82% · High
+                          - generic [ref=e382]:
+                            - img [ref=e383]
+                            - text: AI ranked
+                        - group [ref=e393]:
+                          - generic "Why this? Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e394] [cursor=pointer]:
+                            - generic [ref=e395]:
+                              - img [ref=e396]
+                              - text: Why this?
+                        - generic [ref=e399]: "#Hardware Codecs & Acceleration"
+                        - generic [ref=e400]:
+                          - generic [ref=e401]:
+                            - paragraph [ref=e402]: Shape future recommendations
+                            - group "Feedback for Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e404]:
+                              - 'button "Helpful: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e405] [cursor=pointer]':
+                                - img
+                                - text: Helpful
+                              - 'button "Not for me: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e406] [cursor=pointer]':
+                                - img
+                                - text: Not for me
+                              - 'button "Already know this: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e407] [cursor=pointer]':
+                                - img
+                                - text: Already know this
+                              - 'button "Hide: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming" [ref=e408] [cursor=pointer]':
+                                - img
+                                - text: Hide
+                          - 'link "View resource: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming (opens in new tab)" [ref=e409] [cursor=pointer]':
+                            - /url: https://arxiv.org/abs/2511.18686
+                            - img
+                            - text: View resource
+        - contentinfo [ref=e410]:
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - paragraph [ref=e413]: ── INDEX
+              - link "awesome.video home" [ref=e414] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e415]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e417]:
+              - heading "INDEXED" [level=2] [ref=e418]
+              - paragraph [ref=e419]: 3,826
+              - paragraph [ref=e420]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e421]: live
+            - navigation "Explore categories" [ref=e423]:
+              - heading "EXPLORE" [level=2] [ref=e424]
+              - generic [ref=e425]:
+                - link "Community & Events" [ref=e426] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e427]: ◈
+                  - generic [ref=e428]: Community
+                - link "Encoding & Codecs" [ref=e429] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e430]: ◇
+                  - generic [ref=e431]: Encoding
+                - link "General Tools" [ref=e432] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e433]: ◆
+                  - generic [ref=e434]: General
+                - link "Infrastructure & Delivery" [ref=e435] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e436]: ▣
+                  - generic [ref=e437]: Infrastructure
+                - link "Intro & Learning" [ref=e438] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e439]: ▤
+                  - generic [ref=e440]: Intro
+                - link "Media Tools" [ref=e441] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e442]: ▥
+                  - generic [ref=e443]: Media
+                - link "Players & Clients" [ref=e444] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e445]: ▶
+                  - generic [ref=e446]: Players
+                - link "Protocols & Transport" [ref=e447] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e448]: ⟁
+                  - generic [ref=e449]: Protocols
+                - link "Standards & Industry" [ref=e450] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e451]: ◉
+                  - generic [ref=e452]: Standards
+            - generic [ref=e453]:
+              - heading "SOURCE" [level=2] [ref=e454]
+              - link "krzemienski/awesome-video" [ref=e455] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e456]
+                - generic [ref=e458]:
+                  - text: krzemienski
+                  - generic [ref=e459]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e460]: ↗
+              - paragraph [ref=e461]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e462] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e464] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e465]:
+            - generic [ref=e466]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e467]:
+              - link "About" [ref=e468] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e469] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e470] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e471] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e472] [cursor=pointer]
+              - link "Issues ↗" [ref=e473] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e474] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e475]: built with the awesome-list framework

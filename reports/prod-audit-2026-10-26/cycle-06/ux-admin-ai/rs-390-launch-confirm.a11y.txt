@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Launch research run?"
+    - heading "Launch research run?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This starts a paid Claude research agent (no target · $3.00 cap · 40 turns) on router.hack.ski. It runs in the background."
+    - button "Cancel" [ref=e2]
+    - button "Launch" [ref=e3]

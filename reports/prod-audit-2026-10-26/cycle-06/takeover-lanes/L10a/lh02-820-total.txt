@@ -1,0 +1,1 @@
+"Couldn't load scan status, scan history, problem links, catalog coverage\n\nCould not reach the server. Please check your connection and try again. Previously loaded results may be out of date; missing counts are not evidence of healthy links.\nRetry\n\nLink health results will appear once the failed requests load."

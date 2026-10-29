@@ -1,0 +1,501 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list [ref=e4] clickable [onclick]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e183]
+              - listitem [level=1]
+                - link "Bookmarks" [disabled, ref=e184]
+          - sectionheader
+            - heading "Saved, then finished." [level=1, ref=e25]
+              - StaticText "Saved, then "
+              - emphasis
+                - StaticText "finished."
+            - paragraph
+              - StaticText "Turn bookmarks into a queue you can actually work through."
+            - button "New collection" [ref=e26]
+          - region "Library summary" [ref=e15]
+            - button "13 Active" [ref=e27]
+              - StaticText "13"
+              - StaticText "Active"
+            - button "12 Saved" [ref=e28]
+              - StaticText "12"
+              - StaticText "Saved"
+            - button "1 Watch next" [ref=e29]
+              - StaticText "1"
+              - StaticText "Watch next"
+            - button "0 In progress" [ref=e30]
+              - StaticText "0"
+              - StaticText "In progress"
+            - button "0 Done" [ref=e31]
+              - StaticText "0"
+              - StaticText "Done"
+            - button "0 Archived" [ref=e32]
+              - StaticText "0"
+              - StaticText "Archived"
+          - complementary "Bookmark collections"
+            - generic
+              - button "All saved 13" [ref=e123]
+                - StaticText "All saved"
+                - StaticText "13"
+              - button "[QA-audit-1026] c6 collection A2 1" [ref=e124]
+                - StaticText "[QA-audit-1026] c6 collection A2"
+                - StaticText "1"
+              - group "Reorder [QA-audit-1026] c6 collection A2"
+                - button "Move [QA-audit-1026] c6 collection A2 up" [disabled, ref=e185]
+                - button "Move [QA-audit-1026] c6 collection A2 down" [ref=e186]
+              - button "[QA-audit-1026] c6 collection B 0" [ref=e125]
+                - StaticText "[QA-audit-1026] c6 collection B"
+                - StaticText "0"
+              - group "Reorder [QA-audit-1026] c6 collection B"
+                - button "Move [QA-audit-1026] c6 collection B up" [ref=e187]
+                - button "Move [QA-audit-1026] c6 collection B down" [disabled, ref=e188]
+          - region "Library filters" [ref=e16]
+            - LabelText [ref=e33] clickable [cursor:pointer]
+              - StaticText "Queue status"
+            - combobox "Queue status" [expanded=false, ref=e34]: All statuses
+              - generic [ref=e126] clickable [cursor:pointer, onclick]
+                - StaticText "All statuses"
+            - LabelText [ref=e35] clickable [cursor:pointer]
+              - StaticText "Visibility"
+            - combobox "Visibility" [expanded=false, ref=e36]: Active bookmarks
+              - generic [ref=e127] clickable [cursor:pointer, onclick]
+                - StaticText "Active bookmarks"
+            - LabelText [ref=e37] clickable [cursor:pointer]
+              - StaticText "Sort"
+            - combobox "Sort" [expanded=false, ref=e38]: Newest saved
+              - generic [ref=e128] clickable [cursor:pointer, onclick]
+                - StaticText "Newest saved"
+          - region "Bulk bookmark actions" [ref=e17]
+            - LabelText [ref=e39] clickable [cursor:pointer]
+              - checkbox "Select all visible bookmarks" [checked=false, ref=e129]
+              - StaticText "Select all shown"
+            - paragraph
+              - StaticText "0 bookmarks selected"
+          - article
+            - LabelText [ref=e40] clickable [cursor:pointer]
+              - checkbox "Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [checked=false, ref=e130]
+              - StaticText "Select "
+              - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+            - combobox "Queue status for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [expanded=false, ref=e41]: Watch next
+              - generic [ref=e131] clickable [cursor:pointer, onclick]
+                - StaticText "Watch next"
+            - StaticText "#"
+            - StaticText "1234567890123456789012345678901234567890"
+            - button "Note: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e42]
+              - StaticText "Note"
+            - button "Archive: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e43]
+              - StaticText "Archive"
+            - article [ref=e44] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e189]
+                - button "Remove bookmark: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e190]
+                - button "View or edit bookmark notes: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e191]
+              - heading "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [level=2, ref=e132]
+                - link "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e192]
+              - paragraph
+                - StaticText "Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API."
+              - StaticText "[QA-audit-1026] c6 library note"
+              - generic
+                - StaticText "Page Title: MediaMTX – Download the Media Streaming Server for Live Video"
+              - generic
+                - StaticText "Page Description: Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more."
+              - link "View details for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e133]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "INFRASTRUCTURE & DELIVERY"
+              - link "Browse resources tagged 1234567890123456789012345678901234567890" [ref=e134]
+                - StaticText "#"
+                - StaticText "1234567890123456789012345678901234567890"
+              - generic
+                - link "Open Link MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)" [ref=e193]
+                - button "Suggest an edit: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e194]
+          - article
+            - LabelText [ref=e45] clickable [cursor:pointer]
+              - checkbox "Select 2025 NAB Show: CineCentral" [checked=false, ref=e135]
+              - StaticText "Select "
+              - StaticText "2025 NAB Show: CineCentral"
+            - combobox "Queue status for 2025 NAB Show: CineCentral" [expanded=false, ref=e46]: Saved
+              - generic [ref=e136] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: 2025 NAB Show: CineCentral" [ref=e47]
+              - StaticText "Note"
+            - button "Archive: 2025 NAB Show: CineCentral" [ref=e48]
+              - StaticText "Archive"
+            - article [ref=e49] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: 2025 NAB Show: CineCentral" [ref=e195]
+                - button "Remove bookmark: 2025 NAB Show: CineCentral" [ref=e196]
+              - heading "2025 NAB Show: CineCentral" [level=2, ref=e137]
+                - link "2025 NAB Show: CineCentral" [ref=e197]
+              - paragraph
+                - StaticText "The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production."
+              - link "View details for 2025 NAB Show: CineCentral" [ref=e138]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "COMMUNITY & EVENTS"
+              - StaticText "EVENTS"
+              - generic
+                - link "Open Link 2025 NAB Show: CineCentral (opens in new tab)" [ref=e198]
+                  - StaticText "2025 NAB Show: CineCentral (opens in new tab)"
+                - button "Suggest an edit: 2025 NAB Show: CineCentral" [ref=e199]
+          - article
+            - LabelText [ref=e50] clickable [cursor:pointer]
+              - checkbox "Select Transcoding Performance Trial" [checked=false, ref=e139]
+              - StaticText "Select "
+              - StaticText "Transcoding Performance Trial"
+            - combobox "Queue status for Transcoding Performance Trial" [expanded=false, ref=e51]: Saved
+              - generic [ref=e140] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: Transcoding Performance Trial" [ref=e52]
+              - StaticText "Note"
+            - button "Archive: Transcoding Performance Trial" [ref=e53]
+              - StaticText "Archive"
+            - article [ref=e54] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: Transcoding Performance Trial" [ref=e200]
+                - button "Remove bookmark: Transcoding Performance Trial" [ref=e201]
+              - heading "Transcoding Performance Trial" [level=2, ref=e141]
+                - link "Transcoding Performance Trial" [ref=e202]
+              - paragraph
+                - StaticText "Runs FFmpeg transcoding processes simultaneously and measures CPU performance"
+              - link "View details for Transcoding Performance Trial" [ref=e142]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "ENCODING & CODECS"
+              - StaticText "TOOLS & SDKS"
+              - generic
+                - link "Open Link Transcoding Performance Trial (opens in new tab)" [ref=e203]
+                - button "Suggest an edit: Transcoding Performance Trial" [ref=e204]
+          - article
+            - LabelText [ref=e55] clickable [cursor:pointer]
+              - checkbox "Select 3DLUT Creator" [checked=false, ref=e143]
+              - StaticText "Select "
+              - StaticText "3DLUT Creator"
+            - combobox "Queue status for 3DLUT Creator" [expanded=false, ref=e56]: Saved
+              - generic [ref=e144] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: 3DLUT Creator" [ref=e57]
+              - StaticText "Note"
+            - button "Archive: 3DLUT Creator" [ref=e58]
+              - StaticText "Archive"
+            - article [ref=e59] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: 3DLUT Creator" [ref=e205]
+                - button "Remove bookmark: 3DLUT Creator" [ref=e206]
+              - heading "3DLUT Creator" [level=2, ref=e145]
+                - link "3DLUT Creator" [ref=e207]
+              - paragraph
+                - StaticText "A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors."
+              - link "View details for 3DLUT Creator" [ref=e146]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "MEDIA TOOLS"
+              - StaticText "TOOLS & SDKS"
+              - generic
+                - link "Open Link 3DLUT Creator (opens in new tab)" [ref=e208]
+                - button "Suggest an edit: 3DLUT Creator" [ref=e209]
+          - article
+            - LabelText [ref=e60] clickable [cursor:pointer]
+              - checkbox "Select AVPlayer" [checked=false, ref=e147]
+              - StaticText "Select "
+              - StaticText "AVPlayer"
+            - combobox "Queue status for AVPlayer" [expanded=false, ref=e61]: Saved
+              - generic [ref=e148] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: AVPlayer" [ref=e62]
+              - StaticText "Note"
+            - button "Archive: AVPlayer" [ref=e63]
+              - StaticText "Archive"
+            - article [ref=e64] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: AVPlayer" [ref=e210]
+                - button "Remove bookmark: AVPlayer" [ref=e211]
+              - heading "AVPlayer" [level=2, ref=e149]
+                - link "AVPlayer" [ref=e212]
+              - paragraph
+                - StaticText "AVPlayer is Apple's framework for playing and streaming audio and video content on iOS and macOS. It supports a variety of formats and provides developers with a powerful API to control playback, manage buffering, and handle interruptions, making it a fundamental tool for media playback in iOS applications."
+              - link "View details for AVPlayer" [ref=e150]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "PLAYERS & CLIENTS"
+              - StaticText "LIBRARIES"
+              - generic
+                - link "Open Link AVPlayer (opens in new tab)" [ref=e213]
+                - button "Suggest an edit: AVPlayer" [ref=e214]
+          - article
+            - LabelText [ref=e65] clickable [cursor:pointer]
+              - checkbox "Select Able Player" [checked=false, ref=e151]
+              - StaticText "Select "
+              - StaticText "Able Player"
+            - combobox "Queue status for Able Player" [expanded=false, ref=e66]: Saved
+              - generic [ref=e152] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: Able Player" [ref=e67]
+              - StaticText "Note"
+            - button "Archive: Able Player" [ref=e68]
+              - StaticText "Archive"
+            - article [ref=e69] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: Able Player" [ref=e215]
+                - button "Remove bookmark: Able Player" [ref=e216]
+              - heading "Able Player" [level=2, ref=e153]
+                - link "Able Player" [ref=e217]
+              - paragraph
+                - StaticText "A fully accessible, cross-browser HTML5 media player library that supports captions, audio descriptions, and sign language tracks, designed to be inclusive for users with disabilities."
+              - link "View details for Able Player" [ref=e154]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "PLAYERS & CLIENTS"
+              - StaticText "LIBRARIES"
+              - generic
+                - link "Open Link Able Player (opens in new tab)" [ref=e218]
+                - button "Suggest an edit: Able Player" [ref=e219]
+          - article
+            - LabelText [ref=e70] clickable [cursor:pointer]
+              - checkbox "Select About Frame Rates or Why 29.97?" [checked=false, ref=e155]
+              - StaticText "Select "
+              - StaticText "About Frame Rates or Why 29.97?"
+            - combobox "Queue status for About Frame Rates or Why 29.97?" [expanded=false, ref=e71]: Saved
+              - generic [ref=e156] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: About Frame Rates or Why 29.97?" [ref=e72]
+              - StaticText "Note"
+            - button "Archive: About Frame Rates or Why 29.97?" [ref=e73]
+              - StaticText "Archive"
+            - article [ref=e74] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: About Frame Rates or Why 29.97?" [ref=e220]
+                - button "Remove bookmark: About Frame Rates or Why 29.97?" [ref=e221]
+              - heading "About Frame Rates or Why 29.97?" [level=2, ref=e157]
+                - link "About Frame Rates or Why 29.97?" [ref=e222]
+              - paragraph
+                - StaticText "I recently remembered this popular post from my old blog. Since that blog no longer exists, I thought I would repost it here. Since I wrote this post about a decade ago, many others of done a much better job describing this in detail. I highly recommend the following two videos by Alec Watson fro"
+              - link "View details for About Frame Rates or Why 29.97?" [ref=e158]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "INTRO & LEARNING"
+              - generic
+                - link "Open Link About Frame Rates or Why 29.97? (opens in new tab)" [ref=e223]
+                - button "Suggest an edit: About Frame Rates or Why 29.97?" [ref=e224]
+          - article
+            - LabelText [ref=e75] clickable [cursor:pointer]
+              - checkbox "Select AWS Media Services" [checked=false, ref=e159]
+              - StaticText "Select "
+              - StaticText "AWS Media Services"
+            - combobox "Queue status for AWS Media Services" [expanded=false, ref=e76]: Saved
+              - generic [ref=e160] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: AWS Media Services" [ref=e77]
+              - StaticText "Note"
+            - button "Archive: AWS Media Services" [ref=e78]
+              - StaticText "Archive"
+            - article [ref=e79] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: AWS Media Services" [ref=e225]
+                - button "Remove bookmark: AWS Media Services" [ref=e226]
+              - heading "AWS Media Services" [level=2, ref=e161]
+                - link "AWS Media Services" [ref=e227]
+              - paragraph
+                - StaticText "AWS Media Services offer a suite of cloud-based services that enable the creation, transformation, and delivery of digital content. These services include AWS Elemental MediaConnect for live video transport, AWS Elemental MediaConvert for file-based video transcoding, and AWS Elemental MediaLive for live video processing. They provide scalable and flexible solutions for video streaming and encoding, allowing developers to build and adapt video workflows quickly without the overhead of managing physical infrastructure."
+              - link "View details for AWS Media Services" [ref=e162]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "INFRASTRUCTURE & DELIVERY"
+              - StaticText "TOOLS & SDKS"
+              - generic
+                - link "Open Link AWS Media Services (opens in new tab)" [ref=e228]
+                - button "Suggest an edit: AWS Media Services" [ref=e229]
+          - article
+            - LabelText [ref=e80] clickable [cursor:pointer]
+              - checkbox "Select A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [checked=false, ref=e163]
+              - StaticText "Select "
+              - StaticText "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App"
+            - combobox "Queue status for A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [expanded=false, ref=e81]: Saved
+              - generic [ref=e164] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e82]
+              - StaticText "Note"
+            - button "Archive: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e83]
+              - StaticText "Archive"
+            - article [ref=e84] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e230]
+                - button "Remove bookmark: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e231]
+              - heading "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [level=2, ref=e165]
+                - link "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e232]
+              - paragraph
+                - StaticText "An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks."
+              - link "View details for A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e166]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "INTRO & LEARNING"
+              - generic
+                - link "Open Link A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)" [ref=e233]
+                - button "Suggest an edit: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e234]
+          - article
+            - LabelText [ref=e85] clickable [cursor:pointer]
+              - checkbox "Select M3U8Parser" [checked=false, ref=e167]
+              - StaticText "Select "
+              - StaticText "M3U8Parser"
+            - combobox "Queue status for M3U8Parser" [expanded=false, ref=e86]: Saved
+              - generic [ref=e168] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: M3U8Parser" [ref=e87]
+              - StaticText "Note"
+            - button "Archive: M3U8Parser" [ref=e88]
+              - StaticText "Archive"
+            - article [ref=e89] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: M3U8Parser" [ref=e235]
+                - button "Remove bookmark: M3U8Parser" [ref=e236]
+              - heading "M3U8Parser" [level=2, ref=e169]
+                - link "M3U8Parser" [ref=e237]
+              - paragraph
+                - StaticText "A light weight M3U8 parser. Support X-Key & X-Session-Key."
+              - link "View details for M3U8Parser" [ref=e170]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "PROTOCOLS & TRANSPORT"
+              - StaticText "LIBRARIES"
+              - generic
+                - link "Open Link M3U8Parser (opens in new tab)" [ref=e238]
+                - button "Suggest an edit: M3U8Parser" [ref=e239]
+          - article
+            - LabelText [ref=e90] clickable [cursor:pointer]
+              - checkbox "Select ABR Video Player" [checked=false, ref=e171]
+              - StaticText "Select "
+              - StaticText "ABR Video Player"
+            - combobox "Queue status for ABR Video Player" [expanded=false, ref=e91]: Saved
+              - generic [ref=e172] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: ABR Video Player" [ref=e92]
+              - StaticText "Note"
+            - button "Archive: ABR Video Player" [ref=e93]
+              - StaticText "Archive"
+            - article [ref=e94] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: ABR Video Player" [ref=e240]
+                - button "Remove bookmark: ABR Video Player" [ref=e241]
+              - heading "ABR Video Player" [level=2, ref=e173]
+                - link "ABR Video Player" [ref=e242]
+              - paragraph
+                - StaticText "Sophisticated web-based video player implementing advanced ABR algorithms including BOLA (Buffer Occupancy based Lyapunov Algorithm) and bandwidth-based strategies. Features MSE-based streaming, dual EWMA bandwidth estimation, and intelligent quality switching."
+              - link "View details for ABR Video Player" [ref=e174]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "PROTOCOLS & TRANSPORT"
+              - StaticText "TOOLS & SDKS"
+              - generic
+                - link "Open Link ABR Video Player (opens in new tab)" [ref=e243]
+                - button "Suggest an edit: ABR Video Player" [ref=e244]
+          - article
+            - LabelText [ref=e95] clickable [cursor:pointer]
+              - checkbox "Select 3 Cases from a Video Expert: Encoding Basics" [checked=false, ref=e175]
+              - StaticText "Select "
+              - StaticText "3 Cases from a Video Expert: Encoding Basics"
+            - combobox "Queue status for 3 Cases from a Video Expert: Encoding Basics" [expanded=false, ref=e96]: Saved
+              - generic [ref=e176] clickable [cursor:pointer, onclick]
+                - StaticText "Saved"
+            - button "Note: 3 Cases from a Video Expert: Encoding Basics" [ref=e97]
+              - StaticText "Note"
+            - button "Archive: 3 Cases from a Video Expert: Encoding Basics" [ref=e98]
+              - StaticText "Archive"
+            - article [ref=e99] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: 3 Cases from a Video Expert: Encoding Basics" [ref=e245]
+                - button "Remove bookmark: 3 Cases from a Video Expert: Encoding Basics" [ref=e246]
+              - heading "3 Cases from a Video Expert: Encoding Basics" [level=2, ref=e177]
+                - link "3 Cases from a Video Expert: Encoding Basics" [ref=e247]
+              - paragraph
+                - StaticText "Vicuesoft blog article explaining fundamental video encoding concepts through practical case studies."
+              - link "View details for 3 Cases from a Video Expert: Encoding Basics" [ref=e178]
+                - image
+                - StaticText "VIEW DETAILS"
+              - StaticText "INTRO & LEARNING"
+              - generic
+                - link "Open Link 3 Cases from a Video Expert: Encoding Basics (opens in new tab)" [ref=e248]
+                  - StaticText "3 Cases from a Video Expert: Encoding Basics (opens in new tab)"
+                - button "Suggest an edit: 3 Cases from a Video Expert: Encoding Basics" [ref=e249]
+          - article
+            - LabelText [ref=e100] clickable [cursor:pointer]
+              - checkbox "Select AMD Advanced Media Acceleration (AMA) SDK" [checked=false, ref=e179]
+              - StaticText "Select "
+              - StaticText "AMD Advanced Media Acceleration (AMA) SDK"
+            - combobox "Queue status for AMD Advanced Media Acceleration (AMA) SDK" [expanded=false, ref=e101]: Saved
+              - generic [ref=e180] clickable [cursor:pointer, onclick]
+            - button "Note: AMD Advanced Media Acceleration (AMA) SDK" [ref=e102]
+              - StaticText "Note"
+            - button "Archive: AMD Advanced Media Acceleration (AMA) SDK" [ref=e103]
+              - StaticText "Archive"
+            - article [ref=e104] clickable [cursor:pointer]
+              - generic
+                - button "Add to favorites: AMD Advanced Media Acceleration (AMA) SDK" [ref=e250]
+                - button "Remove bookmark: AMD Advanced Media Acceleration (AMA) SDK" [ref=e251]
+              - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=2, ref=e181]
+                - link "AMD Advanced Media Acceleration (AMA) SDK" [ref=e252]
+              - paragraph
+              - link "View details for AMD Advanced Media Acceleration (AMA) SDK" [ref=e182]
+              - StaticText "ENCODING & CODECS"
+              - StaticText "LIBRARIES"
+              - generic
+                - link "Open Link AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)" [ref=e253]
+                - button "Suggest an edit: AMD Advanced Media Acceleration (AMA) SDK" [ref=e254]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e18]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e19]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e20]
+            - heading "EXPLORE" [level=2, ref=e105]
+            - link "Community & Events" [ref=e106]
+            - link "Encoding & Codecs" [ref=e107]
+            - link "General Tools" [ref=e108]
+            - link "Infrastructure & Delivery" [ref=e109]
+            - link "Intro & Learning" [ref=e110]
+            - link "Media Tools" [ref=e111]
+            - link "Players & Clients" [ref=e112]
+            - link "Protocols & Transport" [ref=e113]
+            - link "Standards & Industry" [ref=e114]
+          - heading "SOURCE" [level=2, ref=e21]
+          - link "krzemienski/ awesome-video" [ref=e22]
+          - paragraph
+            - link "PRs welcome" [ref=e115]
+          - button "Contact maintainers" [ref=e23]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e24]
+            - link "About" [ref=e116]
+            - link "Terms" [ref=e117]
+            - link "Privacy" [ref=e118]
+            - link "Code of Conduct" [ref=e119]
+            - button "Cookie settings" [ref=e120]
+            - link "Issues ↗" [ref=e121]
+            - link "Sitemap" [ref=e122]

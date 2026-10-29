@@ -1,0 +1,286 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,827 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,827 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,827 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Researcher" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - 'region "Research run #68" [ref=e117]':
+                      - generic [ref=e118]:
+                        - generic [ref=e119]:
+                          - 'heading "Research run #68" [level=3] [ref=e120]'
+                          - paragraph [ref=e121]: All categories · ran for 0:32
+                        - generic [ref=e123]:
+                          - img [ref=e124]
+                          - text: Stopped at budget
+                      - paragraph [ref=e126]
+                      - generic [ref=e127]:
+                        - list "Run phases" [ref=e128]:
+                          - listitem [ref=e129]:
+                            - img [ref=e131]
+                            - generic [ref=e133]:
+                              - text: Planning
+                              - generic [ref=e134]: 05:39:04 AM
+                            - generic [ref=e135]: (done)
+                          - listitem [ref=e136]:
+                            - img [ref=e138]
+                            - generic [ref=e140]:
+                              - text: Scouting
+                              - generic [ref=e141]: 05:39:31 AM
+                            - generic [ref=e142]: (done)
+                          - listitem [ref=e143]:
+                            - generic [ref=e145]: Verifying
+                            - generic [ref=e147]: (not reached)
+                          - listitem [ref=e148]:
+                            - generic [ref=e150]: Saving
+                            - generic [ref=e152]: (not reached)
+                          - listitem [ref=e153]:
+                            - generic [ref=e156]:
+                              - text: Stopped at budget
+                              - generic [ref=e157]: 05:39:36 AM
+                            - generic [ref=e158]: (current)
+                        - generic [ref=e159]:
+                          - heading "Scouts 1 started" [level=4] [ref=e160]:
+                            - img [ref=e161]
+                            - text: Scouts
+                            - generic [ref=e164]: 1 started
+                          - list "Scouts" [ref=e165]:
+                            - listitem [ref=e166]:
+                              - generic [ref=e167]:
+                                - generic [ref=e168]: Scout 1
+                                - generic [ref=e169]: Stopped
+                              - paragraph [ref=e170]: Find packaging tools
+                              - paragraph [ref=e171]: 0 searches · 0 candidates · 5s
+                      - generic [ref=e172]:
+                        - generic [ref=e173]:
+                          - term [ref=e174]: Discoveries
+                          - definition [ref=e175]: 0 of 1 saved
+                          - progressbar "Discoveries saved against the target" [ref=e176]
+                        - generic [ref=e178]:
+                          - term [ref=e179]: Turns
+                          - definition [ref=e180]: 3 of 10
+                          - progressbar "Turns used against the cap" [ref=e181]
+                        - generic [ref=e183]:
+                          - term [ref=e184]: Spend
+                          - definition [ref=e185]: $0.3062 of $0.30
+                          - progressbar "Spend against the budget cap" [ref=e186]
+                      - note [ref=e188]:
+                        - img [ref=e189]
+                        - generic [ref=e191]:
+                          - paragraph [ref=e192]: Budget cap reached ($0.30) before the run saved a discovery. Relaunch with a higher cap.
+                          - button "Relaunch with a higher cap" [ref=e193] [cursor=pointer]:
+                            - img
+                            - text: Relaunch with a higher cap
+                      - region "Review discoveries" [ref=e194]:
+                        - heading "Review discoveries" [level=4] [ref=e195]
+                        - paragraph [ref=e196]: This run saved no discoveries.
+                        - generic [ref=e197]:
+                          - button "Done — go to job history" [ref=e198] [cursor=pointer]:
+                            - img
+                            - text: Done — go to job history
+                          - button "Start another run" [ref=e199] [cursor=pointer]:
+                            - img
+                            - text: Start another run
+                      - generic [ref=e200]:
+                        - 'button "Run details: raw event log and agent graph" [expanded] [ref=e201] [cursor=pointer]':
+                          - text: "Run details: raw event log and agent graph"
+                          - img
+                        - generic [ref=e203]:
+                          - tablist [ref=e204]:
+                            - tab "Event log" [ref=e205] [cursor=pointer]
+                            - tab "Agent graph" [active] [selected] [ref=e206] [cursor=pointer]
+                          - tabpanel "Agent graph" [ref=e207]:
+                            - region "Communication Graph" [ref=e208]:
+                              - generic [ref=e209]:
+                                - heading "Communication Graph" [level=3] [ref=e210]
+                                - generic [ref=e211]:
+                                  - generic [ref=e212]: orchestrator
+                                  - generic [ref=e214]: subagent
+                                  - generic [ref=e216]: tool
+                              - region "Agent communication graph for research job 68" [ref=e218]:
+                                - 'img "Agent communication graph: 1 orchestrator, 1 subagent, 2 tools; 1 delegation, 5 tool calls." [ref=e219]':
+                                  - generic [ref=e224]: ×4
+                                  - generic [ref=e225]:
+                                    - generic [ref=e227]: orchestrator
+                                    - generic [ref=e228]: orchestrator
+                                    - generic [ref=e229]: cc/claude-opus-5
+                                  - generic [ref=e230]:
+                                    - generic [ref=e232]: get_coverage_gaps
+                                    - generic [ref=e233]: tool
+                                  - generic [ref=e234]:
+                                    - generic [ref=e236]: WebSearch
+                                    - generic [ref=e237]: tool
+                                  - generic [ref=e238]:
+                                    - generic [ref=e240]: scout
+                                    - generic [ref=e241]: subagent
+                                    - generic [ref=e242]: claude-haiku-4-5-2025…
+                    - generic [ref=e243]:
+                      - generic [ref=e245]:
+                        - heading "Researcher jobs" [level=2] [ref=e246]
+                        - paragraph [ref=e247]: Latest 5 of 75 research runs
+                      - generic [ref=e248]:
+                        - region "Researcher jobs table, scrollable" [ref=e249]:
+                          - table [ref=e250]:
+                            - rowgroup [ref=e251]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e252]:
+                                - columnheader "Status" [ref=e253]
+                                - columnheader "Prompt" [ref=e254]
+                                - columnheader "Found" [ref=e255]
+                                - columnheader "Approved / Rejected" [ref=e256]
+                                - columnheader "Cost" [ref=e257]
+                                - columnheader "Turns" [ref=e258]
+                                - columnheader "Created" [ref=e259]
+                            - rowgroup [ref=e260]:
+                              - row [ref=e261]:
+                                - cell "processing" [ref=e262]:
+                                  - generic [ref=e263]: processing
+                                - cell [ref=e264]
+                                - cell "0" [ref=e265]
+                                - cell "0/0" [ref=e266]
+                                - cell "$0.0000" [ref=e267]
+                                - cell "0/600" [ref=e268]
+                                - cell "Oct 27, 2026" [ref=e269]
+                              - row [ref=e270]:
+                                - cell "completed" [ref=e271]:
+                                  - generic [ref=e272]: completed
+                                - cell [ref=e273]
+                                - cell "0" [ref=e274]
+                                - cell "0/0" [ref=e275]
+                                - cell "$0.5650" [ref=e276]
+                                - cell "13/600" [ref=e277]
+                                - cell "Oct 27, 2026" [ref=e278]
+                              - row [ref=e279]:
+                                - cell "completed" [ref=e280]:
+                                  - generic [ref=e281]: completed
+                                - cell [ref=e282]
+                                - cell "4" [ref=e283]
+                                - cell "1/0" [ref=e284]
+                                - cell "$5.4603" [ref=e285]
+                                - cell "155/200" [ref=e286]
+                                - cell "Oct 27, 2026" [ref=e287]
+                              - row [ref=e288]:
+                                - cell "failed" [ref=e289]:
+                                  - generic [ref=e290]: failed
+                                - cell [ref=e291]
+                                - cell "0" [ref=e292]
+                                - cell "0/0" [ref=e293]
+                                - cell "$0.0000" [ref=e294]
+                                - cell "1/200" [ref=e295]
+                                - cell "Oct 27, 2026" [ref=e296]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e297]':
+                                - cell "completed" [ref=e298]:
+                                  - generic [ref=e299]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e300]'
+                                - cell "9" [ref=e301]
+                                - cell "0/0" [ref=e302]
+                                - cell "$3.3100" [ref=e303]
+                                - cell "41/200" [ref=e304]
+                                - cell "Oct 27, 2026" [ref=e305]
+                        - button "Show more" [ref=e307] [cursor=pointer]
+                  - group [ref=e308]:
+                    - generic "All pending discoveries & full job history" [ref=e309] [cursor=pointer]

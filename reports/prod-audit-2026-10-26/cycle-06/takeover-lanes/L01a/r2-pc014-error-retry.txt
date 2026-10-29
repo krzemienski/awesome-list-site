@@ -1,0 +1,6 @@
+== 1440 error: "{\"vw\":1440,\"url\":\"/category/players-clients\",\"err\":1,\"retry\":[44],\"cats\":0}"
+   after retry: navGETs=1 "{\"vw\":1440,\"url\":\"/category/players-clients\",\"err\":0,\"retry\":[],\"cats\":9}"
+== 820 error: "{\"vw\":820,\"url\":\"/category/players-clients\",\"err\":2,\"retry\":[44,44],\"cats\":0}"
+   after retry: navGETs=0 "{\"vw\":820,\"url\":\"/submit\",\"err\":1,\"retry\":[0],\"cats\":0}"
+== 390 error: "{\"vw\":390,\"url\":\"/category/players-clients\",\"err\":1,\"retry\":[44],\"cats\":0}"
+   after retry: navGETs=1 "{\"vw\":390,\"url\":\"/category/players-clients\",\"err\":0,\"retry\":[],\"cats\":9}"

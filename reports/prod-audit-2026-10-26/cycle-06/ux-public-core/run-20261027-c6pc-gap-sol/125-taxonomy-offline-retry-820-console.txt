@@ -1,0 +1,8 @@
+Emulating network conditions: Offline
+Default navigation timeout set to 10000 ms
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":true,"isLandscape":false,"width":820,"height":1180}
+Emulating color scheme: dark
+## Console messages
+Showing 1-2 of 2 (Page 1 of 1).
+msgid=21 [issue] A form field element should have an id or name attribute (count: 3)
+msgid=22 [error] Failed to load resource: net::ERR_INTERNET_DISCONNECTED (0 args) [2 times]

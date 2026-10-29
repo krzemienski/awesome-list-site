@@ -1,0 +1,22 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - main
+        - tabpanel "Researcher" [ref=e8] focusable [tabindex]
+          - generic
+            - generic
+              - region "Research run #71" [ref=e9]
+                - paragraph
+  - dialog "Reject Discovery"
+    - heading "Reject Discovery" [level=2, ref=e2]
+    - paragraph
+      - StaticText "Mark this discovered resource as rejected. Optionally include a reason for the audit trail."
+    - generic
+      - LabelText [ref=e6] clickable [cursor:pointer]
+        - StaticText "Reason (optional)"
+      - textbox "Reason (optional)" [ref=e7]
+    - button "Cancel" [ref=e3]
+    - button "Reject" [ref=e4]
+    - button "Close" [ref=e5]
+      - image
+      - StaticText "Close"

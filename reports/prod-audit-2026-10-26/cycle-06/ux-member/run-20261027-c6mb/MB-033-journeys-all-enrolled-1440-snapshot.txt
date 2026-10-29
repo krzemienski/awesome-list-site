@@ -1,0 +1,151 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e57]
+              - listitem [level=1]
+                - link "Learning Journeys" [disabled, ref=e58]
+          - sectionheader
+            - StaticText "DISCOVERY · LEARNING PATHS"
+            - heading "Learning Journeys" [level=1, ref=e22]
+            - paragraph
+          - StaticText "Filter by category:"
+          - combobox "Filter by category" [expanded=false, ref=e14]: All Categories
+            - generic [ref=e23] clickable [cursor:pointer, onclick]
+          - generic
+            - StaticText "5 journeys available"
+          - article
+            - image
+            - StaticText "INTERMEDIATE"
+            - heading "Building Your First Streaming Platform" [level=2, ref=e24]
+              - link "Building Your First Streaming Platform" [ref=e52]
+            - StaticText "Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of managed versus self-hosted infrastructure."
+            - image
+            - StaticText "15-20 HOURS"
+            - StaticText "INFRASTRUCTURE & DELIVERY"
+            - StaticText "6"
+            - StaticText " STEPS"
+            - StaticText "Progress"
+            - StaticText "100"
+            - StaticText "%"
+            - progressbar "Building Your First Streaming Platform progress: 100%": 100
+            - paragraph
+            - button "Completed · Review: Building Your First Streaming Platform" [ref=e25]
+          - article
+            - image
+            - StaticText "ADVANCED"
+            - heading "Advanced Live Streaming Architecture" [level=2, ref=e26]
+              - link "Advanced Live Streaming Architecture" [ref=e53]
+            - StaticText "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+            - image
+            - StaticText "20-25 HOURS"
+            - StaticText "PROTOCOLS & TRANSPORT"
+            - StaticText "6"
+            - StaticText " STEPS"
+            - StaticText "Progress"
+            - StaticText "0"
+            - StaticText "%"
+            - progressbar "Advanced Live Streaming Architecture progress: 0%": 0
+            - paragraph
+            - button "Continue Journey: Advanced Live Streaming Architecture" [ref=e27]
+          - article
+            - image
+            - StaticText "ADVANCED"
+            - heading "DRM & Content Protection" [level=2, ref=e28]
+              - link "DRM & Content Protection" [ref=e54]
+            - StaticText "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach."
+            - image
+            - StaticText "10-12 HOURS"
+            - StaticText "GENERAL TOOLS"
+            - StaticText "6"
+            - StaticText " STEPS"
+            - StaticText "Progress"
+            - StaticText "0"
+            - StaticText "%"
+            - progressbar "DRM & Content Protection progress: 0%": 0
+            - paragraph
+            - button "Continue Journey: DRM & Content Protection" [ref=e29]
+          - article
+            - image
+            - StaticText "INTERMEDIATE"
+            - heading "FFmpeg Mastery" [level=2, ref=e30]
+              - link "FFmpeg Mastery" [ref=e55]
+            - StaticText "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+            - image
+            - StaticText "12-15 HOURS"
+            - StaticText "ENCODING & CODECS"
+            - StaticText "6"
+            - StaticText " STEPS"
+            - StaticText "Progress"
+            - StaticText "0"
+            - StaticText "%"
+            - progressbar "FFmpeg Mastery progress: 0%": 0
+            - paragraph
+            - button "Continue Journey: FFmpeg Mastery" [ref=e31]
+          - article
+            - image
+            - StaticText "BEGINNER"
+            - heading "Video Streaming Fundamentals" [level=2, ref=e32]
+              - link "Video Streaming Fundamentals" [ref=e56]
+            - StaticText "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+            - progressbar "Video Streaming Fundamentals progress: 67%": 67
+            - button "Continue Journey: Video Streaming Fundamentals" [ref=e33]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e15]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e16]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e17]
+            - heading "EXPLORE" [level=2, ref=e34]
+            - link "Community & Events" [ref=e35]
+            - link "Encoding & Codecs" [ref=e36]
+            - link "General Tools" [ref=e37]
+            - link "Infrastructure & Delivery" [ref=e38]
+            - link "Intro & Learning" [ref=e39]
+            - link "Media Tools" [ref=e40]
+            - link "Players & Clients" [ref=e41]
+            - link "Protocols & Transport" [ref=e42]
+            - link "Standards & Industry" [ref=e43]
+          - heading "SOURCE" [level=2, ref=e18]
+          - link "krzemienski/ awesome-video" [ref=e19]
+          - paragraph
+            - link "PRs welcome" [ref=e44]
+          - button "Contact maintainers" [ref=e20]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e21]
+            - link "About" [ref=e45]
+            - link "Terms" [ref=e46]
+            - link "Privacy" [ref=e47]
+            - link "Code of Conduct" [ref=e48]
+            - button "Cookie settings" [ref=e49]
+            - link "Issues ↗" [ref=e50]
+            - link "Sitemap" [ref=e51]

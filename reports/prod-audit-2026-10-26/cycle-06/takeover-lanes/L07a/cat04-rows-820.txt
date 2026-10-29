@@ -1,0 +1,10 @@
+"icon|Community & Events|community-events|129|2
+icon|Encoding & Codecs|encoding-codecs|580|16
+icon|General Tools|general-tools|514|19
+icon|Infrastructure & Delivery|infrastructure-delivery|353|10
+icon|Intro & Learning|intro-learning|297|9
+icon|Media Tools|media-tools|704|16
+icon|Players & Clients|players-clients|447|10
+icon|Protocols & Transport|protocols-transport|467|9
+icon|Standards & Industry|standards-industry|335|8
+icon|[QA-audit-1026] Café Ünï Ætest w390|qa-audit-1026-cafe-ni-aetest-w390|0|0"

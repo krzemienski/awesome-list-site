@@ -1,0 +1,412 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Enrichment" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [selected] [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Enrichment" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - generic [ref=e116]:
+                      - article [ref=e117]:
+                        - generic [ref=e118]: Last enriched
+                        - generic [ref=e119]: 27h ago
+                        - generic [ref=e120]: "batch #34 · 10 resources · cancelled"
+                      - article [ref=e121]:
+                        - generic [ref=e122]: Queue
+                        - generic [ref=e123]: "0"
+                        - generic [ref=e124]: idle
+                      - article [ref=e125]:
+                        - generic [ref=e126]: Avg cost
+                        - generic [ref=e127]: $0.03
+                        - generic [ref=e128]: per batch
+                    - generic [ref=e129]:
+                      - generic [ref=e130]:
+                        - generic [ref=e131]:
+                          - heading "Enrichment jobs" [level=2] [ref=e132]
+                          - paragraph [ref=e133]: LLM-driven metadata enhancement
+                        - button "Run job" [ref=e135] [cursor=pointer]:
+                          - img
+                          - text: Run job
+                      - generic [ref=e136]:
+                        - region "Enrichment jobs table, scrollable" [ref=e137]:
+                          - table [ref=e138]:
+                            - rowgroup [ref=e139]:
+                              - row "Job Status Started Completed Actions" [ref=e140]:
+                                - columnheader "Job" [ref=e141]
+                                - columnheader "Status" [ref=e142]
+                                - columnheader "Started" [ref=e143]
+                                - columnheader "Completed" [ref=e144]
+                                - columnheader "Actions" [ref=e145]:
+                                  - generic [ref=e146]: Actions
+                            - rowgroup [ref=e147]:
+                              - 'row "#34 cancelled 10/26/2026, 12:33:50 AM 10/26/2026, 12:34:47 AM View logs for job #34" [ref=e148]':
+                                - cell "#34" [ref=e149]
+                                - cell "cancelled" [ref=e150]:
+                                  - generic [ref=e151]: cancelled
+                                - cell "10/26/2026, 12:33:50 AM" [ref=e152]
+                                - cell "10/26/2026, 12:34:47 AM" [ref=e153]
+                                - 'cell "View logs for job #34" [ref=e154]':
+                                  - 'button "View logs for job #34" [ref=e155] [cursor=pointer]': Logs
+                              - 'row "#33 cancelled 10/26/2026, 12:30:14 AM 10/26/2026, 12:33:13 AM View logs for job #33" [ref=e156]':
+                                - cell "#33" [ref=e157]
+                                - cell "cancelled" [ref=e158]:
+                                  - generic [ref=e159]: cancelled
+                                - cell "10/26/2026, 12:30:14 AM" [ref=e160]
+                                - cell "10/26/2026, 12:33:13 AM" [ref=e161]
+                                - 'cell "View logs for job #33" [ref=e162]':
+                                  - 'button "View logs for job #33" [ref=e163] [cursor=pointer]': Logs
+                              - 'row "#32 completed 7/16/2026, 9:45:33 PM 7/16/2026, 9:45:33 PM View logs for job #32" [ref=e164]':
+                                - cell "#32" [ref=e165]
+                                - cell "completed" [ref=e166]:
+                                  - generic [ref=e167]: completed
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e168]
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e169]
+                                - 'cell "View logs for job #32" [ref=e170]':
+                                  - 'button "View logs for job #32" [ref=e171] [cursor=pointer]': Logs
+                              - 'row "#31 completed 7/16/2026, 9:45:32 PM 7/16/2026, 9:45:32 PM View logs for job #31" [ref=e172]':
+                                - cell "#31" [ref=e173]
+                                - cell "completed" [ref=e174]:
+                                  - generic [ref=e175]: completed
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e176]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e177]
+                                - 'cell "View logs for job #31" [ref=e178]':
+                                  - 'button "View logs for job #31" [ref=e179] [cursor=pointer]': Logs
+                              - 'row "#30 completed 7/16/2026, 9:45:31 PM 7/16/2026, 9:45:32 PM View logs for job #30" [ref=e180]':
+                                - cell "#30" [ref=e181]
+                                - cell "completed" [ref=e182]:
+                                  - generic [ref=e183]: completed
+                                - cell "7/16/2026, 9:45:31 PM" [ref=e184]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e185]
+                                - 'cell "View logs for job #30" [ref=e186]':
+                                  - 'button "View logs for job #30" [ref=e187] [cursor=pointer]': Logs
+                              - 'row "#29 completed 7/16/2026, 9:41:27 PM 7/16/2026, 9:41:27 PM View logs for job #29" [ref=e188]':
+                                - cell "#29" [ref=e189]
+                                - cell "completed" [ref=e190]:
+                                  - generic [ref=e191]: completed
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e192]
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e193]
+                                - 'cell "View logs for job #29" [ref=e194]':
+                                  - 'button "View logs for job #29" [ref=e195] [cursor=pointer]': Logs
+                              - 'row "#28 completed 7/7/2026, 12:54:43 PM 7/7/2026, 12:54:43 PM View logs for job #28" [ref=e196]':
+                                - cell "#28" [ref=e197]
+                                - cell "completed" [ref=e198]:
+                                  - generic [ref=e199]: completed
+                                - cell "7/7/2026, 12:54:43 PM" [ref=e200]
+                                - cell "7/7/2026, 12:54:43 PM" [ref=e201]
+                                - 'cell "View logs for job #28" [ref=e202]':
+                                  - 'button "View logs for job #28" [ref=e203] [cursor=pointer]': Logs
+                              - 'row "#27 completed 7/7/2026, 12:53:50 PM 7/7/2026, 12:53:51 PM View logs for job #27" [ref=e204]':
+                                - cell "#27" [ref=e205]
+                                - cell "completed" [ref=e206]:
+                                  - generic [ref=e207]: completed
+                                - cell "7/7/2026, 12:53:50 PM" [ref=e208]
+                                - cell "7/7/2026, 12:53:51 PM" [ref=e209]
+                                - 'cell "View logs for job #27" [ref=e210]':
+                                  - 'button "View logs for job #27" [ref=e211] [cursor=pointer]': Logs
+                              - 'row "#26 completed 7/6/2026, 1:30:06 PM 7/6/2026, 1:30:07 PM View logs for job #26" [ref=e212]':
+                                - cell "#26" [ref=e213]
+                                - cell "completed" [ref=e214]:
+                                  - generic [ref=e215]: completed
+                                - cell "7/6/2026, 1:30:06 PM" [ref=e216]
+                                - cell "7/6/2026, 1:30:07 PM" [ref=e217]
+                                - 'cell "View logs for job #26" [ref=e218]':
+                                  - 'button "View logs for job #26" [ref=e219] [cursor=pointer]': Logs
+                              - 'row "#25 completed 7/5/2026, 10:57:15 PM 7/5/2026, 10:57:18 PM View logs for job #25" [ref=e220]':
+                                - cell "#25" [ref=e221]
+                                - cell "completed" [ref=e222]:
+                                  - generic [ref=e223]: completed
+                                - cell "7/5/2026, 10:57:15 PM" [ref=e224]
+                                - cell "7/5/2026, 10:57:18 PM" [ref=e225]
+                                - 'cell "View logs for job #25" [ref=e226]':
+                                  - 'button "View logs for job #25" [ref=e227] [cursor=pointer]': Logs
+                              - 'row "#24 failed 6/26/2026, 8:21:50 AM 6/26/2026, 8:54:22 AM View logs for job #24" [ref=e228]':
+                                - cell "#24" [ref=e229]
+                                - cell "failed" [ref=e230]:
+                                  - generic [ref=e231]: failed
+                                - cell "6/26/2026, 8:21:50 AM" [ref=e232]
+                                - cell "6/26/2026, 8:54:22 AM" [ref=e233]
+                                - 'cell "View logs for job #24" [ref=e234]':
+                                  - 'button "View logs for job #24" [ref=e235] [cursor=pointer]': Logs
+                              - 'row "#23 completed 6/25/2026, 5:57:52 PM 6/25/2026, 5:57:55 PM View logs for job #23" [ref=e236]':
+                                - cell "#23" [ref=e237]
+                                - cell "completed" [ref=e238]:
+                                  - generic [ref=e239]: completed
+                                - cell "6/25/2026, 5:57:52 PM" [ref=e240]
+                                - cell "6/25/2026, 5:57:55 PM" [ref=e241]
+                                - 'cell "View logs for job #23" [ref=e242]':
+                                  - 'button "View logs for job #23" [ref=e243] [cursor=pointer]': Logs
+                              - 'row "#22 completed 6/3/2026, 1:17:36 AM 6/3/2026, 1:17:42 AM View logs for job #22" [ref=e244]':
+                                - cell "#22" [ref=e245]
+                                - cell "completed" [ref=e246]:
+                                  - generic [ref=e247]: completed
+                                - cell "6/3/2026, 1:17:36 AM" [ref=e248]
+                                - cell "6/3/2026, 1:17:42 AM" [ref=e249]
+                                - 'cell "View logs for job #22" [ref=e250]':
+                                  - 'button "View logs for job #22" [ref=e251] [cursor=pointer]': Logs
+                              - 'row "#21 completed 2/11/2026, 11:38:54 PM 2/11/2026, 11:38:56 PM View logs for job #21" [ref=e252]':
+                                - cell "#21" [ref=e253]
+                                - cell "completed" [ref=e254]:
+                                  - generic [ref=e255]: completed
+                                - cell "2/11/2026, 11:38:54 PM" [ref=e256]
+                                - cell "2/11/2026, 11:38:56 PM" [ref=e257]
+                                - 'cell "View logs for job #21" [ref=e258]':
+                                  - 'button "View logs for job #21" [ref=e259] [cursor=pointer]': Logs
+                              - 'row "#20 completed 2/11/2026, 11:20:11 PM 2/11/2026, 11:20:44 PM View logs for job #20" [ref=e260]':
+                                - cell "#20" [ref=e261]
+                                - cell "completed" [ref=e262]:
+                                  - generic [ref=e263]: completed
+                                - cell "2/11/2026, 11:20:11 PM" [ref=e264]
+                                - cell "2/11/2026, 11:20:44 PM" [ref=e265]
+                                - 'cell "View logs for job #20" [ref=e266]':
+                                  - 'button "View logs for job #20" [ref=e267] [cursor=pointer]': Logs
+                              - 'row "#19 cancelled 2/11/2026, 11:19:09 PM 3/22/2026, 10:45:21 PM View logs for job #19" [ref=e268]':
+                                - cell "#19" [ref=e269]
+                                - cell "cancelled" [ref=e270]:
+                                  - generic [ref=e271]: cancelled
+                                - cell "2/11/2026, 11:19:09 PM" [ref=e272]
+                                - cell "3/22/2026, 10:45:21 PM" [ref=e273]
+                                - 'cell "View logs for job #19" [ref=e274]':
+                                  - 'button "View logs for job #19" [ref=e275] [cursor=pointer]': Logs
+                              - 'row "#18 cancelled 2/11/2026, 11:17:52 PM 3/22/2026, 10:45:30 PM View logs for job #18" [ref=e276]':
+                                - cell "#18" [ref=e277]
+                                - cell "cancelled" [ref=e278]:
+                                  - generic [ref=e279]: cancelled
+                                - cell "2/11/2026, 11:17:52 PM" [ref=e280]
+                                - cell "3/22/2026, 10:45:30 PM" [ref=e281]
+                                - 'cell "View logs for job #18" [ref=e282]':
+                                  - 'button "View logs for job #18" [ref=e283] [cursor=pointer]': Logs
+                              - 'row "#17 completed 12/1/2025, 1:43:34 AM 12/1/2025, 1:45:58 AM View logs for job #17" [ref=e284]':
+                                - cell "#17" [ref=e285]
+                                - cell "completed" [ref=e286]:
+                                  - generic [ref=e287]: completed
+                                - cell "12/1/2025, 1:43:34 AM" [ref=e288]
+                                - cell "12/1/2025, 1:45:58 AM" [ref=e289]
+                                - 'cell "View logs for job #17" [ref=e290]':
+                                  - 'button "View logs for job #17" [ref=e291] [cursor=pointer]': Logs
+                              - 'row "#16 completed 11/19/2025, 12:57:43 AM 11/19/2025, 12:57:47 AM View logs for job #16" [ref=e292]':
+                                - cell "#16" [ref=e293]
+                                - cell "completed" [ref=e294]:
+                                  - generic [ref=e295]: completed
+                                - cell "11/19/2025, 12:57:43 AM" [ref=e296]
+                                - cell "11/19/2025, 12:57:47 AM" [ref=e297]
+                                - 'cell "View logs for job #16" [ref=e298]':
+                                  - 'button "View logs for job #16" [ref=e299] [cursor=pointer]': Logs
+                              - 'row "#15 completed 11/19/2025, 12:57:17 AM 11/19/2025, 12:57:22 AM View logs for job #15" [ref=e300]':
+                                - cell "#15" [ref=e301]
+                                - cell "completed" [ref=e302]:
+                                  - generic [ref=e303]: completed
+                                - cell "11/19/2025, 12:57:17 AM" [ref=e304]
+                                - cell "11/19/2025, 12:57:22 AM" [ref=e305]
+                                - 'cell "View logs for job #15" [ref=e306]':
+                                  - 'button "View logs for job #15" [ref=e307] [cursor=pointer]': Logs
+                              - 'row "#14 completed 11/18/2025, 8:05:33 PM 11/18/2025, 8:05:35 PM View logs for job #14" [ref=e308]':
+                                - cell "#14" [ref=e309]
+                                - cell "completed" [ref=e310]:
+                                  - generic [ref=e311]: completed
+                                - cell "11/18/2025, 8:05:33 PM" [ref=e312]
+                                - cell "11/18/2025, 8:05:35 PM" [ref=e313]
+                                - 'cell "View logs for job #14" [ref=e314]':
+                                  - 'button "View logs for job #14" [ref=e315] [cursor=pointer]': Logs
+                              - 'row "#13 completed 11/18/2025, 8:04:52 PM 11/18/2025, 8:04:55 PM View logs for job #13" [ref=e316]':
+                                - cell "#13" [ref=e317]
+                                - cell "completed" [ref=e318]:
+                                  - generic [ref=e319]: completed
+                                - cell "11/18/2025, 8:04:52 PM" [ref=e320]
+                                - cell "11/18/2025, 8:04:55 PM" [ref=e321]
+                                - 'cell "View logs for job #13" [ref=e322]':
+                                  - 'button "View logs for job #13" [ref=e323] [cursor=pointer]': Logs
+                              - 'row "#12 completed 11/18/2025, 8:04:22 PM 11/18/2025, 8:04:24 PM View logs for job #12" [ref=e324]':
+                                - cell "#12" [ref=e325]
+                                - cell "completed" [ref=e326]:
+                                  - generic [ref=e327]: completed
+                                - cell "11/18/2025, 8:04:22 PM" [ref=e328]
+                                - cell "11/18/2025, 8:04:24 PM" [ref=e329]
+                                - 'cell "View logs for job #12" [ref=e330]':
+                                  - 'button "View logs for job #12" [ref=e331] [cursor=pointer]': Logs
+                              - 'row "#11 completed 11/18/2025, 7:54:39 PM 11/18/2025, 7:54:42 PM View logs for job #11" [ref=e332]':
+                                - cell "#11" [ref=e333]
+                                - cell "completed" [ref=e334]:
+                                  - generic [ref=e335]: completed
+                                - cell "11/18/2025, 7:54:39 PM" [ref=e336]
+                                - cell "11/18/2025, 7:54:42 PM" [ref=e337]
+                                - 'cell "View logs for job #11" [ref=e338]':
+                                  - 'button "View logs for job #11" [ref=e339] [cursor=pointer]': Logs
+                              - 'row "#10 completed 11/18/2025, 7:52:03 PM 11/18/2025, 7:52:05 PM View logs for job #10" [ref=e340]':
+                                - cell "#10" [ref=e341]
+                                - cell "completed" [ref=e342]:
+                                  - generic [ref=e343]: completed
+                                - cell "11/18/2025, 7:52:03 PM" [ref=e344]
+                                - cell "11/18/2025, 7:52:05 PM" [ref=e345]
+                                - 'cell "View logs for job #10" [ref=e346]':
+                                  - 'button "View logs for job #10" [ref=e347] [cursor=pointer]': Logs
+                              - 'row "#8 cancelled 11/18/2025, 7:22:11 PM 3/22/2026, 10:45:38 PM View logs for job #8" [ref=e348]':
+                                - cell "#8" [ref=e349]
+                                - cell "cancelled" [ref=e350]:
+                                  - generic [ref=e351]: cancelled
+                                - cell "11/18/2025, 7:22:11 PM" [ref=e352]
+                                - cell "3/22/2026, 10:45:38 PM" [ref=e353]
+                                - 'cell "View logs for job #8" [ref=e354]':
+                                  - 'button "View logs for job #8" [ref=e355] [cursor=pointer]': Logs
+                              - 'row "#7 failed 11/18/2025, 7:15:54 PM 5/20/2026, 6:47:18 AM View logs for job #7" [ref=e356]':
+                                - cell "#7" [ref=e357]
+                                - cell "failed" [ref=e358]:
+                                  - generic [ref=e359]: failed
+                                - cell "11/18/2025, 7:15:54 PM" [ref=e360]
+                                - cell "5/20/2026, 6:47:18 AM" [ref=e361]
+                                - 'cell "View logs for job #7" [ref=e362]':
+                                  - 'button "View logs for job #7" [ref=e363] [cursor=pointer]': Logs
+                              - 'row "#6 completed 11/18/2025, 7:14:10 PM 11/18/2025, 7:14:12 PM View logs for job #6" [ref=e364]':
+                                - cell "#6" [ref=e365]
+                                - cell "completed" [ref=e366]:
+                                  - generic [ref=e367]: completed
+                                - cell "11/18/2025, 7:14:10 PM" [ref=e368]
+                                - cell "11/18/2025, 7:14:12 PM" [ref=e369]
+                                - 'cell "View logs for job #6" [ref=e370]':
+                                  - 'button "View logs for job #6" [ref=e371] [cursor=pointer]': Logs
+                              - 'row "#5 completed 11/18/2025, 6:50:39 PM 11/18/2025, 6:50:41 PM View logs for job #5" [ref=e372]':
+                                - cell "#5" [ref=e373]
+                                - cell "completed" [ref=e374]:
+                                  - generic [ref=e375]: completed
+                                - cell "11/18/2025, 6:50:39 PM" [ref=e376]
+                                - cell "11/18/2025, 6:50:41 PM" [ref=e377]
+                                - 'cell "View logs for job #5" [ref=e378]':
+                                  - 'button "View logs for job #5" [ref=e379] [cursor=pointer]': Logs
+                              - 'row "#4 completed 11/18/2025, 6:46:29 PM 11/18/2025, 6:46:31 PM View logs for job #4" [ref=e380]':
+                                - cell "#4" [ref=e381]
+                                - cell "completed" [ref=e382]:
+                                  - generic [ref=e383]: completed
+                                - cell "11/18/2025, 6:46:29 PM" [ref=e384]
+                                - cell "11/18/2025, 6:46:31 PM" [ref=e385]
+                                - 'cell "View logs for job #4" [ref=e386]':
+                                  - 'button "View logs for job #4" [ref=e387] [cursor=pointer]': Logs
+                              - 'row "#3 completed 11/18/2025, 6:38:53 PM 11/18/2025, 6:38:55 PM View logs for job #3" [ref=e388]':
+                                - cell "#3" [ref=e389]
+                                - cell "completed" [ref=e390]:
+                                  - generic [ref=e391]: completed
+                                - cell "11/18/2025, 6:38:53 PM" [ref=e392]
+                                - cell "11/18/2025, 6:38:55 PM" [ref=e393]
+                                - 'cell "View logs for job #3" [ref=e394]':
+                                  - 'button "View logs for job #3" [ref=e395] [cursor=pointer]': Logs
+                              - 'row "#2 completed 11/18/2025, 6:27:09 PM 11/18/2025, 6:27:11 PM View logs for job #2" [ref=e396]':
+                                - cell "#2" [ref=e397]
+                                - cell "completed" [ref=e398]:
+                                  - generic [ref=e399]: completed
+                                - cell "11/18/2025, 6:27:09 PM" [ref=e400]
+                                - cell "11/18/2025, 6:27:11 PM" [ref=e401]
+                                - 'cell "View logs for job #2" [ref=e402]':
+                                  - 'button "View logs for job #2" [ref=e403] [cursor=pointer]': Logs
+                              - 'row "#1 failed 11/18/2025, 6:25:38 PM 5/20/2026, 6:47:18 AM View logs for job #1" [ref=e404]':
+                                - cell "#1" [ref=e405]
+                                - cell "failed" [ref=e406]:
+                                  - generic [ref=e407]: failed
+                                - cell "11/18/2025, 6:25:38 PM" [ref=e408]
+                                - cell "5/20/2026, 6:47:18 AM" [ref=e409]
+                                - 'cell "View logs for job #1" [ref=e410]':
+                                  - 'button "View logs for job #1" [ref=e411] [cursor=pointer]': Logs
+                        - button "Show fewer" [expanded] [active] [ref=e413] [cursor=pointer]
+                  - group [ref=e414]:
+                    - generic "Job controls & monitoring" [ref=e415] [cursor=pointer]

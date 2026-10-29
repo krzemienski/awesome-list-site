@@ -1,0 +1,6 @@
+category 1205 created 18:52Z (name '[QA-audit-1026] Café Ünï Ætest x')
+category 1206 created 18:53Z by tool slip (slug 'qa-audit-1026-dupqa-audit-1026-cat-renamed')
+category 1206 deleted 18:55Z OK
+category 1207 created 18:56Z (for edit-dup test)
+state 18:57Z: categories 1205,1207 remain (parents for SC tests)
+categories 1205,1207 deleted 18:57Z; public taxonomy equals baseline

@@ -1,0 +1,23 @@
+uid=454_0 RootWebArea "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video" url="https://awesome.video/category/encoding-codecs"
+  uid=469_11 main
+    uid=482_70 generic "Resources (579)"
+      uid=482_508 navigation "Pagination"
+        uid=482_525 status atomic live="polite" relevant="additions text"
+  uid=486_0 dialog "Search Resources" description="Search resources, categories, and pages in the awesome video collection."
+    uid=486_1 heading "Search Resources" level="2"
+    uid=486_2 "Search resources, categories, and pages in the awesome video collection."
+    uid=486_3 generic
+      uid=486_4 combobox "Search resources, categories, and pages" autocomplete="list" expandable expanded focusable focused haspopup="listbox"
+      uid=486_5 button "esc Close search"
+      uid=486_6 listbox "Suggestions" orientation="vertical"
+      uid=486_7 contentinfo
+        uid=486_8 "↑↓"
+        uid=486_9 " navigate"
+        uid=486_10 "↵"
+        uid=486_11 " open"
+        uid=486_12 "esc"
+        uid=486_13 " close"
+        uid=486_14 generic live="polite" relevant="additions text"
+          uid=486_15 "14"
+          uid=486_16 " suggestion"
+          uid=486_17 "s"

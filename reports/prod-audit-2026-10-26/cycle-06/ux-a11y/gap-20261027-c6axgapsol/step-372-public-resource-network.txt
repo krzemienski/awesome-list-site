@@ -1,0 +1,12 @@
+[35343.1702] GET https://awesome.video/api/resources?page=1&limit=24&facets=true (Fetch) 200
+[35343.1715] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.1813] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2092] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2273] GET https://awesome.video/api/resources?page=1&limit=24&facets=true&search=ffmpeg (Fetch) 200
+[35343.2411] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2639] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2910] GET https://awesome.video/api/resources?page=1&limit=24&facets=true&category=encoding-codecs (Fetch) 200
+[35343.3003] GET https://awesome.video/api/resources?page=1&limit=24&facets=true&search=ffmpeg (Fetch) 200
+[35343.3006] GET https://awesome.video/api/resources?page=1&limit=24&facets=true&search=ffmpeg&category=Encoding+%26+Codecs (Fetch) 200
+[35343.4042] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.4146] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200

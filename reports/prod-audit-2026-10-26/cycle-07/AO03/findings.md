@@ -1,0 +1,4 @@
+# C7 AO03 (admin Export backups + Database tab)
+Worker: sonnet a30b6901b348cda0f. Revision 130e5829 (15:56Z-16:04Z). Evidence: e2e-evidence/cycle-07/AO03/.
+- C7-AO03-01 CONFIRMED, MEDIUM: cancelling or Escaping the Seed Database / Clear & Re-seed AlertDialog moves the admin to the Export tab (#database -> #export, plus a history entry). Reproduced 6/6 at 3 widths with 3 methods. The lead viewed s16-1440-after-escape.png (Export tab selected). Source: DatabaseTab.tsx dialogs ~:369/:397 have no trigger and no onCloseAutoFocus; focus lands on the Export tab button and Radix tabs auto-activate on focus. Routed to FIX-C7-06.
+PASS: DB-01 (loading unseen), DB-02, DB-03, DB-06, DB-07 at all widths. FAIL: DB-04, DB-08. BLOCKED-BY-LEAD: EX-25 (create backup), DB-05, DB-09 (seed/reseed prod: never). BLOCKED: EX-26 non-empty states (tool), EX-27 (no backup exists).

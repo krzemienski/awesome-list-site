@@ -1,0 +1,185 @@
+✓ Done
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,826 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [selected, ref=e19]
+    - tab "Approvals" [ref=e20]
+    - tab "Edits" [ref=e21]
+    - tab "Enrichment" [ref=e22]
+    - tab "Researcher" [ref=e23]
+    - tab "Export" [ref=e24]
+    - tab "Database" [ref=e25]
+    - tab "Resources" [ref=e26]
+    - tab "Categories" [ref=e27]
+    - tab "Subcategories" [ref=e28]
+    - tab "Users" [ref=e29]
+    - tab "GitHub" [ref=e30]
+    - tab "Link Health" [ref=e31]
+    - tab "Audit" [ref=e32]
+    - tab "Research" [ref=e33]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Overview" [ref=e12] focusable [tabindex]
+    - button "RESOURCES 3,826 across — categories" [ref=e15]
+    - button "SUBCATEGORIES —" [ref=e16]
+    - button "ACTIVE USERS —" [ref=e17]
+    - button "PENDING APPROVALS —" [ref=e18]
+    - heading "Recent activity" [level=2, ref=e34]
+    - heading "System health" [level=2, ref=e35]
+    - heading "Top categories" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-344-bare-admin-390.png
+
+✓ Done
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e42]
+    - link "Admin" [disabled, ref=e43]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [selected, ref=e24]
+    - tab "Approvals" [ref=e25]
+    - tab "Edits" [ref=e26]
+    - tab "Enrichment" [ref=e27]
+    - tab "Researcher" [ref=e28]
+    - tab "Export" [ref=e29]
+    - tab "Database" [ref=e30]
+    - tab "Resources" [ref=e31]
+    - tab "Categories" [ref=e32]
+    - tab "Subcategories" [ref=e33]
+    - tab "Users" [ref=e34]
+    - tab "GitHub" [ref=e35]
+    - tab "Link Health" [ref=e36]
+    - tab "Audit" [ref=e37]
+    - tab "Research" [ref=e38]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Overview" [ref=e17] focusable [tabindex]
+    - button "RESOURCES 3,826 across — categories" [ref=e20]
+    - button "SUBCATEGORIES 99 all canonical" [ref=e21]
+    - button "ACTIVE USERS —" [ref=e22]
+    - button "PENDING APPROVALS —" [ref=e23]
+    - heading "Recent activity" [level=2, ref=e39]
+    - heading "System health" [level=2, ref=e40]
+    - heading "Top categories" [level=2, ref=e41]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-345-bare-admin-1440.png
+
+[50845.183] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.348] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.502] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.655] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.790] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.962] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1113] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1270] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1427] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1573] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1707] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1842] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1978] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2117] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2254] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2387] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2526] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2660] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2796] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2932] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3066] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3200] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3339] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3473] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3609] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3745] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.3879] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4013] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4152] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4288] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4424] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4560] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4727] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.4874] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5008] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5143] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5279] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5417] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5554] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5688] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5827] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.5961] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6096] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6230] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6365] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6503] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6637] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6771] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.6907] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7041] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7175] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7315] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7451] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7587] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7725] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.7872] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8006] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8141] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8277] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8415] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8552] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8686] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8825] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.8959] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9094] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9228] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9363] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9501] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9635] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9769] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.9905] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10039] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10173] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10311] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10447] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10583] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10748] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.10888] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.11028] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.11207] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.11297] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.11432] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.11578] GET https://awesome.video/api/auth/user (Fetch) 200
+

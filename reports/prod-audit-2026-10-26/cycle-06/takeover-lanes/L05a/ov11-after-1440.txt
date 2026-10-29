@@ -1,0 +1,74 @@
+RESOURCES
+3,826
+across 11 categories
+SUBCATEGORIES
+99
+all canonical
+ACTIVE USERS
+20
+2 admins · 18 contributors
+PENDING APPROVALS
+16
+oldest 63d ago
+Recent activity
+
+Latest 6 events
+
+TX#27638
+a•••@example.com
+categories.exported
+Admin exported the category tree (OPML, 3826 resources)
+5m ago
+TX#27637
+a•••@example.com
+resources.exported
+Admin exported 4019 resources (CSV)
+5m ago
+TX#27636
+a•••@example.com
+database.exported
+Admin exported non-restorable catalog JSON snapshot (4019 resources, 133 user summaries)
+5m ago
+TX#27635
+a•••@example.com
+catalog.exported
+Admin exported 3826 catalog rows as awesome-list markdown
+5m ago
+TX#27634
+a•••@example.com
+resources.exported
+Admin exported 4019 resources (CSV)
+5m ago
+TX#27633
+a•••@example.com
+database.exported
+Admin exported non-restorable catalog JSON snapshot (4019 resources, 133 user summaries)
+5m ago
+System health
+
+Some systems are still working
+
+Database
+ready · 215ms
+GitHub sync
+Completed · 99d ago
+Link checker
+last 84d ago · 12 broken
+Enrichment queue
+last run cancelled before finishing · 39h ago
+Researcher API
+healthy
+Top categories
+
+By resource count
+
+▥ Media Tools
+704
+◇ Encoding & Codecs
+580
+◆ General Tools
+514
+⟁ Protocols & Transport
+467
+▶ Players & Clients
+447

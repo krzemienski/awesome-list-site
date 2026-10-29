@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings/theme",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": true,
+  "system": "editorial",
+  "accent": "magenta",
+  "font": "system",
+  "focus": "<button type=\"button\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\" data-testid=\"font-option-system\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">System default</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check theme-option__check\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: Inter, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button>"
+}

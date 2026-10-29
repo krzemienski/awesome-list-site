@@ -1,0 +1,243 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e5]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - navigation "Sidebar" [ref=e13]
+          - link "Home" [ref=e42]
+            - image
+            - StaticText "Home"
+          - generic
+            - StaticText "CATEGORIES · 9"
+          - button "Collapse sidebar" [ref=e43]
+          - button "Community & Events 129 resources" [expanded=false, ref=e44]
+            - StaticText "Community & Events"
+            - StaticText "129"
+            - image
+          - button "Encoding & Codecs 580 resources" [expanded=false, ref=e45]
+            - StaticText "Encoding & Codecs"
+            - StaticText "580"
+            - image
+          - button "General Tools 514 resources" [expanded=false, ref=e46]
+            - StaticText "General Tools"
+            - StaticText "514"
+            - image
+          - button "Infrastructure & Delivery 353 resources" [expanded=false, ref=e47]
+            - StaticText "Infrastructure & Delivery"
+            - StaticText "353"
+            - image
+          - button "Intro & Learning 297 resources" [expanded=false, ref=e48]
+            - StaticText "Intro & Learning"
+            - StaticText "297"
+            - image
+          - button "Media Tools 704 resources" [expanded=false, ref=e49]
+            - StaticText "Media Tools"
+            - StaticText "704"
+            - image
+          - button "Players & Clients 447 resources" [expanded=false, ref=e50]
+            - StaticText "Players & Clients"
+            - StaticText "447"
+            - image
+          - button "Protocols & Transport 467 resources" [expanded=false, ref=e51]
+            - StaticText "Protocols & Transport"
+            - StaticText "467"
+            - image
+          - button "Standards & Industry 335 resources" [expanded=false, ref=e52]
+            - StaticText "Standards & Industry"
+            - StaticText "335"
+            - image
+          - StaticText "3,826 indexed"
+          - StaticText " · live"
+          - link "Source: krzemienski/awesome-video" [ref=e53]
+          - group
+            - DisclosureTriangle "More navigation" [expanded=false]
+        - main
+          - StaticText "CURATED · WEEK 44 · 3,826 INDEXED"
+          - generic "Content types in this index"
+            - button "Tools & SDKs, 1,836 resources" [ref=e54]
+            - button "Libraries, 745 resources" [ref=e55]
+            - button "Standards, 278 resources" [ref=e56]
+            - button "Events, 142 resources" [ref=e57]
+            - button "Protocols, 124 resources" [ref=e58]
+            - StaticText "other — "
+            - StaticText "701"
+            - StaticText " resources"
+          - heading "Awesome Video Resources" [level=1, ref=e14]
+            - StaticText "Awesome Video Resources"
+          - paragraph
+            - StaticText "A curated index of 3,826 resources across 9 categories — codecs, players, protocols, infrastructure, and the people building it all."
+          - link "+ Submit a resource" [ref=e15]
+          - link "Browse categories" [ref=e16]
+          - generic "Catalog statistics"
+            - StaticText "RESOURCES"
+            - StaticText "3,826"
+            - StaticText "+2 this week"
+            - StaticText "CATEGORIES"
+            - StaticText "9"
+            - StaticText "99 subcategories"
+            - StaticText "FEATURED"
+            - StaticText "8"
+            - StaticText "hand-picked"
+            - StaticText "APPROVED THIS WEEK"
+            - StaticText "2"
+            - StaticText "newly indexed"
+          - StaticText "── FEATURED RESOURCES"
+          - heading "Hand-picked highlights" [level=2, ref=e17]
+            - StaticText "Hand-picked highlights"
+          - paragraph
+            - StaticText "6 of 8 hand-picked resources."
+          - article [ref=e18] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "Shaka Packager" [level=3, ref=e59]
+              - link "Shaka Packager" [ref=e97]
+            - paragraph
+          - article [ref=e19] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "OBS Studio" [level=3, ref=e60]
+              - link "OBS Studio" [ref=e98]
+            - paragraph
+          - article [ref=e20] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "FFmpeg Encoding Course" [level=3, ref=e61]
+              - link "FFmpeg Encoding Course" [ref=e99]
+            - paragraph
+          - article [ref=e21] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "Secure Reliable Transport (SRT) Protocol Specification" [level=3, ref=e62]
+              - link "Secure Reliable Transport (SRT) Protocol Specification" [ref=e100]
+            - paragraph
+            - generic "Tags for Secure Reliable Transport (SRT) Protocol Specification"
+              - link "#SRT" [ref=e101]
+              - link "#UDP" [ref=e102]
+              - link "#VIDEO TRANSPORT" [ref=e103]
+          - article [ref=e22] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "AV1 Video Codec" [level=3, ref=e63]
+              - link "AV1 Video Codec" [ref=e104]
+            - paragraph
+            - generic "Tags for AV1 Video Codec"
+              - link "#AV1" [ref=e105]
+              - link "#VIDEO CODEC" [ref=e106]
+              - link "#OPEN-SOURCE" [ref=e107]
+          - article [ref=e23] clickable [cursor:pointer]
+            - StaticText "★ FEATURED"
+            - heading "Demuxed 2024" [level=3, ref=e64]
+              - link "Demuxed 2024" [ref=e108]
+            - paragraph
+            - generic "Tags for Demuxed 2024"
+              - link "#VIDEO ENGINEERING" [ref=e109]
+              - link "#CONFERENCE" [ref=e110]
+              - link "#ENCODING" [ref=e111]
+          - StaticText "── ALL CATEGORIES"
+          - heading "Nine domains, one taxonomy" [level=2, ref=e24]
+            - StaticText "Nine domains, one taxonomy"
+          - link "129 Community & Events Community & Events brings together 129 curated resources from across the video technology landscape. Notable topics include Community Groups and Events & Conferences. Explore" [ref=e25]
+            - StaticText "129"
+            - heading "Community & Events" [level=3, ref=e65]
+            - paragraph
+            - StaticText "Explore"
+          - link "580 Encoding & Codecs Encoding & Codecs brings together 580 curated resources from across the video technology landscape. Notable topics include Benchmarking & Performance Tools for Codecs, Cloud-Based Encoding Solutions, Codecs, and Comparative Analysis of Codecs. Explore" [ref=e26]
+            - StaticText "580"
+            - heading "Encoding & Codecs" [level=3, ref=e66]
+            - paragraph
+            - StaticText "Explore"
+          - link "514 General Tools General Tools brings together 514 curated resources from across the video technology landscape. Notable topics include API Libraries & SDKs, Build Scripts & Automation, Case Studies & Best Practices in DRM, and Command-line Utilities & Wrappers. Explore" [ref=e27]
+            - StaticText "514"
+            - heading "General Tools" [level=3, ref=e67]
+            - paragraph
+            - StaticText "Explore"
+          - link "353 Infrastructure & Delivery Infrastructure & Delivery brings together 353 curated resources from across the video technology landscape. Notable topics include CDN Integration & Distribution, Cloud & CDN, Edge Computing & Caching Solutions, and Live Streaming Servers. Explore" [ref=e28]
+            - StaticText "353"
+            - heading "Infrastructure & Delivery" [level=3, ref=e68]
+            - paragraph
+            - StaticText "Explore"
+          - link "297 Intro & Learning Intro & Learning brings together 297 curated resources from across the video technology landscape. Notable topics include Books & Courses, Case Studies & Whitepapers, Community Blogs & Forums, and Encoding & Transcoding Guides. Explore" [ref=e29]
+            - StaticText "297"
+            - heading "Intro & Learning" [level=3, ref=e69]
+            - paragraph
+            - StaticText "Explore"
+          - link "704 Media Tools Media Tools brings together 704 curated resources from across the video technology landscape. Notable topics include AI & Machine Learning Tools, Ads & QoE, Audio & Subtitles, and Audio Analysis & Processing. Explore" [ref=e30]
+            - StaticText "704"
+            - heading "Media Tools" [level=3, ref=e70]
+            - paragraph
+            - StaticText "Explore"
+          - link "447 Players & Clients Players & Clients brings together 447 curated resources from across the video technology landscape. Notable topics include Browser Extensions, Desktop Players, Embedded Players, and Frameworks & UI Components. Explore" [ref=e31]
+            - StaticText "447"
+            - heading "Players & Clients" [level=3, ref=e71]
+            - paragraph
+            - StaticText "Explore"
+          - link "467 Protocols & Transport Protocols & Transport brings together 467 curated resources from across the video technology landscape. Notable topics include Adaptive Bitrate Algorithms & Tools, Adaptive Streaming, CMAF & fMP4 Packaging, and DASH Manifest Tools. Explore" [ref=e32]
+            - StaticText "467"
+            - heading "Protocols & Transport" [level=3, ref=e72]
+            - paragraph
+            - StaticText "Explore"
+          - link "335 Standards & Industry Standards & Industry brings together 335 curated resources from across the video technology landscape. Notable topics include Adaptive Streaming Standards, Best Practices & Guidelines, Closed Captioning & Subtitling Standards, and DRM & Content Protection Standards. Explore" [ref=e33]
+            - StaticText "335"
+            - heading "Standards & Industry" [level=3, ref=e73]
+            - paragraph
+            - StaticText "Explore"
+          - StaticText "── RECENTLY UPDATED"
+          - heading "Fresh from the index" [level=2, ref=e34]
+            - StaticText "Fresh from the index"
+          - generic
+            - link "01 PyTorchVideoCompression ENCODING & CODECS PyTorch implementations of learned video compression methods (DVC, FVC, DCVC and related neural codecs) with training and inference code used as a common research baseline." [ref=e74]
+            - link "02 MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) INFRASTRUCTURE & DELIVERY Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API." [ref=e75]
+            - link "03 MirrorFly IM Software INTRO & LEARNING MirrorFly is a self-hosted instant messaging software that enables businesses to create a white-label team chat and meeting app. The solution combines private messaging, voice calling, video conferencing, and collaboration features into a single mobile and web app. Organizations can deploy the MirrorFly IM solution in their own data center, private cloud, or other preferred hosting environments. This flexibility gives enterprises control over infrastructure, data storage, and security policies. The solution provides full source code access and enables developers to customize features and workflows for various businesses. It comes with a perpetual one-time license and is ideal for long-term cost value. It's designed with a scalable messaging architecture and low-latency communication. This helps organizations build secure internal communication platforms that grow along with their business." [ref=e76]
+            - link "04 AV1 Encoding with libsvtav1 on Qencode ENCODING & CODECS The libsvtav1 encoder (SVT-AV1) is an AV1 implementation tuned for both compression efficiency and parallel performance. This guide covers the preset scale from 0 to 13 and its speed-versus-efficiency trade-off, CRF selection in the 20-40 range, MP4 versus WebM output, and advanced controls including tune, aq_mode, film_grain, fast_decode, enable_dlf, enable_restoration, hierarchical_levels and pred_struct. It gives concrete starting points: preset 3 for archival, preset 8 for fast turnaround, preset 5 with CRF 30-35 for web streaming, and fast_decode when targeting low-power devices such as set-top boxes and budget phones. On why AV1 at all: roughly 30-40% bitrate savings versus H.264 and 20-30% versus HEVC or VP9 at equivalent quality, royalty-free under the Alliance for Open Media, with decode support in Chrome, Firefox and Edge." [ref=e77]
+              - StaticText "The libsvtav1 encoder (SVT-AV1) is an AV1 implementation tuned for both compression efficiency and parallel performance. This guide covers the preset scale from 0 to 13 and its speed-versus-efficiency trade-off, CRF selection in the 20-40 range, MP4 versus WebM output, and advanced controls including tune, aq_mode, film_grain, fast_decode, enable_dlf, enable_restoration, hierarchical_levels and pred_struct. It gives concrete starting points: preset 3 for archival, preset 8 for fast turnaround, preset 5 with CRF 30-35 for web streaming, and fast_decode when targeting low-power devices such as set-top boxes and budget phones. On why AV1 at all: roughly 30-40% bitrate savings versus H.264 and 20-30% versus HEVC or VP9 at equivalent quality, royalty-free under the Alliance for Open Media, with decode support in Chrome, Firefox and Edge."
+            - link "05 MLVC: Multi-platform Learned Video Codec for Real-World Deployment ENCODING & CODECS Academic paper on a neural video codec targeting competitive compression, real-time speed, and cross-platform (Apple/Intel/Qualcomm NPU) inference." [ref=e78]
+              - StaticText "MLVC: Multi-platform Learned Video Codec for Real-World Deployment"
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e35]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e36]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e37]
+            - heading "EXPLORE" [level=2, ref=e79]
+            - link "Community & Events" [ref=e80]
+            - link "Encoding & Codecs" [ref=e81]
+            - link "General Tools" [ref=e82]
+            - link "Infrastructure & Delivery" [ref=e83]
+            - link "Intro & Learning" [ref=e84]
+            - link "Media Tools" [ref=e85]
+            - link "Players & Clients" [ref=e86]
+            - link "Protocols & Transport" [ref=e87]
+            - link "Standards & Industry" [ref=e88]
+          - heading "SOURCE" [level=2, ref=e38]
+          - link "krzemienski/ awesome-video" [ref=e39]
+          - paragraph
+            - link "PRs welcome" [ref=e89]
+          - button "Contact maintainers" [ref=e40]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e41]
+            - link "About" [ref=e90]
+            - link "Terms" [ref=e91]
+            - link "Privacy" [ref=e92]
+            - link "Code of Conduct" [ref=e93]
+            - button "Cookie settings" [ref=e94]
+            - link "Issues ↗" [ref=e95]
+            - link "Sitemap" [ref=e96]

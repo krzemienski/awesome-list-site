@@ -1,0 +1,853 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic:
+              - text: Search
+              - generic: 3,826 resources…
+            - generic: ⌘K
+          - navigation:
+            - link:
+              - /url: /categories
+              - text: Browse
+            - link:
+              - /url: /submit
+              - text: Submit
+            - link:
+              - /url: /about
+              - text: About
+            - link:
+              - /url: /design-system
+              - text: Docs ↗
+            - link:
+              - /url: /admin
+              - text: Admin
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab [selected]:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                    - tabpanel:
+                      - generic:
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic: krzemienski/awesome-video
+                                - paragraph: master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs
+                              - generic:
+                                - generic:
+                                  - button: Preview import
+                                  - button: Pull
+                                  - button: Sync now
+                            - generic:
+                              - text: Target Repository
+                              - generic:
+                                - textbox:
+                                  - /placeholder: krzemienski/awesome-video
+                                  - text: krzemienski/awesome-video
+                                - button:
+                                  - img
+                              - paragraph: "Format: owner/repository (configured: krzemienski/awesome-video)"
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                                - text: Sync Status
+                              - generic:
+                                - generic:
+                                  - img
+                                  - text: 38 failed
+                          - generic:
+                            - paragraph: 38 earlier sync jobs failed; the latest sync completed.
+                            - status:
+                              - img
+                              - generic:
+                                - generic:
+                                  - generic: Last Export
+                                  - generic:
+                                    - img
+                                    - text: Jul 20, 2026, 02:42 PM
+                                - paragraph: Initial awesome list export
+                                - generic:
+                                  - generic:
+                                    - generic: "+2283"
+                                    - generic: Added
+                                  - generic:
+                                    - generic: ~0
+                                    - generic: Updated
+                                  - generic:
+                                    - generic: "-0"
+                                    - generic: Removed
+                                  - generic:
+                                    - generic: "2283"
+                                    - generic: Total
+                                - link:
+                                  - /url: https://github.com/krzemienski/awesome-video/commit/be0c146ae2dbab74e21ba6bc65706545d5fb02b5
+                                  - img
+                                  - text: View Commit on GitHub
+                            - generic:
+                              - heading [level=4]: Recent Sync Jobs
+                              - generic:
+                                - region:
+                                  - generic:
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #49"
+                                            - generic: export
+                                            - generic: Jul 20, 2026, 02:42 PM
+                                          - generic: completed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #48"
+                                            - generic: export
+                                            - generic: Jul 18, 2026, 03:12 PM
+                                            - generic: ×4
+                                          - generic: completed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #45"
+                                            - generic: export
+                                            - generic: Jul 17, 2026, 08:32 AM
+                                          - generic: failed
+                                        - paragraph: "Export failed: timeout exceeded when trying to connect"
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #3"
+                                            - generic: import
+                                            - generic: Jul 17, 2026, 01:41 AM
+                                            - generic: ×2
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                                        - paragraph: Orphaned by server restart
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #12"
+                                            - generic: export
+                                            - generic: Jul 17, 2026, 01:41 AM
+                                          - generic: failed
+                                        - paragraph: Orphaned by server restart
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #41"
+                                            - generic: import
+                                            - generic: Jul 17, 2026, 01:41 AM
+                                            - generic: ×7
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                                        - paragraph: Orphaned by server restart
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #21"
+                                            - generic: import
+                                            - generic: Jul 17, 2026, 01:41 AM
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                                        - paragraph: Orphaned by server restart
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #40"
+                                            - generic: export
+                                            - generic: Jul 17, 2026, 01:41 AM
+                                            - generic: ×5
+                                          - generic: failed
+                                        - paragraph: Orphaned by server restart
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #43"
+                                            - generic: export
+                                            - generic: Jun 25, 2026, 05:59 PM
+                                            - generic: ×5
+                                          - generic: failed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #34"
+                                            - generic: import
+                                            - generic: Feb 11, 2026, 08:06 PM
+                                            - generic: ×2
+                                          - generic: completed
+                                        - paragraph: "Imported: 1; updated: 680; skipped: 0; failed: 0."
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #32"
+                                            - generic: import
+                                            - generic: Feb 11, 2026, 08:02 PM
+                                            - generic: ×4
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #22"
+                                            - generic: import
+                                            - generic: Dec 3, 2025, 05:01 PM
+                                          - generic: completed
+                                        - paragraph: "Imported: 1062; updated: 16; skipped: 0; failed: 0."
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #18"
+                                            - generic: export
+                                            - generic: Dec 3, 2025, 02:32 PM
+                                            - generic: ×8
+                                          - generic: failed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #13"
+                                            - generic: export
+                                            - generic: Dec 1, 2025, 01:43 AM
+                                          - generic: failed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #11"
+                                            - generic: import
+                                            - generic: Nov 18, 2025, 07:54 PM
+                                            - generic: ×3
+                                          - generic: completed
+                                        - paragraph: "Imported: 201; updated: 597; skipped: 0; failed: 0."
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #10"
+                                            - generic: import
+                                            - generic: Nov 18, 2025, 07:51 PM
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #5"
+                                            - generic: export
+                                            - generic: Nov 18, 2025, 07:29 PM
+                                          - generic: failed
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - img
+                                            - generic: "Job #2"
+                                            - generic: import
+                                            - generic: Nov 18, 2025, 06:00 PM
+                                          - generic: failed
+                                        - paragraph: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                        - generic:
+                          - generic:
+                            - generic:
+                              - heading [level=2]: Sync jobs
+                              - paragraph: All 49 import/export operations
+                          - generic:
+                            - generic:
+                              - generic:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: ID
+                                      - columnheader: Type
+                                      - columnheader: Status
+                                      - columnheader
+                                  - rowgroup:
+                                    - row:
+                                      - cell: "Job #49"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 20, 2026, 02:42 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #48"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 18, 2026, 03:12 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #47"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 18, 2026, 05:30 AM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #46"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 08:54 AM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #45"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 08:32 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #44"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 08:31 AM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #1"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #3"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #12"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #19"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #21"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #23"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #25"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #27"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #29"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #31"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #33"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #35"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #37"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #39"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #40"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #41"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jul 17, 2026, 01:41 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #43"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jun 25, 2026, 05:59 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #42"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jun 25, 2026, 05:59 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #38"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jun 3, 2026, 01:17 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #36"
+                                      - cell:
+                                        - text: export
+                                        - generic: Feb 11, 2026, 08:07 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #34"
+                                      - cell:
+                                        - text: import
+                                        - generic: Feb 11, 2026, 08:06 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #32"
+                                      - cell:
+                                        - text: import
+                                        - generic: Feb 11, 2026, 08:02 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #30"
+                                      - cell:
+                                        - text: import
+                                        - generic: Feb 11, 2026, 07:20 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #28"
+                                      - cell:
+                                        - text: import
+                                        - generic: Feb 11, 2026, 06:35 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #26"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jan 28, 2026, 03:25 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #24"
+                                      - cell:
+                                        - text: import
+                                        - generic: Jan 28, 2026, 03:25 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #22"
+                                      - cell:
+                                        - text: import
+                                        - generic: Dec 3, 2025, 05:01 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #20"
+                                      - cell:
+                                        - text: import
+                                        - generic: Dec 3, 2025, 04:16 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #18"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 3, 2025, 02:32 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #17"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 3, 2025, 02:30 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #16"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 3, 2025, 02:28 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #15"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 3, 2025, 02:27 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #14"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 3, 2025, 02:24 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #13"
+                                      - cell:
+                                        - text: export
+                                        - generic: Dec 1, 2025, 01:43 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #11"
+                                      - cell:
+                                        - text: import
+                                        - generic: Nov 18, 2025, 07:54 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #10"
+                                      - cell:
+                                        - text: import
+                                        - generic: Nov 18, 2025, 07:51 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #9"
+                                      - cell:
+                                        - text: import
+                                        - generic: Nov 18, 2025, 07:51 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #8"
+                                      - cell:
+                                        - text: export
+                                        - generic: Nov 18, 2025, 07:40 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #7"
+                                      - cell:
+                                        - text: export
+                                        - generic: Nov 18, 2025, 07:30 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #6"
+                                      - cell:
+                                        - text: export
+                                        - generic: Nov 18, 2025, 07:29 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #5"
+                                      - cell:
+                                        - text: export
+                                        - generic: Nov 18, 2025, 07:29 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #4"
+                                      - cell:
+                                        - text: import
+                                        - generic: Nov 18, 2025, 06:19 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #2"
+                                      - cell:
+                                        - text: import
+                                        - generic: Nov 18, 2025, 06:00 PM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                        - generic:
+                          - button [expanded]: Less
+      - button:
+        - img
+  - 'dialog "Sync Job #1"':
+    - generic:
+      - 'heading "Sync Job #1" [level=2]'
+      - paragraph: Import · Jul 17, 2026, 01:41 AM · krzemienski/awesome-video
+    - generic:
+      - generic:
+        - term: Status
+        - definition:
+          - generic: failed
+      - generic:
+        - term: Resources added
+        - definition: "+0"
+      - generic:
+        - term: Resources updated
+        - definition: ~0
+      - generic:
+        - term: Resources removed
+        - definition: "-0"
+      - generic:
+        - term: Total resources
+        - definition: "0"
+      - alert:
+        - term: Error
+        - definition: Orphaned by server restart
+    - button "Close" [active]:
+      - img
+      - generic: Close

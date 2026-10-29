@@ -1,0 +1,737 @@
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#researcher
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [selected, ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Researcher" [ref=e17] focusable [tabindex]
+    - heading "Run a research task" [level=3, ref=e37]
+    - region "Brief" [ref=e38]
+      - heading "Brief" [level=4, ref=e45]
+      - radiogroup "Research brief" [ref=e46] focusable [tabindex]
+        - LabelText "Auto-generate at launchA gap-aware brief built from the catalog and past runs." [ref=e59] clickable [cursor:pointer]
+          - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked=true, ref=e64]
+        - LabelText "Write my ownDescribe what to search for, or start from a generated brief." [ref=e60] clickable [cursor:pointer]
+          - radio "Write my own Describe what to search for, or start from a generated brief." [checked=false, ref=e65]
+    - region "Focus" [ref=e39]
+      - heading "Focus" [level=4, ref=e47]
+      - combobox "Category focus" [expanded=false, ref=e48]: All categories
+        - generic "All categories" [ref=e61] clickable [cursor:pointer, onclick]
+    - region "Limits" [ref=e40]
+      - heading "Limits" [level=4, ref=e49]
+      - LabelText "Stop after (discoveries)" [ref=e50] clickable [cursor:pointer]
+      - spinbutton "Stop after (discoveries)" [ref=e51]
+      - LabelText "Budget cap (USD)" [ref=e52] clickable [cursor:pointer]
+      - spinbutton "Budget cap (USD)" [ref=e53]: 3
+      - LabelText "Max turns" [ref=e54] clickable [cursor:pointer]
+      - spinbutton "Max turns" [ref=e55]: 40
+    - region "Endpoint & model" [ref=e41]
+      - heading "Endpoint & model" [level=4, ref=e56]
+      - button "Override endpoint or models (optional)" [expanded=false, ref=e62]
+    - region "About to run on" [ref=e42]
+      - heading "About to run on" [level=4, ref=e57]
+      - button "Launch research run" [ref=e63]
+    - heading "Researcher jobs" [level=2, ref=e58]
+    - region "Researcher jobs table, scrollable" [ref=e43] focusable [tabindex]
+      - columnheader "STATUS" [ref=e101]
+      - columnheader "PROMPT" [ref=e102]
+      - columnheader "FOUND" [ref=e103]
+      - columnheader "APPROVED / REJECTED" [ref=e104]
+      - columnheader "COST" [ref=e105]
+      - columnheader "TURNS" [ref=e106]
+      - columnheader "CREATED" [ref=e107]
+      - cell "COMPLETED" [ref=e66]
+      - cell "Sustained production research requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. Find up to 25 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Evaluate at least 150 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Use scouts throughout for direct-source retrieval, URL verification, taxonomy comparison and candidate evaluation. Keep a written candidate ledger. Use at most 40 WebSearch calls in the entire run so the shared search budget cannot end the work; after that continue substantive direct official-source retrieval and evaluation with remaining tools. Do not finalize before 30 minutes, 450 substantive turns and 150 evaluated candidates. Never invent URLs/metadata and never idle-wait to pad runtime." [ref=e67]
+      - cell "0" [ref=e68]
+      - cell "0/0" [ref=e69]
+      - cell "$0.5650" [ref=e70]
+      - cell "13/600" [ref=e71]
+      - cell "Oct 27, 2026" [ref=e72]
+      - cell "COMPLETED" [ref=e73]
+      - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e74]
+      - cell "4" [ref=e75]
+      - cell "0/0" [ref=e76]
+      - cell "$5.4603" [ref=e77]
+      - cell "155/200" [ref=e78]
+      - cell "Oct 27, 2026" [ref=e79]
+      - cell "FAILED" [ref=e80]
+      - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e81]
+      - cell "0" [ref=e82]
+      - cell "0/0" [ref=e83]
+      - cell "$0.0000" [ref=e84]
+      - cell "1/200" [ref=e85]
+      - cell "Oct 27, 2026" [ref=e86]
+      - cell "COMPLETED" [ref=e87]
+      - cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e88]
+      - cell "9" [ref=e89]
+      - cell "0/0" [ref=e90]
+      - cell "$3.3100" [ref=e91]
+      - cell "41/200" [ref=e92]
+      - cell "Oct 27, 2026" [ref=e93]
+      - cell "COMPLETED" [ref=e94]
+      - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e95]
+      - cell "0" [ref=e96]
+      - cell "0/0" [ref=e97]
+      - cell "$1.1166" [ref=e98]
+      - cell "18/80" [ref=e99]
+      - cell "Oct 27, 2026" [ref=e100]
+    - button "Show more" [ref=e44]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-011-researcher-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#export
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e40]
+    - link "Admin" [disabled, ref=e41]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [selected, ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Export" [ref=e17] focusable [tabindex]
+    - region "Export link check" [ref=e35]
+      - heading "Link check #8 COMPLETED" [level=2, ref=e42]
+      - link "Open Link Health for problem links" [ref=e43]
+    - article "JSON SnapshotNon-restorable catalog snapshot, not a full database backup. Includes resources, catego" [ref=e36] clickable [cursor:pointer]
+      - heading "JSON Snapshot" [level=3, ref=e44]
+      - button "Download" [ref=e45]
+    - article "CSV (resources)Flat resource table for spreadsheet workflows.Download" [ref=e37] clickable [cursor:pointer]
+      - heading "CSV (resources)" [level=3, ref=e46]
+      - button "Download" [ref=e47]
+    - article "README.mdAwesome-list flavored Markdown for the GitHub repo.Generate" [ref=e38] clickable [cursor:pointer]
+      - heading "README.md" [level=3, ref=e48]
+      - button "Generate" [ref=e49]
+    - article "OPML (categories)Hierarchical export for feed readers.Download" [ref=e39] clickable [cursor:pointer]
+      - heading "OPML (categories)" [level=3, ref=e50]
+      - button "Download" [ref=e51]
+    - heading "Full database backup" [level=2, ref=e52]
+    - button "Create backup" [ref=e53]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-012-export-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#database
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [selected, ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Database" [ref=e17] focusable [tabindex]
+    - heading "Key tables" [level=2, ref=e37]
+    - region "Key tables, scrollable" [ref=e38] focusable [tabindex]
+      - columnheader "NAME" [ref=e63]
+      - columnheader "ROWS" [ref=e64]
+      - columnheader "SIZE" [ref=e65]
+      - columnheader "NEWEST ROW" [ref=e66]
+      - cell "resources" [ref=e39]
+      - cell "4,017" [ref=e40]
+      - cell "28 MB" [ref=e41]
+      - cell "7h ago" [ref=e42]
+      - cell "categories" [ref=e43]
+      - cell "10" [ref=e44]
+      - cell "96 KB" [ref=e45]
+      - cell "5m ago" [ref=e46]
+      - cell "subcategories" [ref=e47]
+      - cell "100" [ref=e48]
+      - cell "88 KB" [ref=e49]
+      - cell "2m ago" [ref=e50]
+      - cell "users" [ref=e51]
+      - cell "133" [ref=e52]
+      - cell "128 KB" [ref=e53]
+      - cell "8m ago" [ref=e54]
+      - cell "resource_audit_log" [ref=e55]
+      - cell "16,881" [ref=e56]
+      - cell "4.4 MB" [ref=e57]
+      - cell "2m ago" [ref=e58]
+      - cell "enrichment_jobs" [ref=e59]
+      - cell "33" [ref=e60]
+      - cell "160 KB" [ref=e61]
+      - cell "26h ago" [ref=e62]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-013-database-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#resources
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e41]
+    - link "Admin" [disabled, ref=e42]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [selected, ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Resources" [ref=e17] focusable [tabindex]
+    - heading "Resources (25 of 3,825)" [level=2, ref=e35]
+    - textbox "Search…" [ref=e36]
+    - button "Show filters and tools" [expanded=false, ref=e37]
+    - button "Add" [ref=e38]
+    - region "Resources table, scrollable" [ref=e43] focusable [tabindex]
+      - columnheader "ID Select all resources on this page" [ref=e201]
+        - checkbox "Select all resources on this page" [checked=false, ref=e332]
+      - columnheader "TITLE" [ref=e202]
+      - columnheader "CATEGORY" [ref=e203]
+      - columnheader "TAGS" [ref=e204]
+      - columnheader "FEATURED" [ref=e205]
+      - columnheader "Actions" [ref=e206]
+      - cell "190342 Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e51]
+        - checkbox "Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [checked=false, ref=e207]
+      - cell "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e52]
+      - cell "Infrastructure & Delivery" [ref=e53]
+      - cell "RTMP RTSP" [ref=e54]
+      - cell "Feature on the home page: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e55]
+        - button "Feature on the home page: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e208]
+      - cell "View MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) Edit MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) Delete MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e56]
+        - link "View MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e209]
+        - button "Edit MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e210]
+        - button "Delete MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e211]
+      - cell "190152 Select AV1 Encoding with libsvtav1 on Qencode" [ref=e57]
+        - checkbox "Select AV1 Encoding with libsvtav1 on Qencode" [checked=false, ref=e212]
+      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e58]
+      - cell "Encoding & Codecs" [ref=e59]
+      - cell "AV1 SVT-AV1" [ref=e60]
+      - cell "Feature on the home page: AV1 Encoding with libsvtav1 on Qencode" [ref=e61]
+        - button "Feature on the home page: AV1 Encoding with libsvtav1 on Qencode" [ref=e213]
+      - cell "View AV1 Encoding with libsvtav1 on Qencode Edit AV1 Encoding with libsvtav1 on Qencode Delete AV1 Encoding with libsvtav1 on Qencode" [ref=e62]
+        - link "View AV1 Encoding with libsvtav1 on Qencode" [ref=e214]
+        - button "Edit AV1 Encoding with libsvtav1 on Qencode" [ref=e215]
+        - button "Delete AV1 Encoding with libsvtav1 on Qencode" [ref=e216]
+      - cell "190151 Select MirrorFly IM Software" [ref=e63]
+        - checkbox "Select MirrorFly IM Software" [checked=false, ref=e217]
+      - cell "MirrorFly IM Software" [ref=e64]
+      - cell "Intro & Learning" [ref=e65]
+      - cell "INSTANT MESSAGING SOFTWARE INSTANT MESSAGING SOLUTION" [ref=e66]
+      - cell "Feature on the home page: MirrorFly IM Software" [ref=e67]
+        - button "Feature on the home page: MirrorFly IM Software" [ref=e218]
+      - cell "View MirrorFly IM Software Edit MirrorFly IM Software Delete MirrorFly IM Software" [ref=e68]
+        - link "View MirrorFly IM Software" [ref=e219]
+        - button "Edit MirrorFly IM Software" [ref=e220]
+        - button "Delete MirrorFly IM Software" [ref=e221]
+      - cell "190135 Select MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e69]
+        - checkbox "Select MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [checked=false, ref=e222]
+      - cell "MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e70]
+      - cell "Encoding & Codecs" [ref=e71]
+      - cell "LEARNED VIDEO CODEC NEURAL CODEC" [ref=e72]
+      - cell "Feature on the home page: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e73]
+        - button "Feature on the home page: MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e223]
+      - cell "View MLVC: Multi-platform Learned Video Codec for Real-World Deployment Edit MLVC: Multi-platform Learned Video Codec for Real-World Deployment Delete MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e74]
+        - link "View MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e224]
+        - button "Edit MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e225]
+        - button "Delete MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e226]
+      - cell "190134 Select Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e75]
+        - checkbox "Select Encoder-Quantization-Motion (EQM) Video Quality Metric" [checked=false, ref=e227]
+      - cell "Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e76]
+      - cell "Media Tools" [ref=e77]
+      - cell "VIDEO QUALITY METRIC QUANTIZATION PARAMETER" [ref=e78]
+      - cell "Feature on the home page: Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e79]
+        - button "Feature on the home page: Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e228]
+      - cell "View Encoder-Quantization-Motion (EQM) Video Quality Metric Edit Encoder-Quantization-Motion (EQM) Video Quality Metric Delete Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e80]
+        - link "View Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e229]
+        - button "Edit Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e230]
+        - button "Delete Encoder-Quantization-Motion (EQM) Video Quality Metric" [ref=e231]
+      - cell "190133 Select Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e81]
+        - checkbox "Select Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [checked=false, ref=e232]
+      - cell "Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e82]
+      - cell "Media Tools" [ref=e83]
+      - cell "VMAF VIDEO QUALITY METRICS" [ref=e84]
+      - cell "Feature on the home page: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e85]
+        - button "Feature on the home page: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e233]
+      - cell "View Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) Edit Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) Delete Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e86]
+        - link "View Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e234]
+        - button "Edit Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e235]
+        - button "Delete Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e236]
+      - cell "190132 Select GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e87]
+        - checkbox "Select GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [checked=false, ref=e237]
+      - cell "GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e88]
+      - cell "Media Tools" [ref=e89]
+      - cell "AI-GENERATED VIDEO QUALITY ASSESSMENT" [ref=e90]
+      - cell "Feature on the home page: GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e91]
+        - button "Feature on the home page: GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e238]
+      - cell "View GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality Edit GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality Delete GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e92]
+        - link "View GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e239]
+        - button "Edit GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e240]
+        - button "Delete GHVQ: Benchmark and Metric for AI-Generated Human-Activity Video Quality" [ref=e241]
+      - cell "190131 Select VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e93]
+        - checkbox "Select VQA² (Visual Question Answering for Video Quality Assessment)" [checked=false, ref=e242]
+      - cell "VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e94]
+      - cell "Media Tools" [ref=e95]
+      - cell "VIDEO QUALITY ASSESSMENT VISUAL QUESTION ANSWERING" [ref=e96]
+      - cell "Feature on the home page: VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e97]
+        - button "Feature on the home page: VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e243]
+      - cell "View VQA² (Visual Question Answering for Video Quality Assessment) Edit VQA² (Visual Question Answering for Video Quality Assessment) Delete VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e98]
+        - link "View VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e244]
+        - button "Edit VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e245]
+        - button "Delete VQA² (Visual Question Answering for Video Quality Assessment)" [ref=e246]
+      - cell "190130 Select webrtc-externals" [ref=e99]
+        - checkbox "Select webrtc-externals" [checked=false, ref=e247]
+      - cell "webrtc-externals" [ref=e100]
+      - cell "Players & Clients" [ref=e101]
+      - cell "WEBRTC BROWSER EXTENSION" [ref=e102]
+      - cell "Feature on the home page: webrtc-externals" [ref=e103]
+        - button "Feature on the home page: webrtc-externals" [ref=e248]
+      - cell "View webrtc-externals Edit webrtc-externals Delete webrtc-externals" [ref=e104]
+        - link "View webrtc-externals" [ref=e249]
+        - button "Edit webrtc-externals" [ref=e250]
+        - button "Delete webrtc-externals" [ref=e251]
+      - cell "190129 Select webrtc-internals-exporter" [ref=e105]
+        - checkbox "Select webrtc-internals-exporter" [checked=false, ref=e252]
+      - cell "webrtc-internals-exporter" [ref=e106]
+      - cell "Players & Clients" [ref=e107]
+      - cell "WEBRTC PROMETHEUS" [ref=e108]
+      - cell "Feature on the home page: webrtc-internals-exporter" [ref=e109]
+        - button "Feature on the home page: webrtc-internals-exporter" [ref=e253]
+      - cell "View webrtc-internals-exporter Edit webrtc-internals-exporter Delete webrtc-internals-exporter" [ref=e110]
+        - link "View webrtc-internals-exporter" [ref=e254]
+        - button "Edit webrtc-internals-exporter" [ref=e255]
+        - button "Delete webrtc-internals-exporter" [ref=e256]
+      - cell "190128 Select auto-transcode-watcher" [ref=e111]
+        - checkbox "Select auto-transcode-watcher" [checked=false, ref=e257]
+      - cell "auto-transcode-watcher" [ref=e112]
+      - cell "Encoding & Codecs" [ref=e113]
+      - cell "FFMPEG TRANSCODING" [ref=e114]
+      - cell "Feature on the home page: auto-transcode-watcher" [ref=e115]
+        - button "Feature on the home page: auto-transcode-watcher" [ref=e258]
+      - cell "View auto-transcode-watcher Edit auto-transcode-watcher Delete auto-transcode-watcher" [ref=e116]
+        - link "View auto-transcode-watcher" [ref=e259]
+        - button "Edit auto-transcode-watcher" [ref=e260]
+        - button "Delete auto-transcode-watcher" [ref=e261]
+      - cell "190127 Select Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e117]
+        - checkbox "Select Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [checked=false, ref=e262]
+      - cell "Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e118]
+      - cell "General Tools" [ref=e119]
+      - cell "DRM CONTENT PROTECTION" [ref=e120]
+      - cell "Feature on the home page: Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e121]
+        - button "Feature on the home page: Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e263]
+      - cell "View Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services Edit Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services Delete Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e122]
+        - link "View Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e264]
+        - button "Edit Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e265]
+        - button "Delete Looney Tunes: Exposing Lack of DRM Protection in Indian Music Streaming Services" [ref=e266]
+      - cell "190126 Select On the Current State of Interoperable Content Protection for OTT" [ref=e123]
+        - checkbox "Select On the Current State of Interoperable Content Protection for OTT" [checked=false, ref=e267]
+      - cell "On the Current State of Interoperable Content Protection for OTT" [ref=e124]
+      - cell "General Tools" [ref=e125]
+      - cell "DRM CPIX" [ref=e126]
+      - cell "Feature on the home page: On the Current State of Interoperable Content Protection for OTT" [ref=e127]
+        - button "Feature on the home page: On the Current State of Interoperable Content Protection for OTT" [ref=e268]
+      - cell "View On the Current State of Interoperable Content Protection for OTT Edit On the Current State of Interoperable Content Protection for OTT Delete On the Current State of Interoperable Content Protection for OTT" [ref=e128]
+        - link "View On the Current State of Interoperable Content Protection for OTT" [ref=e269]
+        - button "Edit On the Current State of Interoperable Content Protection for OTT" [ref=e270]
+        - button "Delete On the Current State of Interoperable Content Protection for OTT" [ref=e271]
+      - cell "190125 Select AV1-discuss Mailing List" [ref=e129]
+        - checkbox "Select AV1-discuss Mailing List" [checked=false, ref=e272]
+      - cell "AV1-discuss Mailing List" [ref=e130]
+      - cell "General Tools" [ref=e131]
+      - cell "AV1 MAILING-LIST" [ref=e132]
+      - cell "Feature on the home page: AV1-discuss Mailing List" [ref=e133]
+        - button "Feature on the home page: AV1-discuss Mailing List" [ref=e273]
+      - cell "View AV1-discuss Mailing List Edit AV1-discuss Mailing List Delete AV1-discuss Mailing List" [ref=e134]
+        - link "View AV1-discuss Mailing List" [ref=e274]
+        - button "Edit AV1-discuss Mailing List" [ref=e275]
+        - button "Delete AV1-discuss Mailing List" [ref=e276]
+      - cell "190124 Select Jitsi Community Forum" [ref=e135]
+        - checkbox "Select Jitsi Community Forum" [checked=false, ref=e277]
+      - cell "Jitsi Community Forum" [ref=e136]
+      - cell "General Tools" [ref=e137]
+      - cell "WEBRTC JITSI" [ref=e138]
+      - cell "Feature on the home page: Jitsi Community Forum" [ref=e139]
+        - button "Feature on the home page: Jitsi Community Forum" [ref=e278]
+      - cell "View Jitsi Community Forum Edit Jitsi Community Forum Delete Jitsi Community Forum" [ref=e140]
+        - link "View Jitsi Community Forum" [ref=e279]
+        - button "Edit Jitsi Community Forum" [ref=e280]
+        - button "Delete Jitsi Community Forum" [ref=e281]
+      - cell "190123 Select AOMedia Community Wiki" [ref=e141]
+        - checkbox "Select AOMedia Community Wiki" [checked=false, ref=e282]
+      - cell "AOMedia Community Wiki" [ref=e142]
+      - cell "General Tools" [ref=e143]
+      - cell "AV1 AOMEDIA" [ref=e144]
+      - cell "Feature on the home page: AOMedia Community Wiki" [ref=e145]
+        - button "Feature on the home page: AOMedia Community Wiki" [ref=e283]
+      - cell "View AOMedia Community Wiki Edit AOMedia Community Wiki Delete AOMedia Community Wiki" [ref=e146]
+        - link "View AOMedia Community Wiki" [ref=e284]
+        - button "Edit AOMedia Community Wiki" [ref=e285]
+        - button "Delete AOMedia Community Wiki" [ref=e286]
+      - cell "190122 Select Hydrogenaudio Forums" [ref=e147]
+        - checkbox "Select Hydrogenaudio Forums" [checked=false, ref=e287]
+      - cell "Hydrogenaudio Forums" [ref=e148]
+      - cell "General Tools" [ref=e149]
+      - cell "AUDIO-CODEC COMMUNITY-FORUM" [ref=e150]
+      - cell "Feature on the home page: Hydrogenaudio Forums" [ref=e151]
+        - button "Feature on the home page: Hydrogenaudio Forums" [ref=e288]
+      - cell "View Hydrogenaudio Forums Edit Hydrogenaudio Forums Delete Hydrogenaudio Forums" [ref=e152]
+        - link "View Hydrogenaudio Forums" [ref=e289]
+        - button "Edit Hydrogenaudio Forums" [ref=e290]
+        - button "Delete Hydrogenaudio Forums" [ref=e291]
+      - cell "190121 Select vvDecPlayer" [ref=e153]
+        - checkbox "Select vvDecPlayer" [checked=false, ref=e292]
+      - cell "vvDecPlayer" [ref=e154]
+      - cell "Players & Clients" [ref=e155]
+      - cell "VVC H.266" [ref=e156]
+      - cell "Feature on the home page: vvDecPlayer" [ref=e157]
+        - button "Feature on the home page: vvDecPlayer" [ref=e293]
+      - cell "View vvDecPlayer Edit vvDecPlayer Delete vvDecPlayer" [ref=e158]
+        - link "View vvDecPlayer" [ref=e294]
+        - button "Edit vvDecPlayer" [ref=e295]
+        - button "Delete vvDecPlayer" [ref=e296]
+      - cell "190120 Select Refract" [ref=e159]
+        - checkbox "Select Refract" [checked=false, ref=e297]
+      - cell "Refract" [ref=e160]
+      - cell "Encoding & Codecs" [ref=e161]
+      - cell "AVIF JPEG-XL" [ref=e162]
+      - cell "Feature on the home page: Refract" [ref=e163]
+        - button "Feature on the home page: Refract" [ref=e298]
+      - cell "View Refract Edit Refract Delete Refract" [ref=e164]
+        - link "View Refract" [ref=e299]
+        - button "Edit Refract" [ref=e300]
+        - button "Delete Refract" [ref=e301]
+      - cell "190119 Select GStreamerVideoMetrics" [ref=e165]
+        - checkbox "Select GStreamerVideoMetrics" [checked=false, ref=e302]
+      - cell "GStreamerVideoMetrics" [ref=e166]
+      - cell "General Tools" [ref=e167]
+      - cell "GSTREAMER RTMP" [ref=e168]
+      - cell "Feature on the home page: GStreamerVideoMetrics" [ref=e169]
+        - button "Feature on the home page: GStreamerVideoMetrics" [ref=e303]
+      - cell "View GStreamerVideoMetrics Edit GStreamerVideoMetrics Delete GStreamerVideoMetrics" [ref=e170]
+        - link "View GStreamerVideoMetrics" [ref=e304]
+        - button "Edit GStreamerVideoMetrics" [ref=e305]
+        - button "Delete GStreamerVideoMetrics" [ref=e306]
+      - cell "190118 Select csplayready" [ref=e171]
+        - checkbox "Select csplayready" [checked=false, ref=e307]
+      - cell "csplayready" [ref=e172]
+      - cell "General Tools" [ref=e173]
+      - cell "PLAYREADY DRM" [ref=e174]
+      - cell "Feature on the home page: csplayready" [ref=e175]
+        - button "Feature on the home page: csplayready" [ref=e308]
+      - cell "View csplayready Edit csplayready Delete csplayready" [ref=e176]
+        - link "View csplayready" [ref=e309]
+        - button "Edit csplayready" [ref=e310]
+        - button "Delete csplayready" [ref=e311]
+      - cell "190117 Select NextPlayer" [ref=e177]
+        - checkbox "Select NextPlayer" [checked=false, ref=e312]
+      - cell "NextPlayer" [ref=e178]
+      - cell "Players & Clients" [ref=e179]
+      - cell "ANDROID H.265" [ref=e180]
+      - cell "Feature on the home page: NextPlayer" [ref=e181]
+        - button "Feature on the home page: NextPlayer" [ref=e313]
+      - cell "View NextPlayer Edit NextPlayer Delete NextPlayer" [ref=e182]
+        - link "View NextPlayer" [ref=e314]
+        - button "Edit NextPlayer" [ref=e315]
+        - button "Delete NextPlayer" [ref=e316]
+      - cell "190116 Select pAV0NE" [ref=e183]
+        - checkbox "Select pAV0NE" [checked=false, ref=e317]
+      - cell "pAV0NE" [ref=e184]
+      - cell "Players & Clients" [ref=e185]
+      - cell "AV1 EXOPLAYER" [ref=e186]
+      - cell "Feature on the home page: pAV0NE" [ref=e187]
+        - button "Feature on the home page: pAV0NE" [ref=e318]
+      - cell "View pAV0NE Edit pAV0NE Delete pAV0NE" [ref=e188]
+        - link "View pAV0NE" [ref=e319]
+        - button "Edit pAV0NE" [ref=e320]
+        - button "Delete pAV0NE" [ref=e321]
+      - cell "190115 Select multiflux" [ref=e189]
+        - checkbox "Select multiflux" [checked=false, ref=e322]
+      - cell "multiflux" [ref=e190]
+      - cell "Infrastructure & Delivery" [ref=e191]
+      - cell "CLOUDFLARE WORKERS MULTISTREAMING" [ref=e192]
+      - cell "Feature on the home page: multiflux" [ref=e193]
+        - button "Feature on the home page: multiflux" [ref=e323]
+      - cell "View multiflux Edit multiflux Delete multiflux" [ref=e194]
+        - link "View multiflux" [ref=e324]
+        - button "Edit multiflux" [ref=e325]
+        - button "Delete multiflux" [ref=e326]
+      - cell "190114 Select TV-Workers" [ref=e195]
+        - checkbox "Select TV-Workers" [checked=false, ref=e327]
+      - cell "TV-Workers" [ref=e196]
+      - cell "Infrastructure & Delivery" [ref=e197]
+      - cell "HLS IPTV" [ref=e198]
+      - cell "Feature on the home page: TV-Workers" [ref=e199]
+        - button "Feature on the home page: TV-Workers" [ref=e328]
+      - cell "View TV-Workers Edit TV-Workers Delete TV-Workers" [ref=e200]
+        - link "View TV-Workers" [ref=e329]
+        - button "Edit TV-Workers" [ref=e330]
+        - button "Delete TV-Workers" [ref=e331]
+    - combobox "Rows per page" [expanded=false, ref=e39]: 25 / page
+      - generic "25 / page" [ref=e44] clickable [cursor:pointer, onclick]
+    - navigation "Pagination" [ref=e40]
+      - link "Page 1, current page" [ref=e45]
+      - link "Go to page 2" [ref=e46]
+      - link "Go to page 153" [ref=e47]
+      - link "Next" [ref=e48]
+      - LabelText "Go to page" [ref=e49] clickable [cursor:pointer]
+      - textbox "Page number, 1 to 153" [ref=e50]: 1
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-014-resources-1440.png
+
+[2330C73D3DB80E8F026D55F06C424FDB] OPTIONS https://i.replit.com/api/send (Other) 204
+[10579.179] POST https://i.replit.com/api/send (Fetch) 200
+[10579.197] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.198] GET https://awesome.video/api/config (Fetch) 200
+[10579.208] POST https://i.replit.com/api/send (Fetch) 200
+[10579.212] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.269] GET https://awesome.video/api/config (Fetch) 200
+[10579.270] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.334] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.335] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.336] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.338] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.339] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.341] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.342] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[10579.343] GET https://awesome.video/api/categories (Fetch) 200
+[10579.344] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.345] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[10579.346] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[10579.347] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.348] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[10579.349] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10579.350] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.351] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[10579.352] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[10579.353] GET https://awesome.video/api/categories (Fetch) 200
+[10579.354] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.355] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.357] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[10579.358] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.359] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.360] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.361] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.362] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.363] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.364] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.365] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.366] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.367] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.368] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.369] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.370] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.371] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.372] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.373] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.374] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.375] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.376] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.377] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.378] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.379] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.380] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.381] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.382] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.383] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.384] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.385] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.386] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.387] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.388] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.389] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.390] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.391] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.392] GET https://awesome.video/api/admin/pending-resources (Fetch)
+[10579.402] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.574] GET https://awesome.video/api/config (Fetch) 200
+[10579.575] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.638] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.639] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.640] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.642] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.643] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.645] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.646] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.648] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.649] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.650] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.651] GET https://awesome.video/api/admin/resource-edits (Fetch)
+[10579.662] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.711] GET https://awesome.video/api/config (Fetch) 200
+[10579.712] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.774] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.775] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.776] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.778] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.779] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.781] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.782] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.784] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.785] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.786] GET https://awesome.video/api/admin/resource-edits (Fetch) 200
+[10579.787] GET https://awesome.video/api/admin/resource-edits/recent (Fetch)
+[10579.788] GET https://awesome.video/api/health/ai (Fetch)
+[10579.789] GET https://awesome.video/api/enrichment/jobs (Fetch)
+[10579.790] GET https://awesome.video/api/admin/enrichment/coverage (Fetch)
+[10579.801] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.850] GET https://awesome.video/api/config (Fetch) 200
+[10579.851] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.913] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.914] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.915] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.917] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.918] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.920] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.921] GET https://awesome.video/api/enrichment/jobs (Fetch) 200
+[10579.922] GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+[10579.923] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.924] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.926] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.927] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.928] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.929] GET https://awesome.video/api/researcher/config (Fetch) 200
+[10579.930] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+[10579.931] GET https://awesome.video/api/researcher/discoveries (Fetch) 200
+[10579.932] GET https://awesome.video/api/awesome-list (Fetch) 200
+[10579.934] GET https://awesome.video/api/admin/database-backups (Fetch) 200
+[10579.935] GET https://awesome.video/api/admin/validation-status (Fetch) 200
+[10579.936] GET https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported (Fetch) 200
+[10579.937] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.940] GET https://awesome.video/api/categories (Fetch) 200
+[10579.941] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.942] GET https://awesome.video/api/sub-subcategories (Fetch) 200
+[10579.943] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[10579.944] GET https://awesome.video/api/admin/resources?page=1&limit=1 (Fetch) 200
+[10579.945] GET https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true (Fetch) 200
+
+

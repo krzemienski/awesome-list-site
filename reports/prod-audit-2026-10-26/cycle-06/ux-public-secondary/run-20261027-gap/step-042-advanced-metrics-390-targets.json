@@ -1,0 +1,568 @@
+{
+  "url": "https://awesome.video/advanced?tab=metrics&sub=categories",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<button type=\"button\" role=\"tab\" aria-selected=\"true\" aria-controls=\"radix-:r14:-content-categories\" data-state=\"active\" id=\"radix-:r14:-trigger-categories\" class=\"tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active\" tabindex=\"0\" data-orientation=\"horizontal\" data-radix-collection-item=\"\">Categories</button>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Explorer",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": 199.1875,
+        "width": 162.453125,
+        "height": 44,
+        "top": 199.1875,
+        "right": 202.453125,
+        "bottom": 243.1875,
+        "left": 40
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Metrics",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 202.453125,
+        "y": 199.1875,
+        "width": 157.59375,
+        "height": 44,
+        "top": 199.1875,
+        "right": 360.046875,
+        "bottom": 243.1875,
+        "left": 202.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Export",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 360.046875,
+        "y": 199.1875,
+        "width": 151.40625,
+        "height": 44,
+        "top": 199.1875,
+        "right": 511.453125,
+        "bottom": 243.1875,
+        "left": 360.046875
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "AI Recommendations",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 511.453125,
+        "y": 199.1875,
+        "width": 242.546875,
+        "height": 44,
+        "top": 199.1875,
+        "right": 754,
+        "bottom": 243.1875,
+        "left": 511.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Overview",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 375.1875,
+        "width": 332,
+        "height": 44,
+        "top": 375.1875,
+        "right": 397,
+        "bottom": 419.1875,
+        "left": 65
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50",
+      "disabled": false
+    },
+    {
+      "name": "Categories",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 397,
+        "y": 375.1875,
+        "width": 332,
+        "height": 44,
+        "top": 375.1875,
+        "right": 729,
+        "bottom": 419.1875,
+        "left": 397
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active",
+      "disabled": false
+    },
+    {
+      "name": "Browse All Resources",
+      "role": "A",
+      "href": "/categories",
+      "rect": {
+        "x": 231.359375,
+        "y": 1945.3125,
+        "width": 170.015625,
+        "height": 44,
+        "top": 1945.3125,
+        "right": 401.375,
+        "bottom": 1989.3125,
+        "left": 231.359375
+      },
+      "class": "discovery-tools-cta-primary"
+    },
+    {
+      "name": "Explore Categories",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 409.375,
+        "y": 1945.3125,
+        "width": 153.25,
+        "height": 44,
+        "top": 1945.3125,
+        "right": 562.625,
+        "bottom": 1989.3125,
+        "left": 409.375
+      },
+      "class": "discovery-tools-cta-secondary"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 2219.3125,
+        "width": 195.046875,
+        "height": 44,
+        "top": 2219.3125,
+        "right": 235.046875,
+        "bottom": 2263.3125,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 2396.09375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2396.09375,
+        "right": 505.328125,
+        "bottom": 2440.09375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 2424.90625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2424.90625,
+        "right": 505.328125,
+        "bottom": 2468.90625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2453.71875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2453.71875,
+        "right": 505.328125,
+        "bottom": 2497.71875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 2482.53125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2482.53125,
+        "right": 505.328125,
+        "bottom": 2526.53125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 2511.34375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2511.34375,
+        "right": 505.328125,
+        "bottom": 2555.34375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2540.15625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2540.15625,
+        "right": 505.328125,
+        "bottom": 2584.15625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 2568.96875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2568.96875,
+        "right": 505.328125,
+        "bottom": 2612.96875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 2597.78125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2597.78125,
+        "right": 505.328125,
+        "bottom": 2641.78125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 2626.59375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2626.59375,
+        "right": 505.328125,
+        "bottom": 2670.59375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 2407.6875,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 2407.6875,
+        "right": 754,
+        "bottom": 2468.0625,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 2480.0625,
+        "width": 73,
+        "height": 24,
+        "top": 2480.0625,
+        "right": 688.6875,
+        "bottom": 2504.0625,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 2534.453125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2534.453125,
+        "right": 754,
+        "bottom": 2578.453125,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 2752,
+        "width": 44,
+        "height": 44,
+        "top": 2752,
+        "right": 84,
+        "bottom": 2796,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 2752,
+        "width": 44,
+        "height": 44,
+        "top": 2752,
+        "right": 142,
+        "bottom": 2796,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 2752,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2752,
+        "right": 204.515625,
+        "bottom": 2796,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 2752,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2752,
+        "right": 267.03125,
+        "bottom": 2796,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 2752,
+        "width": 103.953125,
+        "height": 44,
+        "top": 2752,
+        "right": 384.984375,
+        "bottom": 2796,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 2752,
+        "width": 55.46875,
+        "height": 44,
+        "top": 2752,
+        "right": 454.453125,
+        "bottom": 2796,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 2752,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2752,
+        "right": 516.96875,
+        "bottom": 2796,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

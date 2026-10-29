@@ -1,0 +1,579 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - navigation "Breadcrumb" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "Home" [ref=e29] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e30]:
+                - img [ref=e31]
+              - listitem [ref=e33]:
+                - link "Admin" [ref=e34] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e35]:
+                - img [ref=e36]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e38]: Authorized admin area
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e45]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e46]:
+                  - text: Operations
+                  - emphasis [ref=e47]: dashboard
+                - paragraph [ref=e48]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e49]:
+                - button "Settings" [ref=e50] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e51] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e52]
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - tablist "Admin sections" [ref=e55]:
+                  - tab "Overview" [ref=e56] [cursor=pointer]:
+                    - img [ref=e57]
+                    - text: Overview
+                  - tab "Approvals" [ref=e62] [cursor=pointer]:
+                    - img [ref=e63]
+                    - text: Approvals
+                  - tab "Edits" [ref=e65] [cursor=pointer]:
+                    - img [ref=e66]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e67] [cursor=pointer]:
+                    - img [ref=e68]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Researcher
+                  - tab "Export" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Export
+                  - tab "Database" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Database
+                  - tab "Resources" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Resources
+                  - tab "Categories" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e86] [cursor=pointer]:
+                    - img [ref=e87]
+                    - text: Subcategories
+                  - tab "Users" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Users
+                  - tab "GitHub" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: Link Health
+                  - tab "Audit" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: Audit
+                  - tab "Research" [ref=e103] [cursor=pointer]:
+                    - img [ref=e104]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e106] [cursor=pointer]:
+                  - img [ref=e107]
+              - tabpanel "Researcher" [ref=e109]:
+                - generic [ref=e110]:
+                  - generic [ref=e111]:
+                    - 'region "Research run #77" [ref=e113]':
+                      - generic [ref=e114]:
+                        - generic [ref=e115]:
+                          - 'heading "Research run #77" [level=3] [ref=e116]'
+                          - paragraph [ref=e117]: All categories · running for 11:10
+                        - generic [ref=e118]:
+                          - generic [ref=e119]:
+                            - img [ref=e120]
+                            - text: Running
+                          - button "Cancel run" [ref=e122] [cursor=pointer]:
+                            - img
+                            - text: Cancel run
+                      - paragraph [ref=e123]
+                      - generic [ref=e124]:
+                        - list "Run phases" [ref=e125]:
+                          - listitem [ref=e126]:
+                            - generic [ref=e129]:
+                              - text: Planning
+                              - generic [ref=e130]: 03:38:14 AM
+                            - generic [ref=e131]: (current)
+                          - listitem [ref=e132]:
+                            - img [ref=e134]
+                            - generic [ref=e136]:
+                              - text: Scouting
+                              - generic [ref=e137]: 03:38:32 AM
+                            - generic [ref=e138]: (done)
+                          - listitem [ref=e139]:
+                            - generic [ref=e141]: Verifying
+                            - generic [ref=e143]: (not reached)
+                          - listitem [ref=e144]:
+                            - generic [ref=e146]: Saving
+                            - generic [ref=e148]: (not reached)
+                          - listitem [ref=e149]:
+                            - generic [ref=e151]: Done
+                            - generic [ref=e153]: (not reached)
+                        - generic [ref=e154]:
+                          - heading "Scouts 1 started · 1 searching" [level=4] [ref=e155]:
+                            - img [ref=e156]
+                            - text: Scouts
+                            - generic [ref=e159]: 1 started · 1 searching
+                          - list "Scouts" [ref=e160]:
+                            - listitem [ref=e161]:
+                              - generic [ref=e162]:
+                                - generic [ref=e163]: Scout 1
+                                - generic [ref=e164]: Searching
+                              - paragraph [ref=e165]: List taxonomy subcategories
+                      - generic [ref=e167]:
+                        - generic [ref=e168]:
+                          - term [ref=e169]: Discoveries
+                          - definition [ref=e170]: 0 of 25 saved
+                          - progressbar "Discoveries saved against the target" [ref=e171]
+                        - generic [ref=e173]:
+                          - term [ref=e174]: Turns
+                          - definition [ref=e175]: counted at the end · cap 600
+                        - generic [ref=e176]:
+                          - term [ref=e177]: Spend
+                          - definition [ref=e178]: reported at the end · cap $8.00
+                      - region "Discoveries so far" [ref=e179]:
+                        - heading "Discoveries so far" [level=4] [ref=e180]
+                        - paragraph [ref=e181]: Saved discoveries appear here as the agent finds them.
+                      - 'button "Run details: raw event log and agent graph" [ref=e183] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e184]:
+                      - generic [ref=e186]:
+                        - heading "Researcher jobs" [level=2] [ref=e187]
+                        - paragraph [ref=e188]: Latest 5 of 77 research runs
+                      - generic [ref=e189]:
+                        - region "Researcher jobs table, scrollable" [ref=e190]:
+                          - table [ref=e191]:
+                            - rowgroup [ref=e192]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e193]:
+                                - columnheader "Status" [ref=e194]
+                                - columnheader "Prompt" [ref=e195]
+                                - columnheader "Found" [ref=e196]
+                                - columnheader "Approved / Rejected" [ref=e197]
+                                - columnheader "Cost" [ref=e198]
+                                - columnheader "Turns" [ref=e199]
+                                - columnheader "Created" [ref=e200]
+                            - rowgroup [ref=e201]:
+                              - row [ref=e202]:
+                                - cell "processing" [ref=e203]:
+                                  - generic [ref=e204]: processing
+                                - cell [ref=e205]
+                                - cell "0" [ref=e206]
+                                - cell "0/0" [ref=e207]
+                                - cell "$0.0000" [ref=e208]
+                                - cell "0/600" [ref=e209]
+                                - cell "Oct 27, 2026" [ref=e210]
+                              - row [ref=e211]:
+                                - cell "completed" [ref=e212]:
+                                  - generic [ref=e213]: completed
+                                - cell [ref=e214]
+                                - cell "0" [ref=e215]
+                                - cell "0/0" [ref=e216]
+                                - cell "$0.7600" [ref=e217]
+                                - cell "28/600" [ref=e218]
+                                - cell "Oct 27, 2026" [ref=e219]
+                              - row [ref=e220]:
+                                - cell "completed" [ref=e221]:
+                                  - generic [ref=e222]: completed
+                                - cell [ref=e223]
+                                - cell "0" [ref=e224]
+                                - cell "0/0" [ref=e225]
+                                - cell "$1.2973" [ref=e226]
+                                - cell "93/600" [ref=e227]
+                                - cell "Oct 27, 2026" [ref=e228]
+                              - row [ref=e229]:
+                                - cell "completed" [ref=e230]:
+                                  - generic [ref=e231]: completed
+                                - cell [ref=e232]
+                                - cell "0" [ref=e233]
+                                - cell "0/0" [ref=e234]
+                                - cell "$0.5650" [ref=e235]
+                                - cell "13/600" [ref=e236]
+                                - cell "Oct 27, 2026" [ref=e237]
+                              - row [ref=e238]:
+                                - cell "completed" [ref=e239]:
+                                  - generic [ref=e240]: completed
+                                - cell [ref=e241]
+                                - cell "4" [ref=e242]
+                                - cell "1/0" [ref=e243]
+                                - cell "$5.4603" [ref=e244]
+                                - cell "155/200" [ref=e245]
+                                - cell "Oct 27, 2026" [ref=e246]
+                        - button "Show more" [ref=e248] [cursor=pointer]
+                  - group [ref=e249]:
+                    - generic "All pending discoveries & full job history" [ref=e250] [cursor=pointer]
+                    - generic [ref=e251]:
+                      - tablist [ref=e252]:
+                        - tab "Review Discoveries 12" [ref=e253] [cursor=pointer]:
+                          - img [ref=e254]
+                          - text: Review Discoveries
+                          - generic [ref=e257]: "12"
+                        - tab "Job History" [active] [selected] [ref=e258] [cursor=pointer]:
+                          - img [ref=e259]
+                          - text: Job History
+                      - tabpanel "Job History" [ref=e262]:
+                        - article [ref=e263]:
+                          - generic [ref=e264]:
+                            - generic [ref=e265]: Research Job History
+                            - generic [ref=e266]: Showing latest 20 of 77 research jobs
+                          - generic [ref=e267]:
+                            - table [ref=e269]:
+                              - rowgroup [ref=e270]:
+                                - row "ID Status Prompt Found Approved / Rejected Cost Turns Created Actions" [ref=e271]:
+                                  - columnheader "ID" [ref=e272]
+                                  - columnheader "Status" [ref=e273]
+                                  - columnheader "Prompt" [ref=e274]
+                                  - columnheader "Found" [ref=e275]
+                                  - columnheader "Approved / Rejected" [ref=e276]
+                                  - columnheader "Cost" [ref=e277]
+                                  - columnheader "Turns" [ref=e278]
+                                  - columnheader "Created" [ref=e279]
+                                  - columnheader "Actions" [ref=e280]
+                              - rowgroup [ref=e281]:
+                                - row [ref=e282]:
+                                  - cell "#77" [ref=e283]
+                                  - cell "Running" [ref=e284]:
+                                    - generic [ref=e285]:
+                                      - img [ref=e286]
+                                      - text: Running
+                                  - cell [ref=e288]
+                                  - cell "0" [ref=e289]
+                                  - cell "0 / 0" [ref=e290]
+                                  - cell "$0.0000" [ref=e291]
+                                  - cell "0/600" [ref=e292]
+                                  - cell "Oct 27, 2026" [ref=e293]
+                                  - 'cell "View details for job #77 Cancel job #77" [ref=e294]':
+                                    - generic [ref=e295]:
+                                      - 'button "View details for job #77" [ref=e296] [cursor=pointer]':
+                                        - img
+                                      - 'button "Cancel job #77" [ref=e297] [cursor=pointer]':
+                                        - img
+                                - row [ref=e298]:
+                                  - cell "#76" [ref=e299]
+                                  - cell "Completed" [ref=e300]:
+                                    - generic [ref=e301]:
+                                      - img [ref=e302]
+                                      - text: Completed
+                                  - cell [ref=e305]
+                                  - cell "0" [ref=e306]
+                                  - cell "0 / 0" [ref=e307]
+                                  - cell "$0.7600" [ref=e308]
+                                  - cell "28/600" [ref=e309]
+                                  - cell "Oct 27, 2026" [ref=e310]
+                                  - 'cell "View details for job #76" [ref=e311]':
+                                    - 'button "View details for job #76" [ref=e313] [cursor=pointer]':
+                                      - img
+                                - row [ref=e314]:
+                                  - cell "#75" [ref=e315]
+                                  - cell "Completed" [ref=e316]:
+                                    - generic [ref=e317]:
+                                      - img [ref=e318]
+                                      - text: Completed
+                                  - cell [ref=e321]
+                                  - cell "0" [ref=e322]
+                                  - cell "0 / 0" [ref=e323]
+                                  - cell "$1.2973" [ref=e324]
+                                  - cell "93/600" [ref=e325]
+                                  - cell "Oct 27, 2026" [ref=e326]
+                                  - 'cell "View details for job #75" [ref=e327]':
+                                    - 'button "View details for job #75" [ref=e329] [cursor=pointer]':
+                                      - img
+                                - row [ref=e330]:
+                                  - cell "#74" [ref=e331]
+                                  - cell "Completed" [ref=e332]:
+                                    - generic [ref=e333]:
+                                      - img [ref=e334]
+                                      - text: Completed
+                                  - cell [ref=e337]
+                                  - cell "0" [ref=e338]
+                                  - cell "0 / 0" [ref=e339]
+                                  - cell "$0.5650" [ref=e340]
+                                  - cell "13/600" [ref=e341]
+                                  - cell "Oct 27, 2026" [ref=e342]
+                                  - 'cell "View details for job #74" [ref=e343]':
+                                    - 'button "View details for job #74" [ref=e345] [cursor=pointer]':
+                                      - img
+                                - row [ref=e346]:
+                                  - cell "#73" [ref=e347]
+                                  - cell "Completed" [ref=e348]:
+                                    - generic [ref=e349]:
+                                      - img [ref=e350]
+                                      - text: Completed
+                                  - cell [ref=e353]
+                                  - cell "4" [ref=e354]
+                                  - cell "1 / 0 3 awaiting review" [ref=e355]:
+                                    - text: 1 / 0
+                                    - generic [ref=e356]: 3 awaiting review
+                                  - cell "$5.4603" [ref=e357]
+                                  - cell "155/200" [ref=e358]
+                                  - cell "Oct 27, 2026" [ref=e359]
+                                  - 'cell "View details for job #73" [ref=e360]':
+                                    - 'button "View details for job #73" [ref=e362] [cursor=pointer]':
+                                      - img
+                                - row [ref=e363]:
+                                  - cell "#72" [ref=e364]
+                                  - cell "Failed" [ref=e365]:
+                                    - generic [ref=e366]:
+                                      - img [ref=e367]
+                                      - text: Failed
+                                  - cell [ref=e369]
+                                  - cell "0" [ref=e370]
+                                  - cell "0 / 0" [ref=e371]
+                                  - cell "$0.0000" [ref=e372]
+                                  - cell "1/200" [ref=e373]
+                                  - cell "Oct 27, 2026" [ref=e374]
+                                  - 'cell "View details for job #72" [ref=e375]':
+                                    - 'button "View details for job #72" [ref=e377] [cursor=pointer]':
+                                      - img
+                                - row [ref=e378]:
+                                  - cell [ref=e379]:
+                                    - note [ref=e380]:
+                                      - img [ref=e381]
+                                      - generic [ref=e383]: "Job #72: Claude Code returned an error result: API Error: 402 [glm] All 1 connection(s) credits exhausted — please reconnect in the dashboard"
+                                - row [ref=e384]:
+                                  - cell "#71" [ref=e385]
+                                  - cell "Completed" [ref=e386]:
+                                    - generic [ref=e387]:
+                                      - img [ref=e388]
+                                      - text: Completed
+                                  - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e391]'
+                                  - cell "9" [ref=e392]
+                                  - cell "0 / 0 9 awaiting review" [ref=e393]:
+                                    - text: 0 / 0
+                                    - generic [ref=e394]: 9 awaiting review
+                                  - cell "$3.3100" [ref=e395]
+                                  - cell "41/200" [ref=e396]
+                                  - cell "Oct 27, 2026" [ref=e397]
+                                  - 'cell "View details for job #71" [ref=e398]':
+                                    - 'button "View details for job #71" [ref=e400] [cursor=pointer]':
+                                      - img
+                                - row [ref=e401]:
+                                  - cell "#70" [ref=e402]
+                                  - cell "Completed" [ref=e403]:
+                                    - generic [ref=e404]:
+                                      - img [ref=e405]
+                                      - text: Completed
+                                  - 'cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e408]'
+                                  - cell "0" [ref=e409]
+                                  - cell "0 / 0" [ref=e410]
+                                  - cell "$1.1166" [ref=e411]
+                                  - cell "18/80" [ref=e412]
+                                  - cell "Oct 27, 2026" [ref=e413]
+                                  - 'cell "View details for job #70" [ref=e414]':
+                                    - 'button "View details for job #70" [ref=e416] [cursor=pointer]':
+                                      - img
+                                - row [ref=e417]:
+                                  - cell "#69" [ref=e418]
+                                  - cell "Completed" [ref=e419]:
+                                    - generic [ref=e420]:
+                                      - img [ref=e421]
+                                      - text: Completed
+                                  - cell [ref=e424]
+                                  - cell "0" [ref=e425]
+                                  - cell "0 / 0" [ref=e426]
+                                  - cell "$0.4199" [ref=e427]
+                                  - cell "10/80" [ref=e428]
+                                  - cell "Oct 27, 2026" [ref=e429]
+                                  - 'cell "View details for job #69" [ref=e430]':
+                                    - 'button "View details for job #69" [ref=e432] [cursor=pointer]':
+                                      - img
+                                - 'row "#68 Stopped at budget [QA-audit-1026] smoke: find 1 new open-source video tool 0 0 / 0 $0.3062 3/10 Oct 26, 2026 View details for job #68" [ref=e433]':
+                                  - cell "#68" [ref=e434]
+                                  - cell "Stopped at budget" [ref=e435]:
+                                    - generic [ref=e436]:
+                                      - img [ref=e437]
+                                      - text: Stopped at budget
+                                  - 'cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e439]'
+                                  - cell "0" [ref=e440]
+                                  - cell "0 / 0" [ref=e441]
+                                  - cell "$0.3062" [ref=e442]
+                                  - cell "3/10" [ref=e443]
+                                  - cell "Oct 26, 2026" [ref=e444]
+                                  - 'cell "View details for job #68" [ref=e445]':
+                                    - 'button "View details for job #68" [ref=e447] [cursor=pointer]':
+                                      - img
+                                - row [ref=e448]:
+                                  - cell "#67" [ref=e449]
+                                  - cell "Completed" [ref=e450]:
+                                    - generic [ref=e451]:
+                                      - img [ref=e452]
+                                      - text: Completed
+                                  - 'cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e455]'
+                                  - cell "0" [ref=e456]
+                                  - cell "0 / 0" [ref=e457]
+                                  - cell "$0.1508" [ref=e458]
+                                  - cell "1/8" [ref=e459]
+                                  - cell "Oct 26, 2026" [ref=e460]
+                                  - 'cell "View details for job #67" [ref=e461]':
+                                    - 'button "View details for job #67" [ref=e463] [cursor=pointer]':
+                                      - img
+                                - row [ref=e464]:
+                                  - cell "#66" [ref=e465]
+                                  - cell "Cancelled" [ref=e466]:
+                                    - generic [ref=e467]:
+                                      - img [ref=e468]
+                                      - text: Cancelled
+                                  - cell [ref=e472]
+                                  - cell "0" [ref=e473]
+                                  - cell "—" [ref=e474]
+                                  - cell "$0.2753 lower bound" [ref=e475]:
+                                    - text: $0.2753
+                                    - generic [ref=e476]: lower bound
+                                  - cell "3/40" [ref=e477]
+                                  - cell "Oct 26, 2026" [ref=e478]
+                                  - 'cell "View details for job #66" [ref=e479]':
+                                    - 'button "View details for job #66" [ref=e481] [cursor=pointer]':
+                                      - img
+                                - row [ref=e482]:
+                                  - cell "#65" [ref=e483]
+                                  - cell "Stopped at budget" [ref=e484]:
+                                    - generic [ref=e485]:
+                                      - img [ref=e486]
+                                      - text: Stopped at budget
+                                  - cell [ref=e488]
+                                  - cell "0" [ref=e489]
+                                  - cell "0 / 0" [ref=e490]
+                                  - cell "$0.3213" [ref=e491]
+                                  - cell "3/40" [ref=e492]
+                                  - cell "Oct 26, 2026" [ref=e493]
+                                  - 'cell "View details for job #65" [ref=e494]':
+                                    - 'button "View details for job #65" [ref=e496] [cursor=pointer]':
+                                      - img
+                                - row [ref=e497]:
+                                  - cell "#64" [ref=e498]
+                                  - cell "Completed" [ref=e499]:
+                                    - generic [ref=e500]:
+                                      - img [ref=e501]
+                                      - text: Completed
+                                  - cell [ref=e504]
+                                  - cell "2" [ref=e505]
+                                  - cell "1 / 1" [ref=e506]
+                                  - cell "$1.3245" [ref=e507]
+                                  - cell "9/40" [ref=e508]
+                                  - cell "Oct 26, 2026" [ref=e509]
+                                  - 'cell "View details for job #64" [ref=e510]':
+                                    - 'button "View details for job #64" [ref=e512] [cursor=pointer]':
+                                      - img
+                                - row [ref=e513]:
+                                  - cell "#63" [ref=e514]
+                                  - cell "Completed" [ref=e515]:
+                                    - generic [ref=e516]:
+                                      - img [ref=e517]
+                                      - text: Completed
+                                  - cell [ref=e520]
+                                  - cell "173" [ref=e521]
+                                  - cell "173 / 0" [ref=e522]
+                                  - cell "$40.5425" [ref=e523]
+                                  - cell "625/∞" [ref=e524]
+                                  - cell "Jul 30, 2026" [ref=e525]
+                                  - 'cell "View details for job #63" [ref=e526]':
+                                    - 'button "View details for job #63" [ref=e528] [cursor=pointer]':
+                                      - img
+                                - row [ref=e529]:
+                                  - cell "#62" [ref=e530]
+                                  - cell "Completed" [ref=e531]:
+                                    - generic [ref=e532]:
+                                      - img [ref=e533]
+                                      - text: Completed
+                                  - cell [ref=e536]
+                                  - cell "179" [ref=e537]
+                                  - cell "179 / 0" [ref=e538]
+                                  - cell "$41.7846" [ref=e539]
+                                  - cell "639/∞" [ref=e540]
+                                  - cell "Jul 30, 2026" [ref=e541]
+                                  - 'cell "View details for job #62" [ref=e542]':
+                                    - 'button "View details for job #62" [ref=e544] [cursor=pointer]':
+                                      - img
+                                - row [ref=e545]:
+                                  - cell "#61" [ref=e546]
+                                  - cell "Completed" [ref=e547]:
+                                    - generic [ref=e548]:
+                                      - img [ref=e549]
+                                      - text: Completed
+                                  - cell [ref=e552]
+                                  - cell "113" [ref=e553]
+                                  - cell "113 / 0" [ref=e554]
+                                  - cell "$28.2090" [ref=e555]
+                                  - cell "475/∞" [ref=e556]
+                                  - cell "Jul 29, 2026" [ref=e557]
+                                  - 'cell "View details for job #61" [ref=e558]':
+                                    - 'button "View details for job #61" [ref=e560] [cursor=pointer]':
+                                      - img
+                                - row [ref=e561]:
+                                  - cell "#60" [ref=e562]
+                                  - cell "Cancelled" [ref=e563]:
+                                    - generic [ref=e564]:
+                                      - img [ref=e565]
+                                      - text: Cancelled
+                                  - cell [ref=e569]
+                                  - cell "0" [ref=e570]
+                                  - cell "—" [ref=e571]
+                                  - cell "—" [ref=e572]
+                                  - cell "—" [ref=e573]
+                                  - cell "Jul 29, 2026" [ref=e574]
+                                  - 'cell "View details for job #60" [ref=e575]':
+                                    - 'button "View details for job #60" [ref=e577] [cursor=pointer]':
+                                      - img
+                                - row [ref=e578]:
+                                  - cell "#59" [ref=e579]
+                                  - cell "Cancelled" [ref=e580]:
+                                    - generic [ref=e581]:
+                                      - img [ref=e582]
+                                      - text: Cancelled
+                                  - cell [ref=e586]
+                                  - cell "0" [ref=e587]
+                                  - cell "—" [ref=e588]
+                                  - cell "—" [ref=e589]
+                                  - cell "—" [ref=e590]
+                                  - cell "Jul 29, 2026" [ref=e591]
+                                  - 'cell "View details for job #59" [ref=e592]':
+                                    - 'button "View details for job #59" [ref=e594] [cursor=pointer]':
+                                      - img
+                                - row [ref=e595]:
+                                  - cell "#58" [ref=e596]
+                                  - cell "Cancelled" [ref=e597]:
+                                    - generic [ref=e598]:
+                                      - img [ref=e599]
+                                      - text: Cancelled
+                                  - cell [ref=e603]
+                                  - cell "0" [ref=e604]
+                                  - cell "—" [ref=e605]
+                                  - cell "—" [ref=e606]
+                                  - cell "—" [ref=e607]
+                                  - cell "Jul 29, 2026" [ref=e608]
+                                  - 'cell "View details for job #58" [ref=e609]':
+                                    - 'button "View details for job #58" [ref=e611] [cursor=pointer]':
+                                      - img
+                            - button "Load more (20 of 77) in Job History" [ref=e613] [cursor=pointer]: Load more (20 of 77)

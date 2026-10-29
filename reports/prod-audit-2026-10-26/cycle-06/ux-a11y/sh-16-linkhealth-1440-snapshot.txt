@@ -1,0 +1,127 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "Link Health" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e18]
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [selected, ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Link Health" [ref=e17] focusable [tabindex]
+            - generic
+              - generic "Link health status summary"
+                - generic
+                  - StaticText "Healthy"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Redirect"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Broken"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Timeout"
+                  - StaticText "0"
+                - generic
+                  - StaticText "Suspect"
+                  - StaticText "0"
+              - paragraph
+                - StaticText "Counts are the totals saved when scan #8 finished (Aug 4, 2026, 08:18 PM)."
+              - article
+                - heading "Member reports Open" [level=2, ref=e39]
+                  - StaticText "Member reports"
+                  - combobox "Report status" [expanded=false, ref=e41]: Open
+                    - generic [ref=e44] clickable [cursor:pointer, onclick]
+                      - StaticText "Open"
+                - StaticText "Links that signed-in members reported as broken from a resource page."
+                - status
+                  - StaticText "Loading reports…"
+              - generic
+                - sectionheader
+                  - heading "Recent failures" [level=2, ref=e42]
+                  - paragraph
+                    - StaticText "Broken, DNS and timeout failures plus links flagged for review from the last sweep"
+                  - button "Run full check" [ref=e43]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "RESOURCE" [ref=e45]
+                      - columnheader "URL" [ref=e46]
+                      - columnheader "STATUS" [ref=e47]
+                      - columnheader "LAST CHECKED" [ref=e48]
+                - status
+                  - StaticText "No link check has been run yet."
+              - button "More" [expanded=false, ref=e40]

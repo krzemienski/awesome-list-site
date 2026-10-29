@@ -1,0 +1,13 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Subcategories" [ref=e12] focusable [tabindex]
+    - navigation "Pagination" [ref=e13]
+- heading "Create Subcategory" [level=2, ref=e3]
+- LabelText "Parent Category *" [ref=e4] clickable [cursor:pointer]
+- combobox "Parent Category *" [expanded=false, ref=e5]: Select parent category
+- LabelText "Name *" [ref=e10] clickable [cursor:pointer]
+- textbox "Name *" [ref=e11]
+- LabelText "Slug *" [ref=e6] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e7]
+- button "Cancel" [ref=e8]
+- button "Create" [ref=e9]
+- button "Close" [ref=e2]

@@ -1,0 +1,52 @@
+[
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=1&limit=20&q=%5BQA-audit-1026%5D-no-match&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=1&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=2&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=3&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=4&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=5&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=6&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=7&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=1&limit=20&q=%5BQA-audit-1026%5D-no-match&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/users?page=1&limit=20&sortBy=createdAt&sortDir=desc",
+    "status": 200
+  }
+]

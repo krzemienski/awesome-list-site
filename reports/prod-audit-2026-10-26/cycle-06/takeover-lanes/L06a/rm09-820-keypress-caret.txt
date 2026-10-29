@@ -1,0 +1,8 @@
+"INPUT val=a sel=1 scrollL=6"
+"INPUT val=ab sel=2 scrollL=14"
+"INPUT val=abc sel=3 scrollL=21"
+"INPUT val=abcd sel=4 scrollL=29"
+"after keyboard type: val=zyabcdx sel=0"
+"1440 keyboard type: val=xyz"
+"separate presses: val=hlsx"
+elapsed 0.78s for 4 keys

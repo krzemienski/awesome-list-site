@@ -1,0 +1,2 @@
+   1 GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+   1 GET https://awesome.video/api/admin/link-health/history (Fetch) 200

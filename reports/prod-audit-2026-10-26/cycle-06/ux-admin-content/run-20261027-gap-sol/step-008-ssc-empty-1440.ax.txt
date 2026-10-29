@@ -1,0 +1,22 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Subcategories" [ref=e14] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e15]
+  - dialog "Create Sub-Subcategory"
+    - form
+      - heading "Create Sub-Subcategory" [level=2, ref=e3]
+      - LabelText [ref=e4] clickable [cursor:pointer]
+      - combobox "Parent Category *" [expanded=false, ref=e5]: Select parent category
+      - LabelText [ref=e6] clickable [cursor:pointer]
+      - combobox "Parent Subcategory *" [expanded=false, disabled, ref=e7]: Select parent subcategory
+      - LabelText [ref=e8] clickable [cursor:pointer]
+      - textbox "Name *" [ref=e9]
+      - LabelText [ref=e10] clickable [cursor:pointer]
+      - textbox "Slug *" [ref=e11]
+      - button "Cancel" [ref=e12]
+      - button "Create" [ref=e13]
+    - button "Close" [ref=e2]

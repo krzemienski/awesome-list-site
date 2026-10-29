@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks?collection=155",
+  "width": 1440,
+  "height": 900,
+  "dpr": 1,
+  "coarse": false,
+  "touchPoints": 0,
+  "scrollY": 14,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]\" data-ds-variant=\"ghost\" type=\"button\" aria-label=\"Move [QA-audit-1026] gap collection B up\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"",
+  "umami": "1",
+  "consent": "denied"
+}

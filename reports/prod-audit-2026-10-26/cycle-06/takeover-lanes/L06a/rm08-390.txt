@@ -1,0 +1,2 @@
+rm08 before "{\"name\":\"Show filters and tools\",\"exp\":\"false\",\"size\":\"44x44\",\"region\":false}"
+rm08 click1 "{\"name\":\"Hide filters and tools\",\"exp\":\"true\",\"size\":\"44x44\",\"region\":true}"

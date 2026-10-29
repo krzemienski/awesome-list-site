@@ -1,0 +1,5 @@
+200 /resource/189364
+200 /resource/188285
+200 /resource/186653
+200 /sub-subcategory/advertising
+200 /resource/188906

@@ -1,0 +1,1104 @@
+{
+  "url": "https://awesome.video/design-system",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "reduced": true,
+  "overflow": 0,
+  "focus": "<button type=\"button\" aria-pressed=\"true\" data-testid=\"ds-accent-crimson\" class=\"text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer\" style=\"border-color: rgb(255, 61, 82);\"><div class=\"flex h-7 w-full overflow-hidden rounded-[var(--radius-xs)] mb-1.5\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(255, 61, 82);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(184, 77, 255);\"></div></div><div class=\"flex items-center justify-between gap-1\"><span class=\"text-xs font-medium truncate\">Crimson</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check h-3.5 w-3.5 shrink-0\" style=\"color: rgb(255, 61, 82);\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><code class=\"block font-mono text-[10px] text-[color:var(--text-3)]\">#ff3d52</code></button>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -596,
+        "width": 156.234375,
+        "height": 44,
+        "top": -596,
+        "right": 164.234375,
+        "bottom": -552,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 14,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 58,
+        "bottom": 49.5,
+        "left": 14
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 72,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 116,
+        "bottom": 49.5,
+        "left": 72
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,826 resources",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 274,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 318,
+        "bottom": 49.5,
+        "left": 274
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 332,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 376,
+        "bottom": 49.5,
+        "left": 332
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 19,
+        "y": -393,
+        "width": 39.234375,
+        "height": 20,
+        "top": -393,
+        "right": 58.234375,
+        "bottom": -373,
+        "left": 19
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Theme Settings",
+      "href": "/settings/theme",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": -392,
+        "width": 125.796875,
+        "height": 44,
+        "top": -392,
+        "right": 145.796875,
+        "bottom": -348,
+        "left": 20
+      },
+      "class": "inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
+    },
+    {
+      "name": "Editorial",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": -62.046875,
+        "width": 112.25,
+        "height": 44,
+        "top": -62.046875,
+        "right": 132.25,
+        "bottom": -18.046875,
+        "left": 20
+      },
+      "class": "inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-pill)] border bg-[var(--surface)] px-4 text-sm transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Geist",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 140.25,
+        "y": -62.046875,
+        "width": 68.53125,
+        "height": 44,
+        "top": -62.046875,
+        "right": 208.78125,
+        "bottom": -18.046875,
+        "left": 140.25
+      },
+      "class": "inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-pill)] border bg-[var(--surface)] px-4 text-sm transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Crimson\n#ff3d52",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 143.859375,
+        "width": 151,
+        "height": 84,
+        "top": 143.859375,
+        "right": 171,
+        "bottom": 227.859375,
+        "left": 20
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Magenta\n#ec4899",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 179,
+        "y": 143.859375,
+        "width": 151,
+        "height": 84,
+        "top": 143.859375,
+        "right": 330,
+        "bottom": 227.859375,
+        "left": 179
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Orange\n#ff7a3d",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 235.859375,
+        "width": 151,
+        "height": 84,
+        "top": 235.859375,
+        "right": 171,
+        "bottom": 319.859375,
+        "left": 20
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Amber\n#ffb84d",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 179,
+        "y": 235.859375,
+        "width": 151,
+        "height": 84,
+        "top": 235.859375,
+        "right": 330,
+        "bottom": 319.859375,
+        "left": 179
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Emerald\n#34d08c",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 327.859375,
+        "width": 151,
+        "height": 84,
+        "top": 327.859375,
+        "right": 171,
+        "bottom": 411.859375,
+        "left": 20
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Matrix\n#00ff88",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 179,
+        "y": 327.859375,
+        "width": 151,
+        "height": 84,
+        "top": 327.859375,
+        "right": 330,
+        "bottom": 411.859375,
+        "left": 179
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Cyan\n#5eddf2",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 419.859375,
+        "width": 151,
+        "height": 84,
+        "top": 419.859375,
+        "right": 171,
+        "bottom": 503.859375,
+        "left": 20
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Violet\n#9d4edd",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 179,
+        "y": 419.859375,
+        "width": 151,
+        "height": 84,
+        "top": 419.859375,
+        "right": 330,
+        "bottom": 503.859375,
+        "left": 179
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Lime\n#aaff00",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 511.859375,
+        "width": 151,
+        "height": 84,
+        "top": 511.859375,
+        "right": 171,
+        "bottom": 595.859375,
+        "left": 20
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Rose\n#ff7a8a",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 179,
+        "y": 511.859375,
+        "width": 151,
+        "height": 84,
+        "top": 511.859375,
+        "right": 330,
+        "bottom": 595.859375,
+        "left": 179
+      },
+      "class": "text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer",
+      "disabled": false
+    },
+    {
+      "name": "Primary",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 5434.546875,
+        "width": 113.21875,
+        "height": 44,
+        "top": 5434.546875,
+        "right": 158.21875,
+        "bottom": 5478.546875,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Secondary",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 166.21875,
+        "y": 5434.546875,
+        "width": 101.34375,
+        "height": 44,
+        "top": 5434.546875,
+        "right": 267.5625,
+        "bottom": 5478.546875,
+        "left": 166.21875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Outline",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 5486.546875,
+        "width": 78.234375,
+        "height": 44,
+        "top": 5486.546875,
+        "right": 123.234375,
+        "bottom": 5530.546875,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Ghost",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 131.234375,
+        "y": 5486.546875,
+        "width": 70.828125,
+        "height": 44,
+        "top": 5486.546875,
+        "right": 202.0625,
+        "bottom": 5530.546875,
+        "left": 131.234375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Destructive",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 5538.546875,
+        "width": 105.359375,
+        "height": 44,
+        "top": 5538.546875,
+        "right": 150.359375,
+        "bottom": 5582.546875,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 danger min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Link",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 158.359375,
+        "y": 5538.546875,
+        "width": 59.71875,
+        "height": 44,
+        "top": 5538.546875,
+        "right": 218.078125,
+        "bottom": 5582.546875,
+        "left": 158.359375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 link min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Icon button",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 226.078125,
+        "y": 5538.546875,
+        "width": 44,
+        "height": 44,
+        "top": 5538.546875,
+        "right": 270.078125,
+        "bottom": 5582.546875,
+        "left": 226.078125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]",
+      "disabled": false
+    },
+    {
+      "name": "Search resources…",
+      "href": null,
+      "role": "INPUT",
+      "rect": {
+        "x": 45,
+        "y": 5916.140625,
+        "width": 260,
+        "height": 44,
+        "top": 5916.140625,
+        "right": 305,
+        "bottom": 5960.140625,
+        "left": 45
+      },
+      "class": "input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed",
+      "disabled": false
+    },
+    {
+      "name": "Multi-line input…",
+      "href": null,
+      "role": "TEXTAREA",
+      "rect": {
+        "x": 45,
+        "y": 5972.140625,
+        "width": 260,
+        "height": 44,
+        "top": 5972.140625,
+        "right": 305,
+        "bottom": 6016.140625,
+        "left": 45
+      },
+      "class": "textarea placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed min-h-[44px] h-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Example switch",
+      "href": null,
+      "role": "switch",
+      "rect": {
+        "x": 45,
+        "y": 6038.140625,
+        "width": 44,
+        "height": 24,
+        "top": 6038.140625,
+        "right": 89,
+        "bottom": 6062.140625,
+        "left": 45
+      },
+      "class": "peer inline-flex h-6 w-11 shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+      "disabled": false
+    },
+    {
+      "name": "Example checkbox",
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 6098.140625,
+        "width": 16,
+        "height": 16,
+        "top": 6098.140625,
+        "right": 61,
+        "bottom": 6114.140625,
+        "left": 45
+      },
+      "class": "peer h-4 w-4 shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      "disabled": false
+    },
+    {
+      "name": "Tokens",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 45,
+        "y": 6176.140625,
+        "width": 76.765625,
+        "height": 44,
+        "top": 6176.140625,
+        "right": 121.765625,
+        "bottom": 6220.140625,
+        "left": 45
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active",
+      "disabled": false
+    },
+    {
+      "name": "Skins",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 121.765625,
+        "y": 6176.140625,
+        "width": 65.765625,
+        "height": 44,
+        "top": 6176.140625,
+        "right": 187.53125,
+        "bottom": 6220.140625,
+        "left": 121.765625
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50",
+      "disabled": false
+    },
+    {
+      "name": "Bridge",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 187.53125,
+        "y": 6176.140625,
+        "width": 72.671875,
+        "height": 44,
+        "top": 6176.140625,
+        "right": 260.203125,
+        "bottom": 6220.140625,
+        "left": 187.53125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50",
+      "disabled": false
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 7060.640625,
+        "width": 195.046875,
+        "height": 44,
+        "top": 7060.640625,
+        "right": 215.046875,
+        "bottom": 7104.640625,
+        "left": 20
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7251.109375,
+        "width": 143,
+        "height": 44,
+        "top": 7251.109375,
+        "right": 330,
+        "bottom": 7295.109375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7279.921875,
+        "width": 143,
+        "height": 44,
+        "top": 7279.921875,
+        "right": 330,
+        "bottom": 7323.921875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7308.734375,
+        "width": 143,
+        "height": 44,
+        "top": 7308.734375,
+        "right": 330,
+        "bottom": 7352.734375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7337.546875,
+        "width": 143,
+        "height": 44,
+        "top": 7337.546875,
+        "right": 330,
+        "bottom": 7381.546875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7366.359375,
+        "width": 143,
+        "height": 44,
+        "top": 7366.359375,
+        "right": 330,
+        "bottom": 7410.359375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7395.171875,
+        "width": 143,
+        "height": 44,
+        "top": 7395.171875,
+        "right": 330,
+        "bottom": 7439.171875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7423.984375,
+        "width": 143,
+        "height": 44,
+        "top": 7423.984375,
+        "right": 330,
+        "bottom": 7467.984375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7452.796875,
+        "width": 143,
+        "height": 44,
+        "top": 7452.796875,
+        "right": 330,
+        "bottom": 7496.796875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 7481.609375,
+        "width": 143,
+        "height": 44,
+        "top": 7481.609375,
+        "right": 330,
+        "bottom": 7525.609375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 7580.015625,
+        "width": 258.734375,
+        "height": 44,
+        "top": 7580.015625,
+        "right": 278.734375,
+        "bottom": 7624.015625,
+        "left": 20
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 98.359375,
+        "y": 7636.015625,
+        "width": 73,
+        "height": 24,
+        "top": 7636.015625,
+        "right": 171.359375,
+        "bottom": 7660.015625,
+        "left": 98.359375
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 7690.40625,
+        "width": 310,
+        "height": 44,
+        "top": 7690.40625,
+        "right": 330,
+        "bottom": 7734.40625,
+        "left": 20
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 7811.40625,
+        "width": 44,
+        "height": 44,
+        "top": 7811.40625,
+        "right": 64,
+        "bottom": 7855.40625,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 78,
+        "y": 7811.40625,
+        "width": 44,
+        "height": 44,
+        "top": 7811.40625,
+        "right": 122,
+        "bottom": 7855.40625,
+        "left": 78
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 136,
+        "y": 7811.40625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 7811.40625,
+        "right": 184.515625,
+        "bottom": 7855.40625,
+        "left": 136
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 198.515625,
+        "y": 7811.40625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 7811.40625,
+        "right": 247.03125,
+        "bottom": 7855.40625,
+        "left": 198.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 7855.40625,
+        "width": 103.953125,
+        "height": 44,
+        "top": 7855.40625,
+        "right": 123.953125,
+        "bottom": 7899.40625,
+        "left": 20
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 137.953125,
+        "y": 7855.40625,
+        "width": 55.46875,
+        "height": 44,
+        "top": 7855.40625,
+        "right": 193.421875,
+        "bottom": 7899.40625,
+        "left": 137.953125
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 207.421875,
+        "y": 7855.40625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 7855.40625,
+        "right": 255.9375,
+        "bottom": 7899.40625,
+        "left": 207.421875
+      },
+      "class": ""
+    }
+  ],
+  "network": [
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/DesignSystemShowcase-DVC6kBze.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tabs-D1zzd93y.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/switch-Dn5unf1k.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/arrow-left-DEdDATMn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sliders-horizontal-DttIcMM2.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    }
+  ]
+}

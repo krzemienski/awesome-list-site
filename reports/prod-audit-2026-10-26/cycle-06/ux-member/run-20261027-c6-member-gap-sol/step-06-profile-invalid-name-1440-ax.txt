@@ -1,0 +1,677 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic:
+              - text: Search
+              - generic: 3,826 resources…
+            - generic: ⌘K
+          - navigation:
+            - link:
+              - /url: /categories
+              - text: Browse
+            - link:
+              - /url: /submit
+              - text: Submit
+            - link:
+              - /url: /about
+              - text: About
+            - link:
+              - /url: /design-system
+              - text: Docs ↗
+            - link:
+              - /url: /admin
+              - text: Admin
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: AU
+                    - generic:
+                      - generic: // Profile
+                      - heading [level=1]:
+                        - generic: Admin User
+                        - button:
+                          - img
+                      - generic:
+                        - generic:
+                          - img
+                          - generic: admin@example.com
+                        - generic:
+                          - img
+                          - text: Joined 11 months ago
+                        - generic: beginner
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: Sign out
+                      - button:
+                        - img
+                        - text: Sign out all devices
+                  - generic:
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: "2"
+                          - paragraph: Favorites
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: "12"
+                          - paragraph: Bookmarks
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: 1d
+                          - paragraph: Learning Streak
+                          - paragraph: Consecutive days signed in
+                    - article:
+                      - generic:
+                        - img
+                        - generic:
+                          - paragraph: "1"
+                          - paragraph: Journeys Completed
+                          - paragraph: Learning journeys finished
+                  - generic:
+                    - tablist:
+                      - tab [selected]: Overview
+                      - tab: Favorites
+                      - tab: Bookmarks
+                      - tab: Submissions
+                      - tab: Security
+                    - tabpanel:
+                      - article:
+                        - generic:
+                          - generic:
+                            - img
+                            - text: Learning Progress
+                          - generic: Track your learning journey and achievements
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Journeys Completed
+                                - generic: 1 completed of 5 started
+                            - generic:
+                              - paragraph: Current Learning Path
+                              - paragraph: Advanced Live Streaming Architecture
+                            - generic:
+                              - img
+                              - generic: "Estimated learning time across your journeys: 23h 30m"
+                      - article:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - paragraph: // Your learning
+                              - generic:
+                                - img
+                                - text: Continue Learning
+                            - link:
+                              - /url: /continue-learning
+                              - text: View dashboard
+                              - img
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Advanced Live Streaming Architecture
+                                - generic:
+                                  - img
+                                  - text: about 2 hours ago
+                              - paragraph: "Next: Live Streaming Fundamentals"
+                              - generic:
+                                - progressbar
+                                - generic: 0%
+                            - button:
+                              - img
+                              - text: Resume
+                      - generic:
+                        - generic:
+                          - article:
+                            - generic:
+                              - generic:
+                                - img
+                                - text: Personalized Recommendations
+                              - generic: Account preferences, learning activity, and your feedback shape these picks.
+                          - article:
+                            - generic:
+                              - generic: Using your saved learning profile
+                              - generic: These results use your saved topics, goals, formats, skill level, and available time.
+                            - generic:
+                              - generic:
+                                - generic: beginner
+                                - generic: Encoding & Codecs
+                                - generic: Learn the fundamentals
+                                - generic: Videos
+                                - generic: Whenever time allows
+                              - generic:
+                                - link:
+                                  - /url: /settings#learning-preferences
+                                  - text: Edit learning preferences
+                                - button:
+                                  - img
+                                  - text: Refresh recommendations
+                          - generic:
+                            - generic:
+                              - heading [level=2]:
+                                - img
+                                - text: Your personalized recommendations
+                              - paragraph: 9 resources selected from real profile and catalog signals.
+                            - generic:
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders
+                                    - paragraph: Cross-codec (AV1/HEVC/VVC/AVM/VP9) energy efficiency and compression review across software and hardware decoders.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 95% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Comparative Analysis of Codecs"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/html/2402.09001v1
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: Comparative Evaluation of VVC, HEVC, H.264, AV1, and VP9 Encoders for Low-Delay Video Applications
+                                    - paragraph: IEEE paper benchmarking five codec encoders (VVC, HEVC, H.264, AV1, VP9) specifically for low-delay video applications.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 92% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Comparative Analysis of Codecs"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://ieeexplore.ieee.org/document/9264275/
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: "OpenDCVCs: Reproducible PyTorch Reimplementation of the DCVC Codec Series"
+                                    - paragraph: Independent open reimplementation with training+eval code of the whole Microsoft DCVC learned video codec family (prior official releases were eval-only).
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 89% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Open Source Encoder Projects"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/pdf/2508.04491
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: "OpenHardwareVC: Open-Source Library for 8K UHD Hardware (AVS3)"
+                                    - paragraph: ACM paper presenting an open-source hardware library targeting 8K UHD AVS3 chip design for video coding.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 89% · High
+                                    - generic:
+                                      - img
+                                      - text: Rule ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Hardware Codecs & Acceleration"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://dl.acm.org/doi/pdf/10.1145/3503161.3548543
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: Content-Driven Frame-Level Bit Prediction for Rate Control in Versatile Video Coding
+                                    - paragraph: Academic paper on frame-level rate control for VVC, building on VVenC rate-capping for real-time-oriented bit allocation.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 89% · High
+                                    - generic:
+                                      - img
+                                      - text: Rule ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Real-Time Encoding Solutions"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/pdf/2602.06242
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: PyTorchVideoCompression
+                                    - paragraph: PyTorch implementations of learned video compression methods (DVC, FVC, DCVC and related neural codecs) with training and inference code used as a common research baseline.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 88% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Next-Generation Codecs AV1 VVC"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://github.com/ZhihaoHu/PyTorchVideoCompression
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: "MLVC: Multi-platform Learned Video Codec for Real-World Deployment"
+                                    - paragraph: Academic paper on a neural video codec targeting competitive compression, real-time speed, and cross-platform (Apple/Intel/Qualcomm NPU) inference.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 86% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Comparative Analysis of Codecs"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/abs/2606.28027
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: "Cool-chic: Coordinate-based Low Complexity Hierarchical Image/Video Codec"
+                                    - paragraph: Ultra-low-complexity overfitted/coordinate-based learned video codec using ~800 parameters, with companion open-source implementation.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 85% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Open Source Encoder Projects"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/pdf/2402.03179
+                                      - img
+                                      - text: View resource
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - heading [level=3]: Evaluation of Hardware-based Video Encoders on Modern GPUs for UHD Live-Streaming
+                                    - paragraph: Academic evaluation of NVIDIA/Intel GPU and Snapdragon hardware video encoders for UHD live-streaming applications.
+                                  - generic:
+                                    - generic: Encoding & Codecs
+                                    - generic:
+                                      - img
+                                      - text: 82% · High
+                                    - generic:
+                                      - img
+                                      - text: AI ranked
+                                  - group:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Why this?
+                                  - generic:
+                                    - generic: "#Hardware Codecs & Acceleration"
+                                  - generic:
+                                    - generic:
+                                      - paragraph: Shape future recommendations
+                                      - generic:
+                                        - group:
+                                          - button:
+                                            - img
+                                            - text: Helpful
+                                          - button:
+                                            - img
+                                            - text: Not for me
+                                          - button:
+                                            - img
+                                            - text: Already know this
+                                          - button:
+                                            - img
+                                            - text: Hide
+                                    - link:
+                                      - /url: https://arxiv.org/abs/2511.18686
+                                      - img
+                                      - text: View resource
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 3,826
+                  - paragraph:
+                    - text: 9 categories 99 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+                  - generic:
+                    - button:
+                      - img
+                      - text: Contact maintainers
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - button: Cookie settings
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+  - dialog "Edit display name" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Edit display name" [level=2] [ref=e4]
+      - paragraph [ref=e5]: This is the name shown on your profile. Enter at least a first or last name.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: First name
+        - textbox "First name" [invalid] [ref=e8]
+      - generic [ref=e9]:
+        - text: Last name
+        - textbox "Last name" [invalid] [ref=e10]
+      - alert [ref=e11]: Enter at least a first or last name.
+      - generic [ref=e12]:
+        - button "Cancel" [ref=e13] [cursor=pointer]
+        - button "Save" [active] [ref=e14] [cursor=pointer]
+    - button "Close" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - generic [ref=e19]: Close

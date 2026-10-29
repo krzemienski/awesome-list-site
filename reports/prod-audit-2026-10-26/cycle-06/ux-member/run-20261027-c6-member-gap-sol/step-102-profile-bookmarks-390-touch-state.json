@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/profile?tab=bookmarks",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 389,
+  "active": "<button type=\"button\" role=\"tab\" aria-selected=\"true\" aria-controls=\"radix-:rk:-content-bookmarks\" data-state=\"active\" id=\"radix-:rk:-trigger-bookmarks\" class=\"tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active\" tabindex=\"0\" data-orientation=\"horizontal\" data-radix-collection-item=\"\">Bookmarks</button>",
+  "umami": "1",
+  "consent": "denied"
+}

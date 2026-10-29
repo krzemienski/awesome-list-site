@@ -1,0 +1,142 @@
+[
+  {
+    "label": "View details for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "rect": {
+      "x": 341,
+      "y": 544.515625,
+      "width": 32,
+      "height": 32,
+      "top": 544.515625,
+      "right": 373,
+      "bottom": 576.515625,
+      "left": 341
+    },
+    "visible": true
+  },
+  {
+    "label": "Show 2 more tags",
+    "rect": {
+      "x": 379,
+      "y": 544.515625,
+      "width": 61.65625,
+      "height": 32,
+      "top": 544.515625,
+      "right": 440.65625,
+      "bottom": 576.515625,
+      "left": 379
+    },
+    "visible": true
+  },
+  {
+    "label": "Open LinkMediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)",
+    "rect": {
+      "x": 446.65625,
+      "y": 538.515625,
+      "width": 44,
+      "height": 32,
+      "top": 538.515625,
+      "right": 490.65625,
+      "bottom": 570.515625,
+      "left": 446.65625
+    },
+    "visible": true
+  },
+  {
+    "label": "Suggest an edit: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "rect": {
+      "x": 498.65625,
+      "y": 538.515625,
+      "width": 44,
+      "height": 44,
+      "top": 538.515625,
+      "right": 542.65625,
+      "bottom": 582.515625,
+      "left": 498.65625
+    },
+    "visible": true
+  },
+  {
+    "label": "Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "rect": {
+      "x": 547.65625,
+      "y": 490.515625,
+      "width": 44,
+      "height": 44,
+      "top": 490.515625,
+      "right": 591.65625,
+      "bottom": 534.515625,
+      "left": 547.65625
+    },
+    "visible": true
+  },
+  {
+    "label": "Add bookmark: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "rect": {
+      "x": 595.65625,
+      "y": 490.515625,
+      "width": 44,
+      "height": 44,
+      "top": 490.515625,
+      "right": 639.65625,
+      "bottom": 534.515625,
+      "left": 595.65625
+    },
+    "visible": true
+  },
+  {
+    "label": "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "rect": {
+      "x": 341,
+      "y": 592.515625,
+      "width": 298.65625,
+      "height": 41.59375,
+      "top": 592.515625,
+      "right": 639.65625,
+      "bottom": 634.109375,
+      "left": 341
+    },
+    "visible": true
+  },
+  {
+    "label": "Browse resources tagged hls",
+    "rect": {
+      "x": 341,
+      "y": 872.84375,
+      "width": 49.609375,
+      "height": 26.796875,
+      "top": 872.84375,
+      "right": 390.609375,
+      "bottom": 899.640625,
+      "left": 341
+    },
+    "visible": true
+  },
+  {
+    "label": "Browse resources tagged rtmp",
+    "rect": {
+      "x": 396.609375,
+      "y": 872.84375,
+      "width": 56.515625,
+      "height": 26.796875,
+      "top": 872.84375,
+      "right": 453.125,
+      "bottom": 899.640625,
+      "left": 396.609375
+    },
+    "visible": true
+  },
+  {
+    "label": "Browse resources tagged rtsp",
+    "rect": {
+      "x": 459.125,
+      "y": 872.84375,
+      "width": 56.515625,
+      "height": 26.796875,
+      "top": 872.84375,
+      "right": 515.640625,
+      "bottom": 899.640625,
+      "left": 459.125
+    },
+    "visible": true
+  }
+]

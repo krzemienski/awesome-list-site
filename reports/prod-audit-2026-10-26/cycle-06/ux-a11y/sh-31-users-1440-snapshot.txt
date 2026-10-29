@@ -1,0 +1,318 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e37]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [selected, ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Users" [ref=e17] focusable [tabindex]
+            - generic
+              - sectionheader
+                - heading "Users (133)" [level=2, ref=e39]
+                - paragraph
+                  - StaticText "Admins and contributors"
+                - button "Row actions" [expanded=false, ref=e40]
+                - generic
+                  - image
+                  - textbox "Search users by email or name" [ref=e43]
+                - link "Export CSV" [ref=e41]
+                  - image
+                  - StaticText "Export CSV"
+                - button "Invite unavailable" [disabled, ref=e42]
+                  - image
+                  - StaticText "Invite unavailable"
+              - region "Users table, scrollable" [ref=e44] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "Sort by Name" [ref=e145]
+                        - button "Sort by Name" [ref=e170]
+                          - StaticText "NAME"
+                      - columnheader "Sort by Email" [ref=e146]
+                        - button "Sort by Email" [ref=e171]
+                          - StaticText "EMAIL"
+                      - columnheader "Sort by Role" [ref=e147]
+                        - button "Sort by Role" [ref=e172]
+                          - StaticText "ROLE"
+                      - columnheader "Sort by Joined" [ref=e148]
+                        - button "Sort by Joined" [ref=e173]
+                          - StaticText "JOINED"
+                      - columnheader "Actions" [ref=e149]
+                  - row
+                    - cell "m•••@gmail.com" [ref=e45]
+                      - StaticText "m•••@gmail.com"
+                    - cell "m•••@gmail.com" [ref=e46]
+                      - StaticText "m•••@gmail.com"
+                    - cell "USER" [ref=e47]
+                    - cell "Oct 26, 2026" [ref=e48]
+                    - cell "Edit role for m•••@gmail.com" [ref=e49]
+                      - button "Edit role for m•••@gmail.com" [ref=e150]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Oghenejivwe" [ref=e50]
+                      - StaticText "Oghenejivwe"
+                    - cell "j•••@gmail.com" [ref=e51]
+                      - StaticText "j•••@gmail.com"
+                    - cell "USER" [ref=e52]
+                    - cell "Oct 24, 2026" [ref=e53]
+                    - cell "Edit role for Oghenejivwe" [ref=e54]
+                      - button "Edit role for Oghenejivwe" [ref=e151]
+                        - StaticText "Edit"
+                  - row
+                    - cell "aarthi priya" [ref=e55]
+                      - StaticText "aarthi priya"
+                    - cell "a•••@gmail.com" [ref=e56]
+                      - StaticText "a•••@gmail.com"
+                    - cell "USER" [ref=e57]
+                    - cell "Oct 22, 2026" [ref=e58]
+                    - cell "Edit role for aarthi priya" [ref=e59]
+                      - button "Edit role for aarthi priya" [ref=e152]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Frank Brown" [ref=e60]
+                      - StaticText "Frank Brown"
+                    - cell "f•••@gmail.com" [ref=e61]
+                      - StaticText "f•••@gmail.com"
+                    - cell "USER" [ref=e62]
+                    - cell "Oct 21, 2026" [ref=e63]
+                    - cell "Edit role for Frank Brown" [ref=e64]
+                      - button "Edit role for Frank Brown" [ref=e153]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Sumit Das" [ref=e65]
+                      - StaticText "Sumit Das"
+                    - cell "s•••@gmail.com" [ref=e66]
+                      - StaticText "s•••@gmail.com"
+                    - cell "USER" [ref=e67]
+                    - cell "Oct 20, 2026" [ref=e68]
+                    - cell "Edit role for Sumit Das" [ref=e69]
+                      - button "Edit role for Sumit Das" [ref=e154]
+                        - StaticText "Edit"
+                  - row
+                    - cell "s1" [ref=e70]
+                      - StaticText "s1"
+                    - cell "o•••@gmail.com" [ref=e71]
+                      - StaticText "o•••@gmail.com"
+                    - cell "USER" [ref=e72]
+                    - cell "Oct 19, 2026" [ref=e73]
+                    - cell "Edit role for s1" [ref=e74]
+                      - button "Edit role for s1" [ref=e155]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Vasilios Vikatos" [ref=e75]
+                      - StaticText "Vasilios Vikatos"
+                    - cell "v•••@gmail.com" [ref=e76]
+                      - StaticText "v•••@gmail.com"
+                    - cell "USER" [ref=e77]
+                    - cell "Oct 18, 2026" [ref=e78]
+                    - cell "Edit role for Vasilios Vikatos" [ref=e79]
+                      - button "Edit role for Vasilios Vikatos" [ref=e156]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Mohamed Fouad" [ref=e80]
+                      - StaticText "Mohamed Fouad"
+                    - cell "d•••@gmail.com" [ref=e81]
+                      - StaticText "d•••@gmail.com"
+                    - cell "USER" [ref=e82]
+                    - cell "Oct 17, 2026" [ref=e83]
+                    - cell "Edit role for Mohamed Fouad" [ref=e84]
+                      - button "Edit role for Mohamed Fouad" [ref=e157]
+                        - StaticText "Edit"
+                  - row
+                    - cell "SANTHOSH GUNTUPALLI" [ref=e85]
+                      - StaticText "SANTHOSH GUNTUPALLI"
+                    - cell "s•••@gmail.com" [ref=e86]
+                      - StaticText "s•••@gmail.com"
+                    - cell "USER" [ref=e87]
+                    - cell "Oct 15, 2026" [ref=e88]
+                    - cell "Edit role for SANTHOSH GUNTUPALLI" [ref=e89]
+                      - button "Edit role for SANTHOSH GUNTUPALLI" [ref=e158]
+                        - StaticText "Edit"
+                  - row
+                    - cell "canlıdinle" [ref=e90]
+                      - StaticText "canlıdinle"
+                    - cell "c•••@gmail.com" [ref=e91]
+                      - StaticText "c•••@gmail.com"
+                    - cell "USER" [ref=e92]
+                    - cell "Oct 14, 2026" [ref=e93]
+                    - cell "Edit role for canlıdinle" [ref=e94]
+                      - button "Edit role for canlıdinle" [ref=e159]
+                        - StaticText "Edit"
+                  - row
+                    - cell "James McKillop" [ref=e95]
+                      - StaticText "James McKillop"
+                    - cell "j•••@gmail.com" [ref=e96]
+                      - StaticText "j•••@gmail.com"
+                    - cell "USER" [ref=e97]
+                    - cell "Oct 11, 2026" [ref=e98]
+                    - cell "Edit role for James McKillop" [ref=e99]
+                      - button "Edit role for James McKillop" [ref=e160]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Lucas" [ref=e100]
+                      - StaticText "Lucas"
+                    - cell "l•••@yandex.com" [ref=e101]
+                      - StaticText "l•••@yandex.com"
+                    - cell "USER" [ref=e102]
+                    - cell "Oct 11, 2026" [ref=e103]
+                    - cell "Edit role for Lucas" [ref=e104]
+                      - button "Edit role for Lucas" [ref=e161]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Eungoo Jung" [ref=e105]
+                      - StaticText "Eungoo Jung"
+                    - cell "a•••@gmail.com" [ref=e106]
+                      - StaticText "a•••@gmail.com"
+                    - cell "USER" [ref=e107]
+                    - cell "Oct 10, 2026" [ref=e108]
+                    - cell "Edit role for Eungoo Jung" [ref=e109]
+                      - button "Edit role for Eungoo Jung" [ref=e162]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Wranker Seo" [ref=e110]
+                      - StaticText "Wranker Seo"
+                    - cell "w•••@gmail.com" [ref=e111]
+                      - StaticText "w•••@gmail.com"
+                    - cell "USER" [ref=e112]
+                    - cell "Oct 10, 2026" [ref=e113]
+                    - cell "Edit role for Wranker Seo" [ref=e114]
+                      - button "Edit role for Wranker Seo" [ref=e163]
+                        - StaticText "Edit"
+                  - row
+                    - cell "s•••@chatgptimage.app" [ref=e115]
+                      - StaticText "s•••@chatgptimage.app"
+                    - cell "s•••@chatgptimage.app" [ref=e116]
+                      - StaticText "s•••@chatgptimage.app"
+                    - cell "USER" [ref=e117]
+                    - cell "Oct 9, 2026" [ref=e118]
+                    - cell "Edit role for s•••@chatgptimage.app" [ref=e119]
+                      - button "Edit role for s•••@chatgptimage.app" [ref=e164]
+                        - StaticText "Edit"
+                  - row
+                    - cell "scandylau" [ref=e120]
+                      - StaticText "scandylau"
+                    - cell "s•••@gmail.com" [ref=e121]
+                      - StaticText "s•••@gmail.com"
+                    - cell "USER" [ref=e122]
+                    - cell "Sep 30, 2026" [ref=e123]
+                    - cell "Edit role for scandylau" [ref=e124]
+                      - button "Edit role for scandylau" [ref=e165]
+                        - StaticText "Edit"
+                  - row
+                    - cell "CF Audit" [ref=e125]
+                      - StaticText "CF Audit"
+                    - cell "c•••@awesome.video" [ref=e126]
+                      - StaticText "c•••@awesome.video"
+                    - cell "ADMIN" [ref=e127]
+                    - cell "Sep 29, 2026" [ref=e128]
+                    - cell "Edit role for CF Audit" [ref=e129]
+                      - button "Edit role for CF Audit" [ref=e166]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Alexander Wagner" [ref=e130]
+                      - StaticText "Alexander Wagner"
+                    - cell "i•••@alexanderwagnerdev.com" [ref=e131]
+                      - StaticText "i•••@alexanderwagnerdev.com"
+                    - cell "USER" [ref=e132]
+                    - cell "Sep 29, 2026" [ref=e133]
+                    - cell "Edit role for Alexander Wagner" [ref=e134]
+                      - button "Edit role for Alexander Wagner" [ref=e167]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Valdo Zichar" [ref=e135]
+                      - StaticText "Valdo Zichar"
+                    - cell "v•••@gmail.com" [ref=e136]
+                      - StaticText "v•••@gmail.com"
+                    - cell "USER" [ref=e137]
+                    - cell "Sep 28, 2026" [ref=e138]
+                    - cell "Edit role for Valdo Zichar" [ref=e139]
+                      - button "Edit role for Valdo Zichar" [ref=e168]
+                        - StaticText "Edit"
+                  - row
+                    - cell "Luiz Alves" [ref=e140]
+                      - StaticText "Luiz Alves"
+                    - cell "s•••@gmail.com" [ref=e141]
+                      - StaticText "s•••@gmail.com"
+                    - cell "USER" [ref=e142]
+                    - cell "Sep 26, 2026" [ref=e143]
+                    - cell "Edit role for Luiz Alves" [ref=e144]
+                      - button "Edit role for Luiz Alves" [ref=e169]
+                        - StaticText "Edit"
+              - StaticText "Page "
+              - StaticText "1"
+              - StaticText " of "
+              - StaticText "7"
+              - button "Previous page" [disabled, ref=e35]
+              - button "Next page" [ref=e36]

@@ -1,0 +1,874 @@
+{
+  "url": "https://awesome.video/resource/185310",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<h1 class=\"page-title\" data-testid=\"text-resource-title\" data-route-focus=\"\" tabindex=\"-1\">VCT (Video Converter &amp; Transcoder)</h1>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Show 1 hidden breadcrumb level",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 112.234375,
+        "y": 107,
+        "width": 20,
+        "height": 20,
+        "top": 107,
+        "right": 132.234375,
+        "bottom": 127,
+        "left": 112.234375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] relative !size-5 !min-h-5 !min-w-5 !p-0 before:absolute before:-inset-0.5 before:content-['']",
+      "disabled": false
+    },
+    {
+      "name": "Back",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": 108,
+        "width": 84.703125,
+        "height": 44,
+        "top": 108,
+        "right": 124.703125,
+        "bottom": 152,
+        "left": 40
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 gap-2",
+      "disabled": false
+    },
+    {
+      "name": "◇\nENCODING & CODECS",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 40,
+        "y": 302.65625,
+        "width": 152.234375,
+        "height": 44,
+        "top": 302.65625,
+        "right": 192.234375,
+        "bottom": 346.65625,
+        "left": 40
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "View on GitHub",
+      "role": "A",
+      "href": "https://github.com/zbabac/VCT",
+      "rect": {
+        "x": 40,
+        "y": 572.65625,
+        "width": 155.203125,
+        "height": 44,
+        "top": 572.65625,
+        "right": 195.203125,
+        "bottom": 616.65625,
+        "left": 40
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]"
+    },
+    {
+      "name": "Favorite",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 203.203125,
+        "y": 572.65625,
+        "width": 115.96875,
+        "height": 44,
+        "top": 572.65625,
+        "right": 319.171875,
+        "bottom": 616.65625,
+        "left": 203.203125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-[44px] px-4",
+      "disabled": false
+    },
+    {
+      "name": "Add bookmark",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 327.171875,
+        "y": 572.65625,
+        "width": 128.953125,
+        "height": 44,
+        "top": 572.65625,
+        "right": 456.125,
+        "bottom": 616.65625,
+        "left": 327.171875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-[44px] px-4",
+      "disabled": false
+    },
+    {
+      "name": "Share this resource",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 464.125,
+        "y": 572.65625,
+        "width": 102.015625,
+        "height": 44,
+        "top": 572.65625,
+        "right": 566.140625,
+        "bottom": 616.65625,
+        "left": 464.125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-[44px] px-4",
+      "disabled": false
+    },
+    {
+      "name": "Suggest Edit",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 574.140625,
+        "y": 572.65625,
+        "width": 144.4375,
+        "height": 44,
+        "top": 572.65625,
+        "right": 718.578125,
+        "bottom": 616.65625,
+        "left": 574.140625
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-[44px] px-4",
+      "disabled": false
+    },
+    {
+      "name": "Report broken link",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": 624.65625,
+        "width": 179.109375,
+        "height": 44,
+        "top": 624.65625,
+        "right": 219.109375,
+        "bottom": 668.65625,
+        "left": 40
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-[44px] px-4",
+      "disabled": false
+    },
+    {
+      "name": "Search all resources",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 749.65625,
+        "width": 664,
+        "height": 44,
+        "top": 749.65625,
+        "right": 729,
+        "bottom": 793.65625,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 gap-2 w-full",
+      "disabled": false
+    },
+    {
+      "name": "View all in Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 65,
+        "y": 835.25,
+        "width": 664,
+        "height": 44,
+        "top": 835.25,
+        "right": 729,
+        "bottom": 879.25,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 w-full"
+    },
+    {
+      "name": "#VIDEO CONVERSION",
+      "role": "A",
+      "href": "/tag/video-conversion",
+      "rect": {
+        "x": 65,
+        "y": 920.84375,
+        "width": 139.3125,
+        "height": 44,
+        "top": 920.84375,
+        "right": 204.3125,
+        "bottom": 964.84375,
+        "left": 65
+      },
+      "class": "resource-detail-onward-tag"
+    },
+    {
+      "name": "#TRANSCODING",
+      "role": "A",
+      "href": "/tag/transcoding",
+      "rect": {
+        "x": 212.3125,
+        "y": 920.84375,
+        "width": 104.8125,
+        "height": 44,
+        "top": 920.84375,
+        "right": 317.125,
+        "bottom": 964.84375,
+        "left": 212.3125
+      },
+      "class": "resource-detail-onward-tag"
+    },
+    {
+      "name": "#FFMPEG FRONTEND",
+      "role": "A",
+      "href": "/tag/ffmpeg-frontend",
+      "rect": {
+        "x": 325.125,
+        "y": 920.84375,
+        "width": 132.40625,
+        "height": 44,
+        "top": 920.84375,
+        "right": 457.53125,
+        "bottom": 964.84375,
+        "left": 325.125
+      },
+      "class": "resource-detail-onward-tag"
+    },
+    {
+      "name": "#BATCH PROCESSING",
+      "role": "A",
+      "href": "/tag/batch-processing",
+      "rect": {
+        "x": 465.53125,
+        "y": 920.84375,
+        "width": 139.3125,
+        "height": 44,
+        "top": 920.84375,
+        "right": 604.84375,
+        "bottom": 964.84375,
+        "left": 465.53125
+      },
+      "class": "resource-detail-onward-tag"
+    },
+    {
+      "name": "#NETWORK STREAM RECORDING",
+      "role": "A",
+      "href": "/tag/network-stream-recording",
+      "rect": {
+        "x": 65,
+        "y": 964.84375,
+        "width": 194.515625,
+        "height": 44,
+        "top": 964.84375,
+        "right": 259.515625,
+        "bottom": 1008.84375,
+        "left": 65
+      },
+      "class": "resource-detail-onward-tag"
+    },
+    {
+      "name": "auto-transcode-watcher\n25% MATCH\n\nPython+watchdog+FFmpeg folder watcher with file stabilization, retry queue, rename templates, and YAML config.\n\nWhy recommended:\n2 shared keywords",
+      "role": "A",
+      "href": "/resource/190128",
+      "rect": {
+        "x": 65,
+        "y": 1150.84375,
+        "width": 664,
+        "height": 100,
+        "top": 1150.84375,
+        "right": 729,
+        "bottom": 1250.84375,
+        "left": 65
+      },
+      "class": "resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+    },
+    {
+      "name": "Refract\n25% MATCH\n\nGuided AVIF/JPEG XL/WebP conversion tool using an iterative quality-search (\"optometrist\") approach.\n\nWhy recommended:\n2 shared keywords",
+      "role": "A",
+      "href": "/resource/190120",
+      "rect": {
+        "x": 65,
+        "y": 1258.84375,
+        "width": 664,
+        "height": 100,
+        "top": 1258.84375,
+        "right": 729,
+        "bottom": 1358.84375,
+        "left": 65
+      },
+      "class": "resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+    },
+    {
+      "name": "distributed-transcoder\n25% MATCH\n\nDistributed video transcoding system using RabbitMQ job distribution, GStreamer transcoding, and MinIO storage with FastAPI/React interface.\n\nWhy recommended:\n2 shared keywords",
+      "role": "A",
+      "href": "/resource/190087",
+      "rect": {
+        "x": 65,
+        "y": 1366.84375,
+        "width": 664,
+        "height": 100,
+        "top": 1366.84375,
+        "right": 729,
+        "bottom": 1466.84375,
+        "left": 65
+      },
+      "class": "resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+    },
+    {
+      "name": "hevc.js\n25% MATCH\n\nHEVC decoder in WASM transcribed directly from the H.265 spec, pixel-validated against ffmpeg on 128 streams; ships as a dash.js drop-in plugin.\n\nWhy recommended:\n2 shared keywords",
+      "role": "A",
+      "href": "/resource/189922",
+      "rect": {
+        "x": 65,
+        "y": 1474.84375,
+        "width": 664,
+        "height": 100,
+        "top": 1474.84375,
+        "right": 729,
+        "bottom": 1574.84375,
+        "left": 65
+      },
+      "class": "resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+    },
+    {
+      "name": "drm-video-processing\n25% MATCH\n\nStep-by-step scripts using FFmpeg and Shaka Packager to encrypt/decrypt video with multi-DRM (Widevine/PlayReady/FairPlay), producing CMAF output.\n\nWhy recommended:\n2 shared keywords",
+      "role": "A",
+      "href": "/resource/189770",
+      "rect": {
+        "x": 65,
+        "y": 1582.84375,
+        "width": 664,
+        "height": 100,
+        "top": 1582.84375,
+        "right": 729,
+        "bottom": 1682.84375,
+        "left": 65
+      },
+      "class": "resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+    },
+    {
+      "name": "https://github.com/zbabac/VCT ↗",
+      "role": "A",
+      "href": "https://github.com/zbabac/VCT",
+      "rect": {
+        "x": 69,
+        "y": 2000.34375,
+        "width": 656,
+        "height": 25.59375,
+        "top": 2000.34375,
+        "right": 725,
+        "bottom": 2025.9375,
+        "left": 69
+      },
+      "class": "text-foreground underline underline-offset-4 hover:opacity-80 break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
+    },
+    {
+      "name": "#VIDEO CONVERSION",
+      "role": "A",
+      "href": "/tag/video-conversion",
+      "rect": {
+        "x": 69,
+        "y": 2127.9375,
+        "width": 139.3125,
+        "height": 44,
+        "top": 2127.9375,
+        "right": 208.3125,
+        "bottom": 2171.9375,
+        "left": 69
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "#TRANSCODING",
+      "role": "A",
+      "href": "/tag/transcoding",
+      "rect": {
+        "x": 216.3125,
+        "y": 2127.9375,
+        "width": 104.8125,
+        "height": 44,
+        "top": 2127.9375,
+        "right": 321.125,
+        "bottom": 2171.9375,
+        "left": 216.3125
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "#FFMPEG FRONTEND",
+      "role": "A",
+      "href": "/tag/ffmpeg-frontend",
+      "rect": {
+        "x": 329.125,
+        "y": 2127.9375,
+        "width": 132.40625,
+        "height": 44,
+        "top": 2127.9375,
+        "right": 461.53125,
+        "bottom": 2171.9375,
+        "left": 329.125
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "#BATCH PROCESSING",
+      "role": "A",
+      "href": "/tag/batch-processing",
+      "rect": {
+        "x": 469.53125,
+        "y": 2127.9375,
+        "width": 139.3125,
+        "height": 44,
+        "top": 2127.9375,
+        "right": 608.84375,
+        "bottom": 2171.9375,
+        "left": 469.53125
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "#NETWORK STREAM RECORDING",
+      "role": "A",
+      "href": "/tag/network-stream-recording",
+      "rect": {
+        "x": 69,
+        "y": 2179.9375,
+        "width": 194.515625,
+        "height": 44,
+        "top": 2179.9375,
+        "right": 263.515625,
+        "bottom": 2223.9375,
+        "left": 69
+      },
+      "class": "resource-detail-chip-link"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 2551.9375,
+        "width": 195.046875,
+        "height": 44,
+        "top": 2551.9375,
+        "right": 235.046875,
+        "bottom": 2595.9375,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 2728.71875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2728.71875,
+        "right": 505.328125,
+        "bottom": 2772.71875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 2757.53125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2757.53125,
+        "right": 505.328125,
+        "bottom": 2801.53125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2786.34375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2786.34375,
+        "right": 505.328125,
+        "bottom": 2830.34375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 2815.15625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2815.15625,
+        "right": 505.328125,
+        "bottom": 2859.15625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 2843.96875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2843.96875,
+        "right": 505.328125,
+        "bottom": 2887.96875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2872.78125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2872.78125,
+        "right": 505.328125,
+        "bottom": 2916.78125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 2901.59375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2901.59375,
+        "right": 505.328125,
+        "bottom": 2945.59375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 2930.40625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2930.40625,
+        "right": 505.328125,
+        "bottom": 2974.40625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 2959.21875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2959.21875,
+        "right": 505.328125,
+        "bottom": 3003.21875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 2740.3125,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 2740.3125,
+        "right": 754,
+        "bottom": 2800.6875,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 2812.6875,
+        "width": 73,
+        "height": 24,
+        "top": 2812.6875,
+        "right": 688.6875,
+        "bottom": 2836.6875,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 2867.078125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2867.078125,
+        "right": 754,
+        "bottom": 2911.078125,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 3084.625,
+        "width": 44,
+        "height": 44,
+        "top": 3084.625,
+        "right": 84,
+        "bottom": 3128.625,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 3084.625,
+        "width": 44,
+        "height": 44,
+        "top": 3084.625,
+        "right": 142,
+        "bottom": 3128.625,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 3084.625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3084.625,
+        "right": 204.515625,
+        "bottom": 3128.625,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 3084.625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3084.625,
+        "right": 267.03125,
+        "bottom": 3128.625,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 3084.625,
+        "width": 103.953125,
+        "height": 44,
+        "top": 3084.625,
+        "right": 384.984375,
+        "bottom": 3128.625,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 3084.625,
+        "width": 55.46875,
+        "height": 44,
+        "top": 3084.625,
+        "right": 454.453125,
+        "bottom": 3128.625,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 3084.625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3084.625,
+        "right": 516.96875,
+        "bottom": 3128.625,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

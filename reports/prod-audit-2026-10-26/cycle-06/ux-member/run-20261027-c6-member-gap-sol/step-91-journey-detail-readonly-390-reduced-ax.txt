@@ -1,0 +1,405 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - generic [ref=e23]:
+        - main [ref=e24]:
+          - generic [ref=e25]:
+            - navigation "Breadcrumb" [ref=e26]:
+              - list [ref=e27]:
+                - listitem [ref=e28]:
+                  - link "Home" [ref=e29] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e30]:
+                  - img [ref=e31]
+                - listitem [ref=e33]:
+                  - link "Learning Journeys" [ref=e34] [cursor=pointer]:
+                    - /url: /journeys
+                - listitem [ref=e35]:
+                  - img [ref=e36]
+                - listitem:
+                  - link "Advanced Live Streaming Architecture" [disabled]
+            - generic [ref=e38]:
+              - button "Back to Journeys" [ref=e39] [cursor=pointer]:
+                - img
+                - text: Back to Journeys
+              - article [ref=e40]:
+                - generic [ref=e41]:
+                  - generic [ref=e42]:
+                    - img [ref=e43]
+                    - generic [ref=e46]:
+                      - img [ref=e47]
+                      - text: advanced
+                  - heading "Advanced Live Streaming Architecture" [active] [level=1] [ref=e50]
+                  - generic [ref=e51]: "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+                - generic [ref=e52]:
+                  - generic [ref=e53]:
+                    - generic [ref=e54]:
+                      - img [ref=e55]
+                      - text: 20-25 hours
+                    - generic [ref=e58]: Protocols & Transport
+                    - generic [ref=e59]: 6 steps
+                  - generic [ref=e60]:
+                    - generic [ref=e61]:
+                      - heading "Your Progress" [level=2] [ref=e62]
+                      - generic [ref=e63]: 0%
+                    - 'progressbar "Advanced Live Streaming Architecture progress: 0%" [ref=e64]'
+                    - paragraph [ref=e66]: 0 of 6 steps completed
+              - generic [ref=e67]:
+                - heading "Learning Path" [level=2] [ref=e68]
+                - article [ref=e69]:
+                  - generic [ref=e71]:
+                    - generic [ref=e72]: "1"
+                    - generic [ref=e73]:
+                      - generic [ref=e75]:
+                        - heading "Live Streaming Fundamentals" [level=3] [ref=e76]
+                        - paragraph [ref=e77]: "Review the live-streaming pipeline end-to-end: contribution, transcoding, packaging, distribution and playback timing budgets."
+                      - generic [ref=e78]:
+                        - generic [ref=e79]:
+                          - generic [ref=e80]:
+                            - 'link "Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT" [ref=e81] [cursor=pointer]':
+                              - /url: /resource/184986
+                              - img [ref=e82]
+                              - 'generic "Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT" [ref=e84]'
+                            - 'link "Open Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT on its source site (new tab)" [ref=e85] [cursor=pointer]':
+                              - /url: https://restream.io/blog/streaming-protocols/
+                              - img [ref=e86]
+                          - paragraph [ref=e90]: An in-depth guide by Restream that explains and compares popular live streaming protocols, including RTMP, WebRTC, FTL, and SRT. This resource helps developers understand the strengths and weaknesses of each protocol to make informed decisions for their streaming needs.
+                        - generic [ref=e91]:
+                          - generic [ref=e92]:
+                            - 'link "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e93] [cursor=pointer]':
+                              - /url: /resource/185020
+                              - img [ref=e94]
+                              - 'generic "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e96]'
+                            - 'link "Open 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared on its source site (new tab)" [ref=e97] [cursor=pointer]':
+                              - /url: https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls
+                              - img [ref=e98]
+                          - paragraph [ref=e102]: A detailed comparison of RTMP, WebRTC, and HLS protocols, highlighting their differences in latency, scalability, quality, and reach. This resource assists developers in choosing the appropriate protocol based on their specific live video streaming requirements.
+                        - generic [ref=e103]:
+                          - generic [ref=e104]:
+                            - link "Streaming Learning Center's Beginner's Guide to Live Streaming" [ref=e105] [cursor=pointer]:
+                              - /url: /resource/185151
+                              - img [ref=e106]
+                              - generic "Streaming Learning Center's Beginner's Guide to Live Streaming" [ref=e108]
+                            - link "Open Streaming Learning Center's Beginner's Guide to Live Streaming on its source site (new tab)" [ref=e109] [cursor=pointer]:
+                              - /url: https://streaminglearningcenter.com/learning/beginners-guide-to-live-streaming.html
+                              - img [ref=e110]
+                          - paragraph [ref=e114]: A beginner-friendly guide that introduces the basics of live streaming, including equipment setup, encoding, and streaming protocols. This resource is ideal for those new to live streaming and looking to understand the foundational concepts.
+                      - 'button "Mark as Complete: Live Streaming Fundamentals" [ref=e115] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+                - article [ref=e116]:
+                  - generic [ref=e118]:
+                    - generic [ref=e119]: "2"
+                    - generic [ref=e120]:
+                      - generic [ref=e122]:
+                        - heading "Low-Latency Protocols" [level=3] [ref=e123]
+                        - paragraph [ref=e124]: Deep-dive into LL-HLS, LL-DASH, WebRTC and SRT. Compare achievable glass-to-glass latency and operational complexity.
+                      - generic [ref=e125]:
+                        - generic [ref=e126]:
+                          - generic [ref=e127]:
+                            - link "Low Latency Live Streaming" [ref=e128] [cursor=pointer]:
+                              - /url: /resource/186001
+                              - img [ref=e129]
+                              - generic "Low Latency Live Streaming" [ref=e131]
+                            - link "Open Low Latency Live Streaming on its source site (new tab)" [ref=e132] [cursor=pointer]:
+                              - /url: https://docs.google.com/presentation/d/1ZwqWcweR5SqeMBRmJjSukWaHbpdPy-EPYvJCS23_n3U/edit?usp=sharing
+                              - img [ref=e133]
+                          - paragraph [ref=e137]: Talk deck on low-latency live streaming with Apple LL-HLS and CMAF — chunked transfer, latency budgets and player behaviour.
+                        - generic [ref=e138]:
+                          - generic [ref=e139]:
+                            - 'link "BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e140] [cursor=pointer]':
+                              - /url: /resource/185017
+                              - img [ref=e141]
+                              - 'generic "BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e143]'
+                            - 'link "Open BlendVision: Top 6 Live Streaming Protocols Comparison on its source site (new tab)" [ref=e144] [cursor=pointer]':
+                              - /url: https://web.archive.org/web/20251116092923/https://blendvision.com/en/blog/live-streaming-protocols-comparison
+                              - img [ref=e145]
+                          - paragraph [ref=e149]: "A comprehensive comparison of six common live streaming protocols: RTP, SRT, RTMP, RIST, ZiXi, and WebRTC. The article explores their technical characteristics, application scenarios, and differences, aiding developers in selecting the most suitable protocol for their live streaming services."
+                        - generic [ref=e150]:
+                          - generic [ref=e151]:
+                            - link "CMAF for Low Latency Streaming – Bitmovin" [ref=e152] [cursor=pointer]:
+                              - /url: /resource/186495
+                              - img [ref=e153]
+                              - generic "CMAF for Low Latency Streaming – Bitmovin" [ref=e155]
+                            - link "Open CMAF for Low Latency Streaming – Bitmovin on its source site (new tab)" [ref=e156] [cursor=pointer]:
+                              - /url: https://bitmovin.com/cmaf-low-latency.html
+                              - img [ref=e157]
+                          - paragraph [ref=e161]: A detailed blog explaining how CMAF enables low-latency streaming. Bitmovin covers the technical aspects of chunked CMAF, the changes required in players and CDNs, and results from tests using their encoder and player in low-latency mode.
+                      - 'button "Mark as Complete: Low-Latency Protocols" [ref=e162] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+                - article [ref=e163]:
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: "3"
+                    - generic [ref=e167]:
+                      - generic [ref=e169]:
+                        - heading "Scalable Distribution Patterns" [level=3] [ref=e170]
+                        - paragraph [ref=e171]: Design multi-region origin shielding, mid-tier caching and CDN failover to handle spikes without sacrificing latency.
+                      - generic [ref=e172]:
+                        - generic [ref=e173]:
+                          - generic [ref=e174]:
+                            - link "cdnselector — Multi-CDN Switching/Failover Server" [ref=e175] [cursor=pointer]:
+                              - /url: /resource/188131
+                              - img [ref=e176]
+                              - generic "cdnselector — Multi-CDN Switching/Failover Server" [ref=e178]
+                            - link "Open cdnselector — Multi-CDN Switching/Failover Server on its source site (new tab)" [ref=e179] [cursor=pointer]:
+                              - /url: https://github.com/cdnexperts/cdnselector
+                              - img [ref=e180]
+                          - paragraph [ref=e184]: Deployable multi-CDN switch/failover server for HTTP streaming, routing by geo/network/response-time/device with instant failover and backup CDN warming.
+                        - generic [ref=e185]:
+                          - generic [ref=e186]:
+                            - link "Unified Streaming — Origin Shield Cache Recommendations" [ref=e187] [cursor=pointer]:
+                              - /url: /resource/188309
+                              - img [ref=e188]
+                              - generic "Unified Streaming — Origin Shield Cache Recommendations" [ref=e190]
+                            - link "Open Unified Streaming — Origin Shield Cache Recommendations on its source site (new tab)" [ref=e191] [cursor=pointer]:
+                              - /url: https://docs.unified-streaming.com/best-practice/caching/recommendations/shield-cache.html
+                              - img [ref=e192]
+                          - paragraph [ref=e196]: Technical doc on the origin shield caching pattern for video streaming to reduce origin load in multi-CDN setups.
+                        - generic [ref=e197]:
+                          - generic [ref=e198]:
+                            - 'link "Content Steering: A Standard for Multi-CDN Streaming" [ref=e199] [cursor=pointer]':
+                              - /url: /resource/190085
+                              - img [ref=e200]
+                              - 'generic "Content Steering: A Standard for Multi-CDN Streaming" [ref=e202]'
+                            - 'link "Open Content Steering: A Standard for Multi-CDN Streaming on its source site (new tab)" [ref=e203] [cursor=pointer]':
+                              - /url: https://dl.acm.org/doi/10.1145/3638036.3640293
+                              - img [ref=e204]
+                          - paragraph [ref=e208]: Academic paper on the HLS/DASH Content Steering standard enabling multi-CDN traffic steering for streaming.
+                      - 'button "Mark as Complete: Scalable Distribution Patterns" [ref=e209] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+                - article [ref=e210]:
+                  - generic [ref=e212]:
+                    - generic [ref=e213]: "4"
+                    - generic [ref=e214]:
+                      - generic [ref=e216]:
+                        - heading "Monitoring & Analytics" [level=3] [ref=e217]
+                        - paragraph [ref=e218]: Instrument the live pipeline for real-time QoE, error rates and concurrent viewers. Set actionable alerts.
+                      - generic [ref=e219]:
+                        - generic [ref=e220]:
+                          - generic [ref=e221]:
+                            - link "Standardizing Multimedia QoE Telemetry from Telecommunications Networks for Open Analytics" [ref=e222] [cursor=pointer]:
+                              - /url: /resource/188744
+                              - img [ref=e223]
+                              - generic "Standardizing Multimedia QoE Telemetry from Telecommunications Networks for Open Analytics" [ref=e225]
+                            - link "Open Standardizing Multimedia QoE Telemetry from Telecommunications Networks for Open Analytics on its source site (new tab)" [ref=e226] [cursor=pointer]:
+                              - /url: https://dl.acm.org/doi/10.1145/3672196.3673400
+                              - img [ref=e227]
+                          - paragraph [ref=e231]: ACM SIGCOMM EMS '24 paper proposing a QoE telemetry schema extending IPFIX and OpenTelemetry, with an open source tool deployed on a live network.
+                        - generic [ref=e232]:
+                          - generic [ref=e233]:
+                            - link "OpenQoE — Open-Source Video QoE Analytics" [ref=e234] [cursor=pointer]:
+                              - /url: /resource/188050
+                              - img [ref=e235]
+                              - generic "OpenQoE — Open-Source Video QoE Analytics" [ref=e237]
+                            - link "Open OpenQoE — Open-Source Video QoE Analytics on its source site (new tab)" [ref=e238] [cursor=pointer]:
+                              - /url: https://github.com/openqoe/openqoe-dev
+                              - img [ref=e239]
+                          - paragraph [ref=e243]: "Apache-2.0 three-tier QoE stack: JS beaconing SDK (HTML5/Video.js/HLS.js/dash.js/Shaka) → Cloudflare Worker ingest → Prometheus/Grafana dashboards tracking startup time, rebuffer, errors, engagement."
+                        - generic [ref=e244]:
+                          - generic [ref=e245]:
+                            - link "Improving Video Observability with CMCD and CloudFront" [ref=e246] [cursor=pointer]:
+                              - /url: /resource/187969
+                              - img [ref=e247]
+                              - generic "Improving Video Observability with CMCD and CloudFront" [ref=e249]
+                            - link "Open Improving Video Observability with CMCD and CloudFront on its source site (new tab)" [ref=e250] [cursor=pointer]:
+                              - /url: https://aws.amazon.com/blogs/networking-and-content-delivery/improving-video-observability-with-cmcd-and-cloudfront/
+                              - img [ref=e251]
+                          - paragraph [ref=e255]: AWS engineering blog on parsing CMCD query-string metrics from CloudFront real-time logs into Timestream with a Grafana dashboard for session-level rebuffering analysis.
+                      - 'button "Mark as Complete: Monitoring & Analytics" [ref=e256] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+                - article [ref=e257]:
+                  - generic [ref=e259]:
+                    - generic [ref=e260]: "5"
+                    - generic [ref=e261]:
+                      - generic [ref=e263]:
+                        - heading "Edge Computing Integration" [level=3] [ref=e264]
+                        - paragraph [ref=e265]: Move packaging, ad insertion and personalization to the edge to cut latency and origin load.
+                      - generic [ref=e266]:
+                        - generic [ref=e267]:
+                          - generic [ref=e268]:
+                            - 'link "Coffee: Cost-Effective Edge Caching for 360° Live Video" [ref=e269] [cursor=pointer]':
+                              - /url: /resource/190081
+                              - img [ref=e270]
+                              - 'generic "Coffee: Cost-Effective Edge Caching for 360° Live Video" [ref=e272]'
+                            - 'link "Open Coffee: Cost-Effective Edge Caching for 360° Live Video on its source site (new tab)" [ref=e273] [cursor=pointer]':
+                              - /url: https://arxiv.org/abs/2312.13470
+                              - img [ref=e274]
+                          - paragraph [ref=e278]: Academic paper on predictive tile-prefetch edge caching for 360-degree live video streaming, achieving 76% backhaul traffic reduction.
+                        - generic [ref=e279]:
+                          - generic [ref=e280]:
+                            - link "Akamai EdgeWorkers — Manifest and Playlist Personalization" [ref=e281] [cursor=pointer]:
+                              - /url: /resource/188732
+                              - img [ref=e282]
+                              - generic "Akamai EdgeWorkers — Manifest and Playlist Personalization" [ref=e284]
+                            - link "Open Akamai EdgeWorkers — Manifest and Playlist Personalization on its source site (new tab)" [ref=e285] [cursor=pointer]:
+                              - /url: https://techdocs.akamai.com/edgeworkers/docs/manifest-and-playlist-personalization
+                              - img [ref=e286]
+                          - paragraph [ref=e290]: Guide to rewriting HLS/DASH manifests in edge JavaScript for rendition filtering, audio-language localization, live program replacement and content insertion.
+                        - generic [ref=e291]:
+                          - generic [ref=e292]:
+                            - link "SVTA — Enhancing and Standardizing Server-Guided Ad Insertion" [ref=e293] [cursor=pointer]:
+                              - /url: /resource/188995
+                              - img [ref=e294]
+                              - generic "SVTA — Enhancing and Standardizing Server-Guided Ad Insertion" [ref=e296]
+                            - link "Open SVTA — Enhancing and Standardizing Server-Guided Ad Insertion on its source site (new tab)" [ref=e297] [cursor=pointer]:
+                              - /url: https://university.svta.org/wp-content/uploads/2025/07/Enhancing-Standardizing-Server-Guided-Ad-Insertion-SVTAU.pdf
+                              - img [ref=e298]
+                          - paragraph [ref=e302]: "Streaming Video Technology Alliance document on SGAI: how HLS Interstitials-based ad insertion works and where standardization gaps remain versus classic SSAI."
+                      - 'button "Mark as Complete: Edge Computing Integration" [ref=e303] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+                - article [ref=e304]:
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: "6"
+                    - generic [ref=e308]:
+                      - generic [ref=e310]:
+                        - heading "Production Best Practices" [level=3] [ref=e311]
+                        - paragraph [ref=e312]: Plan for redundancy, key rotation, graceful failover and post-event reviews so high-stakes live events ship reliably.
+                      - generic [ref=e313]:
+                        - generic [ref=e314]:
+                          - generic [ref=e315]:
+                            - link "Error Handling Best Practices for HTTP Live Streaming (WWDC17)" [ref=e316] [cursor=pointer]:
+                              - /url: /resource/189033
+                              - img [ref=e317]
+                              - generic "Error Handling Best Practices for HTTP Live Streaming (WWDC17)" [ref=e319]
+                            - link "Open Error Handling Best Practices for HTTP Live Streaming (WWDC17) on its source site (new tab)" [ref=e320] [cursor=pointer]:
+                              - /url: https://developer.apple.com/videos/play/wwdc2017/514/
+                              - img [ref=e321]
+                          - paragraph [ref=e325]: Apple session covering HLS failover behaviour, redundant stream configuration and how AVFoundation surfaces playback errors.
+                        - generic [ref=e326]:
+                          - generic [ref=e327]:
+                            - link "Apple Technical Note TN2224 - HLS Best Practices" [ref=e328] [cursor=pointer]:
+                              - /url: /resource/186415
+                              - img [ref=e329]
+                              - generic "Apple Technical Note TN2224 - HLS Best Practices" [ref=e331]
+                            - link "Open Apple Technical Note TN2224 - HLS Best Practices on its source site (new tab)" [ref=e332] [cursor=pointer]:
+                              - /url: https://developer.apple.com/library/archive/technotes/tn2224/_index.html
+                              - img [ref=e333]
+                          - paragraph [ref=e337]: An Apple Technical Note detailing best practices for HTTP Live Streaming. It covers how to encode media, segment files, set up playlists, and deliver HLS streams efficiently.
+                        - generic [ref=e338]:
+                          - generic [ref=e339]:
+                            - link "AWS CloudFront Live failover" [ref=e340] [cursor=pointer]:
+                              - /url: /resource/185951
+                              - img [ref=e341]
+                              - generic "AWS CloudFront Live failover" [ref=e343]
+                            - link "Open AWS CloudFront Live failover on its source site (new tab)" [ref=e344] [cursor=pointer]:
+                              - /url: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/high_availability_origin_failover.html
+                              - img [ref=e345]
+                          - paragraph [ref=e349]: You can set up CloudFront with origin failover for scenarios that require high availability. To get started, create an origin group in which you designate a primary origin for CloudFront plus a second origin that CloudFront automatically switches to when the primary origin returns specific HTTP status code failure responses.
+                      - 'button "Mark as Complete: Production Best Practices" [ref=e350] [cursor=pointer]':
+                        - img
+                        - text: Mark as Complete
+        - contentinfo [ref=e351]:
+          - generic [ref=e352]:
+            - generic [ref=e353]:
+              - paragraph [ref=e354]: ── INDEX
+              - link "awesome.video home" [ref=e355] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e356]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e358]:
+              - heading "INDEXED" [level=2] [ref=e359]
+              - paragraph [ref=e360]: 3,826
+              - paragraph [ref=e361]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e362]: live
+            - navigation "Explore categories" [ref=e364]:
+              - heading "EXPLORE" [level=2] [ref=e365]
+              - generic [ref=e366]:
+                - link "Community & Events" [ref=e367] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e368]: ◈
+                  - generic [ref=e369]: Community
+                - link "Encoding & Codecs" [ref=e370] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e371]: ◇
+                  - generic [ref=e372]: Encoding
+                - link "General Tools" [ref=e373] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e374]: ◆
+                  - generic [ref=e375]: General
+                - link "Infrastructure & Delivery" [ref=e376] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e377]: ▣
+                  - generic [ref=e378]: Infrastructure
+                - link "Intro & Learning" [ref=e379] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e380]: ▤
+                  - generic [ref=e381]: Intro
+                - link "Media Tools" [ref=e382] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e383]: ▥
+                  - generic [ref=e384]: Media
+                - link "Players & Clients" [ref=e385] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e386]: ▶
+                  - generic [ref=e387]: Players
+                - link "Protocols & Transport" [ref=e388] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e389]: ⟁
+                  - generic [ref=e390]: Protocols
+                - link "Standards & Industry" [ref=e391] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e392]: ◉
+                  - generic [ref=e393]: Standards
+            - generic [ref=e394]:
+              - heading "SOURCE" [level=2] [ref=e395]
+              - link "krzemienski/awesome-video" [ref=e396] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e397]
+                - generic [ref=e399]:
+                  - text: krzemienski
+                  - generic [ref=e400]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e401]: ↗
+              - paragraph [ref=e402]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e403] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e405] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e406]:
+            - generic [ref=e407]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e408]:
+              - link "About" [ref=e409] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e410] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e411] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e412] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e413] [cursor=pointer]
+              - link "Issues ↗" [ref=e414] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e415] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e416]: built with the awesome-list framework

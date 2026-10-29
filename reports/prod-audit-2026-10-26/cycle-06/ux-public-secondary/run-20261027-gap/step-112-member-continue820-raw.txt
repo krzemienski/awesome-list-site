@@ -1,0 +1,4 @@
+error: pi-natives:command: syntax error at line 1 col 578
+
+
+Command exited with code 2

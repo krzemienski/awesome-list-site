@@ -1,0 +1,13 @@
+200 https://awesome.video/category/media-tools?page=23
+200 https://awesome.video/resource/185477
+200 https://awesome.video/resource/188927
+200 https://awesome.video/resource/189514
+200 https://awesome.video/resource/185775
+200 https://awesome.video/resource/188317
+200 https://awesome.video/resource/185257
+200 https://awesome.video/resource/189388
+200 https://awesome.video/tag/editing
+200 https://awesome.video/resource/189200
+200 https://awesome.video/tag/decoder
+200 https://awesome.video/tag/compression
+200 https://awesome.video/journey/7

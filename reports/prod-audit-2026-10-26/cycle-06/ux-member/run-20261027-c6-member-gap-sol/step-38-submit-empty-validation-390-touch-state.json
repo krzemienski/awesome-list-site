@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/submit",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 476,
+  "active": "<input class=\"input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed submit-control\" placeholder=\"e.g. ffmpeg-python\" name=\"title\" data-testid=\"input-title\" id=\":r8:-form-item\" aria-invalid=\"true\" value=\"\" aria-describedby=\":r8:-form-item-description :r8:-form-item-message\">",
+  "umami": "1",
+  "consent": "denied"
+}

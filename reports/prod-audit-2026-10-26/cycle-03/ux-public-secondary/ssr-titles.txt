@@ -1,0 +1,9 @@
+/ -> <title data-react-helmet="true">Awesome Video — 3825+ Curated Video &amp; Streaming Resources</title>
+/search -> <title data-react-helmet="true">Search — Awesome Video</title>
+/journeys -> <title data-react-helmet="true">Learning Journeys — Awesome Video</title>
+/design-system -> <title data-react-helmet="true">Design System — Awesome Video</title>
+/settings -> <title data-react-helmet="true">Settings — Awesome Video</title>
+/continue-learning -> <title data-react-helmet="true">Continue Learning — Awesome Video</title>
+/bookmarks -> <title data-react-helmet="true">Bookmarks — Awesome Video</title>
+/submit -> <title data-react-helmet="true">Submit a Resource — Awesome Video</title>
+/nope -> <title data-react-helmet="true">Page Not Found — Awesome Video</title>

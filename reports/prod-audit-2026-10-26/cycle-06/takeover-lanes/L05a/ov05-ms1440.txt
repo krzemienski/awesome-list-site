@@ -1,0 +1,79 @@
+RESOURCES
+3,826
+across 9 categories
+SUBCATEGORIES
+99
+all canonical
+ACTIVE USERS
+20
+unavailable
+PENDING APPROVALS
+16
+oldest 63d ago
+
+Couldn't load stats for active users
+
+The server hit an error. Nothing was changed — retry to load it again. Affected tiles keep their last loaded value or are marked unavailable.
+Retry
+Recent activity
+
+Latest 6 events
+
+TX#27649
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Café Ünï Ætest w820
+2m ago
+TX#27648
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Cancel390x
+2m ago
+TX#27647
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Café Ünï Ætest w390
+2m ago
+TX#27646
+a•••@example.com
+categories.exported
+Admin exported the category tree (OPML, 3826 resources)
+3m ago
+TX#27645
+a•••@example.com
+resources.exported
+Admin exported 4019 resources (CSV)
+3m ago
+TX#27644
+a•••@example.com
+database.exported
+Admin exported non-restorable catalog JSON snapshot (4019 resources, 133 user summaries)
+3m ago
+System health
+
+Some systems are still working
+
+Database
+ready · 155ms
+GitHub sync
+Completed · 99d ago
+Link checker
+last 84d ago · 12 broken
+Enrichment queue
+last run cancelled before finishing · 39h ago
+Researcher API
+healthy
+Top categories
+
+By resource count
+
+▥ Media Tools
+704
+◇ Encoding & Codecs
+580
+◆ General Tools
+514
+⟁ Protocols & Transport
+467
+▶ Players & Clients
+447

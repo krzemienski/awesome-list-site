@@ -1,0 +1,4 @@
+[35343.1620] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1695] GET https://awesome.video/api/config (Fetch) 200
+[35343.1696] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.1702] GET https://awesome.video/api/resources?page=1&limit=24&facets=true (Fetch) 200

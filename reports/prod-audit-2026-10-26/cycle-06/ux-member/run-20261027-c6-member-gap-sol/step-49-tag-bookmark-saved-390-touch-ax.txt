@@ -1,0 +1,1268 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list:
+        - listitem [ref=e4]:
+          - generic [ref=e6]: Bookmark added
+          - button "Dismiss notification":
+            - img
+    - generic [ref=e8]:
+      - link "Skip to main content" [ref=e9] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e10]:
+        - banner [ref=e11]:
+          - generic [ref=e12]:
+            - button "Toggle sidebar" [ref=e13] [cursor=pointer]:
+              - generic [ref=e14]: Toggle sidebar
+            - img
+          - link "AWESOME.VIDEO home" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e16]: av
+            - generic [ref=e17]: AWESOME.VIDEO home
+          - button "Search 3,826 resources" [ref=e18] [cursor=pointer]:
+            - img [ref=e19]
+            - generic [ref=e22]: Search 3,826 resources
+          - button "Admin, account menu" [ref=e23] [cursor=pointer]:
+            - generic [ref=e25]: A
+            - generic [ref=e26]: Admin, account menu
+        - generic [ref=e28]:
+          - main [ref=e29]:
+            - generic [ref=e30]:
+              - navigation "Breadcrumb" [ref=e31]:
+                - list [ref=e32]:
+                  - listitem [ref=e33]:
+                    - link "Home" [ref=e34] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e35]:
+                    - img [ref=e36]
+                  - listitem [ref=e38]:
+                    - link "Browse" [ref=e39] [cursor=pointer]:
+                      - /url: /categories
+                  - listitem [ref=e40]:
+                    - img [ref=e41]
+                  - listitem:
+                    - 'link "Tag: HLS" [disabled]'
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - link "Browse" [ref=e45] [cursor=pointer]:
+                    - /url: /categories
+                    - img
+                    - text: Browse
+                  - button "Search all resources" [ref=e46] [cursor=pointer]:
+                    - img
+                    - generic [ref=e47]: Search all resources
+                - generic [ref=e48]:
+                  - generic [ref=e49]:
+                    - generic [ref=e50]: "#"
+                    - text: TAG · HLS
+                  - heading "HLS" [level=1] [ref=e51]
+                  - region "About this collection" [ref=e52]:
+                    - heading "About this collection" [level=2] [ref=e53]
+                    - paragraph [ref=e54]: HLS brings together 64 curated resources for video developers. Explore projects and guidance across Protocols & Transport, Infrastructure & Delivery, and Players & Clients.
+                    - paragraph [ref=e55]:
+                      - text: "Related:"
+                      - link "#Streaming" [ref=e56] [cursor=pointer]:
+                        - /url: /tag/streaming
+                      - text: ","
+                      - link "#DASH" [ref=e57] [cursor=pointer]:
+                        - /url: /tag/dash
+                      - text: ","
+                      - link "#FFMPEG" [ref=e58] [cursor=pointer]:
+                        - /url: /tag/ffmpeg
+                      - text: ","
+                      - link "Protocols & Transport" [ref=e59] [cursor=pointer]:
+                        - /url: /category/protocols-transport
+                      - text: ·
+                      - link "All related topics" [ref=e60] [cursor=pointer]:
+                        - /url: "#related-topics-heading"
+                - generic [ref=e61]:
+                  - heading "Resources (64)" [level=2] [ref=e63]
+                  - generic [ref=e64]:
+                    - article [ref=e65] [cursor=pointer]:
+                      - generic [ref=e66]:
+                        - generic [ref=e67]:
+                          - generic [ref=e68]: ▣
+                          - generic [ref=e69]:
+                            - link "View details for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e70]:
+                              - /url: /resource/190342
+                              - generic [ref=e71]:
+                                - img [ref=e72]
+                                - generic [ref=e74]: View Details
+                            - button "Show 2 more tags" [ref=e75]: +2 more
+                            - generic [ref=e76]:
+                              - link "Open Link MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)" [ref=e77]:
+                                - /url: https://mediamtx.net/
+                                - img
+                                - generic [ref=e78]: Open Link
+                                - generic [ref=e79]: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)
+                              - 'button "Suggest an edit: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e80]':
+                                - img
+                          - generic [ref=e82]:
+                            - 'button "Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e83]':
+                              - generic [ref=e84]:
+                                - img
+                            - 'button "Remove bookmark: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [active] [pressed] [ref=e85]':
+                              - generic [ref=e86]:
+                                - img
+                            - 'button "View or edit bookmark notes: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e87]':
+                              - img
+                        - heading "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [level=2] [ref=e89]:
+                          - link "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e90]:
+                            - /url: /resource/190342
+                        - paragraph [ref=e91]: Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API.
+                      - generic [ref=e92]:
+                        - generic [ref=e93]:
+                          - generic [ref=e94]: "Page Title: MediaMTX – Download the Media Streaming Server for Live Video"
+                          - generic [ref=e95]: "Page Description: Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more."
+                        - generic [ref=e96]:
+                          - generic [ref=e97]: Infrastructure & Delivery
+                          - link "Browse resources tagged hls" [ref=e98]:
+                            - /url: /tag/hls
+                            - generic [ref=e99]: "#hls"
+                          - link "Browse resources tagged rtmp" [ref=e100]:
+                            - /url: /tag/rtmp
+                            - generic [ref=e101]: "#rtmp"
+                          - link "Browse resources tagged rtsp" [ref=e102]:
+                            - /url: /tag/rtsp
+                            - generic [ref=e103]: "#rtsp"
+                    - article [ref=e104] [cursor=pointer]:
+                      - generic [ref=e105]:
+                        - generic [ref=e106]:
+                          - generic [ref=e107]: ▣
+                          - generic [ref=e108]:
+                            - link "View details for TV-Workers" [ref=e109]:
+                              - /url: /resource/190114
+                              - generic [ref=e110]:
+                                - img [ref=e111]
+                                - generic [ref=e113]: View Details
+                            - button "Show 2 more tags" [ref=e114]: +2 more
+                            - generic [ref=e115]:
+                              - link "Open Link TV-Workers (opens in new tab)" [ref=e116]:
+                                - /url: https://github.com/frank-vpl/TV-Workers
+                                - img
+                                - generic [ref=e117]: Open Link
+                                - generic [ref=e118]: TV-Workers (opens in new tab)
+                              - 'button "Suggest an edit: TV-Workers" [ref=e119]':
+                                - img
+                          - generic [ref=e121]:
+                            - 'button "Add to favorites: TV-Workers" [ref=e122]':
+                              - generic [ref=e123]:
+                                - img
+                            - 'button "Add bookmark: TV-Workers" [ref=e124]':
+                              - generic [ref=e125]:
+                                - img
+                        - heading "TV-Workers" [level=2] [ref=e127]:
+                          - link "TV-Workers" [ref=e128]:
+                            - /url: /resource/190114
+                        - paragraph [ref=e129]: Cloudflare Worker IPTV proxy performing HLS playlist rewriting and CORS handling at the edge.
+                      - generic [ref=e130]:
+                        - generic [ref=e131]:
+                          - 'img "GitHub - frank-vpl/TV-Workers: Cloudflare Worker–based IPTV proxy for streaming HLS channels with automatic playlist rewriting and CORS support." [ref=e133]'
+                          - generic [ref=e134]: "Page Title: GitHub - frank-vpl/TV-Workers: Cloudflare Worker–based IPTV proxy for streaming HLS channels with automatic playlist rewriting and CORS support. · GitHub"
+                          - generic [ref=e135]: "Page Description: Cloudflare Worker–based IPTV proxy for streaming HLS channels with automatic playlist rewriting and CORS support. - frank-vpl/TV-Workers"
+                        - generic [ref=e136]:
+                          - generic [ref=e137]: Infrastructure & Delivery
+                          - generic [ref=e138]: Tools & SDKs
+                          - link "Browse resources tagged hls" [ref=e139]:
+                            - /url: /tag/hls
+                            - generic [ref=e140]: "#hls"
+                          - link "Browse resources tagged iptv" [ref=e141]:
+                            - /url: /tag/iptv
+                            - generic [ref=e142]: "#iptv"
+                          - link "Browse resources tagged cloudflare-worker" [ref=e143]:
+                            - /url: /tag/cloudflare-worker
+                            - generic [ref=e144]: "#cloudflare-worker"
+                    - article [ref=e145] [cursor=pointer]:
+                      - generic [ref=e146]:
+                        - generic [ref=e147]:
+                          - generic [ref=e148]: ▶
+                          - generic [ref=e149]:
+                            - link "View details for JW Player (Free Version)" [ref=e150]:
+                              - /url: /resource/186499
+                              - generic [ref=e151]:
+                                - img [ref=e152]
+                                - generic [ref=e154]: View Details
+                            - button "Show 3 more tags" [ref=e155]: +3 more
+                            - generic [ref=e156]:
+                              - link "Open Link JW Player (Free Version) (opens in new tab)" [ref=e157]:
+                                - /url: https://jwx.com/
+                                - img
+                                - generic [ref=e158]: Open Link
+                                - generic [ref=e159]: JW Player (Free Version) (opens in new tab)
+                              - 'button "Suggest an edit: JW Player (Free Version)" [ref=e160]':
+                                - img
+                          - generic [ref=e162]:
+                            - 'button "Add to favorites: JW Player (Free Version)" [ref=e163]':
+                              - generic [ref=e164]:
+                                - img
+                            - 'button "Add bookmark: JW Player (Free Version)" [ref=e165]':
+                              - generic [ref=e166]:
+                                - img
+                        - heading "JW Player (Free Version)" [level=2] [ref=e168]:
+                          - link "JW Player (Free Version)" [ref=e169]:
+                            - /url: /resource/186499
+                        - paragraph [ref=e170]: A popular embeddable web video player with a free tier, originally an open source project, offering HLS and DASH support and extensive customization.
+                      - generic [ref=e172]:
+                        - generic [ref=e173]: Players & Clients
+                        - generic [ref=e174]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e175]:
+                          - /url: /tag/hls
+                          - generic [ref=e176]: "#hls"
+                        - link "Browse resources tagged web-player" [ref=e177]:
+                          - /url: /tag/web-player
+                          - generic [ref=e178]: "#web-player"
+                        - link "Browse resources tagged html5" [ref=e179]:
+                          - /url: /tag/html5
+                          - generic [ref=e180]: "#html5"
+                    - article [ref=e181] [cursor=pointer]:
+                      - generic [ref=e182]:
+                        - generic [ref=e183]:
+                          - generic [ref=e184]: ▤
+                          - generic [ref=e185]:
+                            - link "View details for hls.js Low-Latency Playlist Simulator" [ref=e186]:
+                              - /url: /resource/186444
+                              - generic [ref=e187]:
+                                - img [ref=e188]
+                                - generic [ref=e190]: View Details
+                            - button "Show 3 more tags" [ref=e191]: +3 more
+                            - generic [ref=e192]:
+                              - link "Open Link hls.js Low-Latency Playlist Simulator (opens in new tab)" [ref=e193]:
+                                - /url: https://hlsjs.video-dev.org/demo/?src=LL-HLS_URL
+                                - img
+                                - generic [ref=e194]: Open Link
+                                - generic [ref=e195]: hls.js Low-Latency Playlist Simulator (opens in new tab)
+                              - 'button "Suggest an edit: hls.js Low-Latency Playlist Simulator" [ref=e196]':
+                                - img
+                          - generic [ref=e198]:
+                            - 'button "Add to favorites: hls.js Low-Latency Playlist Simulator" [ref=e199]':
+                              - generic [ref=e200]:
+                                - img
+                            - 'button "Add bookmark: hls.js Low-Latency Playlist Simulator" [ref=e201]':
+                              - generic [ref=e202]:
+                                - img
+                        - heading "hls.js Low-Latency Playlist Simulator" [level=2] [ref=e204]:
+                          - link "hls.js Low-Latency Playlist Simulator" [ref=e205]:
+                            - /url: /resource/186444
+                        - paragraph [ref=e206]: An online demo environment for hls.js where one can input a Low-Latency HLS playlist URL to test playback. Useful for testing LL-HLS streams in a real player implementation and observing buffering and timing behaviors.
+                      - generic [ref=e208]:
+                        - generic [ref=e209]: Intro & Learning
+                        - link "Browse resources tagged hls" [ref=e210]:
+                          - /url: /tag/hls
+                          - generic [ref=e211]: "#hls"
+                        - link "Browse resources tagged low-latency" [ref=e212]:
+                          - /url: /tag/low-latency
+                          - generic [ref=e213]: "#low-latency"
+                        - link "Browse resources tagged streaming" [ref=e214]:
+                          - /url: /tag/streaming
+                          - generic [ref=e215]: "#streaming"
+                    - article [ref=e216] [cursor=pointer]:
+                      - generic [ref=e217]:
+                        - generic [ref=e218]:
+                          - generic [ref=e219]: ⟁
+                          - generic [ref=e220]:
+                            - link "View details for Apple Technical Note TN2224 - HLS Best Practices" [ref=e221]:
+                              - /url: /resource/186415
+                              - generic [ref=e222]:
+                                - img [ref=e223]
+                                - generic [ref=e225]: View Details
+                            - button "Show 4 more tags" [ref=e226]: +4 more
+                            - generic [ref=e227]:
+                              - link "Open Link Apple Technical Note TN2224 - HLS Best Practices (opens in new tab)" [ref=e228]:
+                                - /url: https://developer.apple.com/library/archive/technotes/tn2224/_index.html
+                                - img
+                                - generic [ref=e229]: Open Link
+                                - generic [ref=e230]: Apple Technical Note TN2224 - HLS Best Practices (opens in new tab)
+                              - 'button "Suggest an edit: Apple Technical Note TN2224 - HLS Best Practices" [ref=e231]':
+                                - img
+                          - generic [ref=e233]:
+                            - 'button "Add to favorites: Apple Technical Note TN2224 - HLS Best Practices" [ref=e234]':
+                              - generic [ref=e235]:
+                                - img
+                            - 'button "Add bookmark: Apple Technical Note TN2224 - HLS Best Practices" [ref=e236]':
+                              - generic [ref=e237]:
+                                - img
+                        - heading "Apple Technical Note TN2224 - HLS Best Practices" [level=2] [ref=e239]:
+                          - link "Apple Technical Note TN2224 - HLS Best Practices" [ref=e240]:
+                            - /url: /resource/186415
+                        - paragraph [ref=e241]: An Apple Technical Note detailing best practices for HTTP Live Streaming. It covers how to encode media, segment files, set up playlists, and deliver HLS streams efficiently.
+                      - generic [ref=e243]:
+                        - generic [ref=e244]: Protocols & Transport
+                        - generic [ref=e245]: Protocols
+                        - link "Browse resources tagged hls" [ref=e246]:
+                          - /url: /tag/hls
+                          - generic [ref=e247]: "#hls"
+                        - link "Browse resources tagged streaming" [ref=e248]:
+                          - /url: /tag/streaming
+                          - generic [ref=e249]: "#streaming"
+                        - link "Browse resources tagged apple" [ref=e250]:
+                          - /url: /tag/apple
+                          - generic [ref=e251]: "#apple"
+                    - article [ref=e252] [cursor=pointer]:
+                      - generic [ref=e253]:
+                        - generic [ref=e254]:
+                          - generic [ref=e255]: ▤
+                          - generic [ref=e256]:
+                            - 'link "View details for FFmpeg Wiki: Streaming Guide" [ref=e257]':
+                              - /url: /resource/186414
+                              - generic [ref=e258]:
+                                - img [ref=e259]
+                                - generic [ref=e261]: View Details
+                            - button "Show 4 more tags" [ref=e262]: +4 more
+                            - generic [ref=e263]:
+                              - 'link "Open Link FFmpeg Wiki: Streaming Guide (opens in new tab)" [ref=e264]':
+                                - /url: https://trac.ffmpeg.org/wiki/StreamingGuide
+                                - img
+                                - generic [ref=e265]: Open Link
+                                - generic [ref=e266]: "FFmpeg Wiki: Streaming Guide (opens in new tab)"
+                              - 'button "Suggest an edit: FFmpeg Wiki: Streaming Guide" [ref=e267]':
+                                - img
+                          - generic [ref=e269]:
+                            - 'button "Add to favorites: FFmpeg Wiki: Streaming Guide" [ref=e270]':
+                              - generic [ref=e271]:
+                                - img
+                            - 'button "Add bookmark: FFmpeg Wiki: Streaming Guide" [ref=e272]':
+                              - generic [ref=e273]:
+                                - img
+                        - 'heading "FFmpeg Wiki: Streaming Guide" [level=2] [ref=e275]':
+                          - 'link "FFmpeg Wiki: Streaming Guide" [ref=e276]':
+                            - /url: /resource/186414
+                        - paragraph [ref=e277]: An official Wiki guide from FFmpeg explaining how to set up streaming using FFmpeg, including examples for streaming via RTMP to servers or using FFmpeg as a server for HLS/DASH.
+                      - generic [ref=e279]:
+                        - generic [ref=e280]: Intro & Learning
+                        - link "Browse resources tagged hls" [ref=e281]:
+                          - /url: /tag/hls
+                          - generic [ref=e282]: "#hls"
+                        - link "Browse resources tagged ffmpeg" [ref=e283]:
+                          - /url: /tag/ffmpeg
+                          - generic [ref=e284]: "#ffmpeg"
+                        - link "Browse resources tagged streaming" [ref=e285]:
+                          - /url: /tag/streaming
+                          - generic [ref=e286]: "#streaming"
+                    - article [ref=e287] [cursor=pointer]:
+                      - generic [ref=e288]:
+                        - generic [ref=e289]:
+                          - generic [ref=e290]: ▶
+                          - generic [ref=e291]:
+                            - link "View details for Shaka Player" [ref=e292]:
+                              - /url: /resource/186400
+                              - generic [ref=e293]:
+                                - img [ref=e294]
+                                - generic [ref=e296]: View Details
+                            - button "Show 4 more tags" [ref=e297]: +4 more
+                            - generic [ref=e298]:
+                              - link "Open Link Shaka Player (opens in new tab)" [ref=e299]:
+                                - /url: https://github.com/shaka-project/shaka-player
+                                - img
+                                - generic [ref=e300]: Open Link
+                                - generic [ref=e301]: Shaka Player (opens in new tab)
+                              - 'button "Suggest an edit: Shaka Player" [ref=e302]':
+                                - img
+                          - generic [ref=e304]:
+                            - 'button "Add to favorites: Shaka Player" [ref=e305]':
+                              - generic [ref=e306]:
+                                - img
+                            - 'button "Add bookmark: Shaka Player" [ref=e307]':
+                              - generic [ref=e308]:
+                                - img
+                        - heading "Shaka Player" [level=2] [ref=e310]:
+                          - link "Shaka Player" [ref=e311]:
+                            - /url: /resource/186400
+                        - paragraph [ref=e312]: An open source JavaScript library for adaptive video streaming, providing a DASH and HLS player with Widevine DRM support for HTML5 browsers.
+                      - generic [ref=e314]:
+                        - generic [ref=e315]: Players & Clients
+                        - generic [ref=e316]: Libraries
+                        - link "Browse resources tagged hls" [ref=e317]:
+                          - /url: /tag/hls
+                          - generic [ref=e318]: "#hls"
+                        - link "Browse resources tagged javascript" [ref=e319]:
+                          - /url: /tag/javascript
+                          - generic [ref=e320]: "#javascript"
+                        - link "Browse resources tagged html5" [ref=e321]:
+                          - /url: /tag/html5
+                          - generic [ref=e322]: "#html5"
+                    - article [ref=e323] [cursor=pointer]:
+                      - generic [ref=e324]:
+                        - generic [ref=e325]:
+                          - generic [ref=e326]: ▣
+                          - generic [ref=e327]:
+                            - link "View details for MistServer" [ref=e328]:
+                              - /url: /resource/186349
+                              - generic [ref=e329]:
+                                - img [ref=e330]
+                                - generic [ref=e332]: View Details
+                            - button "Show 4 more tags" [ref=e333]: +4 more
+                            - generic [ref=e334]:
+                              - link "Open Link MistServer (opens in new tab)" [ref=e335]:
+                                - /url: https://mistserver.org/
+                                - img
+                                - generic [ref=e336]: Open Link
+                                - generic [ref=e337]: MistServer (opens in new tab)
+                              - 'button "Suggest an edit: MistServer" [ref=e338]':
+                                - img
+                          - generic [ref=e340]:
+                            - 'button "Add to favorites: MistServer" [ref=e341]':
+                              - generic [ref=e342]:
+                                - img
+                            - 'button "Add bookmark: MistServer" [ref=e343]':
+                              - generic [ref=e344]:
+                                - img
+                        - heading "MistServer" [level=2] [ref=e346]:
+                          - link "MistServer" [ref=e347]:
+                            - /url: /resource/186349
+                        - paragraph [ref=e348]: An open source streaming media server that supports multiple protocols (HLS, RTMP, WebRTC, etc.). It focuses on easy setup and compatibility with any device.
+                      - generic [ref=e350]:
+                        - generic [ref=e351]: Infrastructure & Delivery
+                        - generic [ref=e352]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e353]:
+                          - /url: /tag/hls
+                          - generic [ref=e354]: "#hls"
+                        - link "Browse resources tagged open-source" [ref=e355]:
+                          - /url: /tag/open-source
+                          - generic [ref=e356]: "#open-source"
+                        - link "Browse resources tagged media-server" [ref=e357]:
+                          - /url: /tag/media-server
+                          - generic [ref=e358]: "#media-server"
+                    - article [ref=e359] [cursor=pointer]:
+                      - generic [ref=e360]:
+                        - generic [ref=e361]:
+                          - generic [ref=e362]: ⟁
+                          - generic [ref=e363]:
+                            - link "View details for Hlsdownloader CLI" [ref=e364]:
+                              - /url: /resource/185688
+                              - generic [ref=e365]:
+                                - img [ref=e366]
+                                - generic [ref=e368]: View Details
+                            - button "Show 3 more tags" [ref=e369]: +3 more
+                            - generic [ref=e370]:
+                              - link "Open Link Hlsdownloader CLI (opens in new tab)" [ref=e371]:
+                                - /url: https://github.com/nmrony/hlsdownloader-cli
+                                - img
+                                - generic [ref=e372]: Open Link
+                                - generic [ref=e373]: Hlsdownloader CLI (opens in new tab)
+                              - 'button "Suggest an edit: Hlsdownloader CLI" [ref=e374]':
+                                - img
+                          - generic [ref=e376]:
+                            - 'button "Add to favorites: Hlsdownloader CLI" [ref=e377]':
+                              - generic [ref=e378]:
+                                - img
+                            - 'button "Add bookmark: Hlsdownloader CLI" [ref=e379]':
+                              - generic [ref=e380]:
+                                - img
+                        - heading "Hlsdownloader CLI" [level=2] [ref=e382]:
+                          - link "Hlsdownloader CLI" [ref=e383]:
+                            - /url: /resource/185688
+                        - paragraph [ref=e384]: Downloads HLS Playlist file and TS chunks using Terminal
+                      - generic [ref=e386]:
+                        - generic [ref=e387]: Protocols & Transport
+                        - generic [ref=e388]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e389]:
+                          - /url: /tag/hls
+                          - generic [ref=e390]: "#hls"
+                        - link "Browse resources tagged cli" [ref=e391]:
+                          - /url: /tag/cli
+                          - generic [ref=e392]: "#cli"
+                        - link "Browse resources tagged download" [ref=e393]:
+                          - /url: /tag/download
+                          - generic [ref=e394]: "#download"
+                    - article [ref=e395] [cursor=pointer]:
+                      - generic [ref=e396]:
+                        - generic [ref=e397]:
+                          - generic [ref=e398]: ◇
+                          - generic [ref=e399]:
+                            - link "View details for Arch FFmpeg GPAC" [ref=e400]:
+                              - /url: /resource/185682
+                              - generic [ref=e401]:
+                                - img [ref=e402]
+                                - generic [ref=e404]: View Details
+                            - button "Show 2 more tags" [ref=e405]: +2 more
+                            - generic [ref=e406]:
+                              - link "Open Link Arch FFmpeg GPAC (opens in new tab)" [ref=e407]:
+                                - /url: https://github.com/majamee/arch-ffmpeg-gpac
+                                - img
+                                - generic [ref=e408]: Open Link
+                                - generic [ref=e409]: Arch FFmpeg GPAC (opens in new tab)
+                              - 'button "Suggest an edit: Arch FFmpeg GPAC" [ref=e410]':
+                                - img
+                          - generic [ref=e412]:
+                            - 'button "Add to favorites: Arch FFmpeg GPAC" [ref=e413]':
+                              - generic [ref=e414]:
+                                - img
+                            - 'button "Add bookmark: Arch FFmpeg GPAC" [ref=e415]':
+                              - generic [ref=e416]:
+                                - img
+                        - heading "Arch FFmpeg GPAC" [level=2] [ref=e418]:
+                          - link "Arch FFmpeg GPAC" [ref=e419]:
+                            - /url: /resource/185682
+                        - paragraph [ref=e420]: A ready-prepared video transcoding pipeline to create DASH/ HLS compatible video files & playlists
+                      - generic [ref=e422]:
+                        - generic [ref=e423]: Encoding & Codecs
+                        - generic [ref=e424]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e425]:
+                          - /url: /tag/hls
+                          - generic [ref=e426]: "#hls"
+                        - link "Browse resources tagged ffmpeg" [ref=e427]:
+                          - /url: /tag/ffmpeg
+                          - generic [ref=e428]: "#ffmpeg"
+                        - link "Browse resources tagged transcoding" [ref=e429]:
+                          - /url: /tag/transcoding
+                          - generic [ref=e430]: "#transcoding"
+                    - article [ref=e431] [cursor=pointer]:
+                      - generic [ref=e432]:
+                        - generic [ref=e433]:
+                          - generic [ref=e434]: ▥
+                          - generic [ref=e435]:
+                            - link "View details for HLS Stream Health Monitoring Tool" [ref=e436]:
+                              - /url: /resource/185673
+                              - generic [ref=e437]:
+                                - img [ref=e438]
+                                - generic [ref=e440]: View Details
+                            - button "Show 2 more tags" [ref=e441]: +2 more
+                            - generic [ref=e442]:
+                              - link "Open Link HLS Stream Health Monitoring Tool (opens in new tab)" [ref=e443]:
+                                - /url: https://github.com/imsanthosh/HLS-Stream-health-monitoring-tool
+                                - img
+                                - generic [ref=e444]: Open Link
+                                - generic [ref=e445]: HLS Stream Health Monitoring Tool (opens in new tab)
+                              - 'button "Suggest an edit: HLS Stream Health Monitoring Tool" [ref=e446]':
+                                - img
+                          - generic [ref=e448]:
+                            - 'button "Add to favorites: HLS Stream Health Monitoring Tool" [ref=e449]':
+                              - generic [ref=e450]:
+                                - img
+                            - 'button "Add bookmark: HLS Stream Health Monitoring Tool" [ref=e451]':
+                              - generic [ref=e452]:
+                                - img
+                        - heading "HLS Stream Health Monitoring Tool" [level=2] [ref=e454]:
+                          - link "HLS Stream Health Monitoring Tool" [ref=e455]:
+                            - /url: /resource/185673
+                        - paragraph [ref=e456]: HLS stream health monitoring utility tool provides an report of live HLS stream. This utility tool checks the all available bitrate streams and generates the report in html file format.
+                      - generic [ref=e458]:
+                        - generic [ref=e459]: Media Tools
+                        - generic [ref=e460]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e461]:
+                          - /url: /tag/hls
+                          - generic [ref=e462]: "#hls"
+                        - link "Browse resources tagged stream-monitoring" [ref=e463]:
+                          - /url: /tag/stream-monitoring
+                          - generic [ref=e464]: "#stream-monitoring"
+                        - link "Browse resources tagged health-check" [ref=e465]:
+                          - /url: /tag/health-check
+                          - generic [ref=e466]: "#health-check"
+                    - article [ref=e467] [cursor=pointer]:
+                      - generic [ref=e468]:
+                        - generic [ref=e469]:
+                          - generic [ref=e470]: ⟁
+                          - generic [ref=e471]:
+                            - link "View details for NGINX VOD Module Fmp4 HLS" [ref=e472]:
+                              - /url: /resource/185664
+                              - generic [ref=e473]:
+                                - img [ref=e474]
+                                - generic [ref=e476]: View Details
+                            - button "Show 2 more tags" [ref=e477]: +2 more
+                            - generic [ref=e478]:
+                              - link "Open Link NGINX VOD Module Fmp4 HLS (opens in new tab)" [ref=e479]:
+                                - /url: https://github.com/flavioribeiro/nginx-vod-module-fmp4-hls
+                                - img
+                                - generic [ref=e480]: Open Link
+                                - generic [ref=e481]: NGINX VOD Module Fmp4 HLS (opens in new tab)
+                              - 'button "Suggest an edit: NGINX VOD Module Fmp4 HLS" [ref=e482]':
+                                - img
+                          - generic [ref=e484]:
+                            - 'button "Add to favorites: NGINX VOD Module Fmp4 HLS" [ref=e485]':
+                              - generic [ref=e486]:
+                                - img
+                            - 'button "Add bookmark: NGINX VOD Module Fmp4 HLS" [ref=e487]':
+                              - generic [ref=e488]:
+                                - img
+                        - heading "NGINX VOD Module Fmp4 HLS" [level=2] [ref=e490]:
+                          - link "NGINX VOD Module Fmp4 HLS" [ref=e491]:
+                            - /url: /resource/185664
+                        - paragraph [ref=e492]: Play fragmented mp4's on HLS using nginx-vod-module
+                      - generic [ref=e494]:
+                        - generic [ref=e495]: Protocols & Transport
+                        - generic [ref=e496]: Libraries
+                        - link "Browse resources tagged hls" [ref=e497]:
+                          - /url: /tag/hls
+                          - generic [ref=e498]: "#hls"
+                        - link "Browse resources tagged nginx" [ref=e499]:
+                          - /url: /tag/nginx
+                          - generic [ref=e500]: "#nginx"
+                        - link "Browse resources tagged fragmented-mp4" [ref=e501]:
+                          - /url: /tag/fragmented-mp4
+                          - generic [ref=e502]: "#fragmented-mp4"
+                    - article [ref=e503] [cursor=pointer]:
+                      - generic [ref=e504]:
+                        - generic [ref=e505]:
+                          - generic [ref=e506]: ⟁
+                          - generic [ref=e507]:
+                            - link "View details for NGINX Audio Track For HLS Module" [ref=e508]:
+                              - /url: /resource/185663
+                              - generic [ref=e509]:
+                                - img [ref=e510]
+                                - generic [ref=e512]: View Details
+                            - button "Show 2 more tags" [ref=e513]: +2 more
+                            - generic [ref=e514]:
+                              - link "Open Link NGINX Audio Track For HLS Module (opens in new tab)" [ref=e515]:
+                                - /url: https://github.com/flavioribeiro/nginx-audio-track-for-hls-module
+                                - img
+                                - generic [ref=e516]: Open Link
+                                - generic [ref=e517]: NGINX Audio Track For HLS Module (opens in new tab)
+                              - 'button "Suggest an edit: NGINX Audio Track For HLS Module" [ref=e518]':
+                                - img
+                          - generic [ref=e520]:
+                            - 'button "Add to favorites: NGINX Audio Track For HLS Module" [ref=e521]':
+                              - generic [ref=e522]:
+                                - img
+                            - 'button "Add bookmark: NGINX Audio Track For HLS Module" [ref=e523]':
+                              - generic [ref=e524]:
+                                - img
+                        - heading "NGINX Audio Track For HLS Module" [level=2] [ref=e526]:
+                          - link "NGINX Audio Track For HLS Module" [ref=e527]:
+                            - /url: /resource/185663
+                        - paragraph [ref=e528]: Nginx module that generates audio track for HTTP Live Streaming (HLS) streams on the fly.
+                      - generic [ref=e530]:
+                        - generic [ref=e531]: Protocols & Transport
+                        - generic [ref=e532]: Libraries
+                        - link "Browse resources tagged hls" [ref=e533]:
+                          - /url: /tag/hls
+                          - generic [ref=e534]: "#hls"
+                        - link "Browse resources tagged nginx" [ref=e535]:
+                          - /url: /tag/nginx
+                          - generic [ref=e536]: "#nginx"
+                        - link "Browse resources tagged audio" [ref=e537]:
+                          - /url: /tag/audio
+                          - generic [ref=e538]: "#audio"
+                    - article [ref=e539] [cursor=pointer]:
+                      - generic [ref=e540]:
+                        - generic [ref=e541]:
+                          - generic [ref=e542]: ⟁
+                          - generic [ref=e543]:
+                            - link "View details for HLS Analyzer" [ref=e544]:
+                              - /url: /resource/185659
+                              - generic [ref=e545]:
+                                - img [ref=e546]
+                                - generic [ref=e548]: View Details
+                            - button "Show 2 more tags" [ref=e549]: +2 more
+                            - generic [ref=e550]:
+                              - link "Open Link HLS Analyzer (opens in new tab)" [ref=e551]:
+                                - /url: https://github.com/epiclabs-io/hls-analyzer
+                                - img
+                                - generic [ref=e552]: Open Link
+                                - generic [ref=e553]: HLS Analyzer (opens in new tab)
+                              - 'button "Suggest an edit: HLS Analyzer" [ref=e554]':
+                                - img
+                          - generic [ref=e556]:
+                            - 'button "Add to favorites: HLS Analyzer" [ref=e557]':
+                              - generic [ref=e558]:
+                                - img
+                            - 'button "Add bookmark: HLS Analyzer" [ref=e559]':
+                              - generic [ref=e560]:
+                                - img
+                        - heading "HLS Analyzer" [level=2] [ref=e562]:
+                          - link "HLS Analyzer" [ref=e563]:
+                            - /url: /resource/185659
+                        - paragraph [ref=e564]: Analyzer for HTTP Live Streams (HLS) content.
+                      - generic [ref=e566]:
+                        - generic [ref=e567]: Protocols & Transport
+                        - generic [ref=e568]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e569]:
+                          - /url: /tag/hls
+                          - generic [ref=e570]: "#hls"
+                        - link "Browse resources tagged analyzer" [ref=e571]:
+                          - /url: /tag/analyzer
+                          - generic [ref=e572]: "#analyzer"
+                        - link "Browse resources tagged streaming" [ref=e573]:
+                          - /url: /tag/streaming
+                          - generic [ref=e574]: "#streaming"
+                    - article [ref=e575] [cursor=pointer]:
+                      - generic [ref=e576]:
+                        - generic [ref=e577]:
+                          - generic [ref=e578]: ▶
+                          - generic [ref=e579]:
+                            - link "View details for URLSessionHLSDownload" [ref=e580]:
+                              - /url: /resource/185656
+                              - generic [ref=e581]:
+                                - img [ref=e582]
+                                - generic [ref=e584]: View Details
+                            - button "Show 3 more tags" [ref=e585]: +3 more
+                            - generic [ref=e586]:
+                              - link "Open Link URLSessionHLSDownload (opens in new tab)" [ref=e587]:
+                                - /url: https://github.com/dhairav/URLSessionHLSDownload
+                                - img
+                                - generic [ref=e588]: Open Link
+                                - generic [ref=e589]: URLSessionHLSDownload (opens in new tab)
+                              - 'button "Suggest an edit: URLSessionHLSDownload" [ref=e590]':
+                                - img
+                          - generic [ref=e592]:
+                            - 'button "Add to favorites: URLSessionHLSDownload" [ref=e593]':
+                              - generic [ref=e594]:
+                                - img
+                            - 'button "Add bookmark: URLSessionHLSDownload" [ref=e595]':
+                              - generic [ref=e596]:
+                                - img
+                        - heading "URLSessionHLSDownload" [level=2] [ref=e598]:
+                          - link "URLSessionHLSDownload" [ref=e599]:
+                            - /url: /resource/185656
+                        - paragraph [ref=e600]: A swift 3 implementation for downloading HLS content and play it back using native AVPlayer
+                      - generic [ref=e602]:
+                        - generic [ref=e603]: Players & Clients
+                        - generic [ref=e604]: Libraries
+                        - link "Browse resources tagged hls" [ref=e605]:
+                          - /url: /tag/hls
+                          - generic [ref=e606]: "#hls"
+                        - link "Browse resources tagged ios" [ref=e607]:
+                          - /url: /tag/ios
+                          - generic [ref=e608]: "#ios"
+                        - link "Browse resources tagged avplayer" [ref=e609]:
+                          - /url: /tag/avplayer
+                          - generic [ref=e610]: "#avplayer"
+                    - article [ref=e611] [cursor=pointer]:
+                      - generic [ref=e612]:
+                        - generic [ref=e613]:
+                          - generic [ref=e614]: ⟁
+                          - generic [ref=e615]:
+                            - link "View details for Hlstools" [ref=e616]:
+                              - /url: /resource/185632
+                              - generic [ref=e617]:
+                                - img [ref=e618]
+                                - generic [ref=e620]: View Details
+                            - button "Show 1 more tag" [ref=e621]: +1 more
+                            - generic [ref=e622]:
+                              - link "Open Link Hlstools (opens in new tab)" [ref=e623]:
+                                - /url: https://github.com/muxinc/hlstools
+                                - img
+                                - generic [ref=e624]: Open Link
+                                - generic [ref=e625]: Hlstools (opens in new tab)
+                              - 'button "Suggest an edit: Hlstools" [ref=e626]':
+                                - img
+                          - generic [ref=e628]:
+                            - 'button "Add to favorites: Hlstools" [ref=e629]':
+                              - generic [ref=e630]:
+                                - img
+                            - 'button "Add bookmark: Hlstools" [ref=e631]':
+                              - generic [ref=e632]:
+                                - img
+                        - heading "Hlstools" [level=2] [ref=e634]:
+                          - link "Hlstools" [ref=e635]:
+                            - /url: /resource/185632
+                        - paragraph [ref=e636]: Tools for working with HLS streams, including parsing, inspection, and manipulation of HTTP Live Streaming manifest and segment files.
+                      - generic [ref=e638]:
+                        - generic [ref=e639]: Protocols & Transport
+                        - generic [ref=e640]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e641]:
+                          - /url: /tag/hls
+                          - generic [ref=e642]: "#hls"
+                        - link "Browse resources tagged streaming" [ref=e643]:
+                          - /url: /tag/streaming
+                          - generic [ref=e644]: "#streaming"
+                        - link "Browse resources tagged tool" [ref=e645]:
+                          - /url: /tag/tool
+                          - generic [ref=e646]: "#tool"
+                    - article [ref=e647] [cursor=pointer]:
+                      - generic [ref=e648]:
+                        - generic [ref=e649]:
+                          - generic [ref=e650]: ▶
+                          - generic [ref=e651]:
+                            - link "View details for Indigo Player" [ref=e652]:
+                              - /url: /resource/185619
+                              - generic [ref=e653]:
+                                - img [ref=e654]
+                                - generic [ref=e656]: View Details
+                            - button "Show 3 more tags" [ref=e657]: +3 more
+                            - generic [ref=e658]:
+                              - link "Open Link Indigo Player (opens in new tab)" [ref=e659]:
+                                - /url: https://github.com/matvp91/indigo-player
+                                - img
+                                - generic [ref=e660]: Open Link
+                                - generic [ref=e661]: Indigo Player (opens in new tab)
+                              - 'button "Suggest an edit: Indigo Player" [ref=e662]':
+                                - img
+                          - generic [ref=e664]:
+                            - 'button "Add to favorites: Indigo Player" [ref=e665]':
+                              - generic [ref=e666]:
+                                - img
+                            - 'button "Add bookmark: Indigo Player" [ref=e667]':
+                              - generic [ref=e668]:
+                                - img
+                        - heading "Indigo Player" [level=2] [ref=e670]:
+                          - link "Indigo Player" [ref=e671]:
+                            - /url: /resource/185619
+                        - paragraph [ref=e672]: Highly extensible, modern, JavaScript video player. Handles MPEG-DASH / HLS / MPEG-4 and is built on top of the HTML5 video element.
+                      - generic [ref=e674]:
+                        - generic [ref=e675]: Players & Clients
+                        - generic [ref=e676]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e677]:
+                          - /url: /tag/hls
+                          - generic [ref=e678]: "#hls"
+                        - link "Browse resources tagged javascript" [ref=e679]:
+                          - /url: /tag/javascript
+                          - generic [ref=e680]: "#javascript"
+                        - link "Browse resources tagged html5" [ref=e681]:
+                          - /url: /tag/html5
+                          - generic [ref=e682]: "#html5"
+                    - article [ref=e683] [cursor=pointer]:
+                      - generic [ref=e684]:
+                        - generic [ref=e685]:
+                          - generic [ref=e686]: ⟁
+                          - generic [ref=e687]:
+                            - link "View details for HTTP Streaming" [ref=e688]:
+                              - /url: /resource/185611
+                              - generic [ref=e689]:
+                                - img [ref=e690]
+                                - generic [ref=e692]: View Details
+                            - button "Show 3 more tags" [ref=e693]: +3 more
+                            - generic [ref=e694]:
+                              - link "Open Link HTTP Streaming (opens in new tab)" [ref=e695]:
+                                - /url: https://github.com/videojs/http-streaming
+                                - img
+                                - generic [ref=e696]: Open Link
+                                - generic [ref=e697]: HTTP Streaming (opens in new tab)
+                              - 'button "Suggest an edit: HTTP Streaming" [ref=e698]':
+                                - img
+                          - generic [ref=e700]:
+                            - 'button "Add to favorites: HTTP Streaming" [ref=e701]':
+                              - generic [ref=e702]:
+                                - img
+                            - 'button "Add bookmark: HTTP Streaming" [ref=e703]':
+                              - generic [ref=e704]:
+                                - img
+                        - heading "HTTP Streaming" [level=2] [ref=e706]:
+                          - link "HTTP Streaming" [ref=e707]:
+                            - /url: /resource/185611
+                        - paragraph [ref=e708]: HLS, DASH, and future HTTP streaming protocols library for video.js
+                      - generic [ref=e710]:
+                        - generic [ref=e711]: Protocols & Transport
+                        - generic [ref=e712]: Libraries
+                        - link "Browse resources tagged hls" [ref=e713]:
+                          - /url: /tag/hls
+                          - generic [ref=e714]: "#hls"
+                        - link "Browse resources tagged dash" [ref=e715]:
+                          - /url: /tag/dash
+                          - generic [ref=e716]: "#dash"
+                        - link "Browse resources tagged streaming" [ref=e717]:
+                          - /url: /tag/streaming
+                          - generic [ref=e718]: "#streaming"
+                    - article [ref=e719] [cursor=pointer]:
+                      - generic [ref=e720]:
+                        - generic [ref=e721]:
+                          - generic [ref=e722]: ⟁
+                          - generic [ref=e723]:
+                            - link "View details for HLS Cutsegment" [ref=e724]:
+                              - /url: /resource/185609
+                              - generic [ref=e725]:
+                                - img [ref=e726]
+                                - generic [ref=e728]: View Details
+                            - button "Show 2 more tags" [ref=e729]: +2 more
+                            - generic [ref=e730]:
+                              - link "Open Link HLS Cutsegment (opens in new tab)" [ref=e731]:
+                                - /url: https://github.com/Eyevinn/hls-cutsegment
+                                - img
+                                - generic [ref=e732]: Open Link
+                                - generic [ref=e733]: HLS Cutsegment (opens in new tab)
+                              - 'button "Suggest an edit: HLS Cutsegment" [ref=e734]':
+                                - img
+                          - generic [ref=e736]:
+                            - 'button "Add to favorites: HLS Cutsegment" [ref=e737]':
+                              - generic [ref=e738]:
+                                - img
+                            - 'button "Add bookmark: HLS Cutsegment" [ref=e739]':
+                              - generic [ref=e740]:
+                                - img
+                        - heading "HLS Cutsegment" [level=2] [ref=e742]:
+                          - link "HLS Cutsegment" [ref=e743]:
+                            - /url: /resource/185609
+                        - paragraph [ref=e744]: A web app that lets you insert a cut into a segment, which is then cut into two new segments.
+                      - generic [ref=e746]:
+                        - generic [ref=e747]: Protocols & Transport
+                        - generic [ref=e748]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e749]:
+                          - /url: /tag/hls
+                          - generic [ref=e750]: "#hls"
+                        - link "Browse resources tagged segmentation" [ref=e751]:
+                          - /url: /tag/segmentation
+                          - generic [ref=e752]: "#segmentation"
+                        - link "Browse resources tagged web-app" [ref=e753]:
+                          - /url: /tag/web-app
+                          - generic [ref=e754]: "#web-app"
+                    - article [ref=e755] [cursor=pointer]:
+                      - generic [ref=e756]:
+                        - generic [ref=e757]:
+                          - generic [ref=e758]: ▣
+                          - generic [ref=e759]:
+                            - link "View details for HLS.js P2P Engine" [ref=e760]:
+                              - /url: /resource/185601
+                              - generic [ref=e761]:
+                                - img [ref=e762]
+                                - generic [ref=e764]: View Details
+                            - button "Show 2 more tags" [ref=e765]: +2 more
+                            - generic [ref=e766]:
+                              - link "Open Link HLS.js P2P Engine (opens in new tab)" [ref=e767]:
+                                - /url: https://github.com/cdnbye/hlsjs-p2p-engine
+                                - img
+                                - generic [ref=e768]: Open Link
+                                - generic [ref=e769]: HLS.js P2P Engine (opens in new tab)
+                              - 'button "Suggest an edit: HLS.js P2P Engine" [ref=e770]':
+                                - img
+                          - generic [ref=e772]:
+                            - 'button "Add to favorites: HLS.js P2P Engine" [ref=e773]':
+                              - generic [ref=e774]:
+                                - img
+                            - 'button "Add bookmark: HLS.js P2P Engine" [ref=e775]':
+                              - generic [ref=e776]:
+                                - img
+                        - heading "HLS.js P2P Engine" [level=2] [ref=e778]:
+                          - link "HLS.js P2P Engine" [ref=e779]:
+                            - /url: /resource/185601
+                        - paragraph [ref=e780]: A hls.js plugin to offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
+                      - generic [ref=e782]:
+                        - generic [ref=e783]: Infrastructure & Delivery
+                        - generic [ref=e784]: Libraries
+                        - link "Browse resources tagged hls" [ref=e785]:
+                          - /url: /tag/hls
+                          - generic [ref=e786]: "#hls"
+                        - link "Browse resources tagged p2p" [ref=e787]:
+                          - /url: /tag/p2p
+                          - generic [ref=e788]: "#p2p"
+                        - link "Browse resources tagged cdn" [ref=e789]:
+                          - /url: /tag/cdn
+                          - generic [ref=e790]: "#cdn"
+                    - article [ref=e791] [cursor=pointer]:
+                      - generic [ref=e792]:
+                        - generic [ref=e793]:
+                          - generic [ref=e794]: ▣
+                          - generic [ref=e795]:
+                            - link "View details for Gohls" [ref=e796]:
+                              - /url: /resource/185600
+                              - generic [ref=e797]:
+                                - img [ref=e798]
+                                - generic [ref=e800]: View Details
+                            - button "Show 2 more tags" [ref=e801]: +2 more
+                            - generic [ref=e802]:
+                              - link "Open Link Gohls (opens in new tab)" [ref=e803]:
+                                - /url: https://github.com/shimberger/gohls
+                                - img
+                                - generic [ref=e804]: Open Link
+                                - generic [ref=e805]: Gohls (opens in new tab)
+                              - 'button "Suggest an edit: Gohls" [ref=e806]':
+                                - img
+                          - generic [ref=e808]:
+                            - 'button "Add to favorites: Gohls" [ref=e809]':
+                              - generic [ref=e810]:
+                                - img
+                            - 'button "Add bookmark: Gohls" [ref=e811]':
+                              - generic [ref=e812]:
+                                - img
+                        - heading "Gohls" [level=2] [ref=e814]:
+                          - link "Gohls" [ref=e815]:
+                            - /url: /resource/185600
+                        - paragraph [ref=e816]: A server that exposes a directory for video streaming via web interface
+                      - generic [ref=e818]:
+                        - generic [ref=e819]: Infrastructure & Delivery
+                        - generic [ref=e820]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e821]:
+                          - /url: /tag/hls
+                          - generic [ref=e822]: "#hls"
+                        - link "Browse resources tagged go" [ref=e823]:
+                          - /url: /tag/go
+                          - generic [ref=e824]: "#go"
+                        - link "Browse resources tagged video-server" [ref=e825]:
+                          - /url: /tag/video-server
+                          - generic [ref=e826]: "#video-server"
+                    - article [ref=e827] [cursor=pointer]:
+                      - generic [ref=e828]:
+                        - generic [ref=e829]:
+                          - generic [ref=e830]: ⟁
+                          - generic [ref=e831]:
+                            - link "View details for AWS Stale Playlist Detector" [ref=e832]:
+                              - /url: /resource/185589
+                              - generic [ref=e833]:
+                                - img [ref=e834]
+                                - generic [ref=e836]: View Details
+                            - button "Show 3 more tags" [ref=e837]: +3 more
+                            - generic [ref=e838]:
+                              - link "Open Link AWS Stale Playlist Detector (opens in new tab)" [ref=e839]:
+                                - /url: https://github.com/awslabs/aws-stale-playlist-detector
+                                - img
+                                - generic [ref=e840]: Open Link
+                                - generic [ref=e841]: AWS Stale Playlist Detector (opens in new tab)
+                              - 'button "Suggest an edit: AWS Stale Playlist Detector" [ref=e842]':
+                                - img
+                          - generic [ref=e844]:
+                            - 'button "Add to favorites: AWS Stale Playlist Detector" [ref=e845]':
+                              - generic [ref=e846]:
+                                - img
+                            - 'button "Add bookmark: AWS Stale Playlist Detector" [ref=e847]':
+                              - generic [ref=e848]:
+                                - img
+                        - heading "AWS Stale Playlist Detector" [level=2] [ref=e850]:
+                          - link "AWS Stale Playlist Detector" [ref=e851]:
+                            - /url: /resource/185589
+                        - paragraph [ref=e852]: The Stale Playlist Detector (SPD) is a tool to monitor live HLS origin endpoints for changing playlists.
+                      - generic [ref=e854]:
+                        - generic [ref=e855]: Protocols & Transport
+                        - generic [ref=e856]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e857]:
+                          - /url: /tag/hls
+                          - generic [ref=e858]: "#hls"
+                        - link "Browse resources tagged monitoring" [ref=e859]:
+                          - /url: /tag/monitoring
+                          - generic [ref=e860]: "#monitoring"
+                        - link "Browse resources tagged playlist" [ref=e861]:
+                          - /url: /tag/playlist
+                          - generic [ref=e862]: "#playlist"
+                    - article [ref=e863] [cursor=pointer]:
+                      - generic [ref=e864]:
+                        - generic [ref=e865]:
+                          - generic [ref=e866]: ◇
+                          - generic [ref=e867]:
+                            - link "View details for Manifesto" [ref=e868]:
+                              - /url: /resource/185585
+                              - generic [ref=e869]:
+                                - img [ref=e870]
+                                - generic [ref=e872]: View Details
+                            - button "Show 2 more tags" [ref=e873]: +2 more
+                            - generic [ref=e874]:
+                              - link "Open Link Manifesto (opens in new tab)" [ref=e875]:
+                                - /url: https://github.com/gitfu/manifesto
+                                - img
+                                - generic [ref=e876]: Open Link
+                                - generic [ref=e877]: Manifesto (opens in new tab)
+                              - 'button "Suggest an edit: Manifesto" [ref=e878]':
+                                - img
+                          - generic [ref=e880]:
+                            - 'button "Add to favorites: Manifesto" [ref=e881]':
+                              - generic [ref=e882]:
+                                - img
+                            - 'button "Add bookmark: Manifesto" [ref=e883]':
+                              - generic [ref=e884]:
+                                - img
+                        - heading "Manifesto" [level=2] [ref=e886]:
+                          - link "Manifesto" [ref=e887]:
+                            - /url: /resource/185585
+                        - paragraph [ref=e888]: Manifesto is an HLS tool for creating multiple variants, a master .m3u8 file, and converting 608 captions to segmented webvtt subtitles via ffmpeg.
+                      - generic [ref=e890]:
+                        - generic [ref=e891]: Encoding & Codecs
+                        - generic [ref=e892]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e893]:
+                          - /url: /tag/hls
+                          - generic [ref=e894]: "#hls"
+                        - link "Browse resources tagged ffmpeg" [ref=e895]:
+                          - /url: /tag/ffmpeg
+                          - generic [ref=e896]: "#ffmpeg"
+                        - link "Browse resources tagged encoding" [ref=e897]:
+                          - /url: /tag/encoding
+                          - generic [ref=e898]: "#encoding"
+                    - article [ref=e899] [cursor=pointer]:
+                      - generic [ref=e900]:
+                        - generic [ref=e901]:
+                          - generic [ref=e902]: ⟁
+                          - generic [ref=e903]:
+                            - link "View details for Dl" [ref=e904]:
+                              - /url: /resource/185582
+                              - generic [ref=e905]:
+                                - img [ref=e906]
+                                - generic [ref=e908]: View Details
+                            - button "Show 2 more tags" [ref=e909]: +2 more
+                            - generic [ref=e910]:
+                              - link "Open Link Dl (opens in new tab)" [ref=e911]:
+                                - /url: https://github.com/schedules/dl
+                                - img
+                                - generic [ref=e912]: Open Link
+                                - generic [ref=e913]: Dl (opens in new tab)
+                              - 'button "Suggest an edit: Dl" [ref=e914]':
+                                - img
+                          - generic [ref=e916]:
+                            - 'button "Add to favorites: Dl" [ref=e917]':
+                              - generic [ref=e918]:
+                                - img
+                            - 'button "Add bookmark: Dl" [ref=e919]':
+                              - generic [ref=e920]:
+                                - img
+                        - heading "Dl" [level=2] [ref=e922]:
+                          - link "Dl" [ref=e923]:
+                            - /url: /resource/185582
+                        - paragraph [ref=e924]: Node.js DASH and HLS downloader.
+                      - generic [ref=e926]:
+                        - generic [ref=e927]: Protocols & Transport
+                        - generic [ref=e928]: Tools & SDKs
+                        - link "Browse resources tagged hls" [ref=e929]:
+                          - /url: /tag/hls
+                          - generic [ref=e930]: "#hls"
+                        - link "Browse resources tagged downloader" [ref=e931]:
+                          - /url: /tag/downloader
+                          - generic [ref=e932]: "#downloader"
+                        - link "Browse resources tagged dash" [ref=e933]:
+                          - /url: /tag/dash
+                          - generic [ref=e934]: "#dash"
+                  - navigation "Pagination" [ref=e936]:
+                    - generic [ref=e937]:
+                      - generic:
+                        - img
+                        - text: Previous
+                      - link "Page 1, current page" [ref=e938] [cursor=pointer]:
+                        - /url: /tag/hls
+                        - text: "1"
+                      - link "Go to page 2" [ref=e939] [cursor=pointer]:
+                        - /url: /tag/hls?page=2
+                        - text: "2"
+                      - link "Go to page 3" [ref=e940] [cursor=pointer]:
+                        - /url: /tag/hls?page=3
+                        - text: "3"
+                      - link "Next" [ref=e941] [cursor=pointer]:
+                        - /url: /tag/hls?page=2
+                        - text: Next
+                        - img
+                    - generic [ref=e943]: Page 1 of 3
+                    - status [ref=e944]
+                - region "Explore related topics" [ref=e945]:
+                  - heading "Explore related topics" [level=2] [ref=e946]
+                  - generic [ref=e947]:
+                    - link "Protocols & Transport 32" [ref=e948] [cursor=pointer]:
+                      - /url: /category/protocols-transport
+                      - generic [ref=e949]: Protocols & Transport
+                      - generic [ref=e950]: "32"
+                    - link "Infrastructure & Delivery 13" [ref=e951] [cursor=pointer]:
+                      - /url: /category/infrastructure-delivery
+                      - generic [ref=e952]: Infrastructure & Delivery
+                      - generic [ref=e953]: "13"
+                    - link "Players & Clients 8" [ref=e954] [cursor=pointer]:
+                      - /url: /category/players-clients
+                      - generic [ref=e955]: Players & Clients
+                      - generic [ref=e956]: "8"
+                    - link "Media Tools 4" [ref=e957] [cursor=pointer]:
+                      - /url: /category/media-tools
+                      - generic [ref=e958]: Media Tools
+                      - generic [ref=e959]: "4"
+                    - link "Intro & Learning 3" [ref=e960] [cursor=pointer]:
+                      - /url: /category/intro-learning
+                      - generic [ref=e961]: Intro & Learning
+                      - generic [ref=e962]: "3"
+                    - link "Encoding & Codecs 2" [ref=e963] [cursor=pointer]:
+                      - /url: /category/encoding-codecs
+                      - generic [ref=e964]: Encoding & Codecs
+                      - generic [ref=e965]: "2"
+                    - link "#Streaming 16" [ref=e966] [cursor=pointer]:
+                      - /url: /tag/streaming
+                      - generic [ref=e967]: "#Streaming"
+                      - generic [ref=e968]: "16"
+                    - link "#DASH 6" [ref=e969] [cursor=pointer]:
+                      - /url: /tag/dash
+                      - generic [ref=e970]: "#DASH"
+                      - generic [ref=e971]: "6"
+                    - link "#FFMPEG 3" [ref=e972] [cursor=pointer]:
+                      - /url: /tag/ffmpeg
+                      - generic [ref=e973]: "#FFMPEG"
+                      - generic [ref=e974]: "3"
+                    - link "#HTML5 3" [ref=e975] [cursor=pointer]:
+                      - /url: /tag/html5
+                      - generic [ref=e976]: "#HTML5"
+                      - generic [ref=e977]: "3"
+                    - link "#RTMP 3" [ref=e978] [cursor=pointer]:
+                      - /url: /tag/rtmp
+                      - generic [ref=e979]: "#RTMP"
+                      - generic [ref=e980]: "3"
+                    - link "#Adaptive Streaming 2" [ref=e981] [cursor=pointer]:
+                      - /url: /tag/adaptive-streaming
+                      - generic [ref=e982]: "#Adaptive Streaming"
+                      - generic [ref=e983]: "2"
+                    - link "#Download 2" [ref=e984] [cursor=pointer]:
+                      - /url: /tag/download
+                      - generic [ref=e985]: "#Download"
+                      - generic [ref=e986]: "2"
+                    - link "#Encoding 2" [ref=e987] [cursor=pointer]:
+                      - /url: /tag/encoding
+                      - generic [ref=e988]: "#Encoding"
+                      - generic [ref=e989]: "2"
+          - contentinfo [ref=e990]:
+            - generic [ref=e991]:
+              - generic [ref=e992]:
+                - paragraph [ref=e993]: ── INDEX
+                - link "awesome.video home" [ref=e994] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e995]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - generic [ref=e997]:
+                - heading "INDEXED" [level=2] [ref=e998]
+                - paragraph [ref=e999]: 3,826
+                - paragraph [ref=e1000]:
+                  - text: 9 categories
+                  - text: 99 subcategories
+                  - generic [ref=e1001]: live
+              - navigation "Explore categories" [ref=e1003]:
+                - heading "EXPLORE" [level=2] [ref=e1004]
+                - generic [ref=e1005]:
+                  - link "Community & Events" [ref=e1006] [cursor=pointer]:
+                    - /url: /category/community-events
+                    - generic [ref=e1007]: ◈
+                    - generic [ref=e1008]: Community
+                  - link "Encoding & Codecs" [ref=e1009] [cursor=pointer]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e1010]: ◇
+                    - generic [ref=e1011]: Encoding
+                  - link "General Tools" [ref=e1012] [cursor=pointer]:
+                    - /url: /category/general-tools
+                    - generic [ref=e1013]: ◆
+                    - generic [ref=e1014]: General
+                  - link "Infrastructure & Delivery" [ref=e1015] [cursor=pointer]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e1016]: ▣
+                    - generic [ref=e1017]: Infrastructure
+                  - link "Intro & Learning" [ref=e1018] [cursor=pointer]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e1019]: ▤
+                    - generic [ref=e1020]: Intro
+                  - link "Media Tools" [ref=e1021] [cursor=pointer]:
+                    - /url: /category/media-tools
+                    - generic [ref=e1022]: ▥
+                    - generic [ref=e1023]: Media
+                  - link "Players & Clients" [ref=e1024] [cursor=pointer]:
+                    - /url: /category/players-clients
+                    - generic [ref=e1025]: ▶
+                    - generic [ref=e1026]: Players
+                  - link "Protocols & Transport" [ref=e1027] [cursor=pointer]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e1028]: ⟁
+                    - generic [ref=e1029]: Protocols
+                  - link "Standards & Industry" [ref=e1030] [cursor=pointer]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e1031]: ◉
+                    - generic [ref=e1032]: Standards
+              - generic [ref=e1033]:
+                - heading "SOURCE" [level=2] [ref=e1034]
+                - link "krzemienski/awesome-video" [ref=e1035] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e1036]
+                  - generic [ref=e1038]:
+                    - text: krzemienski
+                    - generic [ref=e1039]:
+                      - text: /
+                      - text: awesome-video
+                  - generic [ref=e1040]: ↗
+                - paragraph [ref=e1041]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e1042] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+                - button "Contact maintainers" [ref=e1044] [cursor=pointer]:
+                  - img
+                  - text: Contact maintainers
+            - generic [ref=e1045]:
+              - generic [ref=e1046]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e1047]:
+                - link "About" [ref=e1048] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e1049] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e1050] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e1051] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - button "Cookie settings" [ref=e1052] [cursor=pointer]
+                - link "Issues ↗" [ref=e1053] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e1054] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e1055]: built with the awesome-list framework
+  - status [ref=e1056]: Notification Bookmark added

@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks?collection=155",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<body>\n    <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.\n         (A prior \"noscript\" match in this file was only a comment.) -->\n    <noscript>\n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);\">\n        <p style=\"font-size:20px;font-weight:700;margin:0 0 12px;\">Awesome Video</p>\n        <p style=\"margin:0 0 8px;\">This app requires JavaScr",
+  "umami": "1",
+  "consent": "denied"
+}

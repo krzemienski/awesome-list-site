@@ -1,0 +1,45 @@
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-335-settings-end-820.png
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e5]
+  - link "AWESOME.VIDEO home" [ref=e6]
+  - button "Search 3,826 resources" [ref=e7]
+  - button "Admin, account menu" [expanded=false, ref=e8]
+  - navigation "Breadcrumb" [ref=e9]
+  - link "Back" [ref=e10]
+  - heading "Settings" [level=1, ref=e11]
+  - link [ref=e12]
+  - link [ref=e13]
+  - link [ref=e14]
+  - link [ref=e15]
+  - link [ref=e16]
+  - region "Home layout" [ref=e17]
+  - region "Learning preferences" [ref=e18]
+  - region "Notifications" [ref=e19]
+  - link "awesome.video home" [ref=e20]
+  - heading "INDEXED" [level=2, ref=e21]
+  - navigation "Explore categories" [ref=e22]
+  - heading "SOURCE" [level=2, ref=e23]
+  - link "krzemienski/ awesome-video" [ref=e24]
+  - link "PRs welcome" [ref=e37]
+  - button "Contact maintainers" [ref=e25]
+  - navigation "Site policies" [ref=e26]
+  - button "Back to top" [ref=e4]

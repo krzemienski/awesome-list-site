@@ -1,0 +1,31 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e10]
+              - listitem [level=1]
+                - link "Admin" [ref=e11]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e12]
+          - StaticText "Authorized admin area"
+          - heading "Admin Dashboard" [level=1, ref=e9]
+          - paragraph
+            - StaticText "Loading admin dashboard..."

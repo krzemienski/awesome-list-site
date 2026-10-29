@@ -1,0 +1,1 @@
+"Healthy\n3,809\nRedirect\n0\nBroken\n11\nTimeout\n0\nSuspect\n2\n\nCounts are from scan #8 (Aug 4, 2026, 08:18 PM) for resources still in the catalog. When it finished, the scan recorded 12 broken; 11 of those resources are still listed.\n\nMember reports\n0 open\nOpen\nLinks"

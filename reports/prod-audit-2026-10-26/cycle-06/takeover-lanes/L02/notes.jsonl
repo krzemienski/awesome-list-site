@@ -1,0 +1,39 @@
+{"row":"PS-001","v":"PASS","w":"1440 (+q=a short state verified at 1440, scrollWidth ok)","ev":"PS-001-1440.png"}
+{"row":"PS-002","v":"PASS","w":"1440,820,390","ev":"PS-002-palette-open-1440.png, PS-002-390-after-escape.png; q debounced to URL, Escape clears+keeps focus, pristine / opens palette, later / literal (q=a%2Fb)"}
+{"row":"PS-003","v":"PASS","w":"1440","ev":"sort URL values name-asc/name-desc/newest/oldest, relevance drops sort, Back restores (terminal output)"}
+{"row":"PS-004","v":"PASS","w":"1440","ev":"PS-004-subsub-selected-1440.png; sub/subsub need details summary opened; parent toggle clears kids; slug category=encoding-codecs resolves to Encoding & Codecs 580"}
+{"row":"PS-005","v":"PARTIAL","w":"390,1440","ev":"PS-005-sheet-390.png, PS-005-tags-390b.png; Filters sheet focus/Done focus-return OK; tag search ok; Provider/Format/Skill groups absent (code hides inert groups SearchFilters.tsx:95)"}
+{"row":"PS-006","v":"FAIL","ev":"PS-006-invalidsort-1440.png; Clear all leaves sort=bogus (Search.tsx clearFilters includeSort=false); Clear invalid filters wipes q+all (Search.tsx:177 readState(''))"}
+{"row":"PS-008","v":"PARTIAL-PASS","ev":"Next/page19/jump99 clamp ok, abc inline error; typed jump keeps '1abc9' (appends)—ok; out-of-range page=999 clamps w/ notice"}
+{"row":"PS-009","v":"PASS","ev":"PS-009-empty-1440.png; popular categories real /category/* links"}
+{"row":"PS-010","v":"PASS","ev":"PS-010-after-suggest-1440.png"}
+{"row":"PS-011","v":"pending: offline ok, retry says Still offline, reconnect auto-recovers; 600 chars check"}
+{"row":"PS-011","v":"PASS 1440","ev":"PS-011-offline-1440.png, PS-011-overlimit-1440.png; Retry offline says Still offline; reconnect auto loads; 600 chars => Query too long (512); script-like q gives No query not poison. 400/server-error not drivable w/o breaking prod"}
+{"row":"PS-012","v":"PASS 1440","ev":"?tab=/sub= back/forward round trip"}
+{"row":"PS-013","v":"PASS 1440","ev":"sort count/activity/name verified order; show-subcategories checkbox hides subs (Space); q=ffmpeg filters with matches"}
+{"row":"PS-014","v":"PASS 1440","ev":"PS-014-tags-1440x2000.png; selected tags outside first 20 visible (rare-tag-zzz), Clear all"}
+{"row":"PS-015","v":"PASS 1440","ev":"PS-015-collapsed-1440.png, tagfilter shows '1 match' labels"}
+{"row":"PS-018","v":"PASS-partial 1440","ev":"dl/ps018-json-nodesc-notags.json: no description/tags keys, 129 rows; ps020 csv/md/yaml/html all 129 w/ descriptions+tags; categories/grouping not individually flipped"}
+{"row":"PS-020","v":"PARTIAL 1440","ev":"dl/ps020-{markdown,json,csv,html,yaml,pdf}: all nonempty valid (pdf 13pp), html no script, csv no formula cells; toast 'Export Successful'; offline export still succeeds (client-side); double-activation count and PDF spinner not observed"}
+{"row":"PS-021","v":"BLOCKED-tool","ev":"data SSR-embedded; network abort **/api/** no effect on /advanced; error/loading/empty not inducible"}
+{"row":"PS-022","v":"FAIL?","ev":"Explore Categories -> /category/community-events (first category alpha) OK; Browse All -> /categories OK"}
+{"row":"PS-023","v":"PASS 1440","ev":"PS-023-empty-1440.png"}
+{"row":"PS-024","v":"PARTIAL","ev":"guest: Start Journey opens /journey/7 read-only, no POST; member POST BLOCKED-BY-POLICY (writes real owner account)"}
+{"row":"PS-025","v":"PASS 1440","ev":"PS-025-detail-guest-1440.png login href preserves path+query"}
+{"row":"PS-027","v":"PASS 1440 guest","ev":"resource links unique per journey 6-10; internal /resource/188703 opens; external rel noopener, 44px"}
+{"row":"PS-029","v":"PARTIAL","ev":"/journey/99999 and /abc shared 404; loading/error/offline/zero-step not driven"}
+{"row":"PS-030","v":"PASS 1440","ev":"PS-030-guest-1440.png (dashboard = /continue-learning)"}
+{"row":"PS-031/032/033","v":"PARTIAL (read-only member)","ev":"PS-032-member-continue-1440.png; Resume is button (POST) not clicked per policy; recent resource hrefs ok"}
+{"row":"PS-034","v":"PASS 1440","ev":"PS-034-guest-1440.png GET /api/recommendations?limit=12"}
+{"row":"PS-035","v":"PARTIAL","ev":"PS-035-member-recs-1440.png edit prefs ->/settings#learning-preferences; refresh/feedback not clicked"}
+{"row":"PS-042","v":"PASS 1440","ev":"PS-042-cookie-reopen-1440.png; /api/config contact.email unavailable, issues+form available"}
+{"row":"PS-054","v":"PARTIAL","ev":"PS-054-dialog-{1440,820,390}.png PS-054-invalid-390.png; validation retains input, 0 POST; valid submit BLOCKED (persists real contact row, no delete path); variants A-E only the live config driven"}
+{"row":"PS-043","v":"PASS guest 1440 (member PUT not driven)","ev":"PS-043-ds2-1440.png, PS-043-lime-plex-1440.png; radios roving ArrowRight; persists after reload (ls ds-system)"}
+{"row":"PS-044","v":"PASS 1440","ev":"PS-044-geist-lime-1440.png; preview ARTICLE[inert]; only 2 systems exist (row says both systems)"}
+{"row":"PS-045","v":"PASS 1440","ev":"PS-045-signedout-1440.png, PS-045-curated-home-1440.png"}
+{"row":"PS-046","v":"PASS widths 1440/820/390; completion BLOCKED (no login)","ev":"PS-046-signin-*.png; aliases login/forgot/reset/auth/login map next->redirect_url; //evil, https, javascript: dropped"}
+{"row":"PS-047","v":"PARTIAL","ev":"PS-047-signup-390.png; completion BLOCKED (no account creation)"}
+{"row":"PS-048","v":"PARTIAL/BLOCKED-BY-POLICY","ev":"PS-048-admin-1440.png empty submit disabled; wrong/valid/rate-limit not submitted per brief"}
+{"row":"PS-049","v":"BLOCKED-tool","ev":"network abort **clerk** no effect; Clerk unavailable not inducible"}
+{"row":"PS-050","v":"PARTIAL","ev":"/logout as guest -> / ; failure path not forced"}
+{"row":"PS-051","v":"PARTIAL","ev":"guest redirects preserve path/query/hash for profile,contributions,notifications,onboarding,admin; non-admin member not testable (owner is admin)"}

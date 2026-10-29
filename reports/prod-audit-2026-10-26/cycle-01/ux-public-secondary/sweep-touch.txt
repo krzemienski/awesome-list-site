@@ -1,0 +1,76 @@
+== 820 /search
+"{\"w\":820,\"url\":\"/search\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /search?q=ffmpeg
+"{\"w\":820,\"url\":\"/search?q=ffmpeg\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /search?q=zzqxvqq
+"{\"w\":820,\"url\":\"/search?q=zzqxvqq\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /journeys
+"{\"w\":820,\"url\":\"/journeys\",\"h1\":[\"Learning Journeys\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /journey/8
+"{\"w\":820,\"url\":\"/journey/8\",\"h1\":[\"FFmpeg Mastery\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /about
+"{\"w\":820,\"url\":\"/about\",\"h1\":[\"A field journal for video engineers\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /terms
+"{\"w\":820,\"url\":\"/terms\",\"h1\":[\"Terms of Use\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /privacy
+"{\"w\":820,\"url\":\"/privacy\",\"h1\":[\"Privacy Policy\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[[\"BUTTON\",\"button-privacy-cookie-settings\",\"138x24\",\"y1045\",\"\",\"44\"]]}"
+== 820 /code-of-conduct
+"{\"w\":820,\"url\":\"/code-of-conduct\",\"h1\":[\"Code of Conduct\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /design-system
+"{\"w\":820,\"url\":\"/design-system\",\"h1\":[\"Design System\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /settings/theme
+"{\"w\":820,\"url\":\"/settings/theme\",\"h1\":[\"Theme Settings\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /sign-in
+"{\"w\":820,\"url\":\"/sign-in\",\"h1\":[\"Welcome back\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /sign-up
+"{\"w\":820,\"url\":\"/sign-up\",\"h1\":[\"Create your account\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[[\"BUTTON\",\"Show password\",\"50x38\",\"y558\",\"\",\"44\"]]}"
+== 820 /sign-in?admin
+"{\"w\":820,\"url\":\"/sign-in?admin\",\"h1\":[\"Admin sign-in\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /bookmarks
+"{\"w\":820,\"url\":\"/bookmarks\",\"h1\":[\"Nothing saved on this device\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /recommendations
+"{\"w\":820,\"url\":\"/recommendations\",\"h1\":[\"Recommended Resources\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /continue-learning
+"{\"w\":820,\"url\":\"/continue-learning\",\"h1\":[\"Your progress lives with your account\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /submit
+"{\"w\":820,\"url\":\"/submit\",\"h1\":[\"Add to the index\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 820 /no-such-page
+"{\"w\":820,\"url\":\"/no-such-page\",\"h1\":[\"Page Not Found\"],\"hold\":false,\"sw\":814,\"offenders\":[],\"t\":[]}"
+== 390 /search
+"{\"w\":390,\"url\":\"/search\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /search?q=ffmpeg
+"{\"w\":390,\"url\":\"/search?q=ffmpeg\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /search?q=zzqxvqq
+"{\"w\":390,\"url\":\"/search?q=zzqxvqq\",\"h1\":[\"Search\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /journeys
+"{\"w\":390,\"url\":\"/journeys\",\"h1\":[\"Learning Journeys\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /journey/8
+"{\"w\":390,\"url\":\"/journey/8\",\"h1\":[\"FFmpeg Mastery\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /about
+"{\"w\":390,\"url\":\"/about\",\"h1\":[\"A field journal for video engineers\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /terms
+"{\"w\":390,\"url\":\"/terms\",\"h1\":[\"Terms of Use\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /privacy
+"{\"w\":390,\"url\":\"/privacy\",\"h1\":[\"Privacy Policy\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[[\"BUTTON\",\"button-privacy-cookie-settings\",\"138x24\",\"y1927\",\"\",\"44\"]]}"
+== 390 /code-of-conduct
+"{\"w\":390,\"url\":\"/code-of-conduct\",\"h1\":[\"Code of Conduct\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /design-system
+"{\"w\":390,\"url\":\"/design-system\",\"h1\":[\"Design System\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /settings/theme
+"{\"w\":390,\"url\":\"/settings/theme\",\"h1\":[\"Theme Settings\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /sign-in
+"{\"w\":390,\"url\":\"/sign-in\",\"h1\":[\"Welcome back\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /sign-up
+"{\"w\":390,\"url\":\"/sign-up\",\"h1\":[\"Create your account\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[[\"BUTTON\",\"Show password\",\"50x38\",\"y573\",\"\",\"44\"]]}"
+== 390 /sign-in?admin
+"{\"w\":390,\"url\":\"/sign-in?admin\",\"h1\":[\"Admin sign-in\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /bookmarks
+"{\"w\":390,\"url\":\"/bookmarks\",\"h1\":[\"Nothing saved on this device\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /recommendations
+"{\"w\":390,\"url\":\"/recommendations\",\"h1\":[\"Recommended Resources\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /continue-learning
+"{\"w\":390,\"url\":\"/continue-learning\",\"h1\":[\"Your progress lives with your account\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /submit
+"{\"w\":390,\"url\":\"/submit\",\"h1\":[\"Add to the index\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"
+== 390 /no-such-page
+"{\"w\":390,\"url\":\"/no-such-page\",\"h1\":[\"Page Not Found\"],\"hold\":false,\"sw\":384,\"offenders\":[],\"t\":[]}"

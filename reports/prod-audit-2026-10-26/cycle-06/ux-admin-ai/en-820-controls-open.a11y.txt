@@ -1,0 +1,745 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Enrichment" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [selected, ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Enrichment" [ref=e12] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "LAST ENRICHED"
+                - StaticText "26h ago"
+                - StaticText "batch #34 · 10 resources · cancelled"
+              - article
+                - StaticText "QUEUE"
+                - StaticText "0"
+                - StaticText "idle"
+              - article
+                - StaticText "AVG COST"
+                - StaticText "$0.03"
+                - StaticText "per batch"
+              - generic
+                - sectionheader
+                  - heading "Enrichment jobs" [level=2, ref=e35]
+                  - paragraph
+                    - StaticText "LLM-driven metadata enhancement"
+                  - button "Run job" [ref=e36]
+                - region "Enrichment jobs table, scrollable" [ref=e33] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "JOB" [ref=e75]
+                        - columnheader "STATUS" [ref=e76]
+                        - columnheader "STARTED" [ref=e77]
+                        - columnheader "COMPLETED" [ref=e78]
+                        - columnheader "ACTIONS" [ref=e79]
+                          - StaticText "ACTIONS"
+                    - row
+                      - cell "#34" [ref=e45]
+                        - StaticText "#34"
+                      - cell "CANCELLED" [ref=e46]
+                      - cell "10/26/2026, 12:33:50 AM" [ref=e47]
+                      - cell "10/26/2026, 12:34:47 AM" [ref=e48]
+                      - cell "View logs for job #34" [ref=e49]
+                        - button "View logs for job #34" [ref=e80]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#33" [ref=e50]
+                        - StaticText "#33"
+                      - cell "CANCELLED" [ref=e51]
+                      - cell "10/26/2026, 12:30:14 AM" [ref=e52]
+                      - cell "10/26/2026, 12:33:13 AM" [ref=e53]
+                      - cell "View logs for job #33" [ref=e54]
+                        - button "View logs for job #33" [ref=e81]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#32" [ref=e55]
+                        - StaticText "#32"
+                      - cell "COMPLETED" [ref=e56]
+                      - cell "7/16/2026, 9:45:33 PM" [ref=e57]
+                      - cell "7/16/2026, 9:45:33 PM" [ref=e58]
+                      - cell "View logs for job #32" [ref=e59]
+                        - button "View logs for job #32" [ref=e82]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#31" [ref=e60]
+                        - StaticText "#31"
+                      - cell "COMPLETED" [ref=e61]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e62]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e63]
+                      - cell "View logs for job #31" [ref=e64]
+                        - button "View logs for job #31" [ref=e83]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#30" [ref=e65]
+                        - StaticText "#30"
+                      - cell "COMPLETED" [ref=e66]
+                      - cell "7/16/2026, 9:45:31 PM" [ref=e67]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e68]
+                      - cell "View logs for job #30" [ref=e69]
+                        - button "View logs for job #30" [ref=e84]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#29" [ref=e70]
+                        - StaticText "#29"
+                      - cell "COMPLETED" [ref=e71]
+                      - cell "7/16/2026, 9:41:27 PM" [ref=e72]
+                      - cell "7/16/2026, 9:41:27 PM" [ref=e73]
+                      - cell "View logs for job #29" [ref=e74]
+                        - button "View logs for job #29" [ref=e85]
+                          - StaticText "Logs"
+                - button "Show all 33 jobs" [expanded=false, ref=e34]
+              - group
+                - DisclosureTriangle "Job controls & monitoring" [expanded=true]
+                - article
+                  - image
+                  - StaticText "Job Control"
+                  - StaticText "Configure and start a new batch enrichment job"
+                  - paragraph
+                    - StaticText "Tag coverage: 1,089 of 3,825 approved resources have tags (28.5%). Run an enrichment job with the \"Unenriched Only\" filter to close the 2,736-resource gap."
+                  - LabelText [ref=e37] clickable [cursor:pointer]
+                    - StaticText "Filter"
+                  - combobox "Filter" [expanded=false, ref=e38]: Unenriched Only
+                    - generic [ref=e44] clickable [cursor:pointer, onclick]
+                      - StaticText "Unenriched Only"
+                  - paragraph
+                    - StaticText "Choose which resources to enrich"
+                  - LabelText [ref=e39] clickable [cursor:pointer]
+                    - StaticText "Batch Size"
+                  - spinbutton "Batch Size" [ref=e40]: 10
+                    - StaticText "10"
+                  - paragraph
+                    - StaticText "Resources per batch (1-50)"
+                  - button "Custom Model & Endpoint (optional)" [expanded=false, ref=e41]
+                    - image
+                    - StaticText "Custom Model & Endpoint (optional)"
+                    - image
+                  - button "Start Enrichment" [ref=e42]
+                    - image
+                    - StaticText "Start Enrichment"
+                - article
+                  - image
+                  - StaticText "Job History"
+                  - StaticText "33 TOTAL JOBS"
+                  - StaticText "Complete history of all enrichment jobs"
+                  - region "Job history table, scrollable" [ref=e43] focusable [tabindex]
+                    - table
+                      - rowgroup
+                        - row
+                          - columnheader "ID" [ref=e317]
+                          - columnheader "STATUS" [ref=e318]
+                          - columnheader "STARTED" [ref=e319]
+                          - columnheader "ENDED" [ref=e320]
+                          - columnheader "PROCESSED" [ref=e321]
+                          - columnheader "SUCCESS RATE" [ref=e322]
+                          - columnheader "ACTIONS" [ref=e323]
+                      - row
+                        - cell "#34" [ref=e86]
+                          - StaticText "#34"
+                        - cell "CANCELLED" [ref=e87]
+                        - cell "Oct 26, 2026, 12:33 AM" [ref=e88]
+                        - cell "Oct 26, 2026, 12:34 AM" [ref=e89]
+                        - cell "10 / 2746" [ref=e90]
+                          - StaticText "10 / 2746"
+                        - cell "10/10 OK (100%)" [ref=e91]
+                          - StaticText "10/10 OK (100%)"
+                        - cell "View details for job #34" [ref=e92]
+                          - button "View details for job #34" [ref=e324]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#33" [ref=e93]
+                          - StaticText "#33"
+                        - cell "CANCELLED" [ref=e94]
+                        - cell "Oct 26, 2026, 12:30 AM" [ref=e95]
+                        - cell "Oct 26, 2026, 12:33 AM" [ref=e96]
+                        - cell "30 / 2776" [ref=e97]
+                          - StaticText "30 / 2776"
+                        - cell "30/30 OK (100%)" [ref=e98]
+                          - StaticText "30/30 OK (100%)"
+                        - cell "View details for job #33" [ref=e99]
+                          - button "View details for job #33" [ref=e325]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#32" [ref=e100]
+                          - StaticText "#32"
+                        - cell "COMPLETED" [ref=e101]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e102]
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e103]
+                        - cell "Nothing to process" [ref=e104]
+                        - cell "N/A" [ref=e105]
+                        - cell "View details for job #32" [ref=e106]
+                          - button "View details for job #32" [ref=e326]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#31" [ref=e107]
+                          - StaticText "#31"
+                        - cell "COMPLETED" [ref=e108]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e109]
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e110]
+                        - cell "Nothing to process" [ref=e111]
+                        - cell "N/A" [ref=e112]
+                        - cell "View details for job #31" [ref=e113]
+                          - button "View details for job #31" [ref=e327]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#30" [ref=e114]
+                          - StaticText "#30"
+                        - cell "COMPLETED" [ref=e115]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e116]
+                        - cell "Jul 16, 2026, 09:45 PM" [ref=e117]
+                        - cell "Nothing to process" [ref=e118]
+                        - cell "N/A" [ref=e119]
+                        - cell "View details for job #30" [ref=e120]
+                          - button "View details for job #30" [ref=e328]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#29" [ref=e121]
+                          - StaticText "#29"
+                        - cell "COMPLETED" [ref=e122]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 16, 2026, 09:41 PM" [ref=e123]
+                        - cell "Jul 16, 2026, 09:41 PM" [ref=e124]
+                        - cell "Nothing to process" [ref=e125]
+                        - cell "N/A" [ref=e126]
+                        - cell "View details for job #29" [ref=e127]
+                          - button "View details for job #29" [ref=e329]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#28" [ref=e128]
+                          - StaticText "#28"
+                        - cell "COMPLETED" [ref=e129]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 7, 2026, 12:54 PM" [ref=e130]
+                        - cell "Jul 7, 2026, 12:54 PM" [ref=e131]
+                        - cell "1 / 1" [ref=e132]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e133]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #28" [ref=e134]
+                          - button "View details for job #28" [ref=e330]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#27" [ref=e135]
+                          - StaticText "#27"
+                        - cell "COMPLETED" [ref=e136]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 7, 2026, 12:53 PM" [ref=e137]
+                        - cell "Jul 7, 2026, 12:53 PM" [ref=e138]
+                        - cell "1 / 1" [ref=e139]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e140]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #27" [ref=e141]
+                          - button "View details for job #27" [ref=e331]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#26" [ref=e142]
+                          - StaticText "#26"
+                        - cell "COMPLETED" [ref=e143]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 6, 2026, 01:30 PM" [ref=e144]
+                        - cell "Jul 6, 2026, 01:30 PM" [ref=e145]
+                        - cell "1 / 1" [ref=e146]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e147]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #26" [ref=e148]
+                          - button "View details for job #26" [ref=e332]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#25" [ref=e149]
+                          - StaticText "#25"
+                        - cell "COMPLETED" [ref=e150]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jul 5, 2026, 10:57 PM" [ref=e151]
+                        - cell "Jul 5, 2026, 10:57 PM" [ref=e152]
+                        - cell "1 / 1" [ref=e153]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e154]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #25" [ref=e155]
+                          - button "View details for job #25" [ref=e333]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#24" [ref=e156]
+                          - StaticText "#24"
+                        - cell "FAILED ended in error after 10/10 succeeded" [ref=e157]
+                          - generic
+                            - image
+                            - StaticText "FAILED"
+                          - StaticText "ended in error after "
+                          - StaticText "10"
+                          - StaticText "/"
+                          - StaticText "10"
+                          - StaticText " succeeded"
+                        - cell "Jun 26, 2026, 08:21 AM" [ref=e158]
+                        - cell "Jun 26, 2026, 08:54 AM" [ref=e159]
+                        - cell "10 / 2364" [ref=e160]
+                          - StaticText "10 / 2364"
+                        - cell "10/10 OK (100%)" [ref=e161]
+                          - StaticText "10/10 OK (100%)"
+                        - cell "View details for job #24" [ref=e162]
+                          - button "View details for job #24" [ref=e334]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#23" [ref=e163]
+                          - StaticText "#23"
+                        - cell "COMPLETED" [ref=e164]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jun 25, 2026, 05:57 PM" [ref=e165]
+                        - cell "Jun 25, 2026, 05:57 PM" [ref=e166]
+                        - cell "1 / 1" [ref=e167]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e168]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #23" [ref=e169]
+                          - button "View details for job #23" [ref=e335]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#22" [ref=e170]
+                          - StaticText "#22"
+                        - cell "COMPLETED" [ref=e171]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Jun 3, 2026, 01:17 AM" [ref=e172]
+                        - cell "Jun 3, 2026, 01:17 AM" [ref=e173]
+                        - cell "1 / 1" [ref=e174]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e175]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #22" [ref=e176]
+                          - button "View details for job #22" [ref=e336]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#21" [ref=e177]
+                          - StaticText "#21"
+                        - cell "COMPLETED" [ref=e178]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Feb 11, 2026, 11:38 PM" [ref=e179]
+                        - cell "Feb 11, 2026, 11:38 PM" [ref=e180]
+                        - cell "1 / 1" [ref=e181]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e182]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #21" [ref=e183]
+                          - button "View details for job #21" [ref=e337]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#20" [ref=e184]
+                          - StaticText "#20"
+                        - cell "COMPLETED" [ref=e185]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Feb 11, 2026, 11:20 PM" [ref=e186]
+                        - cell "Feb 11, 2026, 11:20 PM" [ref=e187]
+                        - cell "9 / 9" [ref=e188]
+                          - StaticText "9 / 9"
+                        - cell "8/9 OK (89%)" [ref=e189]
+                          - StaticText "8/9 OK (89%)"
+                        - cell "View details for job #20" [ref=e190]
+                          - button "View details for job #20" [ref=e338]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#19" [ref=e191]
+                          - StaticText "#19"
+                        - cell "CANCELLED" [ref=e192]
+                        - cell "Feb 11, 2026, 11:19 PM" [ref=e193]
+                        - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e194]
+                          - StaticText "Mar 22, 2026, 10:45 PM"
+                          - StaticText "end recorded at cleanup, not when processing stopped"
+                        - cell "11 / 19" [ref=e195]
+                          - StaticText "11 / 19"
+                        - cell "10/11 OK (91%)" [ref=e196]
+                          - StaticText "10/11 OK (91%)"
+                        - cell "View details for job #19" [ref=e197]
+                          - button "View details for job #19" [ref=e339]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#18" [ref=e198]
+                          - StaticText "#18"
+                        - cell "CANCELLED" [ref=e199]
+                        - cell "Feb 11, 2026, 11:17 PM" [ref=e200]
+                        - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e201]
+                          - StaticText "Mar 22, 2026, 10:45 PM"
+                          - StaticText "end recorded at cleanup, not when processing stopped"
+                        - cell "14 / 32" [ref=e202]
+                          - StaticText "14 / 32"
+                        - cell "13/14 OK (93%)" [ref=e203]
+                          - StaticText "13/14 OK (93%)"
+                        - cell "View details for job #18" [ref=e204]
+                          - button "View details for job #18" [ref=e340]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#17" [ref=e205]
+                          - StaticText "#17"
+                        - cell "COMPLETED" [ref=e206]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Dec 1, 2025, 01:43 AM" [ref=e207]
+                        - cell "Dec 1, 2025, 01:45 AM" [ref=e208]
+                        - cell "31 / 31" [ref=e209]
+                          - StaticText "31 / 31"
+                        - cell "31/31 OK (100%)" [ref=e210]
+                          - StaticText "31/31 OK (100%)"
+                        - cell "View details for job #17" [ref=e211]
+                          - button "View details for job #17" [ref=e341]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#16" [ref=e212]
+                          - StaticText "#16"
+                        - cell "COMPLETED" [ref=e213]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 19, 2025, 12:57 AM" [ref=e214]
+                        - cell "Nov 19, 2025, 12:57 AM" [ref=e215]
+                        - cell "3 / 3" [ref=e216]
+                          - StaticText "3 / 3"
+                        - cell "2/3 OK (67%)" [ref=e217]
+                          - StaticText "2/3 OK (67%)"
+                        - cell "View details for job #16" [ref=e218]
+                          - button "View details for job #16" [ref=e342]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#15" [ref=e219]
+                          - StaticText "#15"
+                        - cell "COMPLETED" [ref=e220]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 19, 2025, 12:57 AM" [ref=e221]
+                        - cell "Nov 19, 2025, 12:57 AM" [ref=e222]
+                        - cell "4 / 4" [ref=e223]
+                          - StaticText "4 / 4"
+                        - cell "3/4 OK (75%)" [ref=e224]
+                          - StaticText "3/4 OK (75%)"
+                        - cell "View details for job #15" [ref=e225]
+                          - button "View details for job #15" [ref=e343]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#14" [ref=e226]
+                          - StaticText "#14"
+                        - cell "COMPLETED" [ref=e227]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 08:05 PM" [ref=e228]
+                        - cell "Nov 18, 2025, 08:05 PM" [ref=e229]
+                        - cell "1 / 1" [ref=e230]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e231]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #14" [ref=e232]
+                          - button "View details for job #14" [ref=e344]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#13" [ref=e233]
+                          - StaticText "#13"
+                        - cell "COMPLETED" [ref=e234]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 08:04 PM" [ref=e235]
+                        - cell "Nov 18, 2025, 08:04 PM" [ref=e236]
+                        - cell "1 / 1" [ref=e237]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e238]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #13" [ref=e239]
+                          - button "View details for job #13" [ref=e345]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#12" [ref=e240]
+                          - StaticText "#12"
+                        - cell "COMPLETED" [ref=e241]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 08:04 PM" [ref=e242]
+                        - cell "Nov 18, 2025, 08:04 PM" [ref=e243]
+                        - cell "1 / 1" [ref=e244]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e245]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #12" [ref=e246]
+                          - button "View details for job #12" [ref=e346]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#11" [ref=e247]
+                          - StaticText "#11"
+                        - cell "COMPLETED" [ref=e248]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 07:54 PM" [ref=e249]
+                        - cell "Nov 18, 2025, 07:54 PM" [ref=e250]
+                        - cell "1 / 1" [ref=e251]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e252]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #11" [ref=e253]
+                          - button "View details for job #11" [ref=e347]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#10" [ref=e254]
+                          - StaticText "#10"
+                        - cell "COMPLETED" [ref=e255]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 07:52 PM" [ref=e256]
+                        - cell "Nov 18, 2025, 07:52 PM" [ref=e257]
+                        - cell "1 / 1" [ref=e258]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e259]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #10" [ref=e260]
+                          - button "View details for job #10" [ref=e348]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#8" [ref=e261]
+                          - StaticText "#8"
+                        - cell "CANCELLED" [ref=e262]
+                        - cell "Nov 18, 2025, 07:22 PM" [ref=e263]
+                        - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e264]
+                          - StaticText "Mar 22, 2026, 10:45 PM"
+                          - StaticText "end recorded at cleanup, not when processing stopped"
+                        - cell "78 / 2192" [ref=e265]
+                          - StaticText "78 / 2192"
+                        - cell "78/78 OK (100%)" [ref=e266]
+                          - StaticText "78/78 OK (100%)"
+                        - cell "View details for job #8" [ref=e267]
+                          - button "View details for job #8" [ref=e349]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#7" [ref=e268]
+                          - StaticText "#7"
+                        - cell "FAILED ended in error after 8/8 succeeded" [ref=e269]
+                          - generic
+                            - image
+                            - StaticText "FAILED"
+                          - StaticText "ended in error after "
+                          - StaticText "8"
+                          - StaticText "/"
+                          - StaticText "8"
+                          - StaticText " succeeded"
+                        - cell "Nov 18, 2025, 07:15 PM" [ref=e270]
+                        - cell "May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped" [ref=e271]
+                          - StaticText "May 20, 2026, 06:47 AM"
+                          - StaticText "end recorded at cleanup, not when processing stopped"
+                        - cell "8 / 2192" [ref=e272]
+                          - StaticText "8 / 2192"
+                        - cell "8/8 OK (100%)" [ref=e273]
+                          - StaticText "8/8 OK (100%)"
+                        - cell "View details for job #7" [ref=e274]
+                          - button "View details for job #7" [ref=e350]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#6" [ref=e275]
+                          - StaticText "#6"
+                        - cell "COMPLETED" [ref=e276]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 07:14 PM" [ref=e277]
+                        - cell "Nov 18, 2025, 07:14 PM" [ref=e278]
+                        - cell "1 / 1" [ref=e279]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e280]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #6" [ref=e281]
+                          - button "View details for job #6" [ref=e351]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#5" [ref=e282]
+                          - StaticText "#5"
+                        - cell "COMPLETED" [ref=e283]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 06:50 PM" [ref=e284]
+                        - cell "Nov 18, 2025, 06:50 PM" [ref=e285]
+                        - cell "1 / 1" [ref=e286]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e287]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #5" [ref=e288]
+                          - button "View details for job #5" [ref=e352]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#4" [ref=e289]
+                          - StaticText "#4"
+                        - cell "COMPLETED" [ref=e290]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 06:46 PM" [ref=e291]
+                        - cell "Nov 18, 2025, 06:46 PM" [ref=e292]
+                        - cell "1 / 1" [ref=e293]
+                          - StaticText "1 / 1"
+                        - cell "1 SKIPPED" [ref=e294]
+                          - StaticText "1 SKIPPED"
+                        - cell "View details for job #4" [ref=e295]
+                          - button "View details for job #4" [ref=e353]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#3" [ref=e296]
+                          - StaticText "#3"
+                        - cell "COMPLETED" [ref=e297]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 06:38 PM" [ref=e298]
+                        - cell "Nov 18, 2025, 06:38 PM" [ref=e299]
+                        - cell "1 / 1" [ref=e300]
+                          - StaticText "1 / 1"
+                        - cell "1/1 OK (100%)" [ref=e301]
+                          - StaticText "1/1 OK (100%)"
+                        - cell "View details for job #3" [ref=e302]
+                          - button "View details for job #3" [ref=e354]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#2" [ref=e303]
+                          - StaticText "#2"
+                        - cell "COMPLETED" [ref=e304]
+                          - image
+                          - StaticText "COMPLETED"
+                        - cell "Nov 18, 2025, 06:27 PM" [ref=e305]
+                        - cell "Nov 18, 2025, 06:27 PM" [ref=e306]
+                        - cell "1 / 1" [ref=e307]
+                          - StaticText "1 / 1"
+                        - cell "1/1 OK (100%)" [ref=e308]
+                          - StaticText "1/1 OK (100%)"
+                        - cell "View details for job #2" [ref=e309]
+                          - button "View details for job #2" [ref=e355]
+                            - image
+                            - StaticText "View Details"
+                      - row
+                        - cell "#1" [ref=e310]
+                          - StaticText "#1"
+                        - cell "FAILED ended in error after 31/49 succeeded" [ref=e311]
+                          - generic
+                            - image
+                            - StaticText "FAILED"
+                          - StaticText "ended in error after "
+                          - StaticText "31"
+                          - StaticText "/"
+                          - StaticText "49"
+                          - StaticText " succeeded"
+                        - cell "Nov 18, 2025, 06:25 PM" [ref=e312]
+                        - cell "May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped" [ref=e313]
+                          - StaticText "May 20, 2026, 06:47 AM"
+                          - StaticText "end recorded at cleanup, not when processing stopped"
+                        - cell "32 / 32" [ref=e314]
+                          - StaticText "32 / 32"
+                        - cell "31/32 OK (97%)" [ref=e315]
+                          - StaticText "31/32 OK (97%)"
+                        - cell "View details for job #1" [ref=e316]
+                          - button "View details for job #1" [ref=e356]
+                            - image
+                            - StaticText "View Details"
+                    - paragraph
+                      - StaticText "Processed = resources attempted out of the job's target. Success rate = successful ÷ processed (not ÷ target). A job marked failed with successes means the run stopped on an error after those resources were enriched — open View Details for the error."

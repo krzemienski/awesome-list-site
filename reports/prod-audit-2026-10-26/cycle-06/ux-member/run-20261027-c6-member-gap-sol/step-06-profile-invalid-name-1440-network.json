@@ -1,0 +1,82 @@
+[
+  {
+    "id": "request-1",
+    "seq": 1,
+    "ts": 1793088214334,
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "resourceType": "fetch",
+    "status": 200,
+    "ok": true,
+    "durationMs": 141,
+    "requestHeaders": {
+      "accept-language": "en-US,en;q=0.9",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+      "referer": "https://awesome.video/"
+    },
+    "responseHeaders": {
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "cache-control": "no-store",
+      "content-length": "36",
+      "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-ALH9UzJEZFeGkHJhDRbZ2A==' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'",
+      "content-type": "application/json; charset=utf-8",
+      "cross-origin-opener-policy": "same-origin-allow-popups",
+      "cross-origin-resource-policy": "same-origin",
+      "date": "Tue, 27 Oct 2026 08:03:34 GMT",
+      "etag": "W/\"24-YWEFQlZ+emHwBOEVevqncEYu21k\"",
+      "permissions-policy": "camera=(), microphone=(), geolocation=()",
+      "referrer-policy": "strict-origin",
+      "server": "Google Frontend",
+      "strict-transport-security": "max-age=63072000; includeSubDomains",
+      "vary": "Accept-Encoding",
+      "via": "1.1 google",
+      "x-cloud-trace-context": "15d99d78606ba56e03b22dd6ad501365",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY"
+    },
+    "sizes": {
+      "requestBody": 0,
+      "responseBody": 36
+    }
+  },
+  {
+    "id": "request-2",
+    "seq": 2,
+    "ts": 1793088274483,
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "resourceType": "fetch",
+    "status": 200,
+    "ok": true,
+    "durationMs": 143,
+    "requestHeaders": {
+      "accept-language": "en-US,en;q=0.9",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+      "referer": "https://awesome.video/"
+    },
+    "responseHeaders": {
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "cache-control": "no-store",
+      "content-length": "36",
+      "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-bSc24uZwz+MhlupV5JmGlA==' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'",
+      "content-type": "application/json; charset=utf-8",
+      "cross-origin-opener-policy": "same-origin-allow-popups",
+      "cross-origin-resource-policy": "same-origin",
+      "date": "Tue, 27 Oct 2026 08:04:34 GMT",
+      "etag": "W/\"24-YWEFQlZ+emHwBOEVevqncEYu21k\"",
+      "permissions-policy": "camera=(), microphone=(), geolocation=()",
+      "referrer-policy": "strict-origin",
+      "server": "Google Frontend",
+      "strict-transport-security": "max-age=63072000; includeSubDomains",
+      "vary": "Accept-Encoding",
+      "via": "1.1 google",
+      "x-cloud-trace-context": "35836a713fc47291fed62ff259ede10d",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY"
+    },
+    "sizes": {
+      "requestBody": 0,
+      "responseBody": 36
+    }
+  }
+]

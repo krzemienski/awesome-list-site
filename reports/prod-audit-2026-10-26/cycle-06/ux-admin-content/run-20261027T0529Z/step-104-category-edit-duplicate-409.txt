@@ -1,0 +1,26 @@
+- generic
+  - dialog "Edit Category"
+    - form
+      - heading "Edit Category" [level=2, ref=e2]
+      - paragraph
+        - StaticText "Update the category details."
+      - generic
+        - LabelText [ref=e7] clickable [cursor:pointer]
+          - StaticText "Name *"
+        - textbox "Name *" [ref=e8]: [QA-audit-1026] c6 category renamed
+          - StaticText "[QA-audit-1026] c6 category renamed"
+      - LabelText [ref=e3] clickable [cursor:pointer]
+        - StaticText "Slug *"
+      - textbox "Slug *" [ref=e4]: community-events
+        - StaticText "community-events"
+      - paragraph
+        - StaticText "The slug \"community-events\" is already in use"
+      - button "Cancel" [ref=e5]
+        - image
+        - StaticText "Cancel"
+      - button "Save" [ref=e6]
+        - image
+        - StaticText "Save"
+    - button "Close" [ref=e1]
+      - image
+      - StaticText "Close"

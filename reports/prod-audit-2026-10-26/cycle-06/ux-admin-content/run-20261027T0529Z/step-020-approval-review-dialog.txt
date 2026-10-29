@@ -1,0 +1,4 @@
+- heading "Resource Details" [level=2, ref=e1]
+- link "https://github.com/Flipatic/flip-reel" [ref=e2]
+- button "Close" [ref=e3]
+- button "Close" [ref=e4]

@@ -1,0 +1,304 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "reduced": true,
+  "scroll": [
+    0,
+    0
+  ],
+  "overflow": 0,
+  "controls": [
+    {
+      "name": "Nick Krzemienski on GitHub",
+      "role": "A",
+      "href": "https://github.com/krzemienski",
+      "rect": {
+        "x": 20,
+        "y": 1527.640625,
+        "width": 211.078125,
+        "height": 20,
+        "top": 1527.640625,
+        "right": 231.078125,
+        "bottom": 1547.640625,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "awesome-video",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 20,
+        "y": 1696.296875,
+        "width": 123.4375,
+        "height": 19,
+        "top": 1696.296875,
+        "right": 143.4375,
+        "bottom": 1715.296875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "awesome-list-site",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-list-site",
+      "rect": {
+        "x": 20,
+        "y": 1900.546875,
+        "width": 139.015625,
+        "height": 19,
+        "top": 1900.546875,
+        "right": 159.015625,
+        "bottom": 1919.546875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Nick Krzemienski",
+      "role": "A",
+      "href": "https://github.com/krzemienski",
+      "rect": {
+        "x": 20,
+        "y": 3323.734375,
+        "width": 130.828125,
+        "height": 20,
+        "top": 3323.734375,
+        "right": 150.828125,
+        "bottom": 3343.734375,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "shadcn/ui",
+      "role": "A",
+      "href": "https://ui.shadcn.com/",
+      "rect": {
+        "x": 20,
+        "y": 3349.328125,
+        "width": 74.390625,
+        "height": 20,
+        "top": 3349.328125,
+        "right": 94.390625,
+        "bottom": 3369.328125,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Tailwind CSS",
+      "role": "A",
+      "href": "https://tailwindcss.com/",
+      "rect": {
+        "x": 20,
+        "y": 3374.921875,
+        "width": 98.828125,
+        "height": 20,
+        "top": 3374.921875,
+        "right": 118.828125,
+        "bottom": 3394.921875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Home — all categories",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 20,
+        "y": 6187.109375,
+        "width": 170.984375,
+        "height": 20,
+        "top": 6187.109375,
+        "right": 190.984375,
+        "bottom": 6207.109375,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Learning journeys",
+      "role": "A",
+      "href": "/journeys",
+      "rect": {
+        "x": 20,
+        "y": 6223.078125,
+        "width": 136,
+        "height": 20,
+        "top": 6223.078125,
+        "right": 156,
+        "bottom": 6243.078125,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 20,
+        "y": 6259.046875,
+        "width": 45.125,
+        "height": 20,
+        "top": 6259.046875,
+        "right": 65.125,
+        "bottom": 6279.046875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 20,
+        "y": 6358.703125,
+        "width": 156.546875,
+        "height": 20,
+        "top": 6358.703125,
+        "right": 176.546875,
+        "bottom": 6378.703125,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 20,
+        "y": 6394.671875,
+        "width": 148.046875,
+        "height": 20,
+        "top": 6394.671875,
+        "right": 168.046875,
+        "bottom": 6414.671875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 20,
+        "y": 6430.640625,
+        "width": 104.015625,
+        "height": 20,
+        "top": 6430.640625,
+        "right": 124.015625,
+        "bottom": 6450.640625,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 20,
+        "y": 6466.609375,
+        "width": 183.96875,
+        "height": 20,
+        "top": 6466.609375,
+        "right": 203.96875,
+        "bottom": 6486.609375,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 20,
+        "y": 6502.578125,
+        "width": 120.03125,
+        "height": 20,
+        "top": 6502.578125,
+        "right": 140.03125,
+        "bottom": 6522.578125,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 20,
+        "y": 6538.546875,
+        "width": 91.53125,
+        "height": 20,
+        "top": 6538.546875,
+        "right": 111.53125,
+        "bottom": 6558.546875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 20,
+        "y": 6574.515625,
+        "width": 126.375,
+        "height": 20,
+        "top": 6574.515625,
+        "right": 146.375,
+        "bottom": 6594.515625,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 20,
+        "y": 6610.484375,
+        "width": 163.828125,
+        "height": 20,
+        "top": 6610.484375,
+        "right": 183.828125,
+        "bottom": 6630.484375,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 20,
+        "y": 6646.453125,
+        "width": 158.0625,
+        "height": 20,
+        "top": 6646.453125,
+        "right": 178.0625,
+        "bottom": 6666.453125,
+        "left": 20
+      },
+      "class": ""
+    }
+  ]
+}

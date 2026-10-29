@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/resource/185214","title":"FFmpeg — Awesome Video","width":390,"height":844,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BUTTON","id":"","label":null,"text":"Favorite","rect":{"x":20,"y":761.390625,"width":115.96875,"height":44,"top":761.390625,"right":135.96875,"bottom":805.390625,"left":20}},"headings":[{"text":"FFmpeg","id":""},{"text":"DESCRIPTION","id":""},{"text":"Keep exploring","id":"resource-onward-heading"},{"text":"Related Resources","id":"related-resources-heading"},{"text":"Resource details","id":""},{"text":"Canonical URL","id":""},{"text":"Tags","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"FFmpeg","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

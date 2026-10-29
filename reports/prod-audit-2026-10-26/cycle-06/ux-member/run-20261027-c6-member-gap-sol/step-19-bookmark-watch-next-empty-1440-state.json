@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks?status=watch-next",
+  "width": 1440,
+  "height": 900,
+  "dpr": 1,
+  "coarse": false,
+  "touchPoints": 0,
+  "scrollY": 0,
+  "active": "<button type=\"button\" class=\"card hoverable account-list-item min-h-[72px] px-4 py-3 text-left\"><span class=\"block text-2xl font-semibold\">0</span><span class=\"text-sm text-muted-foreground\">Watch next</span></button>",
+  "umami": "1",
+  "consent": "denied"
+}

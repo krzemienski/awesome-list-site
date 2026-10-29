@@ -1,0 +1,9 @@
+[
+  {
+    "tag": "BUTTON",
+    "label": null,
+    "text": "",
+    "outline": "rgb(255, 61, 82) solid 3px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+  }
+]

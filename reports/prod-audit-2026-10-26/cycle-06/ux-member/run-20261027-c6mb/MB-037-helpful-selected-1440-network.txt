@@ -1,0 +1,3 @@
+[6370.326] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.405] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.422] GET https://awesome.video/api/recommendations/feedback (Fetch) 200

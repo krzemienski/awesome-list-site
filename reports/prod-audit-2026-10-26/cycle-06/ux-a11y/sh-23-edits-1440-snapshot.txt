@@ -1,0 +1,231 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e40]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e41]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [selected, ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Edits" [ref=e17] focusable [tabindex]
+            - region "Edit history" [ref=e20]
+              - heading "Edit history" [level=2, ref=e36]
+              - paragraph
+                - StaticText "Pending and recent edits to resources"
+              - button "Check again" [ref=e37]
+                - image
+                - StaticText "Check again"
+              - region "Pending edits table, empty, scrollable" [ref=e38] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "RESOURCE" [ref=e45]
+                      - columnheader "FIELD" [ref=e46]
+                      - columnheader "EDITOR" [ref=e47]
+                      - columnheader "WHEN" [ref=e48]
+                      - columnheader "ACTIONS" [ref=e49]
+                        - StaticText "ACTIONS"
+                  - row
+                    - cell "No pending edits." [ref=e44]
+              - status
+              - region "Recently resolved" [ref=e39]
+                - heading "Recently resolved" [level=3, ref=e42]
+                - paragraph
+                  - StaticText "The last 10 edits that were approved, rejected, withdrawn or superseded"
+                - region "Recently resolved edits table, scrollable" [ref=e43] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "RESOURCE" [ref=e100]
+                        - columnheader "FIELD" [ref=e101]
+                        - columnheader "EDITOR" [ref=e102]
+                        - columnheader "OUTCOME" [ref=e103]
+                        - columnheader "RESOLVED" [ref=e104]
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e50]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e105]
+                      - cell "url" [ref=e51]
+                        - StaticText "url"
+                      - cell "c•••@awesome.video" [ref=e52]
+                      - cell "REJECTED [AUDIT-TEST] C10-V2 blast-radius test edit, not a real suggestion" [ref=e53]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C10-V2 blast-radius test edit, not a real suggestion"
+                      - cell "24d ago" [ref=e54]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e55]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e106]
+                      - cell "title" [ref=e56]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e57]
+                      - cell "REJECTED [AUDIT-TEST] C10-VX edit rejection reason" [ref=e58]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C10-VX edit rejection reason"
+                      - cell "24d ago" [ref=e59]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e60]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e107]
+                      - cell "title" [ref=e61]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e62]
+                      - cell "REJECTED [AUDIT-TEST] C9-VX edit rejection reason" [ref=e63]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C9-VX edit rejection reason"
+                      - cell "24d ago" [ref=e64]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e65]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e108]
+                      - cell "title" [ref=e66]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e67]
+                      - cell "REJECTED [AUDIT-TEST] C8-VX edit rejection reason" [ref=e68]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C8-VX edit rejection reason"
+                      - cell "24d ago" [ref=e69]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e70]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e109]
+                      - cell "title" [ref=e71]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e72]
+                      - cell "REJECTED [AUDIT-TEST] edit rejection reason C7-VX" [ref=e73]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] edit rejection reason C7-VX"
+                      - cell "24d ago" [ref=e74]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e75]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e110]
+                      - cell "title" [ref=e76]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e77]
+                      - cell "REJECTED [AUDIT-TEST] C6-VX edit rejection reason" [ref=e78]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C6-VX edit rejection reason"
+                      - cell "24d ago" [ref=e79]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e80]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e111]
+                      - cell "title" [ref=e81]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e82]
+                      - cell "REJECTED [AUDIT-TEST] C5-VX edit rejection reason" [ref=e83]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C5-VX edit rejection reason"
+                      - cell "24d ago" [ref=e84]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e85]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e112]
+                      - cell "url" [ref=e86]
+                        - StaticText "url"
+                      - cell "c•••@awesome.video" [ref=e87]
+                      - cell "WITHDRAWN" [ref=e88]
+                      - cell "24d ago" [ref=e89]
+                        - time
+                          - StaticText "24d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e90]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e113]
+                      - cell "title" [ref=e91]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e92]
+                      - cell "REJECTED [AUDIT-TEST] C4-VX edit rejection 1790952847" [ref=e93]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C4-VX edit rejection 1790952847"
+                      - cell "25d ago" [ref=e94]
+                        - time
+                          - StaticText "25d ago"
+                    - row
+                      - cell "AV1 Encoding with libsvtav1 on Qencode" [ref=e95]
+                        - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e114]
+                      - cell "title" [ref=e96]
+                        - StaticText "title"
+                      - cell "c•••@awesome.video" [ref=e97]
+                      - cell "REJECTED [AUDIT-TEST] C3-VX edit rejection 1790943340" [ref=e98]
+                        - StaticText "REJECTED"
+                        - StaticText "[AUDIT-TEST] C3-VX edit rejection 1790943340"
+                      - cell "25d ago" [ref=e99]
+                        - time
+                          - StaticText "25d ago"

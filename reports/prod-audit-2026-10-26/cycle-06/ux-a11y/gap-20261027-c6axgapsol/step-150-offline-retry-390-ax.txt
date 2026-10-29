@@ -1,0 +1,8 @@
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - alert
+    - StaticText "ERROR · UNAVAILABLE"
+    - heading "Something went wrong" [level=1, ref=e3]
+    - StaticText "The catalog couldn't be loaded. This is usually a brief network or server problem. Please try again."
+    - button "Retrying…" [disabled, ref=e4]

@@ -1,0 +1,13 @@
+- generic
+  - dialog "Create Subcategory"
+    - form
+      - heading "Create Subcategory" [level=2, ref=e2]
+      - LabelText [ref=e3] clickable [cursor:pointer]
+      - combobox "Parent Category *" [expanded=false, ref=e4]: Select parent category
+      - LabelText [ref=e5] clickable [cursor:pointer]
+      - textbox "Name *" [ref=e6]
+      - LabelText [ref=e7] clickable [cursor:pointer]
+      - textbox "Slug *" [ref=e8]
+      - button "Cancel" [ref=e9]
+      - button "Create" [ref=e10]
+    - button "Close" [ref=e1]

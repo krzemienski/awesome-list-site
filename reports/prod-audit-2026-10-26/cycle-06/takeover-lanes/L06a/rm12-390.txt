@@ -1,0 +1,2 @@
+[390] Sort resources=Oldest first :: url="?sort=oldest" :: "Oldest first | Resources (25 of 3,827) | Page 1 of 154" :: lastreq="?page=1&limit=25&sort=oldest&status=approved"
+[390] Sort resources=Newest first :: url="" :: "Newest first | Resources (25 of 3,827) | Page 1 of 154" :: lastreq="?page=1&limit=25&status=approved"

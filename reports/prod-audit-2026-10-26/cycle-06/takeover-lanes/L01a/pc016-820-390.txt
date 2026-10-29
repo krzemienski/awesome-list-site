@@ -1,0 +1,8 @@
+== 820 bottom
+"{\"vw\":820,\"sy\":10014,\"btn\":[758,1019,44,44],\"overBanner\":false,\"coversFooterLinks\":[],\"focus\":\"BODY:\\n    \\n    \\n      <di\"}"
+after
+"{\"vw\":820,\"sy\":0,\"btn\":null,\"overBanner\":\"nobanner\",\"coversFooterLinks\":[],\"focus\":\"H1:Players & Clients\"}"
+== 390 bottom
+"{\"vw\":390,\"sy\":12760,\"btn\":[328,671,44,44],\"overBanner\":false,\"coversFooterLinks\":[],\"focus\":\"BODY:\\n    \\n    \\n      <di\"}"
+after
+"{\"vw\":390,\"sy\":0,\"btn\":null,\"overBanner\":\"nobanner\",\"coversFooterLinks\":[],\"focus\":\"H1:Players & Clients\"}"

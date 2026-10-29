@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/submit",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 742,
+  "active": "<input type=\"url\" class=\"input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed submit-control\" placeholder=\"https://github.com/...\" autocomplete=\"url\" name=\"url\" data-testid=\"input-url\" id=\":r6:-form-item\" aria-invalid=\"true\" value=\"https://aomedia.org/\" aria-describedby=\":r6:-form-ite",
+  "umami": "1",
+  "consent": "denied"
+}

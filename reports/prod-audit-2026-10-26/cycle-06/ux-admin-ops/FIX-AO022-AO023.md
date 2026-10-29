@@ -1,0 +1,5 @@
+Fix C6-AO-022 and C6-AO-023 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-ao022-export-failures. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-admin-ops/findings.md and cited evidence. AO-022: README/Markdown offline failure toast must identify Markdown like JSON/CSV/OPML. AO-023: uncached Export history offline failure must show a truthful error and focusable Retry, never “No exports recorded yet”; reconnect/Retry restores the real history and genuine zero remains distinct. Scope ExportTab only, preserve downloads, analytics and API contracts.
+
+Run tsc --noEmit and npm run build unpiped. Use an authorized existing local admin session only if already available; never reuse production cookies/SESSION_SECRET or bypass auth. Otherwise mark authenticated browser proof BLOCKED for post-deploy production verification at 1440, 820 touch and 390 touch. Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks and UNVERIFIED evidence. No test files/mocks/validation harnesses. Never merge.

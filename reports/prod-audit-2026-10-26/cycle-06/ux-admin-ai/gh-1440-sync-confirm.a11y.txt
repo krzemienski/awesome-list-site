@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Export to GitHub?"
+    - heading "Export to GitHub?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This pushes the approved catalog as a commit to krzemienski/awesome-video, rewriting its README resource list."
+    - button "Cancel" [ref=e2]
+    - button "Start Export" [ref=e3]

@@ -1,0 +1,34 @@
+Missing arguments for: set viewport
+Usage: agent-browser set viewport <width> <height> [scale]
+✓ Done
+== 820 1180
+"{\"url\":\"/about\",\"nav\":[{\"t\":\"Browse\",\"h\":\"/categories\",\"tg\":\"\",\"cur\":null,\"r\":\"\",\"h2\":24,\"w\":46},{\"t\":\"Submit\",\"h\":\"/submit\",\"tg\":\"\",\"cur\":null,\"r\":\"\",\"h2\":24,\"w\":44},{\"t\":\"About\",\"h\":\"/about\",\"tg\":\"\",\"cur\":\"page\",\"r\":\"\",\"h2\":24,\"w\":37},{\"t\":\"Docs ↗\",\"h\":\"/design-system\",\"tg\":\"_blank\",\"cur\":null,\"r\":\"noopener noreferrer\",\"h2\":24,\"w\":45}]}"
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+  - button "Sign in, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e12]
+Missing arguments for: set viewport
+Usage: agent-browser set viewport <width> <height> [scale]
+✓ Done
+== 390 844
+"{\"url\":\"/about\",\"nav\":[{\"t\":\"Browse\",\"h\":\"/categories\",\"tg\":\"\",\"cur\":null,\"r\":\"\",\"h2\":24,\"w\":46},{\"t\":\"Submit\",\"h\":\"/submit\",\"tg\":\"\",\"cur\":null,\"r\":\"\",\"h2\":24,\"w\":44},{\"t\":\"About\",\"h\":\"/about\",\"tg\":\"\",\"cur\":\"page\",\"r\":\"\",\"h2\":24,\"w\":37},{\"t\":\"Docs ↗\",\"h\":\"/design-system\",\"tg\":\"_blank\",\"cur\":null,\"r\":\"noopener noreferrer\",\"h2\":24,\"w\":45}]}"
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+  - button "Sign in, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e12]

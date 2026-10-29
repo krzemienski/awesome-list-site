@@ -1,0 +1,954 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e122]:
+                      - heading "Run a research task" [level=3] [ref=e123]
+                      - paragraph [ref=e124]: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                      - generic [ref=e125]:
+                        - region "Brief" [ref=e126]:
+                          - generic [ref=e127]:
+                            - generic [ref=e128]: "1"
+                            - heading "Brief" [level=4] [ref=e129]
+                            - generic [ref=e130]: Auto-generated at launch
+                          - radiogroup "Research brief" [ref=e132]:
+                            - generic [ref=e133] [cursor=pointer]:
+                              - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked] [ref=e134]:
+                                - img [ref=e136]
+                              - generic [ref=e138]:
+                                - generic [ref=e139]: Auto-generate at launch
+                                - generic [ref=e140]: A gap-aware brief built from the catalog and past runs.
+                            - generic [ref=e141] [cursor=pointer]:
+                              - radio "Write my own Describe what to search for, or start from a generated brief." [ref=e142]
+                              - generic [ref=e143]:
+                                - generic [ref=e144]: Write my own
+                                - generic [ref=e145]: Describe what to search for, or start from a generated brief.
+                        - region "Focus" [ref=e146]:
+                          - generic [ref=e147]:
+                            - generic [ref=e148]: "2"
+                            - heading "Focus" [level=4] [ref=e149]
+                            - generic [ref=e150]: All categories
+                          - combobox "Category focus" [ref=e152] [cursor=pointer]:
+                            - generic: All categories
+                            - img [ref=e153]
+                        - region "Limits" [ref=e155]:
+                          - generic [ref=e156]:
+                            - generic [ref=e157]: "3"
+                            - heading "Limits" [level=4] [ref=e158]
+                            - generic [ref=e159]: no target · $3.00 cap · 40 turns
+                          - generic [ref=e160]:
+                            - generic [ref=e161]:
+                              - generic [ref=e162]:
+                                - text: Stop after (discoveries)
+                                - spinbutton "Stop after (discoveries)" [ref=e163]
+                                - paragraph [ref=e164]: No target — runs until the budget or turns end.
+                              - generic [ref=e165]:
+                                - text: Budget cap (USD)
+                                - spinbutton "Budget cap (USD)" [ref=e166]: "3.00"
+                                - paragraph [ref=e167]: Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops.
+                              - generic [ref=e168]:
+                                - text: Max turns
+                                - spinbutton "Max turns" [ref=e169]: "40"
+                                - paragraph [ref=e170]: Positive whole number (blank = no cap).
+                            - paragraph [ref=e171]: Past runs cost $0.15–$75.23. Discoveries are deduplicated against the 3,826 catalog resources.
+                        - region "Endpoint & model" [ref=e172]:
+                          - generic [ref=e173]:
+                            - generic [ref=e174]: "4"
+                            - heading "Endpoint & model" [level=4] [ref=e175]
+                            - generic [ref=e176]: Server configuration
+                          - generic [ref=e177]:
+                            - button "Override endpoint or models (optional)" [expanded] [ref=e178] [cursor=pointer]:
+                              - text: Override endpoint or models (optional)
+                              - img
+                            - generic [ref=e179]:
+                              - generic [ref=e180]:
+                                - text: Orchestrator model
+                                - textbox "Orchestrator model" [ref=e181]:
+                                  - /placeholder: Blank = ANTHROPIC_MODEL
+                              - generic [ref=e182]:
+                                - text: Scout model
+                                - textbox "Scout model" [ref=e183]:
+                                  - /placeholder: Blank = haiku tier
+                              - generic [ref=e184]:
+                                - text: Base URL
+                                - textbox "Base URL" [ref=e185]:
+                                  - /placeholder: Blank = ANTHROPIC_BASE_URL
+                                - paragraph [ref=e186]: A custom endpoint needs its own token below.
+                              - generic [ref=e187]:
+                                - text: Auth token
+                                - textbox "Auth token" [ref=e188]:
+                                  - /placeholder: Required with a base URL
+                                - paragraph [ref=e189]: Encrypted at rest; only the last 4 characters are shown afterwards.
+                        - region "About to run on" [ref=e190]:
+                          - generic [ref=e191]:
+                            - generic [ref=e192]: "5"
+                            - heading "About to run on" [level=4] [ref=e193]
+                          - generic [ref=e194]:
+                            - generic [ref=e197]:
+                              - generic [ref=e198]:
+                                - term [ref=e199]: Endpoint
+                                - definition [ref=e200]:
+                                  - text: router.hack.ski
+                                  - generic [ref=e201]: · ANTHROPIC_BASE_URL
+                              - generic [ref=e202]:
+                                - term [ref=e203]: Credential
+                                - definition [ref=e204]: router via ANTHROPIC_BASE_URL
+                              - generic [ref=e205]:
+                                - term [ref=e206]: Orchestrator model
+                                - definition [ref=e207]:
+                                  - text: cc/claude-opus-5
+                                  - generic [ref=e208]: · ANTHROPIC_MODEL
+                              - generic [ref=e209]:
+                                - term [ref=e210]: Scout model
+                                - definition [ref=e211]:
+                                  - text: cc/claude-haiku-4-5-20251001
+                                  - generic [ref=e212]: · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL
+                            - button "Launch research run" [ref=e214] [cursor=pointer]:
+                              - img
+                              - text: Launch research run
+                    - generic [ref=e215]:
+                      - generic [ref=e217]:
+                        - heading "Researcher jobs" [level=2] [ref=e218]
+                        - paragraph [ref=e219]: Latest 5 of 76 research runs
+                      - generic [ref=e220]:
+                        - region "Researcher jobs table, scrollable" [ref=e221]:
+                          - table [ref=e222]:
+                            - rowgroup [ref=e223]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e224]:
+                                - columnheader "Status" [ref=e225]
+                                - columnheader "Prompt" [ref=e226]
+                                - columnheader "Found" [ref=e227]
+                                - columnheader "Approved / Rejected" [ref=e228]
+                                - columnheader "Cost" [ref=e229]
+                                - columnheader "Turns" [ref=e230]
+                                - columnheader "Created" [ref=e231]
+                            - rowgroup [ref=e232]:
+                              - row [ref=e233]:
+                                - cell "completed" [ref=e234]:
+                                  - generic [ref=e235]: completed
+                                - cell [ref=e236]
+                                - cell "0" [ref=e237]
+                                - cell "0/0" [ref=e238]
+                                - cell "$0.7600" [ref=e239]
+                                - cell "28/600" [ref=e240]
+                                - cell "Oct 27, 2026" [ref=e241]
+                              - row [ref=e242]:
+                                - cell "completed" [ref=e243]:
+                                  - generic [ref=e244]: completed
+                                - cell [ref=e245]
+                                - cell "0" [ref=e246]
+                                - cell "0/0" [ref=e247]
+                                - cell "$1.2973" [ref=e248]
+                                - cell "93/600" [ref=e249]
+                                - cell "Oct 27, 2026" [ref=e250]
+                              - row [ref=e251]:
+                                - cell "completed" [ref=e252]:
+                                  - generic [ref=e253]: completed
+                                - cell [ref=e254]
+                                - cell "0" [ref=e255]
+                                - cell "0/0" [ref=e256]
+                                - cell "$0.5650" [ref=e257]
+                                - cell "13/600" [ref=e258]
+                                - cell "Oct 27, 2026" [ref=e259]
+                              - row [ref=e260]:
+                                - cell "completed" [ref=e261]:
+                                  - generic [ref=e262]: completed
+                                - cell [ref=e263]
+                                - cell "4" [ref=e264]
+                                - cell "1/0" [ref=e265]
+                                - cell "$5.4603" [ref=e266]
+                                - cell "155/200" [ref=e267]
+                                - cell "Oct 27, 2026" [ref=e268]
+                              - row [ref=e269]:
+                                - cell "failed" [ref=e270]:
+                                  - generic [ref=e271]: failed
+                                - cell [ref=e272]
+                                - cell "0" [ref=e273]
+                                - cell "0/0" [ref=e274]
+                                - cell "$0.0000" [ref=e275]
+                                - cell "1/200" [ref=e276]
+                                - cell "Oct 27, 2026" [ref=e277]
+                        - button "Show more" [ref=e279] [cursor=pointer]
+                  - group [ref=e280]:
+                    - generic "All pending discoveries & full job history" [ref=e281] [cursor=pointer]
+                    - generic [ref=e282]:
+                      - tablist [ref=e283]:
+                        - tab "Review Discoveries 12" [ref=e284] [cursor=pointer]:
+                          - img [ref=e285]
+                          - text: Review Discoveries
+                          - generic [ref=e288]: "12"
+                        - tab "Job History" [selected] [ref=e289] [cursor=pointer]:
+                          - img [ref=e290]
+                          - text: Job History
+                      - tabpanel "Job History" [ref=e293]:
+                        - article [ref=e294]:
+                          - generic [ref=e295]:
+                            - generic [ref=e296]: Research Job History
+                            - generic [ref=e297]: Showing latest 40 of 76 research jobs
+                          - generic [ref=e298]:
+                            - table [ref=e300]:
+                              - rowgroup [ref=e301]:
+                                - row "ID Status Prompt Found Approved / Rejected Cost Turns Created Actions" [ref=e302]:
+                                  - columnheader "ID" [ref=e303]
+                                  - columnheader "Status" [ref=e304]
+                                  - columnheader "Prompt" [ref=e305]
+                                  - columnheader "Found" [ref=e306]
+                                  - columnheader "Approved / Rejected" [ref=e307]
+                                  - columnheader "Cost" [ref=e308]
+                                  - columnheader "Turns" [ref=e309]
+                                  - columnheader "Created" [ref=e310]
+                                  - columnheader "Actions" [ref=e311]
+                              - rowgroup [ref=e312]:
+                                - row [ref=e313]:
+                                  - cell "#76" [ref=e314]
+                                  - cell "Completed" [ref=e315]:
+                                    - generic [ref=e316]:
+                                      - img [ref=e317]
+                                      - text: Completed
+                                  - cell [ref=e320]
+                                  - cell "0" [ref=e321]
+                                  - cell "0 / 0" [ref=e322]
+                                  - cell "$0.7600" [ref=e323]
+                                  - cell "28/600" [ref=e324]
+                                  - cell "Oct 27, 2026" [ref=e325]
+                                  - 'cell "View details for job #76" [ref=e326]':
+                                    - 'button "View details for job #76" [ref=e328] [cursor=pointer]':
+                                      - img
+                                - row [ref=e329]:
+                                  - cell "#75" [ref=e330]
+                                  - cell "Completed" [ref=e331]:
+                                    - generic [ref=e332]:
+                                      - img [ref=e333]
+                                      - text: Completed
+                                  - cell [ref=e336]
+                                  - cell "0" [ref=e337]
+                                  - cell "0 / 0" [ref=e338]
+                                  - cell "$1.2973" [ref=e339]
+                                  - cell "93/600" [ref=e340]
+                                  - cell "Oct 27, 2026" [ref=e341]
+                                  - 'cell "View details for job #75" [ref=e342]':
+                                    - 'button "View details for job #75" [ref=e344] [cursor=pointer]':
+                                      - img
+                                - row [ref=e345]:
+                                  - cell "#74" [ref=e346]
+                                  - cell "Completed" [ref=e347]:
+                                    - generic [ref=e348]:
+                                      - img [ref=e349]
+                                      - text: Completed
+                                  - cell [ref=e352]
+                                  - cell "0" [ref=e353]
+                                  - cell "0 / 0" [ref=e354]
+                                  - cell "$0.5650" [ref=e355]
+                                  - cell "13/600" [ref=e356]
+                                  - cell "Oct 27, 2026" [ref=e357]
+                                  - 'cell "View details for job #74" [ref=e358]':
+                                    - 'button "View details for job #74" [ref=e360] [cursor=pointer]':
+                                      - img
+                                - row [ref=e361]:
+                                  - cell "#73" [ref=e362]
+                                  - cell "Completed" [ref=e363]:
+                                    - generic [ref=e364]:
+                                      - img [ref=e365]
+                                      - text: Completed
+                                  - cell [ref=e368]
+                                  - cell "4" [ref=e369]
+                                  - cell "1 / 0 3 awaiting review" [ref=e370]:
+                                    - text: 1 / 0
+                                    - generic [ref=e371]: 3 awaiting review
+                                  - cell "$5.4603" [ref=e372]
+                                  - cell "155/200" [ref=e373]
+                                  - cell "Oct 27, 2026" [ref=e374]
+                                  - 'cell "View details for job #73" [ref=e375]':
+                                    - 'button "View details for job #73" [ref=e377] [cursor=pointer]':
+                                      - img
+                                - row [ref=e378]:
+                                  - cell "#72" [ref=e379]
+                                  - cell "Failed" [ref=e380]:
+                                    - generic [ref=e381]:
+                                      - img [ref=e382]
+                                      - text: Failed
+                                  - cell [ref=e384]
+                                  - cell "0" [ref=e385]
+                                  - cell "0 / 0" [ref=e386]
+                                  - cell "$0.0000" [ref=e387]
+                                  - cell "1/200" [ref=e388]
+                                  - cell "Oct 27, 2026" [ref=e389]
+                                  - 'cell "View details for job #72" [ref=e390]':
+                                    - 'button "View details for job #72" [active] [ref=e392] [cursor=pointer]':
+                                      - img
+                                - row [ref=e393]:
+                                  - cell [ref=e394]:
+                                    - note [ref=e395]:
+                                      - img [ref=e396]
+                                      - generic [ref=e398]: "Job #72: Claude Code returned an error result: API Error: 402 [glm] All 1 connection(s) credits exhausted — please reconnect in the dashboard"
+                                - row [ref=e399]:
+                                  - cell "#71" [ref=e400]
+                                  - cell "Completed" [ref=e401]:
+                                    - generic [ref=e402]:
+                                      - img [ref=e403]
+                                      - text: Completed
+                                  - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e406]'
+                                  - cell "9" [ref=e407]
+                                  - cell "0 / 0 9 awaiting review" [ref=e408]:
+                                    - text: 0 / 0
+                                    - generic [ref=e409]: 9 awaiting review
+                                  - cell "$3.3100" [ref=e410]
+                                  - cell "41/200" [ref=e411]
+                                  - cell "Oct 27, 2026" [ref=e412]
+                                  - 'cell "View details for job #71" [ref=e413]':
+                                    - 'button "View details for job #71" [ref=e415] [cursor=pointer]':
+                                      - img
+                                - row [ref=e416]:
+                                  - cell "#70" [ref=e417]
+                                  - cell "Completed" [ref=e418]:
+                                    - generic [ref=e419]:
+                                      - img [ref=e420]
+                                      - text: Completed
+                                  - 'cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e423]'
+                                  - cell "0" [ref=e424]
+                                  - cell "0 / 0" [ref=e425]
+                                  - cell "$1.1166" [ref=e426]
+                                  - cell "18/80" [ref=e427]
+                                  - cell "Oct 27, 2026" [ref=e428]
+                                  - 'cell "View details for job #70" [ref=e429]':
+                                    - 'button "View details for job #70" [ref=e431] [cursor=pointer]':
+                                      - img
+                                - row [ref=e432]:
+                                  - cell "#69" [ref=e433]
+                                  - cell "Completed" [ref=e434]:
+                                    - generic [ref=e435]:
+                                      - img [ref=e436]
+                                      - text: Completed
+                                  - cell [ref=e439]
+                                  - cell "0" [ref=e440]
+                                  - cell "0 / 0" [ref=e441]
+                                  - cell "$0.4199" [ref=e442]
+                                  - cell "10/80" [ref=e443]
+                                  - cell "Oct 27, 2026" [ref=e444]
+                                  - 'cell "View details for job #69" [ref=e445]':
+                                    - 'button "View details for job #69" [ref=e447] [cursor=pointer]':
+                                      - img
+                                - 'row "#68 Stopped at budget [QA-audit-1026] smoke: find 1 new open-source video tool 0 0 / 0 $0.3062 3/10 Oct 26, 2026 View details for job #68" [ref=e448]':
+                                  - cell "#68" [ref=e449]
+                                  - cell "Stopped at budget" [ref=e450]:
+                                    - generic [ref=e451]:
+                                      - img [ref=e452]
+                                      - text: Stopped at budget
+                                  - 'cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e454]'
+                                  - cell "0" [ref=e455]
+                                  - cell "0 / 0" [ref=e456]
+                                  - cell "$0.3062" [ref=e457]
+                                  - cell "3/10" [ref=e458]
+                                  - cell "Oct 26, 2026" [ref=e459]
+                                  - 'cell "View details for job #68" [ref=e460]':
+                                    - 'button "View details for job #68" [ref=e462] [cursor=pointer]':
+                                      - img
+                                - row [ref=e463]:
+                                  - cell "#67" [ref=e464]
+                                  - cell "Completed" [ref=e465]:
+                                    - generic [ref=e466]:
+                                      - img [ref=e467]
+                                      - text: Completed
+                                  - 'cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e470]'
+                                  - cell "0" [ref=e471]
+                                  - cell "0 / 0" [ref=e472]
+                                  - cell "$0.1508" [ref=e473]
+                                  - cell "1/8" [ref=e474]
+                                  - cell "Oct 26, 2026" [ref=e475]
+                                  - 'cell "View details for job #67" [ref=e476]':
+                                    - 'button "View details for job #67" [ref=e478] [cursor=pointer]':
+                                      - img
+                                - row [ref=e479]:
+                                  - cell "#66" [ref=e480]
+                                  - cell "Cancelled" [ref=e481]:
+                                    - generic [ref=e482]:
+                                      - img [ref=e483]
+                                      - text: Cancelled
+                                  - cell [ref=e487]
+                                  - cell "0" [ref=e488]
+                                  - cell "—" [ref=e489]
+                                  - cell "$0.2753 lower bound" [ref=e490]:
+                                    - text: $0.2753
+                                    - generic [ref=e491]: lower bound
+                                  - cell "3/40" [ref=e492]
+                                  - cell "Oct 26, 2026" [ref=e493]
+                                  - 'cell "View details for job #66" [ref=e494]':
+                                    - 'button "View details for job #66" [ref=e496] [cursor=pointer]':
+                                      - img
+                                - row [ref=e497]:
+                                  - cell "#65" [ref=e498]
+                                  - cell "Stopped at budget" [ref=e499]:
+                                    - generic [ref=e500]:
+                                      - img [ref=e501]
+                                      - text: Stopped at budget
+                                  - cell [ref=e503]
+                                  - cell "0" [ref=e504]
+                                  - cell "0 / 0" [ref=e505]
+                                  - cell "$0.3213" [ref=e506]
+                                  - cell "3/40" [ref=e507]
+                                  - cell "Oct 26, 2026" [ref=e508]
+                                  - 'cell "View details for job #65" [ref=e509]':
+                                    - 'button "View details for job #65" [ref=e511] [cursor=pointer]':
+                                      - img
+                                - row [ref=e512]:
+                                  - cell "#64" [ref=e513]
+                                  - cell "Completed" [ref=e514]:
+                                    - generic [ref=e515]:
+                                      - img [ref=e516]
+                                      - text: Completed
+                                  - cell [ref=e519]
+                                  - cell "2" [ref=e520]
+                                  - cell "1 / 1" [ref=e521]
+                                  - cell "$1.3245" [ref=e522]
+                                  - cell "9/40" [ref=e523]
+                                  - cell "Oct 26, 2026" [ref=e524]
+                                  - 'cell "View details for job #64" [ref=e525]':
+                                    - 'button "View details for job #64" [ref=e527] [cursor=pointer]':
+                                      - img
+                                - row [ref=e528]:
+                                  - cell "#63" [ref=e529]
+                                  - cell "Completed" [ref=e530]:
+                                    - generic [ref=e531]:
+                                      - img [ref=e532]
+                                      - text: Completed
+                                  - cell [ref=e535]
+                                  - cell "173" [ref=e536]
+                                  - cell "173 / 0" [ref=e537]
+                                  - cell "$40.5425" [ref=e538]
+                                  - cell "625/∞" [ref=e539]
+                                  - cell "Jul 30, 2026" [ref=e540]
+                                  - 'cell "View details for job #63" [ref=e541]':
+                                    - 'button "View details for job #63" [ref=e543] [cursor=pointer]':
+                                      - img
+                                - row [ref=e544]:
+                                  - cell "#62" [ref=e545]
+                                  - cell "Completed" [ref=e546]:
+                                    - generic [ref=e547]:
+                                      - img [ref=e548]
+                                      - text: Completed
+                                  - cell [ref=e551]
+                                  - cell "179" [ref=e552]
+                                  - cell "179 / 0" [ref=e553]
+                                  - cell "$41.7846" [ref=e554]
+                                  - cell "639/∞" [ref=e555]
+                                  - cell "Jul 30, 2026" [ref=e556]
+                                  - 'cell "View details for job #62" [ref=e557]':
+                                    - 'button "View details for job #62" [ref=e559] [cursor=pointer]':
+                                      - img
+                                - row [ref=e560]:
+                                  - cell "#61" [ref=e561]
+                                  - cell "Completed" [ref=e562]:
+                                    - generic [ref=e563]:
+                                      - img [ref=e564]
+                                      - text: Completed
+                                  - cell [ref=e567]
+                                  - cell "113" [ref=e568]
+                                  - cell "113 / 0" [ref=e569]
+                                  - cell "$28.2090" [ref=e570]
+                                  - cell "475/∞" [ref=e571]
+                                  - cell "Jul 29, 2026" [ref=e572]
+                                  - 'cell "View details for job #61" [ref=e573]':
+                                    - 'button "View details for job #61" [ref=e575] [cursor=pointer]':
+                                      - img
+                                - row [ref=e576]:
+                                  - cell "#60" [ref=e577]
+                                  - cell "Cancelled" [ref=e578]:
+                                    - generic [ref=e579]:
+                                      - img [ref=e580]
+                                      - text: Cancelled
+                                  - cell [ref=e584]
+                                  - cell "0" [ref=e585]
+                                  - cell "—" [ref=e586]
+                                  - cell "—" [ref=e587]
+                                  - cell "—" [ref=e588]
+                                  - cell "Jul 29, 2026" [ref=e589]
+                                  - 'cell "View details for job #60" [ref=e590]':
+                                    - 'button "View details for job #60" [ref=e592] [cursor=pointer]':
+                                      - img
+                                - row [ref=e593]:
+                                  - cell "#59" [ref=e594]
+                                  - cell "Cancelled" [ref=e595]:
+                                    - generic [ref=e596]:
+                                      - img [ref=e597]
+                                      - text: Cancelled
+                                  - cell [ref=e601]
+                                  - cell "0" [ref=e602]
+                                  - cell "—" [ref=e603]
+                                  - cell "—" [ref=e604]
+                                  - cell "—" [ref=e605]
+                                  - cell "Jul 29, 2026" [ref=e606]
+                                  - 'cell "View details for job #59" [ref=e607]':
+                                    - 'button "View details for job #59" [ref=e609] [cursor=pointer]':
+                                      - img
+                                - row [ref=e610]:
+                                  - cell "#58" [ref=e611]
+                                  - cell "Cancelled" [ref=e612]:
+                                    - generic [ref=e613]:
+                                      - img [ref=e614]
+                                      - text: Cancelled
+                                  - cell [ref=e618]
+                                  - cell "0" [ref=e619]
+                                  - cell "—" [ref=e620]
+                                  - cell "—" [ref=e621]
+                                  - cell "—" [ref=e622]
+                                  - cell "Jul 29, 2026" [ref=e623]
+                                  - 'cell "View details for job #58" [ref=e624]':
+                                    - 'button "View details for job #58" [ref=e626] [cursor=pointer]':
+                                      - img
+                                - row [ref=e627]:
+                                  - cell "#57" [ref=e628]
+                                  - cell "Cancelled" [ref=e629]:
+                                    - generic [ref=e630]:
+                                      - img [ref=e631]
+                                      - text: Cancelled
+                                  - cell [ref=e635]
+                                  - cell "0" [ref=e636]
+                                  - cell "—" [ref=e637]
+                                  - cell "—" [ref=e638]
+                                  - cell "—" [ref=e639]
+                                  - cell "Jul 29, 2026" [ref=e640]
+                                  - 'cell "View details for job #57" [ref=e641]':
+                                    - 'button "View details for job #57" [ref=e643] [cursor=pointer]':
+                                      - img
+                                - row [ref=e644]:
+                                  - cell "#56" [ref=e645]
+                                  - cell "Cancelled" [ref=e646]:
+                                    - generic [ref=e647]:
+                                      - img [ref=e648]
+                                      - text: Cancelled
+                                  - cell [ref=e652]
+                                  - cell "30 pre-cancel" [ref=e653]:
+                                    - generic "found before cancellation" [ref=e654]:
+                                      - text: "30"
+                                      - generic [ref=e655]: pre-cancel
+                                  - cell "30 / 0" [ref=e656]
+                                  - cell "—" [ref=e657]
+                                  - cell "—" [ref=e658]
+                                  - cell "Jul 29, 2026" [ref=e659]
+                                  - 'cell "View details for job #56" [ref=e660]':
+                                    - 'button "View details for job #56" [ref=e662] [cursor=pointer]':
+                                      - img
+                                - 'row "#55 Cancelled Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 135 pre-cancel 135 / 0 — — Jul 29, 2026 View details for job #55" [ref=e663]':
+                                  - cell "#55" [ref=e664]
+                                  - cell "Cancelled" [ref=e665]:
+                                    - generic [ref=e666]:
+                                      - img [ref=e667]
+                                      - text: Cancelled
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e671]
+                                  - cell "135 pre-cancel" [ref=e672]:
+                                    - generic "found before cancellation" [ref=e673]:
+                                      - text: "135"
+                                      - generic [ref=e674]: pre-cancel
+                                  - cell "135 / 0" [ref=e675]
+                                  - cell "—" [ref=e676]
+                                  - cell "—" [ref=e677]
+                                  - cell "Jul 29, 2026" [ref=e678]
+                                  - 'cell "View details for job #55" [ref=e679]':
+                                    - 'button "View details for job #55" [ref=e681] [cursor=pointer]':
+                                      - img
+                                - 'row "#54 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 304 304 / 0 $0.0000 0/∞ Jul 29, 2026 View details for job #54" [ref=e682]':
+                                  - cell "#54" [ref=e683]
+                                  - cell "Completed" [ref=e684]:
+                                    - generic [ref=e685]:
+                                      - img [ref=e686]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e689]
+                                  - cell "304" [ref=e690]
+                                  - cell "304 / 0" [ref=e691]
+                                  - cell "$0.0000" [ref=e692]
+                                  - cell "0/∞" [ref=e693]
+                                  - cell "Jul 29, 2026" [ref=e694]
+                                  - 'cell "View details for job #54" [ref=e695]':
+                                    - 'button "View details for job #54" [ref=e697] [cursor=pointer]':
+                                      - img
+                                - 'row "#53 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 152 151 / 1 $55.0971 419/∞ Jul 29, 2026 View details for job #53" [ref=e698]':
+                                  - cell "#53" [ref=e699]
+                                  - cell "Completed" [ref=e700]:
+                                    - generic [ref=e701]:
+                                      - img [ref=e702]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e705]
+                                  - cell "152" [ref=e706]
+                                  - cell "151 / 1" [ref=e707]
+                                  - cell "$55.0971" [ref=e708]
+                                  - cell "419/∞" [ref=e709]
+                                  - cell "Jul 29, 2026" [ref=e710]
+                                  - 'cell "View details for job #53" [ref=e711]':
+                                    - 'button "View details for job #53" [ref=e713] [cursor=pointer]':
+                                      - img
+                                - 'row "#52 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 125 125 / 0 $39.7923 370/∞ Jul 26, 2026 View details for job #52" [ref=e714]':
+                                  - cell "#52" [ref=e715]
+                                  - cell "Completed" [ref=e716]:
+                                    - generic [ref=e717]:
+                                      - img [ref=e718]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e721]
+                                  - cell "125" [ref=e722]
+                                  - cell "125 / 0" [ref=e723]
+                                  - cell "$39.7923" [ref=e724]
+                                  - cell "370/∞" [ref=e725]
+                                  - cell "Jul 26, 2026" [ref=e726]
+                                  - 'cell "View details for job #52" [ref=e727]':
+                                    - 'button "View details for job #52" [ref=e729] [cursor=pointer]':
+                                      - img
+                                - 'row "#51 Failed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 40 40 / 0 $0.0000 0/∞ Jul 25, 2026 View details for job #51" [ref=e730]':
+                                  - cell "#51" [ref=e731]
+                                  - cell "Failed" [ref=e732]:
+                                    - generic [ref=e733]:
+                                      - img [ref=e734]
+                                      - text: Failed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e736]
+                                  - cell "40" [ref=e737]
+                                  - cell "40 / 0" [ref=e738]
+                                  - cell "$0.0000" [ref=e739]
+                                  - cell "0/∞" [ref=e740]
+                                  - cell "Jul 25, 2026" [ref=e741]
+                                  - 'cell "View details for job #51" [ref=e742]':
+                                    - 'button "View details for job #51" [ref=e744] [cursor=pointer]':
+                                      - img
+                                - row [ref=e745]:
+                                  - cell [ref=e746]:
+                                    - note [ref=e747]:
+                                      - img [ref=e748]
+                                      - generic [ref=e750]: "Job #51: Claude Code returned an error result: API Error: 530 {\"type\":\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1033/\",\"title\":\"Error 1033: Cloudflare Tunnel error\",\"status\":530,\"detail\":\"The host is configured as a Cloudflare Tunnel, but Cloudflare is currently unable to reach it.\",\"instance\":\"a20a32b19b1dc9f2\",\"error_code\":1033,\"error_name\":\"tunnel_error\",\"error_category\":\"config\",\"ray_id\":\"a20a32b19b1dc9f2\",\"timestamp\":\"2026-07-25T09:39:32Z\",\"zone\":\"nickel-instructional-anticipated-accurate.trycloudflare.com\",\"cloudflare_error\":true,\"retryable\":true,\"retry_after\":120,\"owner_action_required\":true,\"what_you_should_do\":\"**Wait and retry.** The tunnel may be temporarily disconnected. Try again in a few minutes.\",\"footer\":\"This error was generated by Cloudflare on behalf of the website owner.\"}. This is a server-side issue, usually temporary — try again in a moment. If it persists, check your inference gateway (rgiw7uw.abc-tunnel.us)."
+                                - 'row "#50 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 233 233 / 0 $75.2327 569/∞ Jul 25, 2026 View details for job #50" [ref=e751]':
+                                  - cell "#50" [ref=e752]
+                                  - cell "Completed" [ref=e753]:
+                                    - generic [ref=e754]:
+                                      - img [ref=e755]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e758]
+                                  - cell "233" [ref=e759]
+                                  - cell "233 / 0" [ref=e760]
+                                  - cell "$75.2327" [ref=e761]
+                                  - cell "569/∞" [ref=e762]
+                                  - cell "Jul 25, 2026" [ref=e763]
+                                  - 'cell "View details for job #50" [ref=e764]':
+                                    - 'button "View details for job #50" [ref=e766] [cursor=pointer]':
+                                      - img
+                                - 'row "#49 Cancelled Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 12 pre-cancel 12 / 0 — — Jul 24, 2026 View details for job #49" [ref=e767]':
+                                  - cell "#49" [ref=e768]
+                                  - cell "Cancelled" [ref=e769]:
+                                    - generic [ref=e770]:
+                                      - img [ref=e771]
+                                      - text: Cancelled
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e775]
+                                  - cell "12 pre-cancel" [ref=e776]:
+                                    - generic "found before cancellation" [ref=e777]:
+                                      - text: "12"
+                                      - generic [ref=e778]: pre-cancel
+                                  - cell "12 / 0" [ref=e779]
+                                  - cell "—" [ref=e780]
+                                  - cell "—" [ref=e781]
+                                  - cell "Jul 24, 2026" [ref=e782]
+                                  - 'cell "View details for job #49" [ref=e783]':
+                                    - 'button "View details for job #49" [ref=e785] [cursor=pointer]':
+                                      - img
+                                - 'row "#48 Cancelled Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 0 — — — Jul 24, 2026 View details for job #48" [ref=e786]':
+                                  - cell "#48" [ref=e787]
+                                  - cell "Cancelled" [ref=e788]:
+                                    - generic [ref=e789]:
+                                      - img [ref=e790]
+                                      - text: Cancelled
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e794]
+                                  - cell "0" [ref=e795]
+                                  - cell "—" [ref=e796]
+                                  - cell "—" [ref=e797]
+                                  - cell "—" [ref=e798]
+                                  - cell "Jul 24, 2026" [ref=e799]
+                                  - 'cell "View details for job #48" [ref=e800]':
+                                    - 'button "View details for job #48" [ref=e802] [cursor=pointer]':
+                                      - img
+                                - 'row "#47 Cancelled Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 0 — $0.1864 4/∞ Jul 24, 2026 View details for job #47" [ref=e803]':
+                                  - cell "#47" [ref=e804]
+                                  - cell "Cancelled" [ref=e805]:
+                                    - generic [ref=e806]:
+                                      - img [ref=e807]
+                                      - text: Cancelled
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e811]
+                                  - cell "0" [ref=e812]
+                                  - cell "—" [ref=e813]
+                                  - cell "$0.1864" [ref=e814]
+                                  - cell "4/∞" [ref=e815]
+                                  - cell "Jul 24, 2026" [ref=e816]
+                                  - 'cell "View details for job #47" [ref=e817]':
+                                    - 'button "View details for job #47" [ref=e819] [cursor=pointer]':
+                                      - img
+                                - 'row "#46 Failed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 0 0 / 0 $0.0000 0/∞ Jul 24, 2026 View details for job #46" [ref=e820]':
+                                  - cell "#46" [ref=e821]
+                                  - cell "Failed" [ref=e822]:
+                                    - generic [ref=e823]:
+                                      - img [ref=e824]
+                                      - text: Failed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e826]
+                                  - cell "0" [ref=e827]
+                                  - cell "0 / 0" [ref=e828]
+                                  - cell "$0.0000" [ref=e829]
+                                  - cell "0/∞" [ref=e830]
+                                  - cell "Jul 24, 2026" [ref=e831]
+                                  - 'cell "View details for job #46" [ref=e832]':
+                                    - 'button "View details for job #46" [ref=e834] [cursor=pointer]':
+                                      - img
+                                - row [ref=e835]:
+                                  - cell [ref=e836]:
+                                    - note [ref=e837]:
+                                      - img [ref=e838]
+                                      - generic [ref=e840]: "Job #46: Claude Code returned an error result: API Error: Origin DNS error | soldier-living-even-finite.trycloudflare.com | Cloudflare. This is a server-side issue, usually temporary — try again in a moment. If it persists, check your inference gateway (rgiw7uw.abc-tunnel.us)."
+                                - 'row "#45 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 2 2 / 0 $2.1662 31/∞ Jul 24, 2026 View details for job #45" [ref=e841]':
+                                  - cell "#45" [ref=e842]
+                                  - cell "Completed" [ref=e843]:
+                                    - generic [ref=e844]:
+                                      - img [ref=e845]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e848]
+                                  - cell "2" [ref=e849]
+                                  - cell "2 / 0" [ref=e850]
+                                  - cell "$2.1662" [ref=e851]
+                                  - cell "31/∞" [ref=e852]
+                                  - cell "Jul 24, 2026" [ref=e853]
+                                  - 'cell "View details for job #45" [ref=e854]':
+                                    - 'button "View details for job #45" [ref=e856] [cursor=pointer]':
+                                      - img
+                                - 'row "#44 Cancelled Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 0 — — — Jul 24, 2026 View details for job #44" [ref=e857]':
+                                  - cell "#44" [ref=e858]
+                                  - cell "Cancelled" [ref=e859]:
+                                    - generic [ref=e860]:
+                                      - img [ref=e861]
+                                      - text: Cancelled
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e865]
+                                  - cell "0" [ref=e866]
+                                  - cell "—" [ref=e867]
+                                  - cell "—" [ref=e868]
+                                  - cell "—" [ref=e869]
+                                  - cell "Jul 24, 2026" [ref=e870]
+                                  - 'cell "View details for job #44" [ref=e871]':
+                                    - 'button "View details for job #44" [ref=e873] [cursor=pointer]':
+                                      - img
+                                - 'row "#43 Completed Find new, high-quality video streaming and development resources that aren''t already in our database. Focus on recently launched tools, libraries, and platforms. 48 48 / 0 $18.8061 172/100 over cap: continued runs Jul 24, 2026 View details for job #43" [ref=e874]':
+                                  - cell "#43" [ref=e875]
+                                  - cell "Completed" [ref=e876]:
+                                    - generic [ref=e877]:
+                                      - img [ref=e878]
+                                      - text: Completed
+                                  - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e881]
+                                  - cell "48" [ref=e882]
+                                  - cell "48 / 0" [ref=e883]
+                                  - cell "$18.8061" [ref=e884]
+                                  - 'cell "172/100 over cap: continued runs" [ref=e885]':
+                                    - generic "used across continuation runs (cap 100/run)" [ref=e886]:
+                                      - text: 172/100
+                                      - generic [ref=e887]: "over cap: continued runs"
+                                  - cell "Jul 24, 2026" [ref=e888]
+                                  - 'cell "View details for job #43" [ref=e889]':
+                                    - 'button "View details for job #43" [ref=e891] [cursor=pointer]':
+                                      - img
+                                - 'row "#42 Cancelled __qa6 verify valid job still starts 0 — — — Jul 21, 2026 View details for job #42" [ref=e892]':
+                                  - cell "#42" [ref=e893]
+                                  - cell "Cancelled" [ref=e894]:
+                                    - generic [ref=e895]:
+                                      - img [ref=e896]
+                                      - text: Cancelled
+                                  - cell "__qa6 verify valid job still starts" [ref=e900]
+                                  - cell "0" [ref=e901]
+                                  - cell "—" [ref=e902]
+                                  - cell "—" [ref=e903]
+                                  - cell "—" [ref=e904]
+                                  - cell "Jul 21, 2026" [ref=e905]
+                                  - 'cell "View details for job #42" [ref=e906]':
+                                    - 'button "View details for job #42" [ref=e908] [cursor=pointer]':
+                                      - img
+                                - row [ref=e909]:
+                                  - cell "#41" [ref=e910]
+                                  - cell "Cancelled" [ref=e911]:
+                                    - generic [ref=e912]:
+                                      - img [ref=e913]
+                                      - text: Cancelled
+                                  - cell [ref=e917]
+                                  - cell "0" [ref=e918]
+                                  - cell "—" [ref=e919]
+                                  - cell "—" [ref=e920]
+                                  - cell "—" [ref=e921]
+                                  - cell "Jul 20, 2026" [ref=e922]
+                                  - 'cell "View details for job #41" [ref=e923]':
+                                    - 'button "View details for job #41" [ref=e925] [cursor=pointer]':
+                                      - img
+                                - 'row "#40 Cancelled ‮‮‮‮‮‮‮‮‮‮ 0 — — — Jul 20, 2026 View details for job #40" [ref=e926]':
+                                  - cell "#40" [ref=e927]
+                                  - cell "Cancelled" [ref=e928]:
+                                    - generic [ref=e929]:
+                                      - img [ref=e930]
+                                      - text: Cancelled
+                                  - cell "‮‮‮‮‮‮‮‮‮‮" [ref=e934]
+                                  - cell "0" [ref=e935]
+                                  - cell "—" [ref=e936]
+                                  - cell "—" [ref=e937]
+                                  - cell "—" [ref=e938]
+                                  - cell "Jul 20, 2026" [ref=e939]
+                                  - 'cell "View details for job #40" [ref=e940]':
+                                    - 'button "View details for job #40" [ref=e942] [cursor=pointer]':
+                                      - img
+                                - 'row "#39 Cancelled qa5 probe prompt 0 — — 1/5 Jul 20, 2026 View details for job #39" [ref=e943]':
+                                  - cell "#39" [ref=e944]
+                                  - cell "Cancelled" [ref=e945]:
+                                    - generic [ref=e946]:
+                                      - img [ref=e947]
+                                      - text: Cancelled
+                                  - cell "qa5 probe prompt" [ref=e951]
+                                  - cell "0" [ref=e952]
+                                  - cell "—" [ref=e953]
+                                  - cell "—" [ref=e954]
+                                  - cell "1/5" [ref=e955]
+                                  - cell "Jul 20, 2026" [ref=e956]
+                                  - 'cell "View details for job #39" [ref=e957]':
+                                    - 'button "View details for job #39" [ref=e959] [cursor=pointer]':
+                                      - img
+                                - 'row "#38 Cancelled qa5 probe prompt 0 — — 1/5 Jul 20, 2026 View details for job #38" [ref=e960]':
+                                  - cell "#38" [ref=e961]
+                                  - cell "Cancelled" [ref=e962]:
+                                    - generic [ref=e963]:
+                                      - img [ref=e964]
+                                      - text: Cancelled
+                                  - cell "qa5 probe prompt" [ref=e968]
+                                  - cell "0" [ref=e969]
+                                  - cell "—" [ref=e970]
+                                  - cell "—" [ref=e971]
+                                  - cell "1/5" [ref=e972]
+                                  - cell "Jul 20, 2026" [ref=e973]
+                                  - 'cell "View details for job #38" [ref=e974]':
+                                    - 'button "View details for job #38" [ref=e976] [cursor=pointer]':
+                                      - img
+                                - 'row "#37 Cancelled qa5 probe prompt 0 — — — Jul 20, 2026 View details for job #37" [ref=e977]':
+                                  - cell "#37" [ref=e978]
+                                  - cell "Cancelled" [ref=e979]:
+                                    - generic [ref=e980]:
+                                      - img [ref=e981]
+                                      - text: Cancelled
+                                  - cell "qa5 probe prompt" [ref=e985]
+                                  - cell "0" [ref=e986]
+                                  - cell "—" [ref=e987]
+                                  - cell "—" [ref=e988]
+                                  - cell "—" [ref=e989]
+                                  - cell "Jul 20, 2026" [ref=e990]
+                                  - 'cell "View details for job #37" [ref=e991]':
+                                    - 'button "View details for job #37" [ref=e993] [cursor=pointer]':
+                                      - img
+                            - button "Load more (40 of 76) in Job History" [ref=e995] [cursor=pointer]: Load more (40 of 76)
+    - button "Back to top" [ref=e996] [cursor=pointer]:
+      - img

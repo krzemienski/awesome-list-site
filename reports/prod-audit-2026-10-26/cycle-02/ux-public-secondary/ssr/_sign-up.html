@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-product-profile="public-discovery">
+  <head>
+    <!--OG_META_INJECTED-->
+    <title data-react-helmet="true">Create an Account — Awesome Video</title>
+    <meta name="description" content="Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys." data-react-helmet="true" />
+    <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" data-react-helmet="true" />
+    <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+    <meta property="og:type" content="website" data-react-helmet="true" />
+    <meta property="og:site_name" content="Awesome Video" data-react-helmet="true" />
+    <meta property="og:locale" content="en_US" data-react-helmet="true" />
+    <meta property="og:title" content="Create an Account — Awesome Video" data-react-helmet="true" />
+    <meta property="og:description" content="Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys." data-react-helmet="true" />
+    <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsign-up" data-react-helmet="true" />
+    <meta property="og:image:secure_url" content="https://awesome.video/og-image.png?path=%2Fsign-up" data-react-helmet="true" />
+    <meta property="og:image:type" content="image/png" data-react-helmet="true" />
+    <meta property="og:image:width" content="1200" data-react-helmet="true" />
+    <meta property="og:image:height" content="630" data-react-helmet="true" />
+    <meta property="og:image:alt" content="Awesome Video — curated video development resources" data-react-helmet="true" />
+    <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+    <meta name="twitter:site" content="@awesome_video" data-react-helmet="true" />
+    <meta name="twitter:title" content="Create an Account — Awesome Video" data-react-helmet="true" />
+    <meta name="twitter:description" content="Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys." data-react-helmet="true" />
+    <meta name="twitter:image" content="https://awesome.video/og-image.png?path=%2Fsign-up" data-react-helmet="true" />
+    <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" data-react-helmet="true" />
+    <meta name="theme-color" content="#ff3d52" data-react-helmet="true" />
+    <meta name="msapplication-TileColor" content="#ff3d52" data-react-helmet="true" />
+    <meta name="application-name" content="Awesome Video" data-react-helmet="true" />
+    <meta name="apple-mobile-web-app-title" content="Awesome Video" data-react-helmet="true" />
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // BUG-021 (run24): strip query params carrying real markup payloads from
+      // the address bar BEFORE any other boot script runs. The app never
+      // renders raw query strings as HTML, but the payload sat in the URL bar
+      // (shareable/copyable) and flowed into analytics page_path. Runs
+      // pre-React via replaceState so no history entry keeps the payload.
+      //
+      // ONE coherent policy (audit2 BUG-009): scrub ONLY strings that could
+      // parse as actual HTML markup if injected raw — a tag-open sequence.
+      // Per the HTML5 tokenizer, "<" starts markup only when immediately
+      // followed by a letter, "/", "!" or "?", so prose like "a < b > c" or
+      // "javascript: the good parts" is plain text and searches normally.
+      // Bare scheme/attribute text (javascript:, onerror=, data:text/html) is
+      // inert without a markup context: every reflection sink HTML-escapes
+      // (React text nodes + the server-rendered fallback), and query text is
+      // never assigned to href/src — so it is no longer scrubbed.
+      //
+      // audit2 BUG-024: the check runs across RECURSIVE percent-decodings
+      // (URLSearchParams already decoded once; loop up to 5 more passes) so
+      // double-/triple-encoded payloads (%253Cscript…) can't slip through.
+      (function () {
+        try {
+          if (!location.search || location.search.length < 2) return;
+          var MARKUP = /<[a-z!\/?]/i;
+          var params = new URLSearchParams(location.search);
+          var dirty = false;
+          var names = [];
+          var removed = [];
+          params.forEach(function (v, k) { names.push(k); });
+          for (var i = 0; i < names.length; i++) {
+            var k = names[i];
+            var probe = k + '=' + (params.get(k) || '');
+            var hit = MARKUP.test(probe);
+            for (var d = 0; d < 5 && !hit; d++) {
+              var next;
+              try { next = decodeURIComponent(probe); } catch (_) { break; }
+              if (next === probe) break;
+              probe = next;
+              hit = MARKUP.test(probe);
+            }
+            if (hit) {
+              params.delete(k);
+              if (removed.indexOf(k) === -1) removed.push(k);
+              dirty = true;
+            }
+          }
+          if (dirty) {
+            // BUG-032/BUG-064 (run27): stripping is the right security call,
+            // but doing it SILENTLY made /search?q=<img…> render the full
+            // catalog and /?tags=<script nonce="T0f1xWGvs/f26fm/pj+83w==">… render unfiltered with no hint the
+            // link was altered. Record what was dropped so the app can show
+            // an explicit "part of this link was ignored" notice after boot.
+            window.__scrubbedParams = removed;
+            var qs = params.toString();
+            history.replaceState(
+              history.state,
+              '',
+              location.pathname + (qs ? '?' + qs : '') + location.hash
+            );
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style nonce="T0f1xWGvs/f26fm/pj+83w==">
+      #home-layout-boot-skeleton { display: none; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #home-layout-boot-skeleton {
+        display: block; min-height: 100vh; background: var(--bg); padding: 40px 20px;
+      }
+      html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner {
+        display: none !important;
+      }
+    </style>
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // Browser-only legacy preference bridge. These markers alter paint only;
+      // React still hydrates the exact server DOM and clears them after its
+      // state has committed.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var params = new URLSearchParams(location.search);
+          var hasLayoutOverride = params.has('layout');
+          var hasLayoutCookie = /(?:^|;\s*)awesome-video-home-layout=(?:index|curated)(?:;|$)/.test(document.cookie);
+          var legacyLayout = localStorage.getItem('awesome-video-home-layout');
+          if (location.pathname === '/' && !hasLayoutOverride && !hasLayoutCookie && legacyLayout === 'curated') {
+            root.setAttribute('data-home-layout-pending', 'true');
+            // React normally clears this after it has committed curated
+            // markup. If the app bundle cannot run, never leave the only
+            // usable document hidden indefinitely.
+            window.setTimeout(function () {
+              root.removeAttribute('data-home-layout-pending');
+            }, 4000);
+          }
+          var hasConsentCookie = /(?:^|;\s*)analytics-consent=(?:granted|denied)(?:;|$)/.test(document.cookie);
+          var legacyConsent = localStorage.getItem('analytics-consent');
+          if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
+            root.setAttribute('data-consent-known', 'true');
+          }
+        } catch (_) {}
+      })();
+    </script>
+
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // BUG-001 (run19): kick off the awesome-list fetch before the JS bundle
+      // is even parsed. fetchStaticAwesomeList() consumes this promise (one
+      // shot) so warm loads don't serialize bundle-parse -> fetch. The catch
+      // only silences unhandled-rejection noise; consumers handle errors.
+      (function () {
+          // The nav tree (~few KB) is needed by chrome on every page. Default
+          // taxonomy views prefetch one 24-card listing slice; the full corpus
+          // remains reserved for Advanced browse and taxonomy filter modes.
+        try {
+          // Exact Home SSR already embeds the request-local nav cache. Avoid
+          // racing it with the legacy early request; non-SSR routes preserve
+          // their existing prefetch behavior.
+          if (document.documentElement.getAttribute('data-home-ssr') !== 'true') {
+            var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
+            window.__awesomeListNavEarlyFetch = n;
+            n.catch(function () {});
+          }
+        } catch (e) {}
+        try {
+          var pth = location.pathname;
+          var taxonomyMatch = pth.match(/^\/(category|subcategory|sub-subcategory)\/([^/]+)$/);
+          var tagMatch = pth.match(/^\/tag\/([^/]+)$/);
+          var searchParams = new URLSearchParams(location.search);
+          var needsCorpus = pth === '/advanced' || (
+            !!taxonomyMatch &&
+            (!!searchParams.get('search') || !!searchParams.get('tags') || !!searchParams.get('tag') ||
+             !!searchParams.get('sortBy') || !!searchParams.get('sort'))
+          );
+          if (needsCorpus) {
+            var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
+            window.__awesomeListEarlyFetch = p;
+            p.catch(function () {});
+          } else if (tagMatch) {
+            var tagPage = searchParams.get('page') || '1';
+            var tagValue = decodeURIComponent(tagMatch[1]);
+            // Over-length tags (TAG_MAX_LENGTH = 50) and offsets past int4
+            // (MAX_PAGE) are a 404 page; the API would answer 400, so skip
+            // the prefetch.
+            var tagOffset = (Number(tagPage) - 1) * 24;
+            if (/^[1-9]\d*$/.test(tagPage) && tagValue.length <= 50 && tagOffset <= 2147483647) {
+              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=true';
+              var tagFetch = fetch(tagUrl, { credentials: 'same-origin' });
+              window.__tagListingEarlyFetch = { url: tagUrl, promise: tagFetch };
+              tagFetch.catch(function () {});
+            }
+          } else if (taxonomyMatch) {
+            var level = taxonomyMatch[1] === 'sub-subcategory' ? 'sub-subcategory' : taxonomyMatch[1];
+            var page = searchParams.get('page');
+            if (!page || /^[1-9]\d*$/.test(page)) {
+              var listingParams = new URLSearchParams({ level: level, slug: decodeURIComponent(taxonomyMatch[2]), page: page || '1' });
+              var subcategory = searchParams.get('subcategory');
+              if (subcategory) {
+                if (level === 'category' && subcategory.indexOf(' › ') !== -1) {
+                  var pieces = subcategory.split(' › ');
+                  listingParams.set('subcategory', pieces[0]);
+                  listingParams.set('subSubcategory', pieces[1]);
+                } else {
+                  listingParams.set('subcategory', subcategory);
+                }
+              }
+              if (searchParams.get('filter') === 'general' || searchParams.get('view') === 'general') listingParams.set('general', '1');
+              var listingUrl = '/api/awesome-list/listing?' + listingParams.toString();
+              var listingPromise = fetch(listingUrl, { credentials: 'same-origin' });
+              window.__awesomeListListingEarlyFetch = { url: listingUrl, promise: listingPromise };
+              listingPromise.catch(function () {});
+            }
+          }
+        } catch (e) {}
+        // Task #307: the Task-169 auth early-fetch was removed — the Clerk
+        // SDK must initialize before auth state is meaningful, so a pre-boot
+        // /api/auth/user snapshot could only go stale.
+      })();
+    </script>
+
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+
+          // Narrow regex: only match the specific Vite/HMR rejection
+          // signatures that drive the overlay loop. Avoid bare "fetch" or
+          // "vite" tokens so real app errors (incl. words like "invite"
+          // or React Query fetch failures) still surface in dev consoles.
+          var noisy = /(?:^|\b)(?:Load failed|Failed to fetch dynamically imported module|WebSocket (?:is closed|connection failed|error)|\[vite\]|vite-hmr|HMR connection lost)(?:\b|$)/i;
+          var stackHit = /\/@vite\/client|\/node_modules\/vite\//;
+
+          window.addEventListener('unhandledrejection', function (e) {
+            var reason = e && e.reason;
+            var msg = (reason && (reason.message || String(reason))) || '';
+            var stack = (reason && reason.stack) || '';
+            if (noisy.test(msg) || stackHit.test(stack)) e.preventDefault();
+          });
+
+          var kill = function (el) {
+            try { el.parentNode && el.parentNode.removeChild(el); } catch (_) {}
+          };
+          var sweep = function () {
+            document.querySelectorAll(
+              'vite-error-overlay, vite-plugin-checker-error-overlay'
+            ).forEach(kill);
+          };
+
+          if (document.body) sweep();
+          new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+              var added = muts[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                var n = added[j];
+                if (n.nodeType === 1) {
+                  var tag = n.tagName && n.tagName.toLowerCase();
+                  if (tag === 'vite-error-overlay' ||
+                      tag === 'vite-plugin-checker-error-overlay') {
+                    kill(n);
+                  }
+                }
+              }
+            }
+          }).observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+      })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The ONE webfont request, originally copied byte-for-byte from the
+         design source (awesome-list-site-ds/index.html). Pixel parity with the design needs
+         both documents to declare the same @font-face set — same families,
+         weights, styles and axes — because a different axis subset (Fraunces
+         with `opsz`, Inter without 800) shapes different glyph outlines and
+         metrics. The families the two kept design systems (Editorial, Geist)
+         name, plus IBM Plex Sans for the font picker, ride on this single
+         pre-paint link, so switching systems never fetches another
+         stylesheet; only picker overrides not in this set load on demand
+         (client/src/lib/font-options.ts). Families only the removed systems
+         used (Instrument Serif, Space Grotesk, IBM Plex Mono, Manrope) were
+         dropped; never add families here. Unused families cost only CSS bytes: the
+         font files themselves download when a face is first used.
+         BUG-014: no inline onload handler (the nonce-based CSP would block it).
+         X-03: the link starts as media="print" so the cross-origin request
+         never blocks first paint; the nonce-stamped script beside it switches
+         it to "all" once it loads. display=swap keeps FOUT control. -->
+    <link rel="stylesheet" id="shell-webfonts" media="print"
+           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      (function () {
+        var l = document.getElementById("shell-webfonts");
+        if (!l) return;
+        var on = function () { l.media = "all"; };
+        if (l.sheet) on(); else { l.addEventListener("load", on); l.addEventListener("error", on); }
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" /></noscript>
+
+    <!-- The design system, verbatim from the design source (never edited here;
+         app CSS lives in the Vite bundle, which links after this sheet). -->
+    <link rel="stylesheet" href="/ds/design-system.css" />
+    <!-- Classic, parser-blocking script on purpose: it defines
+         window.DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT /
+         applyDesignSystem before the boot below runs. -->
+    <script src="/ds/design-system.js"></script>
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // Synchronous boot (HANDOFF §5 Phase 3): write the ~36 inline tokens and
+      // data-system / data-accent before first paint. Runs every route.
+      (function () {
+        var root = document.documentElement;
+        try {
+          // Storage keys + fallback system from design-system.ts (Vite injects them).
+          var THEME_BOOT = {"systemKey":"ds-system","accentKey":"ds-accent","defaultSystem":"editorial","systemIds":["editorial","geist"],"removedSystemIds":["terminal","brutalist","swiss"],"accentIds":["crimson","magenta","orange","amber","emerald","matrix","cyan","violet","lime","rose"],"defaultAccents":{"editorial":"crimson","geist":"cyan"},"text3Corrections":{"editorial":"rgba(244,243,238,0.49)","geist":"rgba(250,250,250,0.49)"}};
+          var FONT_BOOT = {"stacks":{"system":"","inter":"'Inter', system-ui, sans-serif","dm-sans":"'DM Sans', system-ui, sans-serif","source-sans":"'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif","ibm-plex":"'IBM Plex Sans', system-ui, sans-serif","jetbrains":"'JetBrains Mono', ui-monospace, monospace"},"fallback":"system"};
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;
+          root.setAttribute('data-font', fnt);
+          var sys = null, acc = null;
+          try { sys = localStorage.getItem(THEME_BOOT.systemKey); } catch (_) {}
+          try { acc = localStorage.getItem(THEME_BOOT.accentKey); } catch (_) {}
+          // A removed system (terminal/brutalist/swiss) lands on the default
+          // pair before paint, and the stored pair is rewritten to match.
+          if (THEME_BOOT.removedSystemIds.indexOf(sys) !== -1) {
+            sys = THEME_BOOT.defaultSystem;
+            acc = THEME_BOOT.defaultAccents[sys];
+            try {
+              localStorage.setItem(THEME_BOOT.systemKey, sys);
+              localStorage.setItem(THEME_BOOT.accentKey, acc);
+            } catch (_) {}
+          }
+          if (THEME_BOOT.systemIds.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
+          if (!window.DESIGN_SYSTEMS) {
+            if (THEME_BOOT.accentIds.indexOf(acc) === -1) acc = THEME_BOOT.defaultAccents[sys];
+            root.setAttribute('data-system', sys);
+            root.setAttribute('data-accent', acc);
+          } else {
+          if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = THEME_BOOT.defaultSystem;
+          var known = false;
+          for (var i = 0; i < window.ACCENTS.length; i++) if (window.ACCENTS[i].id === acc) known = true;
+          if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];
+          Object.keys(THEME_BOOT.text3Corrections).forEach(function (id) {
+            window.DESIGN_SYSTEMS[id].vars['--text-3'] = THEME_BOOT.text3Corrections[id];
+          });
+          var originalVars = window.DESIGN_SYSTEMS[sys].vars;
+          try {
+            if (fnt && FONT_BOOT.stacks[fnt]) {
+              window.DESIGN_SYSTEMS[sys].vars = Object.assign({}, originalVars, {
+                '--font-body': FONT_BOOT.stacks[fnt],
+                '--font-sans': FONT_BOOT.stacks[fnt]
+              });
+            }
+            if (typeof window.applyDesignSystem === 'function') window.applyDesignSystem(sys, acc);
+            else {
+              root.setAttribute('data-system', sys);
+              root.setAttribute('data-accent', acc);
+            }
+          } finally {
+            window.DESIGN_SYSTEMS[sys].vars = originalVars;
+          }
+          }
+        } catch (_) {}
+
+        try {
+          // Layout-density hook only (shared/styles/product-profiles.css). It
+          // no longer decides which system paints.
+          var PROFILE_ROUTES = {"routePatterns":{"admin":"^/admin(?:/|$)","learning":"^/(?:journeys|journey(?:/|$)|continue-learning|recommendations|bookmarks|favorites|profile|contributions|notifications|onboarding|settings(?:/|$)|account(?:/|$))"}}.routePatterns;
+          root.setAttribute(
+            'data-product-profile',
+            new RegExp(PROFILE_ROUTES.admin).test(location.pathname)
+              ? 'admin-operations'
+              : new RegExp(PROFILE_ROUTES.learning).test(location.pathname)
+                ? 'learning-workspace'
+                : 'public-discovery'
+          );
+          root.classList.add('dark');
+
+          // Font override (Theme Settings picker). Only when a real override
+          // is stored: a first visit is pure applier state. The applier
+          // clears --font-body on every switch, so the app re-applies the
+          // override after each one (font-options.ts, single code path).
+          if (fnt && Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt) && FONT_BOOT.stacks[fnt]) {
+            root.setAttribute('data-font', fnt);
+            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
+            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
+          }
+        } catch (_) {}
+      })();
+    </script>
+    <link rel="modulepreload" crossorigin href="/assets/index-D8hfru9l.js">
+    <link rel="modulepreload" crossorigin href="/assets/index-CMCJ-qQ8.js">
+    <link rel="modulepreload" crossorigin href="/assets/jsx-runtime-D7j2mC9N.js">
+    <link rel="modulepreload" crossorigin href="/assets/index-C7-6WTLg.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-B_ZaE-mm.css">
+  </head>
+  <body>
+    <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.
+         (A prior "noscript" match in this file was only a comment.) -->
+    <noscript>
+      <div style="max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);">
+        <p style="font-size:20px;font-weight:700;margin:0 0 12px;">Awesome Video</p>
+        <p style="margin:0 0 8px;">This app requires JavaScript to browse thousands of curated video development resources.</p>
+        <p style="margin:0;">Please enable JavaScript, or view the source list at
+          <a href="https://github.com/krzemienski/awesome-video" style="color:var(--accent);">github.com/krzemienski/awesome-video</a>.</p>
+      </div>
+    </noscript>
+    <div id="home-layout-boot-skeleton" aria-hidden="true">
+      <div style="max-width:960px;margin:0 auto">
+        <div style="height:2rem;width:55%;background:var(--surface-2);margin-bottom:1rem"></div>
+        <div style="height:1rem;width:80%;background:var(--surface-2);margin-bottom:2rem"></div>
+        <div style="height:12rem;background:var(--surface-2);margin-bottom:1rem"></div>
+      </div>
+    </div>
+    <div id="root"><style nonce="T0f1xWGvs/f26fm/pj+83w==">#ssr-seo-content{background:var(--bg);color:var(--text);min-height:100vh;font-family:var(--font-body);line-height:var(--body-leading)}#ssr-seo-content .ssr-wrap{max-width:960px;margin:0 auto;padding:40px 20px}#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:var(--text)}#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:var(--text)}#ssr-seo-content h3{font-size:.98rem;font-weight:700;margin:1.25rem 0 .35rem;color:var(--text)}#ssr-seo-content p.ssr-lead,#ssr-seo-content section[data-seo-section] > p{font-size:1.1rem;line-height:1.6;color:var(--text-2);margin:0;max-width:72ch}#ssr-seo-content p.ssr-lead{margin-bottom:1rem}#ssr-seo-content a{color:var(--text);text-decoration:none}#ssr-seo-content a:hover{text-decoration:underline}#ssr-seo-content ul.ssr-list{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}#ssr-seo-content ul.ssr-list li{padding:.1rem 0}#ssr-seo-content .ssr-meta{color:var(--text-3);font-size:.85em}#ssr-seo-content .ssr-desc{color:var(--text-2);display:block;font-size:.9em;margin-top:.1rem}#ssr-seo-content nav.ssr-crumbs{font-size:.85rem;color:var(--text-3);margin:0 0 1rem}#ssr-seo-content nav.ssr-crumbs a{color:var(--text-2)}#ssr-seo-content .ssr-sep{color:var(--text-4);padding:0 .35rem}#ssr-seo-content dl{display:grid;grid-template-columns:9rem 1fr;gap:.45rem 1rem;margin:0}#ssr-seo-content dt{color:var(--text-2);font-weight:600}#ssr-seo-content dd{margin:0}</style><div id="ssr-seo-content"><main class="ssr-wrap"><h1>Create your account</h1><p class="ssr-lead">Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys.</p><p class="ssr-lead">Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.</p><p class="ssr-lead">The interactive sign-in form requires JavaScript.</p><h2>Explore</h2><ul class="ssr-list"><li><a href="/">Home — all categories</a></li><li><a href="/journeys">Learning journeys</a></li><li><a href="/about">About</a></li><li><a href="/sign-in">Sign in</a></li><li><a href="/submit">Submit a resource</a></li></ul></main></div></div>
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // BUG-018 (run19): routes without server-injected content (admin,
+      // noindex pages) used to show a blank black page until React mounted.
+      // Paint a minimal skeleton ONLY when #root is empty — injected SSR
+      // content (most public routes) already gives instant real content.
+      // React's createRoot().render() replaces this on mount.
+      (function () {
+        try {
+          var root = document.getElementById('root');
+          if (!root) return;
+          // Crawler-injected routes (#ssr-seo-content, never the hydrated Home
+          // tree): move the markup into the fixed #ssr-seo-hold overlay HERE,
+          // before the first paint, instead of in main.tsx after the bundle
+          // has executed. Re-inserting the nodes later re-registers the lead
+          // paragraph as a fresh Largest Contentful Paint candidate measured
+          // in the swapped web font (a few percent larger than the fallback
+          // paint), which dated the route's LCP to the bundle's execution
+          // instead of the document's first paint. The overlay stays
+          // semantic and interactive (real h1, links, no aria-hidden/inert)
+          // until main.tsx adopts it (data-preboot) right before React
+          // mounts underneath — so a bundle that never runs still leaves a
+          // usable page, exactly like the old in-#root fallback.
+          var ssr = root.querySelector('#ssr-seo-content');
+          if (ssr && root.getAttribute('data-home-ssr') !== 'true' && !document.getElementById('ssr-seo-hold')) {
+            var overlay = document.createElement('div');
+            overlay.id = 'ssr-seo-hold';
+            overlay.setAttribute('data-preboot', 'true');
+            // main.tsx judges readiness for THIS document's URL, not a later one.
+            overlay.setAttribute('data-pathname', location.pathname);
+            overlay.setAttribute(
+              'style',
+              'position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain'
+            );
+            while (root.firstChild) overlay.appendChild(root.firstChild);
+            document.body.appendChild(overlay);
+            return;
+          }
+          if (root.firstElementChild) return;
+          root.innerHTML =
+            '<div aria-hidden="true" style="min-height:100vh;background:var(--bg);padding:40px 20px;max-width:960px;margin:0 auto">' +
+            '<style nonce="T0f1xWGvs/f26fm/pj+83w==">@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:var(--surface-2);animation:bsk 1.4s ease-in-out infinite}</style>' +
+            '<div class="bsk" style="height:2rem;width:60%;max-width:420px;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:1rem;width:80%;max-width:640px;margin-bottom:2rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%"></div>' +
+            '</div>';
+        } catch (e) {}
+      })();
+    </script>
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==">
+      // The Replit dev banner is a development-only convenience. Inject it only
+      // on Replit/dev hosts so production (awesome.video) never requests it.
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.src = 'https://replit.com/public/js/replit-dev-banner.js';
+          document.body.appendChild(s);
+        } catch (e) {}
+      })();
+    </script>
+    <script nonce="T0f1xWGvs/f26fm/pj+83w==" type="module">(function(){var started=false;var start=function(){if(started)return;started=true;var s=document.createElement("script");s.type="module";s.crossOrigin="anonymous";s.src="/assets/index-D8hfru9l.js";document.head.appendChild(s);};if(document.visibilityState==="hidden"||typeof requestAnimationFrame!=="function"){start();return;}requestAnimationFrame(function(){requestAnimationFrame(function(){setTimeout(start,0);});});setTimeout(start,1000);})();</script>
+<script src="https://i.replit.com/script.js" async="" data-website-id="71ccccc7-37f7-4f07-a880-5973ae4aa911"></script></body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "url": "https://awesome.video/sign-in?admin=1#main",
+  "disabled": [
+    {
+      "text": "Sign in",
+      "disabled": true
+    }
+  ],
+  "password": ""
+}

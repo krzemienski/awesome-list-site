@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/submit",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<article class=\"card text-card-foreground submit-success-card\" role=\"status\" tabindex=\"-1\"> <div class=\"flex flex-col space-y-1.5 p-[var(--profile-panel-padding)] submit-success-header\"><div class=\"submit-success-heading\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-circle-check-big\" aria-hidden=\"true\"><path d=\"M21.801 10A10 10 0 1 1 17 3.33",
+  "umami": "1",
+  "consent": "denied"
+}

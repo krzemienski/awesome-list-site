@@ -1,0 +1,7 @@
+Fix C6-MEMBER-04 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-member04-home-card-targets. Never edit stale main checkout or merge/deploy.
+
+Read /tmp/c6-member02-sol.2ofXGB/reports/prod-audit-2026-10-26/cycle-06/ux-member/fix-member02/36-home-1440-geometry.json and companion evidence. Private HomePresentation curated cards have title links 20px high and tag pills about 26.8px high at desktop; tablet/mobile title heights are 20 or 40.8px. Bring every interactive element on private Home cards to at least 44×44 CSS px, matching the shared-card fix without altering shared ResourceCard files or Home content/behavior. Scope Home-specific presentation CSS/components only. Preserve layout, truncation, focus and no-overflow.
+
+Run tsc --noEmit and npm run build unpiped. Drive real local curated Home at 1440, 820 touch and 390 touch with populated recent/featured cards: measure every visible action, verify tag expansion, title/details/external links, keyboard/focus and no overlap/horizontal overflow. Save screenshots, accessibility snapshots, geometry and console/network evidence under reports/prod-audit-2026-10-26/cycle-06/ux-member/fix-member04/. No test files/mocks/validation harnesses.
+
+Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks, evidence and UNVERIFIED items. Never merge.

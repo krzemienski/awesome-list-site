@@ -1,0 +1,18 @@
+uid=791_0 RootWebArea "Search: hls — Awesome Video" url="https://awesome.video/search?q=hls"
+  uid=791_1 region "Notifications (F8)"
+    uid=791_2 list
+  uid=791_3 link "Skip to main content" url="https://awesome.video/search?q=hls#main"
+  uid=791_5 banner
+    uid=791_6 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=791_9 button "Search 3,826 resources"
+    uid=791_10 navigation "Primary"
+      uid=791_11 link "Browse" url="https://awesome.video/categories"
+      uid=791_13 link "Submit" url="https://awesome.video/submit"
+      uid=791_15 link "About" url="https://awesome.video/about"
+      uid=791_17 link "Docs ↗" url="https://awesome.video/design-system"
+    uid=791_19 button "Sign in, account menu" expandable haspopup="menu"
+  uid=791_20 main
+    uid=791_21 navigation "Breadcrumb"
+      uid=791_22 link "Home" url="https://awesome.video/"
+      uid=791_24 "Search"
+    uid=791_25 status "Loading page" atomic busy live="polite" relevant="additions text"

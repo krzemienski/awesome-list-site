@@ -1,0 +1,20 @@
+HTTP/2 200 
+cache-control: private
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-LacVtPuA7h3ola1mQl8sYg==' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+content-type: application/xml; charset=utf-8
+cross-origin-opener-policy: same-origin-allow-popups
+cross-origin-resource-policy: same-origin
+date: Mon, 26 Oct 2026 08:49:22 GMT
+etag: W/"b9a00-jo/jGmnfIN/bjmf9yDyjHoy/HY0"
+expires: Mon, 26 Oct 2026 08:49:22 GMT
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Google Frontend
+set-cookie: GAESA=CrABMDAxMGRkODYwNzcyYTMzZDhmMTgxOWRjNTc3YWIzYjBkOTE4NDFkZWNmNGM0N2U5MjI0NzdhM2RkYTUwM2NiZDYzOGNlYzkxMDQ1OWEwZjJhNDU3YTg1ODA1YmJjNzhjODNhMmIwOTUxY2JjMDY4MGVkZTc4MTk5NGIxOTkwNWE2M2JmNGM5YmZmYmMzNzhmYzVjMDk3OWM0ZWI0ZGNjMDhhOTEzYjkzYjg4MjFkNWQQ982Zu5c0; expires=Wed, 25-Nov-2026 08:49:22 GMT; path=/
+strict-transport-security: max-age=63072000; includeSubDomains
+vary: Accept-Encoding
+x-content-type-options: nosniff
+x-frame-options: DENY
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+

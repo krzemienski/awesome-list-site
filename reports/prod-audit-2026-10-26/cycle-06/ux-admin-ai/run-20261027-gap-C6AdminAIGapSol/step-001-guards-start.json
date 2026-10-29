@@ -1,0 +1,49 @@
+{
+  "revision": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "routes": [
+    {
+      "pattern": "**/api/**",
+      "options": {
+        "method": "POST",
+        "action": "abort"
+      }
+    },
+    {
+      "pattern": {
+        "source": "^https:\\/\\/awesome\\.video\\/api\\/",
+        "flags": ""
+      },
+      "options": {
+        "method": "DELETE",
+        "action": "abort"
+      }
+    },
+    {
+      "pattern": {
+        "source": "^https:\\/\\/awesome\\.video\\/api\\/.*$",
+        "flags": ""
+      },
+      "options": {
+        "method": "PUT",
+        "action": "abort"
+      }
+    },
+    {
+      "pattern": {
+        "source": "https:\\/\\/awesome\\.video\\/api\\/",
+        "flags": ""
+      },
+      "options": {
+        "method": "PATCH",
+        "action": "abort"
+      }
+    }
+  ],
+  "environment": {
+    "width": 1440,
+    "height": 900,
+    "umami": "1",
+    "consent": null,
+    "online": true
+  }
+}

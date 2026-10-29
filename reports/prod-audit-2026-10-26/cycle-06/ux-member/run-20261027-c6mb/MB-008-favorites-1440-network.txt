@@ -1,0 +1,33 @@
+[6370.10] GET https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap (Stylesheet) 200
+[58E03F613C38CE549CA29F4C03D6EDE0] OPTIONS https://i.replit.com/api/send (Other) 204
+[6370.193] POST https://i.replit.com/api/send (Fetch) 200
+[6370.196] GET https://awesome.video/api/auth/user (Fetch) 200
+[6370.197] GET https://awesome.video/api/config (Fetch) 200
+[6370.219] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[6370.220] GET https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap (Stylesheet) 200
+[6370.267] GET https://awesome.video/api/config (Fetch) 200
+[6370.268] GET https://awesome.video/api/auth/user (Fetch) 200
+[6370.281] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[6370.323] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[6370.324] GET https://awesome.video/api/user/preferences (Fetch) 200
+[6370.281] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[6370.325] GET https://awesome.video/api/user/continue-learning (Fetch) 200
+[6370.326] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.327] GET https://awesome.video/api/favorites (Fetch) 200
+[6370.328] GET https://awesome.video/api/bookmarks (Fetch) 200
+[6370.329] GET https://awesome.video/api/user/progress (Fetch) 200
+[6370.330] GET https://awesome.video/api/user/contributions?limit=1 (Fetch) 200
+[6370.331] GET https://awesome.video/api/user/journeys (Fetch) 200
+[6370.332] POST https://awesome.video/api/recommendations?limit=10 (Fetch) 200
+[6370.333] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[6370.333] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[6370.334] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[6370.335] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[6370.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[6370.338] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[6370.340] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[6370.341] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[6370.342] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[6370.343] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[6370.344] GET https://awesome.video/api/favorites (Fetch) 200
+[6370.346] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200

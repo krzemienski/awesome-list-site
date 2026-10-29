@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/api/public/me",
+    "status": 200
+  },
+  {
+    "path": "/api/public/resources?limit=1",
+    "status": 200
+  },
+  {
+    "path": "/api/public/categories",
+    "status": 200
+  },
+  {
+    "path": "/api/public/tags?limit=1",
+    "status": 200
+  }
+]

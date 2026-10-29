@@ -1,0 +1,11 @@
+{'name': 'Benchmarking & Performance Tools for Codecs', 'slug': 'benchmarking-performance-tools-for-codecs', 'resourceCount': 18, 'subSubcategories': 'list0'}
+community-events nav-sum 129 admin 129 subs nav 2 admin 2
+encoding-codecs nav-sum 580 admin 580 subs nav 16 admin 16
+general-tools nav-sum 514 admin 514 subs nav 19 admin 19
+infrastructure-delivery nav-sum 353 admin 353 subs nav 10 admin 10
+intro-learning nav-sum 297 admin 297 subs nav 9 admin 9
+media-tools nav-sum 704 admin 704 subs nav 16 admin 16
+players-clients nav-sum 447 admin 447 subs nav 10 admin 10
+protocols-transport nav-sum 467 admin 467 subs nav 9 admin 9
+standards-industry nav-sum 335 admin 335 subs nav 8 admin 8
+total 3826 3826

@@ -1,0 +1,72 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subcategories"
+  uid=270_0 region "Notifications (F8)"
+    uid=270_1 list
+  uid=270_2 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=270_4 banner
+    uid=270_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=270_8 button "Search 3,825 resources"
+    uid=270_9 navigation "Primary"
+      uid=270_10 link "Browse" url="https://awesome.video/categories"
+      uid=270_12 link "Submit" url="https://awesome.video/submit"
+      uid=270_14 link "About" url="https://awesome.video/about"
+      uid=270_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=270_18 link "Admin" url="https://awesome.video/admin"
+    uid=270_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=270_21 main
+    uid=270_22 navigation "Breadcrumb"
+      uid=270_23 link "Home" url="https://awesome.video/"
+      uid=270_25 "Admin"
+    uid=270_26 "Authorized admin area"
+    uid=270_27 "ADMIN CONSOLE · "
+    uid=270_28 "ADMIN USER"
+    uid=270_29 heading "Operations dashboard" level="1"
+    uid=270_30 "Manage the "
+    uid=270_31 "3,825"
+    uid=270_32 " resources, jobs, and contributors that keep the index alive."
+    uid=270_33 button "Settings" expandable haspopup="menu"
+    uid=270_34 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=270_35 status atomic live="polite" relevant="additions text"
+    uid=270_36 tablist "Admin sections" orientation="horizontal"
+      uid=270_37 tab "Overview" selectable
+      uid=270_38 tab "Approvals" selectable
+      uid=270_39 tab "Edits" selectable
+      uid=270_40 tab "Enrichment" selectable
+      uid=270_41 tab "Researcher" selectable
+      uid=270_42 tab "Export" selectable
+      uid=270_43 tab "Database" selectable
+      uid=270_44 tab "Resources" selectable
+      uid=270_45 tab "Categories" selectable
+      uid=270_46 tab "Subcategories" selectable selected
+      uid=270_47 tab "Users" selectable
+      uid=270_48 tab "GitHub" selectable
+      uid=270_49 tab "Link Health" selectable
+      uid=270_50 tab "Audit" selectable
+      uid=270_51 tab "Research" selectable
+    uid=270_52 button "Scroll tabs right"
+    uid=270_53 tabpanel "Subcategories"
+      uid=270_54 "Subcategories"
+      uid=270_55 "100 second-level groupings"
+      uid=270_56 button "Hide search" expandable expanded
+      uid=272_0 textbox "Search subcategories..." focusable focused value="QA-audit"
+      uid=272_1 button "Clear search"
+      uid=270_57 button "Add subcategory"
+      uid=272_2 "Showing "
+      uid=272_3 "1-1 of "
+      uid=272_4 "1"
+      uid=272_5 " result"
+      uid=272_6 " (filtered from "
+      uid=272_7 "100"
+      uid=272_8 ")"
+      uid=270_58 region "Subcategories table, scrollable"
+        uid=270_59 "NAME"
+        uid=270_60 "SLUG"
+        uid=270_61 "PARENT"
+        uid=270_62 "RESOURCES"
+        uid=272_9 "[QA-audit-1026] c4 subcategory"
+        uid=272_10 "qa-audit-1026-c4-subcategory"
+        uid=272_11 "[QA-audit-1026] c4 category"
+        uid=272_12 "0"
+        uid=272_13 button "Edit [QA-audit-1026] c4 subcategory"
+        uid=272_14 button "Delete [QA-audit-1026] c4 subcategory"
+      uid=270_207 "Rows per page:"
+      uid=270_208 combobox "Items per page" expandable haspopup="listbox" value="24"

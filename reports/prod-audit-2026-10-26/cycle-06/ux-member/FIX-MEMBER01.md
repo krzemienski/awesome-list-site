@@ -1,0 +1,5 @@
+Fix C6-MEMBER-01 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-member01-profile-name-focus. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-member/findings.md and MB-003 evidence. After invalid empty/invisible profile-name submit, validation appears without PATCH but focus stays Save. Move focus to the first invalid visible name input, associate the validation message with it using the existing field-error pattern, and preserve valid submit/cancel behavior and no-request client validation. Scope Profile name editing only.
+
+Run tsc --noEmit and npm run build unpiped. Use an authorized local member session only if already available; never transfer production cookies or bypass auth. Otherwise mark browser proof BLOCKED for post-deploy production verification at 1440, 820 touch and 390 touch. Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks and UNVERIFIED items. No test files/mocks/validation harnesses. Never merge.

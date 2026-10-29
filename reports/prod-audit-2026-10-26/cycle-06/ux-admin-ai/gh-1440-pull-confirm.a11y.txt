@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Import from GitHub?"
+    - heading "Import from GitHub?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This pulls the resource list from krzemienski/awesome-video and updates the database to match. The preview at Oct 27, 2026, 02:01 AM found it would add 36, update 799 and skip 1,448 resources, creating no new categories. Edits since then can change these numbers."
+    - button "Cancel" [ref=e2]
+    - button "Start Import" [ref=e3]

@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings#notification-settings",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 4161,
+  "active": "<input type=\"checkbox\" class=\"peer sr-only\">",
+  "umami": "1",
+  "consent": "denied"
+}

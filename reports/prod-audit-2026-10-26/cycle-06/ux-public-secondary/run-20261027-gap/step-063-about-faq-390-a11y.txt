@@ -1,0 +1,168 @@
+- main [ref=e5]:
+  - heading "A field journal for video engineers" [level=1] [ref=e6]
+  - paragraph [ref=e7]: Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it.
+  - article [ref=e8]:
+    - paragraph [ref=e9]: awesome.video is a hand-curated index of 3,825 resources across 9 domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. awesome.video is the web home of awesome-video — a community-curated list of the best streaming and video-development tools, frameworks, libraries, and learning resources, maintained by Nick Krzemienski on GitHub.
+    - generic [ref=e10]:
+      - term [ref=e11]: The source list
+      - definition [ref=e12]: Resources on this site are drawn from the open-source awesome-video repository.
+      - term [ref=e13]: Open source
+      - definition [ref=e14]: The curated list and the platform that renders it are open source on GitHub.
+      - term [ref=e15]: Human reviewed
+      - definition [ref=e16]: New submissions are reviewed by maintainers before they are published.
+      - term [ref=e17]: For video builders
+      - definition [ref=e18]: Browse practical tools, frameworks, libraries, and learning resources for the video pipeline.
+    - generic [ref=e19]:
+      - heading "About the maintainer" [level=2] [ref=e20]
+      - paragraph [ref=e21]: Creator & maintainer of awesome-video
+      - paragraph [ref=e22]: awesome.video is curated and maintained by Nick Krzemienski, a video engineer and long-time contributor to the streaming media community and the creator of the open-source awesome-video list. He started the list to share the encoders, players, codecs, specifications, and learning resources he relies on with the wider video development community.
+      - paragraph [ref=e23]: The awesome-video list has become one of the most referenced open-source collections in the space, with more than 1,800 stars on GitHub. Every resource on this site is drawn from and kept in sync with that repository, so the directory reflects tools that working video engineers actually use.
+      - paragraph [ref=e24]:
+        - link "Nick Krzemienski on GitHub" [ref=e25] [cursor=pointer]:
+          - /url: https://github.com/krzemienski
+    - generic [ref=e26]:
+      - heading "Open source at its core" [level=2] [ref=e27]
+      - paragraph [ref=e28]: The curated list that feeds this site, and the platform that renders it
+      - heading "awesome-video" [level=3] [ref=e29]:
+        - link "awesome-video" [ref=e30] [cursor=pointer]:
+          - /url: https://github.com/krzemienski/awesome-video
+      - paragraph [ref=e31]: A curated list of awesome streaming video tools, frameworks, libraries, and learning resources. Every resource on this site is sourced from and kept in sync with this repository.
+      - paragraph [ref=e32]: The source list · CC0-1.0
+      - heading "awesome-list-site" [level=3] [ref=e33]:
+        - link "awesome-list-site" [ref=e34] [cursor=pointer]:
+          - /url: https://github.com/krzemienski/awesome-list-site
+      - paragraph [ref=e35]: The open-source platform that powers this site — it transforms any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.
+      - paragraph [ref=e36]: The engine · MIT
+    - generic [ref=e37]:
+      - heading "Features" [level=2] [ref=e38]
+      - paragraph [ref=e39]: Built for speed, accessibility, and user experience
+      - generic [ref=e40]:
+        - term [ref=e41]: Responsive Design
+        - definition [ref=e42]: Mobile-first
+        - term [ref=e43]: Fast Performance
+        - definition [ref=e44]: Optimized SPA
+        - term [ref=e45]: Fuzzy Search
+        - definition [ref=e46]: Find anything
+        - term [ref=e47]: Multiple Themes
+        - definition [ref=e48]: Customizable
+        - term [ref=e49]: Accessible
+        - definition [ref=e50]: WCAG compliant
+        - term [ref=e51]: SEO Optimized
+        - definition [ref=e52]: Discoverable
+        - term [ref=e53]: Keyboard Shortcuts
+        - definition [ref=e54]: ⌘K or / to search
+        - term [ref=e55]: Component Library
+        - definition [ref=e56]: shadcn/ui
+    - generic [ref=e57]:
+      - heading "Technology Stack" [level=2] [ref=e58]
+      - paragraph [ref=e59]: Modern web technologies for optimal performance
+      - generic [ref=e60]:
+        - term [ref=e61]: React
+        - definition [ref=e62]: UI component framework
+        - term [ref=e63]: Tailwind CSS
+        - definition [ref=e64]: Utility-first styling
+        - term [ref=e65]: shadcn/ui
+        - definition [ref=e66]: Component primitives
+        - term [ref=e67]: Fuse.js
+        - definition [ref=e68]: Fuzzy search engine
+        - term [ref=e69]: Framer Motion
+        - definition [ref=e70]: Smooth animations
+        - term [ref=e71]: TypeScript
+        - definition [ref=e72]: Type safety
+    - generic [ref=e73]:
+      - heading "Accessibility First" [level=2] [ref=e74]
+      - paragraph [ref=e75]: Following WCAG 2.1 AA guidelines for inclusive design
+      - list [ref=e76]:
+        - listitem [ref=e77]: Proper heading structure
+        - listitem [ref=e78]: Keyboard navigation
+        - listitem [ref=e79]: Sufficient color contrast
+        - listitem [ref=e80]: Appropriate ARIA attributes
+        - listitem [ref=e81]: Respect for user motion preferences
+        - listitem [ref=e82]: Screen reader optimized
+    - generic [ref=e83]:
+      - heading "Credits" [level=2] [ref=e84]
+      - paragraph [ref=e85]: Built with open source technologies
+      - paragraph [ref=e86]: "This project was built with dedication using open source technologies. Special thanks to:"
+      - list [ref=e87]:
+        - listitem [ref=e88]:
+          - link "Nick Krzemienski" [ref=e89] [cursor=pointer]:
+            - /url: https://github.com/krzemienski
+          - text: — Maintainer
+        - listitem [ref=e90]:
+          - link "shadcn/ui" [ref=e91] [cursor=pointer]:
+            - /url: https://ui.shadcn.com/
+          - text: — Components
+        - listitem [ref=e92]:
+          - link "Tailwind CSS" [ref=e93] [cursor=pointer]:
+            - /url: https://tailwindcss.com/
+          - text: — Styling
+  - heading "Frequently asked questions" [level=2] [ref=e94]
+  - heading "What is Awesome Video?" [level=3] [ref=e95]
+  - paragraph [ref=e96]: Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes 3,825 reviewed resources drawn from the open-source krzemienski/awesome-video list maintained by Nick Krzemienski on GitHub.
+  - heading "Is Awesome Video free to use?" [level=3] [ref=e97]
+  - paragraph [ref=e98]: Yes. Browsing, search, and learning journeys are completely free and require no account. The underlying resource list (krzemienski/awesome-video) and the platform that renders it are open source on GitHub.
+  - heading "How are resources curated?" [level=3] [ref=e99]
+  - paragraph [ref=e100]: Every resource is sourced from the community-maintained krzemienski/awesome-video GitHub repository. New submissions are reviewed by maintainers before being published, and the site database stays in sync with the list, so quality and relevance are checked by humans rather than scraped automatically.
+  - heading "What topics does Awesome Video cover?" [level=3] [ref=e101]
+  - paragraph [ref=e102]: "The directory spans the full video pipeline: encoding and codecs (AV1, HEVC, H.264), adaptive streaming protocols such as HLS and MPEG-DASH, FFmpeg tooling, video players for web and mobile, media processing infrastructure, quality testing, learning courses, and community events and conferences."
+  - heading "How do I suggest a new resource?" [level=3] [ref=e103]
+  - paragraph [ref=e104]: Use the Submit page (/submit). Sign in, provide the resource URL, title, and category, and a maintainer will review your suggestion before it is published to the directory.
+  - heading "What are the best video codecs for developers?" [level=3] [ref=e105]
+  - paragraph [ref=e106]: The most widely used video codecs are H.264/AVC for maximum device compatibility, H.265/HEVC for higher efficiency on 4K and HDR content, AV1 for royalty-free next-generation compression, and VP9 for web streaming. Awesome Video curates encoders, specifications, and comparison resources for each of these codecs in its encoding and codecs category.
+  - heading "What are the best free video encoding tools?" [level=3] [ref=e107]
+  - paragraph [ref=e108]: FFmpeg is the most popular free, open-source tool for encoding, transcoding, and processing video, and it powers a large share of the industry. Other widely used free tools include HandBrake for desktop transcoding, Shaka Packager and Bento4 for packaging HLS and DASH, and GPAC for MP4 and streaming workflows. All are catalogued in Awesome Video's encoding and tooling categories.
+  - heading "What streaming protocols should I use?" [level=3] [ref=e109]
+  - paragraph [ref=e110]: HLS (HTTP Live Streaming) and MPEG-DASH are the two dominant adaptive bitrate protocols for on-demand and live video, with CMAF used to share a single set of media segments between them. WebRTC is preferred for real-time, sub-second latency use cases, while RTMP is still common for ingest. Awesome Video's streaming category collects specifications, servers, and players for each.
+  - heading "What are the best open-source video players for the web?" [level=3] [ref=e111]
+  - paragraph [ref=e112]: Popular open-source web players include Video.js, Plyr, and Vidstack for general playback, plus hls.js, dash.js, and Google's Shaka Player for adaptive HLS and MPEG-DASH streaming in the browser. Awesome Video lists players and player SDKs for web, mobile, and smart-TV platforms in its players category.
+  - heading "How do I get started with video development?" [level=3] [ref=e113]
+  - paragraph [ref=e114]: A good path is to learn the fundamentals of codecs and containers, practice encoding with FFmpeg, and then experiment with an adaptive streaming player such as hls.js or Shaka Player. Awesome Video offers guided learning journeys and a curated set of courses, articles, and tools that take you from beginner streaming concepts to advanced encoding pipelines.
+  - heading "Explore" [level=2] [ref=e115]
+  - list [ref=e116]:
+    - listitem [ref=e117]:
+      - link "Home — all categories" [ref=e118] [cursor=pointer]:
+        - /url: /
+    - listitem [ref=e119]:
+      - link "Learning journeys" [ref=e120] [cursor=pointer]:
+        - /url: /journeys
+    - listitem [ref=e121]:
+      - link "About" [ref=e122] [cursor=pointer]:
+        - /url: /about
+  - heading "Top categories" [level=2] [ref=e123]
+  - list [ref=e124]:
+    - listitem [ref=e125]:
+      - link "Community & Events" [ref=e126] [cursor=pointer]:
+        - /url: /category/community-events
+      - text: 129 resources
+    - listitem [ref=e127]:
+      - link "Encoding & Codecs" [ref=e128] [cursor=pointer]:
+        - /url: /category/encoding-codecs
+      - text: 579 resources
+    - listitem [ref=e129]:
+      - link "General Tools" [ref=e130] [cursor=pointer]:
+        - /url: /category/general-tools
+      - text: 514 resources
+    - listitem [ref=e131]:
+      - link "Infrastructure & Delivery" [ref=e132] [cursor=pointer]:
+        - /url: /category/infrastructure-delivery
+      - text: 353 resources
+    - listitem [ref=e133]:
+      - link "Intro & Learning" [ref=e134] [cursor=pointer]:
+        - /url: /category/intro-learning
+      - text: 297 resources
+    - listitem [ref=e135]:
+      - link "Media Tools" [ref=e136] [cursor=pointer]:
+        - /url: /category/media-tools
+      - text: 704 resources
+    - listitem [ref=e137]:
+      - link "Players & Clients" [ref=e138] [cursor=pointer]:
+        - /url: /category/players-clients
+      - text: 447 resources
+    - listitem [ref=e139]:
+      - link "Protocols & Transport" [ref=e140] [cursor=pointer]:
+        - /url: /category/protocols-transport
+      - text: 467 resources
+    - listitem [ref=e141]:
+      - link "Standards & Industry" [ref=e142] [cursor=pointer]:
+        - /url: /category/standards-industry
+      - text: 335 resources

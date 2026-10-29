@@ -1,0 +1,135 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e34]
+              - listitem [level=1]
+                - link "Admin" [ref=e35]
+              - listitem [level=1]
+                - link "Export" [disabled, ref=e36]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [selected, ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Export" [ref=e12] focusable [tabindex]
+            - generic
+              - group
+                - DisclosureTriangle "Validation controls" [expanded=false]
+              - article [ref=e30] clickable [cursor:pointer]
+                - heading "JSON Snapshot" [level=3, ref=e37]
+                - paragraph
+                  - StaticText "Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state. For a restorable copy, use Full database backup below."
+                - button "Download" [ref=e38]
+              - article [ref=e31] clickable [cursor:pointer]
+                - heading "CSV (resources)" [level=3, ref=e39]
+                - paragraph
+                  - StaticText "Flat resource table for spreadsheet workflows."
+                - button "Download" [ref=e40]
+              - article [ref=e32] clickable [cursor:pointer]
+                - heading "README.md" [level=3, ref=e41]
+                - paragraph
+                  - StaticText "Awesome-list flavored Markdown for the GitHub repo."
+                - button "Generate" [ref=e42]
+              - article [ref=e33] clickable [cursor:pointer]
+                - heading "OPML (categories)" [level=3, ref=e43]
+                - paragraph
+                  - StaticText "Hierarchical export for feed readers."
+                - button "Download" [ref=e44]
+              - group
+                - DisclosureTriangle "Export history & validation results" [expanded=false]
+              - generic
+                - sectionheader
+                  - heading "Full database backup" [level=2, ref=e45]
+                  - paragraph
+                    - StaticText "Restorable copy of the whole database, kept in private storage."
+                  - button "Create backup" [ref=e46]
+                - paragraph
+                  - strong
+                    - StaticText "Covers:"
+                  - StaticText " every table and row in the application database, with its primary keys, foreign-key relationships, unique and check constraints, indexes, sequence positions, extensions and the migration journal. That includes user accounts and their Clerk sign-in links, favorites, bookmarks and collections, journeys and progress, submissions and suggested edits, the audit log, AI enrichment and research jobs and their discoveries, notification preferences, API keys and sessions."
+                - paragraph
+                  - strong
+                    - StaticText "Not covered:"
+                  - StaticText " Clerk sign-in credentials (passwords, social logins, MFA), which Clerk holds outside this database, and the hosting platform's own "
+                  - code
+                    - StaticText "_system"
+                  - StaticText " schema."
+                - paragraph
+                  - strong
+                    - StaticText "Storage:"
+                  - StaticText " this project's private App Storage (current backups only). Backups contain personal data, so they are never downloaded to the browser."
+                - paragraph
+                  - strong
+                    - StaticText "Restore:"
+                  - StaticText " into a new, empty database with "
+                  - code
+                    - StaticText "npm run db:backup -- restore <backup id>"
+                  - StaticText " (runbook: "
+                  - code
+                    - StaticText "docs/DATABASE-BACKUP.md"
+                  - StaticText "). The restore checks the archive's SHA-256, then compares every table's row count, every sequence and the schema with the backup's record."
+                - paragraph
+                  - StaticText "Loading backups..."

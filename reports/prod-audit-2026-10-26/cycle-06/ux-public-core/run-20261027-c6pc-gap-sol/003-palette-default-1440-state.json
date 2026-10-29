@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/","title":"Awesome Video — 3825+ Curated Video & Streaming Resources","width":1440,"height":900,"scrollX":0,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"INPUT","id":"radix-:r8:","label":"Search resources, categories, and pages","text":""},"headings":[{"text":"~/awesome.videoAwesome Video Resources","id":""},{"text":"Hand-picked highlights","id":"home-index-featured-title"},{"text":"Categories","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""},{"text":"Search Resources","id":"radix-:r4:"}],"dialogs":["Search ResourcesSearch resources, categories, and pages in the awesome video collection.escClose searchJump tocatCommunity & Eventscategory · 129→catEncoding & Codecscategory · 579→catGeneral Toolscategory · 514→catInfrastructure & Delivery"],"pressed":[{"text":"Home","label":null}],"status":[],"analyticsDisabled":"1"}
+```

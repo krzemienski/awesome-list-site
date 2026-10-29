@@ -1,0 +1,366 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Profile" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e40]: AU
+                - generic [ref=e41]:
+                  - generic [ref=e42]: // Profile
+                  - heading "Admin User Edit display name" [level=1] [ref=e43]:
+                    - generic [ref=e44]: Admin User
+                    - button "Edit display name" [ref=e45] [cursor=pointer]:
+                      - img
+                  - generic [ref=e46]:
+                    - generic [ref=e47]:
+                      - img [ref=e48]
+                      - generic [ref=e51]: admin@example.com
+                    - generic [ref=e52]:
+                      - img [ref=e53]
+                      - text: Joined 11 months ago
+                - generic [ref=e55]:
+                  - button "Settings" [ref=e56] [cursor=pointer]:
+                    - img
+                    - text: Settings
+                  - button "Sign out" [ref=e57] [cursor=pointer]:
+                    - img
+                    - text: Sign out
+                  - button "Sign out all devices" [ref=e58] [cursor=pointer]:
+                    - img
+                    - text: Sign out all devices
+              - generic [ref=e59]:
+                - article [ref=e60]:
+                  - generic [ref=e61]:
+                    - img [ref=e62]
+                    - generic [ref=e64]:
+                      - paragraph [ref=e65]: "2"
+                      - paragraph [ref=e66]: Favorites
+                - article [ref=e67]:
+                  - generic [ref=e68]:
+                    - img [ref=e69]
+                    - generic [ref=e71]:
+                      - paragraph [ref=e72]: "12"
+                      - paragraph [ref=e73]: Bookmarks
+                - article [ref=e74]:
+                  - generic [ref=e75]:
+                    - img [ref=e76]
+                    - generic [ref=e82]:
+                      - paragraph [ref=e83]: —
+                      - paragraph [ref=e84]: Learning Streak
+                      - paragraph [ref=e85]: Consecutive days signed in
+                - article [ref=e86]:
+                  - generic [ref=e87]:
+                    - img [ref=e88]
+                    - generic [ref=e92]:
+                      - paragraph [ref=e93]: —
+                      - paragraph [ref=e94]: Journeys Completed
+                      - paragraph [ref=e95]: Learning journeys finished
+              - generic [ref=e96]:
+                - tablist [ref=e97]:
+                  - tab "Overview" [ref=e98] [cursor=pointer]
+                  - tab "Favorites" [ref=e99] [cursor=pointer]
+                  - tab "Bookmarks" [active] [selected] [ref=e100] [cursor=pointer]
+                  - tab "Submissions" [ref=e101] [cursor=pointer]
+                  - tab "Security" [ref=e102] [cursor=pointer]
+                - tabpanel "Bookmarks" [ref=e103]:
+                  - article [ref=e104]:
+                    - generic [ref=e105]:
+                      - generic [ref=e106]:
+                        - img [ref=e107]
+                        - text: Your Bookmarks
+                      - generic [ref=e109]: Resources you've saved for later
+                    - generic [ref=e114]:
+                      - generic [ref=e116]:
+                        - 'heading "2025 NAB Show: CineCentral" [level=4] [ref=e118]':
+                          - 'link "2025 NAB Show: CineCentral" [ref=e119] [cursor=pointer]':
+                            - /url: /resource/184751
+                        - generic [ref=e120]:
+                          - 'button "Remove bookmark: 2025 NAB Show: CineCentral" [pressed] [ref=e121] [cursor=pointer]':
+                            - generic [ref=e122]:
+                              - img
+                          - 'link "Open 2025 NAB Show: CineCentral in a new tab" [ref=e123] [cursor=pointer]':
+                            - /url: https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique
+                            - img
+                        - generic [ref=e124]:
+                          - generic [ref=e125]: Community & Events
+                          - generic [ref=e126]: Added 3 months ago
+                      - generic [ref=e128]:
+                        - heading "Transcoding Performance Trial" [level=4] [ref=e130]:
+                          - link "Transcoding Performance Trial" [ref=e131] [cursor=pointer]:
+                            - /url: /resource/186231
+                        - generic [ref=e132]:
+                          - 'button "Remove bookmark: Transcoding Performance Trial" [pressed] [ref=e133] [cursor=pointer]':
+                            - generic [ref=e134]:
+                              - img
+                          - link "Open Transcoding Performance Trial in a new tab" [ref=e135] [cursor=pointer]:
+                            - /url: https://github.com/2501world/transcoding-performance-trial
+                            - img
+                        - generic [ref=e136]:
+                          - generic [ref=e137]: Encoding & Codecs
+                          - generic [ref=e138]: Added 3 months ago
+                      - generic [ref=e140]:
+                        - heading "3DLUT Creator" [level=4] [ref=e142]:
+                          - link "3DLUT Creator" [ref=e143] [cursor=pointer]:
+                            - /url: /resource/186477
+                        - generic [ref=e144]:
+                          - 'button "Remove bookmark: 3DLUT Creator" [pressed] [ref=e145] [cursor=pointer]':
+                            - generic [ref=e146]:
+                              - img
+                          - link "Open 3DLUT Creator in a new tab" [ref=e147] [cursor=pointer]:
+                            - /url: https://3dlutcreator.com/
+                            - img
+                        - generic [ref=e148]:
+                          - generic [ref=e149]: Media Tools
+                          - generic [ref=e150]: Added 3 months ago
+                      - generic [ref=e152]:
+                        - heading "AVPlayer" [level=4] [ref=e154]:
+                          - link "AVPlayer" [ref=e155] [cursor=pointer]:
+                            - /url: /resource/184763
+                        - generic [ref=e156]:
+                          - 'button "Remove bookmark: AVPlayer" [pressed] [ref=e157] [cursor=pointer]':
+                            - generic [ref=e158]:
+                              - img
+                          - link "Open AVPlayer in a new tab" [ref=e159] [cursor=pointer]:
+                            - /url: https://developer.apple.com/documentation/avfoundation/avplayer
+                            - img
+                        - generic [ref=e160]:
+                          - generic [ref=e161]: Players & Clients
+                          - generic [ref=e162]: Added 3 months ago
+                      - generic [ref=e164]:
+                        - heading "Able Player" [level=4] [ref=e166]:
+                          - link "Able Player" [ref=e167] [cursor=pointer]:
+                            - /url: /resource/186609
+                        - generic [ref=e168]:
+                          - 'button "Remove bookmark: Able Player" [pressed] [ref=e169] [cursor=pointer]':
+                            - generic [ref=e170]:
+                              - img
+                          - link "Open Able Player in a new tab" [ref=e171] [cursor=pointer]:
+                            - /url: https://ableplayer.github.io/ableplayer
+                            - img
+                        - generic [ref=e172]:
+                          - generic [ref=e173]: Players & Clients
+                          - generic [ref=e174]: Added 3 months ago
+                      - generic [ref=e176]:
+                        - heading "About Frame Rates or Why 29.97?" [level=4] [ref=e178]:
+                          - link "About Frame Rates or Why 29.97?" [ref=e179] [cursor=pointer]:
+                            - /url: /resource/186212
+                        - generic [ref=e180]:
+                          - 'button "Remove bookmark: About Frame Rates or Why 29.97?" [pressed] [ref=e181] [cursor=pointer]':
+                            - generic [ref=e182]:
+                              - img
+                          - link "Open About Frame Rates or Why 29.97? in a new tab" [ref=e183] [cursor=pointer]:
+                            - /url: https://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html
+                            - img
+                        - generic [ref=e184]:
+                          - generic [ref=e185]: Intro & Learning
+                          - generic [ref=e186]: Added 3 months ago
+                      - generic [ref=e188]:
+                        - heading "AWS Media Services" [level=4] [ref=e190]:
+                          - link "AWS Media Services" [ref=e191] [cursor=pointer]:
+                            - /url: /resource/184789
+                        - generic [ref=e192]:
+                          - 'button "Remove bookmark: AWS Media Services" [pressed] [ref=e193] [cursor=pointer]':
+                            - generic [ref=e194]:
+                              - img
+                          - link "Open AWS Media Services in a new tab" [ref=e195] [cursor=pointer]:
+                            - /url: https://aws.amazon.com/media-services/
+                            - img
+                        - generic [ref=e196]:
+                          - generic [ref=e197]: Infrastructure & Delivery
+                          - generic [ref=e198]: Added 3 months ago
+                      - generic [ref=e200]:
+                        - heading "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [level=4] [ref=e202]:
+                          - link "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e203] [cursor=pointer]:
+                            - /url: /resource/184838
+                        - generic [ref=e204]:
+                          - 'button "Remove bookmark: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [pressed] [ref=e205] [cursor=pointer]':
+                            - generic [ref=e206]:
+                              - img
+                          - link "Open A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App in a new tab" [ref=e207] [cursor=pointer]:
+                            - /url: https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+                            - img
+                        - generic [ref=e208]:
+                          - generic [ref=e209]: Intro & Learning
+                          - generic [ref=e210]: Added 3 months ago
+                      - generic [ref=e212]:
+                        - heading "M3U8Parser" [level=4] [ref=e214]:
+                          - link "M3U8Parser" [ref=e215] [cursor=pointer]:
+                            - /url: /resource/185574
+                        - generic [ref=e216]:
+                          - 'button "Remove bookmark: M3U8Parser" [pressed] [ref=e217] [cursor=pointer]':
+                            - generic [ref=e218]:
+                              - img
+                          - link "Open M3U8Parser in a new tab" [ref=e219] [cursor=pointer]:
+                            - /url: https://github.com/M3U8Kit/M3U8Parser
+                            - img
+                        - generic [ref=e220]:
+                          - generic [ref=e221]: Protocols & Transport
+                          - generic [ref=e222]: Added 3 months ago
+                      - generic [ref=e224]:
+                        - heading "ABR Video Player" [level=4] [ref=e226]:
+                          - link "ABR Video Player" [ref=e227] [cursor=pointer]:
+                            - /url: /resource/187911
+                        - generic [ref=e228]:
+                          - 'button "Remove bookmark: ABR Video Player" [pressed] [ref=e229] [cursor=pointer]':
+                            - generic [ref=e230]:
+                              - img
+                          - link "Open ABR Video Player in a new tab" [ref=e231] [cursor=pointer]:
+                            - /url: https://github.com/LennartPaduch/abr-video-player
+                            - img
+                        - generic [ref=e232]:
+                          - generic [ref=e233]: Protocols & Transport
+                          - generic [ref=e234]: Added 3 months ago
+                      - generic [ref=e236]:
+                        - 'heading "3 Cases from a Video Expert: Encoding Basics" [level=4] [ref=e238]':
+                          - 'link "3 Cases from a Video Expert: Encoding Basics" [ref=e239] [cursor=pointer]':
+                            - /url: /resource/186145
+                        - generic [ref=e240]:
+                          - 'button "Remove bookmark: 3 Cases from a Video Expert: Encoding Basics" [pressed] [ref=e241] [cursor=pointer]':
+                            - generic [ref=e242]:
+                              - img
+                          - 'link "Open 3 Cases from a Video Expert: Encoding Basics in a new tab" [ref=e243] [cursor=pointer]':
+                            - /url: https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8
+                            - img
+                        - generic [ref=e244]:
+                          - generic [ref=e245]: Intro & Learning
+                          - generic [ref=e246]: Added 3 months ago
+                      - generic [ref=e248]:
+                        - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=4] [ref=e250]:
+                          - link "AMD Advanced Media Acceleration (AMA) SDK" [ref=e251] [cursor=pointer]:
+                            - /url: /resource/184847
+                        - generic [ref=e252]:
+                          - 'button "Remove bookmark: AMD Advanced Media Acceleration (AMA) SDK" [pressed] [ref=e253] [cursor=pointer]':
+                            - generic [ref=e254]:
+                              - img
+                          - link "Open AMD Advanced Media Acceleration (AMA) SDK in a new tab" [ref=e255] [cursor=pointer]:
+                            - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                            - img
+                        - generic [ref=e256]:
+                          - generic [ref=e257]: Encoding & Codecs
+                          - generic [ref=e258]: Added 3 months ago
+        - contentinfo [ref=e259]:
+          - generic [ref=e260]:
+            - generic [ref=e261]:
+              - paragraph [ref=e262]: ── INDEX
+              - link "awesome.video home" [ref=e263] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e264]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e266]:
+              - heading "INDEXED" [level=2] [ref=e267]
+              - paragraph [ref=e268]: 3,826
+              - paragraph [ref=e269]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e270]: live
+            - navigation "Explore categories" [ref=e272]:
+              - heading "EXPLORE" [level=2] [ref=e273]
+              - generic [ref=e274]:
+                - link "Community & Events" [ref=e275] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e276]: ◈
+                  - generic [ref=e277]: Community
+                - link "Encoding & Codecs" [ref=e278] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e279]: ◇
+                  - generic [ref=e280]: Encoding
+                - link "General Tools" [ref=e281] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e282]: ◆
+                  - generic [ref=e283]: General
+                - link "Infrastructure & Delivery" [ref=e284] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e285]: ▣
+                  - generic [ref=e286]: Infrastructure
+                - link "Intro & Learning" [ref=e287] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e288]: ▤
+                  - generic [ref=e289]: Intro
+                - link "Media Tools" [ref=e290] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e291]: ▥
+                  - generic [ref=e292]: Media
+                - link "Players & Clients" [ref=e293] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e294]: ▶
+                  - generic [ref=e295]: Players
+                - link "Protocols & Transport" [ref=e296] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e297]: ⟁
+                  - generic [ref=e298]: Protocols
+                - link "Standards & Industry" [ref=e299] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e300]: ◉
+                  - generic [ref=e301]: Standards
+            - generic [ref=e302]:
+              - heading "SOURCE" [level=2] [ref=e303]
+              - link "krzemienski/awesome-video" [ref=e304] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e305]
+                - generic [ref=e307]:
+                  - text: krzemienski
+                  - generic [ref=e308]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e309]: ↗
+              - paragraph [ref=e310]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e311] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e313] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e314]:
+            - generic [ref=e315]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e316]:
+              - link "About" [ref=e317] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e318] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e319] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e320] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e321] [cursor=pointer]
+              - link "Issues ↗" [ref=e322] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e323] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e324]: built with the awesome-list framework

@@ -1,0 +1,797 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "GitHub" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - button "Scroll tabs left" [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+                - tablist "Admin sections" [ref=e66]:
+                  - tab "Overview" [ref=e67] [cursor=pointer]:
+                    - img [ref=e68]
+                    - text: Overview
+                  - tab "Approvals" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Approvals
+                  - tab "Edits" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Researcher
+                  - tab "Export" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Export
+                  - tab "Database" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Database
+                  - tab "Resources" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Resources
+                  - tab "Categories" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: Subcategories
+                  - tab "Users" [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Users
+                  - tab "GitHub" [selected] [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Link Health
+                  - tab "Audit" [ref=e112] [cursor=pointer]:
+                    - img [ref=e113]
+                    - text: Audit
+                  - tab "Research" [ref=e114] [cursor=pointer]:
+                    - img [ref=e115]
+                    - text: Research
+              - tabpanel "GitHub" [ref=e117]:
+                - generic [ref=e118]:
+                  - article [ref=e119]:
+                    - generic [ref=e120]:
+                      - generic [ref=e121]:
+                        - img [ref=e123]
+                        - generic [ref=e125]:
+                          - generic [ref=e126]: krzemienski/awesome-video
+                          - paragraph [ref=e127]: master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs
+                          - paragraph [ref=e128]: Pull and Sync now stay off until Target Repository holds a repository (owner/repository).
+                        - generic [ref=e130]:
+                          - button "Preview import" [disabled]
+                          - button "Pull" [disabled]
+                          - button "Sync now" [disabled]
+                      - generic [ref=e131]:
+                        - text: Target Repository
+                        - generic [ref=e132]:
+                          - textbox "Target Repository" [active] [invalid] [ref=e133]:
+                            - /placeholder: krzemienski/awesome-video
+                            - text: not a repo
+                          - button "Reset to configured repository" [ref=e134] [cursor=pointer]:
+                            - img
+                        - alert [ref=e135]: Not a valid repository. Use owner/repository (e.g., krzemienski/awesome-video) or a github.com URL.
+                  - article [ref=e136]:
+                    - generic [ref=e138]:
+                      - generic [ref=e139]:
+                        - img [ref=e140]
+                        - text: Sync Status
+                      - generic [ref=e143]:
+                        - img [ref=e144]
+                        - text: 38 failed
+                    - generic [ref=e148]:
+                      - paragraph [ref=e149]: 38 earlier sync jobs failed; the latest sync completed.
+                      - status [ref=e150]:
+                        - img [ref=e151]
+                        - generic [ref=e154]:
+                          - generic [ref=e155]:
+                            - generic [ref=e156]: Last Export
+                            - generic [ref=e157]:
+                              - img [ref=e158]
+                              - text: Jul 20, 2026, 02:42 PM
+                          - paragraph [ref=e161]: Initial awesome list export
+                          - generic [ref=e162]:
+                            - generic [ref=e163]:
+                              - generic [ref=e164]: "+2283"
+                              - generic [ref=e165]: Added
+                            - generic [ref=e166]:
+                              - generic [ref=e167]: ~0
+                              - generic [ref=e168]: Updated
+                            - generic [ref=e169]:
+                              - generic [ref=e170]: "-0"
+                              - generic [ref=e171]: Removed
+                            - generic [ref=e172]:
+                              - generic [ref=e173]: "2283"
+                              - generic [ref=e174]: Total
+                          - link "View Commit on GitHub" [ref=e175] [cursor=pointer]:
+                            - /url: https://github.com/krzemienski/awesome-video/commit/be0c146ae2dbab74e21ba6bc65706545d5fb02b5
+                            - img
+                            - text: View Commit on GitHub
+                      - generic [ref=e176]:
+                        - heading "Recent Sync Jobs" [level=4] [ref=e177]
+                        - region "Recent sync jobs, scrollable" [ref=e179]:
+                          - generic [ref=e181]:
+                            - generic [ref=e183]:
+                              - generic [ref=e184]:
+                                - img [ref=e185]
+                                - generic [ref=e188]: "Job #49"
+                                - generic [ref=e189]: export
+                                - generic [ref=e190]: Jul 20, 2026, 02:42 PM
+                              - generic [ref=e191]: completed
+                            - generic [ref=e193]:
+                              - generic [ref=e194]:
+                                - img [ref=e195]
+                                - generic [ref=e198]: "Job #48"
+                                - generic [ref=e199]: export
+                                - generic [ref=e200]: Jul 18, 2026, 03:12 PM
+                                - generic [ref=e201]: ×4
+                              - generic [ref=e202]: completed
+                            - generic [ref=e203]:
+                              - generic [ref=e204]:
+                                - generic [ref=e205]:
+                                  - img [ref=e206]
+                                  - generic [ref=e210]: "Job #45"
+                                  - generic [ref=e211]: export
+                                  - generic [ref=e212]: Jul 17, 2026, 08:32 AM
+                                - generic [ref=e213]: failed
+                              - paragraph [ref=e214]: "Export failed: timeout exceeded when trying to connect"
+                            - generic [ref=e215]:
+                              - generic [ref=e216]:
+                                - generic [ref=e217]:
+                                  - img [ref=e218]
+                                  - generic [ref=e222]: "Job #3"
+                                  - generic [ref=e223]: import
+                                  - generic [ref=e224]: Jul 17, 2026, 01:41 AM
+                                  - generic [ref=e225]: ×2
+                                - generic [ref=e226]: failed
+                              - paragraph [ref=e227]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                              - paragraph [ref=e228]: Orphaned by server restart
+                            - generic [ref=e229]:
+                              - generic [ref=e230]:
+                                - generic [ref=e231]:
+                                  - img [ref=e232]
+                                  - generic [ref=e236]: "Job #12"
+                                  - generic [ref=e237]: export
+                                  - generic [ref=e238]: Jul 17, 2026, 01:41 AM
+                                - generic [ref=e239]: failed
+                              - paragraph [ref=e240]: Orphaned by server restart
+                            - generic [ref=e241]:
+                              - generic [ref=e242]:
+                                - generic [ref=e243]:
+                                  - img [ref=e244]
+                                  - generic [ref=e248]: "Job #41"
+                                  - generic [ref=e249]: import
+                                  - generic [ref=e250]: Jul 17, 2026, 01:41 AM
+                                  - generic [ref=e251]: ×7
+                                - generic [ref=e252]: failed
+                              - paragraph [ref=e253]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                              - paragraph [ref=e254]: Orphaned by server restart
+                            - generic [ref=e255]:
+                              - generic [ref=e256]:
+                                - generic [ref=e257]:
+                                  - img [ref=e258]
+                                  - generic [ref=e262]: "Job #21"
+                                  - generic [ref=e263]: import
+                                  - generic [ref=e264]: Jul 17, 2026, 01:41 AM
+                                - generic [ref=e265]: failed
+                              - paragraph [ref=e266]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                              - paragraph [ref=e267]: Orphaned by server restart
+                            - generic [ref=e268]:
+                              - generic [ref=e269]:
+                                - generic [ref=e270]:
+                                  - img [ref=e271]
+                                  - generic [ref=e275]: "Job #40"
+                                  - generic [ref=e276]: export
+                                  - generic [ref=e277]: Jul 17, 2026, 01:41 AM
+                                  - generic [ref=e278]: ×5
+                                - generic [ref=e279]: failed
+                              - paragraph [ref=e280]: Orphaned by server restart
+                            - generic [ref=e282]:
+                              - generic [ref=e283]:
+                                - img [ref=e284]
+                                - generic [ref=e288]: "Job #43"
+                                - generic [ref=e289]: export
+                                - generic [ref=e290]: Jun 25, 2026, 05:59 PM
+                                - generic [ref=e291]: ×5
+                              - generic [ref=e292]: failed
+                            - generic [ref=e293]:
+                              - generic [ref=e294]:
+                                - generic [ref=e295]:
+                                  - img [ref=e296]
+                                  - generic [ref=e299]: "Job #34"
+                                  - generic [ref=e300]: import
+                                  - generic [ref=e301]: Feb 11, 2026, 08:06 PM
+                                  - generic [ref=e302]: ×2
+                                - generic [ref=e303]: completed
+                              - paragraph [ref=e304]: "Imported: 1; updated: 680; skipped: 0; failed: 0."
+                            - generic [ref=e305]:
+                              - generic [ref=e306]:
+                                - generic [ref=e307]:
+                                  - img [ref=e308]
+                                  - generic [ref=e312]: "Job #32"
+                                  - generic [ref=e313]: import
+                                  - generic [ref=e314]: Feb 11, 2026, 08:02 PM
+                                  - generic [ref=e315]: ×4
+                                - generic [ref=e316]: failed
+                              - paragraph [ref=e317]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                            - generic [ref=e318]:
+                              - generic [ref=e319]:
+                                - generic [ref=e320]:
+                                  - img [ref=e321]
+                                  - generic [ref=e324]: "Job #22"
+                                  - generic [ref=e325]: import
+                                  - generic [ref=e326]: Dec 3, 2025, 05:01 PM
+                                - generic [ref=e327]: completed
+                              - paragraph [ref=e328]: "Imported: 1062; updated: 16; skipped: 0; failed: 0."
+                            - generic [ref=e330]:
+                              - generic [ref=e331]:
+                                - img [ref=e332]
+                                - generic [ref=e336]: "Job #18"
+                                - generic [ref=e337]: export
+                                - generic [ref=e338]: Dec 3, 2025, 02:32 PM
+                                - generic [ref=e339]: ×8
+                              - generic [ref=e340]: failed
+                            - generic [ref=e342]:
+                              - generic [ref=e343]:
+                                - img [ref=e344]
+                                - generic [ref=e348]: "Job #13"
+                                - generic [ref=e349]: export
+                                - generic [ref=e350]: Dec 1, 2025, 01:43 AM
+                              - generic [ref=e351]: failed
+                            - generic [ref=e352]:
+                              - generic [ref=e353]:
+                                - generic [ref=e354]:
+                                  - img [ref=e355]
+                                  - generic [ref=e358]: "Job #11"
+                                  - generic [ref=e359]: import
+                                  - generic [ref=e360]: Nov 18, 2025, 07:54 PM
+                                  - generic [ref=e361]: ×3
+                                - generic [ref=e362]: completed
+                              - paragraph [ref=e363]: "Imported: 201; updated: 597; skipped: 0; failed: 0."
+                            - generic [ref=e364]:
+                              - generic [ref=e365]:
+                                - generic [ref=e366]:
+                                  - img [ref=e367]
+                                  - generic [ref=e371]: "Job #10"
+                                  - generic [ref=e372]: import
+                                  - generic [ref=e373]: Nov 18, 2025, 07:51 PM
+                                - generic [ref=e374]: failed
+                              - paragraph [ref=e375]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                            - generic [ref=e377]:
+                              - generic [ref=e378]:
+                                - img [ref=e379]
+                                - generic [ref=e383]: "Job #5"
+                                - generic [ref=e384]: export
+                                - generic [ref=e385]: Nov 18, 2025, 07:29 PM
+                              - generic [ref=e386]: failed
+                            - generic [ref=e387]:
+                              - generic [ref=e388]:
+                                - generic [ref=e389]:
+                                  - img [ref=e390]
+                                  - generic [ref=e394]: "Job #2"
+                                  - generic [ref=e395]: import
+                                  - generic [ref=e396]: Nov 18, 2025, 06:00 PM
+                                - generic [ref=e397]: failed
+                              - paragraph [ref=e398]: "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                  - generic [ref=e399]:
+                    - generic [ref=e401]:
+                      - heading "Sync jobs" [level=2] [ref=e402]
+                      - paragraph [ref=e403]: All 49 import/export operations
+                    - table [ref=e407]:
+                      - rowgroup [ref=e408]:
+                        - row "ID Type Status" [ref=e409]:
+                          - columnheader "ID" [ref=e410]
+                          - columnheader "Type" [ref=e411]
+                          - columnheader "Status" [ref=e412]
+                          - columnheader [ref=e413]
+                      - rowgroup [ref=e414]:
+                        - 'row "Job #49 export Jul 20, 2026, 02:42 PM completed View logs for export Job #49" [ref=e415]':
+                          - 'cell "Job #49" [ref=e416]'
+                          - cell "export Jul 20, 2026, 02:42 PM" [ref=e417]:
+                            - text: export
+                            - generic [ref=e418]: Jul 20, 2026, 02:42 PM
+                          - cell "completed" [ref=e419]:
+                            - generic [ref=e420]: completed
+                          - 'cell "View logs for export Job #49" [ref=e421]':
+                            - 'button "View logs for export Job #49" [ref=e422] [cursor=pointer]': Logs
+                        - 'row "Job #48 export Jul 18, 2026, 03:12 PM completed View logs for export Job #48" [ref=e423]':
+                          - 'cell "Job #48" [ref=e424]'
+                          - cell "export Jul 18, 2026, 03:12 PM" [ref=e425]:
+                            - text: export
+                            - generic [ref=e426]: Jul 18, 2026, 03:12 PM
+                          - cell "completed" [ref=e427]:
+                            - generic [ref=e428]: completed
+                          - 'cell "View logs for export Job #48" [ref=e429]':
+                            - 'button "View logs for export Job #48" [ref=e430] [cursor=pointer]': Logs
+                        - 'row "Job #47 export Jul 18, 2026, 05:30 AM completed View logs for export Job #47" [ref=e431]':
+                          - 'cell "Job #47" [ref=e432]'
+                          - cell "export Jul 18, 2026, 05:30 AM" [ref=e433]:
+                            - text: export
+                            - generic [ref=e434]: Jul 18, 2026, 05:30 AM
+                          - cell "completed" [ref=e435]:
+                            - generic [ref=e436]: completed
+                          - 'cell "View logs for export Job #47" [ref=e437]':
+                            - 'button "View logs for export Job #47" [ref=e438] [cursor=pointer]': Logs
+                        - 'row "Job #46 export Jul 17, 2026, 08:54 AM completed View logs for export Job #46" [ref=e439]':
+                          - 'cell "Job #46" [ref=e440]'
+                          - cell "export Jul 17, 2026, 08:54 AM" [ref=e441]:
+                            - text: export
+                            - generic [ref=e442]: Jul 17, 2026, 08:54 AM
+                          - cell "completed" [ref=e443]:
+                            - generic [ref=e444]: completed
+                          - 'cell "View logs for export Job #46" [ref=e445]':
+                            - 'button "View logs for export Job #46" [ref=e446] [cursor=pointer]': Logs
+                        - 'row "Job #45 export Jul 17, 2026, 08:32 AM failed View logs for export Job #45" [ref=e447]':
+                          - 'cell "Job #45" [ref=e448]'
+                          - cell "export Jul 17, 2026, 08:32 AM" [ref=e449]:
+                            - text: export
+                            - generic [ref=e450]: Jul 17, 2026, 08:32 AM
+                          - cell "failed" [ref=e451]:
+                            - 'generic "Export failed: timeout exceeded when trying to connect" [ref=e452]': failed
+                          - 'cell "View logs for export Job #45" [ref=e453]':
+                            - 'button "View logs for export Job #45" [ref=e454] [cursor=pointer]': Logs
+                        - 'row "Job #44 export Jul 17, 2026, 08:31 AM completed View logs for export Job #44" [ref=e455]':
+                          - 'cell "Job #44" [ref=e456]'
+                          - cell "export Jul 17, 2026, 08:31 AM" [ref=e457]:
+                            - text: export
+                            - generic [ref=e458]: Jul 17, 2026, 08:31 AM
+                          - cell "completed" [ref=e459]:
+                            - generic [ref=e460]: completed
+                          - 'cell "View logs for export Job #44" [ref=e461]':
+                            - 'button "View logs for export Job #44" [ref=e462] [cursor=pointer]': Logs
+                        - 'row "Job #1 import Jul 17, 2026, 01:41 AM failed View logs for import Job #1" [ref=e463]':
+                          - 'cell "Job #1" [ref=e464]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e465]:
+                            - text: import
+                            - generic [ref=e466]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e467]:
+                            - generic "Orphaned by server restart" [ref=e468]: failed
+                          - 'cell "View logs for import Job #1" [ref=e469]':
+                            - 'button "View logs for import Job #1" [ref=e470] [cursor=pointer]': Logs
+                        - 'row "Job #3 import Jul 17, 2026, 01:41 AM failed View logs for import Job #3" [ref=e471]':
+                          - 'cell "Job #3" [ref=e472]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e473]:
+                            - text: import
+                            - generic [ref=e474]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e475]:
+                            - generic "Orphaned by server restart" [ref=e476]: failed
+                          - 'cell "View logs for import Job #3" [ref=e477]':
+                            - 'button "View logs for import Job #3" [ref=e478] [cursor=pointer]': Logs
+                        - 'row "Job #12 export Jul 17, 2026, 01:41 AM failed View logs for export Job #12" [ref=e479]':
+                          - 'cell "Job #12" [ref=e480]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e481]:
+                            - text: export
+                            - generic [ref=e482]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e483]:
+                            - generic "Orphaned by server restart" [ref=e484]: failed
+                          - 'cell "View logs for export Job #12" [ref=e485]':
+                            - 'button "View logs for export Job #12" [ref=e486] [cursor=pointer]': Logs
+                        - 'row "Job #19 import Jul 17, 2026, 01:41 AM failed View logs for import Job #19" [ref=e487]':
+                          - 'cell "Job #19" [ref=e488]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e489]:
+                            - text: import
+                            - generic [ref=e490]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e491]:
+                            - generic "Orphaned by server restart" [ref=e492]: failed
+                          - 'cell "View logs for import Job #19" [ref=e493]':
+                            - 'button "View logs for import Job #19" [ref=e494] [cursor=pointer]': Logs
+                        - 'row "Job #21 import Jul 17, 2026, 01:41 AM failed View logs for import Job #21" [ref=e495]':
+                          - 'cell "Job #21" [ref=e496]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e497]:
+                            - text: import
+                            - generic [ref=e498]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e499]:
+                            - generic "Orphaned by server restart" [ref=e500]: failed
+                          - 'cell "View logs for import Job #21" [ref=e501]':
+                            - 'button "View logs for import Job #21" [ref=e502] [cursor=pointer]': Logs
+                        - 'row "Job #23 import Jul 17, 2026, 01:41 AM failed View logs for import Job #23" [ref=e503]':
+                          - 'cell "Job #23" [ref=e504]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e505]:
+                            - text: import
+                            - generic [ref=e506]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e507]:
+                            - generic "Orphaned by server restart" [ref=e508]: failed
+                          - 'cell "View logs for import Job #23" [ref=e509]':
+                            - 'button "View logs for import Job #23" [ref=e510] [cursor=pointer]': Logs
+                        - 'row "Job #25 export Jul 17, 2026, 01:41 AM failed View logs for export Job #25" [ref=e511]':
+                          - 'cell "Job #25" [ref=e512]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e513]:
+                            - text: export
+                            - generic [ref=e514]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e515]:
+                            - generic "Orphaned by server restart" [ref=e516]: failed
+                          - 'cell "View logs for export Job #25" [ref=e517]':
+                            - 'button "View logs for export Job #25" [ref=e518] [cursor=pointer]': Logs
+                        - 'row "Job #27 import Jul 17, 2026, 01:41 AM failed View logs for import Job #27" [ref=e519]':
+                          - 'cell "Job #27" [ref=e520]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e521]:
+                            - text: import
+                            - generic [ref=e522]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e523]:
+                            - generic "Orphaned by server restart" [ref=e524]: failed
+                          - 'cell "View logs for import Job #27" [ref=e525]':
+                            - 'button "View logs for import Job #27" [ref=e526] [cursor=pointer]': Logs
+                        - 'row "Job #29 import Jul 17, 2026, 01:41 AM failed View logs for import Job #29" [ref=e527]':
+                          - 'cell "Job #29" [ref=e528]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e529]:
+                            - text: import
+                            - generic [ref=e530]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e531]:
+                            - generic "Orphaned by server restart" [ref=e532]: failed
+                          - 'cell "View logs for import Job #29" [ref=e533]':
+                            - 'button "View logs for import Job #29" [ref=e534] [cursor=pointer]': Logs
+                        - 'row "Job #31 import Jul 17, 2026, 01:41 AM failed View logs for import Job #31" [ref=e535]':
+                          - 'cell "Job #31" [ref=e536]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e537]:
+                            - text: import
+                            - generic [ref=e538]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e539]:
+                            - generic "Orphaned by server restart" [ref=e540]: failed
+                          - 'cell "View logs for import Job #31" [ref=e541]':
+                            - 'button "View logs for import Job #31" [ref=e542] [cursor=pointer]': Logs
+                        - 'row "Job #33 import Jul 17, 2026, 01:41 AM failed View logs for import Job #33" [ref=e543]':
+                          - 'cell "Job #33" [ref=e544]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e545]:
+                            - text: import
+                            - generic [ref=e546]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e547]:
+                            - generic "Orphaned by server restart" [ref=e548]: failed
+                          - 'cell "View logs for import Job #33" [ref=e549]':
+                            - 'button "View logs for import Job #33" [ref=e550] [cursor=pointer]': Logs
+                        - 'row "Job #35 export Jul 17, 2026, 01:41 AM failed View logs for export Job #35" [ref=e551]':
+                          - 'cell "Job #35" [ref=e552]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e553]:
+                            - text: export
+                            - generic [ref=e554]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e555]:
+                            - generic "Orphaned by server restart" [ref=e556]: failed
+                          - 'cell "View logs for export Job #35" [ref=e557]':
+                            - 'button "View logs for export Job #35" [ref=e558] [cursor=pointer]': Logs
+                        - 'row "Job #37 export Jul 17, 2026, 01:41 AM failed View logs for export Job #37" [ref=e559]':
+                          - 'cell "Job #37" [ref=e560]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e561]:
+                            - text: export
+                            - generic [ref=e562]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e563]:
+                            - generic "Orphaned by server restart" [ref=e564]: failed
+                          - 'cell "View logs for export Job #37" [ref=e565]':
+                            - 'button "View logs for export Job #37" [ref=e566] [cursor=pointer]': Logs
+                        - 'row "Job #39 export Jul 17, 2026, 01:41 AM failed View logs for export Job #39" [ref=e567]':
+                          - 'cell "Job #39" [ref=e568]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e569]:
+                            - text: export
+                            - generic [ref=e570]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e571]:
+                            - generic "Orphaned by server restart" [ref=e572]: failed
+                          - 'cell "View logs for export Job #39" [ref=e573]':
+                            - 'button "View logs for export Job #39" [ref=e574] [cursor=pointer]': Logs
+                        - 'row "Job #40 export Jul 17, 2026, 01:41 AM failed View logs for export Job #40" [ref=e575]':
+                          - 'cell "Job #40" [ref=e576]'
+                          - cell "export Jul 17, 2026, 01:41 AM" [ref=e577]:
+                            - text: export
+                            - generic [ref=e578]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e579]:
+                            - generic "Orphaned by server restart" [ref=e580]: failed
+                          - 'cell "View logs for export Job #40" [ref=e581]':
+                            - 'button "View logs for export Job #40" [ref=e582] [cursor=pointer]': Logs
+                        - 'row "Job #41 import Jul 17, 2026, 01:41 AM failed View logs for import Job #41" [ref=e583]':
+                          - 'cell "Job #41" [ref=e584]'
+                          - cell "import Jul 17, 2026, 01:41 AM" [ref=e585]:
+                            - text: import
+                            - generic [ref=e586]: Jul 17, 2026, 01:41 AM
+                          - cell "failed" [ref=e587]:
+                            - generic "Orphaned by server restart" [ref=e588]: failed
+                          - 'cell "View logs for import Job #41" [ref=e589]':
+                            - 'button "View logs for import Job #41" [ref=e590] [cursor=pointer]': Logs
+                        - 'row "Job #43 export Jun 25, 2026, 05:59 PM failed View logs for export Job #43" [ref=e591]':
+                          - 'cell "Job #43" [ref=e592]'
+                          - cell "export Jun 25, 2026, 05:59 PM" [ref=e593]:
+                            - text: export
+                            - generic [ref=e594]: Jun 25, 2026, 05:59 PM
+                          - cell "failed" [ref=e595]:
+                            - generic "Sync failed" [ref=e596]: failed
+                          - 'cell "View logs for export Job #43" [ref=e597]':
+                            - 'button "View logs for export Job #43" [ref=e598] [cursor=pointer]': Logs
+                        - 'row "Job #42 export Jun 25, 2026, 05:59 PM failed View logs for export Job #42" [ref=e599]':
+                          - 'cell "Job #42" [ref=e600]'
+                          - cell "export Jun 25, 2026, 05:59 PM" [ref=e601]:
+                            - text: export
+                            - generic [ref=e602]: Jun 25, 2026, 05:59 PM
+                          - cell "failed" [ref=e603]:
+                            - generic "Sync failed" [ref=e604]: failed
+                          - 'cell "View logs for export Job #42" [ref=e605]':
+                            - 'button "View logs for export Job #42" [ref=e606] [cursor=pointer]': Logs
+                        - 'row "Job #38 export Jun 3, 2026, 01:17 AM failed View logs for export Job #38" [ref=e607]':
+                          - 'cell "Job #38" [ref=e608]'
+                          - cell "export Jun 3, 2026, 01:17 AM" [ref=e609]:
+                            - text: export
+                            - generic [ref=e610]: Jun 3, 2026, 01:17 AM
+                          - cell "failed" [ref=e611]:
+                            - generic "Sync failed" [ref=e612]: failed
+                          - 'cell "View logs for export Job #38" [ref=e613]':
+                            - 'button "View logs for export Job #38" [ref=e614] [cursor=pointer]': Logs
+                        - 'row "Job #36 export Feb 11, 2026, 08:07 PM failed View logs for export Job #36" [ref=e615]':
+                          - 'cell "Job #36" [ref=e616]'
+                          - cell "export Feb 11, 2026, 08:07 PM" [ref=e617]:
+                            - text: export
+                            - generic [ref=e618]: Feb 11, 2026, 08:07 PM
+                          - cell "failed" [ref=e619]:
+                            - generic "Sync failed" [ref=e620]: failed
+                          - 'cell "View logs for export Job #36" [ref=e621]':
+                            - 'button "View logs for export Job #36" [ref=e622] [cursor=pointer]': Logs
+                        - 'row "Job #34 import Feb 11, 2026, 08:06 PM completed View logs for import Job #34" [ref=e623]':
+                          - 'cell "Job #34" [ref=e624]'
+                          - cell "import Feb 11, 2026, 08:06 PM" [ref=e625]:
+                            - text: import
+                            - generic [ref=e626]: Feb 11, 2026, 08:06 PM
+                          - cell "completed" [ref=e627]:
+                            - generic [ref=e628]: completed
+                          - 'cell "View logs for import Job #34" [ref=e629]':
+                            - 'button "View logs for import Job #34" [ref=e630] [cursor=pointer]': Logs
+                        - 'row "Job #32 import Feb 11, 2026, 08:02 PM failed View logs for import Job #32" [ref=e631]':
+                          - 'cell "Job #32" [ref=e632]'
+                          - cell "import Feb 11, 2026, 08:02 PM" [ref=e633]:
+                            - text: import
+                            - generic [ref=e634]: Feb 11, 2026, 08:02 PM
+                          - cell "failed" [ref=e635]:
+                            - generic "Sync failed" [ref=e636]: failed
+                          - 'cell "View logs for import Job #32" [ref=e637]':
+                            - 'button "View logs for import Job #32" [ref=e638] [cursor=pointer]': Logs
+                        - 'row "Job #30 import Feb 11, 2026, 07:20 PM failed View logs for import Job #30" [ref=e639]':
+                          - 'cell "Job #30" [ref=e640]'
+                          - cell "import Feb 11, 2026, 07:20 PM" [ref=e641]:
+                            - text: import
+                            - generic [ref=e642]: Feb 11, 2026, 07:20 PM
+                          - cell "failed" [ref=e643]:
+                            - generic "Sync failed" [ref=e644]: failed
+                          - 'cell "View logs for import Job #30" [ref=e645]':
+                            - 'button "View logs for import Job #30" [ref=e646] [cursor=pointer]': Logs
+                        - 'row "Job #28 import Feb 11, 2026, 06:35 PM failed View logs for import Job #28" [ref=e647]':
+                          - 'cell "Job #28" [ref=e648]'
+                          - cell "import Feb 11, 2026, 06:35 PM" [ref=e649]:
+                            - text: import
+                            - generic [ref=e650]: Feb 11, 2026, 06:35 PM
+                          - cell "failed" [ref=e651]:
+                            - generic "Sync failed" [ref=e652]: failed
+                          - 'cell "View logs for import Job #28" [ref=e653]':
+                            - 'button "View logs for import Job #28" [ref=e654] [cursor=pointer]': Logs
+                        - 'row "Job #26 export Jan 28, 2026, 03:25 AM failed View logs for export Job #26" [ref=e655]':
+                          - 'cell "Job #26" [ref=e656]'
+                          - cell "export Jan 28, 2026, 03:25 AM" [ref=e657]:
+                            - text: export
+                            - generic [ref=e658]: Jan 28, 2026, 03:25 AM
+                          - cell "failed" [ref=e659]:
+                            - generic "Sync failed" [ref=e660]: failed
+                          - 'cell "View logs for export Job #26" [ref=e661]':
+                            - 'button "View logs for export Job #26" [ref=e662] [cursor=pointer]': Logs
+                        - 'row "Job #24 import Jan 28, 2026, 03:25 AM failed View logs for import Job #24" [ref=e663]':
+                          - 'cell "Job #24" [ref=e664]'
+                          - cell "import Jan 28, 2026, 03:25 AM" [ref=e665]:
+                            - text: import
+                            - generic [ref=e666]: Jan 28, 2026, 03:25 AM
+                          - cell "failed" [ref=e667]:
+                            - generic "Sync failed" [ref=e668]: failed
+                          - 'cell "View logs for import Job #24" [ref=e669]':
+                            - 'button "View logs for import Job #24" [ref=e670] [cursor=pointer]': Logs
+                        - 'row "Job #22 import Dec 3, 2025, 05:01 PM completed View logs for import Job #22" [ref=e671]':
+                          - 'cell "Job #22" [ref=e672]'
+                          - cell "import Dec 3, 2025, 05:01 PM" [ref=e673]:
+                            - text: import
+                            - generic [ref=e674]: Dec 3, 2025, 05:01 PM
+                          - cell "completed" [ref=e675]:
+                            - generic [ref=e676]: completed
+                          - 'cell "View logs for import Job #22" [ref=e677]':
+                            - 'button "View logs for import Job #22" [ref=e678] [cursor=pointer]': Logs
+                        - 'row "Job #20 import Dec 3, 2025, 04:16 PM completed View logs for import Job #20" [ref=e679]':
+                          - 'cell "Job #20" [ref=e680]'
+                          - cell "import Dec 3, 2025, 04:16 PM" [ref=e681]:
+                            - text: import
+                            - generic [ref=e682]: Dec 3, 2025, 04:16 PM
+                          - cell "completed" [ref=e683]:
+                            - generic [ref=e684]: completed
+                          - 'cell "View logs for import Job #20" [ref=e685]':
+                            - 'button "View logs for import Job #20" [ref=e686] [cursor=pointer]': Logs
+                        - 'row "Job #18 export Dec 3, 2025, 02:32 PM failed View logs for export Job #18" [ref=e687]':
+                          - 'cell "Job #18" [ref=e688]'
+                          - cell "export Dec 3, 2025, 02:32 PM" [ref=e689]:
+                            - text: export
+                            - generic [ref=e690]: Dec 3, 2025, 02:32 PM
+                          - cell "failed" [ref=e691]:
+                            - generic "Sync failed" [ref=e692]: failed
+                          - 'cell "View logs for export Job #18" [ref=e693]':
+                            - 'button "View logs for export Job #18" [ref=e694] [cursor=pointer]': Logs
+                        - 'row "Job #17 export Dec 3, 2025, 02:30 PM failed View logs for export Job #17" [ref=e695]':
+                          - 'cell "Job #17" [ref=e696]'
+                          - cell "export Dec 3, 2025, 02:30 PM" [ref=e697]:
+                            - text: export
+                            - generic [ref=e698]: Dec 3, 2025, 02:30 PM
+                          - cell "failed" [ref=e699]:
+                            - generic "Sync failed" [ref=e700]: failed
+                          - 'cell "View logs for export Job #17" [ref=e701]':
+                            - 'button "View logs for export Job #17" [ref=e702] [cursor=pointer]': Logs
+                        - 'row "Job #16 export Dec 3, 2025, 02:28 PM failed View logs for export Job #16" [ref=e703]':
+                          - 'cell "Job #16" [ref=e704]'
+                          - cell "export Dec 3, 2025, 02:28 PM" [ref=e705]:
+                            - text: export
+                            - generic [ref=e706]: Dec 3, 2025, 02:28 PM
+                          - cell "failed" [ref=e707]:
+                            - generic "Sync failed" [ref=e708]: failed
+                          - 'cell "View logs for export Job #16" [ref=e709]':
+                            - 'button "View logs for export Job #16" [ref=e710] [cursor=pointer]': Logs
+                        - 'row "Job #15 export Dec 3, 2025, 02:27 PM failed View logs for export Job #15" [ref=e711]':
+                          - 'cell "Job #15" [ref=e712]'
+                          - cell "export Dec 3, 2025, 02:27 PM" [ref=e713]:
+                            - text: export
+                            - generic [ref=e714]: Dec 3, 2025, 02:27 PM
+                          - cell "failed" [ref=e715]:
+                            - generic "Sync failed" [ref=e716]: failed
+                          - 'cell "View logs for export Job #15" [ref=e717]':
+                            - 'button "View logs for export Job #15" [ref=e718] [cursor=pointer]': Logs
+                        - 'row "Job #14 export Dec 3, 2025, 02:24 PM failed View logs for export Job #14" [ref=e719]':
+                          - 'cell "Job #14" [ref=e720]'
+                          - cell "export Dec 3, 2025, 02:24 PM" [ref=e721]:
+                            - text: export
+                            - generic [ref=e722]: Dec 3, 2025, 02:24 PM
+                          - cell "failed" [ref=e723]:
+                            - generic "Sync failed" [ref=e724]: failed
+                          - 'cell "View logs for export Job #14" [ref=e725]':
+                            - 'button "View logs for export Job #14" [ref=e726] [cursor=pointer]': Logs
+                        - 'row "Job #13 export Dec 1, 2025, 01:43 AM failed View logs for export Job #13" [ref=e727]':
+                          - 'cell "Job #13" [ref=e728]'
+                          - cell "export Dec 1, 2025, 01:43 AM" [ref=e729]:
+                            - text: export
+                            - generic [ref=e730]: Dec 1, 2025, 01:43 AM
+                          - cell "failed" [ref=e731]:
+                            - generic "Sync failed" [ref=e732]: failed
+                          - 'cell "View logs for export Job #13" [ref=e733]':
+                            - 'button "View logs for export Job #13" [ref=e734] [cursor=pointer]': Logs
+                        - 'row "Job #11 import Nov 18, 2025, 07:54 PM completed View logs for import Job #11" [ref=e735]':
+                          - 'cell "Job #11" [ref=e736]'
+                          - cell "import Nov 18, 2025, 07:54 PM" [ref=e737]:
+                            - text: import
+                            - generic [ref=e738]: Nov 18, 2025, 07:54 PM
+                          - cell "completed" [ref=e739]:
+                            - generic [ref=e740]: completed
+                          - 'cell "View logs for import Job #11" [ref=e741]':
+                            - 'button "View logs for import Job #11" [ref=e742] [cursor=pointer]': Logs
+                        - 'row "Job #10 import Nov 18, 2025, 07:51 PM failed View logs for import Job #10" [ref=e743]':
+                          - 'cell "Job #10" [ref=e744]'
+                          - cell "import Nov 18, 2025, 07:51 PM" [ref=e745]:
+                            - text: import
+                            - generic [ref=e746]: Nov 18, 2025, 07:51 PM
+                          - cell "failed" [ref=e747]:
+                            - generic "Sync failed" [ref=e748]: failed
+                          - 'cell "View logs for import Job #10" [ref=e749]':
+                            - 'button "View logs for import Job #10" [ref=e750] [cursor=pointer]': Logs
+                        - 'row "Job #9 import Nov 18, 2025, 07:51 PM completed View logs for import Job #9" [ref=e751]':
+                          - 'cell "Job #9" [ref=e752]'
+                          - cell "import Nov 18, 2025, 07:51 PM" [ref=e753]:
+                            - text: import
+                            - generic [ref=e754]: Nov 18, 2025, 07:51 PM
+                          - cell "completed" [ref=e755]:
+                            - generic [ref=e756]: completed
+                          - 'cell "View logs for import Job #9" [ref=e757]':
+                            - 'button "View logs for import Job #9" [ref=e758] [cursor=pointer]': Logs
+                        - 'row "Job #8 export Nov 18, 2025, 07:40 PM failed View logs for export Job #8" [ref=e759]':
+                          - 'cell "Job #8" [ref=e760]'
+                          - cell "export Nov 18, 2025, 07:40 PM" [ref=e761]:
+                            - text: export
+                            - generic [ref=e762]: Nov 18, 2025, 07:40 PM
+                          - cell "failed" [ref=e763]:
+                            - generic "Sync failed" [ref=e764]: failed
+                          - 'cell "View logs for export Job #8" [ref=e765]':
+                            - 'button "View logs for export Job #8" [ref=e766] [cursor=pointer]': Logs
+                        - 'row "Job #7 export Nov 18, 2025, 07:30 PM failed View logs for export Job #7" [ref=e767]':
+                          - 'cell "Job #7" [ref=e768]'
+                          - cell "export Nov 18, 2025, 07:30 PM" [ref=e769]:
+                            - text: export
+                            - generic [ref=e770]: Nov 18, 2025, 07:30 PM
+                          - cell "failed" [ref=e771]:
+                            - generic "Sync failed" [ref=e772]: failed
+                          - 'cell "View logs for export Job #7" [ref=e773]':
+                            - 'button "View logs for export Job #7" [ref=e774] [cursor=pointer]': Logs
+                        - 'row "Job #6 export Nov 18, 2025, 07:29 PM failed View logs for export Job #6" [ref=e775]':
+                          - 'cell "Job #6" [ref=e776]'
+                          - cell "export Nov 18, 2025, 07:29 PM" [ref=e777]:
+                            - text: export
+                            - generic [ref=e778]: Nov 18, 2025, 07:29 PM
+                          - cell "failed" [ref=e779]:
+                            - generic "Sync failed" [ref=e780]: failed
+                          - 'cell "View logs for export Job #6" [ref=e781]':
+                            - 'button "View logs for export Job #6" [ref=e782] [cursor=pointer]': Logs
+                        - 'row "Job #5 export Nov 18, 2025, 07:29 PM failed View logs for export Job #5" [ref=e783]':
+                          - 'cell "Job #5" [ref=e784]'
+                          - cell "export Nov 18, 2025, 07:29 PM" [ref=e785]:
+                            - text: export
+                            - generic [ref=e786]: Nov 18, 2025, 07:29 PM
+                          - cell "failed" [ref=e787]:
+                            - generic "Sync failed" [ref=e788]: failed
+                          - 'cell "View logs for export Job #5" [ref=e789]':
+                            - 'button "View logs for export Job #5" [ref=e790] [cursor=pointer]': Logs
+                        - 'row "Job #4 import Nov 18, 2025, 06:19 PM completed View logs for import Job #4" [ref=e791]':
+                          - 'cell "Job #4" [ref=e792]'
+                          - cell "import Nov 18, 2025, 06:19 PM" [ref=e793]:
+                            - text: import
+                            - generic [ref=e794]: Nov 18, 2025, 06:19 PM
+                          - cell "completed" [ref=e795]:
+                            - generic [ref=e796]: completed
+                          - 'cell "View logs for import Job #4" [ref=e797]':
+                            - 'button "View logs for import Job #4" [ref=e798] [cursor=pointer]': Logs
+                        - 'row "Job #2 import Nov 18, 2025, 06:00 PM failed View logs for import Job #2" [ref=e799]':
+                          - 'cell "Job #2" [ref=e800]'
+                          - cell "import Nov 18, 2025, 06:00 PM" [ref=e801]:
+                            - text: import
+                            - generic [ref=e802]: Nov 18, 2025, 06:00 PM
+                          - cell "failed" [ref=e803]:
+                            - generic "Sync failed" [ref=e804]: failed
+                          - 'cell "View logs for import Job #2" [ref=e805]':
+                            - 'button "View logs for import Job #2" [ref=e806] [cursor=pointer]': Logs
+                  - button "Less" [expanded] [ref=e808] [cursor=pointer]

@@ -1,0 +1,1 @@
+"{\"width\":390,\"height\":844,\"coarse\":true,\"touch\":1,\"reduced\":true}"

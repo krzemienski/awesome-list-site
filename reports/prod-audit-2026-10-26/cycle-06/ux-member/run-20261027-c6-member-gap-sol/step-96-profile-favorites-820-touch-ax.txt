@@ -1,0 +1,226 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Profile" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e40]: AU
+                - generic [ref=e41]:
+                  - generic [ref=e42]: // Profile
+                  - heading "Admin User Edit display name" [level=1] [ref=e43]:
+                    - generic [ref=e44]: Admin User
+                    - button "Edit display name" [ref=e45] [cursor=pointer]:
+                      - img
+                  - generic [ref=e46]:
+                    - generic [ref=e47]:
+                      - img [ref=e48]
+                      - generic [ref=e51]: admin@example.com
+                    - generic [ref=e52]:
+                      - img [ref=e53]
+                      - text: Joined 11 months ago
+                - generic [ref=e55]:
+                  - button "Settings" [ref=e56] [cursor=pointer]:
+                    - img
+                    - text: Settings
+                  - button "Sign out" [ref=e57] [cursor=pointer]:
+                    - img
+                    - text: Sign out
+                  - button "Sign out all devices" [ref=e58] [cursor=pointer]:
+                    - img
+                    - text: Sign out all devices
+              - generic [ref=e59]:
+                - article [ref=e60]:
+                  - generic [ref=e61]:
+                    - img [ref=e62]
+                    - generic [ref=e64]:
+                      - paragraph [ref=e65]: "2"
+                      - paragraph [ref=e66]: Favorites
+                - article [ref=e67]:
+                  - generic [ref=e68]:
+                    - img [ref=e69]
+                    - generic [ref=e71]:
+                      - paragraph [ref=e72]: —
+                      - paragraph [ref=e73]: Bookmarks
+                - article [ref=e74]:
+                  - generic [ref=e75]:
+                    - img [ref=e76]
+                    - generic [ref=e82]:
+                      - paragraph [ref=e83]: —
+                      - paragraph [ref=e84]: Learning Streak
+                      - paragraph [ref=e85]: Consecutive days signed in
+                - article [ref=e86]:
+                  - generic [ref=e87]:
+                    - img [ref=e88]
+                    - generic [ref=e92]:
+                      - paragraph [ref=e93]: —
+                      - paragraph [ref=e94]: Journeys Completed
+                      - paragraph [ref=e95]: Learning journeys finished
+              - generic [ref=e96]:
+                - tablist [ref=e97]:
+                  - tab "Overview" [ref=e98] [cursor=pointer]
+                  - tab "Favorites" [active] [selected] [ref=e99] [cursor=pointer]
+                  - tab "Bookmarks" [ref=e100] [cursor=pointer]
+                  - tab "Submissions" [ref=e101] [cursor=pointer]
+                  - tab "Security" [ref=e102] [cursor=pointer]
+                - tabpanel "Favorites" [ref=e103]:
+                  - article [ref=e104]:
+                    - generic [ref=e105]:
+                      - generic [ref=e106]:
+                        - img [ref=e107]
+                        - text: Your Favorites
+                      - generic [ref=e109]: Resources you've marked as favorites
+                    - generic [ref=e114]:
+                      - generic [ref=e116]:
+                        - heading "Alliance for Open Media (AOMedia)" [level=4] [ref=e118]:
+                          - link "Alliance for Open Media (AOMedia)" [ref=e119] [cursor=pointer]:
+                            - /url: /resource/186357
+                        - generic [ref=e120]:
+                          - 'button "Remove from favorites: Alliance for Open Media (AOMedia)" [pressed] [ref=e121] [cursor=pointer]':
+                            - generic [ref=e122]:
+                              - img
+                          - link "Open Alliance for Open Media (AOMedia) in a new tab" [ref=e123] [cursor=pointer]:
+                            - /url: https://aomedia.org/
+                            - img
+                        - generic [ref=e124]:
+                          - generic [ref=e125]: Encoding & Codecs
+                          - generic [ref=e126]: Added about 2 hours ago
+                      - generic [ref=e128]:
+                        - heading "Audacity" [level=4] [ref=e130]:
+                          - link "Audacity" [ref=e131] [cursor=pointer]:
+                            - /url: /resource/185551
+                        - generic [ref=e132]:
+                          - 'button "Remove from favorites: Audacity" [pressed] [ref=e133] [cursor=pointer]':
+                            - generic [ref=e134]:
+                              - img
+                          - link "Open Audacity in a new tab" [ref=e135] [cursor=pointer]:
+                            - /url: https://audacity.sourceforge.net/
+                            - img
+                        - generic [ref=e136]:
+                          - generic [ref=e137]: Standards & Industry
+                          - generic [ref=e138]: Added about 2 hours ago
+        - contentinfo [ref=e139]:
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - paragraph [ref=e142]: ── INDEX
+              - link "awesome.video home" [ref=e143] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e144]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e146]:
+              - heading "INDEXED" [level=2] [ref=e147]
+              - paragraph [ref=e148]: 3,826
+              - paragraph [ref=e149]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e150]: live
+            - navigation "Explore categories" [ref=e152]:
+              - heading "EXPLORE" [level=2] [ref=e153]
+              - generic [ref=e154]:
+                - link "Community & Events" [ref=e155] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e156]: ◈
+                  - generic [ref=e157]: Community
+                - link "Encoding & Codecs" [ref=e158] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e159]: ◇
+                  - generic [ref=e160]: Encoding
+                - link "General Tools" [ref=e161] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e162]: ◆
+                  - generic [ref=e163]: General
+                - link "Infrastructure & Delivery" [ref=e164] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e165]: ▣
+                  - generic [ref=e166]: Infrastructure
+                - link "Intro & Learning" [ref=e167] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e168]: ▤
+                  - generic [ref=e169]: Intro
+                - link "Media Tools" [ref=e170] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e171]: ▥
+                  - generic [ref=e172]: Media
+                - link "Players & Clients" [ref=e173] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e174]: ▶
+                  - generic [ref=e175]: Players
+                - link "Protocols & Transport" [ref=e176] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e177]: ⟁
+                  - generic [ref=e178]: Protocols
+                - link "Standards & Industry" [ref=e179] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e180]: ◉
+                  - generic [ref=e181]: Standards
+            - generic [ref=e182]:
+              - heading "SOURCE" [level=2] [ref=e183]
+              - link "krzemienski/awesome-video" [ref=e184] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e185]
+                - generic [ref=e187]:
+                  - text: krzemienski
+                  - generic [ref=e188]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e189]: ↗
+              - paragraph [ref=e190]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e191] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e193] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e194]:
+            - generic [ref=e195]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e196]:
+              - link "About" [ref=e197] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e198] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e199] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e200] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e201] [cursor=pointer]
+              - link "Issues ↗" [ref=e202] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e203] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e204]: built with the awesome-list framework

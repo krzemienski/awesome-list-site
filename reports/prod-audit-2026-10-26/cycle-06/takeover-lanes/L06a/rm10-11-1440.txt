@@ -1,0 +1,10 @@
+[1440] rejected deeplink: "{\"url\":\"?status=rejected\",\"h\":\"Resources (25 of 147)\",\"empty\":null,\"hdrSearch\":\"\",\"fSearch\":\"\",\"cat\":\"All Categories\",\"status\":\"Rejected\",\"feat\":\"false\",\"rows\":25,\"focus\":\"H1.page-title tabindex=-1\"}" panel="{\"name\":\"Hide filters and tools\",\"exp\":\"true\",\"size\":\"162x44\",\"region\":true}"
+[1440] Filter by status=Withdrawn :: url="?status=withdrawn" :: shown="Withdrawn | Resources (25 of 30) | Page 1 of 2 | 190364,190334,190333 | 0 checked" :: lastreq="?page=1&limit=25&status=withdrawn"
+qa checkbox ref=e192
+selected: 1 bar=null
+[1440] Filter by category=Intro & Learning :: url="?status=withdrawn&category=Intro+%26+Learning" :: shown="Intro & Learning | Resources (1 of 1) |  | 190207 | 0 checked" :: lastreq="?page=1&limit=25&category=Intro+%26+Learning&status=withdrawn"
+"no selection bar"
+[1440] Filter by category=Encoding & Codecs :: url="?status=withdrawn&category=Encoding+%26+Codecs" :: shown="Encoding & Codecs | Resources (13 of 13) |  | 190281,190276,190275 | 0 checked" :: lastreq="?page=1&limit=25&category=Encoding+%26+Codecs&status=withdrawn"
+[1440] Filter by category=All Categories :: url="?status=withdrawn" :: shown="All Categories | Resources (25 of 30) | Page 1 of 2 | 190364,190334,190333 | 0 checked" :: lastreq="?page=1&limit=25&category=Encoding+%26+Codecs&status=withdrawn"
+[1440] Filter by status=All Status :: url="?status=all" :: shown="All Status | Resources (25 of 4,019) | Page 1 of 161 | 190364,190359,190350 | 0 checked" :: lastreq="?page=1&limit=25"
+[1440] Filter by status=Approved :: url="" :: shown="Approved | Resources (25 of 3,826) | Page 1 of 154 | 190359,190342,190152 | 0 checked" :: lastreq="?page=1&limit=25&status=approved"

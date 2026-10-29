@@ -1,0 +1,5 @@
+# C7 AO05 (admin Users: export, invite, sorts, reveal, role dialog)
+Worker: sonnet aed6b313961e6d376. Revisions 130e5829 -> 31d0acce (all flows re-driven on 31d0acce except 390 Role/Joined sort). Evidence: e2e-evidence/cycle-07/AO05/.
+- C7-AO05-01 CONFIRMED, HIGH (data): Users "Sort by Role" pages are non-deterministic: 7 pages (133 rows) give only 129 unique ids ascending and 126 descending, so users are duplicated or skipped. The lead confirmed in source: UserRepository.ts orders by lower(role) only, with LIMIT/OFFSET and no unique tiebreaker; createdAt and name can tie too. Routed to FIX-C7-11 (id tiebreaker on every sort, plus an audit of other ORDER BY + OFFSET queries).
+- C7-AO05-02 DISMISSED: the 4 CSV cells starting with ' are the CSV formula-injection guard (0 raw = + - @ cells); intended.
+PASS: US-08, 09, 10, 11, 13, 14 (Reveal via the Row actions tap path), 15, 16, 17 at all widths; US-18 PASS (network log not captured at every width). FAIL: US-12. BLOCKED-BY-POLICY: US-19 (confirming a role change).

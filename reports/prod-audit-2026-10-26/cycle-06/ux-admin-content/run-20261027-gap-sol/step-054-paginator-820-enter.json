@@ -1,0 +1,22 @@
+{
+  "phase": "100 Enter",
+  "state": {
+    "url": "https://awesome.video/admin?limit=100&page=2#resources",
+    "input": "1"
+  },
+  "events": [
+    {
+      "url": "https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true",
+      "status": 200
+    },
+    {
+      "url": "https://awesome.video/api/admin/resources?page=1&limit=100&status=approved",
+      "status": 200
+    },
+    {
+      "url": "https://awesome.video/api/admin/resources?page=1&limit=1",
+      "status": 200
+    }
+  ],
+  "errors": []
+}

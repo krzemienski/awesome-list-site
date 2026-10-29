@@ -1,0 +1,22 @@
+uid=389_0 RootWebArea "HLS Video Resources & Tools — Awesome Video" url="https://awesome.video/tag/hls"
+  uid=389_113 main
+    uid=390_588 navigation "Pagination"
+      uid=390_603 status atomic live="polite" relevant="additions text"
+  uid=392_0 dialog "Search Resources" description="Search resources, categories, and pages in the awesome video collection."
+    uid=392_1 heading "Search Resources" level="2"
+    uid=392_2 "Search resources, categories, and pages in the awesome video collection."
+    uid=392_3 generic
+      uid=392_4 combobox "Search resources, categories, and pages" autocomplete="list" expandable expanded focusable focused haspopup="listbox"
+      uid=392_5 button "esc Close search"
+      uid=392_6 listbox "Suggestions" orientation="vertical"
+      uid=392_7 contentinfo
+        uid=392_8 "↑↓"
+        uid=392_9 " navigate"
+        uid=392_10 "↵"
+        uid=392_11 " open"
+        uid=392_12 "esc"
+        uid=392_13 " close"
+        uid=392_14 generic live="polite" relevant="additions text"
+          uid=392_15 "14"
+          uid=392_16 " suggestion"
+          uid=392_17 "s"

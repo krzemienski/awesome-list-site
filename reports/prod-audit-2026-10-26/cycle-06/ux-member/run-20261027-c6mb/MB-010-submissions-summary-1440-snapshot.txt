@@ -1,0 +1,111 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e52]
+              - listitem [level=1]
+                - link "Profile" [disabled, ref=e53]
+          - StaticText "AU"
+          - heading "Admin User Edit display name" [level=1, ref=e14]
+            - StaticText "Admin User"
+            - button "Edit display name" [ref=e27]
+          - image
+          - StaticText "admin@example.com"
+          - image
+          - StaticText "Joined "
+          - StaticText "11 months ago"
+          - StaticText "Beginner"
+          - button "Settings" [ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "Sign out" [ref=e16]
+            - image
+            - StaticText "Sign out"
+          - button "Sign out all devices" [expanded=false, ref=e17]
+            - image
+            - StaticText "Sign out all devices"
+          - article
+            - image
+            - paragraph
+            - paragraph
+          - article
+            - image
+            - paragraph
+            - paragraph
+          - article
+            - image
+            - paragraph
+            - paragraph
+          - article
+            - image
+            - paragraph
+            - paragraph
+            - paragraph
+          - tablist [ref=e18] focusable [tabindex]
+            - tab "Overview" [ref=e28]
+            - tab "Favorites" [ref=e29]
+            - tab "Bookmarks" [ref=e30]
+            - tab "Submissions" [selected, ref=e31]
+            - tab "Security" [ref=e32]
+          - tabpanel "Submissions" [ref=e19] focusable [tabindex]
+            - article
+              - link "Open contribution dashboard" [ref=e51]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e20]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e21]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e22]
+            - heading "EXPLORE" [level=2, ref=e33]
+            - link "Community & Events" [ref=e34]
+            - link "Encoding & Codecs" [ref=e35]
+            - link "General Tools" [ref=e36]
+            - link "Infrastructure & Delivery" [ref=e37]
+            - link "Intro & Learning" [ref=e38]
+            - link "Media Tools" [ref=e39]
+            - link "Players & Clients" [ref=e40]
+            - link "Protocols & Transport" [ref=e41]
+            - link "Standards & Industry" [ref=e42]
+          - heading "SOURCE" [level=2, ref=e23]
+          - link "krzemienski/ awesome-video" [ref=e24]
+          - paragraph
+            - link "PRs welcome" [ref=e43]
+          - button "Contact maintainers" [ref=e25]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e26]
+            - link "About" [ref=e44]
+            - link "Terms" [ref=e45]
+            - link "Privacy" [ref=e46]
+            - link "Code of Conduct" [ref=e47]
+            - button "Cookie settings" [ref=e48]
+            - link "Issues ↗" [ref=e49]
+            - link "Sitemap" [ref=e50]

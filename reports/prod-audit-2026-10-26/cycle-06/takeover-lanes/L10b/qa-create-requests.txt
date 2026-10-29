@@ -1,0 +1,1 @@
+[22400.1324] POST https://awesome.video/api/admin/resources (Fetch) 201

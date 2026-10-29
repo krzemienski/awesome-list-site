@@ -1,0 +1,10 @@
+{
+  "active": "edit-name",
+  "dialog": "Edit Sub-Subcategory\n\nUpdate the sub-subcategory details.\n\nParent Category *\n[QA-audit-1026] Cáfé gap A\nCommunity & Events\nEncoding & Codecs\nGeneral Tools\nInfrastructure & Delivery\nIntro & Learning\nMedia Tools\nPlayers & Clients\nProtocols & Transport\nStandards & Industry\n[QA-audit-1026] Cáfé gap A\nParent Subcategory *\n[QA-audit-1026] gap SC A\n[QA-audit-1026] gap SC A\nName *\n\nName is required\n\nSlug *\nCancel\nSave\nClose",
+  "invalid": [
+    {
+      "describedby": "edit-name-error",
+      "id": "edit-name"
+    }
+  ]
+}

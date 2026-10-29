@@ -1,0 +1,333 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,827 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,827 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e37]: Authorized admin area
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e44]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e45]:
+                  - text: Operations
+                  - emphasis [ref=e46]: dashboard
+                - paragraph [ref=e47]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e48]:
+                - button "Settings" [ref=e49] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e50] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e51]
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - tablist "Admin sections" [ref=e54]:
+                  - tab "Overview" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - text: Overview
+                  - tab "Approvals" [ref=e61] [cursor=pointer]:
+                    - img [ref=e62]
+                    - text: Approvals
+                  - tab "Edits" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Researcher
+                  - tab "Export" [selected] [ref=e72] [cursor=pointer]:
+                    - img [ref=e73]
+                    - text: Export
+                  - tab "Database" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Database
+                  - tab "Resources" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Resources
+                  - tab "Categories" [ref=e83] [cursor=pointer]:
+                    - img [ref=e84]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Subcategories
+                  - tab "Users" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Users
+                  - tab "GitHub" [ref=e93] [cursor=pointer]:
+                    - img [ref=e94]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: Link Health
+                  - tab "Audit" [ref=e100] [cursor=pointer]:
+                    - img [ref=e101]
+                    - text: Audit
+                  - tab "Research" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e105] [cursor=pointer]:
+                  - img [ref=e106]
+              - tabpanel "Export" [ref=e108]:
+                - generic [ref=e109]:
+                  - group [ref=e110]:
+                    - generic "Validation controls" [ref=e111] [cursor=pointer]
+                  - region "Export link check" [ref=e112]:
+                    - 'heading "Link check #8 Completed" [level=2] [ref=e114]':
+                      - text: "Link check #8"
+                      - generic [ref=e115]: Completed
+                    - paragraph [ref=e116]: Checks the stored URL of every approved resource — the same URLs the exports write.
+                    - status [ref=e117]: "Scan #8 completed Aug 4, 2026, 08:18 PM. At scan time: 3,809 healthy, 12 broken, 0 redirects, 0 timeouts, 2 suspect of 3,823."
+                    - paragraph [ref=e118]: These are the counts saved when the scan finished. Link Health shows the same scan's problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed.
+                    - link "Open Link Health for problem links" [ref=e119] [cursor=pointer]:
+                      - /url: /admin/linkhealth
+                  - generic [ref=e120]:
+                    - article [ref=e121] [cursor=pointer]:
+                      - heading "JSON Snapshot" [level=3] [ref=e122]
+                      - paragraph [ref=e123]: Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state. For a restorable copy, use Full database backup below.
+                      - button "Download" [ref=e124]
+                    - article [ref=e125] [cursor=pointer]:
+                      - heading "CSV (resources)" [level=3] [ref=e126]
+                      - paragraph [ref=e127]: Flat resource table for spreadsheet workflows.
+                      - button "Download" [ref=e128]
+                    - article [ref=e129] [cursor=pointer]:
+                      - heading "README.md" [level=3] [ref=e130]
+                      - paragraph [ref=e131]: Awesome-list flavored Markdown for the GitHub repo.
+                      - button "Generate" [ref=e132]
+                    - article [ref=e133] [cursor=pointer]:
+                      - heading "OPML (categories)" [level=3] [ref=e134]
+                      - paragraph [ref=e135]: Hierarchical export for feed readers.
+                      - button "Download" [ref=e136]
+                  - group [ref=e137]:
+                    - generic "Export history & validation results" [ref=e138] [cursor=pointer]
+                    - generic [ref=e139]:
+                      - generic [ref=e140]:
+                        - generic [ref=e141]:
+                          - heading "Export history" [level=2] [ref=e142]
+                          - paragraph [ref=e143]: Exports 1–20 of 165, newest first
+                        - generic "Export history pages" [ref=e145]:
+                          - button "Previous exports" [disabled] [active] [ref=e146]:
+                            - img
+                            - text: Previous
+                          - button "Next exports" [ref=e147] [cursor=pointer]:
+                            - text: Next
+                            - img
+                      - region "Export history table, scrollable" [ref=e150]:
+                        - table [ref=e151]:
+                          - rowgroup [ref=e152]:
+                            - row "Type Format Status Rows Created" [ref=e153]:
+                              - columnheader "Type" [ref=e154]
+                              - columnheader "Format" [ref=e155]
+                              - columnheader "Status" [ref=e156]
+                              - columnheader "Rows" [ref=e157]
+                              - columnheader "Created" [ref=e158]
+                          - rowgroup [ref=e159]:
+                            - row "Category tree opml Completed 3,825 Oct 27, 2026, 01:48 AM" [ref=e160]:
+                              - cell "Category tree" [ref=e161]
+                              - cell "opml" [ref=e162]
+                              - cell "Completed" [ref=e163]:
+                                - generic [ref=e164]: Completed
+                              - cell "3,825" [ref=e165]
+                              - cell "Oct 27, 2026, 01:48 AM" [ref=e166]
+                            - row "Awesome list markdown Completed 3,825 Oct 27, 2026, 01:48 AM" [ref=e167]:
+                              - cell "Awesome list" [ref=e168]
+                              - cell "markdown" [ref=e169]
+                              - cell "Completed" [ref=e170]:
+                                - generic [ref=e171]: Completed
+                              - cell "3,825" [ref=e172]
+                              - cell "Oct 27, 2026, 01:48 AM" [ref=e173]
+                            - row "Resources csv Completed 4,018 Oct 27, 2026, 01:48 AM" [ref=e174]:
+                              - cell "Resources" [ref=e175]
+                              - cell "csv" [ref=e176]
+                              - cell "Completed" [ref=e177]:
+                                - generic [ref=e178]: Completed
+                              - cell "4,018" [ref=e179]
+                              - cell "Oct 27, 2026, 01:48 AM" [ref=e180]
+                            - row "Catalog snapshot json Completed 4,018 Oct 27, 2026, 01:48 AM" [ref=e181]:
+                              - cell "Catalog snapshot" [ref=e182]
+                              - cell "json" [ref=e183]
+                              - cell "Completed" [ref=e184]:
+                                - generic [ref=e185]: Completed
+                              - cell "4,018" [ref=e186]
+                              - cell "Oct 27, 2026, 01:48 AM" [ref=e187]
+                            - row "Category tree opml Completed 3,825 Oct 27, 2026, 01:46 AM" [ref=e188]:
+                              - cell "Category tree" [ref=e189]
+                              - cell "opml" [ref=e190]
+                              - cell "Completed" [ref=e191]:
+                                - generic [ref=e192]: Completed
+                              - cell "3,825" [ref=e193]
+                              - cell "Oct 27, 2026, 01:46 AM" [ref=e194]
+                            - row "Awesome list markdown Completed 3,825 Oct 27, 2026, 01:46 AM" [ref=e195]:
+                              - cell "Awesome list" [ref=e196]
+                              - cell "markdown" [ref=e197]
+                              - cell "Completed" [ref=e198]:
+                                - generic [ref=e199]: Completed
+                              - cell "3,825" [ref=e200]
+                              - cell "Oct 27, 2026, 01:46 AM" [ref=e201]
+                            - row "Resources csv Completed 4,018 Oct 27, 2026, 01:43 AM" [ref=e202]:
+                              - cell "Resources" [ref=e203]
+                              - cell "csv" [ref=e204]
+                              - cell "Completed" [ref=e205]:
+                                - generic [ref=e206]: Completed
+                              - cell "4,018" [ref=e207]
+                              - cell "Oct 27, 2026, 01:43 AM" [ref=e208]
+                            - row "Catalog snapshot json Completed 4,018 Oct 27, 2026, 01:43 AM" [ref=e209]:
+                              - cell "Catalog snapshot" [ref=e210]
+                              - cell "json" [ref=e211]
+                              - cell "Completed" [ref=e212]:
+                                - generic [ref=e213]: Completed
+                              - cell "4,018" [ref=e214]
+                              - cell "Oct 27, 2026, 01:43 AM" [ref=e215]
+                            - row "Category tree opml Completed 3,825 Oct 27, 2026, 01:37 AM" [ref=e216]:
+                              - cell "Category tree" [ref=e217]
+                              - cell "opml" [ref=e218]
+                              - cell "Completed" [ref=e219]:
+                                - generic [ref=e220]: Completed
+                              - cell "3,825" [ref=e221]
+                              - cell "Oct 27, 2026, 01:37 AM" [ref=e222]
+                            - row "Awesome list markdown Completed 3,825 Oct 27, 2026, 01:36 AM" [ref=e223]:
+                              - cell "Awesome list" [ref=e224]
+                              - cell "markdown" [ref=e225]
+                              - cell "Completed" [ref=e226]:
+                                - generic [ref=e227]: Completed
+                              - cell "3,825" [ref=e228]
+                              - cell "Oct 27, 2026, 01:36 AM" [ref=e229]
+                            - row "Resources csv Completed 4,017 Oct 27, 2026, 01:36 AM" [ref=e230]:
+                              - cell "Resources" [ref=e231]
+                              - cell "csv" [ref=e232]
+                              - cell "Completed" [ref=e233]:
+                                - generic [ref=e234]: Completed
+                              - cell "4,017" [ref=e235]
+                              - cell "Oct 27, 2026, 01:36 AM" [ref=e236]
+                            - row "Catalog snapshot json Completed 4,017 Oct 27, 2026, 01:36 AM" [ref=e237]:
+                              - cell "Catalog snapshot" [ref=e238]
+                              - cell "json" [ref=e239]
+                              - cell "Completed" [ref=e240]:
+                                - generic [ref=e241]: Completed
+                              - cell "4,017" [ref=e242]
+                              - cell "Oct 27, 2026, 01:36 AM" [ref=e243]
+                            - row "Category tree opml Completed 3,825 Oct 26, 2026, 11:21 PM" [ref=e244]:
+                              - cell "Category tree" [ref=e245]
+                              - cell "opml" [ref=e246]
+                              - cell "Completed" [ref=e247]:
+                                - generic [ref=e248]: Completed
+                              - cell "3,825" [ref=e249]
+                              - cell "Oct 26, 2026, 11:21 PM" [ref=e250]
+                            - row "Catalog snapshot json Completed 4,017 Oct 26, 2026, 11:20 PM" [ref=e251]:
+                              - cell "Catalog snapshot" [ref=e252]
+                              - cell "json" [ref=e253]
+                              - cell "Completed" [ref=e254]:
+                                - generic [ref=e255]: Completed
+                              - cell "4,017" [ref=e256]
+                              - cell "Oct 26, 2026, 11:20 PM" [ref=e257]
+                            - row "Resources csv Completed 4,017 Oct 26, 2026, 11:13 PM" [ref=e258]:
+                              - cell "Resources" [ref=e259]
+                              - cell "csv" [ref=e260]
+                              - cell "Completed" [ref=e261]:
+                                - generic [ref=e262]: Completed
+                              - cell "4,017" [ref=e263]
+                              - cell "Oct 26, 2026, 11:13 PM" [ref=e264]
+                            - row "Category tree opml Completed 3,825 Oct 26, 2026, 11:12 PM" [ref=e265]:
+                              - cell "Category tree" [ref=e266]
+                              - cell "opml" [ref=e267]
+                              - cell "Completed" [ref=e268]:
+                                - generic [ref=e269]: Completed
+                              - cell "3,825" [ref=e270]
+                              - cell "Oct 26, 2026, 11:12 PM" [ref=e271]
+                            - row "Awesome list markdown Completed 3,825 Oct 26, 2026, 11:12 PM" [ref=e272]:
+                              - cell "Awesome list" [ref=e273]
+                              - cell "markdown" [ref=e274]
+                              - cell "Completed" [ref=e275]:
+                                - generic [ref=e276]: Completed
+                              - cell "3,825" [ref=e277]
+                              - cell "Oct 26, 2026, 11:12 PM" [ref=e278]
+                            - row "Resources csv Completed 4,017 Oct 26, 2026, 11:12 PM" [ref=e279]:
+                              - cell "Resources" [ref=e280]
+                              - cell "csv" [ref=e281]
+                              - cell "Completed" [ref=e282]:
+                                - generic [ref=e283]: Completed
+                              - cell "4,017" [ref=e284]
+                              - cell "Oct 26, 2026, 11:12 PM" [ref=e285]
+                            - row "Catalog snapshot json Completed 4,017 Oct 26, 2026, 11:11 PM" [ref=e286]:
+                              - cell "Catalog snapshot" [ref=e287]
+                              - cell "json" [ref=e288]
+                              - cell "Completed" [ref=e289]:
+                                - generic [ref=e290]: Completed
+                              - cell "4,017" [ref=e291]
+                              - cell "Oct 26, 2026, 11:11 PM" [ref=e292]
+                            - row "Catalog snapshot json Completed 4,017 Oct 26, 2026, 10:10 PM" [ref=e293]:
+                              - cell "Catalog snapshot" [ref=e294]
+                              - cell "json" [ref=e295]
+                              - cell "Completed" [ref=e296]:
+                                - generic [ref=e297]: Completed
+                              - cell "4,017" [ref=e298]
+                              - cell "Oct 26, 2026, 10:10 PM" [ref=e299]
+                    - generic [ref=e302]:
+                      - img [ref=e303]
+                      - paragraph [ref=e305]: No validation results yet
+                      - paragraph [ref=e306]: Open “Validation controls” at the top of this tab and use “Run Validation” to check the exported Markdown against awesome-lint rules.
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - generic [ref=e309]:
+                        - heading "Full database backup" [level=2] [ref=e310]
+                        - paragraph [ref=e311]: Restorable copy of the whole database, kept in private storage.
+                      - button "Create backup" [ref=e313] [cursor=pointer]:
+                        - img
+                        - text: Create backup
+                    - generic [ref=e314]:
+                      - generic [ref=e315]:
+                        - paragraph [ref=e316]:
+                          - strong [ref=e317]: "Covers:"
+                          - text: every table and row in the application database, with its primary keys, foreign-key relationships, unique and check constraints, indexes, sequence positions, extensions and the migration journal. That includes user accounts and their Clerk sign-in links, favorites, bookmarks and collections, journeys and progress, submissions and suggested edits, the audit log, AI enrichment and research jobs and their discoveries, notification preferences, API keys and sessions.
+                        - paragraph [ref=e318]:
+                          - strong [ref=e319]: "Not covered:"
+                          - text: Clerk sign-in credentials (passwords, social logins, MFA), which Clerk holds outside this database, and the hosting platform's own
+                          - code [ref=e320]: _system
+                          - text: schema.
+                        - paragraph [ref=e321]:
+                          - strong [ref=e322]: "Storage:"
+                          - text: this project's private App Storage (production backups only). Backups contain personal data, so they are never downloaded to the browser.
+                        - paragraph [ref=e323]:
+                          - strong [ref=e324]: "Restore:"
+                          - text: into a new, empty database with
+                          - code [ref=e325]: npm run db:backup -- restore <backup id>
+                          - text: "(runbook:"
+                          - code [ref=e326]: docs/DATABASE-BACKUP.md
+                          - text: ). The restore checks the archive's SHA-256, then compares every table's row count, every sequence and the schema with the backup's record.
+                      - paragraph [ref=e327]: No production backups yet.
+    - button "Back to top" [ref=e328] [cursor=pointer]:
+      - img

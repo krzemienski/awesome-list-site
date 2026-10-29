@@ -1,0 +1,14 @@
+- generic
+  - alertdialog "Start enrichment job?"
+    - heading "Start enrichment job?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This starts a Claude AI enrichment run over unenriched resources in batches of 10 on router.hack.ski. The job runs in the background and incurs real API cost."
+    - paragraph
+      - StaticText "It will process "
+      - strong
+        - StaticText "2,736"
+      - StaticText " resources (274 batches of 10), not just one batch."
+    - paragraph
+      - StaticText "Recent runs cost about $0.006 per resource, so this run could cost around $15.97. You can cancel it while it runs."
+    - button "Cancel" [ref=e2]
+    - button "Start enrichment" [ref=e3]

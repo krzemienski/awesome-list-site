@@ -1,0 +1,1 @@
+"{\"role\":\"alertdialog\",\"text\":\"Run link health check? / This checks the URL of every approved resource in the catalog (currently 3,827) against the live web. The job runs in the background and can take several minutes to complete. / Cancel / Run check\",\"focus\":\"Cancel\",\"btns\":[\"Cancel:77x44\",\"Run check:100x44\"]}"

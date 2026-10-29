@@ -1,0 +1,8 @@
+- heading "Edit Category" [level=2, ref=e2]
+- LabelText "Name *" [ref=e5] clickable [cursor:pointer]
+- textbox "Name *" [ref=e6]: [QA-audit-1026] Cáfé c6qa-audit-1026-c6-category
+- LabelText "Slug *" [ref=e7] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e8]: qa-audit-1026-c6-category
+- button "Cancel" [ref=e3]
+- button "Save" [ref=e4]
+- button "Close" [ref=e1]

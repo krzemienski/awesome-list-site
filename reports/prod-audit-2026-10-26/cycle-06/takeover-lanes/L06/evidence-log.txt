@@ -1,0 +1,2 @@
+[1440] RM-41 page input: focus+select+keyboard type 9 + Enter -> ?page=9, indicator Page 9 of 154, stays after 2.5s. (tool note: agent-browser type appends; fill/press Control+a unreliable)
+[1440] RM-42 blur 12 -> ?page=12 committed; abc+Enter -> aria-invalid=true, describedby=input-page-jump-error, role=status text "Enter a whole number between 1 and 154."; 999+Enter -> clamps to 154; 0+blur -> clamps 1 (URL ?page dropped); 5x+Enter invalid; 4+Tab -> ?page=4

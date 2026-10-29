@@ -1,0 +1,8 @@
+uid=171_0 RootWebArea "Error — Awesome Video" url="https://awesome.video/advanced"
+  uid=171_1 region "Notifications (F8)"
+    uid=171_2 list
+  uid=173_0 alert atomic live="assertive" relevant="additions text"
+    uid=173_1 "ERROR · UNAVAILABLE"
+    uid=173_2 heading "Something went wrong" level="1"
+    uid=173_3 "The catalog couldn't be loaded. This is usually a brief network or server problem. Please try again."
+    uid=173_4 button "Retry" focusable focused

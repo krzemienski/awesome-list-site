@@ -1,0 +1,16 @@
+{
+  "url": "https://awesome.video/settings/theme",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "system": "geist",
+  "accent": "rose",
+  "font": "jetbrains",
+  "store": {
+    "ds-accent": "rose",
+    "ds-font-override": "jetbrains",
+    "ds-system": "geist"
+  }
+}

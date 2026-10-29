@@ -1,0 +1,7 @@
+Fix C6-AX-020 and C6-AX-022 in awesome-list-site. Work in an isolated /tmp clone from origin/main 520d6778369bc7ce495204cfcacc7e0533f941cc on branch fix/c6-ax020-advanced-offline-recovery. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-a11y/findings.md and cited evidence. AX-020: generic ErrorPage used by Advanced must distinguish actual offline from online-but-server-unreachable, show explicit offline copy and “Still offline — reconnect and try again.” on Retry while offline; preserve generic server-error copy and no reload loop. AX-022: successful automatic offline→online recovery must hand keyboard focus to the recovered H1 (Advanced Features), without focus theft during normal background refetch or when the user has moved elsewhere. Reuse the PS-29 and existing focus-handoff patterns; do not change analytics or API contracts.
+
+Run tsc --noEmit and npm run build with unpiped exits. Drive real local Advanced at 1440, 820 touch and 390 touch: offline initial failure, offline Retry feedback, online server failure copy, automatic recovery and focused H1, plus ordinary navigation no-focus-theft. Save screenshots, accessibility snapshots and focus/network state under reports/prod-audit-2026-10-26/cycle-06/ux-a11y/fix-ax020-ax022/. No test files/mocks/validation harnesses.
+
+Commit conventional fix, push HEAD to fix/c6-ax020-advanced-offline-recovery, open non-draft PR to main and return PR/head SHA, files, checks, evidence and UNVERIFIED items. Never merge.

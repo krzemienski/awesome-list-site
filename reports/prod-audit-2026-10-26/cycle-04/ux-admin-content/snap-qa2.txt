@@ -1,0 +1,72 @@
+uid=221_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin?search=QA-audit-1026#resources"
+  uid=229_0 region "Notifications (F8)"
+    uid=229_1 list
+  uid=229_2 link "Skip to main content" url="https://awesome.video/admin?search=QA-audit-1026#main"
+  uid=229_4 banner
+    uid=229_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=229_8 button "Search 3,826 resources"
+    uid=229_9 navigation "Primary"
+      uid=229_10 link "Browse" url="https://awesome.video/categories"
+      uid=229_12 link "Submit" url="https://awesome.video/submit"
+      uid=229_14 link "About" url="https://awesome.video/about"
+      uid=229_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=229_18 link "Admin" url="https://awesome.video/admin"
+    uid=229_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=229_21 main
+    uid=229_22 navigation "Breadcrumb"
+      uid=229_23 link "Home" url="https://awesome.video/"
+      uid=229_25 "Admin"
+    uid=229_26 "Authorized admin area"
+    uid=229_27 "ADMIN CONSOLE · "
+    uid=229_28 "ADMIN USER"
+    uid=229_29 heading "Operations dashboard" level="1"
+    uid=229_30 "Manage the "
+    uid=229_31 "3,826"
+    uid=229_32 " resources, jobs, and contributors that keep the index alive."
+    uid=229_33 button "Settings" expandable haspopup="menu"
+    uid=229_34 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=229_35 status atomic live="polite" relevant="additions text"
+    uid=229_36 tablist "Admin sections" orientation="horizontal"
+      uid=229_37 tab "Overview" selectable
+      uid=229_38 tab "Approvals" selectable
+      uid=229_39 tab "Edits" selectable
+      uid=229_40 tab "Enrichment" selectable
+      uid=229_41 tab "Researcher" selectable
+      uid=229_42 tab "Export" selectable
+      uid=229_43 tab "Database" selectable
+      uid=229_44 tab "Resources" selectable selected
+      uid=229_45 tab "Categories" selectable
+      uid=229_46 tab "Subcategories" selectable
+      uid=229_47 tab "Users" selectable
+      uid=229_48 tab "GitHub" selectable
+      uid=229_49 tab "Link Health" selectable
+      uid=229_50 tab "Audit" selectable
+      uid=229_51 tab "Research" selectable
+    uid=229_52 button "Scroll tabs right"
+    uid=229_53 tabpanel "Resources"
+      uid=229_54 heading "Resources (1 of 1)" level="2"
+      uid=229_55 "Manage every entry in the index"
+      uid=229_56 " · ★ 8 featured on the home page"
+      uid=229_57 " · Filters applied"
+      uid=229_58 textbox "Search…" value="QA-audit-1026"
+      uid=229_59 button "Show filters and tools" expandable
+      uid=229_60 button "Add"
+      uid=229_61 region "Resources table, scrollable"
+        uid=229_62 "ID"
+        uid=229_63 checkbox "Select all resources on this page"
+        uid=229_64 "TITLE"
+        uid=229_65 "CATEGORY"
+        uid=229_66 "TAGS"
+        uid=229_67 "FEATURED"
+        uid=229_68 columnheader "Actions"
+        uid=229_69 "190355"
+        uid=229_70 checkbox "Select [QA-audit-1026] c4 admin-content resource"
+        uid=229_71 "[QA-audit-1026] c4 admin-content resource"
+        uid=229_72 "General Tools"
+        uid=229_73 button "Feature on the home page: [QA-audit-1026] c4 admin-content resource" description="Feature on the home page"
+        uid=229_74 link "View [QA-audit-1026] c4 admin-content resource" url="https://awesome.video/resource/190355"
+          uid=229_75 "View"
+        uid=229_76 button "Edit [QA-audit-1026] c4 admin-content resource" focusable focused
+        uid=229_77 button "Delete [QA-audit-1026] c4 admin-content resource"
+      uid=229_78 "Showing 1 - 1 of 1 resource"
+      uid=229_79 combobox "Rows per page" expandable haspopup="listbox" value="25 / page"

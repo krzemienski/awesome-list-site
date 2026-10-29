@@ -1,0 +1,427 @@
+- generic
+  - dialog "Job Details #34"
+    - heading "Job Details #34" [level=2, ref=e1]
+      - image
+      - StaticText "Job Details #34"
+    - generic
+      - heading "Configuration" [level=3, ref=e3]
+        - image
+        - StaticText "Configuration"
+      - StaticText "Filter"
+      - StaticText "unenriched"
+      - StaticText "Batch Size"
+      - StaticText "10"
+      - StaticText "Model"
+      - StaticText "cc/claude-haiku-4-5-20251001 (default)"
+      - StaticText "Base URL"
+      - StaticText "Platform default"
+      - StaticText "Auth Token"
+      - StaticText "Platform key"
+      - heading "Statistics" [level=3, ref=e4]
+        - image
+        - StaticText "Statistics"
+      - StaticText "2746"
+      - StaticText "Total"
+      - StaticText "10"
+      - StaticText "Processed"
+      - StaticText "10"
+      - StaticText "Successful"
+      - StaticText "0"
+      - StaticText "Failed"
+      - StaticText "0"
+      - StaticText "Skipped"
+      - heading "Processed Resources (10)" [level=3, ref=e5]
+        - image
+        - StaticText "Processed Resources (10)"
+      - StaticText "#"
+      - StaticText "190106"
+      - StaticText "#"
+      - StaticText "190105"
+      - StaticText "#"
+      - StaticText "190104"
+      - StaticText "#"
+      - StaticText "190103"
+      - StaticText "#"
+      - StaticText "190102"
+      - StaticText "#"
+      - StaticText "190101"
+      - StaticText "#"
+      - StaticText "190100"
+      - StaticText "#"
+      - StaticText "190099"
+      - StaticText "#"
+      - StaticText "190098"
+      - StaticText "#"
+      - StaticText "190097"
+      - region "Communication Graph" [ref=e6]
+        - heading "Communication Graph" [level=3, ref=e8]
+        - StaticText "orchestrator"
+        - StaticText "subagent"
+        - StaticText "tool"
+        - region "Agent communication graph for enrichment job 34" [ref=e9] focusable [tabindex]
+          - image "Agent communication graph: 1 orchestrator, 0 subagents, 2 tools; 0 delegations, 11 tool calls."
+            - generic
+              - StaticText "×10"
+            - StaticText "orchestrator"
+            - StaticText "orchestrator"
+            - StaticText "cc/claude-haiku-4-5-2…"
+            - StaticText "get_pending_batch"
+            - StaticText "tool"
+            - StaticText "submit_enrichment"
+            - StaticText "tool"
+      - region "Agent Events (structured)" [ref=e7]
+        - heading "Agent Events (structured)" [level=3, ref=e10]
+        - StaticText "41"
+        - StaticText " event"
+        - StaticText "s"
+        - log "Structured agent events for enrichment job 34" [ref=e11] focusable [tabindex]
+          - list
+            - listitem [level=1]
+              - StaticText "12:34:16 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "LIFECYCLE"
+              - StaticText "Run started (model cc/claude-haiku-4-5-20251001, maxTurns 52, budget $0.35)"
+              - button "Hide detail for event 0" [expanded=true, ref=e12]
+                - image
+              - StaticText "cc/claude-haiku-4-5-20251001"
+              - StaticText "{\n  \"tools\": [\n    \"ToolSearch\",\n    \"mcp__enrichment__get_pending_batch\",\n    \"mcp__enrichment__submit_enrichment\"\n  ],\n  \"agents\": [\n    \"claude\",\n    \"Explore\",\n    \"general-purpose\",\n    \"Plan\",\n    \"statusline-setup\"\n  ],\n  \"maxTurns\": 52,\n  \"mcp_servers\": [\n    {\n      \"name\": \"enrichment\",\n      \"source\": \"sdk\",\n      \"status\": \"connected\"\n    }\n  ],\n  \"maxBudgetUsd\": 0.35,\n  \"disallowedTools\": [\n    \"Bash\",\n    \"Edit\",\n    \"Write\",\n    \"NotebookEdit\",\n    \"Read\",\n    \"Glob\",\n    \"Grep\",\n    \"WebFetch\",\n    \"CronCreate\",\n    \"CronDelete\",\n    \"CronList\",\n    \"DesignSync\",\n    \"EnterWorktree\",\n    \"ExitWorktree\",\n    \"Monitor\",\n    \"PushNotification\",\n    \"ScheduleWakeup\",\n    \"Workflow\",\n    \"Skill\",\n    \"TaskCreate\",\n    \"TaskGet\",\n    \"TaskList\",\n    \"TaskOutput\",\n    \"TaskStop\",\n    \"TaskUpdate\",\n    \"SendMessage\",\n    \"ListAgents\",\n    \"ReportFindings\",\n    \"WebSearch\",\n    \"Task\",\n    \"Agent\"\n  ]\n}"
+            - listitem [level=1]
+              - StaticText "12:34:19 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "(no text)"
+              - button "Show detail for event 1" [expanded=false, ref=e13]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+              - generic
+                - StaticText "in 4,877(↩4,867 )"
+              - StaticText "out "
+              - StaticText "3"
+            - listitem [level=1]
+              - StaticText "12:34:20 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "I'll start by loading the tool schemas and then fetching the pending batch."
+              - button "Show detail for event 2" [expanded=false, ref=e14]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:20 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: ToolSearch"
+              - button "Show detail for event 3" [expanded=false, ref=e15]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:22 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "(no text)"
+              - button "Show detail for event 4" [expanded=false, ref=e16]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+              - generic
+                - StaticText "in 5,098(⊕5,088)"
+              - StaticText "out "
+              - StaticText "1"
+            - listitem [level=1]
+              - StaticText "12:34:22 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__get_pending_batch"
+              - button "Show detail for event 5" [expanded=false, ref=e17]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:22 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "get_pending_batch"
+              - StaticText "{\"count\":10}"
+            - listitem [level=1]
+              - StaticText "12:34:22 AM"
+              - StaticText "GET_PENDING_BATCH"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "10 resources"
+              - StaticText "31"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:38 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "(no text)"
+              - button "Show detail for event 8" [expanded=false, ref=e18]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+              - generic
+                - StaticText "in 6,836(↩5,088 ⊕1,740)"
+              - StaticText "out "
+              - StaticText "1"
+            - listitem [level=1]
+              - StaticText "12:34:38 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "Now I'll analyze each resource and submit enrichment for all 10. Let me process them:"
+              - button "Show detail for event 9" [expanded=false, ref=e19]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:38 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 10" [expanded=false, ref=e20]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:38 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190106,\"category\":\"Standards & Industry\",\"confidence\":92}"
+            - listitem [level=1]
+              - StaticText "12:34:38 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":9}"
+              - StaticText "233"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:39 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 13" [expanded=false, ref=e21]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:39 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190105,\"category\":\"Media Tools\",\"confidence\":88}"
+            - listitem [level=1]
+              - StaticText "12:34:39 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":8}"
+              - StaticText "638"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:39 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 16" [expanded=false, ref=e22]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:40 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190104,\"category\":\"Infrastructure & Delivery\",\"confidence\":87}"
+            - listitem [level=1]
+              - StaticText "12:34:40 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":7}"
+              - StaticText "382"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:40 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 19" [expanded=false, ref=e23]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:40 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190103,\"category\":\"Infrastructure & Delivery\",\"confidence\":72}"
+            - listitem [level=1]
+              - StaticText "12:34:40 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":6}"
+              - StaticText "333"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:41 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 22" [expanded=false, ref=e24]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:41 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190102,\"category\":\"Infrastructure & Delivery\",\"confidence\":75}"
+            - listitem [level=1]
+              - StaticText "12:34:41 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 24" [expanded=false, ref=e25]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:42 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":5}"
+              - StaticText "363"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:42 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190101,\"category\":\"Protocols & Transport\",\"confidence\":90}"
+            - listitem [level=1]
+              - StaticText "12:34:42 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 27" [expanded=false, ref=e26]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:42 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":4}"
+              - StaticText "473"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:42 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190100,\"category\":\"Protocols & Transport\",\"confidence\":89}"
+            - listitem [level=1]
+              - StaticText "12:34:43 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 30" [expanded=false, ref=e27]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:43 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":3}"
+              - StaticText "453"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:43 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190099,\"category\":\"Infrastructure & Delivery\",\"confidence\":90}"
+            - listitem [level=1]
+              - StaticText "12:34:43 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":2}"
+              - StaticText "364"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:44 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 34" [expanded=false, ref=e28]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:45 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "MESSAGE"
+              - StaticText "→ tools: mcp__enrichment__submit_enrichment"
+              - button "Show detail for event 35" [expanded=false, ref=e29]
+                - image
+              - StaticText "claude-haiku-4-5-20251001"
+            - listitem [level=1]
+              - StaticText "12:34:45 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190098,\"category\":\"Protocols & Transport\",\"confidence\":91}"
+            - listitem [level=1]
+              - StaticText "12:34:45 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":1}"
+              - StaticText "844"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:46 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "TOOL_CALL"
+              - StaticText "→ "
+              - StaticText "submit_enrichment"
+              - StaticText "{\"resourceId\":190097,\"category\":\"Media Tools\",\"confidence\":86}"
+            - listitem [level=1]
+              - StaticText "12:34:46 AM"
+              - StaticText "SUBMIT_ENRICHMENT"
+              - StaticText "TOOL_RESULT"
+              - StaticText "→ "
+              - StaticText "orchestrator"
+              - StaticText "{\"saved\":true,\"remaining\":0}"
+              - StaticText "343"
+              - StaticText "ms"
+            - listitem [level=1]
+              - StaticText "12:34:49 AM"
+              - StaticText "ORCHESTRATOR"
+              - StaticText "LIFECYCLE"
+              - StaticText "Run aborted (4 turns, $0.0408 lower_bound)"
+              - button "Show detail for event 40" [expanded=false, ref=e30]
+                - image
+              - StaticText "in "
+              - StaticText "36"
+              - StaticText "out "
+              - StaticText "3,604"
+              - StaticText "$"
+              - StaticText "0.0408"
+    - button "Close" [ref=e2]
+      - image
+      - StaticText "Close"

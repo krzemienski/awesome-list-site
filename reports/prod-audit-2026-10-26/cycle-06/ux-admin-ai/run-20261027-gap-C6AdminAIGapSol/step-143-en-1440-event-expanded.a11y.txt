@@ -1,0 +1,724 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic:
+              - text: Search
+              - generic: 3,826 resources…
+            - generic: ⌘K
+          - navigation:
+            - link:
+              - /url: /categories
+              - text: Browse
+            - link:
+              - /url: /submit
+              - text: Submit
+            - link:
+              - /url: /about
+              - text: About
+            - link:
+              - /url: /design-system
+              - text: Docs ↗
+            - link:
+              - /url: /admin
+              - text: Admin
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab [selected]:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - article:
+                              - generic: Last enriched
+                              - generic: 27h ago
+                              - generic: "batch #34 · 10 resources · cancelled"
+                            - article:
+                              - generic: Queue
+                              - generic: "0"
+                              - generic: idle
+                            - article:
+                              - generic: Avg cost
+                              - generic: $0.03
+                              - generic: per batch
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Enrichment jobs
+                                - paragraph: LLM-driven metadata enhancement
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Run job
+                            - generic:
+                              - region:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: Job
+                                      - columnheader: Status
+                                      - columnheader: Started
+                                      - columnheader: Completed
+                                      - columnheader:
+                                        - generic: Actions
+                                  - rowgroup:
+                                    - row:
+                                      - cell: "#34"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:33:50 AM
+                                      - cell: 10/26/2026, 12:34:47 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#33"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:30:14 AM
+                                      - cell: 10/26/2026, 12:33:13 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#32"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#31"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#30"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:31 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#29"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell:
+                                        - button: Logs
+                              - generic:
+                                - button: Show all 33 jobs
+                        - group:
+                          - generic: Job controls & monitoring
+  - 'dialog "Job Details #34" [ref=e2]':
+    - 'heading "Job Details #34" [level=2] [ref=e4]':
+      - img [ref=e5]
+      - text: "Job Details #34"
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - heading "Configuration" [level=3] [ref=e12]:
+          - img [ref=e13]
+          - text: Configuration
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - generic [ref=e17]: Filter
+            - generic [ref=e18]: unenriched
+          - generic [ref=e19]:
+            - generic [ref=e20]: Batch Size
+            - generic [ref=e21]: "10"
+          - generic [ref=e22]:
+            - generic [ref=e23]: Model
+            - generic [ref=e24]: cc/claude-haiku-4-5-20251001 (default)
+          - generic [ref=e25]:
+            - generic [ref=e26]: Base URL
+            - generic [ref=e27]: Platform default
+          - generic [ref=e28]:
+            - generic [ref=e29]: Auth Token
+            - generic [ref=e30]: Platform key
+      - generic [ref=e31]:
+        - heading "Statistics" [level=3] [ref=e32]:
+          - img [ref=e33]
+          - text: Statistics
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: "2746"
+            - generic [ref=e38]: Total
+          - generic [ref=e39]:
+            - generic [ref=e40]: "10"
+            - generic [ref=e41]: Processed
+          - generic [ref=e42]:
+            - generic [ref=e43]: "10"
+            - generic [ref=e44]: Successful
+          - generic [ref=e45]:
+            - generic [ref=e46]: "0"
+            - generic [ref=e47]: Failed
+          - generic [ref=e48]:
+            - generic [ref=e49]: "0"
+            - generic [ref=e50]: Skipped
+      - generic [ref=e51]:
+        - heading "Processed Resources (10)" [level=3] [ref=e52]:
+          - img [ref=e53]
+          - text: Processed Resources (10)
+        - generic [ref=e56]:
+          - generic [ref=e57]: "#190106"
+          - generic [ref=e58]: "#190105"
+          - generic [ref=e59]: "#190104"
+          - generic [ref=e60]: "#190103"
+          - generic [ref=e61]: "#190102"
+          - generic [ref=e62]: "#190101"
+          - generic [ref=e63]: "#190100"
+          - generic [ref=e64]: "#190099"
+          - generic [ref=e65]: "#190098"
+          - generic [ref=e66]: "#190097"
+      - region "Communication Graph" [ref=e67]:
+        - generic [ref=e68]:
+          - heading "Communication Graph" [level=3] [ref=e69]
+          - generic [ref=e70]:
+            - generic [ref=e71]: orchestrator
+            - generic [ref=e73]: subagent
+            - generic [ref=e75]: tool
+        - region "Agent communication graph for enrichment job 34" [ref=e77]:
+          - 'img "Agent communication graph: 1 orchestrator, 0 subagents, 2 tools; 0 delegations, 11 tool calls." [ref=e78]':
+            - generic [ref=e83]: ×10
+            - generic [ref=e84]:
+              - generic [ref=e86]: orchestrator
+              - generic [ref=e87]: orchestrator
+              - generic [ref=e88]: cc/claude-haiku-4-5-2…
+            - generic [ref=e89]:
+              - generic [ref=e91]: get_pending_batch
+              - generic [ref=e92]: tool
+            - generic [ref=e93]:
+              - generic [ref=e95]: submit_enrichment
+              - generic [ref=e96]: tool
+      - region "Agent Events (structured)" [ref=e97]:
+        - generic [ref=e98]:
+          - heading "Agent Events (structured)" [level=3] [ref=e99]
+          - generic [ref=e100]: 41 events
+        - log "Structured agent events for enrichment job 34" [ref=e101]:
+          - list [ref=e104]:
+            - listitem [ref=e105]:
+              - generic [ref=e106]:
+                - generic [ref=e107]:
+                  - generic [ref=e108]: 12:34:16 AM
+                  - generic [ref=e109]: orchestrator
+                  - generic [ref=e110]: lifecycle
+                - generic [ref=e111]:
+                  - generic [ref=e112]: Run started (model cc/claude-haiku-4-5-20251001, maxTurns 52, budget $0.35)
+                  - button "Hide detail for event 0" [expanded] [active] [ref=e113] [cursor=pointer]:
+                    - img [ref=e114]
+              - generic [ref=e117]: cc/claude-haiku-4-5-20251001
+              - generic [ref=e118]: "{ \"tools\": [ \"ToolSearch\", \"mcp__enrichment__get_pending_batch\", \"mcp__enrichment__submit_enrichment\" ], \"agents\": [ \"claude\", \"Explore\", \"general-purpose\", \"Plan\", \"statusline-setup\" ], \"maxTurns\": 52, \"mcp_servers\": [ { \"name\": \"enrichment\", \"source\": \"sdk\", \"status\": \"connected\" } ], \"maxBudgetUsd\": 0.35, \"disallowedTools\": [ \"Bash\", \"Edit\", \"Write\", \"NotebookEdit\", \"Read\", \"Glob\", \"Grep\", \"WebFetch\", \"CronCreate\", \"CronDelete\", \"CronList\", \"DesignSync\", \"EnterWorktree\", \"ExitWorktree\", \"Monitor\", \"PushNotification\", \"ScheduleWakeup\", \"Workflow\", \"Skill\", \"TaskCreate\", \"TaskGet\", \"TaskList\", \"TaskOutput\", \"TaskStop\", \"TaskUpdate\", \"SendMessage\", \"ListAgents\", \"ReportFindings\", \"WebSearch\", \"Task\", \"Agent\" ] }"
+            - listitem [ref=e119]:
+              - generic [ref=e120]:
+                - generic [ref=e121]:
+                  - generic [ref=e122]: 12:34:19 AM
+                  - generic [ref=e123]: orchestrator
+                  - generic [ref=e124]: message
+                - generic [ref=e125]:
+                  - generic [ref=e126]: (no text)
+                  - button "Show detail for event 1" [ref=e127] [cursor=pointer]:
+                    - img [ref=e128]
+              - generic [ref=e130]:
+                - generic [ref=e131]: claude-haiku-4-5-20251001
+                - 'generic "raw: 10 + cache_read: 4867 + cache_creation: 0" [ref=e132]':
+                  - text: in 4,877
+                  - generic [ref=e133]: (↩4,867 )
+                - generic [ref=e134]: out 3
+            - listitem [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]:
+                  - generic [ref=e138]: 12:34:20 AM
+                  - generic [ref=e139]: orchestrator
+                  - generic [ref=e140]: message
+                - generic [ref=e141]:
+                  - generic [ref=e142]: I'll start by loading the tool schemas and then fetching the pending batch.
+                  - button "Show detail for event 2" [ref=e143] [cursor=pointer]:
+                    - img [ref=e144]
+              - generic [ref=e147]: claude-haiku-4-5-20251001
+            - listitem [ref=e148]:
+              - generic [ref=e149]:
+                - generic [ref=e150]:
+                  - generic [ref=e151]: 12:34:20 AM
+                  - generic [ref=e152]: orchestrator
+                  - generic [ref=e153]: message
+                - generic [ref=e154]:
+                  - generic [ref=e155]: "→ tools: ToolSearch"
+                  - button "Show detail for event 3" [ref=e156] [cursor=pointer]:
+                    - img [ref=e157]
+              - generic [ref=e160]: claude-haiku-4-5-20251001
+            - listitem [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - generic [ref=e164]: 12:34:22 AM
+                  - generic [ref=e165]: orchestrator
+                  - generic [ref=e166]: message
+                - generic [ref=e167]:
+                  - generic [ref=e168]: (no text)
+                  - button "Show detail for event 4" [ref=e169] [cursor=pointer]:
+                    - img [ref=e170]
+              - generic [ref=e172]:
+                - generic [ref=e173]: claude-haiku-4-5-20251001
+                - 'generic "raw: 10 + cache_read: 0 + cache_creation: 5088" [ref=e174]':
+                  - text: in 5,098
+                  - generic [ref=e175]: (⊕5,088)
+                - generic [ref=e176]: out 1
+            - listitem [ref=e177]:
+              - generic [ref=e178]:
+                - generic [ref=e179]:
+                  - generic [ref=e180]: 12:34:22 AM
+                  - generic [ref=e181]: orchestrator
+                  - generic [ref=e182]: message
+                - generic [ref=e183]:
+                  - generic [ref=e184]: "→ tools: mcp__enrichment__get_pending_batch"
+                  - button "Show detail for event 5" [ref=e185] [cursor=pointer]:
+                    - img [ref=e186]
+              - generic [ref=e189]: claude-haiku-4-5-20251001
+            - listitem [ref=e190]:
+              - generic [ref=e191]:
+                - generic [ref=e192]:
+                  - generic [ref=e193]: 12:34:22 AM
+                  - generic [ref=e194]: orchestrator
+                  - generic [ref=e195]: tool_call
+                  - generic [ref=e196]: → get_pending_batch
+                - generic [ref=e198]: "{\"count\":10}"
+            - listitem [ref=e199]:
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - generic [ref=e202]: 12:34:22 AM
+                  - generic [ref=e203]: get_pending_batch
+                  - generic [ref=e204]: tool_result
+                  - generic [ref=e205]: → orchestrator
+                - generic [ref=e207]: 10 resources
+              - generic [ref=e209]: 31ms
+            - listitem [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]:
+                  - generic [ref=e213]: 12:34:38 AM
+                  - generic [ref=e214]: orchestrator
+                  - generic [ref=e215]: message
+                - generic [ref=e216]:
+                  - generic [ref=e217]: (no text)
+                  - button "Show detail for event 8" [ref=e218] [cursor=pointer]:
+                    - img [ref=e219]
+              - generic [ref=e221]:
+                - generic [ref=e222]: claude-haiku-4-5-20251001
+                - 'generic "raw: 8 + cache_read: 5088 + cache_creation: 1740" [ref=e223]':
+                  - text: in 6,836
+                  - generic [ref=e224]: (↩5,088 ⊕1,740)
+                - generic [ref=e225]: out 1
+            - listitem [ref=e226]:
+              - generic [ref=e227]:
+                - generic [ref=e228]:
+                  - generic [ref=e229]: 12:34:38 AM
+                  - generic [ref=e230]: orchestrator
+                  - generic [ref=e231]: message
+                - generic [ref=e232]:
+                  - generic [ref=e233]: "Now I'll analyze each resource and submit enrichment for all 10. Let me process them:"
+                  - button "Show detail for event 9" [ref=e234] [cursor=pointer]:
+                    - img [ref=e235]
+              - generic [ref=e238]: claude-haiku-4-5-20251001
+            - listitem [ref=e239]:
+              - generic [ref=e240]:
+                - generic [ref=e241]:
+                  - generic [ref=e242]: 12:34:38 AM
+                  - generic [ref=e243]: orchestrator
+                  - generic [ref=e244]: message
+                - generic [ref=e245]:
+                  - generic [ref=e246]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 10" [ref=e247] [cursor=pointer]:
+                    - img [ref=e248]
+              - generic [ref=e251]: claude-haiku-4-5-20251001
+            - listitem [ref=e252]:
+              - generic [ref=e253]:
+                - generic [ref=e254]:
+                  - generic [ref=e255]: 12:34:38 AM
+                  - generic [ref=e256]: orchestrator
+                  - generic [ref=e257]: tool_call
+                  - generic [ref=e258]: → submit_enrichment
+                - generic [ref=e260]: "{\"resourceId\":190106,\"category\":\"Standards & Industry\",\"confidence\":92}"
+            - listitem [ref=e261]:
+              - generic [ref=e262]:
+                - generic [ref=e263]:
+                  - generic [ref=e264]: 12:34:38 AM
+                  - generic [ref=e265]: submit_enrichment
+                  - generic [ref=e266]: tool_result
+                  - generic [ref=e267]: → orchestrator
+                - generic [ref=e269]: "{\"saved\":true,\"remaining\":9}"
+              - generic [ref=e271]: 233ms
+            - listitem [ref=e272]:
+              - generic [ref=e273]:
+                - generic [ref=e274]:
+                  - generic [ref=e275]: 12:34:39 AM
+                  - generic [ref=e276]: orchestrator
+                  - generic [ref=e277]: message
+                - generic [ref=e278]:
+                  - generic [ref=e279]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 13" [ref=e280] [cursor=pointer]:
+                    - img [ref=e281]
+              - generic [ref=e284]: claude-haiku-4-5-20251001
+            - listitem [ref=e285]:
+              - generic [ref=e286]:
+                - generic [ref=e287]:
+                  - generic [ref=e288]: 12:34:39 AM
+                  - generic [ref=e289]: orchestrator
+                  - generic [ref=e290]: tool_call
+                  - generic [ref=e291]: → submit_enrichment
+                - generic [ref=e293]: "{\"resourceId\":190105,\"category\":\"Media Tools\",\"confidence\":88}"
+            - listitem [ref=e294]:
+              - generic [ref=e295]:
+                - generic [ref=e296]:
+                  - generic [ref=e297]: 12:34:39 AM
+                  - generic [ref=e298]: submit_enrichment
+                  - generic [ref=e299]: tool_result
+                  - generic [ref=e300]: → orchestrator
+                - generic [ref=e302]: "{\"saved\":true,\"remaining\":8}"
+              - generic [ref=e304]: 638ms
+            - listitem [ref=e305]:
+              - generic [ref=e306]:
+                - generic [ref=e307]:
+                  - generic [ref=e308]: 12:34:39 AM
+                  - generic [ref=e309]: orchestrator
+                  - generic [ref=e310]: message
+                - generic [ref=e311]:
+                  - generic [ref=e312]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 16" [ref=e313] [cursor=pointer]:
+                    - img [ref=e314]
+              - generic [ref=e317]: claude-haiku-4-5-20251001
+            - listitem [ref=e318]:
+              - generic [ref=e319]:
+                - generic [ref=e320]:
+                  - generic [ref=e321]: 12:34:40 AM
+                  - generic [ref=e322]: orchestrator
+                  - generic [ref=e323]: tool_call
+                  - generic [ref=e324]: → submit_enrichment
+                - generic [ref=e326]: "{\"resourceId\":190104,\"category\":\"Infrastructure & Delivery\",\"confidence\":87}"
+            - listitem [ref=e327]:
+              - generic [ref=e328]:
+                - generic [ref=e329]:
+                  - generic [ref=e330]: 12:34:40 AM
+                  - generic [ref=e331]: submit_enrichment
+                  - generic [ref=e332]: tool_result
+                  - generic [ref=e333]: → orchestrator
+                - generic [ref=e335]: "{\"saved\":true,\"remaining\":7}"
+              - generic [ref=e337]: 382ms
+            - listitem [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]:
+                  - generic [ref=e341]: 12:34:40 AM
+                  - generic [ref=e342]: orchestrator
+                  - generic [ref=e343]: message
+                - generic [ref=e344]:
+                  - generic [ref=e345]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 19" [ref=e346] [cursor=pointer]:
+                    - img [ref=e347]
+              - generic [ref=e350]: claude-haiku-4-5-20251001
+            - listitem [ref=e351]:
+              - generic [ref=e352]:
+                - generic [ref=e353]:
+                  - generic [ref=e354]: 12:34:40 AM
+                  - generic [ref=e355]: orchestrator
+                  - generic [ref=e356]: tool_call
+                  - generic [ref=e357]: → submit_enrichment
+                - generic [ref=e359]: "{\"resourceId\":190103,\"category\":\"Infrastructure & Delivery\",\"confidence\":72}"
+            - listitem [ref=e360]:
+              - generic [ref=e361]:
+                - generic [ref=e362]:
+                  - generic [ref=e363]: 12:34:40 AM
+                  - generic [ref=e364]: submit_enrichment
+                  - generic [ref=e365]: tool_result
+                  - generic [ref=e366]: → orchestrator
+                - generic [ref=e368]: "{\"saved\":true,\"remaining\":6}"
+              - generic [ref=e370]: 333ms
+            - listitem [ref=e371]:
+              - generic [ref=e372]:
+                - generic [ref=e373]:
+                  - generic [ref=e374]: 12:34:41 AM
+                  - generic [ref=e375]: orchestrator
+                  - generic [ref=e376]: message
+                - generic [ref=e377]:
+                  - generic [ref=e378]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 22" [ref=e379] [cursor=pointer]:
+                    - img [ref=e380]
+              - generic [ref=e383]: claude-haiku-4-5-20251001
+            - listitem [ref=e384]:
+              - generic [ref=e385]:
+                - generic [ref=e386]:
+                  - generic [ref=e387]: 12:34:41 AM
+                  - generic [ref=e388]: orchestrator
+                  - generic [ref=e389]: tool_call
+                  - generic [ref=e390]: → submit_enrichment
+                - generic [ref=e392]: "{\"resourceId\":190102,\"category\":\"Infrastructure & Delivery\",\"confidence\":75}"
+            - listitem [ref=e393]:
+              - generic [ref=e394]:
+                - generic [ref=e395]:
+                  - generic [ref=e396]: 12:34:41 AM
+                  - generic [ref=e397]: orchestrator
+                  - generic [ref=e398]: message
+                - generic [ref=e399]:
+                  - generic [ref=e400]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 24" [ref=e401] [cursor=pointer]:
+                    - img [ref=e402]
+              - generic [ref=e405]: claude-haiku-4-5-20251001
+            - listitem [ref=e406]:
+              - generic [ref=e407]:
+                - generic [ref=e408]:
+                  - generic [ref=e409]: 12:34:42 AM
+                  - generic [ref=e410]: submit_enrichment
+                  - generic [ref=e411]: tool_result
+                  - generic [ref=e412]: → orchestrator
+                - generic [ref=e414]: "{\"saved\":true,\"remaining\":5}"
+              - generic [ref=e416]: 363ms
+            - listitem [ref=e417]:
+              - generic [ref=e418]:
+                - generic [ref=e419]:
+                  - generic [ref=e420]: 12:34:42 AM
+                  - generic [ref=e421]: orchestrator
+                  - generic [ref=e422]: tool_call
+                  - generic [ref=e423]: → submit_enrichment
+                - generic [ref=e425]: "{\"resourceId\":190101,\"category\":\"Protocols & Transport\",\"confidence\":90}"
+            - listitem [ref=e426]:
+              - generic [ref=e427]:
+                - generic [ref=e428]:
+                  - generic [ref=e429]: 12:34:42 AM
+                  - generic [ref=e430]: orchestrator
+                  - generic [ref=e431]: message
+                - generic [ref=e432]:
+                  - generic [ref=e433]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 27" [ref=e434] [cursor=pointer]:
+                    - img [ref=e435]
+              - generic [ref=e438]: claude-haiku-4-5-20251001
+            - listitem [ref=e439]:
+              - generic [ref=e440]:
+                - generic [ref=e441]:
+                  - generic [ref=e442]: 12:34:42 AM
+                  - generic [ref=e443]: submit_enrichment
+                  - generic [ref=e444]: tool_result
+                  - generic [ref=e445]: → orchestrator
+                - generic [ref=e447]: "{\"saved\":true,\"remaining\":4}"
+              - generic [ref=e449]: 473ms
+            - listitem [ref=e450]:
+              - generic [ref=e451]:
+                - generic [ref=e452]:
+                  - generic [ref=e453]: 12:34:42 AM
+                  - generic [ref=e454]: orchestrator
+                  - generic [ref=e455]: tool_call
+                  - generic [ref=e456]: → submit_enrichment
+                - generic [ref=e458]: "{\"resourceId\":190100,\"category\":\"Protocols & Transport\",\"confidence\":89}"
+            - listitem [ref=e459]:
+              - generic [ref=e460]:
+                - generic [ref=e461]:
+                  - generic [ref=e462]: 12:34:43 AM
+                  - generic [ref=e463]: orchestrator
+                  - generic [ref=e464]: message
+                - generic [ref=e465]:
+                  - generic [ref=e466]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 30" [ref=e467] [cursor=pointer]:
+                    - img [ref=e468]
+              - generic [ref=e471]: claude-haiku-4-5-20251001
+            - listitem [ref=e472]:
+              - generic [ref=e473]:
+                - generic [ref=e474]:
+                  - generic [ref=e475]: 12:34:43 AM
+                  - generic [ref=e476]: submit_enrichment
+                  - generic [ref=e477]: tool_result
+                  - generic [ref=e478]: → orchestrator
+                - generic [ref=e480]: "{\"saved\":true,\"remaining\":3}"
+              - generic [ref=e482]: 453ms
+            - listitem [ref=e483]:
+              - generic [ref=e484]:
+                - generic [ref=e485]:
+                  - generic [ref=e486]: 12:34:43 AM
+                  - generic [ref=e487]: orchestrator
+                  - generic [ref=e488]: tool_call
+                  - generic [ref=e489]: → submit_enrichment
+                - generic [ref=e491]: "{\"resourceId\":190099,\"category\":\"Infrastructure & Delivery\",\"confidence\":90}"
+            - listitem [ref=e492]:
+              - generic [ref=e493]:
+                - generic [ref=e494]:
+                  - generic [ref=e495]: 12:34:43 AM
+                  - generic [ref=e496]: submit_enrichment
+                  - generic [ref=e497]: tool_result
+                  - generic [ref=e498]: → orchestrator
+                - generic [ref=e500]: "{\"saved\":true,\"remaining\":2}"
+              - generic [ref=e502]: 364ms
+            - listitem [ref=e503]:
+              - generic [ref=e504]:
+                - generic [ref=e505]:
+                  - generic [ref=e506]: 12:34:44 AM
+                  - generic [ref=e507]: orchestrator
+                  - generic [ref=e508]: message
+                - generic [ref=e509]:
+                  - generic [ref=e510]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 34" [ref=e511] [cursor=pointer]:
+                    - img [ref=e512]
+              - generic [ref=e515]: claude-haiku-4-5-20251001
+            - listitem [ref=e516]:
+              - generic [ref=e517]:
+                - generic [ref=e518]:
+                  - generic [ref=e519]: 12:34:45 AM
+                  - generic [ref=e520]: orchestrator
+                  - generic [ref=e521]: message
+                - generic [ref=e522]:
+                  - generic [ref=e523]: "→ tools: mcp__enrichment__submit_enrichment"
+                  - button "Show detail for event 35" [ref=e524] [cursor=pointer]:
+                    - img [ref=e525]
+              - generic [ref=e528]: claude-haiku-4-5-20251001
+            - listitem [ref=e529]:
+              - generic [ref=e530]:
+                - generic [ref=e531]:
+                  - generic [ref=e532]: 12:34:45 AM
+                  - generic [ref=e533]: orchestrator
+                  - generic [ref=e534]: tool_call
+                  - generic [ref=e535]: → submit_enrichment
+                - generic [ref=e537]: "{\"resourceId\":190098,\"category\":\"Protocols & Transport\",\"confidence\":91}"
+            - listitem [ref=e538]:
+              - generic [ref=e539]:
+                - generic [ref=e540]:
+                  - generic [ref=e541]: 12:34:45 AM
+                  - generic [ref=e542]: submit_enrichment
+                  - generic [ref=e543]: tool_result
+                  - generic [ref=e544]: → orchestrator
+                - generic [ref=e546]: "{\"saved\":true,\"remaining\":1}"
+              - generic [ref=e548]: 844ms
+            - listitem [ref=e549]:
+              - generic [ref=e550]:
+                - generic [ref=e551]:
+                  - generic [ref=e552]: 12:34:46 AM
+                  - generic [ref=e553]: orchestrator
+                  - generic [ref=e554]: tool_call
+                  - generic [ref=e555]: → submit_enrichment
+                - generic [ref=e557]: "{\"resourceId\":190097,\"category\":\"Media Tools\",\"confidence\":86}"
+            - listitem [ref=e558]:
+              - generic [ref=e559]:
+                - generic [ref=e560]:
+                  - generic [ref=e561]: 12:34:46 AM
+                  - generic [ref=e562]: submit_enrichment
+                  - generic [ref=e563]: tool_result
+                  - generic [ref=e564]: → orchestrator
+                - generic [ref=e566]: "{\"saved\":true,\"remaining\":0}"
+              - generic [ref=e568]: 343ms
+            - listitem [ref=e569]:
+              - generic [ref=e570]:
+                - generic [ref=e571]:
+                  - generic [ref=e572]: 12:34:49 AM
+                  - generic [ref=e573]: orchestrator
+                  - generic [ref=e574]: lifecycle
+                - generic [ref=e575]:
+                  - generic [ref=e576]: Run aborted (4 turns, $0.0408 lower_bound)
+                  - button "Show detail for event 40" [ref=e577] [cursor=pointer]:
+                    - img [ref=e578]
+              - generic [ref=e580]:
+                - generic [ref=e581]: in 36
+                - generic [ref=e582]: out 3,604
+                - generic [ref=e583]: $0.0408
+    - button "Close" [ref=e586] [cursor=pointer]:
+      - img [ref=e587]
+      - generic [ref=e590]: Close

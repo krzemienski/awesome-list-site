@@ -1,0 +1,1671 @@
+{
+  "url": "https://awesome.video/advanced",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<button type=\"button\" role=\"checkbox\" aria-checked=\"false\" data-state=\"unchecked\" value=\"on\" class=\"peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-10 w-10 max-lg:h-11 max-lg:w-11\" id=\"subcategories\" aria-label=\"Show subcategories\"></button>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -323,
+        "width": 156.234375,
+        "height": 44,
+        "top": -323,
+        "right": 164.234375,
+        "bottom": -279,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": -116,
+        "width": 39.234375,
+        "height": 20,
+        "top": -116,
+        "right": 78.234375,
+        "bottom": -96,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Explorer",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": -23.8125,
+        "width": 162.453125,
+        "height": 44,
+        "top": -23.8125,
+        "right": 202.453125,
+        "bottom": 20.1875,
+        "left": 40
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Metrics",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 202.453125,
+        "y": -23.8125,
+        "width": 157.59375,
+        "height": 44,
+        "top": -23.8125,
+        "right": 360.046875,
+        "bottom": 20.1875,
+        "left": 202.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Export",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 360.046875,
+        "y": -23.8125,
+        "width": 151.40625,
+        "height": 44,
+        "top": -23.8125,
+        "right": 511.453125,
+        "bottom": 20.1875,
+        "left": 360.046875
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "AI Recommendations",
+      "role": "tab",
+      "href": null,
+      "rect": {
+        "x": 511.453125,
+        "y": -23.8125,
+        "width": 242.546875,
+        "height": 44,
+        "top": -23.8125,
+        "right": 754,
+        "bottom": 20.1875,
+        "left": 511.453125
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Search categories and resources...",
+      "role": "INPUT",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 547.671875,
+        "width": 664,
+        "height": 44,
+        "top": 547.671875,
+        "right": 729,
+        "bottom": 591.671875,
+        "left": 65
+      },
+      "class": "input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed pl-10",
+      "disabled": false
+    },
+    {
+      "name": "Sort categories",
+      "role": "combobox",
+      "href": null,
+      "rect": {
+        "x": 128.484375,
+        "y": 607.671875,
+        "width": 128,
+        "height": 44,
+        "top": 607.671875,
+        "right": 256.484375,
+        "bottom": 651.671875,
+        "left": 128.484375
+      },
+      "class": "select flex min-h-[44px] items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1 w-auto min-w-32",
+      "disabled": false
+    },
+    {
+      "name": "Show subcategories",
+      "role": "checkbox",
+      "href": null,
+      "rect": {
+        "x": 272.484375,
+        "y": 607.671875,
+        "width": 44,
+        "height": 44,
+        "top": 607.671875,
+        "right": 316.484375,
+        "bottom": 651.671875,
+        "left": 272.484375
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-10 w-10 max-lg:h-11 max-lg:w-11",
+      "disabled": false
+    },
+    {
+      "name": "open-source",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 695.671875,
+        "width": 107.8125,
+        "height": 44,
+        "top": 695.671875,
+        "right": 172.8125,
+        "bottom": 739.671875,
+        "left": 65
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-streaming",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 176.8125,
+        "y": 695.671875,
+        "width": 128.453125,
+        "height": 44,
+        "top": 695.671875,
+        "right": 305.265625,
+        "bottom": 739.671875,
+        "left": 176.8125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "streaming",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 309.265625,
+        "y": 695.671875,
+        "width": 91.265625,
+        "height": 44,
+        "top": 695.671875,
+        "right": 400.53125,
+        "bottom": 739.671875,
+        "left": 309.265625
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "ffmpeg",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 404.53125,
+        "y": 695.671875,
+        "width": 75.1875,
+        "height": 44,
+        "top": 695.671875,
+        "right": 479.71875,
+        "bottom": 739.671875,
+        "left": 404.53125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-processing",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 483.71875,
+        "y": 695.671875,
+        "width": 134.84375,
+        "height": 44,
+        "top": 695.671875,
+        "right": 618.5625,
+        "bottom": 739.671875,
+        "left": 483.71875
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "live-streaming",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 743.671875,
+        "width": 116.578125,
+        "height": 44,
+        "top": 743.671875,
+        "right": 181.578125,
+        "bottom": 787.671875,
+        "left": 65
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-encoding",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 185.578125,
+        "y": 743.671875,
+        "width": 124.71875,
+        "height": 44,
+        "top": 743.671875,
+        "right": 310.296875,
+        "bottom": 787.671875,
+        "left": 185.578125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "hls",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 314.296875,
+        "y": 743.671875,
+        "width": 50.71875,
+        "height": 44,
+        "top": 743.671875,
+        "right": 365.015625,
+        "bottom": 787.671875,
+        "left": 314.296875
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-player",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 369.015625,
+        "y": 743.671875,
+        "width": 106.625,
+        "height": 44,
+        "top": 743.671875,
+        "right": 475.640625,
+        "bottom": 787.671875,
+        "left": 369.015625
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "encoding",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 479.640625,
+        "y": 743.671875,
+        "width": 87.53125,
+        "height": 44,
+        "top": 743.671875,
+        "right": 567.171875,
+        "bottom": 787.671875,
+        "left": 479.640625
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-technology",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 571.171875,
+        "y": 743.671875,
+        "width": 135.421875,
+        "height": 44,
+        "top": 743.671875,
+        "right": 706.59375,
+        "bottom": 787.671875,
+        "left": 571.171875
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "drm",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 791.671875,
+        "width": 56.875,
+        "height": 44,
+        "top": 791.671875,
+        "right": 121.875,
+        "bottom": 835.671875,
+        "left": 65
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "standard",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 125.875,
+        "y": 791.671875,
+        "width": 84.703125,
+        "height": 44,
+        "top": 791.671875,
+        "right": 210.578125,
+        "bottom": 835.671875,
+        "left": 125.875
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "webassembly",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 214.578125,
+        "y": 791.671875,
+        "width": 113.203125,
+        "height": 44,
+        "top": 791.671875,
+        "right": 327.78125,
+        "bottom": 835.671875,
+        "left": 214.578125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "webrtc",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 331.78125,
+        "y": 791.671875,
+        "width": 73.953125,
+        "height": 44,
+        "top": 791.671875,
+        "right": 405.734375,
+        "bottom": 835.671875,
+        "left": 331.78125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "android",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 409.734375,
+        "y": 791.671875,
+        "width": 77.5625,
+        "height": 44,
+        "top": 791.671875,
+        "right": 487.296875,
+        "bottom": 835.671875,
+        "left": 409.734375
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "cross-platform",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 491.296875,
+        "y": 791.671875,
+        "width": 119.015625,
+        "height": 44,
+        "top": 791.671875,
+        "right": 610.3125,
+        "bottom": 835.671875,
+        "left": 491.296875
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "video-editing",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 839.671875,
+        "width": 110.4375,
+        "height": 44,
+        "top": 839.671875,
+        "right": 175.4375,
+        "bottom": 883.671875,
+        "left": 65
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "sdk",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 179.4375,
+        "y": 839.671875,
+        "width": 54.59375,
+        "height": 44,
+        "top": 839.671875,
+        "right": 234.03125,
+        "bottom": 883.671875,
+        "left": 179.4375
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "transcoding",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 238.03125,
+        "y": 839.671875,
+        "width": 102.4375,
+        "height": 44,
+        "top": 839.671875,
+        "right": 340.46875,
+        "bottom": 883.671875,
+        "left": 238.03125
+      },
+      "class": "btn ghost text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "Show all 1617 tags",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 344.46875,
+        "y": 839.671875,
+        "width": 121.65625,
+        "height": 44,
+        "top": 839.671875,
+        "right": 466.125,
+        "bottom": 883.671875,
+        "left": 344.46875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] min-h-10 px-2 text-xs max-lg:min-h-11",
+      "disabled": false
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 65,
+        "y": 881.671875,
+        "width": 172.484375,
+        "height": 44,
+        "top": 881.671875,
+        "right": 237.484375,
+        "bottom": 925.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "AOSP and AAOS Meetup Archive\n(opens in new tab)",
+      "role": "A",
+      "href": "https://aospandaaos.github.io/meetup.html",
+      "rect": {
+        "x": 65,
+        "y": 965.671875,
+        "width": 239.59375,
+        "height": 44,
+        "top": 965.671875,
+        "right": 304.59375,
+        "bottom": 1009.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Apple Developer Forums - Media Technologies\n(opens in new tab)",
+      "role": "A",
+      "href": "https://developer.apple.com/forums/topics/media-technologies/streaming",
+      "rect": {
+        "x": 65,
+        "y": 1033.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1033.671875,
+        "right": 364,
+        "bottom": 1077.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Atlanta Tech Resources\n(opens in new tab)",
+      "role": "A",
+      "href": "https://github.com/citizen00147/atlanta-tech-resources",
+      "rect": {
+        "x": 65,
+        "y": 1101.671875,
+        "width": 177.8125,
+        "height": 44,
+        "top": 1101.671875,
+        "right": 242.8125,
+        "bottom": 1145.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Community & Events",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 1201.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1201.671875,
+        "right": 364,
+        "bottom": 1245.671875,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 430,
+        "y": 881.671875,
+        "width": 161.390625,
+        "height": 44,
+        "top": 881.671875,
+        "right": 591.390625,
+        "bottom": 925.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "Adobe Media Encoder\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.adobe.com/products/media-encoder.html",
+      "rect": {
+        "x": 430,
+        "y": 965.671875,
+        "width": 168.109375,
+        "height": 44,
+        "top": 965.671875,
+        "right": 598.109375,
+        "bottom": 1009.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Alliance for Open Media (AOMedia)\n(opens in new tab)",
+      "role": "A",
+      "href": "https://aomedia.org/",
+      "rect": {
+        "x": 430,
+        "y": 1033.671875,
+        "width": 255.671875,
+        "height": 44,
+        "top": 1033.671875,
+        "right": 685.671875,
+        "bottom": 1077.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "AMD Advanced Media Acceleration (AMA) SDK\n(opens in new tab)",
+      "role": "A",
+      "href": "https://amd.github.io/ama-sdk/latest/git_hub.html",
+      "rect": {
+        "x": 430,
+        "y": 1101.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1101.671875,
+        "right": 729,
+        "bottom": 1145.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Encoding & Codecs",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 430,
+        "y": 1201.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1201.671875,
+        "right": 729,
+        "bottom": 1245.671875,
+        "left": 430
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 65,
+        "y": 1311.671875,
+        "width": 113.5,
+        "height": 44,
+        "top": 1311.671875,
+        "right": 178.5,
+        "bottom": 1355.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "AutoVideo\n(opens in new tab)",
+      "role": "A",
+      "href": "https://github.com/datamllab/autovideo",
+      "rect": {
+        "x": 65,
+        "y": 1395.671875,
+        "width": 89.46875,
+        "height": 44,
+        "top": 1395.671875,
+        "right": 154.46875,
+        "bottom": 1439.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "AviSynth\n(opens in new tab)",
+      "role": "A",
+      "href": "https://github.com/AviSynth/AviSynthPlus",
+      "rect": {
+        "x": 65,
+        "y": 1463.671875,
+        "width": 79.265625,
+        "height": 44,
+        "top": 1463.671875,
+        "right": 144.265625,
+        "bottom": 1507.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "AWS SPEKE Reference Server\n(opens in new tab)",
+      "role": "A",
+      "href": "https://github.com/awslabs/speke-reference-server",
+      "rect": {
+        "x": 65,
+        "y": 1531.671875,
+        "width": 220.515625,
+        "height": 44,
+        "top": 1531.671875,
+        "right": 285.515625,
+        "bottom": 1575.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: General Tools",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 1631.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1631.671875,
+        "right": 364,
+        "bottom": 1675.671875,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 430,
+        "y": 1311.671875,
+        "width": 201.6875,
+        "height": 44,
+        "top": 1311.671875,
+        "right": 631.6875,
+        "bottom": 1355.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "Amazon CloudFront Streaming Tutorials\n(opens in new tab)",
+      "role": "A",
+      "href": "https://aws.amazon.com/cloudfront/streaming/",
+      "rect": {
+        "x": 430,
+        "y": 1395.671875,
+        "width": 285.984375,
+        "height": 44,
+        "top": 1395.671875,
+        "right": 715.984375,
+        "bottom": 1439.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Ant Media Server\n(opens in new tab)",
+      "role": "A",
+      "href": "https://antmedia.io/",
+      "rect": {
+        "x": 430,
+        "y": 1463.671875,
+        "width": 136.015625,
+        "height": 44,
+        "top": 1463.671875,
+        "right": 566.015625,
+        "bottom": 1507.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Apache Traffic Control\n(opens in new tab)",
+      "role": "A",
+      "href": "https://trafficcontrol.apache.org/",
+      "rect": {
+        "x": 430,
+        "y": 1531.671875,
+        "width": 171.25,
+        "height": 44,
+        "top": 1531.671875,
+        "right": 601.25,
+        "bottom": 1575.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Infrastructure & Delivery",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 430,
+        "y": 1631.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1631.671875,
+        "right": 729,
+        "bottom": 1675.671875,
+        "left": 430
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 65,
+        "y": 1741.671875,
+        "width": 130.515625,
+        "height": 44,
+        "top": 1741.671875,
+        "right": 195.515625,
+        "bottom": 1785.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "A Brief History of Video Coding\n(opens in new tab)",
+      "role": "A",
+      "href": "https://docslib.org/doc/10606874/a-brief-history-of-video-coding",
+      "rect": {
+        "x": 65,
+        "y": 1825.671875,
+        "width": 229.1875,
+        "height": 44,
+        "top": 1825.671875,
+        "right": 294.1875,
+        "bottom": 1869.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "A Brief History of Video Compression Standards: 1929 to 2020\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html",
+      "rect": {
+        "x": 65,
+        "y": 1893.671875,
+        "width": 299,
+        "height": 44,
+        "top": 1893.671875,
+        "right": 364,
+        "bottom": 1937.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App\n(opens in new tab)",
+      "role": "A",
+      "href": "https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915",
+      "rect": {
+        "x": 65,
+        "y": 1961.671875,
+        "width": 299,
+        "height": 60,
+        "top": 1961.671875,
+        "right": 364,
+        "bottom": 2021.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Intro & Learning",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 2077.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2077.671875,
+        "right": 364,
+        "bottom": 2121.671875,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 430,
+        "y": 1741.671875,
+        "width": 100.109375,
+        "height": 44,
+        "top": 1741.671875,
+        "right": 530.109375,
+        "bottom": 1785.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "3DLUT Creator\n(opens in new tab)",
+      "role": "A",
+      "href": "https://3dlutcreator.com/",
+      "rect": {
+        "x": 430,
+        "y": 1825.671875,
+        "width": 120.265625,
+        "height": 44,
+        "top": 1825.671875,
+        "right": 550.265625,
+        "bottom": 1869.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "4K Media\n(opens in new tab)",
+      "role": "A",
+      "href": "https://4kmedia.org/",
+      "rect": {
+        "x": 430,
+        "y": 1893.671875,
+        "width": 83.6875,
+        "height": 44,
+        "top": 1893.671875,
+        "right": 513.6875,
+        "bottom": 1937.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Ad Insertion Sample\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.intel.com/content/www/us/en/developer/articles/technical/ad-insertion-sample-powered-by-open-visual-cloud.html",
+      "rect": {
+        "x": 430,
+        "y": 1961.671875,
+        "width": 154.59375,
+        "height": 44,
+        "top": 1961.671875,
+        "right": 584.59375,
+        "bottom": 2005.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Media Tools",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 430,
+        "y": 2061.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2061.671875,
+        "right": 729,
+        "bottom": 2105.671875,
+        "left": 430
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 65,
+        "y": 2187.671875,
+        "width": 138.078125,
+        "height": 44,
+        "top": 2187.671875,
+        "right": 203.078125,
+        "bottom": 2231.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "Advantech Video Solutions\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.advantech.com/en-us/solutions/video-solution",
+      "rect": {
+        "x": 65,
+        "y": 2271.671875,
+        "width": 200.65625,
+        "height": 44,
+        "top": 2271.671875,
+        "right": 265.65625,
+        "bottom": 2315.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Agora Video SDK for Android\n(opens in new tab)",
+      "role": "A",
+      "href": "https://docs.agora.io/en/interactive-live-streaming/get-started/compile-run-sample-project",
+      "rect": {
+        "x": 65,
+        "y": 2339.671875,
+        "width": 214.34375,
+        "height": 44,
+        "top": 2339.671875,
+        "right": 279.34375,
+        "bottom": 2383.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Agora.io Live Streaming SDK\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.agora.io/en/products/interactive-live-streaming/",
+      "rect": {
+        "x": 65,
+        "y": 2407.671875,
+        "width": 212.203125,
+        "height": 44,
+        "top": 2407.671875,
+        "right": 277.203125,
+        "bottom": 2451.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Players & Clients",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 2507.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2507.671875,
+        "right": 364,
+        "bottom": 2551.671875,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 430,
+        "y": 2187.671875,
+        "width": 179.15625,
+        "height": 44,
+        "top": 2187.671875,
+        "right": 609.15625,
+        "bottom": 2231.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls",
+      "rect": {
+        "x": 430,
+        "y": 2271.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2271.671875,
+        "right": 729,
+        "bottom": 2315.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Ad Creative Signaling in DASH and HLS\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/",
+      "rect": {
+        "x": 430,
+        "y": 2339.671875,
+        "width": 281.890625,
+        "height": 44,
+        "top": 2339.671875,
+        "right": 711.890625,
+        "bottom": 2383.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Adaptive Streaming\n(opens in new tab)",
+      "role": "A",
+      "href": "https://github.com/moorthy-g/adaptive-streaming",
+      "rect": {
+        "x": 430,
+        "y": 2407.671875,
+        "width": 151.40625,
+        "height": 44,
+        "top": 2407.671875,
+        "right": 581.40625,
+        "bottom": 2451.671875,
+        "left": 430
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Protocols & Transport",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 430,
+        "y": 2507.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2507.671875,
+        "right": 729,
+        "bottom": 2551.671875,
+        "left": 430
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 65,
+        "y": 2617.671875,
+        "width": 173.46875,
+        "height": 44,
+        "top": 2617.671875,
+        "right": 238.46875,
+        "bottom": 2661.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+    },
+    {
+      "name": "Academy Color Encoding System (ACES)\n(opens in new tab)",
+      "role": "A",
+      "href": "https://acescentral.com/",
+      "rect": {
+        "x": 65,
+        "y": 2701.671875,
+        "width": 294.28125,
+        "height": 44,
+        "top": 2701.671875,
+        "right": 359.28125,
+        "bottom": 2745.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Advanced Television Systems Committee (ATSC)\n(opens in new tab)",
+      "role": "A",
+      "href": "https://www.atsc.org/",
+      "rect": {
+        "x": 65,
+        "y": 2769.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2769.671875,
+        "right": 364,
+        "bottom": 2813.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10\n(opens in new tab)",
+      "role": "A",
+      "href": "https://en.wikipedia.org/wiki/Advanced_Video_Coding",
+      "rect": {
+        "x": 65,
+        "y": 2837.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2837.671875,
+        "right": 364,
+        "bottom": 2881.671875,
+        "left": 65
+      },
+      "class": "inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
+    },
+    {
+      "name": "Explore Category: Standards & Industry",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 65,
+        "y": 2937.671875,
+        "width": 299,
+        "height": 44,
+        "top": 2937.671875,
+        "right": 364,
+        "bottom": 2981.671875,
+        "left": 65
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 flex-1",
+      "disabled": false
+    },
+    {
+      "name": "Browse All Resources",
+      "role": "A",
+      "href": "/categories",
+      "rect": {
+        "x": 231.359375,
+        "y": 3156.453125,
+        "width": 170.015625,
+        "height": 44,
+        "top": 3156.453125,
+        "right": 401.375,
+        "bottom": 3200.453125,
+        "left": 231.359375
+      },
+      "class": "discovery-tools-cta-primary"
+    },
+    {
+      "name": "Explore Categories",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 409.375,
+        "y": 3156.453125,
+        "width": 153.25,
+        "height": 44,
+        "top": 3156.453125,
+        "right": 562.625,
+        "bottom": 3200.453125,
+        "left": 409.375
+      },
+      "class": "discovery-tools-cta-secondary"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 3430.453125,
+        "width": 195.046875,
+        "height": 44,
+        "top": 3430.453125,
+        "right": 235.046875,
+        "bottom": 3474.453125,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 3607.234375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3607.234375,
+        "right": 505.328125,
+        "bottom": 3651.234375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 3636.046875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3636.046875,
+        "right": 505.328125,
+        "bottom": 3680.046875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3664.859375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3664.859375,
+        "right": 505.328125,
+        "bottom": 3708.859375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 3693.671875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3693.671875,
+        "right": 505.328125,
+        "bottom": 3737.671875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 3722.484375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3722.484375,
+        "right": 505.328125,
+        "bottom": 3766.484375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3751.296875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3751.296875,
+        "right": 505.328125,
+        "bottom": 3795.296875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 3780.109375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3780.109375,
+        "right": 505.328125,
+        "bottom": 3824.109375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 3808.921875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3808.921875,
+        "right": 505.328125,
+        "bottom": 3852.921875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 3837.734375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3837.734375,
+        "right": 505.328125,
+        "bottom": 3881.734375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 3618.828125,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 3618.828125,
+        "right": 754,
+        "bottom": 3679.203125,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 3691.203125,
+        "width": 73,
+        "height": 24,
+        "top": 3691.203125,
+        "right": 688.6875,
+        "bottom": 3715.203125,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 3745.59375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3745.59375,
+        "right": 754,
+        "bottom": 3789.59375,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 3963.140625,
+        "width": 44,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 84,
+        "bottom": 4007.140625,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 3963.140625,
+        "width": 44,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 142,
+        "bottom": 4007.140625,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 3963.140625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 204.515625,
+        "bottom": 4007.140625,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 3963.140625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 267.03125,
+        "bottom": 4007.140625,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 3963.140625,
+        "width": 103.953125,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 384.984375,
+        "bottom": 4007.140625,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 3963.140625,
+        "width": 55.46875,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 454.453125,
+        "bottom": 4007.140625,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 3963.140625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3963.140625,
+        "right": 516.96875,
+        "bottom": 4007.140625,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

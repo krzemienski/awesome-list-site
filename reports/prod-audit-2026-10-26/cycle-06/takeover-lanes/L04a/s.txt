@@ -1,0 +1,8 @@
+- heading "Edit display name" [level=2, ref=e1]
+- LabelText "First name" [ref=e5] clickable [cursor:pointer]
+- textbox "First name" [ref=e6]: Admin
+- LabelText "Last name" [ref=e7] clickable [cursor:pointer]
+- textbox "Last name" [ref=e8]: User
+- button "Cancel" [ref=e3]
+- button "Save" [ref=e4]
+- button "Close" [ref=e2]

@@ -1,0 +1,479 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Users" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - button "Scroll tabs left" [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+                - tablist "Admin sections" [ref=e66]:
+                  - tab "Overview" [ref=e67] [cursor=pointer]:
+                    - img [ref=e68]
+                    - text: Overview
+                  - tab "Approvals" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Approvals
+                  - tab "Edits" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Researcher
+                  - tab "Export" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Export
+                  - tab "Database" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Database
+                  - tab "Resources" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Resources
+                  - tab "Categories" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: Subcategories
+                  - tab "Users" [selected] [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Users
+                  - tab "GitHub" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Link Health
+                  - tab "Audit" [ref=e112] [cursor=pointer]:
+                    - img [ref=e113]
+                    - text: Audit
+                  - tab "Research" [ref=e114] [cursor=pointer]:
+                    - img [ref=e115]
+                    - text: Research
+              - tabpanel "Users" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e120]:
+                      - heading "Users (133)" [level=2] [ref=e121]
+                      - paragraph [ref=e122]: Admins and contributors
+                    - generic [ref=e123]:
+                      - button "Hide row actions" [expanded] [ref=e124] [cursor=pointer]
+                      - generic [ref=e125]:
+                        - img [ref=e126]
+                        - textbox "Search users by email or name" [ref=e129]:
+                          - /placeholder: Email or name…
+                      - link "Export CSV" [ref=e130] [cursor=pointer]:
+                        - /url: /api/admin/users/export
+                        - img
+                        - text: Export CSV
+                      - button "Invite unavailable" [disabled] [ref=e131]:
+                        - img [ref=e132]
+                        - text: Invite unavailable
+                  - generic [ref=e133]:
+                    - region "Users table, scrollable" [ref=e136]:
+                      - table [ref=e137]:
+                        - rowgroup [ref=e138]:
+                          - row "Sort by Name Sort by Email Sort by Role Sort by Joined Actions" [ref=e139]:
+                            - columnheader "Sort by Name" [ref=e140]:
+                              - button "Sort by Name" [ref=e141] [cursor=pointer]: Name
+                            - columnheader "Sort by Email" [ref=e142]:
+                              - button "Sort by Email" [ref=e143] [cursor=pointer]: Email
+                            - columnheader "Sort by Role" [ref=e144]:
+                              - button "Sort by Role" [ref=e145] [cursor=pointer]: Role
+                            - columnheader "Sort by Joined" [ref=e146]:
+                              - button "Sort by Joined" [ref=e147] [cursor=pointer]: Joined
+                            - columnheader "Actions" [ref=e148]
+                        - rowgroup [ref=e149]:
+                          - row "m•••@gmail.com m•••@gmail.com Reveal email for m•••@gmail.com user Oct 26, 2026 Edit role for m•••@gmail.com Delete user m•••@gmail.com (user_3LEGqO0QvRko1zBVxXYfE5927xu)" [ref=e150]:
+                            - cell "m•••@gmail.com" [ref=e151]:
+                              - generic "m•••@gmail.com" [ref=e153]
+                            - cell "m•••@gmail.com Reveal email for m•••@gmail.com" [ref=e154]:
+                              - generic [ref=e155]:
+                                - generic "m•••@gmail.com" [ref=e156]
+                                - button "Reveal email for m•••@gmail.com" [ref=e157] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e158]:
+                              - generic [ref=e159]: user
+                            - cell "Oct 26, 2026" [ref=e160]
+                            - cell "Edit role for m•••@gmail.com Delete user m•••@gmail.com (user_3LEGqO0QvRko1zBVxXYfE5927xu)" [ref=e161]:
+                              - generic [ref=e162]:
+                                - button "Edit role for m•••@gmail.com" [ref=e163] [cursor=pointer]: Edit
+                                - button "Delete user m•••@gmail.com (user_3LEGqO0QvRko1zBVxXYfE5927xu)" [active] [ref=e164] [cursor=pointer]:
+                                  - img
+                          - row "Oghenejivwe j•••@gmail.com Reveal email for Oghenejivwe user Oct 24, 2026 Edit role for Oghenejivwe Delete user j•••@gmail.com (user_3L9mV9Flj9hP9dCa63qE9jJVtdA)" [ref=e165]:
+                            - cell "Oghenejivwe" [ref=e166]:
+                              - generic "Oghenejivwe" [ref=e168]
+                            - cell "j•••@gmail.com Reveal email for Oghenejivwe" [ref=e169]:
+                              - generic [ref=e170]:
+                                - generic "j•••@gmail.com" [ref=e171]
+                                - button "Reveal email for Oghenejivwe" [ref=e172] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e173]:
+                              - generic [ref=e174]: user
+                            - cell "Oct 24, 2026" [ref=e175]
+                            - cell "Edit role for Oghenejivwe Delete user j•••@gmail.com (user_3L9mV9Flj9hP9dCa63qE9jJVtdA)" [ref=e176]:
+                              - generic [ref=e177]:
+                                - button "Edit role for Oghenejivwe" [ref=e178] [cursor=pointer]: Edit
+                                - button "Delete user j•••@gmail.com (user_3L9mV9Flj9hP9dCa63qE9jJVtdA)" [ref=e179] [cursor=pointer]:
+                                  - img
+                          - row "aarthi priya a•••@gmail.com Reveal email for aarthi priya user Oct 22, 2026 Edit role for aarthi priya Delete user a•••@gmail.com (user_3L2ab5RQ6ADnIsqjtTJjJmu4XvU)" [ref=e180]:
+                            - cell "aarthi priya" [ref=e181]:
+                              - generic "aarthi priya" [ref=e183]
+                            - cell "a•••@gmail.com Reveal email for aarthi priya" [ref=e184]:
+                              - generic [ref=e185]:
+                                - generic "a•••@gmail.com" [ref=e186]
+                                - button "Reveal email for aarthi priya" [ref=e187] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e188]:
+                              - generic [ref=e189]: user
+                            - cell "Oct 22, 2026" [ref=e190]
+                            - cell "Edit role for aarthi priya Delete user a•••@gmail.com (user_3L2ab5RQ6ADnIsqjtTJjJmu4XvU)" [ref=e191]:
+                              - generic [ref=e192]:
+                                - button "Edit role for aarthi priya" [ref=e193] [cursor=pointer]: Edit
+                                - button "Delete user a•••@gmail.com (user_3L2ab5RQ6ADnIsqjtTJjJmu4XvU)" [ref=e194] [cursor=pointer]:
+                                  - img
+                          - row "Frank Brown f•••@gmail.com Reveal email for Frank Brown user Oct 21, 2026 Edit role for Frank Brown Delete user f•••@gmail.com (user_3L0EoZjnsiXJEJ2enKV3XV4ahbt)" [ref=e195]:
+                            - cell "Frank Brown" [ref=e196]:
+                              - generic "Frank Brown" [ref=e198]
+                            - cell "f•••@gmail.com Reveal email for Frank Brown" [ref=e199]:
+                              - generic [ref=e200]:
+                                - generic "f•••@gmail.com" [ref=e201]
+                                - button "Reveal email for Frank Brown" [ref=e202] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e203]:
+                              - generic [ref=e204]: user
+                            - cell "Oct 21, 2026" [ref=e205]
+                            - cell "Edit role for Frank Brown Delete user f•••@gmail.com (user_3L0EoZjnsiXJEJ2enKV3XV4ahbt)" [ref=e206]:
+                              - generic [ref=e207]:
+                                - button "Edit role for Frank Brown" [ref=e208] [cursor=pointer]: Edit
+                                - button "Delete user f•••@gmail.com (user_3L0EoZjnsiXJEJ2enKV3XV4ahbt)" [ref=e209] [cursor=pointer]:
+                                  - img
+                          - row "Sumit Das s•••@gmail.com Reveal email for Sumit Das user Oct 20, 2026 Edit role for Sumit Das Delete user s•••@gmail.com (user_3KxI3Ytnb3tL7DVCToHEDc2ugac)" [ref=e210]:
+                            - cell "Sumit Das" [ref=e211]:
+                              - generic "Sumit Das" [ref=e213]
+                            - cell "s•••@gmail.com Reveal email for Sumit Das" [ref=e214]:
+                              - generic [ref=e215]:
+                                - generic "s•••@gmail.com" [ref=e216]
+                                - button "Reveal email for Sumit Das" [ref=e217] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e218]:
+                              - generic [ref=e219]: user
+                            - cell "Oct 20, 2026" [ref=e220]
+                            - cell "Edit role for Sumit Das Delete user s•••@gmail.com (user_3KxI3Ytnb3tL7DVCToHEDc2ugac)" [ref=e221]:
+                              - generic [ref=e222]:
+                                - button "Edit role for Sumit Das" [ref=e223] [cursor=pointer]: Edit
+                                - button "Delete user s•••@gmail.com (user_3KxI3Ytnb3tL7DVCToHEDc2ugac)" [ref=e224] [cursor=pointer]:
+                                  - img
+                          - row "s1 o•••@gmail.com Reveal email for s1 user Oct 19, 2026 Edit role for s1 Delete user o•••@gmail.com (user_3Kv87FrTPDxQui2IQfnBX2bMGLR)" [ref=e225]:
+                            - cell "s1" [ref=e226]:
+                              - generic "s1" [ref=e228]
+                            - cell "o•••@gmail.com Reveal email for s1" [ref=e229]:
+                              - generic [ref=e230]:
+                                - generic "o•••@gmail.com" [ref=e231]
+                                - button "Reveal email for s1" [ref=e232] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e233]:
+                              - generic [ref=e234]: user
+                            - cell "Oct 19, 2026" [ref=e235]
+                            - cell "Edit role for s1 Delete user o•••@gmail.com (user_3Kv87FrTPDxQui2IQfnBX2bMGLR)" [ref=e236]:
+                              - generic [ref=e237]:
+                                - button "Edit role for s1" [ref=e238] [cursor=pointer]: Edit
+                                - button "Delete user o•••@gmail.com (user_3Kv87FrTPDxQui2IQfnBX2bMGLR)" [ref=e239] [cursor=pointer]:
+                                  - img
+                          - row "Vasilios Vikatos v•••@gmail.com Reveal email for Vasilios Vikatos user Oct 18, 2026 Edit role for Vasilios Vikatos Delete user v•••@gmail.com (user_3Krbuli85NVX3GHaoHKaM6ANpxV)" [ref=e240]:
+                            - cell "Vasilios Vikatos" [ref=e241]:
+                              - generic "Vasilios Vikatos" [ref=e243]
+                            - cell "v•••@gmail.com Reveal email for Vasilios Vikatos" [ref=e244]:
+                              - generic [ref=e245]:
+                                - generic "v•••@gmail.com" [ref=e246]
+                                - button "Reveal email for Vasilios Vikatos" [ref=e247] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e248]:
+                              - generic [ref=e249]: user
+                            - cell "Oct 18, 2026" [ref=e250]
+                            - cell "Edit role for Vasilios Vikatos Delete user v•••@gmail.com (user_3Krbuli85NVX3GHaoHKaM6ANpxV)" [ref=e251]:
+                              - generic [ref=e252]:
+                                - button "Edit role for Vasilios Vikatos" [ref=e253] [cursor=pointer]: Edit
+                                - button "Delete user v•••@gmail.com (user_3Krbuli85NVX3GHaoHKaM6ANpxV)" [ref=e254] [cursor=pointer]:
+                                  - img
+                          - row "Mohamed Fouad d•••@gmail.com Reveal email for Mohamed Fouad user Oct 17, 2026 Edit role for Mohamed Fouad Delete user d•••@gmail.com (user_3KozcQaaBUlegSDyAo9dp6H5F6b)" [ref=e255]:
+                            - cell "Mohamed Fouad" [ref=e256]:
+                              - generic "Mohamed Fouad" [ref=e258]
+                            - cell "d•••@gmail.com Reveal email for Mohamed Fouad" [ref=e259]:
+                              - generic [ref=e260]:
+                                - generic "d•••@gmail.com" [ref=e261]
+                                - button "Reveal email for Mohamed Fouad" [ref=e262] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e263]:
+                              - generic [ref=e264]: user
+                            - cell "Oct 17, 2026" [ref=e265]
+                            - cell "Edit role for Mohamed Fouad Delete user d•••@gmail.com (user_3KozcQaaBUlegSDyAo9dp6H5F6b)" [ref=e266]:
+                              - generic [ref=e267]:
+                                - button "Edit role for Mohamed Fouad" [ref=e268] [cursor=pointer]: Edit
+                                - button "Delete user d•••@gmail.com (user_3KozcQaaBUlegSDyAo9dp6H5F6b)" [ref=e269] [cursor=pointer]:
+                                  - img
+                          - row "SANTHOSH GUNTUPALLI s•••@gmail.com Reveal email for SANTHOSH GUNTUPALLI user Oct 15, 2026 Edit role for SANTHOSH GUNTUPALLI Delete user s•••@gmail.com (user_3KjzFhzdDzKxi36nX2L0fh01g5s)" [ref=e270]:
+                            - cell "SANTHOSH GUNTUPALLI" [ref=e271]:
+                              - generic "SANTHOSH GUNTUPALLI" [ref=e273]
+                            - cell "s•••@gmail.com Reveal email for SANTHOSH GUNTUPALLI" [ref=e274]:
+                              - generic [ref=e275]:
+                                - generic "s•••@gmail.com" [ref=e276]
+                                - button "Reveal email for SANTHOSH GUNTUPALLI" [ref=e277] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e278]:
+                              - generic [ref=e279]: user
+                            - cell "Oct 15, 2026" [ref=e280]
+                            - cell "Edit role for SANTHOSH GUNTUPALLI Delete user s•••@gmail.com (user_3KjzFhzdDzKxi36nX2L0fh01g5s)" [ref=e281]:
+                              - generic [ref=e282]:
+                                - button "Edit role for SANTHOSH GUNTUPALLI" [ref=e283] [cursor=pointer]: Edit
+                                - button "Delete user s•••@gmail.com (user_3KjzFhzdDzKxi36nX2L0fh01g5s)" [ref=e284] [cursor=pointer]:
+                                  - img
+                          - row "canlıdinle c•••@gmail.com Reveal email for canlıdinle user Oct 14, 2026 Edit role for canlıdinle Delete user c•••@gmail.com (user_3KiB6hyE7fUJoTkEHrsRWMuIK4L)" [ref=e285]:
+                            - cell "canlıdinle" [ref=e286]:
+                              - generic "canlıdinle" [ref=e288]
+                            - cell "c•••@gmail.com Reveal email for canlıdinle" [ref=e289]:
+                              - generic [ref=e290]:
+                                - generic "c•••@gmail.com" [ref=e291]
+                                - button "Reveal email for canlıdinle" [ref=e292] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e293]:
+                              - generic [ref=e294]: user
+                            - cell "Oct 14, 2026" [ref=e295]
+                            - cell "Edit role for canlıdinle Delete user c•••@gmail.com (user_3KiB6hyE7fUJoTkEHrsRWMuIK4L)" [ref=e296]:
+                              - generic [ref=e297]:
+                                - button "Edit role for canlıdinle" [ref=e298] [cursor=pointer]: Edit
+                                - button "Delete user c•••@gmail.com (user_3KiB6hyE7fUJoTkEHrsRWMuIK4L)" [ref=e299] [cursor=pointer]:
+                                  - img
+                          - row "James McKillop j•••@gmail.com Reveal email for James McKillop user Oct 11, 2026 Edit role for James McKillop Delete user j•••@gmail.com (user_3KZcI40r9J5AryDOlkMIUua5Mgz)" [ref=e300]:
+                            - cell "James McKillop" [ref=e301]:
+                              - generic "James McKillop" [ref=e303]
+                            - cell "j•••@gmail.com Reveal email for James McKillop" [ref=e304]:
+                              - generic [ref=e305]:
+                                - generic "j•••@gmail.com" [ref=e306]
+                                - button "Reveal email for James McKillop" [ref=e307] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e308]:
+                              - generic [ref=e309]: user
+                            - cell "Oct 11, 2026" [ref=e310]
+                            - cell "Edit role for James McKillop Delete user j•••@gmail.com (user_3KZcI40r9J5AryDOlkMIUua5Mgz)" [ref=e311]:
+                              - generic [ref=e312]:
+                                - button "Edit role for James McKillop" [ref=e313] [cursor=pointer]: Edit
+                                - button "Delete user j•••@gmail.com (user_3KZcI40r9J5AryDOlkMIUua5Mgz)" [ref=e314] [cursor=pointer]:
+                                  - img
+                          - row "Lucas l•••@yandex.com Reveal email for Lucas user Oct 11, 2026 Edit role for Lucas Delete user l•••@yandex.com (user_3KYM4lGk7U6ZYMtBuVZZhcw7WXP)" [ref=e315]:
+                            - cell "Lucas" [ref=e316]:
+                              - generic "Lucas" [ref=e318]
+                            - cell "l•••@yandex.com Reveal email for Lucas" [ref=e319]:
+                              - generic [ref=e320]:
+                                - generic "l•••@yandex.com" [ref=e321]
+                                - button "Reveal email for Lucas" [ref=e322] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e323]:
+                              - generic [ref=e324]: user
+                            - cell "Oct 11, 2026" [ref=e325]
+                            - cell "Edit role for Lucas Delete user l•••@yandex.com (user_3KYM4lGk7U6ZYMtBuVZZhcw7WXP)" [ref=e326]:
+                              - generic [ref=e327]:
+                                - button "Edit role for Lucas" [ref=e328] [cursor=pointer]: Edit
+                                - button "Delete user l•••@yandex.com (user_3KYM4lGk7U6ZYMtBuVZZhcw7WXP)" [ref=e329] [cursor=pointer]:
+                                  - img
+                          - row "Eungoo Jung a•••@gmail.com Reveal email for Eungoo Jung user Oct 10, 2026 Edit role for Eungoo Jung Delete user a•••@gmail.com (user_3KVUurNEKWE6NphuCH5Vwq46rc7)" [ref=e330]:
+                            - cell "Eungoo Jung" [ref=e331]:
+                              - generic "Eungoo Jung" [ref=e333]
+                            - cell "a•••@gmail.com Reveal email for Eungoo Jung" [ref=e334]:
+                              - generic [ref=e335]:
+                                - generic "a•••@gmail.com" [ref=e336]
+                                - button "Reveal email for Eungoo Jung" [ref=e337] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e338]:
+                              - generic [ref=e339]: user
+                            - cell "Oct 10, 2026" [ref=e340]
+                            - cell "Edit role for Eungoo Jung Delete user a•••@gmail.com (user_3KVUurNEKWE6NphuCH5Vwq46rc7)" [ref=e341]:
+                              - generic [ref=e342]:
+                                - button "Edit role for Eungoo Jung" [ref=e343] [cursor=pointer]: Edit
+                                - button "Delete user a•••@gmail.com (user_3KVUurNEKWE6NphuCH5Vwq46rc7)" [ref=e344] [cursor=pointer]:
+                                  - img
+                          - row "Wranker Seo w•••@gmail.com Reveal email for Wranker Seo user Oct 10, 2026 Edit role for Wranker Seo Delete user w•••@gmail.com (user_3KULwHFeysErICPrgd2a9B0p10W)" [ref=e345]:
+                            - cell "Wranker Seo" [ref=e346]:
+                              - generic "Wranker Seo" [ref=e348]
+                            - cell "w•••@gmail.com Reveal email for Wranker Seo" [ref=e349]:
+                              - generic [ref=e350]:
+                                - generic "w•••@gmail.com" [ref=e351]
+                                - button "Reveal email for Wranker Seo" [ref=e352] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e353]:
+                              - generic [ref=e354]: user
+                            - cell "Oct 10, 2026" [ref=e355]
+                            - cell "Edit role for Wranker Seo Delete user w•••@gmail.com (user_3KULwHFeysErICPrgd2a9B0p10W)" [ref=e356]:
+                              - generic [ref=e357]:
+                                - button "Edit role for Wranker Seo" [ref=e358] [cursor=pointer]: Edit
+                                - button "Delete user w•••@gmail.com (user_3KULwHFeysErICPrgd2a9B0p10W)" [ref=e359] [cursor=pointer]:
+                                  - img
+                          - row "s•••@chatgptimage.app s•••@chatgptimage.app Reveal email for s•••@chatgptimage.app user Oct 9, 2026 Edit role for s•••@chatgptimage.app Delete user s•••@chatgptimage.app (user_3KRbuiHE9eTVXFEhgb6btvv81hE)" [ref=e360]:
+                            - cell "s•••@chatgptimage.app" [ref=e361]:
+                              - generic "s•••@chatgptimage.app" [ref=e363]
+                            - cell "s•••@chatgptimage.app Reveal email for s•••@chatgptimage.app" [ref=e364]:
+                              - generic [ref=e365]:
+                                - generic "s•••@chatgptimage.app" [ref=e366]
+                                - button "Reveal email for s•••@chatgptimage.app" [ref=e367] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e368]:
+                              - generic [ref=e369]: user
+                            - cell "Oct 9, 2026" [ref=e370]
+                            - cell "Edit role for s•••@chatgptimage.app Delete user s•••@chatgptimage.app (user_3KRbuiHE9eTVXFEhgb6btvv81hE)" [ref=e371]:
+                              - generic [ref=e372]:
+                                - button "Edit role for s•••@chatgptimage.app" [ref=e373] [cursor=pointer]: Edit
+                                - button "Delete user s•••@chatgptimage.app (user_3KRbuiHE9eTVXFEhgb6btvv81hE)" [ref=e374] [cursor=pointer]:
+                                  - img
+                          - row "scandylau s•••@gmail.com Reveal email for scandylau user Sep 30, 2026 Edit role for scandylau Delete user s•••@gmail.com (user_3K3KuCKCyfJ3R88i1jI7mON5kZC)" [ref=e375]:
+                            - cell "scandylau" [ref=e376]:
+                              - generic "scandylau" [ref=e378]
+                            - cell "s•••@gmail.com Reveal email for scandylau" [ref=e379]:
+                              - generic [ref=e380]:
+                                - generic "s•••@gmail.com" [ref=e381]
+                                - button "Reveal email for scandylau" [ref=e382] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e383]:
+                              - generic [ref=e384]: user
+                            - cell "Sep 30, 2026" [ref=e385]
+                            - cell "Edit role for scandylau Delete user s•••@gmail.com (user_3K3KuCKCyfJ3R88i1jI7mON5kZC)" [ref=e386]:
+                              - generic [ref=e387]:
+                                - button "Edit role for scandylau" [ref=e388] [cursor=pointer]: Edit
+                                - button "Delete user s•••@gmail.com (user_3K3KuCKCyfJ3R88i1jI7mON5kZC)" [ref=e389] [cursor=pointer]:
+                                  - img
+                          - row "CF Audit c•••@awesome.video Reveal email for CF Audit admin Sep 29, 2026 Edit role for CF Audit Delete user c•••@awesome.video (user_3K1RqOtITAqqTqT62nRvvGGks9s)" [ref=e390]:
+                            - cell "CF Audit" [ref=e391]:
+                              - generic "CF Audit" [ref=e393]
+                            - cell "c•••@awesome.video Reveal email for CF Audit" [ref=e394]:
+                              - generic [ref=e395]:
+                                - generic "c•••@awesome.video" [ref=e396]
+                                - button "Reveal email for CF Audit" [ref=e397] [cursor=pointer]:
+                                  - img
+                            - cell "admin" [ref=e398]:
+                              - generic [ref=e399]: admin
+                            - cell "Sep 29, 2026" [ref=e400]
+                            - cell "Edit role for CF Audit Delete user c•••@awesome.video (user_3K1RqOtITAqqTqT62nRvvGGks9s)" [ref=e401]:
+                              - generic [ref=e402]:
+                                - button "Edit role for CF Audit" [ref=e403] [cursor=pointer]: Edit
+                                - button "Delete user c•••@awesome.video (user_3K1RqOtITAqqTqT62nRvvGGks9s)" [ref=e404] [cursor=pointer]:
+                                  - img
+                          - row "Alexander Wagner i•••@alexanderwagnerdev.com Reveal email for Alexander Wagner user Sep 29, 2026 Edit role for Alexander Wagner Delete user i•••@alexanderwagnerdev.com (user_3K0lHREKL1eIPS1pAyY77IQ2t0U)" [ref=e405]:
+                            - cell "Alexander Wagner" [ref=e406]:
+                              - generic "Alexander Wagner" [ref=e408]
+                            - cell "i•••@alexanderwagnerdev.com Reveal email for Alexander Wagner" [ref=e409]:
+                              - generic [ref=e410]:
+                                - generic "i•••@alexanderwagnerdev.com" [ref=e411]
+                                - button "Reveal email for Alexander Wagner" [ref=e412] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e413]:
+                              - generic [ref=e414]: user
+                            - cell "Sep 29, 2026" [ref=e415]
+                            - cell "Edit role for Alexander Wagner Delete user i•••@alexanderwagnerdev.com (user_3K0lHREKL1eIPS1pAyY77IQ2t0U)" [ref=e416]:
+                              - generic [ref=e417]:
+                                - button "Edit role for Alexander Wagner" [ref=e418] [cursor=pointer]: Edit
+                                - button "Delete user i•••@alexanderwagnerdev.com (user_3K0lHREKL1eIPS1pAyY77IQ2t0U)" [ref=e419] [cursor=pointer]:
+                                  - img
+                          - row "Valdo Zichar v•••@gmail.com Reveal email for Valdo Zichar user Sep 28, 2026 Edit role for Valdo Zichar Delete user v•••@gmail.com (user_3JxtEzCys3sTqeuCPOKRxz77vX9)" [ref=e420]:
+                            - cell "Valdo Zichar" [ref=e421]:
+                              - generic "Valdo Zichar" [ref=e423]
+                            - cell "v•••@gmail.com Reveal email for Valdo Zichar" [ref=e424]:
+                              - generic [ref=e425]:
+                                - generic "v•••@gmail.com" [ref=e426]
+                                - button "Reveal email for Valdo Zichar" [ref=e427] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e428]:
+                              - generic [ref=e429]: user
+                            - cell "Sep 28, 2026" [ref=e430]
+                            - cell "Edit role for Valdo Zichar Delete user v•••@gmail.com (user_3JxtEzCys3sTqeuCPOKRxz77vX9)" [ref=e431]:
+                              - generic [ref=e432]:
+                                - button "Edit role for Valdo Zichar" [ref=e433] [cursor=pointer]: Edit
+                                - button "Delete user v•••@gmail.com (user_3JxtEzCys3sTqeuCPOKRxz77vX9)" [ref=e434] [cursor=pointer]:
+                                  - img
+                          - row "Luiz Alves s•••@gmail.com Reveal email for Luiz Alves user Sep 26, 2026 Edit role for Luiz Alves Delete user s•••@gmail.com (user_3JtViuTASKIEBwkE3z3pnuuvseF)" [ref=e435]:
+                            - cell "Luiz Alves" [ref=e436]:
+                              - generic "Luiz Alves" [ref=e438]
+                            - cell "s•••@gmail.com Reveal email for Luiz Alves" [ref=e439]:
+                              - generic [ref=e440]:
+                                - generic "s•••@gmail.com" [ref=e441]
+                                - button "Reveal email for Luiz Alves" [ref=e442] [cursor=pointer]:
+                                  - img
+                            - cell "user" [ref=e443]:
+                              - generic [ref=e444]: user
+                            - cell "Sep 26, 2026" [ref=e445]
+                            - cell "Edit role for Luiz Alves Delete user s•••@gmail.com (user_3JtViuTASKIEBwkE3z3pnuuvseF)" [ref=e446]:
+                              - generic [ref=e447]:
+                                - button "Edit role for Luiz Alves" [ref=e448] [cursor=pointer]: Edit
+                                - button "Delete user s•••@gmail.com (user_3JtViuTASKIEBwkE3z3pnuuvseF)" [ref=e449] [cursor=pointer]:
+                                  - img
+                    - generic [ref=e450]:
+                      - generic [ref=e451]: Page 1 of 7
+                      - generic [ref=e452]:
+                        - button "Previous page" [disabled]:
+                          - img
+                        - button "Next page" [ref=e453] [cursor=pointer]:
+                          - img

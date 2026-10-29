@@ -1,0 +1,285 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Settings" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - link "Back" [ref=e39] [cursor=pointer]:
+                  - /url: /
+                  - img [ref=e40]
+                  - text: Back
+                - heading "Settings" [level=1] [ref=e42]
+                - paragraph [ref=e43]: Manage your preferences and account. Pick a section below.
+              - generic [ref=e44]:
+                - link [ref=e45] [cursor=pointer]:
+                  - /url: /settings/theme
+                  - article [ref=e46]:
+                    - img [ref=e47]
+                    - generic [ref=e53]:
+                      - generic [ref=e54]:
+                        - heading "Appearance" [level=2] [ref=e55]
+                        - img [ref=e56]
+                      - paragraph [ref=e58]: Switch design system, accent color, and font.
+                - link [ref=e59] [cursor=pointer]:
+                  - /url: /profile
+                  - article [ref=e60]:
+                    - img [ref=e61]
+                    - generic [ref=e64]:
+                      - generic [ref=e65]:
+                        - heading "Account" [level=2] [ref=e66]
+                        - img [ref=e67]
+                      - paragraph [ref=e69]: View your profile, submissions, favorites, and progress.
+                - link [ref=e70] [cursor=pointer]:
+                  - /url: /profile?tab=security
+                  - article [ref=e71]:
+                    - img [ref=e72]
+                    - generic [ref=e75]:
+                      - generic [ref=e76]:
+                        - heading "Security" [level=2] [ref=e77]
+                        - img [ref=e78]
+                      - paragraph [ref=e80]: Change your password from the Security tab on your profile.
+                - link [ref=e81] [cursor=pointer]:
+                  - /url: /bookmarks
+                  - article [ref=e82]:
+                    - img [ref=e83]
+                    - generic [ref=e85]:
+                      - generic [ref=e86]:
+                        - heading "Bookmarks" [level=2] [ref=e87]
+                        - img [ref=e88]
+                      - paragraph [ref=e90]: Review the resources you've saved for later.
+                - link [ref=e91] [cursor=pointer]:
+                  - /url: /recommendations
+                  - article [ref=e92]:
+                    - img [ref=e93]
+                    - generic [ref=e95]:
+                      - generic [ref=e96]:
+                        - heading "Recommendations" [level=2] [ref=e97]
+                        - img [ref=e98]
+                      - paragraph [ref=e100]: Personalized resource suggestions based on your interests.
+              - region "Home layout" [ref=e101]:
+                - article [ref=e102]:
+                  - generic [ref=e103]:
+                    - generic [ref=e104]: Home layout
+                    - generic [ref=e105]: Choose the default view you see on the Home page.
+                  - group "Home layout" [ref=e107]:
+                    - generic [ref=e108]: Home layout
+                    - paragraph [ref=e109]: Choose how the home page opens for you.
+                    - radiogroup "Home layout" [ref=e110]:
+                      - generic [ref=e111] [cursor=pointer]:
+                        - radio "Index The full catalog, organized for browsing." [checked] [ref=e112]:
+                          - img [ref=e114]
+                        - generic [ref=e116]:
+                          - generic [ref=e117]: Index
+                          - generic [ref=e118]: The full catalog, organized for browsing.
+                      - generic [ref=e119] [cursor=pointer]:
+                        - radio "Curated A focused home feed with recent and featured picks." [ref=e120]
+                        - generic [ref=e121]:
+                          - generic [ref=e122]: Curated
+                          - generic [ref=e123]: A focused home feed with recent and featured picks.
+              - region "Learning preferences" [ref=e124]:
+                - article [ref=e125]:
+                  - generic [ref=e126]:
+                    - generic [ref=e127]:
+                      - img [ref=e128]
+                      - text: Learning preferences
+                    - generic [ref=e129]: Review the same profile used by optional onboarding. These values shape only surfaces explicitly labeled personalized and are not sent to analytics.
+              - region "Notifications" [ref=e134]:
+                - article [ref=e135]:
+                  - generic [ref=e136]:
+                    - generic [ref=e137]:
+                      - img [ref=e138]
+                      - text: Notifications
+                    - generic [ref=e141]: Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in.
+                  - generic [ref=e142]:
+                    - generic [ref=e143]:
+                      - generic [ref=e144] [cursor=pointer]:
+                        - checkbox "Email digest A considered digest, never a stream. Off" [ref=e145]
+                        - img [ref=e147]
+                        - generic [ref=e150]:
+                          - generic [ref=e151]: Email digest
+                          - generic [ref=e152]: A considered digest, never a stream.
+                        - generic [ref=e153]: "Off"
+                      - generic [ref=e154] [cursor=pointer]:
+                        - checkbox "In-app updates A small inbox inside your account. Off" [ref=e155]
+                        - img [ref=e157]
+                        - generic [ref=e160]:
+                          - generic [ref=e161]: In-app updates
+                          - generic [ref=e162]: A small inbox inside your account.
+                        - generic [ref=e163]: "Off"
+                    - generic [ref=e164]:
+                      - img [ref=e165]
+                      - paragraph [ref=e168]: These channels are independent. Delivery content excludes private notes, learning history, and external URLs.
+                    - region "Digest sections" [ref=e169]:
+                      - heading "Digest sections" [level=3] [ref=e170]
+                      - generic [ref=e171]:
+                        - generic [ref=e172]:
+                          - checkbox "New resources" [checked] [ref=e173]
+                          - text: New resources
+                        - generic [ref=e174]:
+                          - checkbox "Watch next" [checked] [ref=e175]
+                          - text: Watch next
+                        - generic [ref=e176]:
+                          - checkbox "Journey steps" [checked] [ref=e177]
+                          - text: Journey steps
+                    - generic [ref=e178]:
+                      - generic [ref=e179]:
+                        - text: Cadence
+                        - combobox "Cadence" [ref=e180] [cursor=pointer]:
+                          - option "Weekly" [selected]
+                          - option "Every 2 weeks"
+                          - option "Monthly"
+                      - generic [ref=e181]:
+                        - text: Time zone
+                        - textbox "Time zone" [invalid] [ref=e182]: Not/AZone
+                        - alert [ref=e183]: Choose a valid IANA time zone.
+                    - generic [ref=e184]:
+                      - button "Pause for 7 days" [ref=e185] [cursor=pointer]:
+                        - img
+                        - text: Pause for 7 days
+                      - button "Unsubscribe all" [disabled] [ref=e186]
+                      - button "Save choices" [active] [ref=e187] [cursor=pointer]
+                    - region "Preview" [ref=e188]:
+                      - generic [ref=e189]:
+                        - generic [ref=e190]:
+                          - heading "Preview" [level=3] [ref=e191]:
+                            - img [ref=e192]
+                            - text: Preview
+                          - paragraph [ref=e195]: This uses the same rules as delivery.
+                        - generic [ref=e196]: 2 items
+                      - generic [ref=e197]:
+                        - link "New for you PyTorchVideoCompression New in Encoding & Codecs" [ref=e198] [cursor=pointer]:
+                          - /url: /resource/190359
+                          - text: New for you
+                          - generic [ref=e199]: PyTorchVideoCompression
+                          - generic [ref=e200]: New in Encoding & Codecs
+                        - link "Continue your journey Live Streaming Fundamentals Next in Advanced Live Streaming Architecture" [ref=e201] [cursor=pointer]:
+                          - /url: /journey/9#step-1
+                          - text: Continue your journey
+                          - generic [ref=e202]: Live Streaming Fundamentals
+                          - generic [ref=e203]: Next in Advanced Live Streaming Architecture
+        - contentinfo [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - paragraph [ref=e207]: ── INDEX
+              - link "awesome.video home" [ref=e208] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e209]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e211]:
+              - heading "INDEXED" [level=2] [ref=e212]
+              - paragraph [ref=e213]: 3,826
+              - paragraph [ref=e214]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e215]: live
+            - navigation "Explore categories" [ref=e217]:
+              - heading "EXPLORE" [level=2] [ref=e218]
+              - generic [ref=e219]:
+                - link "Community & Events" [ref=e220] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e221]: ◈
+                  - generic [ref=e222]: Community
+                - link "Encoding & Codecs" [ref=e223] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e224]: ◇
+                  - generic [ref=e225]: Encoding
+                - link "General Tools" [ref=e226] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e227]: ◆
+                  - generic [ref=e228]: General
+                - link "Infrastructure & Delivery" [ref=e229] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e230]: ▣
+                  - generic [ref=e231]: Infrastructure
+                - link "Intro & Learning" [ref=e232] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e233]: ▤
+                  - generic [ref=e234]: Intro
+                - link "Media Tools" [ref=e235] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e236]: ▥
+                  - generic [ref=e237]: Media
+                - link "Players & Clients" [ref=e238] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e239]: ▶
+                  - generic [ref=e240]: Players
+                - link "Protocols & Transport" [ref=e241] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e242]: ⟁
+                  - generic [ref=e243]: Protocols
+                - link "Standards & Industry" [ref=e244] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e245]: ◉
+                  - generic [ref=e246]: Standards
+            - generic [ref=e247]:
+              - heading "SOURCE" [level=2] [ref=e248]
+              - link "krzemienski/awesome-video" [ref=e249] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e250]
+                - generic [ref=e252]:
+                  - text: krzemienski
+                  - generic [ref=e253]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e254]: ↗
+              - paragraph [ref=e255]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e256] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e258] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e259]:
+            - generic [ref=e260]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e261]:
+              - link "About" [ref=e262] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e263] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e264] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e265] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e266] [cursor=pointer]
+              - link "Issues ↗" [ref=e267] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e268] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e269]: built with the awesome-list framework

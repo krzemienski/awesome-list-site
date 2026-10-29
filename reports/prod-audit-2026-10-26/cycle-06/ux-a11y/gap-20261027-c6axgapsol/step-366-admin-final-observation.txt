@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/admin#approvals\",\"online\":true,\"viewport\":[390,844],\"coarse\":true,\"reducedMotion\":false,\"noindex\":\"noindex, nofollow\",\"selected\":\"Approvals\"}"

@@ -1,0 +1,1 @@
+"{\"reduced\":true,\"width\":820,\"scrollBehavior\":\"auto\",\"animations\":[]}"

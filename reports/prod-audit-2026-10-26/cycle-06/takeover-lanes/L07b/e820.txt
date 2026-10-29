@@ -1,0 +1,11 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,827 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Categories" [ref=e10] focusable [tabindex]
+    - navigation "Pagination" [ref=e11]
+- heading "Edit Category" [level=2, ref=e3]
+- LabelText "Name *" [ref=e6] clickable [cursor:pointer]
+- textbox "Name *" [ref=e7]: [QA-audit-1026] L07b A
+- LabelText "Slug *" [ref=e8] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e9]: qa-audit-1026-l07b-a
+- button "Cancel" [ref=e4]
+- button "Save" [ref=e5]
+- button "Close" [ref=e2]

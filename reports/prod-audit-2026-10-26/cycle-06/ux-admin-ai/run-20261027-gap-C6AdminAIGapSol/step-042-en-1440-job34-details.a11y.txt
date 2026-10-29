@@ -1,0 +1,225 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic:
+              - text: Search
+              - generic: 3,826 resources…
+            - generic: ⌘K
+          - navigation:
+            - link:
+              - /url: /categories
+              - text: Browse
+            - link:
+              - /url: /submit
+              - text: Submit
+            - link:
+              - /url: /about
+              - text: About
+            - link:
+              - /url: /design-system
+              - text: Docs ↗
+            - link:
+              - /url: /admin
+              - text: Admin
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab [selected]:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - article:
+                              - generic: Last enriched
+                              - generic: 27h ago
+                              - generic: "batch #34 · 10 resources · cancelled"
+                            - article:
+                              - generic: Queue
+                              - generic: "0"
+                              - generic: idle
+                            - article:
+                              - generic: Avg cost
+                              - generic: $0.03
+                              - generic: per batch
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Enrichment jobs
+                                - paragraph: LLM-driven metadata enhancement
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Run job
+                            - generic:
+                              - region:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: Job
+                                      - columnheader: Status
+                                      - columnheader: Started
+                                      - columnheader: Completed
+                                      - columnheader:
+                                        - generic: Actions
+                                  - rowgroup:
+                                    - row:
+                                      - cell: "#34"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:33:50 AM
+                                      - cell: 10/26/2026, 12:34:47 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#33"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:30:14 AM
+                                      - cell: 10/26/2026, 12:33:13 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#32"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#31"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#30"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:31 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#29"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell:
+                                        - button: Logs
+                              - generic:
+                                - button: Show all 33 jobs
+                        - group:
+                          - generic: Job controls & monitoring
+  - 'dialog "Job Details #34" [ref=e2]':
+    - 'heading "Job Details #34" [level=2] [ref=e4]':
+      - img [ref=e5]
+      - text: "Job Details #34"
+    - button "Close" [active] [ref=e7] [cursor=pointer]:
+      - img [ref=e8]
+      - generic [ref=e11]: Close

@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/tag/hls#related-topics-heading\",\"focus\":\"related-topics-heading\",\"rect\":{\"x\":280,\"y\":80.015625,\"width\":474,\"height\":24.796875,\"top\":80.015625,\"right\":754,\"bottom\":104.8125,\"left\":280},\"outline\":\"rgba(250, 250, 250, 0.62) none 3px\",\"coarse\":true}"

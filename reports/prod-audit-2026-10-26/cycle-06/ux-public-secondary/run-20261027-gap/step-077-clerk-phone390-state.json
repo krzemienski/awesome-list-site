@@ -1,0 +1,23 @@
+{
+  "url": "https://awesome.video/sign-in?redirect_url=%2Frecommendations",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "phone": [
+    {
+      "rect": {
+        "x": 230.6875,
+        "y": 449.921875,
+        "width": 59.3125,
+        "height": 44,
+        "top": 449.921875,
+        "right": 290,
+        "bottom": 493.921875,
+        "left": 230.6875
+      },
+      "html": "<a class=\"cl-formFieldAction cl-formFieldAction__identifier 🔒️ cl-internal-tidb9f\" data-localization-key=\"signIn.start.actionLink__use_phone\" href=\"\">Use phone</a>"
+    }
+  ]
+}

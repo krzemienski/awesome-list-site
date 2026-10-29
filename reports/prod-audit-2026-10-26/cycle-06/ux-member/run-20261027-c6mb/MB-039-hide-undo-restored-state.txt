@@ -1,0 +1,1 @@
+"{\"first\":\"A Comprehensive Review of Software and Hardware Energy Efficiency of Video Decoders\",\"restore\":0,\"count\":10}"

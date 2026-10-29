@@ -1,0 +1,2 @@
+pointer click x=110 y=400 (on the lower half of the "All in Codecs" glyphs, text box 387-401) -> https://awesome.video/sub-subcategory/av1
+after back, link top=372; pointer click y=392 (center) -> https://awesome.video/subcategory/codecs "{\"h1\":\"Codecs\",\"cur\":[\"sub-codecs=page\"],\"err\":\"Codecs — Encoding & Codecs tools & guides — Awesome Video\"}"

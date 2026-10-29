@@ -1,0 +1,15 @@
+- generic
+  - dialog "Edit display name"
+    - heading "Edit display name" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This is the name shown on your profile. Enter at least a first or last name."
+    - form
+      - generic
+        - LabelText [ref=e5] clickable [cursor:pointer]
+        - textbox "First name" [ref=e6]
+      - generic
+        - LabelText [ref=e7] clickable [cursor:pointer]
+        - textbox "Last name" [ref=e8]
+      - button "Cancel" [ref=e3]
+      - button "Save" [ref=e4]
+    - button "Close" [ref=e2]

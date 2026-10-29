@@ -1,0 +1,3 @@
+  - region "Notifications (F8)" [ref=e2]
+  - tabpanel "Users" [ref=e17] focusable [tabindex]
+    - region "Users table, scrollable" [ref=e44] focusable [tabindex]

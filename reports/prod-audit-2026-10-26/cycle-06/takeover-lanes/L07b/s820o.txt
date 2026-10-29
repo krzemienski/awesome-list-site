@@ -1,0 +1,5 @@
+- listbox [ref=e1]
+  - option "10" [ref=e2]
+  - option "25" [ref=e3]
+  - option "50" [ref=e4]
+  - option "100" [selected, ref=e5]

@@ -1,0 +1,14 @@
+- heading "Edit Sub-Subcategory" [level=2, ref=e2]
+- LabelText "Parent Category *" [ref=e3] clickable [cursor:pointer]
+- combobox "Parent Category *" [expanded=false, ref=e4]: [QA-audit-1026] Cáfé gap A
+  - generic "[QA-audit-1026] Cáfé gap A" [ref=e11] clickable [cursor:pointer, onclick]
+- LabelText "Parent Subcategory *" [ref=e5] clickable [cursor:pointer]
+- combobox "Parent Subcategory *" [expanded=false, ref=e6]: [QA-audit-1026] gap SC A
+  - generic "[QA-audit-1026] gap SC A" [ref=e12] clickable [cursor:pointer, onclick]
+- LabelText "Name *" [ref=e13] clickable [cursor:pointer]
+- textbox "Name *" [ref=e14]: [QA-audit-1026] gap SSC A edited
+- LabelText "Slug *" [ref=e7] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e8]: av1
+- button "Cancel" [ref=e9]
+- button "Save" [ref=e10]
+- button "Close" [ref=e1]

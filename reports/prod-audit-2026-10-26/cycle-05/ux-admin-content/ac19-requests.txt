@@ -1,0 +1,5 @@
+[91413.1069] GET https://awesome.video/api/admin/resources?page=7&limit=25&status=approved (Fetch) 200
+[91413.1311] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[91413.1312] GET https://awesome.video/api/admin/resources?page=1&limit=1 (Fetch) 200
+[91413.1313] GET https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true (Fetch) 200
+[91413.1319] GET https://awesome.video/api/admin/resources?page=17&limit=25&status=approved (Fetch) 200

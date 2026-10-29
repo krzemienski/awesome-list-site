@@ -1,0 +1,2 @@
+Error: Error: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+pptr:evaluate;performEvaluation%20(file%3A%2F%2F%2FUsers%2Fnick%2F.npm%2F_npx%2F15c61037b1978c83%2Fnode_modules%2Fchrome-devtools-mcp%2Fbuild%2Fsrc%2Ftools%2Fscript.js%3A235%3A40):3:49

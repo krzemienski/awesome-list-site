@@ -1,0 +1,150 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "GitHub" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e18]
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [selected, ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "GitHub" [ref=e17] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "krzemienski/awesome-video"
+                - paragraph
+                  - StaticText "master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs"
+                - button "Preview import" [ref=e39]
+                - button "Pull" [ref=e40]
+                - button "Sync now" [ref=e41]
+              - generic
+                - sectionheader
+                  - heading "Sync jobs" [level=2, ref=e43]
+                  - paragraph
+                    - StaticText "Last 5 import/export operations"
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID" [ref=e64]
+                      - columnheader "TYPE" [ref=e65]
+                      - columnheader "STATUS" [ref=e66]
+                      - columnheader
+                  - row
+                    - cell "Job #49" [ref=e44]
+                    - cell "Export Jul 20, 2026, 02:42 PM" [ref=e45]
+                      - StaticText "Export"
+                      - StaticText "Jul 20, 2026, 02:42 PM"
+                    - cell "COMPLETED" [ref=e46]
+                    - cell "View logs for export Job #49" [ref=e47]
+                      - button "View logs for export Job #49" [ref=e67]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #48" [ref=e48]
+                    - cell "Export Jul 18, 2026, 03:12 PM" [ref=e49]
+                      - StaticText "Export"
+                      - StaticText "Jul 18, 2026, 03:12 PM"
+                    - cell "COMPLETED" [ref=e50]
+                    - cell "View logs for export Job #48" [ref=e51]
+                      - button "View logs for export Job #48" [ref=e68]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #47" [ref=e52]
+                    - cell "Export Jul 18, 2026, 05:30 AM" [ref=e53]
+                      - StaticText "Export"
+                      - StaticText "Jul 18, 2026, 05:30 AM"
+                    - cell "COMPLETED" [ref=e54]
+                    - cell "View logs for export Job #47" [ref=e55]
+                      - button "View logs for export Job #47" [ref=e69]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #46" [ref=e56]
+                    - cell "Export Jul 17, 2026, 08:54 AM" [ref=e57]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 08:54 AM"
+                    - cell "COMPLETED" [ref=e58]
+                    - cell "View logs for export Job #46" [ref=e59]
+                      - button "View logs for export Job #46" [ref=e70]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #45" [ref=e60]
+                    - cell "Export Jul 17, 2026, 08:32 AM" [ref=e61]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 08:32 AM"
+                    - cell "FAILED" [ref=e62]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #45" [ref=e63]
+                      - button "View logs for export Job #45" [ref=e71]
+                        - StaticText "Logs"
+              - button "More" [expanded=false, ref=e42]

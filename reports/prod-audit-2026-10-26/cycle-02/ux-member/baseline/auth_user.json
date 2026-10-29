@@ -1,0 +1,13 @@
+{
+ "isAuthenticated": true,
+ "user": {
+  "authMethod": "owner_password",
+  "avatar": null,
+  "createdAt": "2025-11-18T16:40:48.993Z",
+  "deletionRequestedAt": null,
+  "email": "<REDACTED>",
+  "id": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+  "name": "Admin User",
+  "role": "admin"
+ }
+}

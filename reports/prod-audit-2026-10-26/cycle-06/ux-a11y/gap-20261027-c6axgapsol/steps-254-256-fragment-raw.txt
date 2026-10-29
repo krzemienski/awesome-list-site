@@ -1,0 +1,224 @@
+✓ Done
+
+✓ HLS Video Resources & Tools — Awesome Video
+  https://awesome.video/tag/hls#missing-c6-fragment
+
+✓ Done
+
+https://awesome.video/tag/hls#missing-c6-fragment
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e5]
+  - link "AWESOME.VIDEO home" [ref=e6]
+  - button "Search 3,826 resources" [ref=e7]
+  - button "Sign in, account menu" [expanded=false, ref=e8]
+  - navigation "Sidebar" [ref=e9]
+  - navigation "Breadcrumb" [ref=e10]
+  - link "Browse" [ref=e11]
+  - button "Search all resources" [ref=e12]
+  - heading "HLS" [level=1, ref=e49]
+  - region "About this collection" [ref=e50]
+  - heading "Resources (64)" [level=2, ref=e13]
+  - article "▣View Details+2 moreOpen LinkMediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (open" [ref=e14] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkTV-Workers (opens in new tab)TV-Workershttps://github.com/frank-vpl/TV-" [ref=e15] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkJW Player (Free Version) (opens in new tab)JW Player (Free Version)http" [ref=e16] clickable [cursor:pointer]
+  - article "▤View Details+3 moreOpen Linkhls.js Low-Latency Playlist Simulator (opens in new tab)hls.js Low-Late" [ref=e17] clickable [cursor:pointer]
+  - article "⟁View Details+4 moreOpen LinkApple Technical Note TN2224 - HLS Best Practices (opens in new tab)Appl" [ref=e18] clickable [cursor:pointer]
+  - article "▤View Details+4 moreOpen LinkFFmpeg Wiki: Streaming Guide (opens in new tab)FFmpeg Wiki: Streaming G" [ref=e19] clickable [cursor:pointer]
+  - article "▶View Details+4 moreOpen LinkShaka Player (opens in new tab)Shaka Playerhttps://github.com/shaka-pro" [ref=e20] clickable [cursor:pointer]
+  - article "▣View Details+4 moreOpen LinkMistServer (opens in new tab)MistServerhttps://mistserver.org/An open s" [ref=e21] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHlsdownloader CLI (opens in new tab)Hlsdownloader CLIhttps://github.com" [ref=e22] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkArch FFmpeg GPAC (opens in new tab)Arch FFmpeg GPAChttps://github.com/m" [ref=e23] clickable [cursor:pointer]
+  - article "▥View Details+2 moreOpen LinkHLS Stream Health Monitoring Tool (opens in new tab)HLS Stream Health M" [ref=e24] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX VOD Module Fmp4 HLS (opens in new tab)NGINX VOD Module Fmp4 HLSht" [ref=e25] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX Audio Track For HLS Module (opens in new tab)NGINX Audio Track Fo" [ref=e26] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Analyzer (opens in new tab)HLS Analyzerhttps://github.com/epiclabs-" [ref=e27] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkURLSessionHLSDownload (opens in new tab)URLSessionHLSDownloadhttps://gi" [ref=e28] clickable [cursor:pointer]
+  - article "⟁View Details+1 moreOpen LinkHlstools (opens in new tab)Hlstoolshttps://github.com/muxinc/hlstoolsTo" [ref=e29] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkIndigo Player (opens in new tab)Indigo Playerhttps://github.com/matvp91" [ref=e30] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHTTP Streaming (opens in new tab)HTTP Streaminghttps://github.com/video" [ref=e31] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Cutsegment (opens in new tab)HLS Cutsegmenthttps://github.com/Eyevi" [ref=e32] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkHLS.js P2P Engine (opens in new tab)HLS.js P2P Enginehttps://github.com" [ref=e33] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkGohls (opens in new tab)Gohlshttps://github.com/shimberger/gohlsA serve" [ref=e34] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkAWS Stale Playlist Detector (opens in new tab)AWS Stale Playlist Detect" [ref=e35] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkManifesto (opens in new tab)Manifestohttps://github.com/gitfu/manifesto" [ref=e36] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkDl (opens in new tab)Dlhttps://github.com/schedules/dlNode.js DASH and" [ref=e37] clickable [cursor:pointer]
+  - navigation "Pagination" [ref=e38]
+  - region "Explore related topics" [ref=e39]
+  - link "awesome.video home" [ref=e40]
+  - heading "INDEXED" [level=2, ref=e41]
+  - navigation "Explore categories" [ref=e42]
+  - heading "SOURCE" [level=2, ref=e43]
+  - link "krzemienski/ awesome-video" [ref=e44]
+  - link "PRs welcome" [ref=e176]
+  - button "Contact maintainers" [ref=e45]
+  - navigation "Site policies" [ref=e46]
+  - button "Back to top" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-254-missing-820.png
+
+✓ HLS Video Resources & Tools — Awesome Video
+  https://awesome.video/tag/hls#%E0%A4%A
+
+✓ Done
+
+https://awesome.video/tag/hls#%E0%A4%A
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e5]
+  - link "AWESOME.VIDEO home" [ref=e6]
+  - button "Search 3,826 resources" [ref=e7]
+  - button "Sign in, account menu" [expanded=false, ref=e8]
+  - navigation "Sidebar" [ref=e9]
+  - navigation "Breadcrumb" [ref=e10]
+  - link "Browse" [ref=e11]
+  - button "Search all resources" [ref=e12]
+  - heading "HLS" [level=1, ref=e49]
+  - region "About this collection" [ref=e50]
+  - heading "Resources (64)" [level=2, ref=e13]
+  - article "▣View Details+2 moreOpen LinkMediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (open" [ref=e14] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkTV-Workers (opens in new tab)TV-Workershttps://github.com/frank-vpl/TV-" [ref=e15] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkJW Player (Free Version) (opens in new tab)JW Player (Free Version)http" [ref=e16] clickable [cursor:pointer]
+  - article "▤View Details+3 moreOpen Linkhls.js Low-Latency Playlist Simulator (opens in new tab)hls.js Low-Late" [ref=e17] clickable [cursor:pointer]
+  - article "⟁View Details+4 moreOpen LinkApple Technical Note TN2224 - HLS Best Practices (opens in new tab)Appl" [ref=e18] clickable [cursor:pointer]
+  - article "▤View Details+4 moreOpen LinkFFmpeg Wiki: Streaming Guide (opens in new tab)FFmpeg Wiki: Streaming G" [ref=e19] clickable [cursor:pointer]
+  - article "▶View Details+4 moreOpen LinkShaka Player (opens in new tab)Shaka Playerhttps://github.com/shaka-pro" [ref=e20] clickable [cursor:pointer]
+  - article "▣View Details+4 moreOpen LinkMistServer (opens in new tab)MistServerhttps://mistserver.org/An open s" [ref=e21] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHlsdownloader CLI (opens in new tab)Hlsdownloader CLIhttps://github.com" [ref=e22] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkArch FFmpeg GPAC (opens in new tab)Arch FFmpeg GPAChttps://github.com/m" [ref=e23] clickable [cursor:pointer]
+  - article "▥View Details+2 moreOpen LinkHLS Stream Health Monitoring Tool (opens in new tab)HLS Stream Health M" [ref=e24] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX VOD Module Fmp4 HLS (opens in new tab)NGINX VOD Module Fmp4 HLSht" [ref=e25] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX Audio Track For HLS Module (opens in new tab)NGINX Audio Track Fo" [ref=e26] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Analyzer (opens in new tab)HLS Analyzerhttps://github.com/epiclabs-" [ref=e27] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkURLSessionHLSDownload (opens in new tab)URLSessionHLSDownloadhttps://gi" [ref=e28] clickable [cursor:pointer]
+  - article "⟁View Details+1 moreOpen LinkHlstools (opens in new tab)Hlstoolshttps://github.com/muxinc/hlstoolsTo" [ref=e29] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkIndigo Player (opens in new tab)Indigo Playerhttps://github.com/matvp91" [ref=e30] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHTTP Streaming (opens in new tab)HTTP Streaminghttps://github.com/video" [ref=e31] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Cutsegment (opens in new tab)HLS Cutsegmenthttps://github.com/Eyevi" [ref=e32] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkHLS.js P2P Engine (opens in new tab)HLS.js P2P Enginehttps://github.com" [ref=e33] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkGohls (opens in new tab)Gohlshttps://github.com/shimberger/gohlsA serve" [ref=e34] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkAWS Stale Playlist Detector (opens in new tab)AWS Stale Playlist Detect" [ref=e35] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkManifesto (opens in new tab)Manifestohttps://github.com/gitfu/manifesto" [ref=e36] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkDl (opens in new tab)Dlhttps://github.com/schedules/dlNode.js DASH and" [ref=e37] clickable [cursor:pointer]
+  - navigation "Pagination" [ref=e38]
+  - region "Explore related topics" [ref=e39]
+  - link "awesome.video home" [ref=e40]
+  - heading "INDEXED" [level=2, ref=e41]
+  - navigation "Explore categories" [ref=e42]
+  - heading "SOURCE" [level=2, ref=e43]
+  - link "krzemienski/ awesome-video" [ref=e44]
+  - link "PRs welcome" [ref=e176]
+  - button "Contact maintainers" [ref=e45]
+  - navigation "Site policies" [ref=e46]
+  - button "Back to top" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-255-malformed-820.png
+
+✓ Done
+
+✓ HLS Video Resources & Tools — Awesome Video
+  https://awesome.video/tag/hls#%E0%A4%A
+
+✓ Done
+
+https://awesome.video/tag/hls#%E0%A4%A
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,826 resources" [ref=e6]
+  - navigation "Primary" [ref=e7]
+  - button "Sign in, account menu" [expanded=false, ref=e8]
+  - navigation "Sidebar" [ref=e13]
+  - navigation "Breadcrumb" [ref=e14]
+  - link "Browse" [ref=e15]
+  - button "Search all resources" [ref=e16]
+  - heading "HLS" [level=1, ref=e54]
+  - region "About this collection" [ref=e55]
+  - heading "Resources (64)" [level=2, ref=e17]
+  - article "▣View Details+2 moreOpen LinkMediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (open" [ref=e18] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkTV-Workers (opens in new tab)TV-Workershttps://github.com/frank-vpl/TV-" [ref=e19] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkJW Player (Free Version) (opens in new tab)JW Player (Free Version)http" [ref=e20] clickable [cursor:pointer]
+  - article "▤View Details+3 moreOpen Linkhls.js Low-Latency Playlist Simulator (opens in new tab)hls.js Low-Late" [ref=e21] clickable [cursor:pointer]
+  - article "⟁View Details+4 moreOpen LinkApple Technical Note TN2224 - HLS Best Practices (opens in new tab)Appl" [ref=e22] clickable [cursor:pointer]
+  - article "▤View Details+4 moreOpen LinkFFmpeg Wiki: Streaming Guide (opens in new tab)FFmpeg Wiki: Streaming G" [ref=e23] clickable [cursor:pointer]
+  - article "▶View Details+4 moreOpen LinkShaka Player (opens in new tab)Shaka Playerhttps://github.com/shaka-pro" [ref=e24] clickable [cursor:pointer]
+  - article "▣View Details+4 moreOpen LinkMistServer (opens in new tab)MistServerhttps://mistserver.org/An open s" [ref=e25] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHlsdownloader CLI (opens in new tab)Hlsdownloader CLIhttps://github.com" [ref=e26] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkArch FFmpeg GPAC (opens in new tab)Arch FFmpeg GPAChttps://github.com/m" [ref=e27] clickable [cursor:pointer]
+  - article "▥View Details+2 moreOpen LinkHLS Stream Health Monitoring Tool (opens in new tab)HLS Stream Health M" [ref=e28] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX VOD Module Fmp4 HLS (opens in new tab)NGINX VOD Module Fmp4 HLSht" [ref=e29] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkNGINX Audio Track For HLS Module (opens in new tab)NGINX Audio Track Fo" [ref=e30] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Analyzer (opens in new tab)HLS Analyzerhttps://github.com/epiclabs-" [ref=e31] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkURLSessionHLSDownload (opens in new tab)URLSessionHLSDownloadhttps://gi" [ref=e32] clickable [cursor:pointer]
+  - article "⟁View Details+1 moreOpen LinkHlstools (opens in new tab)Hlstoolshttps://github.com/muxinc/hlstoolsTo" [ref=e33] clickable [cursor:pointer]
+  - article "▶View Details+3 moreOpen LinkIndigo Player (opens in new tab)Indigo Playerhttps://github.com/matvp91" [ref=e34] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkHTTP Streaming (opens in new tab)HTTP Streaminghttps://github.com/video" [ref=e35] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkHLS Cutsegment (opens in new tab)HLS Cutsegmenthttps://github.com/Eyevi" [ref=e36] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkHLS.js P2P Engine (opens in new tab)HLS.js P2P Enginehttps://github.com" [ref=e37] clickable [cursor:pointer]
+  - article "▣View Details+2 moreOpen LinkGohls (opens in new tab)Gohlshttps://github.com/shimberger/gohlsA serve" [ref=e38] clickable [cursor:pointer]
+  - article "⟁View Details+3 moreOpen LinkAWS Stale Playlist Detector (opens in new tab)AWS Stale Playlist Detect" [ref=e39] clickable [cursor:pointer]
+  - article "◇View Details+2 moreOpen LinkManifesto (opens in new tab)Manifestohttps://github.com/gitfu/manifesto" [ref=e40] clickable [cursor:pointer]
+  - article "⟁View Details+2 moreOpen LinkDl (opens in new tab)Dlhttps://github.com/schedules/dlNode.js DASH and" [ref=e41] clickable [cursor:pointer]
+  - navigation "Pagination" [ref=e42]
+  - region "Explore related topics" [ref=e43]
+  - link "awesome.video home" [ref=e44]
+  - heading "INDEXED" [level=2, ref=e45]
+  - navigation "Explore categories" [ref=e46]
+  - heading "SOURCE" [level=2, ref=e47]
+  - link "krzemienski/ awesome-video" [ref=e48]
+  - link "PRs welcome" [ref=e181]
+  - button "Contact maintainers" [ref=e49]
+  - navigation "Site policies" [ref=e50]
+  - button "Back to top" [ref=e4]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-256-malformed-1440.png
+
+[35343.1620] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1695] GET https://awesome.video/api/config (Fetch) 200
+[35343.1696] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.1702] GET https://awesome.video/api/resources?page=1&limit=24&facets=true (Fetch) 200
+[35343.1714] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1715] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.1792] GET https://awesome.video/api/config (Fetch) 200
+[35343.1793] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.1812] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1813] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.1890] GET https://awesome.video/api/config (Fetch) 200
+[35343.1891] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.1911] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1965] GET https://awesome.video/api/config (Fetch) 200
+[35343.1966] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.1986] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.1987] GET https://awesome.video/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1 (Fetch) 200
+[35343.2073] GET https://awesome.video/api/config (Fetch) 200
+[35343.2074] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2091] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2092] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2169] GET https://awesome.video/api/config (Fetch) 200
+[35343.2170] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2189] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2264] GET https://awesome.video/api/config (Fetch) 200
+[35343.2265] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2273] GET https://awesome.video/api/resources?page=1&limit=24&facets=true&search=ffmpeg (Fetch) 200
+[35343.2314] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2392] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2394] GET https://awesome.video/api/config (Fetch) 200
+[35343.2410] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2411] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2488] GET https://awesome.video/api/config (Fetch) 200
+[35343.2489] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2540] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2619] GET https://awesome.video/api/auth/user (Fetch) 200
+[35343.2621] GET https://awesome.video/api/config (Fetch) 200
+[35343.2628] GET https://awesome.video/api/bookmarks (Fetch) 401
+[35343.2638] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[35343.2639] GET https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true (Fetch) 200
+[35343.2716] GET https://awesome.video/api/config (Fetch) 200
+[35343.2717] GET https://awesome.video/api/auth/user (Fetch) 200
+

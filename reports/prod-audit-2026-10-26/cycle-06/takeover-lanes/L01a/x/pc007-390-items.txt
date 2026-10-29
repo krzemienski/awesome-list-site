@@ -1,0 +1,6 @@
+Profile -> "{\"vw\":390,\"p\":\"/profile\",\"menu\":false,\"h1\":\"Admin User\",\"cur\":[]}"
+Bookmarks -> "{\"vw\":390,\"p\":\"/bookmarks\",\"menu\":false,\"h1\":\"Saved, then finished.\",\"cur\":[]}"
+Notifications -> "{\"vw\":390,\"p\":\"/notifications\",\"menu\":false,\"h1\":\"Notifications\",\"cur\":[]}"
+Settings -> "{\"vw\":390,\"p\":\"/settings\",\"menu\":false,\"h1\":\"Settings\",\"cur\":[]}"
+Theme Settings -> "{\"vw\":390,\"p\":\"/settings/theme\",\"menu\":false,\"h1\":\"Theme Settings\",\"cur\":[]}"
+Admin -> "{\"vw\":390,\"p\":\"/admin\",\"menu\":false,\"h1\":\"Operations dashboard\",\"cur\":[\"Admin=page\"]}"

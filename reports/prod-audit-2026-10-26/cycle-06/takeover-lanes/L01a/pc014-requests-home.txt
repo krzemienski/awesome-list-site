@@ -1,0 +1,5 @@
+   1 GET https://awesome.video/api/auth/user
+   1 GET https://awesome.video/api/config
+/categories: api/awesome-list/nav api/config api/auth/user api/auth/user api/config 
+/category/players-clients: api/awesome-list/nav api/awesome-list/listing?level=category&slug=players-clients&page=1 api/config api/auth/user 
+/about: api/awesome-list/nav api/config api/auth/user api/awesome-list 

@@ -1,0 +1,117 @@
+[
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/contact-submissions?limit=20&offset=0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0&resourceId=190345",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=50&offset=0&resourceId=190345",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=100&offset=0&resourceId=190345",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=200&offset=0&resourceId=190345",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0&resourceId=190345",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=25",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0&resourceId=2147483647",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=50&offset=0&resourceId=2147483647",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=100&offset=0&resourceId=2147483647",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=200&offset=0&resourceId=2147483647",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=0",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/audit-logs?limit=25&offset=25",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  }
+]

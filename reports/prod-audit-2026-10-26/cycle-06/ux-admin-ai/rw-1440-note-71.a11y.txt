@@ -1,0 +1,12 @@
+- generic
+  - dialog "Extended thorough research: find up to 10 real, actively maintained open-source…"
+    - heading "Extended thorough research: find up to 10 real, actively maintained open-source…" [level=2, ref=e1]
+    - paragraph
+      - StaticText "Research job #71 · completed · 9 candidates"
+    - link "Review candidates for job #71" [ref=e2]
+      - StaticText "Review candidates for job #71"
+    - heading "Full research brief" [level=3, ref=e3]
+    - StaticText "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch."
+    - button "Close" [ref=e4]
+      - image
+      - StaticText "Close"

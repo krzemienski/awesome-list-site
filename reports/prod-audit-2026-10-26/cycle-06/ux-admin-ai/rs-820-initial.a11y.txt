@@ -1,0 +1,215 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [selected, ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+            - generic
+              - heading "Run a research task" [level=3, ref=e33]
+              - paragraph
+                - StaticText "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+              - region "Brief" [ref=e34]
+                - heading "Brief" [level=4, ref=e41]
+                - StaticText "Auto-generated at launch"
+                - radiogroup "Research brief" [ref=e42] focusable [tabindex]
+                  - LabelText [ref=e55] clickable [cursor:pointer]
+                    - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked=true, ref=e60]
+                      - image
+                    - StaticText "Auto-generate at launch"
+                    - StaticText "A gap-aware brief built from the catalog and past runs."
+                  - LabelText [ref=e56] clickable [cursor:pointer]
+                    - radio "Write my own Describe what to search for, or start from a generated brief." [checked=false, ref=e61]
+                    - StaticText "Write my own"
+                    - StaticText "Describe what to search for, or start from a generated brief."
+              - region "Focus" [ref=e35]
+                - heading "Focus" [level=4, ref=e43]
+                - StaticText "All categories"
+                - combobox "Category focus" [expanded=false, ref=e44]: All categories
+                  - generic [ref=e57] clickable [cursor:pointer, onclick]
+                    - StaticText "All categories"
+              - region "Limits" [ref=e36]
+                - heading "Limits" [level=4, ref=e45]
+                - StaticText "no target · $3.00 cap · 40 turns"
+                - LabelText [ref=e46] clickable [cursor:pointer]
+                  - StaticText "Stop after (discoveries)"
+                - spinbutton "Stop after (discoveries)" [ref=e47]
+                - paragraph
+                  - StaticText "No target — runs until the budget or turns end."
+                - LabelText [ref=e48] clickable [cursor:pointer]
+                  - StaticText "Budget cap (USD)"
+                - spinbutton "Budget cap (USD)" [ref=e49]: 3
+                  - StaticText "3.00"
+                - paragraph
+                  - StaticText "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."
+                - LabelText [ref=e50] clickable [cursor:pointer]
+                  - StaticText "Max turns"
+                - spinbutton "Max turns" [ref=e51]: 40
+                  - StaticText "40"
+                - paragraph
+                  - StaticText "Positive whole number (blank = no cap)."
+                - paragraph
+                  - StaticText "Past runs cost $0.15–$55.10. Discoveries are deduplicated against the 3,825 catalog resources."
+              - region "Endpoint & model" [ref=e37]
+                - heading "Endpoint & model" [level=4, ref=e52]
+                - StaticText "Server configuration"
+                - button "Override endpoint or models (optional)" [expanded=false, ref=e58]
+                  - StaticText "Override endpoint or models (optional)"
+                  - image
+              - region "About to run on" [ref=e38]
+                - heading "About to run on" [level=4, ref=e53]
+                - DescriptionList
+                  - term "Endpoint"
+                  - definition
+                    - StaticText "router.hack.ski · ANTHROPIC_BASE_URL"
+                  - term "Credential"
+                  - definition
+                    - StaticText "router via ANTHROPIC_BASE_URL"
+                  - term "Orchestrator model"
+                  - definition
+                    - StaticText "cc/claude-opus-5 · ANTHROPIC_MODEL"
+                  - term "Scout model"
+                  - definition
+                    - StaticText "cc/claude-haiku-4-5-20251001 · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL"
+                - button "Launch research run" [ref=e59]
+                  - image
+                  - StaticText "Launch research run"
+              - generic
+                - sectionheader
+                  - heading "Researcher jobs" [level=2, ref=e54]
+                  - paragraph
+                    - StaticText "Latest 5 of 71 research runs"
+                - region "Researcher jobs table, scrollable" [ref=e39] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "STATUS" [ref=e97]
+                        - columnheader "PROMPT" [ref=e98]
+                        - columnheader "FOUND" [ref=e99]
+                        - columnheader "APPROVED / REJECTED" [ref=e100]
+                        - columnheader "COST" [ref=e101]
+                        - columnheader "TURNS" [ref=e102]
+                        - columnheader "CREATED" [ref=e103]
+                    - row
+                      - cell "COMPLETED" [ref=e62]
+                      - cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e63]
+                      - cell "9" [ref=e64]
+                      - cell "0/0" [ref=e65]
+                        - StaticText "0/0"
+                      - cell "$3.3100" [ref=e66]
+                      - cell "41/200" [ref=e67]
+                        - StaticText "41/200"
+                      - cell "Oct 27, 2026" [ref=e68]
+                    - row
+                      - cell "COMPLETED" [ref=e69]
+                      - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e70]
+                      - cell "0" [ref=e71]
+                      - cell "0/0" [ref=e72]
+                        - StaticText "0/0"
+                      - cell "$1.1166" [ref=e73]
+                      - cell "18/80" [ref=e74]
+                        - StaticText "18/80"
+                      - cell "Oct 27, 2026" [ref=e75]
+                    - row
+                      - cell "COMPLETED" [ref=e76]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e77]
+                      - cell "0" [ref=e78]
+                      - cell "0/0" [ref=e79]
+                        - StaticText "0/0"
+                      - cell "$0.4199" [ref=e80]
+                      - cell "10/80" [ref=e81]
+                        - StaticText "10/80"
+                      - cell "Oct 27, 2026" [ref=e82]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e83]
+                      - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e84]
+                      - cell "0" [ref=e85]
+                      - cell "0/0" [ref=e86]
+                        - StaticText "0/0"
+                      - cell "$0.3062" [ref=e87]
+                      - cell "3/10" [ref=e88]
+                        - StaticText "3/10"
+                      - cell "Oct 26, 2026" [ref=e89]
+                    - row
+                      - cell "COMPLETED" [ref=e90]
+                      - cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e91]
+                      - cell "0" [ref=e92]
+                      - cell "0/0" [ref=e93]
+                        - StaticText "0/0"
+                      - cell "$0.1508" [ref=e94]
+                      - cell "1/8" [ref=e95]
+                        - StaticText "1/8"
+                      - cell "Oct 26, 2026" [ref=e96]
+                - button "Show more" [ref=e40]
+              - group
+                - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]

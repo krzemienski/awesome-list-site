@@ -1,0 +1,1 @@
+{"revision":"520d6778369bc7ce495204cfcacc7e0533f941cc","source":"single-read curl https://awesome.video/api/version","auth":"signed-out isolatedContext=c6ps-gap-20261027","umami.disabled":"1","scope":"read-only; no code edits; PS-064 separately owned"}

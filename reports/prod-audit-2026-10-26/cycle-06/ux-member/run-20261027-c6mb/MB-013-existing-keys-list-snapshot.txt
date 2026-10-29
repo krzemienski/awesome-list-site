@@ -1,0 +1,19 @@
+- list
+  - listitem [level=1]
+    - StaticText "[QA-audit-1026] c4 key"
+    - StaticText "REVOKED"
+    - paragraph
+      - StaticText "Created about 5 hours ago · Revoked about 5 hours ago · Never used"
+  - listitem [level=1]
+    - StaticText "__qa_test_578_api_key_1791282860771"
+    - StaticText "REVOKED"
+    - paragraph
+      - StaticText "Created 21 days ago · Revoked 21 days ago · Last used 21 days ago"
+- StaticText "[QA-audit-1026] c4 key"
+- StaticText "REVOKED"
+- paragraph
+  - StaticText "Created about 5 hours ago · Revoked about 5 hours ago · Never used"
+- StaticText "__qa_test_578_api_key_1791282860771"
+- StaticText "REVOKED"
+- paragraph
+  - StaticText "Created 21 days ago · Revoked 21 days ago · Last used 21 days ago"

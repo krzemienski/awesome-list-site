@@ -1,0 +1,103 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list
+    - generic [ref=e3]:
+      - link "Skip to main content" [ref=e4] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e5]:
+        - banner [ref=e6]:
+          - generic [ref=e7]:
+            - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+              - generic [ref=e9]: Toggle sidebar
+            - img
+          - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e11]: av
+            - generic [ref=e12]: AWESOME.VIDEO
+            - generic [ref=e13]: AWESOME.VIDEO home
+          - button "Search resources" [ref=e14] [cursor=pointer]:
+            - img [ref=e15]
+            - generic [ref=e18]: Search resources
+            - generic [ref=e19]: Search
+            - generic [ref=e20]: ⌘K
+          - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+            - img [ref=e23]
+            - generic [ref=e26]: Sign in
+            - generic [ref=e27]: Sign in, account menu
+        - generic [ref=e29]:
+          - main [ref=e30]:
+            - generic [ref=e31]:
+              - navigation "Breadcrumb" [ref=e32]:
+                - list [ref=e33]:
+                  - listitem [ref=e34]:
+                    - link "Home" [ref=e35] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e36]:
+                    - img [ref=e37]
+                  - listitem:
+                    - link "Bookmarks" [disabled]
+              - paragraph [ref=e42]: Loading...
+          - contentinfo [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - paragraph [ref=e46]: ── INDEX
+                - link "awesome.video home" [ref=e47] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e48]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - heading "INDEXED" [level=2] [ref=e51]
+              - navigation "Explore categories" [ref=e52]:
+                - heading "EXPLORE" [level=2] [ref=e53]
+              - generic [ref=e54]:
+                - heading "SOURCE" [level=2] [ref=e55]
+                - link "krzemienski/awesome-video" [ref=e56] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e57]
+                  - generic [ref=e59]:
+                    - text: krzemienski
+                    - generic [ref=e60]:
+                      - text: /
+                      - text: awesome-video
+                  - generic [ref=e61]: ↗
+                - paragraph [ref=e62]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e63] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+            - generic [ref=e64]:
+              - generic [ref=e65]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e66]:
+                - link "About" [ref=e67] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e68] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e69] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e70] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - button "Cookie settings" [ref=e71] [cursor=pointer]
+                - link "Issues ↗" [ref=e72] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e73] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e74]: built with the awesome-list framework
+  - main [ref=e77]:
+    - generic [ref=e78]: Nothing saved on this device
+    - paragraph [ref=e79]: Tap the bookmark icon on any resource to save it — no account needed. Sign in to keep your saves across devices.
+    - heading [level=2] [ref=e80]: Explore
+    - list [ref=e81]:
+      - listitem [ref=e82]:
+        - link [ref=e83] [cursor=pointer]:
+          - /url: /
+          - text: Home — all categories
+      - listitem [ref=e84]:
+        - link [ref=e85] [cursor=pointer]:
+          - /url: /journeys
+          - text: Learning journeys
+      - listitem [ref=e86]:
+        - link [ref=e87] [cursor=pointer]:
+          - /url: /about
+          - text: About

@@ -1,0 +1,1 @@
+"{\"width\":820,\"height\":1180,\"screen\":[800,600],\"coarse\":true,\"touch\":1}"

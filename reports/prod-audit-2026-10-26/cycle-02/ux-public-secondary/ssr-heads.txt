@@ -1,0 +1,248 @@
+== _.html
+ title: None
+ desc : Discover 3825+ curated video development resources — codecs, players, encoders, and streaming tools — across 9 categories on Awesome Video.
+ ogd  : Discover 3825+ curated video development resources — codecs, players, encoders, and streaming tools — across 9 categories on Awesome Video.
+ canon: https://awesome.video/
+ ogurl: https://awesome.video/
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['~/awesome.videoAwesome Video Resources']
+== _about.html
+ title: None
+ desc : Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that 
+ ogd  : Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that 
+ canon: https://awesome.video/about
+ ogurl: https://awesome.video/about
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['A field journal for video engineers']
+== _bookmarks.html
+ title: None
+ desc : Your saved video development resources on Awesome Video.
+ ogd  : Your saved video development resources on Awesome Video.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Nothing saved on this device']
+== _category_nope.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _code-of-conduct.html
+ title: None
+ desc : The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resourc
+ ogd  : The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resourc
+ canon: https://awesome.video/code-of-conduct
+ ogurl: https://awesome.video/code-of-conduct
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['Code of Conduct']
+== _collection_nope.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _collections.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _continue-learning.html
+ title: None
+ desc : Resume journeys, revisit resources, and see learning milestones on Awesome Video.
+ ogd  : Resume journeys, revisit resources, and see learning milestones on Awesome Video.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Your progress lives with your account']
+== _design-system.html
+ title: None
+ desc : The Awesome Video design system — 2 systems × 10 accents, live tokens, type scale, and core components.
+ ogd  : The Awesome Video design system — 2 systems × 10 accents, live tokens, type scale, and core components.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Design System']
+== _journey_8.html
+ title: None
+ desc : Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch…
+ ogd  : Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch…
+ canon: https://awesome.video/journey/8
+ ogurl: https://awesome.video/journey/8
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['FFmpeg Mastery']
+== _journey_999999.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _journeys.html
+ title: None
+ desc : Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines.
+ ogd  : Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines.
+ canon: https://awesome.video/journeys
+ ogurl: https://awesome.video/journeys
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['Learning Journeys']
+== _no-such-page.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _notifications.html
+ title: None
+ desc : None
+ ogd  : None
+ canon: None
+ ogurl: None
+ robot: None
+ h1s  : []
+== _privacy.html
+ title: None
+ desc : How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.
+ ogd  : How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.
+ canon: https://awesome.video/privacy
+ ogurl: https://awesome.video/privacy
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['Privacy Policy']
+== _recommendations.html
+ title: None
+ desc : Personalized video development resource recommendations based on your interests and learning goals.
+ ogd  : Personalized video development resource recommendations based on your interests and learning goals.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Recommended Resources']
+== _resource_999999999.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _resource_abc.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _robots.txt.html
+ title: None
+ desc : None
+ ogd  : None
+ canon: None
+ ogurl: None
+ robot: None
+ h1s  : []
+== _search_page_999_q_ffmpeg.html
+ title: None
+ desc : Search curated video development tools, libraries, players, codecs, and learning resources.
+ ogd  : Search curated video development tools, libraries, players, codecs, and learning resources.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Search']
+== _search_q_c_2B_2B.html
+ title: None
+ desc : Search curated video development tools, libraries, players, codecs, and learning resources.
+ ogd  : Search curated video development tools, libraries, players, codecs, and learning resources.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Search']
+== _search_q_ffmpeg.html
+ title: None
+ desc : Search curated video development tools, libraries, players, codecs, and learning resources.
+ ogd  : Search curated video development tools, libraries, players, codecs, and learning resources.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Search']
+== _search.html
+ title: None
+ desc : Search curated video development tools, libraries, players, codecs, and learning resources.
+ ogd  : Search curated video development tools, libraries, players, codecs, and learning resources.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Search']
+== _settings_theme.html
+ title: None
+ desc : Customize the look and feel of Awesome Video — switch fonts and color themes.
+ ogd  : Customize the look and feel of Awesome Video — switch fonts and color themes.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Theme Settings']
+== _sign-in_admin.html
+ title: None
+ desc : Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey.
+ ogd  : Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Admin sign-in']
+== _sign-in.html
+ title: None
+ desc : Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey.
+ ogd  : Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Welcome back']
+== _sign-up.html
+ title: None
+ desc : Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys.
+ ogd  : Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys.
+ canon: None
+ ogurl: None
+ robot: noindex, nofollow
+ h1s  : ['Create your account']
+== _sitemap.xml.html
+ title: None
+ desc : None
+ ogd  : None
+ canon: None
+ ogurl: None
+ robot: None
+ h1s  : []
+== _submit.html
+ title: None
+ desc : Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.
+ ogd  : Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.
+ canon: https://awesome.video/submit
+ ogurl: https://awesome.video/submit
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['Add to the index']
+== _tag_zzqxv-nope.html
+ title: None
+ desc : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ ogd  : The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.
+ canon: None
+ ogurl: https://awesome.video/
+ robot: noindex, nofollow
+ h1s  : ['Page Not Found']
+== _terms.html
+ title: None
+ desc : The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.
+ ogd  : The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.
+ canon: https://awesome.video/terms
+ ogurl: https://awesome.video/terms
+ robot: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1
+ h1s  : ['Terms of Use']

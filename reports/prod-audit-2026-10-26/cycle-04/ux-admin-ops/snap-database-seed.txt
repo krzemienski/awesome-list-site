@@ -1,0 +1,88 @@
+uid=174_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin/database"
+  uid=174_1 region "Notifications (F8)"
+    uid=174_2 list
+  uid=174_3 link "Skip to main content" url="https://awesome.video/admin/database#main"
+  uid=174_5 banner
+    uid=174_6 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=174_9 button "Search 3,825 resources"
+    uid=174_10 navigation "Primary"
+      uid=174_11 link "Browse" url="https://awesome.video/categories"
+      uid=174_13 link "Submit" url="https://awesome.video/submit"
+      uid=174_15 link "About" url="https://awesome.video/about"
+      uid=174_17 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=174_19 link "Admin" url="https://awesome.video/admin"
+    uid=174_21 button "Admin, account menu" expandable haspopup="menu"
+  uid=174_22 main
+    uid=174_23 navigation "Breadcrumb"
+      uid=174_24 link "Home" url="https://awesome.video/"
+      uid=174_26 link "Admin" url="https://awesome.video/admin"
+      uid=174_28 "Database"
+    uid=174_29 "Authorized admin area"
+    uid=174_30 "ADMIN CONSOLE · "
+    uid=174_31 "ADMIN USER"
+    uid=174_32 heading "Operations dashboard" level="1"
+    uid=174_33 "Manage the "
+    uid=174_34 "3,825"
+    uid=174_35 " resources, jobs, and contributors that keep the index alive."
+    uid=174_36 button "Settings" expandable haspopup="menu"
+    uid=174_37 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=174_38 status atomic live="polite" relevant="additions text"
+    uid=174_39 tablist "Admin sections" orientation="horizontal"
+      uid=174_40 tab "Overview" selectable
+      uid=174_41 tab "Approvals" selectable
+      uid=174_42 tab "Edits" selectable
+      uid=174_43 tab "Enrichment" selectable
+      uid=174_44 tab "Researcher" selectable
+      uid=174_45 tab "Export" selectable
+      uid=174_46 tab "Database" selectable selected
+      uid=174_47 tab "Resources" selectable
+      uid=174_48 tab "Categories" selectable
+      uid=174_49 tab "Subcategories" selectable
+      uid=174_50 tab "Users" selectable
+      uid=174_51 tab "GitHub" selectable
+      uid=174_52 tab "Link Health" selectable
+      uid=174_53 tab "Audit" selectable
+      uid=174_54 tab "Research" selectable
+    uid=174_55 button "Scroll tabs right"
+    uid=174_56 tabpanel "Database"
+      uid=174_57 "TABLES"
+      uid=174_58 "41"
+      uid=174_59 "ROWS"
+      uid=174_60 "72,086"
+      uid=174_61 "DISK"
+      uid=174_62 "65 MB"
+      uid=174_63 "MIGRATIONS"
+      uid=174_64 "34"
+      uid=174_65 "0 pending"
+      uid=174_66 DisclosureTriangle "Database seeding" expandable
+      uid=174_67 heading "Key tables" level="2"
+      uid=174_68 "6 key tables of 41 in the primary PostgreSQL database"
+      uid=174_69 region "Key tables, scrollable"
+        uid=174_70 "NAME"
+        uid=174_71 "ROWS"
+        uid=174_72 "SIZE"
+        uid=174_73 "NEWEST ROW"
+        uid=174_74 "resources"
+        uid=174_75 "4,017"
+        uid=174_76 "28 MB"
+        uid=174_77 "1h ago"
+        uid=174_78 "categories"
+        uid=174_79 "9"
+        uid=174_80 "96 KB"
+        uid=174_81 "69d ago"
+        uid=174_82 "subcategories"
+        uid=174_83 "99"
+        uid=174_84 "88 KB"
+        uid=174_85 "69d ago"
+        uid=174_86 "users"
+        uid=174_87 "133"
+        uid=174_88 "128 KB"
+        uid=174_89 "15h ago"
+        uid=174_90 "resource_audit_log"
+        uid=174_91 "16,784"
+        uid=174_92 "4.3 MB"
+        uid=174_93 "3m ago"
+        uid=174_94 "enrichment_jobs"
+        uid=174_95 "33"
+        uid=174_96 "160 KB"
+        uid=174_97 "21h ago"

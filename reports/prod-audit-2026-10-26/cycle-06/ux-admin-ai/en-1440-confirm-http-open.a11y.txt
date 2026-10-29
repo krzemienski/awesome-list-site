@@ -1,0 +1,14 @@
+- generic
+  - alertdialog "Start enrichment job?"
+    - heading "Start enrichment job?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This starts a Claude AI enrichment run over all resources in batches of 10 on example.com (custom endpoint). The job runs in the background and incurs real API cost. The auth token goes to example.com over plain http, unencrypted."
+    - paragraph
+      - StaticText "It will process "
+      - strong
+        - StaticText "3,825"
+      - StaticText " resources (383 batches of 10), not just one batch."
+    - paragraph
+      - StaticText "Recent runs cost about $0.006 per resource, so this run could cost around $22.33. You can cancel it while it runs."
+    - button "Cancel" [ref=e2]
+    - button "Start enrichment" [ref=e3]

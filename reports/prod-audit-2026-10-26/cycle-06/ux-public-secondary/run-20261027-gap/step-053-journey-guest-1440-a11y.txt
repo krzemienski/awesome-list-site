@@ -1,0 +1,340 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem [ref=e39]:
+                  - link "Learning Journeys" [ref=e40] [cursor=pointer]:
+                    - /url: /journeys
+                - listitem [ref=e41]:
+                  - img [ref=e42]
+                - listitem:
+                  - link "Video Streaming Fundamentals" [disabled]
+            - generic [ref=e44]:
+              - button "Back to Journeys" [ref=e45] [cursor=pointer]:
+                - img
+                - text: Back to Journeys
+              - article [ref=e46]:
+                - generic [ref=e47]:
+                  - generic [ref=e48]:
+                    - img [ref=e49]
+                    - generic [ref=e52]:
+                      - img [ref=e53]
+                      - text: beginner
+                  - heading "Video Streaming Fundamentals" [active] [level=1] [ref=e56]
+                  - generic [ref=e57]: "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+                - generic [ref=e58]:
+                  - generic [ref=e59]:
+                    - generic [ref=e60]:
+                      - img [ref=e61]
+                      - text: 8-10 hours
+                    - generic [ref=e64]: Intro & Learning
+                    - generic [ref=e65]: 6 steps
+                  - note [ref=e66]:
+                    - img [ref=e67]
+                    - generic [ref=e69]:
+                      - text: Please
+                      - link "log in" [ref=e70] [cursor=pointer]:
+                        - /url: /sign-in?redirect_url=%2Fjourney%2F6
+                      - text: to start this journey and track your progress.
+              - generic [ref=e71]:
+                - heading "Learning Path" [level=2] [ref=e72]
+                - article [ref=e73]:
+                  - generic [ref=e75]:
+                    - generic [ref=e76]: "1"
+                    - generic [ref=e77]:
+                      - generic [ref=e79]:
+                        - heading "Introduction to Video Streaming" [level=3] [ref=e80]
+                        - paragraph [ref=e81]: "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen."
+                      - generic [ref=e82]:
+                        - generic [ref=e83]:
+                          - generic [ref=e84]:
+                            - 'link "Video Encoding 101: A Beginner''s Guide to Key Concepts" [ref=e85] [cursor=pointer]':
+                              - /url: /resource/185372
+                              - img [ref=e86]
+                              - 'generic "Video Encoding 101: A Beginner''s Guide to Key Concepts" [ref=e88]'
+                            - 'link "Open Video Encoding 101: A Beginner''s Guide to Key Concepts on its source site (new tab)" [ref=e89] [cursor=pointer]':
+                              - /url: https://www.forasoft.com/blog/article/video-encoding-streaming-quality
+                              - img [ref=e90]
+                          - paragraph [ref=e94]: An introductory guide that explains the fundamental concepts of video encoding, including compression techniques, color encoding, and the differences between various encoding approaches. It's a valuable resource for beginners seeking to understand the basics of video encoding.
+                        - generic [ref=e95]:
+                          - generic [ref=e96]:
+                            - link "Streaming Learning Center's Beginner's Guide to Live Streaming" [ref=e97] [cursor=pointer]:
+                              - /url: /resource/185151
+                              - img [ref=e98]
+                              - generic "Streaming Learning Center's Beginner's Guide to Live Streaming" [ref=e100]
+                            - link "Open Streaming Learning Center's Beginner's Guide to Live Streaming on its source site (new tab)" [ref=e101] [cursor=pointer]:
+                              - /url: https://streaminglearningcenter.com/learning/beginners-guide-to-live-streaming.html
+                              - img [ref=e102]
+                          - paragraph [ref=e106]: A beginner-friendly guide that introduces the basics of live streaming, including equipment setup, encoding, and streaming protocols. This resource is ideal for those new to live streaming and looking to understand the foundational concepts.
+                        - generic [ref=e107]:
+                          - generic [ref=e108]:
+                            - 'link "How To Stream Video: A Beginner''s Guide" [ref=e109] [cursor=pointer]':
+                              - /url: /resource/185380
+                              - img [ref=e110]
+                              - 'generic "How To Stream Video: A Beginner''s Guide" [ref=e112]'
+                            - 'link "Open How To Stream Video: A Beginner''s Guide on its source site (new tab)" [ref=e113] [cursor=pointer]':
+                              - /url: https://web.archive.org/web/20260313011439/https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/
+                              - img [ref=e114]
+                          - paragraph [ref=e118]: A beginner's guide covering the essentials of setting up audio and video sources, choosing streaming destinations, and understanding the basics of live streaming.
+                - article [ref=e119]:
+                  - generic [ref=e121]:
+                    - generic [ref=e122]: "2"
+                    - generic [ref=e123]:
+                      - generic [ref=e125]:
+                        - heading "Understanding Video Codecs" [level=3] [ref=e126]
+                        - paragraph [ref=e127]: Compare H.264, HEVC, VP9 and AV1. Learn why codec choice impacts quality, file size, device support and licensing cost.
+                      - generic [ref=e128]:
+                        - generic [ref=e129]:
+                          - generic [ref=e130]:
+                            - 'link "Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming" [ref=e131] [cursor=pointer]':
+                              - /url: /resource/184943
+                              - img [ref=e132]
+                              - 'generic "Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming" [ref=e134]'
+                            - 'link "Open Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming on its source site (new tab)" [ref=e135] [cursor=pointer]':
+                              - /url: https://flussonic.com/cn/blog/news/evolution-of-video-codecs/
+                              - img [ref=e136]
+                          - paragraph [ref=e140]: "This article explores the history and differences between leading video codecs: H.264, HEVC, and AV1. It provides insights into their development, benefits, and implications for TV/IPTV providers, OTT services, and professional production companies."
+                        - generic [ref=e141]:
+                          - generic [ref=e142]:
+                            - link "Guide to HEVC/H.265 Encoding and Playback" [ref=e143] [cursor=pointer]:
+                              - /url: /resource/185985
+                              - img [ref=e144]
+                              - generic "Guide to HEVC/H.265 Encoding and Playback" [ref=e146]
+                            - link "Open Guide to HEVC/H.265 Encoding and Playback on its source site (new tab)" [ref=e147] [cursor=pointer]:
+                              - /url: https://www.techspot.com/article/1131-hevc-h256-enconding-playback/
+                              - img [ref=e148]
+                          - paragraph [ref=e152]: HEVC's main advantage over H.264 is that it offers roughly double the compression ratio for the same quality. This means that a video file encoded with HEVC can occupy half the space of its H.264 equivalent with no noticeable change in quality, or the same amount of space with improved quality.
+                        - generic [ref=e153]:
+                          - generic [ref=e154]:
+                            - link "AV1 Encoding with libsvtav1 on Qencode" [ref=e155] [cursor=pointer]:
+                              - /url: /resource/190152
+                              - img [ref=e156]
+                              - generic "AV1 Encoding with libsvtav1 on Qencode" [ref=e158]
+                            - link "Open AV1 Encoding with libsvtav1 on Qencode on its source site (new tab)" [ref=e159] [cursor=pointer]:
+                              - /url: https://docs.qencode.com/tutorials/transcoding/codecs/using-av1-codec/
+                              - img [ref=e160]
+                          - paragraph [ref=e164]: "The libsvtav1 encoder (SVT-AV1) is an AV1 implementation tuned for both compression efficiency and parallel performance. This guide covers the preset scale from 0 to 13 and its speed-versus-efficiency trade-off, CRF selection in the 20-40 range, MP4 versus WebM output, and advanced controls including tune, aq_mode, film_grain, fast_decode, enable_dlf, enable_restoration, hierarchical_levels and pred_struct. It gives concrete starting points: preset 3 for archival, preset 8 for fast turnaround, preset 5 with CRF 30-35 for web streaming, and fast_decode when targeting low-power devices such as set-top boxes and budget phones. On why AV1 at all: roughly 30-40% bitrate savings versus H.264 and 20-30% versus HEVC or VP9 at equivalent quality, royalty-free under the Alliance for Open Media, with decode support in Chrome, Firefox and Edge."
+                - article [ref=e165]:
+                  - generic [ref=e167]:
+                    - generic [ref=e168]: "3"
+                    - generic [ref=e169]:
+                      - generic [ref=e171]:
+                        - heading "Streaming Protocols Overview" [level=3] [ref=e172]
+                        - paragraph [ref=e173]: Walk through HLS, DASH, RTMP and WebRTC. Understand which protocol fits live, on-demand and ultra-low-latency use cases.
+                      - generic [ref=e174]:
+                        - generic [ref=e175]:
+                          - generic [ref=e176]:
+                            - 'link "FFmpeg Wiki: Streaming Guide" [ref=e177] [cursor=pointer]':
+                              - /url: /resource/186414
+                              - img [ref=e178]
+                              - 'generic "FFmpeg Wiki: Streaming Guide" [ref=e180]'
+                            - 'link "Open FFmpeg Wiki: Streaming Guide on its source site (new tab)" [ref=e181] [cursor=pointer]':
+                              - /url: https://trac.ffmpeg.org/wiki/StreamingGuide
+                              - img [ref=e182]
+                          - paragraph [ref=e186]: An official Wiki guide from FFmpeg explaining how to set up streaming using FFmpeg, including examples for streaming via RTMP to servers or using FFmpeg as a server for HLS/DASH.
+                        - generic [ref=e187]:
+                          - generic [ref=e188]:
+                            - 'link "Wowza: Streaming Protocols Overview" [ref=e189] [cursor=pointer]':
+                              - /url: /resource/185018
+                              - img [ref=e190]
+                              - 'generic "Wowza: Streaming Protocols Overview" [ref=e192]'
+                            - 'link "Open Wowza: Streaming Protocols Overview on its source site (new tab)" [ref=e193] [cursor=pointer]':
+                              - /url: https://www.wowza.com/blog/streaming-protocols
+                              - img [ref=e194]
+                          - paragraph [ref=e198]: An overview of traditional and emerging video streaming protocols, including RTMP, RTSP, HLS, MPEG-DASH, and WebRTC. The resource discusses the advantages and limitations of each protocol, providing insights into their latency, scalability, and compatibility, which is valuable for developers in the video streaming domain.
+                - article [ref=e199]:
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: "4"
+                    - generic [ref=e203]:
+                      - generic [ref=e205]:
+                        - heading "Players and Playback Basics" [level=3] [ref=e206]
+                        - paragraph [ref=e207]: Explore how HTML5 players, MSE and adaptive bitrate switching deliver smooth playback across devices and network conditions.
+                      - generic [ref=e209]:
+                        - generic [ref=e210]:
+                          - link "RDK Video Guide — AAMP Player and GStreamer Pipeline Debugging" [ref=e211] [cursor=pointer]:
+                            - /url: /resource/188709
+                            - img [ref=e212]
+                            - generic "RDK Video Guide — AAMP Player and GStreamer Pipeline Debugging" [ref=e214]
+                          - link "Open RDK Video Guide — AAMP Player and GStreamer Pipeline Debugging on its source site (new tab)" [ref=e215] [cursor=pointer]:
+                            - /url: https://developer.rdkcentral.com/support/support/articles/rdk-video-guide/
+                            - img [ref=e216]
+                        - paragraph [ref=e220]: Practical RDK guide with AAMP player usage and gst-launch-1.0 pipeline/log debugging examples for set-top video playback issues.
+                - article [ref=e221]:
+                  - generic [ref=e223]:
+                    - generic [ref=e224]: "5"
+                    - generic [ref=e225]:
+                      - generic [ref=e227]:
+                        - heading "Video Formats and Containers" [level=3] [ref=e228]
+                        - paragraph [ref=e229]: Demystify MP4, fMP4, MKV, WebM and TS containers — what they hold, when to use each, and how they pair with codecs.
+                      - generic [ref=e231]:
+                        - generic [ref=e232]:
+                          - link "Web-Demuxer" [ref=e233] [cursor=pointer]:
+                            - /url: /resource/184784
+                            - img [ref=e234]
+                            - generic "Web-Demuxer" [ref=e236]
+                          - link "Open Web-Demuxer on its source site (new tab)" [ref=e237] [cursor=pointer]:
+                            - /url: https://foreversc.github.io/web-demuxer/
+                            - img [ref=e238]
+                        - paragraph [ref=e242]: Web-Demuxer is designed to demux various media formats directly in the browser using WebAssembly. It supports formats like mov, mp4, mkv, webm, flv, m4v, wmv, and avi, providing a friendly API for WebCodecs development.
+                - article [ref=e243]:
+                  - generic [ref=e245]:
+                    - generic [ref=e246]: "6"
+                    - generic [ref=e247]:
+                      - generic [ref=e249]:
+                        - heading "Putting It All Together" [level=3] [ref=e250]
+                        - paragraph [ref=e251]: Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper.
+                      - generic [ref=e252]:
+                        - generic [ref=e253]:
+                          - generic [ref=e254]:
+                            - link "Best Practices for End-to-End Workflow Monitoring" [ref=e255] [cursor=pointer]:
+                              - /url: /resource/186115
+                              - img [ref=e256]
+                              - generic "Best Practices for End-to-End Workflow Monitoring" [ref=e258]
+                            - link "Open Best Practices for End-to-End Workflow Monitoring on its source site (new tab)" [ref=e259] [cursor=pointer]:
+                              - /url: https://www.svta.org/project/best-practices-for-end-to-end-workflow-monitoring/
+                              - img [ref=e260]
+                          - paragraph [ref=e264]: Streaming Video Alliance guidelines for monitoring video workflows from ingest through delivery to end users.
+                        - generic [ref=e265]:
+                          - generic [ref=e266]:
+                            - 'link "Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e267] [cursor=pointer]':
+                              - /url: /resource/189842
+                              - img [ref=e268]
+                              - 'generic "Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale" [ref=e270]'
+                            - 'link "Open Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale on its source site (new tab)" [ref=e271] [cursor=pointer]':
+                              - /url: https://systemdr.systemdrd.com/p/live-streaming-architecture-ingest
+                              - img [ref=e272]
+                          - paragraph [ref=e276]: Independent technical deep dive into segment chunking, manifest generation, ABR client polling logic, and manifest-as-single-point-of-failure design issues.
+                        - generic [ref=e277]:
+                          - generic [ref=e278]:
+                            - link "Rebuilding Netflix Video Processing Pipeline with Microservices" [ref=e279] [cursor=pointer]:
+                              - /url: /resource/186421
+                              - img [ref=e280]
+                              - generic "Rebuilding Netflix Video Processing Pipeline with Microservices" [ref=e282]
+                            - link "Open Rebuilding Netflix Video Processing Pipeline with Microservices on its source site (new tab)" [ref=e283] [cursor=pointer]:
+                              - /url: https://netflixtechblog.com/rebuilding-netflix-video-processing-pipeline-with-microservices-7ed3d6f805bf
+                              - img [ref=e284]
+                          - paragraph [ref=e288]: Netflix Tech Blog post (part of a series) describing how Netflix migrated their video processing pipeline to a microservices architecture to increase agility and scalability.
+        - contentinfo [ref=e289]:
+          - generic [ref=e290]:
+            - generic [ref=e291]:
+              - paragraph [ref=e292]: ── INDEX
+              - link "awesome.video home" [ref=e293] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e294]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e296]:
+              - heading "INDEXED" [level=2] [ref=e297]
+              - paragraph [ref=e298]: 3,825
+              - paragraph [ref=e299]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e300]: live
+            - navigation "Explore categories" [ref=e302]:
+              - heading "EXPLORE" [level=2] [ref=e303]
+              - generic [ref=e304]:
+                - link "Community & Events" [ref=e305] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e306]: ◈
+                  - generic [ref=e307]: Community
+                - link "Encoding & Codecs" [ref=e308] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e309]: ◇
+                  - generic [ref=e310]: Encoding
+                - link "General Tools" [ref=e311] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e312]: ◆
+                  - generic [ref=e313]: General
+                - link "Infrastructure & Delivery" [ref=e314] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e315]: ▣
+                  - generic [ref=e316]: Infrastructure
+                - link "Intro & Learning" [ref=e317] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e318]: ▤
+                  - generic [ref=e319]: Intro
+                - link "Media Tools" [ref=e320] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e321]: ▥
+                  - generic [ref=e322]: Media
+                - link "Players & Clients" [ref=e323] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e324]: ▶
+                  - generic [ref=e325]: Players
+                - link "Protocols & Transport" [ref=e326] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e327]: ⟁
+                  - generic [ref=e328]: Protocols
+                - link "Standards & Industry" [ref=e329] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e330]: ◉
+                  - generic [ref=e331]: Standards
+            - generic [ref=e332]:
+              - heading "SOURCE" [level=2] [ref=e333]
+              - link "krzemienski/awesome-video" [ref=e334] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e335]
+                - generic [ref=e337]:
+                  - text: krzemienski
+                  - generic [ref=e338]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e339]: ↗
+              - paragraph [ref=e340]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e341] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e343] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e344]:
+            - generic [ref=e345]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e346]:
+              - link "About" [ref=e347] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e348] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e349] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e350] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e351] [cursor=pointer]
+              - link "Issues ↗" [ref=e352] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e353] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e354]: built with the awesome-list framework

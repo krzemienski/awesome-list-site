@@ -1,0 +1,9 @@
+Fix C6-PS-064 in awesome-list-site. Work in an isolated /tmp clone from origin/main 520d6778369bc7ce495204cfcacc7e0533f941cc, on branch fix/c6-ps064-form-field-ids. Never edit the stale main checkout and never merge/deploy.
+
+Evidence: production Chrome reports “A form field element should have an id or name attribute.” Search.tsx main search input and SearchFilters.tsx tag-search input have id=null/name=null; Advanced reports seven fields with the same issue. Findings and evidence are in reports/prod-audit-2026-10-26/cycle-06/ux-public-secondary/findings.md and its run-20261027T053110Z-ps directory.
+
+Scout every current Search and Advanced form control, including explorer search/sort/tag filters and export select/options. Add stable, unique, semantically appropriate id and name attributes matching existing label/htmlFor conventions. Do not change behavior, validation, analytics event names, CSS or API contracts. Check for duplicate ids across components mounted together and preserve SSR hydration.
+
+Run tsc --noEmit and npm run build with unpiped exit codes. Drive the real local Search and Advanced UI in Chrome at 1440 and 390, inspect console for the warning and verify labels, focus, input, select and export behavior still work. Do not write test files or validation scripts/harnesses. Save screenshots and accessibility snapshots under reports/prod-audit-2026-10-26/cycle-06/ux-public-secondary/fix-ps064/.
+
+Commit with a conventional fix message, push HEAD to fix/c6-ps064-form-field-ids, open a non-draft PR to main, and return PR number, head SHA, changed files, exact checks and remaining UNVERIFIED items. Never merge.

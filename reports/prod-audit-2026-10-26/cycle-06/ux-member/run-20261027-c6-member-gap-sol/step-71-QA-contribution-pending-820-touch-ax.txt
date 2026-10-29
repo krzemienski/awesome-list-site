@@ -1,0 +1,473 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Your Contributions" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e39]: // Contributor dashboard
+                - generic [ref=e40]:
+                  - generic [ref=e41]:
+                    - heading "Your contributions" [level=1] [ref=e42]
+                    - paragraph [ref=e43]: Follow every resource submission and edit suggestion from review to outcome, then see the impact of accepted work.
+                  - link "Submit a resource" [ref=e44] [cursor=pointer]:
+                    - /url: /submit
+                    - img
+                    - text: Submit a resource
+              - region "Recorded impact" [ref=e45]:
+                - generic [ref=e47]:
+                  - heading "Recorded impact" [level=2] [ref=e48]
+                  - paragraph [ref=e49]: Definitions are shown under every metric.
+                - generic [ref=e50]:
+                  - article [ref=e51]:
+                    - generic [ref=e52]:
+                      - generic [ref=e53]:
+                        - generic [ref=e54]: Accepted contributions
+                        - img [ref=e55]
+                      - paragraph [ref=e58]: "3"
+                      - paragraph [ref=e59]: Resource submissions and edit suggestions that moderators approved.
+                  - article [ref=e60]:
+                    - generic [ref=e61]:
+                      - generic [ref=e62]:
+                        - generic [ref=e63]: Live resources improved
+                        - img [ref=e64]
+                      - paragraph [ref=e66]: "2"
+                      - paragraph [ref=e67]: Currently public resources you submitted or improved with an approved edit. Each resource is counted once.
+                  - article [ref=e68]:
+                    - generic [ref=e69]:
+                      - generic [ref=e70]:
+                        - generic [ref=e71]: Distinct signed-in viewers
+                        - img [ref=e72]
+                      - paragraph [ref=e75]: "3"
+                      - paragraph [ref=e76]: Distinct signed-in accounts with a recorded resource detail view across those currently public resources. Each account is counted once.
+                  - article [ref=e77]:
+                    - generic [ref=e78]:
+                      - generic [ref=e79]:
+                        - generic [ref=e80]: Awaiting review
+                        - img [ref=e81]
+                      - paragraph [ref=e84]: "1"
+                      - paragraph [ref=e85]: Your resource submissions and edit suggestions still pending.
+              - region "Contribution timeline" [ref=e86]:
+                - generic [ref=e87]:
+                  - heading "Contribution timeline" [level=2] [ref=e88]
+                  - paragraph [ref=e89]: This private timeline is visible only to you.
+                - article [ref=e90]:
+                  - generic [ref=e92]:
+                    - generic [ref=e93]:
+                      - img [ref=e94]
+                      - textbox "Search your contributions" [active] [ref=e97]: "[QA-audit-1026] MDN VideoFrame clone audit"
+                    - combobox "Filter by contribution type" [ref=e98] [cursor=pointer]:
+                      - generic: All types
+                      - img [ref=e99]
+                    - combobox "Filter by status" [ref=e101] [cursor=pointer]:
+                      - generic: All statuses
+                      - img [ref=e102]
+                    - combobox "Sort contributions" [ref=e104] [cursor=pointer]:
+                      - generic: Newest activity
+                      - img [ref=e105]
+                - paragraph [ref=e107]: 22 matching contributions
+                - generic [ref=e108]:
+                  - article [ref=e109]:
+                    - generic [ref=e110]:
+                      - generic [ref=e111]:
+                        - img [ref=e113]
+                        - generic [ref=e116]:
+                          - generic [ref=e117]:
+                            - generic [ref=e118]: Resource submission
+                            - generic "Waiting for moderator review." [ref=e119]:
+                              - img [ref=e120]
+                              - text: Pending
+                          - heading "[QA-audit-1026] MDN VideoFrame clone audit" [level=2] [ref=e123]
+                          - generic [ref=e125]: Submitted less than a minute ago
+                      - generic [ref=e126]:
+                        - paragraph [ref=e127]: "[QA-audit-1026] Official MDN reference for VideoFrame.clone(), including returned shared-media frame, InvalidStateError and dedicated-worker availability. Run-owned QA submission for immediate withdrawal."
+                        - link "https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame/clone" [ref=e128] [cursor=pointer]:
+                          - /url: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame/clone
+                          - generic [ref=e129]: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame/clone
+                          - img [ref=e130]
+                        - generic [ref=e134]: Media Tools
+                      - generic [ref=e135]:
+                        - paragraph [ref=e136]: Waiting for moderator review.
+                        - button "Withdraw [QA-audit-1026] MDN VideoFrame clone audit" [ref=e138] [cursor=pointer]:
+                          - img
+                          - text: Withdraw
+                  - article [ref=e139]:
+                    - generic [ref=e140]:
+                      - generic [ref=e141]:
+                        - img [ref=e143]
+                        - generic [ref=e146]:
+                          - generic [ref=e147]:
+                            - generic [ref=e148]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e149]:
+                              - img [ref=e150]
+                              - text: Rejected
+                          - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e154]'
+                          - generic [ref=e155]:
+                            - generic [ref=e156]: Submitted 3 months ago
+                            - generic [ref=e157]: Status changed 3 months ago
+                      - group [ref=e158]:
+                        - generic "1 proposed change" [ref=e159] [cursor=pointer]
+                        - generic [ref=e161]:
+                          - generic [ref=e162]: Title
+                          - generic [ref=e163]:
+                            - paragraph [ref=e164]: Not set
+                            - paragraph [ref=e165]: QAEIR4 <script>alert(1)</script>
+                      - alert [ref=e166]:
+                        - img [ref=e167]
+                        - generic [ref=e171]: Review outcome
+                        - generic [ref=e172]: "Leftover QA test submission: proposed title is an XSS probe string (QAEIR4 <script>alert(1)</script>) with no legitimate content. Rejected during production admin-queue cleanup."
+                      - paragraph [ref=e174]: Not accepted after review.
+                  - article [ref=e175]:
+                    - generic [ref=e176]:
+                      - generic [ref=e177]:
+                        - img [ref=e179]
+                        - generic [ref=e182]:
+                          - generic [ref=e183]:
+                            - generic [ref=e184]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e185]:
+                              - img [ref=e186]
+                              - text: Rejected
+                          - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e190]'
+                          - generic [ref=e191]:
+                            - generic [ref=e192]: Submitted 3 months ago
+                            - generic [ref=e193]: Status changed 3 months ago
+                      - group [ref=e194]:
+                        - generic "1 proposed change" [ref=e195] [cursor=pointer]
+                        - generic [ref=e197]:
+                          - generic [ref=e198]: Title
+                          - generic [ref=e199]:
+                            - paragraph [ref=e200]: "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+                            - paragraph [ref=e201]
+                      - alert [ref=e202]:
+                        - img [ref=e203]
+                        - generic [ref=e207]: Review outcome
+                        - generic [ref=e208]: "Legacy invisible-characters-only edit: proposed title contains only zero-width characters (U+200B) and no visible content. Flagged by the admin audit (BUG-012); rejected during production cleanup."
+                      - paragraph [ref=e210]: Not accepted after review.
+                  - article [ref=e211]:
+                    - generic [ref=e212]:
+                      - generic [ref=e213]:
+                        - img [ref=e215]
+                        - generic [ref=e218]:
+                          - generic [ref=e219]:
+                            - generic [ref=e220]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e221]:
+                              - img [ref=e222]
+                              - text: Rejected
+                          - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e226]'
+                          - generic [ref=e227]:
+                            - generic [ref=e228]: Submitted 3 months ago
+                            - generic [ref=e229]: Status changed 3 months ago
+                      - group [ref=e230]:
+                        - generic "1 proposed change" [ref=e231] [cursor=pointer]
+                        - generic [ref=e233]:
+                          - generic [ref=e234]: Title
+                          - generic [ref=e235]:
+                            - paragraph [ref=e236]: "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+                            - paragraph [ref=e237]
+                      - alert [ref=e238]:
+                        - img [ref=e239]
+                        - generic [ref=e243]: Review outcome
+                        - generic [ref=e244]: "Legacy invisible-characters-only edit: proposed title contains only zero-width characters (U+200B) and no visible content. Flagged by the admin audit (BUG-012); rejected during production cleanup."
+                      - paragraph [ref=e246]: Not accepted after review.
+                  - article [ref=e247]:
+                    - generic [ref=e248]:
+                      - generic [ref=e249]:
+                        - img [ref=e251]
+                        - generic [ref=e254]:
+                          - generic [ref=e255]:
+                            - generic [ref=e256]: Edit suggestion
+                            - generic "Accepted by a moderator." [ref=e257]:
+                              - img [ref=e258]
+                              - text: Approved
+                          - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=2] [ref=e261]
+                          - generic [ref=e262]:
+                            - generic [ref=e263]: Submitted 3 months ago
+                            - generic [ref=e264]: Status changed 3 months ago
+                      - group [ref=e265]:
+                        - generic "1 proposed change" [ref=e266] [cursor=pointer]
+                        - generic [ref=e268]:
+                          - generic [ref=e269]: Description
+                          - generic [ref=e270]:
+                            - paragraph [ref=e271]: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.
+                            - paragraph [ref=e272]: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding. [QA-DAILY edit probe 2026-07-19]
+                      - generic [ref=e273]:
+                        - paragraph [ref=e274]: Accepted by a moderator.
+                        - link "View public resource" [ref=e276] [cursor=pointer]:
+                          - /url: /resource/184847
+                          - text: View public resource
+                          - img
+                  - article [ref=e277]:
+                    - generic [ref=e278]:
+                      - generic [ref=e279]:
+                        - img [ref=e281]
+                        - generic [ref=e284]:
+                          - generic [ref=e285]:
+                            - generic [ref=e286]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e287]:
+                              - img [ref=e288]
+                              - text: Rejected
+                          - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e292]'
+                          - generic [ref=e293]:
+                            - generic [ref=e294]: Submitted 3 months ago
+                            - generic [ref=e295]: Status changed 3 months ago
+                      - alert [ref=e296]:
+                        - img [ref=e297]
+                        - generic [ref=e301]: Review outcome
+                        - generic [ref=e302]: __qa6_ R4-016 boundary probe cleanup (2048-char URL edit)
+                      - paragraph [ref=e304]: Not accepted after review.
+                  - article [ref=e305]:
+                    - generic [ref=e306]:
+                      - generic [ref=e307]:
+                        - img [ref=e309]
+                        - generic [ref=e312]:
+                          - generic [ref=e313]:
+                            - generic [ref=e314]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e315]:
+                              - img [ref=e316]
+                              - text: Rejected
+                          - heading "MediaMTX" [level=2] [ref=e320]
+                          - generic [ref=e321]:
+                            - generic [ref=e322]: Submitted 3 months ago
+                            - generic [ref=e323]: Status changed 3 months ago
+                      - alert [ref=e324]:
+                        - img [ref=e325]
+                        - generic [ref=e329]: Review outcome
+                        - generic [ref=e330]: QA6 verification cleanup
+                      - paragraph [ref=e332]: Not accepted after review.
+                  - article [ref=e333]:
+                    - generic [ref=e334]:
+                      - generic [ref=e335]:
+                        - img [ref=e337]
+                        - generic [ref=e340]:
+                          - generic [ref=e341]:
+                            - generic [ref=e342]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e343]:
+                              - img [ref=e344]
+                              - text: Rejected
+                          - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e348]'
+                          - generic [ref=e349]:
+                            - generic [ref=e350]: Submitted 3 months ago
+                            - generic [ref=e351]: Status changed 3 months ago
+                      - alert [ref=e352]:
+                        - img [ref=e353]
+                        - generic [ref=e357]: Review outcome
+                        - generic [ref=e358]: __qa6 cleanup
+                      - paragraph [ref=e360]: Not accepted after review.
+                  - article [ref=e361]:
+                    - generic [ref=e362]:
+                      - generic [ref=e363]:
+                        - img [ref=e365]
+                        - generic [ref=e368]:
+                          - generic [ref=e369]:
+                            - generic [ref=e370]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e371]:
+                              - img [ref=e372]
+                              - text: Rejected
+                          - heading "avm (AOM Video Model) — AV2 reference codec" [level=2] [ref=e376]
+                          - generic [ref=e377]:
+                            - generic [ref=e378]: Submitted 3 months ago
+                            - generic [ref=e379]: Status changed 3 months ago
+                      - alert [ref=e380]:
+                        - img [ref=e381]
+                        - generic [ref=e385]: Review outcome
+                        - generic [ref=e386]: QA5 self-cleanup
+                      - paragraph [ref=e388]: Not accepted after review.
+                  - article [ref=e389]:
+                    - generic [ref=e390]:
+                      - generic [ref=e391]:
+                        - img [ref=e393]
+                        - generic [ref=e396]:
+                          - generic [ref=e397]:
+                            - generic [ref=e398]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e399]:
+                              - img [ref=e400]
+                              - text: Rejected
+                          - heading "avm (AOM Video Model) — AV2 reference codec" [level=2] [ref=e404]
+                          - generic [ref=e405]:
+                            - generic [ref=e406]: Submitted 3 months ago
+                            - generic [ref=e407]: Status changed 3 months ago
+                      - alert [ref=e408]:
+                        - img [ref=e409]
+                        - generic [ref=e413]: Review outcome
+                        - generic [ref=e414]: QA5 self-cleanup
+                      - paragraph [ref=e416]: Not accepted after review.
+                  - article [ref=e417]:
+                    - generic [ref=e418]:
+                      - generic [ref=e419]:
+                        - img [ref=e421]
+                        - generic [ref=e424]:
+                          - generic [ref=e425]:
+                            - generic [ref=e426]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e427]:
+                              - img [ref=e428]
+                              - text: Rejected
+                          - heading "avm (AOM Video Model) — AV2 reference codec" [level=2] [ref=e432]
+                          - generic [ref=e433]:
+                            - generic [ref=e434]: Submitted 3 months ago
+                            - generic [ref=e435]: Status changed 3 months ago
+                      - alert [ref=e436]:
+                        - img [ref=e437]
+                        - generic [ref=e441]: Review outcome
+                        - generic [ref=e442]: QA5 self-cleanup
+                      - paragraph [ref=e444]: Not accepted after review.
+                  - article [ref=e445]:
+                    - generic [ref=e446]:
+                      - generic [ref=e447]:
+                        - img [ref=e449]
+                        - generic [ref=e452]:
+                          - generic [ref=e453]:
+                            - generic [ref=e454]: Edit suggestion
+                            - generic "Not accepted after review." [ref=e455]:
+                              - img [ref=e456]
+                              - text: Rejected
+                          - heading "avm (AOM Video Model) — AV2 reference codec" [level=2] [ref=e460]
+                          - generic [ref=e461]:
+                            - generic [ref=e462]: Submitted 3 months ago
+                            - generic [ref=e463]: Status changed 3 months ago
+                      - alert [ref=e464]:
+                        - img [ref=e465]
+                        - generic [ref=e469]: Review outcome
+                        - generic [ref=e470]: QA5 self-cleanup
+                      - paragraph [ref=e472]: Not accepted after review.
+                - navigation "Pagination" [ref=e473]:
+                  - generic [ref=e474]:
+                    - generic:
+                      - img
+                      - text: Previous
+                    - link "Page 1, current page" [ref=e475] [cursor=pointer]:
+                      - /url: /contributions
+                      - text: "1"
+                    - link "Go to page 2" [ref=e476] [cursor=pointer]:
+                      - /url: /contributions?page=2
+                      - text: "2"
+                    - link "Next" [ref=e477] [cursor=pointer]:
+                      - /url: /contributions?page=2
+                      - text: Next
+                      - img
+                  - generic [ref=e479]: Page 1 of 2
+                  - status [ref=e480]
+        - contentinfo [ref=e481]:
+          - generic [ref=e482]:
+            - generic [ref=e483]:
+              - paragraph [ref=e484]: ── INDEX
+              - link "awesome.video home" [ref=e485] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e486]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e488]:
+              - heading "INDEXED" [level=2] [ref=e489]
+              - paragraph [ref=e490]: 3,826
+              - paragraph [ref=e491]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e492]: live
+            - navigation "Explore categories" [ref=e494]:
+              - heading "EXPLORE" [level=2] [ref=e495]
+              - generic [ref=e496]:
+                - link "Community & Events" [ref=e497] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e498]: ◈
+                  - generic [ref=e499]: Community
+                - link "Encoding & Codecs" [ref=e500] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e501]: ◇
+                  - generic [ref=e502]: Encoding
+                - link "General Tools" [ref=e503] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e504]: ◆
+                  - generic [ref=e505]: General
+                - link "Infrastructure & Delivery" [ref=e506] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e507]: ▣
+                  - generic [ref=e508]: Infrastructure
+                - link "Intro & Learning" [ref=e509] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e510]: ▤
+                  - generic [ref=e511]: Intro
+                - link "Media Tools" [ref=e512] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e513]: ▥
+                  - generic [ref=e514]: Media
+                - link "Players & Clients" [ref=e515] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e516]: ▶
+                  - generic [ref=e517]: Players
+                - link "Protocols & Transport" [ref=e518] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e519]: ⟁
+                  - generic [ref=e520]: Protocols
+                - link "Standards & Industry" [ref=e521] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e522]: ◉
+                  - generic [ref=e523]: Standards
+            - generic [ref=e524]:
+              - heading "SOURCE" [level=2] [ref=e525]
+              - link "krzemienski/awesome-video" [ref=e526] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e527]
+                - generic [ref=e529]:
+                  - text: krzemienski
+                  - generic [ref=e530]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e531]: ↗
+              - paragraph [ref=e532]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e533] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e535] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e536]:
+            - generic [ref=e537]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e538]:
+              - link "About" [ref=e539] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e540] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e541] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e542] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e543] [cursor=pointer]
+              - link "Issues ↗" [ref=e544] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e545] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e546]: built with the awesome-list framework

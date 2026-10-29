@@ -1,0 +1,7 @@
+nav-submit-resource openBefore=true -> "{\"p\":\"/submit\",\"open\":false}"
+nav-learning-journeys openBefore=true -> "{\"p\":\"/journeys\",\"open\":false}"
+nav-advanced openBefore=true -> "{\"p\":\"/advanced\",\"open\":false}"
+nav-theme openBefore=true -> "{\"p\":\"/settings/theme\",\"open\":false}"
+nav-home-dashboard openBefore=true -> "{\"p\":\"/?context=account\",\"open\":false}"
+nav-about openBefore=true -> "{\"p\":\"/about\",\"open\":false}"
+sidebar Admin -> "/admin open=false"

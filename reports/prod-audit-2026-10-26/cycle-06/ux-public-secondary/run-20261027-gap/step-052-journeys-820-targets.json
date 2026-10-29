@@ -1,0 +1,616 @@
+{
+  "url": "https://awesome.video/journeys",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<h1 class=\"page-title journeys-page__title\" data-route-focus=\"\" tabindex=\"-1\">Learning Journeys</h1>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Filter by category",
+      "role": "combobox",
+      "href": null,
+      "rect": {
+        "x": 163.5625,
+        "y": 277.59375,
+        "width": 200,
+        "height": 44,
+        "top": 277.59375,
+        "right": 363.5625,
+        "bottom": 321.59375,
+        "left": 163.5625
+      },
+      "class": "select flex min-h-[44px] items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1 journeys-filter__control",
+      "disabled": false
+    },
+    {
+      "name": "Building Your First Streaming Platform",
+      "role": "A",
+      "href": "/journey/7",
+      "rect": {
+        "x": 61,
+        "y": 410.59375,
+        "width": 306,
+        "height": 44,
+        "top": 410.59375,
+        "right": 367,
+        "bottom": 454.59375,
+        "left": 61
+      },
+      "class": "journey-card__title-link line-clamp-2 break-words"
+    },
+    {
+      "name": "Start Journey: Building Your First Streaming Platform",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 61,
+        "y": 685.03125,
+        "width": 306,
+        "height": 44,
+        "top": 685.03125,
+        "right": 367,
+        "bottom": 729.03125,
+        "left": 61
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] journey-card__cta group h-auto min-h-10 whitespace-normal",
+      "disabled": false
+    },
+    {
+      "name": "Advanced Live Streaming Architecture",
+      "role": "A",
+      "href": "/journey/9",
+      "rect": {
+        "x": 427,
+        "y": 410.59375,
+        "width": 306,
+        "height": 44,
+        "top": 410.59375,
+        "right": 733,
+        "bottom": 454.59375,
+        "left": 427
+      },
+      "class": "journey-card__title-link line-clamp-2 break-words"
+    },
+    {
+      "name": "Start Journey: Advanced Live Streaming Architecture",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 427,
+        "y": 685.03125,
+        "width": 306,
+        "height": 44,
+        "top": 685.03125,
+        "right": 733,
+        "bottom": 729.03125,
+        "left": 427
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] journey-card__cta group h-auto min-h-10 whitespace-normal",
+      "disabled": false
+    },
+    {
+      "name": "DRM & Content Protection",
+      "role": "A",
+      "href": "/journey/10",
+      "rect": {
+        "x": 61,
+        "y": 837.03125,
+        "width": 306,
+        "height": 44,
+        "top": 837.03125,
+        "right": 367,
+        "bottom": 881.03125,
+        "left": 61
+      },
+      "class": "journey-card__title-link line-clamp-2 break-words"
+    },
+    {
+      "name": "Start Journey: DRM & Content Protection",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 61,
+        "y": 1111.46875,
+        "width": 306,
+        "height": 44,
+        "top": 1111.46875,
+        "right": 367,
+        "bottom": 1155.46875,
+        "left": 61
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] journey-card__cta group h-auto min-h-10 whitespace-normal",
+      "disabled": false
+    },
+    {
+      "name": "FFmpeg Mastery",
+      "role": "A",
+      "href": "/journey/8",
+      "rect": {
+        "x": 427,
+        "y": 837.03125,
+        "width": 306,
+        "height": 44,
+        "top": 837.03125,
+        "right": 733,
+        "bottom": 881.03125,
+        "left": 427
+      },
+      "class": "journey-card__title-link line-clamp-2 break-words"
+    },
+    {
+      "name": "Start Journey: FFmpeg Mastery",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 427,
+        "y": 1111.46875,
+        "width": 306,
+        "height": 44,
+        "top": 1111.46875,
+        "right": 733,
+        "bottom": 1155.46875,
+        "left": 427
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] journey-card__cta group h-auto min-h-10 whitespace-normal",
+      "disabled": false
+    },
+    {
+      "name": "Video Streaming Fundamentals",
+      "role": "A",
+      "href": "/journey/6",
+      "rect": {
+        "x": 61,
+        "y": 1263.46875,
+        "width": 306,
+        "height": 44,
+        "top": 1263.46875,
+        "right": 367,
+        "bottom": 1307.46875,
+        "left": 61
+      },
+      "class": "journey-card__title-link line-clamp-2 break-words"
+    },
+    {
+      "name": "Start Journey: Video Streaming Fundamentals",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 61,
+        "y": 1537.90625,
+        "width": 306,
+        "height": 44,
+        "top": 1537.90625,
+        "right": 367,
+        "bottom": 1581.90625,
+        "left": 61
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] journey-card__cta group h-auto min-h-10 whitespace-normal",
+      "disabled": false
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 1807.90625,
+        "width": 195.046875,
+        "height": 44,
+        "top": 1807.90625,
+        "right": 235.046875,
+        "bottom": 1851.90625,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 1984.6875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 1984.6875,
+        "right": 505.328125,
+        "bottom": 2028.6875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 2013.5,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2013.5,
+        "right": 505.328125,
+        "bottom": 2057.5,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2042.3125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2042.3125,
+        "right": 505.328125,
+        "bottom": 2086.3125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 2071.125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2071.125,
+        "right": 505.328125,
+        "bottom": 2115.125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 2099.9375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2099.9375,
+        "right": 505.328125,
+        "bottom": 2143.9375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 2128.75,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2128.75,
+        "right": 505.328125,
+        "bottom": 2172.75,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 2157.5625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2157.5625,
+        "right": 505.328125,
+        "bottom": 2201.5625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 2186.375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2186.375,
+        "right": 505.328125,
+        "bottom": 2230.375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 2215.1875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2215.1875,
+        "right": 505.328125,
+        "bottom": 2259.1875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 1996.28125,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 1996.28125,
+        "right": 754,
+        "bottom": 2056.65625,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 2068.65625,
+        "width": 73,
+        "height": 24,
+        "top": 2068.65625,
+        "right": 688.6875,
+        "bottom": 2092.65625,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 2123.046875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 2123.046875,
+        "right": 754,
+        "bottom": 2167.046875,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 2340.59375,
+        "width": 44,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 84,
+        "bottom": 2384.59375,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 2340.59375,
+        "width": 44,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 142,
+        "bottom": 2384.59375,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 2340.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 204.515625,
+        "bottom": 2384.59375,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 2340.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 267.03125,
+        "bottom": 2384.59375,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 2340.59375,
+        "width": 103.953125,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 384.984375,
+        "bottom": 2384.59375,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 2340.59375,
+        "width": 55.46875,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 454.453125,
+        "bottom": 2384.59375,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 2340.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2340.59375,
+        "right": 516.96875,
+        "bottom": 2384.59375,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

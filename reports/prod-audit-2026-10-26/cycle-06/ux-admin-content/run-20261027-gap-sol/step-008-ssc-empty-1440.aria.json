@@ -1,0 +1,16 @@
+{
+  "active": "create-name",
+  "dialog": "Create Sub-Subcategory\n\nAdd a new sub-subcategory under a parent subcategory.\n\nParent Category, Parent Subcategory are required\nParent Category *\nSelect parent category\nCommunity & Events\nEncoding & Codecs\nGeneral Tools\nInfrastructure & Delivery\nIntro & Learning\nMedia Tools\nPlayers & Clients\nProtocols & Transport\nStandards & Industry\n[QA-audit-1026] Cáfé gap A\nParent Subcategory *\nSelect parent subcategory\nName *\n\nName is required\n\nSlug *\n\nSlug is required\n\nAuto-generated from name. Edit if needed.\n\nCancel\nCreate\nClose",
+  "invalid": [
+    {
+      "describedby": "create-name-error",
+      "id": "create-name",
+      "role": null
+    },
+    {
+      "describedby": "create-slug-error",
+      "id": "create-slug",
+      "role": null
+    }
+  ]
+}

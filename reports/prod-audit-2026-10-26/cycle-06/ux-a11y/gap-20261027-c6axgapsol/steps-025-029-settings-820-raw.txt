@@ -1,0 +1,56 @@
+✓ Done
+
+- menuitem "Theme settings" [ref=e1]
+- menuitem "Pending approvals" [ref=e2]
+- menuitem "Rejected resources" [ref=e3]
+- menuitem "Sub-Subcats" [ref=e4]
+- menuitem "Journeys" [ref=e5]
+- menuitem "Digests" [ref=e6]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-025-settings-820.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#journeys
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings, Journeys section open" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e15]
+    - tab "Approvals" [ref=e16]
+    - tab "Edits" [ref=e17]
+    - tab "Enrichment" [ref=e18]
+    - tab "Researcher" [ref=e19]
+    - tab "Export" [ref=e20]
+    - tab "Database" [ref=e21]
+    - tab "Resources" [ref=e22]
+    - tab "Categories" [ref=e23]
+    - tab "Subcategories" [ref=e24]
+    - tab "Users" [ref=e25]
+    - tab "GitHub" [ref=e26]
+    - tab "Link Health" [ref=e27]
+    - tab "Audit" [ref=e28]
+    - tab "Research" [ref=e29]
+  - tabpanel "Journeys" [ref=e12] focusable [tabindex]
+    - button "Steps for Video Streaming Fundamentals" [ref=e30]
+    - button "Steps for Building Your First Streaming Platform" [ref=e31]
+    - button "Steps for FFmpeg Mastery" [ref=e32]
+    - button "Steps for Advanced Live Streaming Architecture" [ref=e33]
+    - button "Steps for DRM & Content Protection" [ref=e34]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-026-journeys-820.png
+

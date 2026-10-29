@@ -1,0 +1,93 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e5]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e45]
+              - listitem [level=1]
+                - link "Learning Preferences" [disabled, ref=e46]
+          - paragraph
+            - StaticText "OPTIONAL SETUP"
+          - heading "What fits your schedule?" [level=1, ref=e14]
+          - button "Save and browse later" [ref=e15]
+          - generic "Step 5 of 5"
+            - StaticText "Step "
+            - StaticText "5"
+            - StaticText " of "
+            - StaticText "5"
+            - StaticText "Time"
+            - progressbar "Onboarding progress": 100
+          - article
+            - group "What fits your schedule?"
+              - Legend
+                - StaticText "What fits your schedule?"
+              - paragraph
+                - StaticText "This helps us favor resources that fit your learning rhythm."
+              - radiogroup [ref=e43] focusable [tabindex]
+                - LabelText [ref=e47] clickable [cursor:pointer]
+                  - radio "A little most days" [checked=false, ref=e50]
+                - LabelText [ref=e48] clickable [cursor:pointer]
+                  - radio "One focused session each week" [checked=false, ref=e51]
+                - LabelText [ref=e49] clickable [cursor:pointer]
+                  - radio "Whenever time allows" [checked=true, ref=e52]
+              - heading "What changes after you save" [level=3, ref=e44]
+          - button "Back" [ref=e16]
+          - button "Save preferences" [ref=e17]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e18]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e19]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e20]
+            - heading "EXPLORE" [level=2, ref=e25]
+            - link "Community & Events" [ref=e26]
+            - link "Encoding & Codecs" [ref=e27]
+            - link "General Tools" [ref=e28]
+            - link "Infrastructure & Delivery" [ref=e29]
+            - link "Intro & Learning" [ref=e30]
+            - link "Media Tools" [ref=e31]
+            - link "Players & Clients" [ref=e32]
+            - link "Protocols & Transport" [ref=e33]
+            - link "Standards & Industry" [ref=e34]
+          - heading "SOURCE" [level=2, ref=e21]
+          - link "krzemienski/ awesome-video" [ref=e22]
+          - paragraph
+            - link "PRs welcome" [ref=e35]
+          - button "Contact maintainers" [ref=e23]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e24]
+            - link "About" [ref=e36]
+            - link "Terms" [ref=e37]
+            - link "Privacy" [ref=e38]
+            - link "Code of Conduct" [ref=e39]
+            - button "Cookie settings" [ref=e40]
+            - link "Issues ↗" [ref=e41]
+            - link "Sitemap" [ref=e42]

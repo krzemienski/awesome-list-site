@@ -1,0 +1,24 @@
+runC raw probe results (rev 63a1c79d), context c5-pubcore-c. fields: scrollY | activeElement | inView | focus-visible
+1440 link click (Browse): /categories 0 | H1 | true | false (no ring)
+1440 Tab+Enter (category link): /category/community-events 0 | H1 | true | true (ring solid 2px rgb(255,61,82))
+1440 Back after scroll 1400: 1400 | BODY | true | false
+1440 Forward: /resource/184977 0 | H1 | true | false
+1440 first load /tag/hls#related-topics-heading: 3224 | H2#related-topics-heading top=80 | true | true
+1440 fragment -> /about -> Back: 3224 | H2 top=80 | true | false
+1440 bogus fragment (cold load): 0 | H1 | true | true ; same-document hash change from valid fragment: stays 3224 H2
+1440 first load no fragment: 0 | BODY | true | false
+390 link click: H1 /resource/185366 0 | true | false ; Back 1500 | BODY ; Forward H1 0 no ring
+390 Tab+Enter: Skip link ring; category link at top=80 (scrollY 219) ring; after Enter H1 ring
+390 fragment cold load: 9282 | H2 top=80 | ring true
+390 fragment -> click About in footer (scrollY 10703) -> Back: 10703 | BODY (target above view, focus not on out-of-view element)
+390 bogus fragment cold: 0 | H1 | ring true
+Offline x3 at 1440 (category -> in-app sidebar link): run1 error boundary "Couldn't load this page - you appear to be offline" (role=alert, Retry btn; Retry while offline keeps error, focus stays on Retry), reconnect -> recovered in 501ms, no click.
+ run2 /subcategory/cloud-based-encoding-solutions "You're offline" -> recovered 503ms. run3 /subcategory/community-groups "You're offline ... will load on its own when you reconnect" -> recovered 502ms.
+404 /category/zzz-nope: HTTP 404, title Page Not Found, noindex,nofollow, CTAs "Browse all categories" 44px, "Go home" 44px; breadcrumb is sr-only. /totally-bogus-path HTTP 404.
+Rail 1250x720 and 1200x700: sidebar sticky top=60, bottom = viewport minus consent banner (591/555px tall); tree scroller scrolls to last item "Uncategorized"; Home link at top; footer "More navigation" details holds Submit Resource, Learning Journeys, Advanced, Theme, Home dashboard, About, all 44px and inside the rail after opening.
+Sweeps (visible interactive, excl sr-only/aria-hidden/inline-in-text, WCAG 2.5.8 circle exception computed):
+ 1440 /: 213 targets, 0 fail (12 <24px: 4 card titles under overlay, 8 "+ N more" links 341x19 with 6px gap, circle exception holds)
+ 1440 /category/encoding-codecs: 294 targets, 0 fail (19 card titles 299x21, covered-by-overlay=false, nearest target 26px away, exception holds)
+ 820 touch /: 209 targets; <44: 3 card titles under overlay, footer inline "PRs welcome" 73x24 in running text; 0 button/pill/tab <44
+ 820 touch /category/encoding-codecs: 290 targets; only "PRs welcome" 73x24 (inline text link); 0 hover-only hidden controls
+Reduced motion (emulate reduce): / and /category/encoding-codecs: matchMedia true, document.getAnimations()=0, no CSS animation names with duration, scroll-behavior auto on html and body, scrollTo jump lands at 1500 in 150ms.

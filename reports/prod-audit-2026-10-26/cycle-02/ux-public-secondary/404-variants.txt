@@ -1,0 +1,22 @@
+/subcategory/nope                404  Page Not Found
+
+/sub-subcategory/nope            404  Page Not Found
+
+/journey/abc                     404  Page Not Found
+
+/resource/-1                     404  Page Not Found
+
+/resource/1.5                    404  Page Not Found
+
+/tag/                            301 https://awesome.video/tag 
+/category/encoding-codecs/x      404  Page Not Found
+
+/about/                          301 https://awesome.video/about 
+/ABOUT                           301 https://awesome.video/about 
+/search/                         301 https://awesome.video/search 
+/%E2%9C%93                       404  Page Not Found
+
+/admin                           302 https://awesome.video/sign-in?redirect_url=%2Fadmin 
+/api/nope                        404  
+/profile                         302 https://awesome.video/sign-in?redirect_url=%2Fprofile 
+/settings                        200  

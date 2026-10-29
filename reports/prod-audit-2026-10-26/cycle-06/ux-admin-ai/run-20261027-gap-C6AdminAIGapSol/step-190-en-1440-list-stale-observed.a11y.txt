@@ -1,0 +1,205 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Enrichment" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [selected] [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Enrichment" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e120]:
+                      - article [ref=e121]:
+                        - generic [ref=e122]: Last enriched
+                        - generic [ref=e123]: 27h ago
+                        - generic [ref=e124]: "batch #34 · 10 resources · cancelled"
+                      - article [ref=e125]:
+                        - generic [ref=e126]: Queue
+                        - generic [ref=e127]: "0"
+                        - generic [ref=e128]: idle
+                      - article [ref=e129]:
+                        - generic [ref=e130]: Avg cost
+                        - generic [ref=e131]: $0.03
+                        - generic [ref=e132]: per batch
+                    - generic [ref=e133]:
+                      - generic [ref=e134]:
+                        - generic [ref=e135]:
+                          - heading "Enrichment jobs" [level=2] [ref=e136]
+                          - paragraph [ref=e137]: LLM-driven metadata enhancement
+                        - button "Run job" [ref=e139] [cursor=pointer]:
+                          - img
+                          - text: Run job
+                      - generic [ref=e140]:
+                        - region "Enrichment jobs table, scrollable" [ref=e141]:
+                          - table [ref=e142]:
+                            - rowgroup [ref=e143]:
+                              - row "Job Status Started Completed Actions" [ref=e144]:
+                                - columnheader "Job" [ref=e145]
+                                - columnheader "Status" [ref=e146]
+                                - columnheader "Started" [ref=e147]
+                                - columnheader "Completed" [ref=e148]
+                                - columnheader "Actions" [ref=e149]:
+                                  - generic [ref=e150]: Actions
+                            - rowgroup [ref=e151]:
+                              - 'row "#34 cancelled 10/26/2026, 12:33:50 AM 10/26/2026, 12:34:47 AM View logs for job #34" [ref=e152]':
+                                - cell "#34" [ref=e153]
+                                - cell "cancelled" [ref=e154]:
+                                  - generic [ref=e155]: cancelled
+                                - cell "10/26/2026, 12:33:50 AM" [ref=e156]
+                                - cell "10/26/2026, 12:34:47 AM" [ref=e157]
+                                - 'cell "View logs for job #34" [ref=e158]':
+                                  - 'button "View logs for job #34" [ref=e159] [cursor=pointer]': Logs
+                              - 'row "#33 cancelled 10/26/2026, 12:30:14 AM 10/26/2026, 12:33:13 AM View logs for job #33" [ref=e160]':
+                                - cell "#33" [ref=e161]
+                                - cell "cancelled" [ref=e162]:
+                                  - generic [ref=e163]: cancelled
+                                - cell "10/26/2026, 12:30:14 AM" [ref=e164]
+                                - cell "10/26/2026, 12:33:13 AM" [ref=e165]
+                                - 'cell "View logs for job #33" [ref=e166]':
+                                  - 'button "View logs for job #33" [ref=e167] [cursor=pointer]': Logs
+                              - 'row "#32 completed 7/16/2026, 9:45:33 PM 7/16/2026, 9:45:33 PM View logs for job #32" [ref=e168]':
+                                - cell "#32" [ref=e169]
+                                - cell "completed" [ref=e170]:
+                                  - generic [ref=e171]: completed
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e172]
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e173]
+                                - 'cell "View logs for job #32" [ref=e174]':
+                                  - 'button "View logs for job #32" [ref=e175] [cursor=pointer]': Logs
+                              - 'row "#31 completed 7/16/2026, 9:45:32 PM 7/16/2026, 9:45:32 PM View logs for job #31" [ref=e176]':
+                                - cell "#31" [ref=e177]
+                                - cell "completed" [ref=e178]:
+                                  - generic [ref=e179]: completed
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e180]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e181]
+                                - 'cell "View logs for job #31" [ref=e182]':
+                                  - 'button "View logs for job #31" [ref=e183] [cursor=pointer]': Logs
+                              - 'row "#30 completed 7/16/2026, 9:45:31 PM 7/16/2026, 9:45:32 PM View logs for job #30" [ref=e184]':
+                                - cell "#30" [ref=e185]
+                                - cell "completed" [ref=e186]:
+                                  - generic [ref=e187]: completed
+                                - cell "7/16/2026, 9:45:31 PM" [ref=e188]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e189]
+                                - 'cell "View logs for job #30" [ref=e190]':
+                                  - 'button "View logs for job #30" [ref=e191] [cursor=pointer]': Logs
+                              - 'row "#29 completed 7/16/2026, 9:41:27 PM 7/16/2026, 9:41:27 PM View logs for job #29" [ref=e192]':
+                                - cell "#29" [ref=e193]
+                                - cell "completed" [ref=e194]:
+                                  - generic [ref=e195]: completed
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e196]
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e197]
+                                - 'cell "View logs for job #29" [ref=e198]':
+                                  - 'button "View logs for job #29" [ref=e199] [cursor=pointer]': Logs
+                        - button "Show all 33 jobs" [ref=e201] [cursor=pointer]
+                  - group [ref=e202]:
+                    - generic "Job controls & monitoring" [ref=e203] [cursor=pointer]

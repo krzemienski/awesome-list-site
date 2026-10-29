@@ -1,0 +1,9 @@
+uid=177_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin?status=pending#resources"
+  uid=200_0 alertdialog "Approve 1 resource?" description="This publishes the selected resource to the live catalog immediately. You can still edit or remove it afterwards."
+    uid=200_1 heading "Approve 1 resource?" level="2"
+    uid=200_2 "This publishes the selected resource"
+    uid=200_3 " to the live catalog immediately. You can still edit or remove "
+    uid=200_4 "it"
+    uid=200_5 " afterwards."
+    uid=200_6 button "Cancel" focusable focused
+    uid=200_7 button "Approve 1"

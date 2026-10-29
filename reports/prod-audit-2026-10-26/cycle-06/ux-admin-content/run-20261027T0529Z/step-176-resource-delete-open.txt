@@ -1,0 +1,6 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Resources" [ref=e5] focusable [tabindex]
+    - navigation "Pagination" [ref=e6]
+- heading "Delete Resource" [level=2, ref=e2]
+- button "Cancel" [ref=e3]
+- button "Delete" [ref=e4]

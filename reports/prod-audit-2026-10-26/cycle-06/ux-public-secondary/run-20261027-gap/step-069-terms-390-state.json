@@ -1,0 +1,20 @@
+{
+  "url": "https://awesome.video/terms",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "links": [
+    {
+      "text": "Home",
+      "href": "https://awesome.video/",
+      "tag": "A"
+    },
+    {
+      "text": "open an issue on the project's GitHub repository",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "tag": "A"
+    }
+  ]
+}

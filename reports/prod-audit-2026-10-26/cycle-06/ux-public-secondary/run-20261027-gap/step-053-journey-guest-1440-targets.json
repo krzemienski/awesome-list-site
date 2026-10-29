@@ -1,0 +1,899 @@
+{
+  "url": "https://awesome.video/journey/6",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<h1 class=\"page-title journey-detail-card__title\" data-route-focus=\"\" tabindex=\"-1\">Video Streaming Fundamentals</h1>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Learning Journeys",
+      "role": "A",
+      "href": "/journeys",
+      "rect": {
+        "x": 112.234375,
+        "y": 107,
+        "width": 123.59375,
+        "height": 20,
+        "top": 107,
+        "right": 235.828125,
+        "bottom": 127,
+        "left": 112.234375
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Back to Journeys",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": 108,
+        "width": 157.8125,
+        "height": 44,
+        "top": 108,
+        "right": 197.8125,
+        "bottom": 152,
+        "left": 40
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] journey-detail__back",
+      "disabled": false
+    },
+    {
+      "name": "log in",
+      "role": "A",
+      "href": "/sign-in?redirect_url=%2Fjourney%2F6",
+      "rect": {
+        "x": 153.984375,
+        "y": 505.890625,
+        "width": 36.34375,
+        "height": 21,
+        "top": 505.890625,
+        "right": 190.328125,
+        "bottom": 526.890625,
+        "left": 153.984375
+      },
+      "class": "underline font-medium py-0.5"
+    },
+    {
+      "name": "Video Encoding 101: A Beginner's Guide to Key Concepts",
+      "role": "A",
+      "href": "/resource/185372",
+      "rect": {
+        "x": 138,
+        "y": 775.984375,
+        "width": 530,
+        "height": 44,
+        "top": 775.984375,
+        "right": 668,
+        "bottom": 819.984375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Video Encoding 101: A Beginner's Guide to Key Concepts on its source site (new tab)",
+      "role": "A",
+      "href": "https://www.forasoft.com/blog/article/video-encoding-streaming-quality",
+      "rect": {
+        "x": 672,
+        "y": 775.984375,
+        "width": 44,
+        "height": 44,
+        "top": 775.984375,
+        "right": 716,
+        "bottom": 819.984375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Streaming Learning Center's Beginner's Guide to Live Streaming",
+      "role": "A",
+      "href": "/resource/185151",
+      "rect": {
+        "x": 138,
+        "y": 921.984375,
+        "width": 530,
+        "height": 44,
+        "top": 921.984375,
+        "right": 668,
+        "bottom": 965.984375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Streaming Learning Center's Beginner's Guide to Live Streaming on its source site (new tab)",
+      "role": "A",
+      "href": "https://streaminglearningcenter.com/learning/beginners-guide-to-live-streaming.html",
+      "rect": {
+        "x": 672,
+        "y": 921.984375,
+        "width": 44,
+        "height": 44,
+        "top": 921.984375,
+        "right": 716,
+        "bottom": 965.984375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "How To Stream Video: A Beginner's Guide",
+      "role": "A",
+      "href": "/resource/185380",
+      "rect": {
+        "x": 138,
+        "y": 1049.984375,
+        "width": 530,
+        "height": 44,
+        "top": 1049.984375,
+        "right": 668,
+        "bottom": 1093.984375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open How To Stream Video: A Beginner's Guide on its source site (new tab)",
+      "role": "A",
+      "href": "https://web.archive.org/web/20260313011439/https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/",
+      "rect": {
+        "x": 672,
+        "y": 1049.984375,
+        "width": 44,
+        "height": 44,
+        "top": 1049.984375,
+        "right": 716,
+        "bottom": 1093.984375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming",
+      "role": "A",
+      "href": "/resource/184943",
+      "rect": {
+        "x": 138,
+        "y": 1322.96875,
+        "width": 530,
+        "height": 56,
+        "top": 1322.96875,
+        "right": 668,
+        "bottom": 1378.96875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming on its source site (new tab)",
+      "role": "A",
+      "href": "https://flussonic.com/cn/blog/news/evolution-of-video-codecs/",
+      "rect": {
+        "x": 672,
+        "y": 1328.96875,
+        "width": 44,
+        "height": 44,
+        "top": 1328.96875,
+        "right": 716,
+        "bottom": 1372.96875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Guide to HEVC/H.265 Encoding and Playback",
+      "role": "A",
+      "href": "/resource/185985",
+      "rect": {
+        "x": 138,
+        "y": 1462.96875,
+        "width": 530,
+        "height": 44,
+        "top": 1462.96875,
+        "right": 668,
+        "bottom": 1506.96875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Guide to HEVC/H.265 Encoding and Playback on its source site (new tab)",
+      "role": "A",
+      "href": "https://www.techspot.com/article/1131-hevc-h256-enconding-playback/",
+      "rect": {
+        "x": 672,
+        "y": 1462.96875,
+        "width": 44,
+        "height": 44,
+        "top": 1462.96875,
+        "right": 716,
+        "bottom": 1506.96875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "AV1 Encoding with libsvtav1 on Qencode",
+      "role": "A",
+      "href": "/resource/190152",
+      "rect": {
+        "x": 138,
+        "y": 1608.96875,
+        "width": 530,
+        "height": 44,
+        "top": 1608.96875,
+        "right": 668,
+        "bottom": 1652.96875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open AV1 Encoding with libsvtav1 on Qencode on its source site (new tab)",
+      "role": "A",
+      "href": "https://docs.qencode.com/tutorials/transcoding/codecs/using-av1-codec/",
+      "rect": {
+        "x": 672,
+        "y": 1608.96875,
+        "width": 44,
+        "height": 44,
+        "top": 1608.96875,
+        "right": 716,
+        "bottom": 1652.96875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "FFmpeg Wiki: Streaming Guide",
+      "role": "A",
+      "href": "/resource/186414",
+      "rect": {
+        "x": 138,
+        "y": 2025.953125,
+        "width": 530,
+        "height": 44,
+        "top": 2025.953125,
+        "right": 668,
+        "bottom": 2069.953125,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open FFmpeg Wiki: Streaming Guide on its source site (new tab)",
+      "role": "A",
+      "href": "https://trac.ffmpeg.org/wiki/StreamingGuide",
+      "rect": {
+        "x": 672,
+        "y": 2025.953125,
+        "width": 44,
+        "height": 44,
+        "top": 2025.953125,
+        "right": 716,
+        "bottom": 2069.953125,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Wowza: Streaming Protocols Overview",
+      "role": "A",
+      "href": "/resource/185018",
+      "rect": {
+        "x": 138,
+        "y": 2135.953125,
+        "width": 530,
+        "height": 44,
+        "top": 2135.953125,
+        "right": 668,
+        "bottom": 2179.953125,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Wowza: Streaming Protocols Overview on its source site (new tab)",
+      "role": "A",
+      "href": "https://www.wowza.com/blog/streaming-protocols",
+      "rect": {
+        "x": 672,
+        "y": 2135.953125,
+        "width": 44,
+        "height": 44,
+        "top": 2135.953125,
+        "right": 716,
+        "bottom": 2179.953125,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "RDK Video Guide — AAMP Player and GStreamer Pipeline Debugging",
+      "role": "A",
+      "href": "/resource/188709",
+      "rect": {
+        "x": 138,
+        "y": 2444.9375,
+        "width": 530,
+        "height": 44,
+        "top": 2444.9375,
+        "right": 668,
+        "bottom": 2488.9375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open RDK Video Guide — AAMP Player and GStreamer Pipeline Debugging on its source site (new tab)",
+      "role": "A",
+      "href": "https://developer.rdkcentral.com/support/support/articles/rdk-video-guide/",
+      "rect": {
+        "x": 672,
+        "y": 2444.9375,
+        "width": 44,
+        "height": 44,
+        "top": 2444.9375,
+        "right": 716,
+        "bottom": 2488.9375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Web-Demuxer",
+      "role": "A",
+      "href": "/resource/184784",
+      "rect": {
+        "x": 138,
+        "y": 2717.921875,
+        "width": 530,
+        "height": 44,
+        "top": 2717.921875,
+        "right": 668,
+        "bottom": 2761.921875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Web-Demuxer on its source site (new tab)",
+      "role": "A",
+      "href": "https://foreversc.github.io/web-demuxer/",
+      "rect": {
+        "x": 672,
+        "y": 2717.921875,
+        "width": 44,
+        "height": 44,
+        "top": 2717.921875,
+        "right": 716,
+        "bottom": 2761.921875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Best Practices for End-to-End Workflow Monitoring",
+      "role": "A",
+      "href": "/resource/186115",
+      "rect": {
+        "x": 138,
+        "y": 3008.90625,
+        "width": 530,
+        "height": 44,
+        "top": 3008.90625,
+        "right": 668,
+        "bottom": 3052.90625,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Best Practices for End-to-End Workflow Monitoring on its source site (new tab)",
+      "role": "A",
+      "href": "https://www.svta.org/project/best-practices-for-end-to-end-workflow-monitoring/",
+      "rect": {
+        "x": 672,
+        "y": 3008.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3008.90625,
+        "right": 716,
+        "bottom": 3052.90625,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale",
+      "role": "A",
+      "href": "/resource/189842",
+      "rect": {
+        "x": 138,
+        "y": 3118.90625,
+        "width": 530,
+        "height": 44,
+        "top": 3118.90625,
+        "right": 668,
+        "bottom": 3162.90625,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Live Streaming Architecture: Ingest, Transcoding, and Delivery at Scale on its source site (new tab)",
+      "role": "A",
+      "href": "https://systemdr.systemdrd.com/p/live-streaming-architecture-ingest",
+      "rect": {
+        "x": 672,
+        "y": 3118.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3118.90625,
+        "right": 716,
+        "bottom": 3162.90625,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Rebuilding Netflix Video Processing Pipeline with Microservices",
+      "role": "A",
+      "href": "/resource/186421",
+      "rect": {
+        "x": 138,
+        "y": 3228.90625,
+        "width": 530,
+        "height": 44,
+        "top": 3228.90625,
+        "right": 668,
+        "bottom": 3272.90625,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Rebuilding Netflix Video Processing Pipeline with Microservices on its source site (new tab)",
+      "role": "A",
+      "href": "https://netflixtechblog.com/rebuilding-netflix-video-processing-pipeline-with-microservices-7ed3d6f805bf",
+      "rect": {
+        "x": 672,
+        "y": 3228.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3228.90625,
+        "right": 716,
+        "bottom": 3272.90625,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 3563.90625,
+        "width": 195.046875,
+        "height": 44,
+        "top": 3563.90625,
+        "right": 235.046875,
+        "bottom": 3607.90625,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 3740.6875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3740.6875,
+        "right": 505.328125,
+        "bottom": 3784.6875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 3769.5,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3769.5,
+        "right": 505.328125,
+        "bottom": 3813.5,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3798.3125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3798.3125,
+        "right": 505.328125,
+        "bottom": 3842.3125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 3827.125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3827.125,
+        "right": 505.328125,
+        "bottom": 3871.125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 3855.9375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3855.9375,
+        "right": 505.328125,
+        "bottom": 3899.9375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3884.75,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3884.75,
+        "right": 505.328125,
+        "bottom": 3928.75,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 3913.5625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3913.5625,
+        "right": 505.328125,
+        "bottom": 3957.5625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 3942.375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3942.375,
+        "right": 505.328125,
+        "bottom": 3986.375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 3971.1875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3971.1875,
+        "right": 505.328125,
+        "bottom": 4015.1875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 3752.28125,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 3752.28125,
+        "right": 754,
+        "bottom": 3812.65625,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 3824.65625,
+        "width": 73,
+        "height": 24,
+        "top": 3824.65625,
+        "right": 688.6875,
+        "bottom": 3848.65625,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 3879.046875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3879.046875,
+        "right": 754,
+        "bottom": 3923.046875,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 4096.59375,
+        "width": 44,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 84,
+        "bottom": 4140.59375,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 4096.59375,
+        "width": 44,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 142,
+        "bottom": 4140.59375,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 4096.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 204.515625,
+        "bottom": 4140.59375,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 4096.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 267.03125,
+        "bottom": 4140.59375,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 4096.59375,
+        "width": 103.953125,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 384.984375,
+        "bottom": 4140.59375,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 4096.59375,
+        "width": 55.46875,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 454.453125,
+        "bottom": 4140.59375,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 4096.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4096.59375,
+        "right": 516.96875,
+        "bottom": 4140.59375,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

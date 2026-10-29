@@ -1,0 +1,4 @@
+[95743.582] GET https://awesome.video/api/admin/journeys (Fetch) 200
+[95743.584] GET https://awesome.video/api/admin/journeys/6/steps (Fetch) 200
+[95743.596] GET https://awesome.video/api/admin/journeys (Fetch) 200
+[95743.600] POST https://awesome.video/api/admin/journeys/6/steps (Fetch)

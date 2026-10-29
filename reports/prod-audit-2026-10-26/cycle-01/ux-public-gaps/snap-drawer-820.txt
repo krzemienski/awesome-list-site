@@ -1,0 +1,87 @@
+uid=6_0 RootWebArea "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video" url="https://awesome.video/category/encoding-codecs"
+  uid=6_89 main
+    uid=6_160 generic "Resources (579)"
+      uid=6_587 navigation "Pagination"
+        uid=6_604 status atomic live="polite" relevant="additions text"
+  uid=8_0 dialog "Sidebar" description="Displays the sidebar navigation." modal
+    uid=8_1 heading "Sidebar" level="2"
+    uid=8_2 "Displays the sidebar navigation."
+    uid=8_3 navigation "Sidebar"
+      uid=8_4 link "AWESOME.VIDEO home, 3,825 resources" focusable focused url="https://awesome.video/"
+      uid=8_8 form
+        uid=8_9 searchbox "Search resources"
+      uid=8_10 navigation "Primary"
+        uid=8_11 link "Home" url="https://awesome.video/"
+        uid=8_13 link "Submit" url="https://awesome.video/submit"
+        uid=8_15 link "About" url="https://awesome.video/about"
+      uid=8_17 "CATEGORIES"
+      uid=8_18 button "Community & Events 129 resources" description="Community & Events" expandable
+      uid=8_19 button "Encoding & Codecs 579 resources" description="Encoding & Codecs" expandable expanded
+      uid=8_20 link "All in Encoding & Codecs →" url="https://awesome.video/category/encoding-codecs"
+      uid=8_24 link "Benchmarking & Performance Tools for Codecs 18 resources" description="Benchmarking & Performance Tools for Codecs" url="https://awesome.video/subcategory/benchmarking-performance-tools-for-codecs"
+        uid=8_25 "Benchmarking & Performance Tools for Codecs"
+        uid=8_26 "18"
+      uid=8_27 link "Cloud-Based Encoding Solutions 18 resources" description="Cloud-Based Encoding Solutions" url="https://awesome.video/subcategory/cloud-based-encoding-solutions"
+        uid=8_28 "Cloud-Based Encoding Solutions"
+        uid=8_29 "18"
+      uid=8_30 link "Codecs 68 resources" description="Codecs" url="https://awesome.video/subcategory/codecs"
+        uid=8_31 "Codecs"
+        uid=8_32 "68"
+      uid=8_33 button "Expand 3 nested groups in Codecs" description="3 nested groups" expandable
+      uid=8_34 link "Comparative Analysis of Codecs 19 resources" description="Comparative Analysis of Codecs" url="https://awesome.video/subcategory/comparative-analysis-of-codecs"
+        uid=8_35 "Comparative Analysis of Codecs"
+        uid=8_36 "19"
+      uid=8_37 link "Containerization & Packaging Tools 35 resources" description="Containerization & Packaging Tools" url="https://awesome.video/subcategory/containerization-packaging-tools"
+        uid=8_38 "Containerization & Packaging Tools"
+        uid=8_39 "35"
+      uid=8_40 button "Expand 1 nested group in Containerization & Packaging Tools" description="1 nested group" expandable
+      uid=8_41 link "Encoding Tools 136 resources" description="Encoding Tools" url="https://awesome.video/subcategory/encoding-tools"
+        uid=8_42 "Encoding Tools"
+        uid=8_43 "136"
+      uid=8_44 button "Expand 1 nested group in Encoding Tools" description="1 nested group" expandable
+      uid=8_45 link "FFmpeg-Based Tools 18 resources" description="FFmpeg-Based Tools" url="https://awesome.video/subcategory/ffmpeg-based-tools"
+        uid=8_46 "FFmpeg-Based Tools"
+        uid=8_47 "18"
+      uid=8_48 link "Hardware Accelerated Transcoding 25 resources" description="Hardware Accelerated Transcoding" url="https://awesome.video/subcategory/hardware-accelerated-transcoding"
+        uid=8_49 "Hardware Accelerated Transcoding"
+        uid=8_50 "25"
+      uid=8_51 link "Hardware Codecs & Acceleration 24 resources" description="Hardware Codecs & Acceleration" url="https://awesome.video/subcategory/hardware-codecs-acceleration"
+        uid=8_52 "Hardware Codecs & Acceleration"
+        uid=8_53 "24"
+      uid=8_54 link "Multi-format Packaging Tools 13 resources" description="Multi-format Packaging Tools" url="https://awesome.video/subcategory/multi-format-packaging-tools"
+        uid=8_55 "Multi-format Packaging Tools"
+        uid=8_56 "13"
+      uid=8_57 link "Next-Generation Codecs AV1 VVC 19 resources" description="Next-Generation Codecs AV1 VVC" url="https://awesome.video/subcategory/next-generation-codecs-av1-vvc"
+        uid=8_58 "Next-Generation Codecs AV1 VVC"
+        uid=8_59 "19"
+      uid=8_60 link "Open Source Encoder Projects 28 resources" description="Open Source Encoder Projects" url="https://awesome.video/subcategory/open-source-encoder-projects"
+        uid=8_61 "Open Source Encoder Projects"
+        uid=8_62 "28"
+      uid=8_63 link "Real-Time Encoding Solutions 16 resources" description="Real-Time Encoding Solutions" url="https://awesome.video/subcategory/real-time-encoding-solutions"
+        uid=8_64 "Real-Time Encoding Solutions"
+        uid=8_65 "16"
+      uid=8_66 link "Scripting & Automation Tools 17 resources" description="Scripting & Automation Tools" url="https://awesome.video/subcategory/scripting-automation-tools"
+        uid=8_67 "Scripting & Automation Tools"
+        uid=8_68 "17"
+      uid=8_69 link "Software Codecs 18 resources" description="Software Codecs" url="https://awesome.video/subcategory/software-codecs"
+        uid=8_70 "Software Codecs"
+        uid=8_71 "18"
+      uid=8_72 link "Software Transcoding Tools 15 resources" description="Software Transcoding Tools" url="https://awesome.video/subcategory/software-transcoding-tools"
+        uid=8_73 "Software Transcoding Tools"
+        uid=8_74 "15"
+      uid=8_75 link "Uncategorized 92 resources" description="Uncategorized" url="https://awesome.video/category/encoding-codecs?filter=general"
+        uid=8_76 "Uncategorized"
+        uid=8_77 "92"
+      uid=8_78 button "General Tools 514 resources" description="General Tools" expandable
+      uid=8_79 button "Infrastructure & Delivery 353 resources" description="Infrastructure & Delivery" expandable
+      uid=8_80 button "Intro & Learning 297 resources" description="Intro & Learning" expandable
+      uid=8_81 button "Media Tools 704 resources" description="Media Tools" expandable
+      uid=8_82 button "Players & Clients 447 resources" description="Players & Clients" expandable
+      uid=8_83 button "Protocols & Transport 467 resources" description="Protocols & Transport" expandable
+      uid=8_84 button "Standards & Industry 335 resources" description="Standards & Industry" expandable
+      uid=8_85 "3,825 indexed"
+      uid=8_86 " · live"
+      uid=8_87 link "Docs ↗" url="https://github.com/krzemienski/awesome-video/tree/master/docs"
+      uid=8_89 link "Source: krzemienski/awesome-video" description="Source: krzemienski/awesome-video" url="https://github.com/krzemienski/awesome-video"
+      uid=8_90 DisclosureTriangle "More navigation" description="More navigation" expandable
+    uid=8_91 button "Close sidebar"
