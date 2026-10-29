@@ -248,7 +248,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     <Breadcrumb className="sr-only" data-testid="page-breadcrumb">
       <BreadcrumbList className="min-w-0 flex-nowrap overflow-hidden">
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" title="Home" tabIndex={-1} className="inline-flex min-h-6 items-center" data-testid="link-breadcrumb-home">Home</BreadcrumbLink>
+          <BreadcrumbLink href="/" title="Home" tabIndex={-1} data-testid="link-breadcrumb-home">Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         {crumbs.map((crumb, index) => {
@@ -265,7 +265,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
             <BreadcrumbItem className={current ? "min-w-0" : undefined} key={`${crumb.href ?? "current"}-${crumb.label}`}>
               {current
                 ? <BreadcrumbPage className="block truncate" title={crumb.label} data-testid="breadcrumb-mobile-current">{crumb.label}</BreadcrumbPage>
-                : <BreadcrumbLink href={href ?? "/"} title={crumb.label} tabIndex={-1} className="inline-flex min-h-6 items-center" data-testid={`link-breadcrumb-hidden-${href?.split("/").pop() ?? "home"}`}>{crumb.label}</BreadcrumbLink>}
+                : <BreadcrumbLink href={href ?? "/"} title={crumb.label} tabIndex={-1} data-testid={`link-breadcrumb-hidden-${href?.split("/").pop() ?? "home"}`}>{crumb.label}</BreadcrumbLink>}
             </BreadcrumbItem>,
             !current && <BreadcrumbSeparator key={`${crumb.label}-separator`} />,
           ];
