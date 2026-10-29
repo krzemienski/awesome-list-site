@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paginator } from "@/components/ui/paginator";
 import AdvancedFilter from "@/components/ui/advanced-filter";
-import SearchFilters, { ActiveFilters } from "@/components/search/SearchFilters";
+import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
 import { ViewModeToggle, isLayoutViewMode, type ViewMode } from "@/components/ui/view-mode-toggle";
@@ -49,16 +49,19 @@ type Props = { level: ListingLevel };
 import { CATEGORY_GLYPHS as categoryMarks } from "@/lib/category-glyph";
 import { scrollBehavior } from "@/lib/scroll-behavior";
 
-const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
-
-function normalizeSort(value: string | null): string {
-  if (!value) return "default";
+/** The sort the listing applies, or null for one /search would also reject
+ *  (same sortLabels vocabulary). A rejected sort stays in state and the URL so
+ *  ActiveFilters shows the shared "Unsupported sort" chip instead of hiding it. */
+function acceptedSort(value: string): string | null {
   const normalized = value.toLowerCase();
-  if (CANONICAL_SORTS.has(normalized)) return normalized;
+  if (normalized === "default" || normalized === "relevance") return "default";
+  if (Object.hasOwn(sortLabels, normalized)) return normalized;
   if (normalized === "name" || normalized === "asc") return "name-asc";
   if (normalized === "desc") return "name-desc";
-  return "default";
+  return null;
 }
+
+const parseSort = (raw: string | null) => (raw ? acceptedSort(raw) ?? raw : "default");
 
 interface TaxonomyFilterSnapshot {
   tags: string[];
@@ -170,9 +173,7 @@ export default function TaxonomyListing({ level }: Props) {
   const [format, setFormat] = useState(params.get("format") ?? "");
   const [skillLevel, setSkillLevel] = useState(params.get("skillLevel") ?? "");
   const [kind, setKind] = useState<ResourceKind | null>(() => parseKindParam(params.get("kind")));
-  const [sort, setSort] = useState(() =>
-    normalizeSort(params.get("sortBy") || params.get("sort")),
-  );
+  const [sort, setSort] = useState(() => parseSort(params.get("sortBy") || params.get("sort")));
   const [view, setView] = useState<ViewMode>(() => {
     const fromUrl = params.get("view");
     if (isLayoutViewMode(fromUrl)) return fromUrl;
@@ -213,7 +214,7 @@ export default function TaxonomyListing({ level }: Props) {
       setFormat(params.get("format") ?? "");
       setSkillLevel(params.get("skillLevel") ?? "");
       setKind(parseKindParam(params.get("kind")));
-      setSort(normalizeSort(params.get("sortBy") || params.get("sort")));
+      setSort(parseSort(params.get("sortBy") || params.get("sort")));
       setPage(strictUrlPage(params.get("page")) ?? 1);
       setPageNotice(null);
       const nextView = params.get("view");
@@ -293,7 +294,7 @@ export default function TaxonomyListing({ level }: Props) {
     if (provider) query.set("provider", provider);
     if (format) query.set("format", format);
     if (skillLevel) query.set("skillLevel", skillLevel);
-    if (sort !== "default") query.set("sort", sort);
+    if (sort !== "default" && acceptedSort(sort)) query.set("sort", sort);
     if (kind) query.set("kind", kind);
     return `/api/resources?${query.toString()}`;
   }, [debouncedSearch, format, general, kind, level, listingData, page, provider, selection, skillLevel, slug, sort, tags]);

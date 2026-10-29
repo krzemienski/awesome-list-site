@@ -102,11 +102,10 @@ export default function ResourceBreadcrumbAncestorDisclosure({
               type="button"
               variant="ghost"
               size="icon"
-              // Breadcrumb text is 20px tall. Keep this inline visual control
-              // within that established row. Its pseudo-element is intended
-              // to provide a 24px pointer target without adding layout
-              // height; focused geometry verification measures the result.
-              className="relative !size-5 !min-h-5 !min-w-5 !p-0 before:absolute before:-inset-0.5 before:content-['']"
+              // WCAG 2.5.8: the control itself is the 24px target. The
+              // earlier 20px box relied on a pseudo-element that did not
+              // grow the measured box.
+              className="relative !size-6 !min-h-6 !min-w-6 !p-0"
               // Lives inside the visually hidden shell breadcrumb: reachable
               // by assistive technology, never an invisible Tab stop.
               tabIndex={-1}

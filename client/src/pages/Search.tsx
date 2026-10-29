@@ -6,7 +6,7 @@ import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
-import { normalizeTag } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,12 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
-const readState = (search: string): State => {
-  return readSearchState(search);
-};
+// parseTagsParam keeps the visitor's spelling of each tag, so an unknown tag
+// shows as typed instead of as its singular slug.
+const readState = (search: string): State => ({
+  ...readSearchState(search),
+  tags: parseTagsParam(new URLSearchParams(search)),
+});
 const facetState = (s: State) => [s.category, s.subcategory, s.subSubcategory, s.provider, s.format, s.skillLevel].some(Boolean) || s.tags.length > 0;
 const searchFilterSignature = (s: State) => JSON.stringify([
   s.category,
