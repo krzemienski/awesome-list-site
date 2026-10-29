@@ -291,7 +291,7 @@ export default function Advanced() {
             <CardContent className="discovery-tools-panel-content">
               {/* BUG-026 (run13): format cards are now buttons that select the
                   matching format in the export panel below. */}
-              <div className="discovery-tools-format-grid" role="radiogroup" aria-label="Export format">
+              <div className="discovery-tools-format-grid" role="group" aria-label="Export format">
                 {([
                   { format: "Markdown", value: "markdown", icon: FileText, desc: "GitHub-ready" },
                   { format: "JSON", value: "json", icon: Code, desc: "API-friendly" },
@@ -306,8 +306,7 @@ export default function Advanced() {
                       key={item.format}
                       type="button"
                       onClick={() => setExportFormat(item.value)}
-                      role="radio"
-                      aria-checked={exportFormat === item.value}
+                      aria-pressed={exportFormat === item.value}
                       aria-label={item.format}
                       className="discovery-tools-format-option"
                       data-testid={`button-format-${item.value}`}

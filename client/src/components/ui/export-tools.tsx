@@ -94,7 +94,7 @@ function OptionRow({ id, name, text, checked, onCheckedChange }: { id: string; n
   return (
     <div className="flex items-center space-x-2 max-lg:min-h-11">
       <Checkbox className="h-6 w-6" id={id} name={name} aria-labelledby={`${id}-label`} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
-      <label id={`${id}-label`} htmlFor={id}className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
+      <label id={`${id}-label`} htmlFor={id} className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
     </div>
   );
 }
