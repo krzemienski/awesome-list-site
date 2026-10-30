@@ -220,7 +220,7 @@ export default function TagLanding() {
           {/* The full related-topics section sits under the list; nearly every
               tag lander left before reaching it, so name the closest few here. */}
           {(categories.length > 0 || relatedTags.length > 0) && (
-            <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted-foreground" data-testid="tag-related-shortcut">
+            <p className="mt-2 max-w-prose text-sm leading-7 text-muted-foreground" data-testid="tag-related-shortcut">
               Related:{" "}
               {[
                 ...relatedTags.slice(0, 3).map(([related]) => ({ href: tagLandingPath(related), label: `#${tagDisplayName(related)}` })),
