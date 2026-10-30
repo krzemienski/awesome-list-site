@@ -275,7 +275,7 @@ export default function ContactSubmissions() {
                     {revealedId === selectedSubmission.id ? (
                       <a
                         href={`mailto:${selectedSubmission.replyTo}?subject=${encodeURIComponent(`Re: ${selectedSubmission.subject}`)}`}
-                        className="min-w-0 break-all underline underline-offset-4"
+                        className="inline-flex min-h-6 min-w-0 max-lg:min-h-11 items-center break-all underline underline-offset-4"
                         data-testid="text-contact-detail-email"
                       >
                         {selectedSubmission.replyTo}
