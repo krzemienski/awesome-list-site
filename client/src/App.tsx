@@ -204,6 +204,7 @@ async function isServerReachable(): Promise<boolean> {
 // C10-V2-01: a keyboard user who was on the route error card when it reloads
 // the page lands on the recovered page's h1, not <body>.
 const ROUTE_RETRY_FOCUS_FLAG = "route-retry-focus-heading";
+const CARD_RETRY_FOCUS_WINDOW_MS = 10_000;
 
 function restoreRouteRetryFocus(): void {
   let pending = false;
@@ -304,6 +305,13 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       // the whole app session. Offline chunk failures fall through to the
       // in-app retry card, which keeps the shell (and in-memory state) alive.
       if (!recentlyReloaded && navigator.onLine !== false) {
+        if (Date.now() - this.cardRetryFocusAt < CARD_RETRY_FOCUS_WINDOW_MS) {
+          try {
+            sessionStorage.setItem(ROUTE_RETRY_FOCUS_FLAG, "1");
+          } catch {
+            // ignore
+          }
+        }
         window.location.reload();
         return;
       }
@@ -319,6 +327,11 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
 
   private probeTimer: number | undefined;
   private probeAttempts = 0;
+  // When an in-place retry started from the focused error card. The retried
+  // import can fail again right after the card unmounts (focus is already on
+  // <body> by then), and the boundary then reloads the document; this is how
+  // that reload still knows to focus the recovered heading.
+  private cardRetryFocusAt = 0;
 
   componentDidMount() {
     window.addEventListener("online", this.handleOnline);
@@ -374,6 +387,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       const cardHadFocus = Boolean(
         document.activeElement?.closest("[data-testid='route-error-boundary']"),
       );
+      if (cardHadFocus) this.cardRetryFocusAt = Date.now();
       retryFailedRouteImports();
       this.setState({ error: null, retryBlocked: null, failedOffline: false });
       if (cardHadFocus) focusRecoveredHeading();
