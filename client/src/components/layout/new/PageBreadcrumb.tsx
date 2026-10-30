@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import {
@@ -9,11 +9,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { lazyOptional } from "@/lib/lazy-optional";
 import { deslugify } from "@/lib/utils";
 import { tagDisplayNameBranded } from "@shared/seo-templates";
 import { normalizeTagPathSegment } from "@shared/tagNormalize";
 
-const ResourceBreadcrumbAncestorDisclosure = lazy(
+// The breadcrumb sits outside RouteErrorBoundary; a failed chunk drops the
+// disclosure and leaves the plain trail.
+const ResourceBreadcrumbAncestorDisclosure = lazyOptional(
   () => import("./ResourceBreadcrumbAncestorDisclosure"),
 );
 
@@ -48,12 +51,10 @@ function ResourceBreadcrumbAncestorSlot({
   if (!eligible) return null;
 
   return (
-    <Suspense fallback={null}>
-      <ResourceBreadcrumbAncestorDisclosure
-        resourceId={resourceId}
-        categories={categories}
-      />
-    </Suspense>
+    <ResourceBreadcrumbAncestorDisclosure
+      resourceId={resourceId}
+      categories={categories}
+    />
   );
 }
 
