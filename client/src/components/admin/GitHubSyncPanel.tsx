@@ -287,7 +287,7 @@ export default function GitHubSyncPanel() {
                 {configuredRepo || (configIsLoading ? "Loading repository…" : "Repository not configured")}
               </CardTitle>
               <p className="ops-github-panel__repository-meta">
-                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
+                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueUnavailable ? "sync jobs unavailable" : syncQueueIsLoading ? "loading sync jobs…" : `${syncQueueData?.total ?? 0} sync jobs`}
               </p>
               {targetNote && (
                 <p
@@ -619,6 +619,14 @@ export default function GitHubSyncPanel() {
              testId="alert-sync-history-error"
              retryTestId="button-retry-sync-history"
            />
+         </TableShell>
+       ) : syncHistoryIsLoading ? (
+         <TableShell
+           title="Sync jobs"
+           sub="Loading the sync history…"
+           className="ops-github-panel__history-shell"
+         >
+           <p className="ops-github-panel__history-empty" role="status">Loading sync history…</p>
          </TableShell>
        ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell
