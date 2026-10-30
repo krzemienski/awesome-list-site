@@ -806,7 +806,7 @@ export default function GitHubSyncPanel() {
                   href={selectedHistory.commitUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn ghost inline-flex w-fit items-center gap-2"
+                  className="btn ghost inline-flex w-fit items-center gap-2 max-lg:min-h-11"
                 >
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />
                   View commit on GitHub

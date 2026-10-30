@@ -63,7 +63,11 @@
    on an inline box grows its hit area to the 24px inline-link floor without
    changing the line height (sweep NEW-010: it was 17px). */
 .system-consent-banner__privacy-link {
-  padding-block: 4px;
+  /* 4px padding alone left the box at 23px on the smaller mobile text;
+     a fixed 24px min-height doesn't depend on the font size. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--text);
   text-decoration: underline;
   text-decoration-thickness: 1px;

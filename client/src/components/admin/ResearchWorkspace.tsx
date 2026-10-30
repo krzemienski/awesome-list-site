@@ -169,7 +169,7 @@ export function ResearchWorkspace() {
           {!selectedJob && !detailError && <p role="status">Loading research details…</p>}
           {selectedJob && (
             <div className="space-y-4">
-              <a className="text-primary underline" href={`/admin/researcher?jobId=${selectedJob.id}`}>
+              <a className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary underline" href={`/admin/researcher?jobId=${selectedJob.id}`}>
                 Review candidates for job #{selectedJob.id}
               </a>
               <div>
