@@ -789,7 +789,7 @@ function StepsDialog({
 }
 
 export default function JourneyStepsManager() {
-  const { data, isLoading, error, refetch, isFetching } = useQuery<{ journeys: AdminJourney[] }>({
+  const journeysQuery = useQuery<{ journeys: AdminJourney[] }>({
     queryKey: ["/api/admin/journeys"],
     queryFn: async () => {
       const res = await apiFetch("/api/admin/journeys", { credentials: "include" });
@@ -802,6 +802,9 @@ export default function JourneyStepsManager() {
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
+  const { data, isLoading, error, refetch, isFetching } = journeysQuery;
+  // Paused offline is not "No journeys yet." (sweep NEW-002).
+  const unavailable = queryUnavailableReason(journeysQuery);
 
   const [activeJourney, setActiveJourney] = useState<AdminJourney | null>(null);
 
@@ -824,18 +827,20 @@ export default function JourneyStepsManager() {
             <Skeleton className="h-16 w-full" />
           </div>
         )}
-        {error && (
+        {unavailable && (
           <AdminLoadError
             subject="journeys"
             error={error}
-            note={data ? "The list below may be out of date." : undefined}
+            note={unavailable === "offline"
+              ? "You're offline; it will load when your connection returns."
+              : data ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
             testId="alert-journeys-error"
             retryTestId="button-retry-journeys"
           />
         )}
-        {!isLoading && !error && (data?.journeys?.length ?? 0) === 0 && (
+        {!isLoading && !unavailable && (data?.journeys?.length ?? 0) === 0 && (
           <p className="text-sm text-muted-foreground">No journeys yet.</p>
         )}
         <div className="space-y-2">

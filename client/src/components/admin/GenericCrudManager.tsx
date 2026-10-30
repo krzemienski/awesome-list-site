@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useMemo, useCallback, ReactNode, useRef, useEffect } from "react";
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1691,14 +1692,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // second tab's create/edit/delete becomes visible on focus (or after a
   // mutation invalidates [queryKey]) instead of staying stale until a hard
   // refresh.
-  const {
-    data: items,
-    isLoading,
-    isError: itemsIsError,
-    error: itemsError,
-    isFetching: itemsIsFetching,
-    refetch: refetchItems,
-  } = useQuery<T[]>({
+  const itemsQuery = useQuery<T[]>({
     queryKey: [queryKey],
     queryFn: async () => {
       const response = await apiFetch(fetchUrl, {
@@ -1710,6 +1704,17 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+  const {
+    data: items,
+    isLoading,
+    error: itemsError,
+    isFetching: itemsIsFetching,
+    refetch: refetchItems,
+  } = itemsQuery;
+  // A fetch started offline is paused, not failed: without this it fell
+  // through to "No <entities> match your search." (sweep NEW-002).
+  const itemsUnavailable = queryUnavailableReason(itemsQuery);
+  const itemsIsError = itemsUnavailable !== null;
 
   const resolvedDescription = typeof description === "function"
     ? description(items, navTree)
@@ -2883,7 +2888,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <AdminLoadError
             subject={entityNamePlural.toLowerCase()}
             error={itemsError}
-            note={items ? "The list below may be out of date." : undefined}
+            note={itemsUnavailable === "offline"
+              ? "You're offline; it will load when your connection returns."
+              : items ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetchItems(); }}
             retrying={itemsIsFetching}
             className="mb-4"
