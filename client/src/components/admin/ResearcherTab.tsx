@@ -613,7 +613,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                         <TableRow key={d.id} data-testid={`row-research-discovery-${d.id}`}>
                           <TableCell className="max-w-[320px]">
                             <div className="min-w-0">
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-medium line-clamp-1 break-words" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                                 {getVerificationBadges(d)}
                               </div>
@@ -1061,7 +1061,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     {jobDiscoveries.map(d => (
                       <div key={d.id} className="flex items-center justify-between border rounded p-2 text-sm">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium line-clamp-1 break-words min-w-0" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                             {getDiscoveryStatusBadge(d.status)}
                             {getVerificationBadges(d)}
