@@ -193,10 +193,17 @@
   text-decoration-color: var(--text);
 }
 
+/* min-height does nothing on an inline box, so the hit area comes from
+   vertical padding; the paragraph's 28px line keeps padded links on
+   neighbouring lines from overlapping when the text wraps (sweep-5 AX-010). */
 .about-inline-link-text {
   display: inline;
-  min-height: 24px;
+  padding-block: 4px;
   vertical-align: baseline;
+}
+
+.about-body-copy:has(.about-inline-link-text) {
+  line-height: 28px;
 }
 
 .about-inline-icon {
