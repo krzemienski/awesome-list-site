@@ -62,7 +62,7 @@ interface BrokenLinksResponse {
 function ResourceTitle({ check }: { check: CheckWithResource }) {
   if (!check.resource) return <>{`Resource #${check.resourceId}`}</>;
   return (
-    <a href={`/resource/${check.resource.id}`} className="hover:underline">
+    <a href={`/resource/${check.resource.id}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center hover:underline">
       {check.resource.title}
     </a>
   );
@@ -742,7 +742,7 @@ export default function LinkHealthDashboard() {
                           href={check.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`block truncate font-mono text-xs leading-7 hover:underline ${INFO_TEXT_CLASS}`}
+                          className={`flex min-h-7 max-lg:min-h-11 items-center truncate font-mono text-xs hover:underline ${INFO_TEXT_CLASS}`}
                           title={check.url}
                         >
                           {check.url}
@@ -882,7 +882,7 @@ export default function LinkHealthDashboard() {
                           href={check.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`block truncate leading-7 hover:underline ${INFO_TEXT_CLASS}`}
+                          className={`flex min-h-7 max-lg:min-h-11 items-center truncate hover:underline ${INFO_TEXT_CLASS}`}
                         >
                           {check.url}
                         </a>
