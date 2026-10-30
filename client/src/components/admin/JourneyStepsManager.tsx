@@ -831,9 +831,8 @@ export default function JourneyStepsManager() {
           <AdminLoadError
             subject="journeys"
             error={error}
-            note={unavailable === "offline"
-              ? "You're offline; it will load when your connection returns."
-              : data ? "The list below may be out of date." : undefined}
+            offline={unavailable === "offline"}
+            note={data ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
             testId="alert-journeys-error"

@@ -380,10 +380,10 @@ export default function LinkHealthDashboard() {
 
   // One load-error banner names every failed request; Retry re-runs them all.
   const failedLinkHealthParts = [
-    { failed: statusError, label: "scan status", error: statusErrorValue, fetching: statusFetching, retry: retryStatus },
-    { failed: historyError, label: "scan history", error: historyErrorValue, fetching: historyFetching, retry: retryHistory },
-    { failed: linksError, label: "problem links", error: linksErrorValue, fetching: linksFetching, retry: retryLinks },
-    { failed: coverageError, label: "catalog coverage", error: coverageErrorValue, fetching: coverageFetching, retry: retryCoverage },
+    { failed: statusError, unavailable: statusUnavailable, label: "scan status", error: statusErrorValue, fetching: statusFetching, retry: retryStatus },
+    { failed: historyError, unavailable: historyUnavailable, label: "scan history", error: historyErrorValue, fetching: historyFetching, retry: retryHistory },
+    { failed: linksError, unavailable: linksUnavailable, label: "problem links", error: linksErrorValue, fetching: linksFetching, retry: retryLinks },
+    { failed: coverageError, unavailable: coverageUnavailable, label: "catalog coverage", error: coverageErrorValue, fetching: coverageFetching, retry: retryCoverage },
   ].filter((part) => part.failed);
 
   return (
@@ -392,9 +392,8 @@ export default function LinkHealthDashboard() {
         <AdminLoadError
           subject={failedLinkHealthParts.map((part) => part.label).join(", ")}
           error={failedLinkHealthParts[0].error}
-          note={`${[statusUnavailable, historyUnavailable, linksUnavailable, coverageUnavailable].includes("offline")
-            ? "You're offline; it will load when your connection returns. "
-            : ""}Previously loaded results may be out of date; missing counts are not evidence of healthy links.`}
+          offline={failedLinkHealthParts.every((part) => part.unavailable === "offline")}
+          note="Previously loaded results may be out of date; missing counts are not evidence of healthy links."
           onRetry={() => failedLinkHealthParts.forEach((part) => { void part.retry(); })}
           retrying={failedLinkHealthParts.some((part) => part.fetching)}
           testId="alert-link-health-error"
@@ -742,10 +741,10 @@ export default function LinkHealthDashboard() {
                           href={check.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`flex min-h-7 max-lg:min-h-11 items-center truncate font-mono text-xs hover:underline ${INFO_TEXT_CLASS}`}
+                          className={`flex min-h-7 max-lg:min-h-11 items-center font-mono text-xs hover:underline ${INFO_TEXT_CLASS}`}
                           title={check.url}
                         >
-                          {check.url}
+                          <span className="min-w-0 truncate">{check.url}</span>
                         </a>
                         {check.errorMessage && (
                           <span className="mt-1 block truncate text-xs text-muted-foreground" title={check.errorMessage}>
@@ -882,9 +881,9 @@ export default function LinkHealthDashboard() {
                           href={check.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`flex min-h-7 max-lg:min-h-11 items-center truncate hover:underline ${INFO_TEXT_CLASS}`}
+                          className={`flex min-h-7 max-lg:min-h-11 items-center hover:underline ${INFO_TEXT_CLASS}`}
                         >
-                          {check.url}
+                          <span className="min-w-0 truncate">{check.url}</span>
                         </a>
                         {/* Suspicion detail (why the heuristic fired) or fetch error */}
                         {check.errorMessage && (

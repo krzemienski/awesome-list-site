@@ -1716,9 +1716,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const itemsUnavailable = queryUnavailableReason(itemsQuery);
   const itemsIsError = itemsUnavailable !== null;
 
-  const resolvedDescription = typeof description === "function"
-    ? description(items, navTree)
-    : description;
+  // The count descriptions read "0 …" when the list never loaded; show none then.
+  const resolvedDescription = typeof description !== "function"
+    ? description
+    : itemsUnavailable && !items
+      ? null
+      : description(items, navTree);
 
   // Filter items based on search query
   const orderedItems = useMemo(() => {
@@ -2674,9 +2677,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               <Icon className="h-5 w-5" />
               {entityNamePlural}
             </CardTitle>
-            <CardDescription className="admin-taxonomy-description">
-              {resolvedDescription}
-            </CardDescription>
+            {resolvedDescription ? (
+              <CardDescription className="admin-taxonomy-description">
+                {resolvedDescription}
+              </CardDescription>
+            ) : null}
           </div>
           <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
             {searchEnabled && (
@@ -2888,9 +2893,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <AdminLoadError
             subject={entityNamePlural.toLowerCase()}
             error={itemsError}
-            note={itemsUnavailable === "offline"
-              ? "You're offline; it will load when your connection returns."
-              : items ? "The list below may be out of date." : undefined}
+            offline={itemsUnavailable === "offline"}
+            note={items ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetchItems(); }}
             retrying={itemsIsFetching}
             className="mb-4"

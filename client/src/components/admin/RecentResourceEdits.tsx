@@ -87,7 +87,7 @@ export function RecentResourceEdits() {
         <AdminLoadError
           subject="recent edits"
           error={recentQuery.error}
-          note={unavailable === "offline" ? "You're offline; it will load when your connection returns." : undefined}
+          offline={unavailable === "offline"}
           onRetry={() => { void refetch(); }}
           retrying={isFetching}
           testId="recent-edits-load-error"

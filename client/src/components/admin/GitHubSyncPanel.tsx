@@ -160,7 +160,6 @@ export default function GitHubSyncPanel() {
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const syncHistoryUnavailable = queryUnavailableReason(syncHistoryQuery);
   const syncQueueUnavailable = queryUnavailableReason(syncQueueQuery);
-  const offlineNote = "You're offline; it will load when your connection returns.";
 
   useEffect(() => {
     if (syncQueueData) {
@@ -531,7 +530,7 @@ export default function GitHubSyncPanel() {
                <AdminLoadError
                  subject="the sync queue"
                  error={syncQueueError}
-                 note={syncQueueUnavailable === "offline" ? offlineNote : undefined}
+                 offline={syncQueueUnavailable === "offline"}
                  onRetry={() => { void refetchSyncQueue(); }}
                  retrying={syncQueueIsFetching}
                  testId="alert-sync-queue-error"
@@ -614,7 +613,7 @@ export default function GitHubSyncPanel() {
            <AdminLoadError
              subject="sync history"
              error={syncHistoryError}
-             note={syncHistoryUnavailable === "offline" ? offlineNote : undefined}
+             offline={syncHistoryUnavailable === "offline"}
              onRetry={() => { void refetchSyncHistory(); }}
              retrying={syncHistoryIsFetching}
              testId="alert-sync-history-error"

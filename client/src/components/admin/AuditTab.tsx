@@ -360,9 +360,8 @@ export default function AuditTab() {
           <AdminLoadError
             subject="the audit log"
             error={error}
-            note={unavailable === "offline"
-              ? "You're offline; it will load when your connection returns."
-              : "Your filter is still applied."}
+            offline={unavailable === "offline"}
+            note="Your filter is still applied."
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
             testId="alert-audit-error"

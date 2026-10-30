@@ -88,9 +88,8 @@ export function ResearchWorkspace() {
           <AdminLoadError
             subject="research notes"
             error={error}
-            note={unavailable === "offline"
-              ? "You're offline; it will load when your connection returns."
-              : data ? "The notes below may be out of date." : undefined}
+            offline={unavailable === "offline"}
+            note={data ? "The notes below may be out of date." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
             testId="research-notes-error"

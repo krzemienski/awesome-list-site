@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { describeLoadError } from "@/lib/apiError";
 import { cn } from "@/lib/utils";
 
+const OFFLINE_MESSAGE = "You're offline; this will load when your connection returns.";
+
 export interface AdminLoadErrorProps {
   /** What failed to load, phrased to follow "Couldn't load" — e.g. "the audit log". */
   subject: string;
   /** The query error; 5xx responses get the shared server-failure copy. */
   error: unknown;
+  /** True when the request is paused because the browser is offline; shows the offline copy and no Retry (refetch stays paused offline). */
+  offline?: boolean;
   /** Re-runs the failed request(s). Omit only when the parent owns the retry. */
   onRetry?: (event: MouseEvent<HTMLButtonElement>) => void;
   /** True while the retry is in flight. */
@@ -33,6 +37,7 @@ export interface AdminLoadErrorProps {
 export function AdminLoadError({
   subject,
   error,
+  offline = false,
   onRetry,
   retrying = false,
   note,
@@ -52,10 +57,10 @@ export function AdminLoadError({
       </p>
       <AlertDescription className="flex flex-wrap items-center gap-3">
         <span data-load-error-message="">
-          {describeLoadError(error)}
+          {offline ? OFFLINE_MESSAGE : describeLoadError(error)}
           {note ? <> {note}</> : null}
         </span>
-        {onRetry ? (
+        {onRetry && !offline ? (
           <Button
             type="button"
             variant="outline"

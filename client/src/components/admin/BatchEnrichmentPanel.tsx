@@ -188,9 +188,6 @@ export default function BatchEnrichmentPanel() {
   } = jobsQuery;
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const jobsUnavailable = queryUnavailableReason(jobsQuery);
-  const jobsOfflineNote = jobsUnavailable === "offline"
-    ? "You're offline; it will load when your connection returns."
-    : undefined;
 
   // Run23 NB-046: surface how much of the approved catalog actually has tags.
   // The July bulk import left over half the corpus untagged and there was no
@@ -276,7 +273,7 @@ export default function BatchEnrichmentPanel() {
   const jobs = jobsData?.jobs || [];
   // Until the list arrives, or when it failed with nothing cached, the tiles
   // have no jobs to describe; an empty list would read as idle and zero.
-  const jobsUnknownNote = isLoading ? "Loading…" : jobsIsError && !jobsData ? "unavailable" : null;
+  const jobsUnknownNote = isLoading ? "Loading…" : jobsUnavailable && !jobsData ? "unavailable" : null;
   const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
@@ -525,7 +522,8 @@ export default function BatchEnrichmentPanel() {
               <AdminLoadError
                 subject="enrichment jobs"
                 error={jobsError}
-                note={jobsOfflineNote ?? (jobsData ? "The rows above may be out of date." : undefined)}
+                offline={jobsUnavailable === "offline"}
+                note={jobsData ? "The rows above may be out of date." : undefined}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsIsFetching}
                 className="queues-agent__inline-error"
@@ -891,7 +889,7 @@ export default function BatchEnrichmentPanel() {
             <AdminLoadError
               subject="enrichment jobs"
               error={jobsError}
-              note={jobsOfflineNote}
+              offline={jobsUnavailable === "offline"}
               onRetry={() => { void refetchJobs(); }}
               retrying={jobsIsFetching}
               className="queues-agent__inline-error"

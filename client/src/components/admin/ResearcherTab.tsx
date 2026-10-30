@@ -168,9 +168,6 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   } = jobsQuery;
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const jobsUnavailable = queryUnavailableReason(jobsQuery);
-  const jobsOfflineNote = jobsUnavailable === "offline"
-    ? "You're offline; it will load when your connection returns."
-    : undefined;
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
   const [showAllJobs, setShowAllJobs] = useState(false);
@@ -409,7 +406,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 ref={guideRef}
                 categoryNames={categoryNames}
                 activeStateKnown={activeJobStateKnown}
-                activeStateError={jobsIsError}
+                activeStateError={jobsUnavailable !== null}
                 activeJobId={activeJob?.id ?? null}
                 onFollow={(id) => { setFocusRunOnMount(true); setFollowJobId(id); }}
                 onLaunched={(id) => {
@@ -474,7 +471,8 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               <AdminLoadError
                 subject="research jobs"
                 error={jobsError}
-                note={jobsOfflineNote ?? (jobs ? "The rows above may be out of date." : undefined)}
+                offline={jobsUnavailable === "offline"}
+                note={jobs ? "The rows above may be out of date." : undefined}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsFetching}
                 className="queues-agent__inline-error"
@@ -698,7 +696,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 <AdminLoadError
                   subject="research jobs"
                   error={jobsError}
-                  note={jobsOfflineNote}
+                  offline={jobsUnavailable === "offline"}
                   onRetry={() => { void refetchJobs(); }}
                   retrying={jobsFetching}
                   className="queues-agent__inline-error"
@@ -1069,8 +1067,8 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                             {getVerificationBadges(d)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
-                            className="flex min-h-6 max-lg:min-h-11 items-center truncate text-xs text-primary hover:underline">
-                            {sanitizeDisplay(d.url)}
+                            className="flex min-h-6 max-lg:min-h-11 items-center text-xs text-primary hover:underline">
+                            <span className="min-w-0 truncate">{sanitizeDisplay(d.url)}</span>
                           </a>
                         </div>
                         {d.status === 'pending_review' && (

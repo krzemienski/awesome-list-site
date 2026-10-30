@@ -141,7 +141,7 @@ export default function ContactSubmissions() {
             <AdminLoadError
               subject="contact submissions"
               error={error}
-              note={unavailable === "offline" ? "You're offline; it will load when your connection returns." : undefined}
+              offline={unavailable === "offline"}
               onRetry={() => { void refetch(); }}
               retrying={isFetching}
               testId="alert-contact-submissions-error"
