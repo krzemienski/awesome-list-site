@@ -283,7 +283,9 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources approved",
-        description: `${response.succeeded} approved${response.failed > 0 ? `, ${response.failed} failed` : ""}${names ? `: ${names}` : ""}.`,
+        description: response.failed > 0
+          ? `${response.succeeded} approved, ${response.failed} failed.${names ? ` Selected: ${names}.` : ""}`
+          : `${response.succeeded} approved${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
@@ -324,7 +326,9 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources rejected",
-        description: `${response.succeeded} rejected${response.failed > 0 ? `, ${response.failed} failed` : ""}${names ? `: ${names}` : ""}.`,
+        description: response.failed > 0
+          ? `${response.succeeded} rejected, ${response.failed} failed.${names ? ` Selected: ${names}.` : ""}`
+          : `${response.succeeded} rejected${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
