@@ -576,15 +576,15 @@ export default function JourneyDetail() {
           {!isAuthenticated ? (
             <Alert live="off" className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
+              <AlertDescription className="leading-7">
                 {/* P1-08: canonical /sign-in with a redirect_url back to this
                     journey. A real link (not a button) so it opens in a new
-                    tab; inline padding widens the target without stretching
-                    the line box. */}
+                    tab; py-1 gives it a 24px hit area and leading-7 keeps it
+                    from overlapping a wrapped neighbour line. */}
                 Please{" "}
                 <Link
                   href={loginHref}
-                  className="underline font-medium py-0.5"
+                  className="underline font-medium py-1"
                   data-testid="button-login-journey"
                 >
                   log in

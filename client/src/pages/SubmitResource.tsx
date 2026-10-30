@@ -613,9 +613,9 @@ export default function SubmitResource() {
                 <Alert live="off" className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
                   <LogIn className="submit-alert-icon" /> {/* DS-OK: status warn */}
                   <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
-                  <AlertDescription>
+                  <AlertDescription className="leading-7">
                     The form below is read-only. Please{" "}
-                    <a href="/sign-in?redirect_url=%2Fsubmit" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" className="py-1" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
