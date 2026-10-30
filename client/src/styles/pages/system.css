@@ -66,6 +66,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  /* Standalone "did you mean" link on its own line: 24px desktop, 44px touch. */
+  min-height: 24px;
   color: var(--text);
   font-weight: 500;
   text-decoration: underline;
@@ -163,5 +165,11 @@
 
   .system-state-actions > * {
     width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .system-state-suggestion {
+    min-height: 44px;
   }
 }
