@@ -174,7 +174,13 @@ type FuzzyScoreContext = {
   maxDistance: number;
   titleSpanWords: number;
   needleBigrams: Set<string>;
+  needleLetters: string;
 };
+
+/** Letters in sorted order: equal for two words that differ only by a transposition. */
+function sortedLetters(value: string): string {
+  return [...value].sort().join("");
+}
 
 function bigrams(value: string): Set<string> {
   const result = new Set<string>();
@@ -238,7 +244,7 @@ function fuzzyMatchForCandidate(
   context: FuzzyScoreContext,
   candidate: FuzzyCandidate,
 ): FuzzyMatch | undefined {
-  const { needle, maxDistance, needleBigrams, titleSpanWords } = context;
+  const { needle, maxDistance, needleBigrams, needleLetters, titleSpanWords } = context;
   const fields = [
     { text: candidate.title, priority: 0, spanWords: titleSpanWords },
     { text: candidate.description.slice(0, 320), priority: 1, spanWords: 1 },
@@ -267,7 +273,10 @@ function fuzzyMatchForCandidate(
         }
         for (const variant of variants) {
           const lengthDelta = Math.abs(needle.length - variant.length);
-          if (lengthDelta > maxDistance || !sharesBigram(needleBigrams, variant)) continue;
+          // A swapped pair of letters ("hsl" for "hls") can share no bigram
+          // at all with the intended word, so anagrams bypass the prefilter.
+          const isTransposition = lengthDelta === 0 && variant !== needle && sortedLetters(variant) === needleLetters;
+          if (lengthDelta > maxDistance || !(isTransposition || sharesBigram(needleBigrams, variant))) continue;
           const distance = boundedDamerauLevenshtein(needle, variant, maxDistance);
           const normalizedDistance = distance / Math.max(needle.length, variant.length);
           if (distance > maxDistance || normalizedDistance > 0.4) continue;
@@ -280,7 +289,7 @@ function fuzzyMatchForCandidate(
             normalizedDistance,
             lengthDelta,
             titleLengthDelta: Math.abs(needle.length - compactSearchText(candidate.title).length),
-            editDirectionPriority: isSubsequence(variant, needle)
+            editDirectionPriority: isTransposition || isSubsequence(variant, needle)
               ? 0
               : isSubsequence(needle, variant)
                 ? 1
@@ -327,6 +336,7 @@ function scoreFuzzyCandidates(
         : Math.max(2, Math.floor(needle.length * 0.34)),
     titleSpanWords: Math.min(4, Math.max(1, tokenizeSearchQuery(query).length + 2)),
     needleBigrams: bigrams(needle),
+    needleLetters: sortedLetters(needle),
   };
   const matches = candidates
     .map((candidate) => fuzzyMatchForCandidate(context, candidate))
