@@ -283,6 +283,9 @@
 }
 
 .home-subcategory-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   margin-top: 0.25rem;
   color: var(--text-3);
   font-size: 0.75rem;
