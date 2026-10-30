@@ -12,6 +12,7 @@
  */
 import { useId, useRef, useState, type FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { Check, Copy, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -111,6 +112,8 @@ export default function ApiKeysCard() {
     queryFn: () => apiRequest("/api/user/api-keys"),
     staleTime: 0,
   });
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const keysUnavailable = queryUnavailableReason(keysQuery);
 
   const createMutation = useMutation({
     // The expiry option rides along as the mutation variable so the success
@@ -301,11 +304,15 @@ export default function ApiKeysCard() {
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
             </div>
-          ) : keysQuery.isError && !keysQuery.data ? (
+          ) : keysUnavailable && !keysQuery.data ? (
             <Alert variant="destructive" data-testid="alert-api-keys-load-error">
               <AlertTitle>Couldn&apos;t load your keys</AlertTitle>
               <AlertDescription className="space-y-2">
-                <p>Nothing was changed. Try again.</p>
+                <p>
+                  {keysUnavailable === "offline"
+                    ? "You're offline; your keys will load when your connection returns."
+                    : "Nothing was changed. Try again."}
+                </p>
                 <Button type="button" variant="outline" onClick={() => void keysQuery.refetch()}>
                   Try again
                 </Button>

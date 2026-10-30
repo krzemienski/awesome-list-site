@@ -15,6 +15,7 @@ import { staticPageHeads } from "@shared/seo-templates";
 import { useAuth } from "@/hooks/useAuth";
 import LearningPreferencesForm from "@/components/onboarding/learning-preferences-form";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -93,7 +94,7 @@ export default function Settings() {
   const {
     preferences,
     isLoading: preferencesLoading,
-    isError: preferencesError,
+    unavailableReason: preferencesUnavailable,
     refetch: refetchPreferences,
     savePreferencesAsync,
     isSaving,
@@ -103,13 +104,15 @@ export default function Settings() {
   const {
     data: categories,
     isLoading: categoriesLoading,
-    isError: categoriesError,
     refetch: refetchCategories,
+    ...categoriesQuery
   } = useQuery<CategoryOption[]>({
     queryKey: ["/api/categories"],
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   });
+  const categoriesUnavailable = queryUnavailableReason(categoriesQuery);
+  const preferencesLoadUnavailable = preferencesUnavailable ?? categoriesUnavailable;
   // Sections above a deep-linked one change height as they load, so scroll to
   // #learning-preferences / #notification-settings only once they have.
   useScrollToHash(
@@ -322,10 +325,13 @@ export default function Settings() {
                   <div className="skeleton h-5 w-40" />
                   <div className="skeleton h-28" />
                 </div>
-              ) : preferencesError || categoriesError ? (
+              ) : preferencesLoadUnavailable ? (
                 <div className="py-6 text-center" role="alert">
                   <p className="text-sm text-[color:var(--text-2)]">
                     We couldn’t load your learning preferences.
+                    {preferencesUnavailable === "offline" || categoriesUnavailable === "offline"
+                      ? " You’re offline; they will load when your connection returns."
+                      : null}
                   </p>
                   <Button
                     variant="outline"
