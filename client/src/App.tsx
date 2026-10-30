@@ -214,6 +214,11 @@ function restoreRouteRetryFocus(): void {
     return;
   }
   if (!pending) return;
+  focusRecoveredHeading();
+}
+
+/** Wait for the recovered route's h1, then focus it unless focus already moved. */
+function focusRecoveredHeading(): void {
   const startedAt = Date.now();
   const tick = () => {
     if (document.activeElement && document.activeElement !== document.body) return;
@@ -364,8 +369,14 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     // (keeps app state, no document reload, so the 60s reload guard is not
     // consumed). If it fails again online, componentDidCatch applies that guard.
     if (this.state.failedOffline) {
+      // The error card held focus; once it unmounts focus falls to <body>, so
+      // hand it to the recovered page's heading as the reload path does.
+      const cardHadFocus = Boolean(
+        document.activeElement?.closest("[data-testid='route-error-boundary']"),
+      );
       retryFailedRouteImports();
       this.setState({ error: null, retryBlocked: null, failedOffline: false });
+      if (cardHadFocus) focusRecoveredHeading();
       return;
     }
     // Stamp (not clear) the guard: this click IS a reload attempt, so if the
