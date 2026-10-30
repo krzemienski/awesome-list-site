@@ -279,7 +279,11 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         const lastHref = sep === -1 ? "" : raw.slice(sep + 1);
         recentlyReloaded =
           Date.now() - last < 60_000 && lastHref === window.location.href;
-        if (!recentlyReloaded) {
+        // Only a real reload attempt consumes the guard. An offline failure
+        // never reloads, so stamping it there made the in-place retry after
+        // reconnect find the guard already spent and show the "site was
+        // updated" card instead of reloading (sweep C6-PC-062).
+        if (!recentlyReloaded && navigator.onLine !== false) {
           sessionStorage.setItem(
             CHUNK_RELOAD_FLAG,
             `${Date.now()}|${window.location.href}`,
