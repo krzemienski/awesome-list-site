@@ -21,6 +21,7 @@ import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import "@/styles/pages/admin-ops-audit.css";
 import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 interface AuditLogEntry {
   id: number;
@@ -151,7 +152,7 @@ export default function AuditTab() {
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData, dataUpdatedAt } = useQuery<AuditLogsResponse>({
+  const auditQuery = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -167,6 +168,9 @@ export default function AuditTab() {
     // while the next page loads instead of swapping in the skeleton.
     placeholderData: keepPreviousData,
   });
+  const { data, isLoading, error, refetch, isFetching, isPlaceholderData, dataUpdatedAt } = auditQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(auditQuery);
 
   // C9-V5B-01: a taller next page can push the focused pager button below the
   // fold; bring it back into view once the new page has rendered.
@@ -352,10 +356,11 @@ export default function AuditTab() {
 
         {/* Run23 NB-041: fetch failures render a distinct, retryable error
             state — never the "No audit log entries found" empty state. */}
-        {isError ? (
+        {unavailable ? (
           <AdminLoadError
             subject="the audit log"
             error={error}
+            offline={unavailable === "offline"}
             note="Your filter is still applied."
             onRetry={() => { void refetch(); }}
             retrying={isFetching}

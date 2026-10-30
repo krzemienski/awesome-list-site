@@ -59,6 +59,7 @@ import "./research-run.css";
 import { useState, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 const CANONICAL_JOB_ROWS = 5;
 
@@ -142,14 +143,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   // 20 (server caps at 200). Key stays prefixed by '/api/researcher/jobs' so
   // existing prefix invalidations keep working.
   const [jobsLimit, setJobsLimit] = useState(20);
-  const {
-    data: jobsData,
-    error: jobsError,
-    isError: jobsIsError,
-    isLoading: jobsLoading,
-    isFetching: jobsFetching,
-    refetch: refetchJobs,
-  } = useQuery<{ jobs: ResearchJob[]; total: number; cheapestSavingRun: CheapestSavingRun | null }>({
+  const jobsQuery = useQuery<{ jobs: ResearchJob[]; total: number; cheapestSavingRun: CheapestSavingRun | null }>({
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
       const res = await apiFetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
@@ -164,6 +158,16 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     // the button mounted while the next window loads, so focus stays on it.
     placeholderData: keepPreviousData,
   });
+  const {
+    data: jobsData,
+    error: jobsError,
+    isError: jobsIsError,
+    isLoading: jobsLoading,
+    isFetching: jobsFetching,
+    refetch: refetchJobs,
+  } = jobsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const jobsUnavailable = queryUnavailableReason(jobsQuery);
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
   const [showAllJobs, setShowAllJobs] = useState(false);
@@ -402,7 +406,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 ref={guideRef}
                 categoryNames={categoryNames}
                 activeStateKnown={activeJobStateKnown}
-                activeStateError={jobsIsError}
+                activeStateError={jobsUnavailable !== null}
                 activeJobId={activeJob?.id ?? null}
                 onFollow={(id) => { setFocusRunOnMount(true); setFollowJobId(id); }}
                 onLaunched={(id) => {
@@ -463,10 +467,11 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 ))}
               </tbody>
             </table>
-            {jobsIsError ? (
+            {jobsUnavailable ? (
               <AdminLoadError
                 subject="research jobs"
                 error={jobsError}
+                offline={jobsUnavailable === "offline"}
                 note={jobs ? "The rows above may be out of date." : undefined}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsFetching}
@@ -613,7 +618,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                                 {getVerificationBadges(d)}
                               </div>
                               <a href={d.url} target="_blank" rel="noopener noreferrer"
-                                className="mt-1 flex min-h-6 min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
+                                className="mt-1 flex min-h-6 max-lg:min-h-11 min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
                                 <span className="truncate">{sanitizeDisplay(d.url)}</span><ExternalLink className="h-3 w-3 shrink-0" />
                               </a>
                               {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={sanitizeDisplay(d.description)}>{sanitizeDisplay(d.description)}</p>}
@@ -687,10 +692,11 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     <Skeleton key={i} className="h-10 w-full" />
                   ))}
                 </div>
-              ) : jobsIsError ? (
+              ) : jobsUnavailable ? (
                 <AdminLoadError
                   subject="research jobs"
                   error={jobsError}
+                  offline={jobsUnavailable === "offline"}
                   onRetry={() => { void refetchJobs(); }}
                   retrying={jobsFetching}
                   className="queues-agent__inline-error"
@@ -1061,8 +1067,8 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                             {getVerificationBadges(d)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
-                            className="block truncate text-xs leading-6 text-primary hover:underline">
-                            {sanitizeDisplay(d.url)}
+                            className="flex min-h-6 max-lg:min-h-11 items-center text-xs text-primary hover:underline">
+                            <span className="min-w-0 truncate">{sanitizeDisplay(d.url)}</span>
                           </a>
                         </div>
                         {d.status === 'pending_review' && (

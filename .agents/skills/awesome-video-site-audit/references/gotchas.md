@@ -11,7 +11,7 @@ Read this BEFORE filing a finding (auditor) and BEFORE reproducing one (fixer). 
 | Radix tab bar: all tabs except one have `tabindex="-1"` | Correct roving-tabindex pattern. Test: Tab reaches tablist, focus forwards to active tab, ArrowRight moves. |
 | Raw `<button>` elements not using DS `.btn` class | shadcn bridge is the DS implementation (see replit.md MR-DS-13). Audit tokens, not class names. |
 | Hardcoded hex colors in recharts components | Intentional (`/* DS-OK */`) — recharts can't read CSS vars from prop strings. Palette source of truth: `client/src/lib/charts/palette.ts`. |
-| Users CSV export masks emails | PII policy, by design. |
+| Users CSV export shows real emails | By design since NB-012 (run23): the admin export is unmasked and audit-logged ("unmasked emails, CSV", `server/routes/domains/admin-content.ts:243-264`); only the on-screen Users table masks by default. |
 | Resource slugs/URLs not renamed after title fixes | Slug stability is by design (inbound links, SEO). |
 | `GAESA` cookie, edge cacheability quirks, OIDC popup Cloudflare page | Platform-level (Replit/Google front-end); app cannot change these. |
 | Login/global rate limiters reset unexpectedly | Per-instance in-memory under autoscale — known journaled caveat, not a regression. |

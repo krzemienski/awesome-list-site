@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/safeStorage";
 import {
@@ -68,7 +69,7 @@ export default function Onboarding() {
   const {
     preferences,
     isLoading: preferencesLoading,
-    isError: preferencesError,
+    unavailableReason: preferencesUnavailable,
     refetch: refetchPreferences,
     savePreferencesAsync,
     isSaving,
@@ -76,12 +77,13 @@ export default function Onboarding() {
   const {
     data: categories,
     isLoading: categoriesLoading,
-    isError: categoriesError,
     refetch: refetchCategories,
+    ...categoriesQuery
   } = useQuery<CategoryOption[]>({
     queryKey: ["/api/categories"],
     staleTime: 5 * 60 * 1000,
   });
+  const categoriesUnavailable = queryUnavailableReason(categoriesQuery);
   const [values, setValues] = useState<LearningPreferencesValues>(
     DEFAULT_LEARNING_PREFERENCES,
   );
@@ -324,7 +326,7 @@ export default function Onboarding() {
   };
 
   const loading = preferencesLoading || categoriesLoading;
-  const loadError = preferencesError || categoriesError;
+  const loadError = preferencesUnavailable ?? categoriesUnavailable;
   const stepVisible = hydrated && !loading && !loadError && !completed;
   useEffect(() => {
     if (!stepVisible || lastViewedStepRef.current === step) return;
@@ -352,6 +354,7 @@ export default function Onboarding() {
         <SEOHead title="Learning Preferences" noindex />
         <StatePanel tone="error" label="Error · unavailable" title="Couldn’t load your preferences" headingLevel={1}
           actions={<RetryButton onRetry={() => { void refetchPreferences(); void refetchCategories(); }} />}>
+          {loadError === "offline" ? "You’re offline; this will load when your connection returns. " : null}
           Your account and the rest of the catalog are still available.
         </StatePanel>
       </div>
