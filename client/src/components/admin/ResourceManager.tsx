@@ -863,6 +863,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // returns there on close (Radix onCloseAutoFocus) instead of falling to
   // <body> — keyboard/AT users keep their place in the table row.
   const editTriggerRef = useRef<HTMLElement | null>(null);
+  // Same for the row delete confirmation and the create dialog: their opener
+  // is remembered so Cancel/Escape return focus to it instead of <body>.
+  const deleteTriggerRef = useRef<HTMLElement | null>(null);
+  const createTriggerRef = useRef<HTMLElement | null>(null);
 
   const openEditDialog = (resource: AdminResource) => {
     // Capture the triggering row button (falls back to null for the
@@ -898,6 +902,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const openCreateDialog = () => {
+    const active = document.activeElement;
+    createTriggerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     resetEditForm();
     // Run16 BUG-031: new resources follow the approval workflow by default —
     // the admin can still explicitly pick "approved" in the dialog.
@@ -952,6 +958,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   }, []);
 
   const openDeleteDialog = (resource: AdminResource) => {
+    const active = document.activeElement;
+    deleteTriggerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     setSelectedResource(resource);
     setDeleteDialogOpen(true);
   };
@@ -2118,7 +2126,19 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         {/* NB-005 (run18) + F893: same svh cap and pinned footer as the edit dialog. */}
-        <DialogContent className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]">
+        <DialogContent
+          className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
+          onCloseAutoFocus={(event) => {
+            const trigger = createTriggerRef.current;
+            createTriggerRef.current = null;
+            event.preventDefault();
+            // Deep link (?create=1) has no in-page opener: use the Add button.
+            const target = trigger?.isConnected
+              ? trigger
+              : document.querySelector<HTMLElement>('[data-testid="button-add-resource"]');
+            if (!focusElement(target)) focusPageHeading();
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -2367,7 +2387,19 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]" onCloseAutoFocus={restoreFocusToTable}>
+        <AlertDialogContent
+          className="bg-[var(--bg-2)] border-[var(--border)]"
+          onCloseAutoFocus={(event) => {
+            const trigger = deleteTriggerRef.current;
+            deleteTriggerRef.current = null;
+            // A confirmed delete removes the row (and its button): land on the table.
+            if (focusTableOnCloseRef.current) return restoreFocusToTable(event);
+            if (trigger?.isConnected) {
+              event.preventDefault();
+              trigger.focus();
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>
