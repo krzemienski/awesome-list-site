@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
 import { Link, useLocation } from "wouter";
+import { lazyOptional } from "@/lib/lazy-optional";
 import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
 import { countVisibleSubcategories, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
 import { getCategoryGlyph } from "./category-glyphs";
@@ -9,7 +9,7 @@ const ContactFooter =
   import.meta.env.VITE_CONTACT_VARIANT === "a" ||
   import.meta.env.VITE_CONTACT_VARIANT === "b" ||
   import.meta.env.VITE_CONTACT_VARIANT === "c"
-    ? lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
+    ? lazyOptional(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
     : null;
 
 /** The deployment's display identity is the lowercase domain, as in the
@@ -100,7 +100,7 @@ export default function AppFooter({ nav, site }: {
             Indexed automatically from <span className="app-footer-mono">README.md</span>.
           </p>
           {ContactFooter ? (
-            <div className="app-footer-contact"><Suspense fallback={null}><ContactFooter /></Suspense></div>
+            <div className="app-footer-contact"><ContactFooter /></div>
           ) : null}
         </div>
       </div>

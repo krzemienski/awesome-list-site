@@ -1,5 +1,6 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
+import { lazyOptional } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
@@ -25,7 +26,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 // Guard the import itself so disabled builds do not emit the contact chunk.
 const ContactDialogHost =
   import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
-    ? lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
+    ? lazyOptional(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
     : null;
 
 /** Mounts the lazy contact host only after hydration. Server-rendered, its
@@ -36,7 +37,7 @@ function ClientContactDialogHost() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!ContactDialogHost || !mounted) return null;
-  return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
+  return <ContactDialogHost />;
 }
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
