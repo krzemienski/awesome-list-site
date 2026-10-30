@@ -407,11 +407,13 @@ function buildClerkAppearance(
       formFieldErrorText: {
         ...(palette.danger ? { color: palette.danger } : {}),
       },
-      // "Use phone" / "Forgot password?" render as 16px-tall links in the
-      // label row. On touch widths they get the 44px floor; on desktop the
-      // label row keeps its height.
+      // "Use phone" / "Forgot password?" sit in the label row: 24px on
+      // desktop (the inline-link floor), 44px on touch widths.
       formFieldAction: {
         ...(palette.accent ? { color: palette.accent } : {}),
+        display: "inline-flex",
+        alignItems: "center",
+        minHeight: "24px",
         "@media (pointer: coarse), (max-width: 1024px)": {
           display: "inline-flex",
           alignItems: "center",
