@@ -5,6 +5,8 @@ import { AuthUnavailableCard } from "./AuthUnavailable";
 import { apiFetch } from "@/lib/api-fetch";
 
 const SESSION_CHECK_TIMEOUT_MS = 5_000;
+// How long to wait for the Clerk runtime itself before offering Retry.
+const CLERK_LOAD_TIMEOUT_MS = 15_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   return Promise.race([
@@ -63,6 +65,15 @@ export default function StaleSessionGate({ children }: { children: ReactNode }) 
     setUnreachable(false);
     setAttempt((n) => n + 1);
   }, []);
+
+  // If the Clerk runtime never loads (blocked proxy, failed script), isLoaded
+  // stays false and the check below never runs; surface Retry instead of an
+  // endless "Checking…" status.
+  useEffect(() => {
+    if (isLoaded || ready || unreachable) return;
+    const timer = window.setTimeout(() => setUnreachable(true), CLERK_LOAD_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [isLoaded, ready, unreachable, attempt]);
 
   useEffect(() => {
     if (!isLoaded || checkedRef.current) return;
