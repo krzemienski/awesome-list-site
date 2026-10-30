@@ -270,6 +270,8 @@ export default function Settings() {
             key={testid}
             href={href}
             data-testid={testid}
+            aria-labelledby={`${testid}-title`}
+            aria-describedby={`${testid}-description`}
           >
             <Card
               hoverable
