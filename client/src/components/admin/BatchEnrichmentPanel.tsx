@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -327,7 +327,12 @@ export default function BatchEnrichmentPanel() {
     });
   };
 
-  const handleViewDetails = (jobId: number) => {
+  // The details dialog is opened from state, so Radix has no trigger to
+  // return focus to; remember the button that opened it instead.
+  const detailsTriggerRef = useRef<HTMLElement | null>(null);
+
+  const handleViewDetails = (jobId: number, trigger: HTMLElement) => {
+    detailsTriggerRef.current = trigger;
     setSelectedJobId(jobId);
     setIsDetailsModalOpen(true);
   };
@@ -507,7 +512,7 @@ export default function BatchEnrichmentPanel() {
                     <td className="actions">
                       <button
                         className="btn ghost"
-                        onClick={() => handleViewDetails(job.id)}
+                        onClick={(e) => handleViewDetails(job.id, e.currentTarget)}
                         aria-label={`View logs for job #${job.id}`}
                         data-testid={`button-view-job-${job.id}-canonical`}
                       >
@@ -1029,7 +1034,7 @@ export default function BatchEnrichmentPanel() {
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
-                          onClick={() => handleViewDetails(job.id)}
+                          onClick={(e) => handleViewDetails(job.id, e.currentTarget)}
                           variant="ghost"
                           size="sm"
                           aria-label={`View details for job #${job.id}`}
@@ -1057,7 +1062,14 @@ export default function BatchEnrichmentPanel() {
       </Card>
 
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
-        <DialogContent className="queues-agent__dialog max-w-3xl max-h-[80vh]">
+        <DialogContent
+          className="queues-agent__dialog max-w-3xl max-h-[80vh]"
+          onCloseAutoFocus={(event) => {
+            if (!detailsTriggerRef.current?.isConnected) return;
+            event.preventDefault();
+            detailsTriggerRef.current.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
