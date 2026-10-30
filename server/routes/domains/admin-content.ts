@@ -415,7 +415,9 @@ export function registerAdminContentRoutes(
   // POST /api/admin/users/:id/link-clerk — admin reconciliation for the JIT
   // email collision (see server/lib/clerkAccountLink.ts): sets the Clerk
   // user's externalId to this row's id when Clerk's verified primary email
-  // matches the row. Body: { clerkUserId: "user_..." }.
+  // matches the row. Body: { clerkUserId: "user_...", allowUnverifiedEmail?:
+  // true } — the flag waives only the verification check (exact email match is
+  // still required) and is logged.
   app.post('/api/admin/users/:id/link-clerk', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     const clerkUserId = typeof req.body?.clerkUserId === 'string' ? req.body.clerkUserId : '';
     if (!/^user_[A-Za-z0-9]{10,64}$/.test(clerkUserId)) {
@@ -425,13 +427,14 @@ export function registerAdminContentRoutes(
     if (!target) {
       return res.status(404).json({ message: 'User not found' });
     }
-    const result = await linkClerkUserToRow(target, clerkUserId);
+    const allowUnverifiedEmail = req.body?.allowUnverifiedEmail === true;
+    const result = await linkClerkUserToRow(target, clerkUserId, { allowUnverifiedEmail });
     if (!result.ok) {
       const status = result.reason === 'clerk_user_not_found' ? 404 : 409;
       return res.status(status).json({ message: 'Link refused', reason: result.reason, emails: result.emails });
     }
     logger.info('Clerk account linked to existing user', {
-      user: target.id, clerkUserId, changed: result.changed, actor: req.dbUser?.id,
+      user: target.id, clerkUserId, changed: result.changed, allowUnverifiedEmail, actor: req.dbUser?.id,
     });
     res.json(result);
   }));

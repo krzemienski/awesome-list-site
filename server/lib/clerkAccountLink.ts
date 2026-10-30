@@ -37,7 +37,14 @@ function clerkStatus(error: unknown): number | undefined {
   return typeof status === "number" ? status : undefined;
 }
 
-export async function linkClerkUserToRow(target: User, clerkUserId: string): Promise<ClerkLinkResult> {
+/** `allowUnverifiedEmail` waives only the verification check, never the exact
+ *  email match: for a Clerk identity whose address cannot receive mail (the
+ *  owner's admin@example.com login), linked on the owner's explicit say-so. */
+export async function linkClerkUserToRow(
+  target: User,
+  clerkUserId: string,
+  { allowUnverifiedEmail = false }: { allowUnverifiedEmail?: boolean } = {},
+): Promise<ClerkLinkResult> {
   let clerkUser;
   try {
     clerkUser = await clerkClient.users.getUser(clerkUserId);
@@ -54,7 +61,7 @@ export async function linkClerkUserToRow(target: User, clerkUserId: string): Pro
   const rowEmail = target.email?.toLowerCase();
   const matching = emails.filter((e) => e.address.toLowerCase() === rowEmail);
   if (matching.length === 0) return { ok: false, reason: "email_mismatch", emails };
-  if (!matching.some((e) => e.status === "verified")) {
+  if (!allowUnverifiedEmail && !matching.some((e) => e.status === "verified")) {
     return { ok: false, reason: "email_not_verified", emails };
   }
 
