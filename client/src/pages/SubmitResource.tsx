@@ -615,7 +615,7 @@ export default function SubmitResource() {
                   <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
                   <AlertDescription className="leading-7">
                     The form below is read-only. Please{" "}
-                    <a href="/sign-in?redirect_url=%2Fsubmit" className="py-1" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex min-h-6 items-center" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
