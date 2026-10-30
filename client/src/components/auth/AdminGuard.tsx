@@ -47,7 +47,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
                 administrators — your account is signed in, but doesn't have the
                 admin role.
               </p>
-              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline" data-testid="link-admin-home">
+              <WLink href="/" className="inline-flex min-h-6 max-lg:min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline" data-testid="link-admin-home">
                 Back to home →
               </WLink>
             </>
@@ -63,7 +63,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
                   — including the #tab, which the server never sees. */}
               <WLink
                 href={signInHrefForCurrentLocation("/admin")}
-                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline"
+                className="inline-flex min-h-6 max-lg:min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline"
                 data-testid="link-admin-login"
               >
                 Sign in to continue →

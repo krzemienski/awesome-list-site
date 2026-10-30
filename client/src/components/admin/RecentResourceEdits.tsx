@@ -142,7 +142,7 @@ export function RecentResourceEdits() {
                     <tr key={edit.id} data-testid={`row-recent-edit-${edit.id}`}>
                       <td>
                         <span className="queue-review-item-title" title={title}>
-                          <Link href={`/resource/${edit.resourceId}`}>{title}</Link>
+                          <Link href={`/resource/${edit.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center">{title}</Link>
                         </span>
                       </td>
                       <td className="mono queue-review-mono">
