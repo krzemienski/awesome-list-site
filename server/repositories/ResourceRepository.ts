@@ -372,7 +372,11 @@ const SUGGESTION_POOL_SIZE = 50;
 function bestSearchSuggestion(query: string, titles: string[]): string | undefined {
   const needle = query.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
   if (!needle) return undefined;
-  let best: { display: string; score: number; lengthDelta: number } | undefined;
+  // Ties on edit score prefer one real word over a stitched phrase, then
+  // letters over digit fragments, then closer length: "hsl" ties "HLS" with
+  // "2 SL", and "hevcc" ties "HEVC" with "HEVC H"; the single word is the
+  // useful search in each case.
+  let best: { display: string; score: number; lengthDelta: number; parts: number; digits: number } | undefined;
   for (const title of titles) {
     const words = title.match(/[\p{L}\p{N}]+/gu) ?? [];
     const candidates: string[][] = [];
@@ -386,8 +390,16 @@ function bestSearchSuggestion(query: string, titles: string[]): string | undefin
       const distance = damerauLevenshtein(needle, normalized);
       const score = distance / Math.max(needle.length, normalized.length);
       const lengthDelta = Math.abs(needle.length - normalized.length);
-      if (!best || score < best.score || (score === best.score && lengthDelta < best.lengthDelta)) {
-        best = { display: parts.join(" "), score, lengthDelta };
+      const digits = /\d/.test(normalized) ? 1 : 0;
+      const better =
+        !best ||
+        score < best.score ||
+        (score === best.score &&
+          (parts.length < best.parts ||
+            (parts.length === best.parts &&
+              (digits < best.digits || (digits === best.digits && lengthDelta < best.lengthDelta)))));
+      if (better) {
+        best = { display: parts.join(" "), score, lengthDelta, parts: parts.length, digits };
       }
     }
   }
