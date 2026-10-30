@@ -59,8 +59,11 @@
 }
 
 /* Underlined so the link differs from the copy by more than colour (WCAG
-   1.4.1); it stays inline so the copy keeps even leading. */
+   1.4.1); it stays inline so the copy keeps even leading. Vertical padding
+   on an inline box grows its hit area to the 24px inline-link floor without
+   changing the line height (sweep NEW-010: it was 17px). */
 .system-consent-banner__privacy-link {
+  padding-block: 4px;
   color: var(--text);
   text-decoration: underline;
   text-decoration-thickness: 1px;
