@@ -228,11 +228,11 @@ export default function TagLanding() {
               ].map((item, index) => (
                 <Fragment key={item.href}>
                   {index > 0 && ", "}
-                  <Link href={item.href} className="text-foreground underline underline-offset-4 hover:opacity-80">{item.label}</Link>
+                  <Link href={item.href} className="py-1 text-foreground underline underline-offset-4 hover:opacity-80">{item.label}</Link>
                 </Fragment>
               ))}
               {" · "}
-              <a href="#related-topics-heading" className="text-foreground underline underline-offset-4 hover:opacity-80">All related topics</a>
+              <a href="#related-topics-heading" className="py-1 text-foreground underline underline-offset-4 hover:opacity-80">All related topics</a>
             </p>
           )}
         </section>
