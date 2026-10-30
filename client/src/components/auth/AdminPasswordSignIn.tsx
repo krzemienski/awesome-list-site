@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ export function AdminPasswordSignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -47,6 +48,9 @@ export function AdminPasswordSignIn() {
       setError("Couldn't reach the server. Check your connection and try again.");
     }
     setSubmitting(false);
+    // The submit button was disabled while the request ran, which dropped focus
+    // to <body>; put it back in the field the failed password was typed into.
+    passwordRef.current?.focus();
   };
 
   return (
@@ -60,6 +64,7 @@ export function AdminPasswordSignIn() {
         <Label htmlFor="admin-password">Password</Label>
         <Input
           id="admin-password"
+          ref={passwordRef}
           type="password"
           autoComplete="current-password"
           required

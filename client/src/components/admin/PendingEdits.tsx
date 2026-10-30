@@ -462,7 +462,7 @@ export default function PendingEdits() {
                           />
                         )}
                         <span title={title}>
-                          <Link href={`/resource/${edit.resourceId}`} data-testid={`link-edit-resource-detail-${edit.id}`}>
+                          <Link href={`/resource/${edit.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center" data-testid={`link-edit-resource-detail-${edit.id}`}>
                             {title}
                           </Link>
                         </span>
@@ -587,7 +587,7 @@ export default function PendingEdits() {
                 <h3 className="font-semibold mb-2">Resource Information</h3>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1">
                   <p className="text-sm"><strong>Title:</strong> {selectedEdit.resource?.title}</p>
-                  <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
+                  <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
                   <p className="text-sm"><strong>Category:</strong> {selectedEdit.resource?.category}</p>
                   <p className="text-sm" data-testid="text-edit-detail-editor"><strong>Suggested by:</strong> {selectedEdit.submittedByEmail ?? selectedEdit.submittedBy}</p>
                 </div>

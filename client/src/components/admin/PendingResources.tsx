@@ -833,7 +833,7 @@ export default function PendingResources() {
                     href={selectedResource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline flex items-center gap-1 mt-1 min-w-0"
+                    className="text-sm text-primary hover:underline flex min-h-6 max-lg:min-h-11 items-center gap-1 mt-1 min-w-0"
                     data-testid="link-detail-url"
                   >
                     <span className="min-w-0 [overflow-wrap:anywhere]">{selectedResource.url}</span>
