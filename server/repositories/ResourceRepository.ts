@@ -366,6 +366,9 @@ function scoreFuzzyCandidates(
   });
 }
 
+/** How many top-ranked fuzzy matches the did-you-mean suggestion considers. */
+const SUGGESTION_POOL_SIZE = 50;
+
 function bestSearchSuggestion(query: string, titles: string[]): string | undefined {
   const needle = query.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
   if (!needle) return undefined;
@@ -815,11 +818,15 @@ export class ResourceRepository {
         .map((id) => rowsById.get(id))
         .filter((resource): resource is Resource => Boolean(resource));
       const searchMetadata: ResourceSearchMetadata = { mode: "fuzzy" };
-      if (resourceList[0]?.title) {
-        searchMetadata.suggestion = bestSearchSuggestion(
-          normalizedSearch,
-          resourceList.map((resource) => resource.title),
-        );
+      // Suggest from the best-ranked matches, not just this page: a small
+      // `limit` or a later page would otherwise hide the intended term
+      // (sweep NEW-004: hsl suggested "dev Slack" with limit=3).
+      const suggestionTitles = filteredMatches
+        .slice(0, SUGGESTION_POOL_SIZE)
+        .map((match) => match.title)
+        .filter(Boolean);
+      if (suggestionTitles.length > 0) {
+        searchMetadata.suggestion = bestSearchSuggestion(normalizedSearch, suggestionTitles);
       }
       return {
         resources: resourceList,

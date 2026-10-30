@@ -61,6 +61,7 @@ import {
 } from "@shared/resourceKinds";
 import { classifyResourceKind } from "@shared/resourceKindClassifier";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { ChipButton } from "@/components/ui/chip-button";
 import "@/styles/pages/admin-catalog-resources.css";
 import { apiFetch } from "@/lib/api-fetch";
@@ -341,7 +342,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const { data: queryData, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
+  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -1174,8 +1175,23 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // keepPreviousData above, later key changes (typing, paging, filters) keep
   // `data` populated, so this branch can never unmount the search input
   // mid-typing again.
-  // A first load paused offline has no data and no error either; it must show
-  // the skeleton (plus the offline banner), never an empty-catalog claim.
+  // A first load paused offline has no data and no error either; say so
+  // instead of leaving a skeleton up with no explanation (RM-02).
+  if (!data && queryUnavailableReason({ isPending, isPaused, isError }) === "offline") {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <AdminLoadError
+            subject="resources"
+            error={resourcesError}
+            offline
+            testId="banner-resources-offline"
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   if ((isLoading || isPaused) && !data) {
     return (
       <Card>
