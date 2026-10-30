@@ -221,11 +221,11 @@ export default function ConsentBanner() {
         >
           <div className="flex min-h-[44px] items-center gap-3">
             <RadioGroupItem value="granted" id="cookie-settings-granted" data-testid="cookie-settings-granted" />
-            <Label htmlFor="cookie-settings-granted" className="flex-1 cursor-pointer py-2">Allow analytics</Label>
+            <Label htmlFor="cookie-settings-granted" className="flex min-h-[44px] flex-1 cursor-pointer items-center">Allow analytics</Label>
           </div>
           <div className="flex min-h-[44px] items-center gap-3">
             <RadioGroupItem value="denied" id="cookie-settings-denied" data-testid="cookie-settings-denied" />
-            <Label htmlFor="cookie-settings-denied" className="flex-1 cursor-pointer py-2">Decline analytics</Label>
+            <Label htmlFor="cookie-settings-denied" className="flex min-h-[44px] flex-1 cursor-pointer items-center">Decline analytics</Label>
           </div>
         </RadioGroup>
         <DialogFooter className="gap-2">
