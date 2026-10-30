@@ -122,14 +122,14 @@ export default function LinkReportsPanel() {
               return (
                 <li key={key} className="py-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between" data-testid={`link-report-${key}`}>
                   <div className="min-w-0 space-y-1">
-                    <Link href={`/resource/${report.resourceId}`} className="font-medium underline-offset-4 hover:underline">
+                    <Link href={`/resource/${report.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center font-medium underline-offset-4 hover:underline">
                       {report.resourceTitle}
                     </Link>
                     <a
                       href={report.resourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mono block text-xs text-muted-foreground break-all hover:underline"
+                      className="mono flex min-h-6 max-lg:min-h-11 items-center text-xs text-muted-foreground break-all hover:underline"
                     >
                       {report.resourceUrl}
                     </a>
