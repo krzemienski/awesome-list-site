@@ -163,6 +163,9 @@ export default function UsersTab() {
   // dialog; Radix would return focus to that vanished trigger, so hand it to
   // the user search box instead. A failed delete keeps the row: default return.
   const deletedUserRef = useRef(false);
+  // The Delete button that opened the confirmation, so Cancel can hand focus back to it.
+  const deleteOpenerRef = useRef<HTMLElement | null>(null);
+  const [focusReturnId, setFocusReturnId] = useState<string | null>(null);
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
@@ -480,10 +483,13 @@ export default function UsersTab() {
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => {
+                          onClick={(event) => {
                             deletedUserRef.current = false;
+                            deleteOpenerRef.current = event.currentTarget;
+                            setFocusReturnId(user.id);
                             setUserToDelete(user);
                           }}
+                          data-return-focus={focusReturnId === user.id || undefined}
                           aria-label={`Delete user ${
                             /* R4-H05: keep the raw email out of the DOM unless revealed.
                                R5-012: masked emails can collide (j***@gmail.com), so the
@@ -599,8 +605,20 @@ export default function UsersTab() {
         <AlertDialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
           <AlertDialogContent
             onCloseAutoFocus={(event) => {
-              if (!deletedUserRef.current) return;
+              if (!deletedUserRef.current) {
+                // Cancelled: the controlled dialog has no trigger, so Radix would
+                // drop focus; return it to the Delete button that opened it.
+                const opener = deleteOpenerRef.current;
+                deleteOpenerRef.current = null;
+                if (opener?.isConnected) {
+                  event.preventDefault();
+                  opener.focus();
+                }
+                setFocusReturnId(null);
+                return;
+              }
               deletedUserRef.current = false;
+              setFocusReturnId(null);
               event.preventDefault();
               searchInputRef.current?.focus();
             }}

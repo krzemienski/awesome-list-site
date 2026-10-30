@@ -103,7 +103,9 @@
 .admin-ops-users-shell .admin-ops-cell-email:hover [data-testid^="button-toggle-email-"],
 .admin-ops-users-shell .admin-ops-cell-actions:hover [data-testid^="button-delete-user-"],
 .admin-ops-users-shell--tools-open [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"] {
+.admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"],
+.admin-ops-users-shell .admin-ops-cell-actions:focus-within [data-testid^="button-delete-user-"],
+.admin-ops-users-shell [data-testid^="button-delete-user-"][data-return-focus] {
   visibility: visible;
 }
 
