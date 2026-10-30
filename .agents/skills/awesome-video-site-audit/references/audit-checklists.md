@@ -36,7 +36,7 @@ Fix shape: ONE idempotent sweep script per class, run against dev DB directly, a
 ## 4. Exports (admin)
 
 - [ ] JSON/CSV/HTML/YAML/PDF all download non-empty. HTML entities escaped; YAML parses; CSV quoting correct; tags option honored in every format; PDF path gives user feedback (never silent).
-- [ ] Users CSV email masking is **by design** (PII policy) — not a bug.
+- [ ] Users CSV export shows real emails **by design** (NB-012, audit-logged); only the on-screen Users table masks — not a bug.
 - [ ] GitHub export: completes, writes `github_sync_history` row, failures surfaced with error text (no green-washing).
 
 ## 5. Auth & session UX

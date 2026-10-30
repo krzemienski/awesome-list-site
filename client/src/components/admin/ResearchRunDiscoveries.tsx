@@ -55,7 +55,7 @@ export function ResearchRunDiscoveries({ discoveries, active }: { discoveries: R
                     {getVerificationBadges(d)}
                   </div>
                   <a href={d.url} target="_blank" rel="noopener noreferrer"
-                    className="mt-1 flex min-h-6 min-w-0 items-center gap-1 text-xs text-primary hover:underline">
+                    className="mt-1 flex min-h-6 max-lg:min-h-11 min-w-0 items-center gap-1 text-xs text-primary hover:underline">
                     <span className="truncate">{sanitizeDisplay(d.url)}</span><ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
                   </a>
                   {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{sanitizeDisplay(d.description)}</p>}
