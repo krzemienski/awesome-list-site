@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
 import {
@@ -128,27 +129,20 @@ export default function GitHubSyncPanel() {
     }
   };
 
-  const {
-    data: syncHistory,
-    isLoading: syncHistoryIsLoading,
-    isError: syncHistoryIsError,
-    error: syncHistoryError,
-    isFetching: syncHistoryIsFetching,
-    refetch: refetchSyncHistory,
-  } = useQuery<SyncHistory[]>({
+  const syncHistoryQuery = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
     staleTime: 0,
     refetchOnWindowFocus: true,
   });
-
   const {
-    data: syncQueueData,
-    isLoading: syncQueueIsLoading,
-    isError: syncQueueIsError,
-    error: syncQueueError,
-    isFetching: syncQueueIsFetching,
-    refetch: refetchSyncQueue,
-  } = useQuery<SyncQueueResponse>({
+    data: syncHistory,
+    isLoading: syncHistoryIsLoading,
+    error: syncHistoryError,
+    isFetching: syncHistoryIsFetching,
+    refetch: refetchSyncHistory,
+  } = syncHistoryQuery;
+
+  const syncQueueQuery = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -156,6 +150,17 @@ export default function GitHubSyncPanel() {
       (item) => item.status === 'pending' || item.status === 'processing'
     ) ? 3000 : false,
   });
+  const {
+    data: syncQueueData,
+    isLoading: syncQueueIsLoading,
+    error: syncQueueError,
+    isFetching: syncQueueIsFetching,
+    refetch: refetchSyncQueue,
+  } = syncQueueQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const syncHistoryUnavailable = queryUnavailableReason(syncHistoryQuery);
+  const syncQueueUnavailable = queryUnavailableReason(syncQueueQuery);
+  const offlineNote = "You're offline; it will load when your connection returns.";
 
   useEffect(() => {
     if (syncQueueData) {
@@ -407,7 +412,7 @@ export default function GitHubSyncPanel() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!syncQueue.length && !lastSync && !syncQueueIsError && !syncHistoryIsError && (
+            {!syncQueue.length && !lastSync && !syncQueueUnavailable && !syncHistoryUnavailable && (
               <div className="ops-github-panel__empty-state">
                 <Clock className="h-5 w-5" aria-hidden="true" />
                 <div>
@@ -522,10 +527,11 @@ export default function GitHubSyncPanel() {
               );
             })()}
 
-             {syncQueueIsError ? (
+             {syncQueueUnavailable ? (
                <AdminLoadError
                  subject="the sync queue"
                  error={syncQueueError}
+                 note={syncQueueUnavailable === "offline" ? offlineNote : undefined}
                  onRetry={() => { void refetchSyncQueue(); }}
                  retrying={syncQueueIsFetching}
                  testId="alert-sync-queue-error"
@@ -599,7 +605,7 @@ export default function GitHubSyncPanel() {
           </CardContent>
         </Card>}
 
-       {syncHistoryIsError ? (
+       {syncHistoryUnavailable ? (
          <TableShell
            title="Sync jobs"
            sub="The sync history could not be loaded."
@@ -608,6 +614,7 @@ export default function GitHubSyncPanel() {
            <AdminLoadError
              subject="sync history"
              error={syncHistoryError}
+             note={syncHistoryUnavailable === "offline" ? offlineNote : undefined}
              onRetry={() => { void refetchSyncHistory(); }}
              retrying={syncHistoryIsFetching}
              testId="alert-sync-history-error"

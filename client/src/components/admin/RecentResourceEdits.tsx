@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ResolvedResourceEdit } from "@shared/schema";
@@ -72,7 +73,9 @@ function RejectionReason({ editId, reason }: { editId: number; reason: string })
 export function RecentResourceEdits() {
   const recentQuery = useQuery<ResolvedResourceEdit[]>({ queryKey: [RECENT_EDITS_KEY] });
   const scrollCue = useHorizontalScrollCue();
-  const { data: edits, isLoading, isError, isFetching, refetch } = recentQuery;
+  const { data: edits, isLoading, isFetching, refetch } = recentQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(recentQuery);
 
   return (
     <section className="queue-review-recent" aria-labelledby="recent-edits-heading" data-testid="section-recent-edits">
@@ -80,10 +83,11 @@ export function RecentResourceEdits() {
         <h3 id="recent-edits-heading">Recently resolved</h3>
         <p>The last 10 edits that were approved, rejected, withdrawn or superseded</p>
       </div>
-      {isError && !edits ? (
+      {unavailable && !edits ? (
         <AdminLoadError
           subject="recent edits"
           error={recentQuery.error}
+          note={unavailable === "offline" ? "You're offline; it will load when your connection returns." : undefined}
           onRetry={() => { void refetch(); }}
           retrying={isFetching}
           testId="recent-edits-load-error"

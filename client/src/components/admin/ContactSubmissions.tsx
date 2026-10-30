@@ -10,6 +10,7 @@ import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsP
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 interface ContactSubmission {
   id: string;
@@ -58,7 +59,7 @@ export default function ContactSubmissions() {
   // Reply-to stays masked until an admin explicitly reveals it for the open submission.
   const [revealedId, setRevealedId] = useState<string | null>(null);
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<ContactSubmissionsResponse>({
+  const submissionsQuery = useQuery<ContactSubmissionsResponse>({
     queryKey: ["/api/admin/contact-submissions", PAGE_SIZE, offset],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -80,6 +81,9 @@ export default function ContactSubmissions() {
     // The old predicate (retry unless 404) returned true forever, so a 5xx
     // kept the skeleton on screen instead of ever reaching the error state.
   });
+  const { data, isLoading, error, refetch, isFetching } = submissionsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(submissionsQuery);
 
   const pageSize = data?.limit ?? PAGE_SIZE;
   const total = data?.total ?? 0;
@@ -109,7 +113,7 @@ export default function ContactSubmissions() {
         description={data ? `Private inbox · ${total} ${total === 1 ? "message" : "messages"}` : "Private inbox"}
         className="admin-ops-contact-shell"
       >
-        {isError ? (
+        {unavailable ? (
           errorStatus(error) === 404 ? (
             <div
               className="admin-ops-status-panel"
@@ -137,6 +141,7 @@ export default function ContactSubmissions() {
             <AdminLoadError
               subject="contact submissions"
               error={error}
+              note={unavailable === "offline" ? "You're offline; it will load when your connection returns." : undefined}
               onRetry={() => { void refetch(); }}
               retrying={isFetching}
               testId="alert-contact-submissions-error"

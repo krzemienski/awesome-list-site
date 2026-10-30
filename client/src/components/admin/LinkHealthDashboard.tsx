@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import LinkReportsPanel from "@/components/admin/LinkReportsPanel";
 import "@/styles/pages/admin-ops-github-links.css";
 import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
@@ -134,37 +135,51 @@ export default function LinkHealthDashboard() {
   // F10: cancelling a running scan is destructive to its progress — confirm.
   const [confirmCancel, setConfirmCancel] = useState(false);
 
-  const { data: statusData, isLoading: isStatusLoading, isError: statusError, error: statusErrorValue, isFetching: statusFetching, refetch: retryStatus } = useQuery<LinkHealthStatusResponse>({
+  const statusQuery = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
     refetchInterval: isPolling ? 3000 : 60000
   });
+  const { data: statusData, isLoading: isStatusLoading, error: statusErrorValue, isFetching: statusFetching, refetch: retryStatus } = statusQuery;
 
-  const { data: historyData, isLoading: isHistoryLoading, isError: historyError, error: historyErrorValue, isFetching: historyFetching, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
+  const historyQuery = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
+  const { data: historyData, isLoading: isHistoryLoading, error: historyErrorValue, isFetching: historyFetching, refetch: retryHistory } = historyQuery;
 
   // R4-044: fetch the full problem-links set once and filter client-side so the
   // summary counters and the table rows are driven by the SAME dataset. The old
   // server-filtered query made the counters (from the job record) reconcile
   // against a different/stale set than the visible rows.
-  const { data: brokenLinksData, isLoading: isLinksLoading, isError: linksError, error: linksErrorValue, isFetching: linksFetching, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
+  const linksQuery = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links'],
     queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
+  const { data: brokenLinksData, isLoading: isLinksLoading, error: linksErrorValue, isFetching: linksFetching, refetch: retryLinks } = linksQuery;
 
   // BUG-014 (run25): current approved-catalog size, used to state the check's
   // honest scope (a completed job's totalLinks snapshots the catalog at check
   // start and goes stale as the catalog grows).
-  const { data: coverageData, isError: coverageError, error: coverageErrorValue, isFetching: coverageFetching, refetch: retryCoverage } = useQuery<{ approvedTotal: number }>({
+  const coverageQuery = useQuery<{ approvedTotal: number }>({
     queryKey: ['/api/admin/enrichment/coverage'],
     staleTime: 60_000,
   });
+  const { data: coverageData, error: coverageErrorValue, isFetching: coverageFetching, refetch: retryCoverage } = coverageQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002): treat both
+  // as "can't show data" so no empty state reads as a completed-scan result.
+  const statusUnavailable = queryUnavailableReason(statusQuery);
+  const historyUnavailable = queryUnavailableReason(historyQuery);
+  const linksUnavailable = queryUnavailableReason(linksQuery);
+  const coverageUnavailable = queryUnavailableReason(coverageQuery);
+  const statusError = statusUnavailable !== null;
+  const historyError = historyUnavailable !== null;
+  const linksError = linksUnavailable !== null;
+  const coverageError = coverageUnavailable !== null;
   const approvedTotal = coverageData?.approvedTotal;
 
   const runCheckMutation = useMutation({
@@ -377,7 +392,9 @@ export default function LinkHealthDashboard() {
         <AdminLoadError
           subject={failedLinkHealthParts.map((part) => part.label).join(", ")}
           error={failedLinkHealthParts[0].error}
-          note="Previously loaded results may be out of date; missing counts are not evidence of healthy links."
+          note={`${[statusUnavailable, historyUnavailable, linksUnavailable, coverageUnavailable].includes("offline")
+            ? "You're offline; it will load when your connection returns. "
+            : ""}Previously loaded results may be out of date; missing counts are not evidence of healthy links.`}
           onRetry={() => failedLinkHealthParts.forEach((part) => { void part.retry(); })}
           retrying={failedLinkHealthParts.some((part) => part.fetching)}
           testId="alert-link-health-error"

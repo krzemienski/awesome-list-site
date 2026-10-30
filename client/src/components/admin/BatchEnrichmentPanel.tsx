@@ -55,6 +55,7 @@ import { baseUrlSyntaxError, insecureHttpRefusal, plainHttpHost } from "@shared/
 import { Checkbox } from "@/components/ui/checkbox";
 import "./queues-agent.css";
 import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 const CANONICAL_JOB_ROWS = 6;
 
@@ -170,6 +171,13 @@ export default function BatchEnrichmentPanel() {
   const customHost = baseUrl.trim() && !baseUrlError ? new URL(baseUrl.trim()).host : null;
   const startHost = customHost ?? aiDefaults.config?.baseUrlHost ?? null;
 
+  const jobsQuery = useQuery<JobsResponse>({
+    queryKey: ['/api/enrichment/jobs'],
+    refetchInterval: isPolling ? 3000 : false,
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true
+  });
   const {
     data: jobsData,
     error: jobsError,
@@ -177,13 +185,12 @@ export default function BatchEnrichmentPanel() {
     isLoading,
     isFetching: jobsIsFetching,
     refetch: refetchJobs,
-  } = useQuery<JobsResponse>({
-    queryKey: ['/api/enrichment/jobs'],
-    refetchInterval: isPolling ? 3000 : false,
-    // R5-037: refresh admin data when the operator returns to the tab.
-    staleTime: 30_000,
-    refetchOnWindowFocus: true
-  });
+  } = jobsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const jobsUnavailable = queryUnavailableReason(jobsQuery);
+  const jobsOfflineNote = jobsUnavailable === "offline"
+    ? "You're offline; it will load when your connection returns."
+    : undefined;
 
   // Run23 NB-046: surface how much of the approved catalog actually has tags.
   // The July bulk import left over half the corpus untagged and there was no
@@ -514,11 +521,11 @@ export default function BatchEnrichmentPanel() {
                 ))}
               </tbody>
             </table>
-            {jobsIsError ? (
+            {jobsUnavailable ? (
               <AdminLoadError
                 subject="enrichment jobs"
                 error={jobsError}
-                note={jobsData ? "The rows above may be out of date." : undefined}
+                note={jobsOfflineNote ?? (jobsData ? "The rows above may be out of date." : undefined)}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsIsFetching}
                 className="queues-agent__inline-error"
@@ -880,10 +887,11 @@ export default function BatchEnrichmentPanel() {
             <div className="flex items-center justify-center py-8">
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : jobsIsError ? (
+          ) : jobsUnavailable ? (
             <AdminLoadError
               subject="enrichment jobs"
               error={jobsError}
+              note={jobsOfflineNote}
               onRetry={() => { void refetchJobs(); }}
               retrying={jobsIsFetching}
               className="queues-agent__inline-error"
