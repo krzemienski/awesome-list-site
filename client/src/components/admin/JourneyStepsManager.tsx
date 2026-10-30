@@ -338,7 +338,7 @@ function StepEditor({
               onCheckedChange={(v) => setForm((f) => ({ ...f, isOptional: !!v }))}
               data-testid="step-optional-checkbox"
             />
-            <Label htmlFor="step-optional" className="cursor-pointer">
+            <Label htmlFor="step-optional" className="inline-flex min-h-6 max-lg:min-h-11 cursor-pointer items-center">
               Mark this step as optional
             </Label>
           </div>
