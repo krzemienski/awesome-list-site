@@ -660,10 +660,13 @@ export default function Home({ nav, navLoading }: HomeProps) {
 
   const filteredCorpusResources = useMemo(() => {
     if (!corpusFilterActive) return [] as Resource[];
+    if (selectedTags.length > 0) {
+      return tagScopedResources.filter((resource) => resourceMatchesFilters(resource, [], selectedKind));
+    }
     return corpusBaseCategories
       .flatMap((category) => getAllResources(category))
-      .filter((resource) => resourceMatchesFilters(resource, selectedTags, selectedKind));
-  }, [corpusBaseCategories, corpusFilterActive, selectedKind, selectedTags]);
+      .filter((resource) => resourceMatchesFilters(resource, [], selectedKind));
+  }, [corpusBaseCategories, corpusFilterActive, selectedKind, selectedTags.length, tagScopedResources]);
 
   // The home feed is intentionally a bounded API response by default. Once a
   // kind/tag filter is active, derive both visible feeds from the authoritative
@@ -848,8 +851,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
         featured={filteredFeatured}
         stats={stats}
         kindCounts={tagScopedKindCounts ?? kindCounts}
-        kindCountsLoading={kindCountsLoading}
-        kindCountsError={kindCountsUnavailable}
+        kindCountsLoading={tagScopedKindCounts ? false : kindCountsLoading}
+        kindCountsError={tagScopedKindCounts ? false : kindCountsUnavailable}
         selectedKind={selectedKind}
         onKindChange={handleKindChange}
         selectedTags={selectedTags}

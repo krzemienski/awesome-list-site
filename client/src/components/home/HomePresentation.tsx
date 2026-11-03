@@ -275,7 +275,9 @@ function PageMeta({
     layout === "index"
       ? stats.matching === undefined
         ? `INDEX · ${formatCount(stats.total)} ENTRIES`
-        : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.scopeTotal ?? stats.total)} ENTRIES`
+        : stats.matching === (stats.scopeTotal ?? stats.total)
+          ? `INDEX · ${formatCount(stats.matching)} ENTRIES`
+          : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.scopeTotal ?? stats.total)} ENTRIES`
       : `CURATED · WEEK ${isoWeekNumber(new Date())} · ${formatCount(stats.total)} INDEXED`;
   return (
     <div className="home-meta-row">
