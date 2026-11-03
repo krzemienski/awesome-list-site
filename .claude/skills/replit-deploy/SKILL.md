@@ -1,6 +1,6 @@
 ---
 name: replit-deploy
-description: Redeploy awesome.video to production on Replit from GitHub main, end to end and unattended. Syncs the Replit workspace to origin/main over SSH, runs npm install and npm run db:push only when the diff needs them, publishes through the Replit MCP server (publish_app), then proves the live site serves origin/main's commit via /api/version and checks it as a visitor. Use whenever the user says deploy, redeploy, republish, publish, ship to prod, push it live, release, "get main onto awesome.video", "is the published version the latest", or asks why production is behind main; and whenever /api/version is behind origin/main, publish_app is refused, the Replit workspace needs syncing, or a "Published your App" commit appears, even if they don't name Replit.
+description: Redeploy awesome.video to production on Replit from GitHub main, end to end and unattended. Syncs the Replit workspace to origin/main over SSH, runs npm install and npm run db:push only when the diff needs them, publishes through the Replit MCP server (publish_app), then proves the live site serves origin/main's commit via /api/version and checks it as a visitor. Use whenever the user says deploy, redeploy, republish, publish, ship to prod, push it live, release, "get main onto awesome.video", "is the published version the latest", or asks why production is behind main; and whenever a verified, merged fix batch leaves /api/version behind origin/main, publish_app is refused, the Replit workspace needs syncing, or a "Published your App" commit appears, even if they don't name Replit.
 ---
 
 # Redeploy awesome.video from GitHub main
@@ -82,6 +82,8 @@ The printed HEAD must equal TARGET.
 
 After any publish, run `git fetch` (locally and in the workspace) before you branch, merge or create a worktree, because origin/main may have gained the publish commit.
 
+When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
+
 If `git fetch` fails on auth, the workspace has lost its GitHub connection; stop and tell the user to reconnect it in the Git pane.
 
 ### 3. Dependencies and dev schema (SSH)
@@ -126,6 +128,8 @@ The build first fails unless `HEAD`'s tree equals `origin/main`'s, printing the 
 Safe in the workspace: the image-trim step runs only when `REPLIT_DEPLOYMENT=1` or `REPLIT_PUBLISH_IMAGE_TRIM=1`, which exist only in production. A build failure here is a stop condition with the log tail as evidence; publishing would fail the same way and cost a deploy.
 
 ### 5. Publish (MCP)
+
+Before publishing, list the live audit lanes and tell each that the revision is about to change (pause it or note it per row), and stamp the revision on each row. Evidence is valid only for its stamped revision.
 
 1. Find the app: `search_apps` with `url: "https://awesome.video"` (or `list_apps`), take its `replId`. Cache nothing across runs; the app is identified by URL.
 2. `get_publish_status(replId)` first. If a publish is already in progress, wait for it instead of starting another.
