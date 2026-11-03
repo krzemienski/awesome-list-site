@@ -8,7 +8,7 @@ import { bookmarksPageSeo, staticPageHeads } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
-import { queryClient, ApiError } from "@/lib/queryClient";
+import { queryClient, isGoneError } from "@/lib/queryClient";
 import type { Resource } from "@shared/schema";
 import type { ResourceKind } from "@shared/resourceKinds";
 import {
@@ -65,13 +65,14 @@ export default function GuestBookmarks() {
     })),
   });
 
-  // Self-healing: a 404 means the resource is gone — drop that save. Network
-  // or server errors keep the save (never silently lose a guest's list).
+  // Self-healing: a 404 (or a 400 validation_failed for a malformed id) means
+  // the resource can never load — drop that save. Network or server errors
+  // keep the save (never silently lose a guest's list).
   const deadIds = useMemo(
     () =>
       results
         .map((result, index) =>
-          result.error instanceof ApiError && result.error.status === 404
+          isGoneError(result.error)
             ? sortedEntries[index]?.id
             : undefined,
         )
@@ -84,7 +85,7 @@ export default function GuestBookmarks() {
 
   const failedIds = results
     .map((result, index) =>
-      result.error && !(result.error instanceof ApiError && result.error.status === 404)
+      result.error && !isGoneError(result.error)
         ? sortedEntries[index]?.id
         : undefined,
     )
