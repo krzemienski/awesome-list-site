@@ -637,7 +637,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                           <TableCell className="text-right">
                             {d.status === "pending_review" ? (
                               <div className="flex justify-end gap-1">
-                                <Button size="sm" variant="default" className={OK_SOLID_BUTTON} onClick={() => review.approve.mutate(d.id)} disabled={review.approve.isPending}>
+                                <Button size="sm" variant="default" className={OK_SOLID_BUTTON} onClick={() => review.requestApprove(d)} disabled={review.approve.isPending}>
                                   <ThumbsUp className="h-3 w-3 mr-1" />Approve
                                 </Button>
                                 <Button size="sm" variant="destructive" onClick={() => review.requestReject(d.id)}>
@@ -1075,7 +1075,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                           <div className="flex gap-1 ml-2">
                             <Button size="sm" variant="ghost" className={`${OK_TEXT} h-7`}
                               aria-label={`Approve discovery: ${sanitizeDisplay(d.title)}`}
-                              onClick={() => review.approve.mutate(d.id)}>
+                              onClick={() => review.requestApprove(d)}>
                               <ThumbsUp className="w-3 h-3" />
                             </Button>
                             <Button size="sm" variant="ghost" className={`${BAD_TEXT} h-7`}
@@ -1107,6 +1107,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
       </Dialog>
       </details>
 
+      {review.approveDialog}
       {review.rejectDialog}
     </div>
   );
