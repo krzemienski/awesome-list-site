@@ -7,8 +7,17 @@ import { Component, lazy, Suspense, type ComponentProps, type ComponentType } fr
  *
  * React.lazy caches a rejection for the life of the lazy object, so the lazy is
  * recreated, never reused, once the failure has been seen: when the browser
- * reports `online`, and when the component mounts again (navigation).
+ * reports `online`, when the component mounts again, and when
+ * `retryOptionalChunks()` is called (route change, user intent). A retry is
+ * only ever triggered by one of these events, so a still-failing chunk never
+ * loops.
  */
+const RETRY_EVENT = "awesome:retry-optional-chunks";
+
+export function retryOptionalChunks() {
+  window.dispatchEvent(new Event(RETRY_EVENT));
+}
+
 export function lazyOptional<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   let failed = false;
   const create = () =>
@@ -38,14 +47,16 @@ export function lazyOptional<T extends ComponentType<any>>(factory: () => Promis
     }
 
     componentDidMount() {
-      window.addEventListener("online", this.handleOnline);
+      window.addEventListener("online", this.handleRetry);
+      window.addEventListener(RETRY_EVENT, this.handleRetry);
     }
 
     componentWillUnmount() {
-      window.removeEventListener("online", this.handleOnline);
+      window.removeEventListener("online", this.handleRetry);
+      window.removeEventListener(RETRY_EVENT, this.handleRetry);
     }
 
-    handleOnline = () => {
+    handleRetry = () => {
       if (!this.state.hasError) return;
       renew();
       this.setState({ hasError: false });
