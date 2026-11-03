@@ -108,15 +108,17 @@
           function isField(t) {
             return !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
           }
+          var timer = 0;
+          // Removes every listener and the timer. The pending flag is left
+          // alone: a slow but successful hydration still reads it. Also the
+          // disarm path for a dead app (error, rejection, 30 s timeout).
           function stop() {
             document.removeEventListener('keydown', onKey, true);
             document.removeEventListener('focusin', onFocusIn, true);
-          }
-          // The app will not take over (it never mounted): hand the browser
-          // its own shortcuts back.
-          function disarm() {
-            stop();
-            window.__awvPendingPalette = undefined;
+            window.removeEventListener('error', stop);
+            window.removeEventListener('unhandledrejection', stop);
+            document.removeEventListener('DOMContentLoaded', armTimeout);
+            clearTimeout(timer);
           }
           function onFocusIn(e) {
             if (isField(e.target)) window.__awvPendingPalette = undefined;
@@ -140,7 +142,7 @@
                 window.__awvPendingPalette = undefined;
               } else if (isK) {
                 e.preventDefault();
-              } else if (e.metaKey || (e.ctrlKey && !e.altKey)) {
+              } else if (e.metaKey || (e.ctrlKey && !e.altKey) || (e.altKey && !e.ctrlKey)) {
                 return;
               } else if (k === 'Backspace') {
                 e.preventDefault();
@@ -153,8 +155,11 @@
               return;
             }
             var method = null;
-            if (isK) method = 'keyboard_shortcut';
-            else if (k === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !(t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'))) method = 'slash_key';
+            var inTextField = !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+            if (isK) {
+              if (inTextField) return;
+              method = 'keyboard_shortcut';
+            } else if (k === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inTextField) method = 'slash_key';
             if (!method) return;
             e.preventDefault();
             window.__awvPendingPalette = { open: true, draft: '', method: method };
@@ -162,9 +167,9 @@
           window.__awvStopPaletteCapture = stop;
           document.addEventListener('keydown', onKey, true);
           document.addEventListener('focusin', onFocusIn, true);
-          window.addEventListener('error', disarm);
-          window.addEventListener('unhandledrejection', disarm);
-          function armTimeout() { setTimeout(disarm, 30000); }
+          window.addEventListener('error', stop);
+          window.addEventListener('unhandledrejection', stop);
+          function armTimeout() { timer = setTimeout(stop, 30000); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', armTimeout);
           else armTimeout();
         } catch (e) {}
