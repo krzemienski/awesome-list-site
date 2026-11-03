@@ -60,3 +60,22 @@ All audit records created on production were deleted and read back (QA ledger: 2
 - Earlier in the run: submission 190920 and audit member `krzemienski+audit202611031301@gmail.com`, plus fixtures deleted as each lane finished.
 
 One side effect stays: audit-log row TX#29386 (a `database.exported` entry from a read-only leak check).
+
+
+## C18 remediation (47-finding black-box audit, 2026-11-03)
+
+**Final production revision `7c6b1b93`** (= origin/main; `/api/version` and `/api/health/ready` 200). Fix PRs #209–#219, each independently reviewed (sonnet), squash-merged with a merged-tree gate (`tsc` 0, `npm run build` 0), deployed with replit-deploy, and re-checked on production.
+
+Completion table with one evidence path per finding: `docs/audit/C18-COMPLETION.md`.
+
+| Result | Findings |
+|---|---|
+| PASS on production | 47 of 47 |
+
+Catalog data edits (reversible, before/after logged in `e2e-evidence/c18-f/applied.md`): 186041 URL, 186212 description, 4 retitles, 3 archived duplicates or dead links, 3 Stanford links moved to archive.org snapshots, subcategory 2233 renamed.
+
+P0 journey smoke: 18/18 PASS at 1440 and 375 (`e2e-evidence/c18-final/SM/`).
+
+Owner decisions:
+1. BUG-003. Mixpanel now sends after an explicit "Allow analytics" even when the browser sets Do Not Track (`ignore_dnt`), the same as PostHog and Amplitude. The Privacy Policy does not mention DNT.
+2. Follow-up (not one of the 47). On a throttled first load, text typed into the hero search box before hydration is cleared by hydration.
