@@ -45,6 +45,12 @@ export const posthogPersonProps = (
 export const mixpanelInitOptions: Partial<MixpanelConfig> = {
   // EU/CA compliance: nothing is tracked unless explicitly opted in afterwards.
   opt_out_tracking_by_default: true,
+  // The SDK otherwise treats navigator.doNotTrack="1" as a permanent opt-out
+  // (has_opted_out_tracking() stays true even after opt_in_tracking()), so a
+  // visitor who clicked Allow analytics with DNT on sent nothing. Explicit
+  // consent decides here, as it does for PostHog and Amplitude, whose SDKs
+  // ignore DNT by default. This init only runs after that consent.
+  ignore_dnt: true,
   // Default api host (api-js.mixpanel.com) is allowlisted in the server CSP
   // connect-src (server/index.ts).
   debug: import.meta.env.DEV,
