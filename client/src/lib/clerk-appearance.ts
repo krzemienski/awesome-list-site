@@ -288,6 +288,10 @@ function buildClerkAppearance(
       // than the page column on a phone: the card spilled past both gutters
       // and under the back-to-top button. Cap both boxes at the column.
       rootBox: { maxWidth: "100%" },
+      // The account modal (openUserProfile) renders an 880px card inside
+      // modalContent, a flex item with no width cap, so the 100% caps above
+      // resolve to 880 and the card spills off both edges below ~920px.
+      modalContent: { maxWidth: "calc(100vw - 2rem)" },
       // Task #404: Clerk rounds the card at TWICE the base above (its own
       // ladder step), which overshoots the DS card token — 16px against the
       // 12px every other card on the page sits at. `cardBox` is the outer,

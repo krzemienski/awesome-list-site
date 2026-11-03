@@ -684,6 +684,9 @@ export default function TaxonomyListing({ level }: Props) {
   // filter miss — "No resources match this combination" told visitors to clear
   // filters they never set.
   const emptyCollection = listingData.totalAll === 0 && !narrowed && !normalizedSearch;
+  // Moving around the taxonomy keeps the kind the visitor chose (child tiles
+  // already did; breadcrumbs and siblings dropped it).
+  const withKind = (href: string) => (kind ? `${href}?kind=${kind}` : href);
   const kindLabel = kind ? kind.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : "";
 
   return <div className={`taxonomy-page taxonomy-page--${level}`}>
@@ -692,8 +695,8 @@ export default function TaxonomyListing({ level }: Props) {
     {level === "category" ? <Button asChild variant="ghost" size="sm" className="taxonomy-back"><Link href="/categories"><ArrowLeft size={12} aria-hidden="true" />Browse</Link></Button> :
       <nav className="taxonomy-breadcrumbs" aria-label="Breadcrumb">
         <Link href="/">Home</Link><span aria-hidden="true">/</span>
-        {parentCategory && <><Link href={routeFor("category", parentCategory.slug)}>{parentCategory.name}</Link><span aria-hidden="true">/</span></>}
-        {level === "sub-subcategory" && parentSubcategory && <><Link href={routeFor("subcategory", parentSubcategory.slug)}>{parentSubcategory.name}</Link><span aria-hidden="true">/</span></>}
+        {parentCategory && <><Link href={withKind(routeFor("category", parentCategory.slug))}>{parentCategory.name}</Link><span aria-hidden="true">/</span></>}
+        {level === "sub-subcategory" && parentSubcategory && <><Link href={withKind(routeFor("subcategory", parentSubcategory.slug))}>{parentSubcategory.name}</Link><span aria-hidden="true">/</span></>}
         <span aria-current="page">{name}</span>
       </nav>}
     <header className="taxonomy-header">
@@ -768,6 +771,6 @@ export default function TaxonomyListing({ level }: Props) {
     </div>
     {/* Where next: most visitors who land on a subcollection leave from it,
         and below lg the sidebar listing its neighbours is hidden. */}
-    {level !== "category" && siblingParent && siblingTiles.length > 0 && <section className="taxonomy-children taxonomy-siblings" aria-labelledby="taxonomy-siblings-heading" data-testid="taxonomy-siblings"><h2 id="taxonomy-siblings-heading">More in {siblingParent.name}</h2><div className="taxonomy-child-grid">{siblingTiles.map((sibling) => <Link key={sibling.slug} className="taxonomy-child card hoverable" href={routeFor(level, sibling.slug!)}><span>{sibling.name}</span><span className="chip mono">{navTotalCount(sibling)}</span></Link>)}<Link className="taxonomy-child card hoverable" href={routeFor(level === "subcategory" ? "category" : "subcategory", siblingParent.slug!)} data-testid="taxonomy-siblings-parent"><span>All of {siblingParent.name}</span><span aria-hidden="true">→</span></Link></div></section>}
+    {level !== "category" && siblingParent && siblingTiles.length > 0 && <section className="taxonomy-children taxonomy-siblings" aria-labelledby="taxonomy-siblings-heading" data-testid="taxonomy-siblings"><h2 id="taxonomy-siblings-heading">More in {siblingParent.name}</h2><div className="taxonomy-child-grid">{siblingTiles.map((sibling) => <Link key={sibling.slug} className="taxonomy-child card hoverable" href={withKind(routeFor(level, sibling.slug!))}><span>{sibling.name}</span><span className="chip mono">{navTotalCount(sibling)}</span></Link>)}<Link className="taxonomy-child card hoverable" href={withKind(routeFor(level === "subcategory" ? "category" : "subcategory", siblingParent.slug!))} data-testid="taxonomy-siblings-parent"><span>All of {siblingParent.name}</span><span aria-hidden="true">→</span></Link></div></section>}
   </div>;
 }
