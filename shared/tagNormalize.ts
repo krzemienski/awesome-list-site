@@ -6,7 +6,8 @@
  */
 export const TAG_PLURAL_KEEP = new Set([
   "hls", "obs", "oss", "os", "css", "mss", "cbcs", "cbs", "dts", "ts",
-  "graphics", "analytics", "analysis", "ios", "tvos", "macos", "nas",
+  "graphics", "analytics", "analysis", "ios", "ipados", "tvos", "macos", "watchos",
+  "visionos", "nas",
   "kubernetes", "less", "sass", "aws", "cors", "https", "dns", "tls",
   "sas", "saas", "paas", "iaas", "ffmpeg-libs", "canvas", "atmos",
   "axios", "redis", "postgres", "jenkins", "devops", "chaos",
@@ -59,7 +60,7 @@ const TAG_DISPLAY_ACRONYMS = new Set([
  * tag slug. Lives here, beside tagDisplayName(), so the client h1/title, the
  * server og:title and the related-tag chips all read one display source.
  */
-const TAG_BRAND_CASING: Record<string, string> = {
+const TAG_BRAND_CASING = new Map<string, string>(Object.entries({
   ffmpeg: "FFmpeg",
   webassembly: "WebAssembly",
   webgl: "WebGL",
@@ -82,6 +83,9 @@ const TAG_BRAND_CASING: Record<string, string> = {
   ios: "iOS",
   tvos: "tvOS",
   ipados: "iPadOS",
+  watchos: "watchOS",
+  visionos: "visionOS",
+  prometheus: "Prometheus",
   dashjs: "dash.js",
   "dash-js": "dash.js",
   hlsjs: "hls.js",
@@ -102,7 +106,7 @@ const TAG_BRAND_CASING: Record<string, string> = {
   hbbtv: "HbbTV",
   voip: "VoIP",
   "ci-cd": "CI/CD",
-};
+}));
 
 export function normalizeTagFilter(tag: string): string {
   const folded = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
@@ -129,7 +133,7 @@ export function normalizeTagFilter(tag: string): string {
 export function normalizeTagPathSegment(segment: string): string {
   try {
     const tag = normalizeTagFilter(decodeURIComponent(segment));
-    return RETIRED_TAG_SLUGS[tag] ?? tag;
+    return Object.hasOwn(RETIRED_TAG_SLUGS, tag) ? RETIRED_TAG_SLUGS[tag] : tag;
   } catch {
     return "";
   }
@@ -145,7 +149,7 @@ export function tagDisplayName(tag: string): string {
   // The raw key is tried first: some brand keys ("ipados") are not plural-safe.
   const raw = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
   const slug = normalizeTagFilter(tag);
-  const branded = TAG_BRAND_CASING[raw] ?? TAG_BRAND_CASING[slug];
+  const branded = TAG_BRAND_CASING.get(raw) ?? TAG_BRAND_CASING.get(slug);
   if (branded) return branded;
   return slug
     .split("-")
