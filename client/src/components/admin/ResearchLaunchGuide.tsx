@@ -341,9 +341,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
                 : !(Number.isFinite(budgetN) && budgetN > 0) ? "Enter a positive amount in USD (blank = no cap)."
                   : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
-            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < (cheapestSavingRun?.costUsd ?? LOW_BUDGET_USD) && (
+            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < Math.max(cheapestSavingRun?.costUsd ?? 0, LOW_BUDGET_USD) && (
               <p className={hint(true)} data-testid="text-budget-low">
-                {cheapestSavingRun !== null
+                {cheapestSavingRun !== null && budgetN < cheapestSavingRun.costUsd
                   ? `No run in the job history saved a discovery for less than ${cheapestSavingRun.costBasis === "reported" ? "" : "about "}$${cheapestSavingRun.costUsd.toFixed(2)}.`
                   : `Under $${LOW_BUDGET_USD.toFixed(2)} a run may stop before it saves anything.`}{" "}
                 Each turn costs about $0.10–$0.15, and $0.30 caps ended after 3 turns with no searches.
