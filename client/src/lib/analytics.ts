@@ -845,6 +845,45 @@ export const trackRelatedCategoryOpened = (
   });
 };
 
+export type ResourceNextStep =
+  | { kind: 'category'; categorySlug: string }
+  | { kind: 'related'; targetId: string | number; position: number };
+
+/** A visitor followed a next-step link near the top of a resource page. */
+export const trackResourceNextStepClicked = (
+  surface: 'resource_top',
+  fromResourceId: string | number,
+  step: ResourceNextStep,
+) => {
+  track('resource_next_step_clicked', {
+    surface,
+    kind: step.kind,
+    from_resource_id: String(fromResourceId),
+    ...(step.kind === 'category'
+      ? { target_slug: step.categorySlug }
+      : { target_id: String(step.targetId), position: step.position }),
+  });
+};
+
+export type SubmitFormStep = 'sign_in_required' | 'details' | 'category' | 'review';
+
+export const trackSubmitFormStarted = (signedIn: boolean) => {
+  track('submit_form_started', { signed_in: signedIn });
+};
+
+export const trackSubmitStepCompleted = (step: SubmitFormStep) => {
+  track('submit_step_completed', { step });
+};
+
+/** `field` is the form field NAME only, never what the visitor typed. */
+export const trackSubmitValidationFailed = (field: string, source: 'client' | 'server') => {
+  track('submit_validation_failed', { field, source });
+};
+
+export const trackSubmitFormSubmitted = (tagCount: number, hasSubcategory: boolean) => {
+  track('submit_form_submitted', { tag_count: tagCount, has_subcategory: hasSubcategory });
+};
+
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
   track('api_key_copied', { copy_method: copyMethod });
 };

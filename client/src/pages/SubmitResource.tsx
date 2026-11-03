@@ -45,7 +45,14 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
-import { trackGenerateLead } from "@/lib/analytics";
+import {
+  trackGenerateLead,
+  trackSubmitFormStarted,
+  trackSubmitFormSubmitted,
+  trackSubmitStepCompleted,
+  trackSubmitValidationFailed,
+  type SubmitFormStep,
+} from "@/lib/analytics";
 import { serverConversionHeaders } from "@/lib/mixpanel";
 import { scrollBehavior } from "@/lib/scroll-behavior";
 import SEOHead from "@/components/layout/SEOHead";
@@ -205,7 +212,43 @@ export default function SubmitResource() {
     "tags",
   ];
 
+  // Funnel telemetry: each event fires once per page visit. Only field names
+  // and step names leave the page, never what was typed.
+  const funnelSeen = useRef(new Set<string>());
+  const fireOnce = (key: string, send: () => void) => {
+    if (funnelSeen.current.has(key)) return;
+    funnelSeen.current.add(key);
+    send();
+  };
+  const completeStep = (step: SubmitFormStep) =>
+    fireOnce(`step:${step}`, () => trackSubmitStepCompleted(step));
+  const startFunnel = () =>
+    fireOnce("started", () => trackSubmitFormStarted(isAuthenticated));
+
+  // Signed-out visitors cannot type (the fields are disabled), so the sign-in
+  // wall is the first and last step they reach.
+  const signInGateShown = !authLoading && !authFailed && !isAuthenticated;
+  useEffect(() => {
+    if (signInGateShown) completeStep("sign_in_required");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signInGateShown]);
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (!funnelSeen.current.has("started")) return;
+      if (submitResourceSchema.pick({ title: true, url: true, description: true }).safeParse(values).success) {
+        completeStep("details");
+      }
+      if (values.category) completeStep("category");
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
   const onInvalid = (errors: Record<string, unknown>) => {
+    for (const name of FIELD_ORDER) {
+      if (name in errors) trackSubmitValidationFailed(name, "client");
+    }
     const firstBad = FIELD_ORDER.find((name) => name in errors);
     // C4-V3-01: the Select triggers carry field.ref, so setFocus
     // reaches them too; without it setFocus silently did nothing for Category.
@@ -490,6 +533,7 @@ export default function SubmitResource() {
         for (const key of formFields) {
           const message = fieldErrors[key];
           if (message) {
+            trackSubmitValidationFailed(key, "server");
             form.setError(key, { type: "server", message }, { shouldFocus: mapped === 0 });
             mapped++;
           }
@@ -517,6 +561,11 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
+    completeStep("review");
+    trackSubmitFormSubmitted(
+      data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean).length : 0,
+      Boolean(data.subcategory),
+    );
     submitMutation.mutate(data);
   };
 
@@ -631,7 +680,12 @@ export default function SubmitResource() {
               >
                 {/* Fields are disabled for logged-out visitors — they can see the
                     form layout as a preview but cannot fill or submit it (BUG-018). */}
-                <fieldset disabled={!isAuthenticated} className="submit-fields">
+                <fieldset
+                  disabled={!isAuthenticated}
+                  className="submit-fields"
+                  onFocusCapture={startFunnel}
+                  onChangeCapture={startFunnel}
+                >
                   {/* Title Field */}
                   <FormField
                     control={form.control}

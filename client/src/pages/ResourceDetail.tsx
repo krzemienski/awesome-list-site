@@ -32,7 +32,8 @@ import {
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
-import ResourceOnwardPaths, { ONWARD_SURFACE } from "@/components/resource/ResourceOnwardPaths";
+import ResourceOnwardPaths from "@/components/resource/ResourceOnwardPaths";
+import ResourceTopNextSteps, { TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -43,6 +44,7 @@ import {
   trackResourceFavorite,
   trackResourceClick,
   trackRelatedResourceOpened,
+  trackResourceNextStepClicked,
 } from "@/lib/analytics";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
@@ -556,24 +558,36 @@ export default function ResourceDetail() {
   // intercepted for SPA navigation (after tracking); modified clicks
   // (cmd/ctrl/shift/middle) fall through to native anchor behavior so
   // open-in-new-tab works.
-  const handleRelatedResourceClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    relatedResource: { id: number; score?: number },
-    position: number,
-    surface?: string,
-  ) => {
-    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score, surface);
+  const followRelatedLink = (e: React.MouseEvent<HTMLAnchorElement>, relatedResourceId: number) => {
     // Interaction history is per member; guests would only collect a 401.
     if (user?.id) {
       trackInteraction.mutate({
-        resourceId: relatedResource.id.toString(),
+        resourceId: relatedResourceId.toString(),
         interactionType: "click",
         metadata: { source: "related-resources", fromResourceId: id }
       });
     }
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
-    setLocation(`/resource/${relatedResource.id}`);
+    setLocation(`/resource/${relatedResourceId}`);
+  };
+
+  const handleRelatedResourceClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    relatedResource: { id: number; score?: number },
+    position: number,
+  ) => {
+    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score);
+    followRelatedLink(e, relatedResource.id);
+  };
+
+  const handleTopRelatedClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    relatedResource: { id: number },
+    position: number,
+  ) => {
+    trackResourceNextStepClicked(TOP_SURFACE, id, { kind: "related", targetId: relatedResource.id, position });
+    followRelatedLink(e, relatedResource.id);
   };
 
   const metadata = resource?.metadata as Record<string, any> | undefined;
@@ -615,6 +629,14 @@ export default function ResourceDetail() {
   const filteredRelatedResources = (relatedResources?.similar ?? [])
     .slice(0, 6)
     .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
+
+  // Shared tags first, then the server's score (same category / keywords).
+  const ownTags = new Set((tags ?? []).map((tag) => tag.toLowerCase()));
+  const sharedTagCount = (candidate: Resource) =>
+    ((candidate.metadata as { tags?: string[] } | null)?.tags ?? []).filter((tag) => ownTags.has(tag.toLowerCase())).length;
+  const topRelated = [...filteredRelatedResources].sort(
+    (a, b) => sharedTagCount(b) - sharedTagCount(a) || (b.score ?? 0) - (a.score ?? 0),
+  );
 
   // The shared not-found page owns the 404 head, h1 and dead-link telemetry.
   if (resourceMissing) {
@@ -700,7 +722,12 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.category
                 ? (
-                  <Link href={`/category/${taxonomySlugs.category}`} className="resource-detail-chip-link" data-testid="badge-category">
+                  <Link
+                    href={`/category/${taxonomySlugs.category}`}
+                    className="resource-detail-chip-link"
+                    data-testid="badge-category"
+                    onClick={() => trackResourceNextStepClicked(TOP_SURFACE, id, { kind: "category", categorySlug: taxonomySlugs.category! })}
+                  >
                     <span className="chip">
                       <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
                       <span className="resource-detail-chip-label">{resource.category}</span>
@@ -770,6 +797,12 @@ export default function ResourceDetail() {
           )}
         </div>
       </div>
+
+      <ResourceTopNextSteps
+        related={topRelated}
+        loading={relatedQuery.isLoading}
+        onRelatedClick={handleTopRelatedClick}
+      />
 
       <section className="resource-detail-description">
         <h2 className="eyebrow">DESCRIPTION</h2>
@@ -898,9 +931,6 @@ export default function ResourceDetail() {
 
       <ResourceOnwardPaths
         resourceId={resource.id}
-        related={filteredRelatedResources}
-        relatedLoading={relatedQuery.isLoading}
-        onRelatedClick={(e, related, position) => handleRelatedResourceClick(e, related, position, ONWARD_SURFACE)}
         narrowestCollection={narrowestCollection}
         category={resource.category && taxonomySlugs.category
           ? { name: resource.category, href: `/category/${taxonomySlugs.category}` }
