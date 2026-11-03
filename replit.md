@@ -34,6 +34,10 @@ A production-ready React application for browsing and discovering over 2,600 cur
   - Tag filter popover off-screen at 390 (#200): `PopoverContent` had no height cap, so a flipped popover overflowed the top. Cap at `--radix-popover-content-available-height` and let the list scroll (same as `select.tsx`).
   - Clerk account modal clipped below ~920px (#201): our `rootBox`/`cardBox` 100% caps resolved against `modalContent`, which had none. `modalContent` now caps at `100vw - 2rem` in `clerk-appearance.ts`.
   - Taxonomy links dropped `?kind=` (#201): breadcrumbs and sibling tiles built bare routes. `withKind()` in `TaxonomyListing.tsx`.
+  - Researcher low-budget warning missing at $0.30 (#203): the floor was the cheapest past saving run ($0.09). It is now `max(cheapest saving run, $1.25)` in `ResearchLaunchGuide.tsx`.
+  - "Failed to fetch" shown to users (#204, #205, #206): onboarding save, profile name, deletion withdraw, contribution withdraw and home-layout errors printed `error.message`. Show errors through `humanizeApiError`/`describeWriteError` (`client/src/lib/apiError.ts`), never `error.message`.
+  - Focus fell to `<body>` when the control that had it unmounted (#204, #206): bulk archive-all, a 409 contribution withdraw and an API key revoke. Hand focus to a surviving element (`focus-handoff.ts`, or `onCloseAutoFocus` on the dialog), and give that element a `focus-visible` ring (#207).
+  - 16px acknowledgement checkbox row at 820 (#205): checkbox labels need `min-h-6 max-lg:min-h-11`, like the other touch targets.
 - Audit tooling traps: each agent's chrome-devtools MCP is its own browser (page ids are not shared). Clear a field before filling, because fill appends to leftover text. agent-browser headless never scrolls. Never click Sign out on the owner account: it revokes every owner session.
 
 ### Production validation and redeploy loop — October 26, 2026
