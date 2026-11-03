@@ -30,7 +30,7 @@ import {
 import "@/styles/shell/sidebar.css";
 import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
-import { docsUrl } from "@/lib/docs-url";
+import { docsUrl, shellRepo } from "@/lib/docs-url";
 import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
 
 /**
@@ -127,6 +127,10 @@ function filterCategories(categories: NavCategory[]) {
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   return String(n);
+}
+
+function resourceCountLabel(n: number): string {
+  return `${formatCount(n)} ${n === 1 ? "resource" : "resources"}`;
 }
 
 /* Bring an item into its nearest scrolling ancestor ("block: nearest").
@@ -229,6 +233,7 @@ function SubItem({
       )}
       style={count === 0 ? { opacity: 0.45 } : undefined}
       title={count === 0 ? `${label} (no resources yet)` : label}
+      aria-label={typeof count === "number" ? `${label}, ${resourceCountLabel(count)}` : undefined}
     >
       <span className="av-sidebar-leaf-label" title={label}>{label}</span>
       {typeof count === "number" && (
@@ -237,8 +242,7 @@ function SubItem({
           // BUG-049 (run19): bare numbers were ambiguous next to the labeled
           // "N resources" header — give every count an explicit unit for
           // assistive tech and a hover title for sighted users.
-          title={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
-          aria-label={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
+          title={resourceCountLabel(count)}
         >
           {formatCount(count)}
         </span>
@@ -447,8 +451,8 @@ function CategoryAccordion({
             style={{ fontSize: 12, color: "var(--text-3)" }}
             // BUG-049 (run19): unit-label the category badge like the header's
             // "N resources" so the bare number is unambiguous.
-            title={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
-            aria-label={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
+            title={resourceCountLabel(totalCount)}
+            aria-label={resourceCountLabel(totalCount)}
           >
             {formatCount(totalCount)}
           </span>
@@ -533,13 +537,13 @@ function CategoryAccordion({
                         aria-current={subIsPage ? "page" : undefined}
                         data-active={subActive || undefined}
                         title={sub.name}
+                        aria-label={`${sub.name}, ${resourceCountLabel(subCount)}`}
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
                         <span
                           className="font-mono tabular-nums"
-                          title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
-                          aria-label={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
+                          title={resourceCountLabel(subCount)}
                         >
                           {formatCount(subCount)}
                         </span>
@@ -588,6 +592,7 @@ function CategoryAccordion({
                                   navigate(ssPath);
                                 }}
                                 data-testid={`subsub-${ssSlug}`}
+                                aria-label={`${ss.name}, ${resourceCountLabel(getTotalResourceCount(ss))}`}
                                 data-active={activePath === ssPath || undefined}
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
@@ -606,6 +611,7 @@ function CategoryAccordion({
                                 navigate(subGeneralPath);
                               }}
                               data-testid={`subsub-${subSlug}-uncategorized`}
+                              aria-label={`Uncategorized in ${sub.name}, ${resourceCountLabel(subDirectCount)}`}
                               data-active={(activePath === subPath && generalActive) || undefined}
                               aria-current={activePath === subPath && generalActive ? "page" : undefined}
                               className="av-sidebar-l3-row no-underline"
@@ -646,13 +652,15 @@ export default function AppSidebar({
   totalResources,
   isLoading,
   siteName,
-  repoUrl,
-  repoBranch = "main",
+  repoUrl: configuredRepoUrl,
+  repoBranch: configuredRepoBranch,
   navError,
   onRetryNav,
   user,
 }: AppSidebarProps) {
+  const { repoUrl, repoBranch } = shellRepo(configuredRepoUrl, configuredRepoBranch);
   const docsHref = docsUrl(repoUrl, repoBranch);
+  const sourceLabel = `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}`;
   const homeBoot = useHomeBoot();
   const isInitialHomeHydration = homeBoot?.isAnonymous === true;
   const [location, setLocation] = useLocation();
@@ -1050,6 +1058,7 @@ export default function AppSidebar({
                 e.preventDefault();
                 navigate(item.href);
               }}
+              aria-label={item.label}
               data-testid={item.testId ?? `nav-${slugify(item.label)}`}
               data-active={isActive(item.href) || undefined}
               aria-current={isActive(item.href) ? "page" : undefined}
@@ -1162,13 +1171,11 @@ export default function AppSidebar({
             </a>
           )}
           <a
-            {...(repoUrl ? { href: repoUrl } : {})}
+            href={repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-            title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-            aria-disabled={!repoUrl || undefined}
-            tabIndex={repoUrl ? undefined : -1}
+            aria-label={sourceLabel}
+            title={sourceLabel}
           >
             <svg
               width="13"
@@ -1347,14 +1354,12 @@ export default function AppSidebar({
               );
             })}
             <a
-              {...(repoUrl ? { href: repoUrl } : {})}
+              href={repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="rail-icon-btn av-sidebar-rail-repo no-underline"
-              aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-              title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-              aria-disabled={!repoUrl || undefined}
-              tabIndex={repoUrl ? undefined : -1}
+              aria-label={sourceLabel}
+              title={sourceLabel}
             >
               <span aria-hidden="true" className="font-mono text-sm">↗</span>
             </a>
