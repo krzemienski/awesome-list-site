@@ -21,6 +21,8 @@ const ContactPaletteItem =
 interface SearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  /** Text typed into the loading fallback before this chunk arrived. */
+  initialQuery?: string;
 }
 
 interface DbSearchResource {
@@ -104,8 +106,8 @@ function PaletteFooter({ showResults, shownResults, totalMatches }: { showResult
   );
 }
 
-export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
-  const [query, setQuery] = useState("");
+export default function SearchDialog({ isOpen, setIsOpen, initialQuery }: SearchDialogProps) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [recentSearches, setRecentSearches] = useState<string[]>(readRecentSearches);
   const [selectedValue, setSelectedValue] = useState("");
   const selectionInteracted = useRef(false);
@@ -382,7 +384,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           }}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            inputRef.current?.focus();
+            const input = inputRef.current;
+            if (!input) return;
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
           }}
           onCloseAutoFocus={restoreOpenerFocus}
         >
