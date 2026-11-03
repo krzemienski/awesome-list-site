@@ -82,7 +82,7 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
         ? `${immediate}, part of ${root},`
         : `${immediate}`
       : "video technology";
-    lead = `${input.name} is a specific area of ${place} and includes ${resourceCount}.`;
+    lead = `${input.name} is a specific area of ${place} and includes ${countInTotal}.`;
   }
 
   const details = [
