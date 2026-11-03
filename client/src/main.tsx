@@ -92,25 +92,30 @@ const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : u
 // code-split (and auth guards remain unchanged); this only overlaps chunk
 // transfer with bootstrap on deep links instead of waiting for React.lazy to
 // render the route branch.
+// App.tsx owns the matching React.lazy declarations; both resolve to the same
+// module, so the lazy import reuses the request started here.
+const ROUTE_CHUNKS: [RegExp, () => Promise<unknown>][] = [
+  [/^\/category\/[^/]+$/, () => import("./pages/Category")],
+  [/^\/subcategory\/[^/]+$/, () => import("./pages/Subcategory")],
+  [/^\/sub-subcategory\/[^/]+$/, () => import("./pages/SubSubcategory")],
+  [/^\/resource\/[^/]+$/, () => import("./pages/ResourceDetail")],
+  [/^\/journeys\/?$/, () => import("./pages/Journeys")],
+  [/^\/advanced\/?$/, () => import("./pages/Advanced")],
+  [/^\/submit\/?$/, () => import("./pages/SubmitResource")],
+  [/^\/terms\/?$/, () => import("./pages/Terms")],
+  [/^\/privacy\/?$/, () => import("./pages/Privacy")],
+  [/^\/code-of-conduct\/?$/, () => import("./pages/CodeOfConduct")],
+  [/^\/about\/?$/, () => import("./pages/About")],
+];
+
 function preloadInitialRouteChunk() {
   const pathname = window.location.pathname;
-  let chunk;
-  if (pathname === "/") {
-    chunk = import("./pages/Home");
-  } else if (/^\/category\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/Category");
-  } else if (/^\/subcategory\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/Subcategory");
-  } else if (/^\/sub-subcategory\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/SubSubcategory");
-  } else if (/^\/resource\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/ResourceDetail");
-  }
   // A speculative preload must never create an unhandled rejection.  The
   // route's React.lazy import still observes the same module-cache failure and
   // renders its existing error/retry surface if the chunk is unavailable.
-  chunk?.catch(() => undefined);
-  return chunk;
+  ROUTE_CHUNKS.find(([pattern]) => pattern.test(pathname))?.[1]().catch(() => undefined);
+  // The home SSR hydration below needs the Home module itself.
+  return pathname === "/" ? import("./pages/Home") : undefined;
 }
 
 const initialRouteChunk = preloadInitialRouteChunk();
