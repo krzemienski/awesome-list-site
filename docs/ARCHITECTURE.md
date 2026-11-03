@@ -482,6 +482,68 @@ digest_jobs / digest_attempts**
 - Database query optimization with indexes
 - Static asset caching via Vite
 
+#### Public page cache and invalidation
+
+Three layers sit between a visitor and the database. Each has its own rule.
+
+- **HTML documents are never cached.** Every document embeds a per-request CSP
+  nonce, so `server/og-middleware.ts` sends `Cache-Control: no-store` on HTML
+  for GET and HEAD and removes `ETag` and `Last-Modified`. A cached or
+  304-revalidated document would pair an old nonce with a new header and block
+  every inline script. Do not weaken this.
+- **Catalog reads may be reused for 60 s.** `server/http-cache-policy.ts`
+  defines the strings: `CATALOG_CACHE_CONTROL` is
+  `public, max-age=60, must-revalidate`, used by the nav, category, tag and
+  subcategory reads, the kind counts and the home feed. Catalog variants
+  outside the known taxonomy use `UNCACHED_CATALOG_CACHE_CONTROL`
+  (`public, max-age=0, must-revalidate`). Hashed `/assets/*` bundles are
+  immutable for a year. Add a new public class to that file, not as a literal
+  in a route.
+- **Server-side reads share one in-process cache.** `getPublicCacheValue()` in
+  `server/cache/publicCache.ts` holds catalog bodies, nav, taxonomy and the
+  `route-meta` namespace under a caller-supplied TTL, normally 60 s. Concurrent
+  misses share one loader, a failed loader is never replaced by stale data,
+  and the cache is bounded (512 entries, 48 MB, 64 rebuilds in flight). The
+  cache is per process, not shared between instances.
+- **Page metadata is cached for 60 s too.** `resolveRoute()` in
+  `server/og-middleware.ts` resolves the title, description and found/not-found
+  state for a path through `getPublicCacheValue()` with `ttlMs: 60_000`
+  (namespace `route-meta`). The key is the path plus `?page=` (and
+  `/sign-in?admin`). `/search`, filtered category pages and `/collection/*`
+  bypass it, so an unpublished shared collection is not reachable for another
+  minute.
+
+**When a change becomes visible.** Every resource, category and tag write calls
+`invalidatePublicCache(reason)` with `resource-mutation`, `category-mutation`,
+`tag-mutation`, `seed-mutation` or `manual`. The call runs after the
+enclosing transaction commits (`afterCommit`), so a rolled-back write clears
+nothing and a reader cannot re-cache the pre-commit rows. It bumps a
+generation and clears every public entry, and a loader that started before the
+bump is discarded and retried. Creating, editing, approving, rejecting,
+withdrawing and deleting a resource, and approving a resource edit, all
+invalidate (`server/repositories/ResourceRepository.ts`,
+`resourcePublication.ts`, `AuditRepository.ts`).
+
+- On the instance that handled the write, the next server render and API read
+  see the change at once.
+- A browser that already holds a catalog API response keeps it for up to 60 s
+  without asking (`max-age=60`); after that it revalidates. The page document
+  itself is always fetched fresh.
+- Other instances do not hear about the write. Autoscale can run several, so
+  a new or edited resource can take up to 60 s to appear on an instance that
+  did not handle the write. Treat 60 s as the staleness window for public
+  pages and do not expect an audit to see a change sooner on a second request.
+
+**Facets.** `listResources()` counts facet groups only when asked: the
+`facets` option takes the kinds to count (`categories`, `subcategories`,
+`subSubcategories`, `tags`, `providers`, `formats`, `skillLevels`, from
+`RESOURCE_FACET_KINDS` in `shared/resourceFacets-core.ts`). Omitted means none.
+Each kind adds one `UNION ALL` branch to a single extra query, so ask only for
+what the page renders. For example, the sitemap build in
+`server/routes/non-api.ts` passes `facets: ["tags"]`, and
+`GET /api/resources?facets=categories` counts only categories for the tag
+landing page (`true` counts every kind, `false` none).
+
 ### Database
 - Connection pooling via Neon
 - Indexes on frequently queried columns
