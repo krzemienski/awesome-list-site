@@ -316,6 +316,13 @@ function isAdminSignIn(url: string): boolean {
   return new URLSearchParams(url.split("?")[1] || "").has("admin");
 }
 
+// Active ?tags= / legacy ?tag= filters, parsed with the SAME rule as the
+// hydrated client (parseTagsParam -> parseTagFilterValues).
+function activeTagFilters(url: string): string[] {
+  const q = new URLSearchParams(url.split("?")[1] || "");
+  return parseTagFilterValues([...q.getAll("tags"), ...q.getAll("tag")]);
+}
+
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -328,7 +335,9 @@ async function resolveRoute(
     (/^\/(category|subcategory|sub-subcategory)\//.test(cleanPath) && url.includes("?")) ||
     // Shared collections are revocable. Never let the metadata cache keep a
     // just-unpublished or deleted collection reachable for another 60 seconds.
-    cleanPath.startsWith("/collection/")
+    cleanPath.startsWith("/collection/") ||
+    // Tag-filtered Home titles name arbitrary tags: unbounded key space.
+    (cleanPath === "/" && activeTagFilters(url).length > 0)
   ) {
     return resolveRouteUncached(url, signal);
   }
@@ -663,8 +672,7 @@ function homeShellChrome(): string {
  // Home
  if (path === "/" || path === "") {
    const m = defaultMeta(path);
-   const homeParams = new URLSearchParams(url.split("?")[1] || "");
-   const activeTags = parseTagFilterValues([...homeParams.getAll("tags"), ...homeParams.getAll("tag")]);
+   const activeTags = activeTagFilters(url);
    let categories: { name: string; slug: string; count: number }[] = [];
    try {
       const data = await loadHomeNav();
@@ -1316,6 +1324,7 @@ function homeShellChrome(): string {
               .filter((child: any) => countNodeResources(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "subcategory",
@@ -1523,6 +1532,7 @@ function homeShellChrome(): string {
               .filter((child: any) => countNodeResources(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "sub-subcategory",
@@ -1614,6 +1624,7 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           resources: pageResources.map((r: any) => ({

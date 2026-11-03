@@ -12,6 +12,9 @@ export interface TaxonomyIntroInput {
   parentNames?: string[];
   childNames?: string[];
   formats?: string[];
+  // A ?tags= filter is active: the blurb's count is the whole-collection total
+  // and says so, because the visible list below it is the filtered subset.
+  tagFiltered?: boolean;
 }
 
 export interface ResourceFactsInput {
@@ -51,6 +54,7 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
     ? Math.max(0, input.totalResources)
     : 0;
   const resourceCount = `${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"}`;
+  const countInTotal = input.tagFiltered ? `${resourceCount} in total` : resourceCount;
   const parents = list(input.parentNames ?? [], 2);
   const children = list(input.childNames ?? []);
   const formats = list(
@@ -61,9 +65,9 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
 
   let lead: string;
   if (input.level === "category") {
-    lead = `${input.name} brings together ${resourceCount} from across the video technology landscape.`;
+    lead = `${input.name} brings together ${countInTotal} from across the video technology landscape.`;
   } else if (input.level === "subcategory") {
-    lead = `${input.name} is a focused collection within ${parents || "video technology"}, with ${resourceCount}.`;
+    lead = `${input.name} is a focused collection within ${parents || "video technology"}, with ${countInTotal}.`;
   } else {
     // Task #379 (uxv1-07): a sub-subcategory has two ancestors, and joining them
     // with `list()` produced "part of Encoding & Codecs and Codecs and includes
@@ -78,7 +82,7 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
         ? `${immediate}, part of ${root},`
         : `${immediate}`
       : "video technology";
-    lead = `${input.name} is a specific area of ${place} and includes ${resourceCount}.`;
+    lead = `${input.name} is a specific area of ${place} and includes ${countInTotal}.`;
   }
 
   const details = [

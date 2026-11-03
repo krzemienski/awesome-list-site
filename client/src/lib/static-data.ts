@@ -187,6 +187,7 @@ export interface AwesomeListListing {
   totalAll: number;
   generalCount: number;
   scopeIntro: string;
+  scopeIntroTagged: string;
   scope: {
     ignoredSubcategory: boolean;
     ignoredSubSubcategory: boolean;

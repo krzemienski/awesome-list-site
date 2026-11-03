@@ -68,7 +68,7 @@ import {
   resourceKindSchema,
   type ResourceKind,
 } from "@shared/resourceKinds";
-import { taxonomyScopeIntro } from "@shared/seo-content-templates";
+import { taxonomyScopeIntro, type TaxonomyIntroInput } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { describeTaxonomyPlan } from "@shared/github-import";
 import { db, runInTransaction } from "../../db";
@@ -1905,7 +1905,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const total = scoped.length;
       const totalPages = Math.max(1, Math.ceil(total / LISTING_PAGE_SIZE));
       const start = (parsedPage - 1) * LISTING_PAGE_SIZE;
-      const scopeIntro = taxonomyScopeIntro({
+      const scopeIntroInput: TaxonomyIntroInput = {
         name: match.name,
         level,
         totalResources: unfilteredCount,
@@ -1920,7 +1920,9 @@ export function registerAwesomeListDiscoveryRoutes(
           .filter((child: any) => child.count > 0)
           .map((child: any) => child.name),
         formats: allResources.map((resource: any) => resource.resourceFormat),
-      });
+      };
+      const scopeIntro = taxonomyScopeIntro(scopeIntroInput);
+      const scopeIntroTagged = taxonomyScopeIntro({ ...scopeIntroInput, tagFiltered: true });
       const body = JSON.stringify({
         level,
         node: { name: match.name, slug },
@@ -1937,6 +1939,7 @@ export function registerAwesomeListDiscoveryRoutes(
         totalAll: unfilteredCount,
         generalCount: directResources.size,
         scopeIntro,
+        scopeIntroTagged,
         scope: { ignoredSubcategory, ignoredSubSubcategory, generalIgnored },
         children,
         tags,
