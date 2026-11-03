@@ -31,6 +31,7 @@ import {
   NotebookPen
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
+import { bookmarkAriaLabel } from "@/lib/a11y-labels";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
 import ResourceOnwardPaths from "@/components/resource/ResourceOnwardPaths";
 import ResourceTopNextSteps, { TOP_RELATED_LIMIT, TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
@@ -856,11 +857,7 @@ export default function ResourceDetail() {
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}
-            aria-label={
-              isBookmarked
-                ? (isAuthenticated ? "Remove bookmark" : "Remove bookmark saved on this device")
-                : (isAuthenticated ? "Add bookmark" : "Bookmark on this device — no sign-in required")
-            }
+            aria-label={bookmarkAriaLabel(isBookmarked, isAuthenticated, resource.title)}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>

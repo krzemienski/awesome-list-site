@@ -19,7 +19,7 @@ import {
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
 
 // The public resource detail endpoint adds read-time kind resolution to the
@@ -104,6 +104,18 @@ export default function GuestBookmarks() {
     setLocation(`${path}?redirect_url=${encodeURIComponent("/bookmarks")}`);
 
   const count = entries.length;
+
+  // Removing the last save unmounts the focused remove button along with its
+  // card; land on the empty-state heading instead of <body>. Focus the user
+  // has already moved elsewhere is left alone.
+  const previousCountRef = useRef(count);
+  useEffect(() => {
+    const emptied = previousCountRef.current > 0 && count === 0;
+    previousCountRef.current = count;
+    if (emptied && (!document.activeElement || document.activeElement === document.body)) {
+      focusPageHeading();
+    }
+  }, [count]);
 
   if (count === 0) {
     return (

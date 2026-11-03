@@ -28,6 +28,7 @@ import {
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { scrollBehavior } from "@/lib/scroll-behavior";
+import { formatTileCount, tileLabel } from "@/lib/a11y-labels";
 import { TAG_MAX_LENGTH } from "@shared/validation";
 import {
   normalizeTagFilter,
@@ -45,10 +46,6 @@ interface TagListingResponse {
   facets?: {
     categories?: Array<{ value: string; count: number }>;
   };
-}
-
-function tileLabel(name: string, count: number) {
-  return `${name}, ${count} ${count === 1 ? "resource" : "resources"}`;
 }
 
 function listingTag(queryKeyUrl: unknown): string | null {
@@ -289,12 +286,12 @@ export default function TagLanding() {
           <div className="taxonomy-child-grid">
             {categories.map((category) => (
               <Link key={category.value} href={`/category/${slugify(category.value)}`} className="taxonomy-child card hoverable" aria-label={tileLabel(category.value, category.count)}>
-                <span>{category.value}</span><span className="chip mono">{category.count}</span>
+                <span>{category.value}</span><span className="chip mono">{formatTileCount(category.count)}</span>
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
               <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable" aria-label={tileLabel(`#${tagDisplayName(related)}`, count)}>
-                <span>#{tagDisplayName(related)}</span><span className="chip mono">{count}</span>
+                <span>#{tagDisplayName(related)}</span><span className="chip mono">{formatTileCount(count)}</span>
               </Link>
             ))}
           </div>
