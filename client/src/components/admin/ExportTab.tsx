@@ -166,7 +166,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       ? "Loading export history…"
       : auditHistoryTotal === 0
         ? "No exports recorded yet."
-        : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
+        : (exportHistoryData.logs.length === 0)
+          ? `No exports on page ${auditHistoryPage + 1}, ${auditHistoryTotal.toLocaleString()} in total`
+          : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
 
   const exportHistory = useMemo(
     () =>

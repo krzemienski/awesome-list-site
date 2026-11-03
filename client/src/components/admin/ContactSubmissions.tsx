@@ -213,8 +213,9 @@ export default function ContactSubmissions() {
             {total > 0 && (
               <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-4">
                 <p className="text-sm text-muted-foreground" data-testid="text-contact-submissions-range">
-                  {currentOffset + 1}–{Math.min(currentOffset + (data?.submissions.length ?? 0), total)} of{" "}
-                  {total.toLocaleString()} submissions
+                  {(data?.submissions.length ?? 0) === 0
+                    ? `No submissions on this page, ${total.toLocaleString()} in total`
+                    : `${currentOffset + 1}–${Math.min(currentOffset + (data?.submissions.length ?? 0), total)} of ${total.toLocaleString()} submissions`}
                 </p>
                 <div className="flex gap-2">
                   <Button
