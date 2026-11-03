@@ -73,7 +73,7 @@ export default function TagLanding() {
   // The API rejects over-length tags with a 400 that no retry can fix; the
   // server already answers such URLs 404, so the page must agree.
   const tagIsQueryable = Boolean(slug) && slug.length <= TAG_MAX_LENGTH;
-  const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=true`;
+  const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=categories`;
   const listing = useQuery<TagListingResponse>({
     queryKey: [url],
     queryFn: async () => {

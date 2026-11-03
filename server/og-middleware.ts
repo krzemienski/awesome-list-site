@@ -1352,7 +1352,7 @@ function homeShellChrome(): string {
         tags: [slug],
         offset: (page - 1) * LISTING_PAGE_SIZE,
         limit: LISTING_PAGE_SIZE,
-        includeFacets: true,
+        facets: ["categories"],
       } as any) as Awaited<ReturnType<typeof storage.listResources>> & {
         facets?: {
           categories?: Array<{ value: string; count: number }>;

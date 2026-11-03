@@ -80,6 +80,7 @@ import {
 } from "@shared/resourceFacets";
 import { parseTagFilterValues } from "@shared/tagNormalize";
 import { RESOURCE_KIND_VALUES, resourceKindSchema } from "@shared/resourceKinds";
+import { RESOURCE_FACET_KINDS } from "@shared/resourceFacets";
 import { parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
 import { trackServerEvent } from "../../lib/mixpanelServer";
 import { CATALOG_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
@@ -301,15 +302,22 @@ export function registerCatalogContributionsRoutes(
         });
       }
 
+      // `facets=categories` counts only the category facet (the tag landing page
+      // renders nothing else); `true` counts every group.
       const rawFacets = firstQueryValue(req.query.facets);
-      if (rawFacets !== undefined && rawFacets !== 'true' && rawFacets !== 'false') {
+      const FACET_PARAM_VALUES = ['true', 'false', 'categories'];
+      if (rawFacets !== undefined && !FACET_PARAM_VALUES.includes(rawFacets)) {
         return res.status(400).json({
           error: 'invalid_facets',
-          message: 'facets must be true or false',
-          allowed: ['true', 'false'],
+          message: 'facets must be true, false or categories',
+          allowed: FACET_PARAM_VALUES,
         });
       }
-      const includeFacets = rawFacets === 'true';
+      const facets = rawFacets === 'true'
+        ? RESOURCE_FACET_KINDS
+        : rawFacets === 'categories'
+          ? (['categories'] as const)
+          : undefined;
 
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
@@ -409,7 +417,7 @@ export function registerCatalogContributionsRoutes(
         resourceFormat: resourceFormat || undefined,
         skillLevel: skillLevel || undefined,
         generalScope: rawGeneralScope as "category" | "subcategory" | undefined,
-        includeFacets,
+        facets,
         sort,
         kind: kind || undefined,
       });

@@ -48,6 +48,7 @@ import {
   resourceFormatSchema,
   resourceProviderSchema,
   resourceSkillLevelSchema,
+  type ResourceFacetKind,
   type ResourceFormat,
   type ResourceProvider,
   type ResourceSearchFacets,
@@ -86,7 +87,8 @@ export interface ListResourceOptions {
   skillLevel?: ResourceSkillLevel;
   /** Limit results to resources attached directly to this taxonomy level. */
   generalScope?: "category" | "subcategory";
-  includeFacets?: boolean;
+  /** Facet groups to count (disjunctive: each ignores its own filter). Omit for none; each kind costs one UNION branch. */
+  facets?: readonly ResourceFacetKind[];
   /** C9-V5A-06: admin lists must show exact full-text matches only, never fuzzy near-misses. */
   exactSearchOnly?: boolean;
   /** Admin list: a search also matches any resource whose URL contains the raw text. */
@@ -457,7 +459,7 @@ export class ResourceRepository {
       sort,
       kind,
       featuredOnly = false,
-      includeFacets = false,
+      facets: facetKinds = [],
       exactSearchOnly = false,
       matchUrlSubstring = false,
     } = options;
@@ -634,45 +636,31 @@ export class ResourceRepository {
     const getFacetPromise = (
       facetSearchCondition: ReturnType<typeof sql> | undefined,
     ): Promise<ResourceSearchFacets | undefined> => {
-      if (!includeFacets) return Promise.resolve(undefined);
+      if (facetKinds.length === 0) return Promise.resolve(undefined);
       const whereSql = (omit?: Parameters<typeof buildConditions>[0]) => {
         const facetConditions = buildConditions(omit, facetSearchCondition);
         return facetConditions.length > 0 ? and(...facetConditions)! : sql`true`;
       };
-      return db.execute(sql`
-          SELECT facet, value, count
-          FROM (
-            SELECT 'category'::text AS facet, ${resources.category} AS value, count(*)::int AS count
+      const has = (kind: ResourceFacetKind) => facetKinds.includes(kind);
+      const plainBranch = (
+        facet: string,
+        valueSql: ReturnType<typeof sql>,
+        omit: NonNullable<Parameters<typeof buildConditions>[0]>,
+        notNull?: ReturnType<typeof sql>,
+      ) => sql`
+            SELECT ${sql.raw(`'${facet}'`)}::text AS facet, ${valueSql} AS value, count(*)::int AS count
             FROM ${resources}
-            WHERE ${whereSql("category")}
-            GROUP BY ${resources.category}
-            UNION ALL
-            SELECT 'subcategory', coalesce(${resources.subcategory}, ''), count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("subcategory")} AND ${resources.subcategory} IS NOT NULL
-            GROUP BY ${resources.subcategory}
-            UNION ALL
-            SELECT 'subSubcategory', coalesce(${resources.subSubcategory}, ''), count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("subSubcategory")} AND ${resources.subSubcategory} IS NOT NULL
-            GROUP BY ${resources.subSubcategory}
-            UNION ALL
-            SELECT 'provider', ${resources.provider}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("provider")}
-            GROUP BY ${resources.provider}
-            UNION ALL
-            SELECT 'resourceFormat', ${resources.resourceFormat}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("resourceFormat")}
-            GROUP BY ${resources.resourceFormat}
-            UNION ALL
-            SELECT 'skillLevel', ${resources.skillLevel}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("skillLevel")}
-            GROUP BY ${resources.skillLevel}
-            UNION ALL
-            SELECT 'tag', ${canonicalTagSql}, count(DISTINCT ${resources.id})::int
+            WHERE ${whereSql(omit)}${notNull ? sql` AND ${notNull}` : sql``}
+            GROUP BY ${valueSql}`;
+      const branches = [
+        has("categories") && plainBranch("category", sql`${resources.category}`, "category"),
+        has("subcategories") && plainBranch("subcategory", sql`coalesce(${resources.subcategory}, '')`, "subcategory", sql`${resources.subcategory} IS NOT NULL`),
+        has("subSubcategories") && plainBranch("subSubcategory", sql`coalesce(${resources.subSubcategory}, '')`, "subSubcategory", sql`${resources.subSubcategory} IS NOT NULL`),
+        has("providers") && plainBranch("provider", sql`${resources.provider}`, "provider"),
+        has("formats") && plainBranch("resourceFormat", sql`${resources.resourceFormat}`, "resourceFormat"),
+        has("skillLevels") && plainBranch("skillLevel", sql`${resources.skillLevel}`, "skillLevel"),
+        has("tags") && sql`
+            SELECT 'tag'::text AS facet, ${canonicalTagSql} AS value, count(DISTINCT ${resources.id})::int AS count
             FROM ${resources}
             CROSS JOIN LATERAL (${resourceTagSource}) AS resource_tag(value)
             WHERE ${whereSql("tags")} AND trim(resource_tag.value) <> ''
@@ -680,8 +668,11 @@ export class ResourceRepository {
             -- Drizzle assigns fresh parameter positions to repeated SQL
             -- fragments, so PostgreSQL does not consider the two rendered CASE
             -- expressions structurally identical (42803).
-            GROUP BY 2
-          ) facet_counts
+            GROUP BY 2`,
+      ].filter((branch): branch is ReturnType<typeof sql> => branch !== false);
+      return db.execute(sql`
+          SELECT facet, value, count
+          FROM (${sql.join(branches, sql` UNION ALL `)}) facet_counts
           WHERE value <> ''
           ORDER BY facet, count DESC, lower(value), value
         `).then((result) => {
