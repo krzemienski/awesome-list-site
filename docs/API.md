@@ -191,7 +191,7 @@ The exact parameter list, enums and bounds are in `/api/openapi.json`
 | `tags` / `tag` | ✓ | – | 1–10 comma-separated or repeated values |
 | `provider`, `format`, `skillLevel`, `kind` | ✓ | – | Controlled values, case-insensitive; unknown → `400 invalid_<param>` with `allowed` |
 | `sort` | ✓ | – | `relevance`, `name-asc`, `name-desc`, `newest`, `oldest`; unknown → `400 invalid_sort` |
-| `facets` | ✓ | – | `true` adds facet counts |
+| `facets` | ✓ | – | `true` adds all facet counts; `categories` adds the category facet only |
 | `page`, `limit` (1–100), `offset`, `cursor` | ✓ | – | `cursor` aliases `offset`; out-of-range → `400` |
 | `limit`, `offset` | – | ✓ | `limit` defaults to 100 and is clamped to 1–200; non-numeric → `400` |
 

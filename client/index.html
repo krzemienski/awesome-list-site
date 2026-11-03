@@ -175,7 +175,7 @@
             // the prefetch.
             var tagOffset = (Number(tagPage) - 1) * 24;
             if (/^[1-9]\d*$/.test(tagPage) && tagValue.length <= 50 && tagOffset <= 2147483647) {
-              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=true';
+              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=categories';
               var tagFetch = fetch(tagUrl, { credentials: 'same-origin' });
               window.__tagListingEarlyFetch = { url: tagUrl, promise: tagFetch };
               tagFetch.catch(function () {});

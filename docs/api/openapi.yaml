@@ -4296,11 +4296,12 @@ paths:
           in: query
           required: false
           schema:
-            description: true adds provider/format/skillLevel/kind facet counts to the response
+            description: true adds every facet count to the response; categories adds the category facet only
             type: string
             enum:
               - 'true'
               - 'false'
+              - categories
         - name: status
           in: query
           required: false

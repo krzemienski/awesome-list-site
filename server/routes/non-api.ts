@@ -177,7 +177,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
           status: "approved",
           limit: 10_000,
           sort: "newest",
-          includeFacets: true,
+          facets: ["tags"],
         }),
         categoryRepo.listCategories(),
         categoryRepo.listSubcategories(),
