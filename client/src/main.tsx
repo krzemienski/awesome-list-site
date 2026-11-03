@@ -10,7 +10,6 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
 import { syncReplitPageviewOptOut } from "./lib/analytics-suppression";
-import { loadFontOverride } from "./lib/font-options";
 import { seedResourceBoot } from "./lib/resource-boot";
 
 function afterFirstPaint(callback: () => void): void {
@@ -54,15 +53,9 @@ function afterFirstPaint(callback: () => void): void {
 }
 
 // The inline pre-paint boot has already resolved saved-theme precedence and
-// product-profile defaults, and the canonical <link> in index.html carries
-// every family the five systems name, so no per-system font work happens
-// here; only a saved picker override may still need its stylesheet.
-let fontOverrideAtBoot: string | null = null;
-try {
-  fontOverrideAtBoot = localStorage.getItem("ds-font-override");
-} catch {
-  // Storage can be unavailable in hardened/private browsing contexts.
-}
+// product-profile defaults, and every family a design system or the font
+// picker names is self-hosted (client/public/fonts), so no font work happens
+// here.
 
 // Admin sessions and QA paths: quiet Replit's injected page-view tracker
 // before it records this document's first page view (it sends at load).
@@ -75,7 +68,6 @@ afterFirstPaint(() => {
   initMixpanel();
   initPosthog();
   initAmplitude();
-  if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
 });
 
 // Force dark theme immediately
