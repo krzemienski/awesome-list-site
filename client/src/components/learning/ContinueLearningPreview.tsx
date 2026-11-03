@@ -163,7 +163,7 @@ export default function ContinueLearningPreview() {
               </p>
               <Link
                 href={recent.href}
-                className="mt-1 block min-h-8 truncate font-semibold leading-8 hover:text-[var(--accent-ink)] hover:underline"
+                className="mt-1 block min-h-8 max-lg:min-h-11 truncate font-semibold leading-8 max-lg:leading-11 hover:text-[var(--accent-ink)] hover:underline"
               >
                 {recent.title}
               </Link>
