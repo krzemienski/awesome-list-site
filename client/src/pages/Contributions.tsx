@@ -46,6 +46,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
 import { writeFilterParams } from "@/lib/url-filter-state";
 import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
@@ -511,19 +512,22 @@ export default function Contributions() {
             : "Your edit suggestion remains in your history as Withdrawn.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, item) => {
+      const conflict = error instanceof ApiError && error.status === 409;
+      // A 409 refetch can drop the row (and its Withdraw button) from the
+      // filtered list, so the dialog's close needs the same handoff as success.
+      if (conflict) withdrawnRef.current = { kind: item.kind, id: item.id };
       setWithdrawTarget(null);
       void queryClient.invalidateQueries({
         queryKey: ["/api/user/contributions"],
       });
-      const conflict = error instanceof ApiError && error.status === 409;
       toast({
         title: conflict
           ? "This contribution has already changed"
           : "Couldn't withdraw contribution",
         description: conflict
           ? "Its latest moderation state is now shown in your timeline."
-          : error.message || "Please try again.",
+          : humanizeApiError(error, "Please try again."),
         variant: conflict ? "default" : "destructive",
       });
     },
