@@ -725,7 +725,7 @@ export default function BatchEnrichmentPanel() {
                   )}
                 </div>
                 {insecureHost && (
-                  <Label htmlFor="enrich-confirm-insecure-http" className="flex items-start gap-2 font-normal">
+                  <Label htmlFor="enrich-confirm-insecure-http" className="flex min-h-6 max-lg:min-h-11 cursor-pointer items-start gap-2 py-1 font-normal">
                     <Checkbox id="enrich-confirm-insecure-http" checked={confirmInsecureHttp} disabled={hasActiveJob}
                       onCheckedChange={(v) => setConfirmInsecureHttp(v === true)} data-testid="checkbox-enrich-confirm-insecure-http" />
                     <span className="text-xs">Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.</span>
