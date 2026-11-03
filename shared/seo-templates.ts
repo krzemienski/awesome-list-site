@@ -71,7 +71,7 @@ export const publicCollectionSeo = {
 // truthful as the directory grows. Titles deliberately carry NO count, so title
 // parity can never drift even if the two count sources momentarily disagree.
 
-import { tagDisplayName } from "./tagNormalize";
+import { normalizeTagFilter, tagDisplayName } from "./tagNormalize";
 import { THEME_ACCENT_VALUES, THEME_SYSTEM_VALUES } from "./onboarding-values";
 
 const SITE_NAME = "Awesome Video";
@@ -82,6 +82,9 @@ const SITE_NAME = "Awesome Video";
 // SAME functions at emission time, so the crawl-pass HTML and the hydrated DOM
 // always show the identical, budget-fitting string (two-pass parity).
 const SEO_TITLE_MAX = 60;
+// Branded titles may run longer than a bare title so the brand suffix is never
+// the first thing dropped (BUG-024).
+const SEO_BRANDED_TITLE_MAX = 80;
 const SEO_DESCRIPTION_MAX = 160;
 
 // Word-boundary truncation: cut at the budget, back up to the last full word,
@@ -165,8 +168,8 @@ const JOURNEY_SUFFIX = " — Learning Journey";
 
 export function clampSeoTitle(title: string): string {
   const t = (title || "").trim();
-  if (t.length <= SEO_TITLE_MAX) return t;
   if (t.endsWith(BRAND_SUFFIX)) {
+    if (t.length <= SEO_BRANDED_TITLE_MAX) return t;
     const core = t.slice(0, -BRAND_SUFFIX.length);
     const budget = SEO_TITLE_MAX - BRAND_SUFFIX.length;
     if (core.endsWith(JOURNEY_SUFFIX)) {
@@ -174,14 +177,13 @@ export function clampSeoTitle(title: string): string {
       if (bare.length <= budget) return bare + BRAND_SUFFIX;
       return clampAtWord(bare, budget) + BRAND_SUFFIX;
     }
-    // Audit cycle-01 F004: the 43-char post-suffix core budget truncates
-    // BEFORE the words that distinguish sibling resources (9 URLs collided
-    // into 3 identical SERP titles, corpus-proven). When the core alone
-    // overflows that budget, boilerplate yields before content: drop the
-    // brand suffix entirely and give the core the full SERP budget — the
-    // same philosophy as the JOURNEY_SUFFIX rule above.
-    if (core.length > budget) return clampAtWord(core, SEO_TITLE_MAX);
-    return clampAtWord(core, budget) + BRAND_SUFFIX;
+    // BUG-024 (C18): every branded title keeps its brand. The old rule
+    // (audit cycle-01 F004) dropped the suffix from long cores, so sibling
+    // resources disagreed ("X" vs "X — Awesome Video"). Long cores now borrow
+    // up to SEO_BRANDED_TITLE_MAX total, and the clamp still keeps the words
+    // that distinguish siblings.
+    const brandedBudget = SEO_BRANDED_TITLE_MAX - BRAND_SUFFIX.length;
+    return clampAtWord(core, brandedBudget) + BRAND_SUFFIX;
   }
   return clampAtWord(t, SEO_TITLE_MAX);
 }
@@ -252,16 +254,27 @@ export function ogImagePath(routePath: string): string {
 }
 
 // Home ----------------------------------------------------------------------
-// Kept ≤60 chars for a 4-digit count so the SERP shows the full title.
-export function homeSeoTitle(resourceCount: number): string {
-  return `${SITE_NAME} — ${resourceCount}+ Curated Video & Streaming Resources`;
+// BUG-029 (C18): counts use the same thousands grouping as the UI ("4,102"),
+// done by hand so the server and every browser locale print identical text.
+function groupedCount(n: number): string {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// ?tags= filters put the active tag names in the title (BUG-029); `tags` are
+// canonical slugs, so the server and client render the same branded casing.
+export function homeSeoTitle(resourceCount: number, tags: readonly string[] = []): string {
+  if (tags.length > 0) {
+    const names = tags.map((t) => tagDisplayNameBranded(normalizeTagFilter(t))).join(" + ");
+    return `${names} Video Resources — ${SITE_NAME}`;
+  }
+  return `${SITE_NAME} — ${groupedCount(resourceCount)}+ Curated Video & Streaming Resources`;
 }
 
 export function homeSeoDescription(
   resourceCount: number,
   categoryCount: number,
 ): string {
-  return `Discover ${resourceCount}+ curated video development resources — codecs, players, encoders, and streaming tools — across ${categoryCount} categories on ${SITE_NAME}.`;
+  return `Discover ${groupedCount(resourceCount)}+ curated video development resources — codecs, players, encoders, and streaming tools — across ${categoryCount} categories on ${SITE_NAME}.`;
 }
 
 // Categories ----------------------------------------------------------------
@@ -381,27 +394,12 @@ export function tagSeoDescription(name: string, count: number): string {
 }
 
 // Taxonomy listings ----------------------------------------------------------
-// Child listing titles need enough parent context to describe the search intent
-// but must remain within the 44-char core budget left by the brand suffix.
-const CATEGORY_INTENT_NOUNS: Record<string, string> = {
-  "intro-learning": "courses & guides",
-  "community-events": "communities & events",
-  "protocols-transport": "specs & tools",
-  "standards-industry": "specs & docs",
-};
-
-export function subcategorySeoTitleCore(
-  name: string,
-  categoryName?: string | null,
-  categorySlug?: string | null,
-): string {
-  const intent = (categorySlug && CATEGORY_INTENT_NOUNS[categorySlug]) || "tools & guides";
-  const parent = categoryName ? `${name} — ${categoryName} ${intent}` : `${name} ${intent}`;
-  if (parent.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length) return parent;
-  // F211: the bare "<name> <intent>" fallback read as a broken phrase
-  // ("Community Groups communities & events"); fall back to the same
-  // "child – parent" form the sub-subcategory titles use.
-  return categoryName ? withParentContext(name, categoryName) : name;
+// BUG-042 (C18): one template for every subcategory page — the bare name. The
+// old parent-context variants ("X — Parent tools & guides", "X – Parent", "X")
+// were chosen by length, so sibling pages used different shapes. Subcategory
+// names are unique across the catalog, so the name alone stays distinguishing.
+export function subcategorySeoTitleCore(name: string): string {
+  return name;
 }
 
 export function subcategorySeoDescription(

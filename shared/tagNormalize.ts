@@ -36,6 +36,9 @@ const TAG_DISPLAY_ACRONYMS = new Set([
   "ai", "amd", "api", "av1", "cdn", "dash", "drm", "ffmpeg", "hls", "hdr", "hevc",
   "html5", "ios", "mpeg", "obs", "ott", "rtmp", "sdk", "srt", "ssai",
   "vmaf", "vp9", "webrtc", "aaos", "llhls", "lufs", "lms", "vcms", "mpegts",
+  "avc", "aws", "cli", "evc", "fpga", "gpu", "gui", "http", "https", "iso", "itu",
+  "mkv", "mp4", "p2p", "psnr", "qoe", "rist", "rtp", "rtsp", "smpte", "svta", "tcp",
+  "udp", "uhd", "vast", "vfx", "vod", "vp8", "vpaid", "vvc", "w3c", "wcg",
 ]);
 
 export function normalizeTagFilter(tag: string): string {

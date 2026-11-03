@@ -661,7 +661,7 @@ export default function TaxonomyListing({ level }: Props) {
   const seoCore = level === "category"
     ? categorySeoTitleCore(name, slug)
     : level === "subcategory"
-      ? subcategorySeoTitleCore(name, parentCategory?.name ?? "", parentCategory?.slug)
+      ? subcategorySeoTitleCore(name)
       : subSubcategorySeoTitleCore(name, parentSubcategory?.name);
   const seoDescription = level === "category"
     ? categorySeoDescription(name, slug, total)

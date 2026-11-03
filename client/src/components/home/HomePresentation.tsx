@@ -9,6 +9,7 @@ import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { tagLandingPath } from "@shared/tagNormalize";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 
@@ -249,6 +250,7 @@ function PageMeta({
   kindCountsError,
   selectedKind,
   onKindChange,
+  selectedTags,
 }: {
   layout: "index" | "curated";
   stats: HomeStats;
@@ -257,7 +259,16 @@ function PageMeta({
   kindCountsError?: boolean;
   selectedKind?: ResourceKind | null;
   onKindChange?: (kind: ResourceKind | null) => void;
+  selectedTags: string[];
 }) {
+  // The category groups only preview a tag match. A single tag has a landing
+  // page listing every match; several tags (a union) list on /search.
+  const viewAllHref =
+    selectedTags.length === 1
+      ? tagLandingPath(selectedTags[0])
+      : selectedTags.length > 1
+        ? `/search?${selectedTags.map((tag) => `tags=${encodeURIComponent(tag)}`).join("&")}`
+        : null;
   const eyebrow =
     layout === "index"
       ? stats.matching === undefined
@@ -268,6 +279,18 @@ function PageMeta({
     <div className="home-meta-row">
       <div className="home-eyebrow eyebrow">
         {eyebrow}
+        {viewAllHref && !selectedKind && stats.matching !== undefined ? (
+          <>
+            {" · "}
+            <Link
+              href={viewAllHref}
+              className="underline underline-offset-4 max-lg:inline-flex max-lg:min-h-11 max-lg:items-center"
+              data-testid="link-home-view-all-matches"
+            >
+              View all {formatCount(stats.matching)} →
+            </Link>
+          </>
+        ) : null}
       </div>
       <KindStrip
         counts={kindCounts}
@@ -552,6 +575,7 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
           </div>
         </div>
       ) : null}
+      {recent.length > 0 ? (
       <div>
         <div className="eyebrow home-rail-eyebrow">── RECENTLY INDEXED</div>
         <div className="home-recent-list">
@@ -575,6 +599,7 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
           ))}
         </div>
       </div>
+      ) : null}
       <div className="home-contribute-card card">
         <div className="eyebrow home-rail-eyebrow">── CONTRIBUTE</div>
         <p>Know a tool, spec, or event that belongs here? Submissions are reviewed weekly.</p>
@@ -844,6 +869,7 @@ export default function HomePresentation({
         kindCountsError={kindCountsError}
         selectedKind={selectedKind}
         onKindChange={onKindChange}
+        selectedTags={selectedTags}
       />
       {emptyTagParamNotice}
       {layout === "index" ? (
