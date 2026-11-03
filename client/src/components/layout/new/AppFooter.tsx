@@ -9,7 +9,7 @@ const ContactFooter =
   import.meta.env.VITE_CONTACT_VARIANT === "a" ||
   import.meta.env.VITE_CONTACT_VARIANT === "b" ||
   import.meta.env.VITE_CONTACT_VARIANT === "c"
-    ? lazyOptional(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
+    ? lazyOptional(() => import("@/components/contact/contact-footer"), (module) => module.ContactFooter)
     : null;
 
 /** The deployment's display identity is the lowercase domain, as in the
