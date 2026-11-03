@@ -1,6 +1,6 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { focusElement, focusPageHeading, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
+import { focusElement, focusPageHeading, handoffFocusOnUnmount, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -405,7 +405,11 @@ export default function Bookmarks() {
         // already moved it elsewhere.
         const active = document.activeElement;
         if (!active || active === document.body || active.closest('[aria-label="Bulk bookmark actions"]')) {
-          if (!focusElement(document.getElementById("bulk-select-all"))) focusPageHeading();
+          // Archiving or restoring every visible bookmark empties the view, and
+          // "Select all shown" unmounts with it; follow it to the heading.
+          const selectAll = document.getElementById("bulk-select-all");
+          if (focusElement(selectAll)) handoffFocusOnUnmount(selectAll);
+          else focusPageHeading();
         }
         setSelected(new Set());
       },

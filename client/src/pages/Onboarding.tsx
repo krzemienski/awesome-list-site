@@ -1,3 +1,4 @@
+import { describeWriteError } from "@/lib/apiError";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
@@ -251,9 +252,7 @@ export default function Onboarding() {
       navigateStep(nextStep);
     } catch (error) {
       setRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t save your progress. Please try again.",
+        describeWriteError(error, { fallback: "We couldn’t save your progress. Please try again." }),
       );
     }
   };
@@ -293,9 +292,7 @@ export default function Onboarding() {
       window.location.href = "/";
     } catch (error) {
       setRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t save that choice. Please try again.",
+        describeWriteError(error, { fallback: "We couldn’t save that choice. Please try again." }),
       );
     }
   };
@@ -318,9 +315,7 @@ export default function Onboarding() {
       requestAnimationFrame(() => headingRef.current?.focus());
     } catch (error) {
       setRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t save your preferences. Please try again.",
+        describeWriteError(error, { fallback: "We couldn’t save your preferences. Please try again." }),
       );
     }
   };
