@@ -14,7 +14,7 @@ import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
-import { preloadSearchDialog } from "@/lib/search-dialog-loader";
+import { preloadSearchDialog, takePendingPalette } from "@/lib/search-dialog-loader";
 import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/search-palette";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
@@ -141,6 +141,16 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       if (hasIdle) window.cancelIdleCallback(idle);
       else window.clearTimeout(idle);
     };
+  }, []);
+
+  // A search requested before hydration (see the capture script in
+  // index.html) opens the palette now; SearchPalette reads the buffered draft.
+  // Declared after the location-reset effect above so its open wins on mount.
+  useEffect(() => {
+    const pending = takePendingPalette();
+    if (!pending?.open) return;
+    trackCommandPaletteOpened(pending.method);
+    setSearchOpen(true);
   }, []);
 
   // Keep the lightweight global trigger in the eager shell. The palette code

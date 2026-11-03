@@ -12,6 +12,37 @@ export function preloadSearchDialog(): void {
   loadSearchDialog().catch(() => undefined);
 }
 
+/** Search request captured by the inline script in index.html before React
+ * mounted: Ctrl/Cmd+K or "/" plus the keys typed after it. */
+export interface PendingPalette {
+  open: boolean;
+  draft: string;
+  method: "keyboard_shortcut" | "slash_key";
+}
+
+declare global {
+  interface Window {
+    __awvPendingPalette?: PendingPalette;
+    __awvStopPaletteCapture?: () => void;
+  }
+}
+
+/** Remove the pre-hydration key listener; React's own handler takes over. */
+export function stopPalettePrehydrationCapture(): void {
+  window.__awvStopPaletteCapture?.();
+}
+
+/** The request captured before hydration, if any. Stops the capture. */
+export function takePendingPalette(): PendingPalette | undefined {
+  stopPalettePrehydrationCapture();
+  return window.__awvPendingPalette;
+}
+
+/** Drop the captured request once the palette has taken its draft. */
+export function clearPendingPalette(): void {
+  window.__awvPendingPalette = undefined;
+}
+
 /** Focus the element that opened the palette. A disconnected or body opener
  * (the palette was opened from an element that has since unmounted) falls
  * through to the visible header search trigger. Returns whether focus moved. */

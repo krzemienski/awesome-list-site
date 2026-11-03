@@ -95,6 +95,56 @@
       })();
     </script>
 
+    <script>
+      // Pre-hydration search capture (BUG-043). The React key handler only
+      // exists after hydration, which on a throttled load is long after the
+      // server-rendered page is visible. Until the app mounts, Ctrl/Cmd+K and
+      // "/" (outside a text field) set a pending flag and the keys typed after
+      // them are buffered; MainLayout opens the palette with that draft. Escape
+      // cancels. MainLayout and App call __awvStopPaletteCapture on mount, so
+      // this listener never outlives the app's first commit.
+      (function () {
+        try {
+          function stop() {
+            document.removeEventListener('keydown', onKey, true);
+          }
+          function onKey(e) {
+            if (e.defaultPrevented || e.isComposing) return;
+            var k = e.key;
+            var pending = window.__awvPendingPalette;
+            var isK = (e.metaKey || e.ctrlKey) && String(k).toLowerCase() === 'k';
+            if (pending) {
+              if (k === 'Escape') {
+                e.preventDefault();
+                window.__awvPendingPalette = undefined;
+              } else if (isK) {
+                e.preventDefault();
+              } else if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+                if (k === 'Backspace') {
+                  e.preventDefault();
+                  pending.draft = pending.draft.slice(0, -1);
+                } else if (k.length === 1) {
+                  e.preventDefault();
+                  pending.draft += k;
+                }
+              }
+              return;
+            }
+            var t = e.target;
+            var inField = t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
+            var method = null;
+            if (isK) method = 'keyboard_shortcut';
+            else if (k === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inField) method = 'slash_key';
+            if (!method) return;
+            e.preventDefault();
+            window.__awvPendingPalette = { open: true, draft: '', method: method };
+          }
+          window.__awvStopPaletteCapture = stop;
+          document.addEventListener('keydown', onKey, true);
+        } catch (e) {}
+      })();
+    </script>
+
     <style>
       #home-layout-boot-skeleton { display: none; }
       html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }

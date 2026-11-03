@@ -38,7 +38,12 @@ import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
-import { focusPaletteOpener, loadSearchDialog } from "@/lib/search-dialog-loader";
+import {
+  clearPendingPalette,
+  focusPaletteOpener,
+  loadSearchDialog,
+  stopPalettePrehydrationCapture,
+} from "@/lib/search-dialog-loader";
 
 /**
  * React.lazy caches a rejected import for the life of the lazy object, so a
@@ -216,7 +221,8 @@ function SearchDialogFallback({
  * boundary so what was typed into the fallback survives the swap to the real
  * palette; unmounting on close resets it. */
 function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(() => window.__awvPendingPalette?.draft ?? "");
+  useEffect(() => clearPendingPalette, []);
   // Captured during this render, before the fallback's autofocused input exists.
   const [opener] = useState<HTMLElement | null>(() =>
     document.activeElement instanceof HTMLElement ? document.activeElement : null,
@@ -714,6 +720,12 @@ function Router({
   useEffect(() => {
     noteLocationChange();
   }, [location]);
+
+  // Routes rendered without MainLayout (unknown URLs) have no palette; do not
+  // leave the pre-hydration key capture swallowing Ctrl/Cmd+K there.
+  useEffect(() => {
+    stopPalettePrehydrationCapture();
+  }, []);
 
   // Run17 BUG-052: Back/Forward return to the saved scroll position instead
   // of the top; forward navigations still start at the top.
