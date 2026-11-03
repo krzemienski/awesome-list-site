@@ -21,6 +21,21 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Production audit cycle 17: deploy procedure and pitfalls (November 3, 2026)
+- Deploy procedure: `.claude/skills/replit-deploy/SKILL.md`. Done means `/api/version` equals `origin/main` and `/api/health/ready` returns 200, not a publish "success" status.
+- A publish restarts the server and kills running admin jobs. It killed Link Health job 11 at 3880/4102. Check for running jobs (link health, enrichment, researcher) before you publish.
+- Link Health appears stuck near the end ("4100/4102") during its second verification pass, which re-checks broken links with a 15 s timeout each. It is not hung.
+- Enrichment has no small run. `batchSize` is the per-step chunk, and a run covers every unenriched resource (`enrichmentService.ts:319,426`), about $21 for 3,012.
+- Researcher `maxBudgetUsd` is checked after each model response, so spend can pass the cap by one response (Agent SDK behaviour).
+- Admin load-error Retry: React Query clears `error` during a refetch, so the alert unmounts mid-retry. Focus handoff lives in `AdminLoadError.tsx` (#198).
+- Bugs fixed in this cycle and their causes:
+  - Admin load-error Retry (#198): React Query clears `error` during a refetch, so the alert unmounts and focus fell to `<body>`. Fix in `AdminLoadError.tsx`.
+  - 32px links at touch widths (#199): standalone links used `min-h-8`. Pair it with `max-lg:min-h-11` (and `max-lg:leading-11` on block links).
+  - Tag filter popover off-screen at 390 (#200): `PopoverContent` had no height cap, so a flipped popover overflowed the top. Cap at `--radix-popover-content-available-height` and let the list scroll (same as `select.tsx`).
+  - Clerk account modal clipped below ~920px (#201): our `rootBox`/`cardBox` 100% caps resolved against `modalContent`, which had none. `modalContent` now caps at `100vw - 2rem` in `clerk-appearance.ts`.
+  - Taxonomy links dropped `?kind=` (#201): breadcrumbs and sibling tiles built bare routes. `withKind()` in `TaxonomyListing.tsx`.
+- Audit tooling traps: each agent's chrome-devtools MCP is its own browser (page ids are not shared). Clear a field before filling, because fill appends to leftover text. agent-browser headless never scrolls. Never click Sign out on the owner account: it revokes every owner session.
+
 ### Production validation and redeploy loop — October 26, 2026
 - Pieces A–D of the October improvement waves were proven on `https://awesome.video` itself at 1440, 820 and 390, with four redeploys. Three published GitHub `main` exactly. One (`634e8afd`) was a Replit autosave commit that added only an untracked notes file, so its code matched `main`. The audit is in `docs/audits/full-functional-audit-2026-10-26-production.md`.
 - Fixes found on production. Umami Back/Forward page views and event URLs (#30, #38). Touch targets on taxonomy cards, home cards, footer, admin rows, tag pills and the taxonomy breadcrumb (#31, #33, #36, #40). GitHub import dry run: it no longer writes taxonomy (#34), reads the catalog once instead of per item (#37, 504 after 300 s → about 10 s), and keeps `/` in headings (#39).

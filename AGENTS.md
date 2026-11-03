@@ -58,12 +58,12 @@ SendMessage({ to: "researcher", summary: "Start", message: "[task context]" })
 
 ## Build & Test
 
-- ALWAYS run tests after code changes
+- There are no test suites (owner rule, removed in b4040bfe; see replit.md). Verify changes in the real running app and API.
 - ALWAYS verify build succeeds before committing
 
 ```bash
 npm run build
 ```
 
-There is no bare `npm test` script; the suites are `npm run test:unit`, `npm run test:integration`, `npm run test:e2e`, and `npm run test:parity`.
+Gates per change: `npx tsc --noEmit`, `npm run build`, and `npx eslint <touched files>`. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (and on gitignored `.claude/worktrees`), so lint only what you touch.
 

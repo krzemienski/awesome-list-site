@@ -1,0 +1,544 @@
+# awesome.video bug ledger
+
+Compiled 2026-11-03 (read-only research; no production contact). Purpose: one list of every bug earlier Claude Code sessions reported for awesome.video, with its status, so the current audit can re-check every item that is not fixed-verified on production.
+
+Status rules: **fixed-verified** only when a production re-check after the deploy is cited. A merged PR alone is **fixed-unverified**. **failed** = recorded as FAIL/regression with no later pass. **open** = recorded, no fix or no proof of a fix. **withdrawn** = false positive or not reproducible. "Current status" is `re-check on prod` for everything except fixed-verified (which carries the verification date) and the two withdrawn false positives that have nothing left to check.
+
+Sources read: `reports/prod-audit-2026-10-29/` (findings-table, SUMMARY, STATUS, PROGRESS lines 1-end, cycle-01…17 lane files, cycle-15 summary), `reports/prod-audit-2026-10-26/` (PRIOR-FINDINGS.md, STATUS.md, PROGRESS tail), `docs/audits/*` (inspected, no FAIL IDs of their own), memory notes, `gh pr list` (#1-#189), `git log`. Session transcripts were not needed.
+
+## Counts by earlier status
+
+| earlier status | Part A (main ledger) | Part B (10-26 historical IDs) | total |
+|---|---|---|---|
+| fixed-verified | 54 | 0 | 54 |
+| fixed-unverified | 7 | 146 | 153 |
+| failed | 0 | 61 | 61 |
+| open | 5 | 158 | 163 |
+| withdrawn | 3 | 4 | 7 |
+| **rows** | 69 | 369 | 438 |
+
+Part A rows that cover a range (BUG-011..050 = 40 findings, NEW-007/008/009) count once per row. Part B is the 369 historical finding IDs from the 2026-10-26 audit (`PRIOR-FINDINGS.md`); the 2026-10-29 run treated them as reconciliation context and never re-verified them ID by ID.
+
+## Part A — main ledger (2026-10-29 audit, sweeps 1-17, memory notes)
+
+| ID | source | area | description | earlier status | PR / commit | current status |
+|---|---|---|---|---|---|---|
+| BUG-001 | reports/prod-audit-2026-10-29/findings-table.md + reports/prod-audit-2026-10-29/SUMMARY.md | auth | Clerk-signed-in owner not recognised as admin (no Clerk→admin account link); /admin unreachable | fixed-verified | #150 #151 #152 | verified 2026-10-30 |
+| BUG-002 | reports/prod-audit-2026-10-29/findings-table.md | public | Cookie-settings dialog not accessible / pre-consent vendor requests | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-003 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Secondary card actions reported unreactive; not reproducible (pointer+keyboard activate both) | withdrawn | none | withdrawn (re-confirmed in cycle-17/c17r-carry-pub.md) |
+| BUG-004 | reports/prod-audit-2026-10-29/findings-table.md | public | Unknown tag slug gave no clear invalid-tag message | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-005 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Skipped heading levels on cards | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-006 | reports/prod-audit-2026-10-29/findings-table.md | public | Category invalid-sort gave no feedback (search did) | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-007 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Prohibited ARIA on featured tag groups | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-008 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Index/Curated toggles lacked accessible names/checked state | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-009 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Filter checkboxes/format semantics unnamed | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-010 | reports/prod-audit-2026-10-29/findings-table.md | a11y | Breadcrumb/disclosure targets under 24x24 at 768/375 | fixed-verified | #149 | verified 2026-10-29 |
+| BUG-011..050 (replaced, 24 rows) | reports/prod-audit-2026-10-29/findings-table.md; reports/prod-audit-2026-10-29/links-applied.md | data | Dead/wrong resource URLs replaced in catalog, read back, curl 200 + real browser landing (BUG-012,013,014,016,017,018,020-027,029,030,032,035,037) | fixed-verified | data edits (no PR) | verified 2026-10-30 |
+| BUG-011..050 (kept, 16 rows) | reports/prod-audit-2026-10-29/findings-table.md; links-applied.md | data | Flagged URLs kept after real browser landing rendered content (BUG-011,015,019,028,031,033,034,036,038-050); 033/034/036 were 503 and needed a second check ≥1h apart | fixed-verified | none (kept) | verified 2026-10-30 |
+| NEW-001 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Review Discoveries URL links 24px at 390 (RS-38) + Link Health links (LH-24; alias LH-24) | fixed-verified | #153 | verified 2026-10-30 |
+| NEW-002 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Offline admin/settings panels show false empty states (CAT-02, SC-02, JN-02; Settings/Onboarding/ApiKeys) | fixed-verified | #153 | verified 2026-10-30 |
+| NEW-003 | reports/prod-audit-2026-10-29/SUMMARY.md | data | Leftover [QA-audit-1026] sub-subcategory publicly visible (data, deleted) | fixed-verified | data delete | verified 2026-10-30 |
+| NEW-004 | reports/prod-audit-2026-10-29/SUMMARY.md | public | /search?q=hsl suggested "2 SL", never HLS (C6-PS-010); fuzzy transposition | fixed-verified | #154 #155 #156 | verified 2026-10-30 |
+| RM-02 (alias NEW-005 class) | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Offline never-loaded Resources tab = skeleton forever | fixed-verified | #155 | verified 2026-10-30 |
+| NEW-005 | reports/prod-audit-2026-10-29/SUMMARY.md | public | Offline chunk failure showed "site was updated" and never recovered (reload guard spent offline) | fixed-verified | #157 | verified 2026-10-30 |
+| NEW-006 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Member link-report links 32px at 390 | fixed-verified | #158 | verified 2026-10-30 |
+| NEW-007/008/009 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Admin standalone links <24px; delete-dialog focus return; admin tab focus | fixed-verified | #159 | verified 2026-10-30 |
+| NEW-010 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Consent banner privacy link 17px | fixed-verified | #160 | verified 2026-10-30 |
+| NEW-011 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Resource delete dialog Cancel/Escape dropped focus | fixed-verified | #161 | verified 2026-10-30 |
+| NEW-013 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Admin tab-strip arrow covered the GitHub tab | fixed-verified | #161 | verified 2026-10-30 |
+| NEW-014 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Home "+ N more" links 20px | fixed-verified | #161 | verified 2026-10-30 |
+| NEW-015 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | /tag/:slug Related links 17-18px | fixed-verified | #162 | verified 2026-10-30 |
+| NEW-016 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Wrapped /tag/:slug Related links 23px at 390 | fixed-verified | #163 | verified 2026-10-30 |
+| NEW-017 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | /about /terms /privacy inline links ~18px | fixed-verified | #164 | verified 2026-10-30 |
+| NEW-018 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Clerk "Use phone"/"Forgot password?" on /sign-in 16px at desktop ("Forgot password?" not measured) | fixed-verified | #164 | verified 2026-10-30 |
+| NEW-019 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Guest "log in" link on /journey/:id and /submit 21px | fixed-verified | #165 #166 | verified 2026-10-30 |
+| NEW-020 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Sync Job logs dialog "View commit on GitHub" 38.6px at 820/390 | fixed-verified | #166 | verified 2026-10-30 |
+| NEW-021 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Research workspace "Review candidates for job #N" link 20px | fixed-verified | #166 | verified 2026-10-30 |
+| NEW-022 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Enrichment Job Details dialog dropped focus on close | fixed-verified | #166 | verified 2026-10-30 |
+| NEW-023 | reports/prod-audit-2026-10-29/SUMMARY.md | a11y | Consent banner "Privacy Policy" link 23px at 390 | fixed-verified | #166 | verified 2026-10-30 |
+| NEW-024 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Research Job Details dialog scrolls sideways at 390 | fixed-verified | #167 | verified 2026-10-30 |
+| NEW-025 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Contact reply-to mailto link 20px | fixed-verified | #167 | verified 2026-10-30 |
+| NEW-026 | reports/prod-audit-2026-10-29/SUMMARY.md | auth | /admin guard "Sign in to continue →"/"Back to home →" links 20px | fixed-verified | #168 | verified 2026-10-30 |
+| NEW-027 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Edits tab "Recently resolved" title link 20.8px | fixed-verified | #168 | verified 2026-10-30 |
+| NEW-028 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | Journey step dialog "optional" checkbox 16px hit area | fixed-verified | #168 | verified 2026-10-30 |
+| NEW-029 | reports/prod-audit-2026-10-29/SUMMARY.md | admin | GitHub sync history shows "No operations yet" while loading | fixed-verified | #169 | verified 2026-10-30 |
+| NEW-030 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | GitHub panel header "0 sync jobs" when queue failed/loading | fixed-verified | #169 | verified 2026-10-30 |
+| NEW-031 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | public | 404 "did you mean" link 24px at 820/390 | fixed-verified | #169 | verified 2026-10-30 |
+| NEW-032 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | public | Cookie-settings radios: only the 30px label clickable in a 44px row | fixed-verified | #169 | verified 2026-10-30 |
+| NEW-033 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | auth | /sign-in stuck on "Checking your sign-in status…" forever when Clerk fails to load | fixed-verified | #169 | verified 2026-10-30 |
+| NEW-034 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | Bulk approve/reject partial-failure toast lists every title as failed | fixed-verified | #170 | verified 2026-10-30 |
+| NEW-035 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | a11y | Focus left on BODY after offline route error recovers in place | fixed-verified | #171 (ineffective) #172 | verified 2026-10-30 |
+| NEW-036 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | public | At 768-1279px offline nav to /resource/:id blanked the whole app (lazy breadcrumb chunk outside error boundary) | fixed-verified | #173 | verified 2026-10-30 |
+| NEW-037 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | public | Contact/breadcrumb optional chunks never re-fetched after a failed load while online | fixed-verified | #175 (ineffective) #177 | verified 2026-11-03 |
+| NEW-038 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | public | /advanced "Clear all" off-screen at 390 (Explorer chips did not wrap; PS-014) | fixed-verified | #176 | verified 2026-11-03 |
+| NEW-039 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | auth | /sign-in "Can't check your sign-in status": Retry never reloads Clerk after script failure (PS-049) | fixed-verified | #181 | verified 2026-11-03 |
+| NEW-041 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | Per-discovery Approve published on one click with no confirm | fixed-verified | #183 | verified 2026-11-03 |
+| NEW-042 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | ExportTab label "Exports 21–20 of 266" on an empty page (EX-20) | fixed-verified | #184 | verified 2026-11-03 |
+| NEW-043 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | Link Health Summary showed cancelled scan #10 date over #9 counts (LH-14) | fixed-verified | #185 | verified 2026-11-03 |
+| NEW-044 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | a11y | Guest /bookmarks failed-load Retry 40px at 390 (PC-066) | fixed-verified | #186 | verified 2026-11-03 |
+| NEW-045 | reports/prod-audit-2026-10-29/SUMMARY.md + cycle files | admin | GitHub header "not synced yet" when sync-history failed (GH-17, same family as NEW-030) | fixed-verified | #187 | verified 2026-11-03 |
+| NEW-012 | reports/prod-audit-2026-10-29/cycle-03 | a11y | Pager accepted invalid input (aria-invalid + inline message is the BUG-022 design) | withdrawn | none | no re-check (withdrawn false positive) |
+| NEW-040 | PROGRESS.md:676; cycle-15/SWEEP15-SUMMARY.md | a11y | Breadcrumb links 24px at 390 (PS-059): measured the sr-only shell breadcrumb, not a target | withdrawn | #182 closed unmerged | no re-check (withdrawn false positive) |
+| SH-09 | reports/prod-audit-2026-10-29/cycle-16/s16-a11y-sh.md:64; cycle-17/c17-ax-sh.md:6; PROGRESS.md (03:58 local) | a11y | After Retry on the /admin access guard (auth request aborted then restored) focus lands on BODY at 1440/820/390; page recovers to "Operations dashboard". Hypothesis: App.tsx ~754-764 banner Retry unmounts when error clears with no focus handoff (AdminGuard.tsx:17-25). Lead did not reproduce; c17 lane re-reproduced it on bdb94c43 (3/3 widths) | open | PR #190 -> 914076ae (merged 09:5xZ, review-190 APPROVE, tsc 0 build 0) | FIXED-VERIFIED on prod 24b7bf95 (10:15Z): / and /admin at 1440/820/390 retry-fails-again focus stays on Retry, retry-succeeds focus -> H1; normal load no steal. Evidence e2e-evidence/c17/sh09-recheck2/ |
+| ED-13 | cycle-17/c17r-admin.md (ED-13 corrected / ED-15 conflicted, 2026-11-03) | admin | Conflicted edit approve dialog promised "Approving will overwrite current changes" but server marks the edit superseded and returns 409; a conflicted edit can never be approved. PendingEdits.tsx:664 vs AuditRepository.ts:663-682 | new | PR #193 | FIXED-VERIFIED on prod ed141243 (10:40Z): out-of-date edit -> "Edit Out of Date", no Approve, focus Cancel 44px, Esc returns to row at 1440/820/390; clean edit approves and merges (1440). Evidence e2e-evidence/c17/ed13-prod/ |
+| PC-014/025 | cycle-17/c17r-pc3.md (observation), lead repro on prod ed141243 2026-11-03 | a11y | Sidebar 'Couldn't load categories' Retry (AppSidebar.tsx:938-947) and palette 'Search failed' Try again (search-dialog.tsx:450) unmount during refetch; focus lands on <body> / dialog container after recovery. Same family as SH-09 | new | PR #194 | FIXED-VERIFIED on prod a11ccf2e (11:15Z): sidebar Retry -> H1 at 1440/820, stays inside open drawer at 390; palette Try again -> search input (value kept, 16 results) at 1440/820/390. Evidence e2e-evidence/c17/retry-focus-prod/ |
+| PC-046-DISMISS | cycle-17/c17r-pc4.md (observation), lead measured on prod a11ccf2e 2026-11-03 | a11y | Notice 'Dismiss' buttons min-h-8 only: 83x39 (category ?page=9999) and 51x32 (search) at 820/390, under the 44px touch-width rule. TaxonomyListing.tsx:742-743, Search.tsx:308, scrubbed-params-notice.tsx:45, Contributions.tsx:808 | new | PR #195 | FIXED-VERIFIED on prod 151d686c (11:55Z): Dismiss 83x44 (category) / 51x44 (search) at 820+390; desktop 83x39 / 51x32 unchanged. Evidence e2e-evidence/c17/batch195-prod/ |
+| PC-046-SORT | cycle-17/c17r-pc4.md (observation), lead confirmed on prod a11ccf2e | public | Category empty-state 'Search all' link carries an unsupported ?sort to /search, which 400s invalid_sort and shows 'These filters can't be applied'. TaxonomyListing.tsx:675 | new | PR #196 | FIXED-VERIFIED on prod 151d686c (11:55Z): broaden link /search?q=... with bogus sort dropped at 1440/820/390 |
+| RS-43 | cycle-17/c17r-ai.md (FAIL 3 widths, prod a11ccf2e) | a11y | 'Start another run' on an ended researcher run drops focus to <body>. ResearcherTab.tsx:428 onStartNew had no focus move | new | PR #197 | FIXED-VERIFIED on prod 151d686c (11:56Z): Start another run -> focus #research-brief-auto at 1440/820/390; neighbour Relaunch -> #budget unchanged |
+| CAT-02/SSC-02/JN-02/AU-20 +SC-02,LH history,LH reports,EX backups,DG health | cycle-17/c17r-admin.md (FAIL 3 widths, prod 151d686c) | a11y | Shared admin AdminLoadError Retry (39 call sites) hands focus nowhere when its alert unmounts during the retry: keyboard Retry -> focus <body> on Categories, Sub-subcategories, Journeys, contact inbox. AdminLoadError.tsx:63-80 | new | PR #198 | fixed-verified 2026-11-03 on d74699a3: recover -> H1 on 9 surfaces x 1440/820/390 (27/27), fails-again -> re-rendered Retry (11 surfaces); e2e-evidence/c17-198-prod/20261103T1248Z/ |
+| C6-MB-042 (+ sibling) | cycle-17/c17r-member2.md (FAIL 3 widths, prod d74699a3); lead reproduced 1440 1012x32, 390 258x32; lead found sibling 268x32 at 390 | a11y | 32px links at touch widths: /contributions card submitted-URL link (Contributions.tsx:306) and Home/Profile "Recently opened" title (ContinueLearningPreview.tsx:166) | new | PR #199 | fixed-verified 2026-11-03 on 54b90e36: contribution link 44px at 390/820, 32px at 1440, hit-testable; Recently-opened link via branch-build check + served CSS (prod branch not renderable for audit account); evidence e2e-evidence/replit-deploy/20261103T1341Z/08-verify.txt |
+| C6-PC-030 | cycle-17/c17r-carry-pub.md (still-failing 390, rev 54b90e36); lead reproduced on prod 390 touch: side=top, top -58, h 463 vs available 405 | public | Home Filter by Tag popover clips off the top at 390 when its trigger is mid-screen; header + Clear all unreachable (advanced-filter.tsx:123, no max-height) | new | PR #200 | fixed-verified 2026-11-03 on 87b8ece7: 390 popover 0..406, header + Clear all on-screen (44px, hit), list scrolls; evidence e2e-evidence/replit-deploy/20261103T1416Z/08-verify.txt |
+| C6-MB-011 | cycle-17/c17r-member2.md (FAIL 390); lead reproduced prod 54b90e36: Clerk account modal .cl-modalContent 880 wide, 390 -245..635, 820 -30..850 | member | Account security modal clipped off both edges below ~920px (clerk-appearance.ts: rootBox/cardBox 100% caps resolve to uncapped modalContent) | new | PR #201 | fixed-verified 2026-11-03 on 93373522: modal 16..374 @390, 16..804 @820; evidence e2e-evidence/replit-deploy/20261103T1426Z/08-verify.txt |
+| C6-PC-038 | cycle-17/c17r-carry-pub.md (still-failing 390/820) | public | Taxonomy breadcrumb parents, sibling tiles and "All of" link drop ?kind= that child tiles keep (TaxonomyListing.tsx:694-696, :771; spec L01-public-core.md:31) | new | PR #201 | fixed-verified 2026-11-03 on 93373522: breadcrumb/sibling/All-of hrefs carry ?kind=tools @390; evidence e2e-evidence/replit-deploy/20261103T1426Z/08-verify.txt |
+| EN-17-COPY | cycle-17/c17r-admin.md + c17r-ai.md (2026-11-03) | admin/AI (product) | Enrichment 'Batch size' (1-50) reads like a cap but only chunks the run: Start always processes every unenriched resource (3,012, ~$21; enrichmentService.ts:319,426). The confirm dialog states the true scope, so nothing is silently spent. No smallest-limit run exists. | new | none | OWNER DECISION: product call (add a max-resources cap, or relabel 'Batch size'); not changed by the audit |
+| MEM-bookmark-remove | memory/bookmark-remove-mutation-bug.md | public | BookmarkButton remove became an upserting POST (onMutate flipped state before mutationFn); fixed by passing explicit action at click time | fixed-unverified | commit and date not recorded | UNVERIFIED (member bookmark API needs account; guest local path fine) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-password-leak | memory/admin-users-password-leak.md | admin | /api/admin/users and /api/admin/export-json leaked bcrypt hashes; fixed with explicit-column select + SafeUser type | fixed-unverified | 8f1c9ab, ac1df49 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| MEM-advanced-undercount | memory/advanced-explorer-tree-undercount.md | data | Advanced page category-explorer/community-metrics/export-tools undercounted from nested tree (1127 vs 1949); weeklyGrowth rendered as % (+1949%) | fixed-unverified | commit not recorded | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-migration-chain | memory/migration-chain-incomplete.md | deploy | Drizzle migration chain broken (0027/0028 abort fresh migrate; schema.ts 25 tables vs chain 23); fix = re-baseline. Later admin stats show migrations applied 34/journaled 34 (cycle-17/baseline.md), so a re-baseline likely happened but no source cites it | open | none recorded | UNVERIFIED (no production DB access) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-audit-defect-1 | memory/audit-remediation-defects-fixed.md | admin | DELETE resource returned false 500 (duplicate audit-log insert, FK violation) | fixed-unverified | 21-gate audit, June 2026 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| MEM-audit-defect-2 | memory/audit-remediation-defects-fixed.md | admin | Bulk approve/reject shadowed by /:id route (400 Invalid resource ID); fixed with :id(\d+) | fixed-unverified | 21-gate audit | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| MEM-audit-defect-3 | memory/audit-remediation-defects-fixed.md | admin | ResourceRepository.getAllApprovedResources missing; link-health/validate/check-links crashed | fixed-unverified | 21-gate audit | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| MEM-audit-defect-4 | memory/audit-remediation-defects-fixed.md | deploy | Schema drift: research_discoveries.suggested_sub_subcategory not pushed to prod; researcher discoveries/approve/reject 500; fixed via ALTER + migration 0028 | fixed-unverified | 21-gate audit | UNVERIFIED (admin/researcher surface) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-count-inflation | memory/deploy-did-not-fix-count-family.md | data | 2026-07-12 prod: admin stats/dashboard/categories/export showed 2109 (incl. 156 rejected) vs 1951 public; fix = bind UI to totalPublic | open | none recorded | fixed-verified for public (admin figures UNVERIFIED) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-import-defects | memory/deploy-did-not-fix-count-family.md | data | 2026-07-12 prod: 441 resources titled owner/repo slugs, 17 duplicate-title clusters, "back to top" #readme resource 186689, placeholder descriptions, literal HTML entities, personal email in 3 descriptions, 27 too-short descriptions, QA debris users/pending rows/156 rejected AuditNoAuth-* | open | none recorded | UNVERIFIED (data audit not run; partly checked) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-csp-inline-style | memory/deploy-did-not-fix-count-family.md | deploy | 2026-07-12 prod: CSP blocked inline styles site-wide (style-src nonce) and the Replit dev feedback widget showed unstyled on every page | open | none recorded | fixed-verified (header) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| MEM-count-model-held | memory/count-model-db-sourced.md (index) | data | Public UI counts single-sourced from resources table via /api/categories resourceCount (killed static-tree undercounts); current prod counts consistent (cycle-17 PS-001 facet sum 4102 = public total) | fixed-verified | n/a | verified 2026-11-03 |
+
+## Part B — 2026-10-26 audit finding IDs (369)
+
+Source: `reports/prod-audit-2026-10-26/PRIOR-FINDINGS.md` (recorded states OPEN/UNVERIFIED, FIX-RECORDED, OPEN/REGRESSION), source column is relative to `reports/prod-audit-2026-10-26/`. Mapping: FIX-RECORDED → fixed-unverified; OPEN/REGRESSION → failed; OPEN/UNVERIFIED → open; text saying withdrawn/not a defect → withdrawn. PRs #133-#144 had prod re-checks on deploys 2-3 (762a6c0d, 2026-10-28; `reports/prod-audit-2026-10-26/PROGRESS.md` tail), but those checks are per PR, not per ID, so rows citing them stay fixed-unverified. Prefixes: AC/AI/AO = admin content/AI/ops, PC/PS/PG = public core/secondary, AX/C6-AX = a11y, MB/C6-MB = member, C6-*/T6-* = cycle-6 and takeover lane rows. Descriptions are the first 140 characters of the source line.
+
+| ID | source | area | description | earlier status | PR / commit | current status |
+|---|---|---|---|---|---|---|
+| AC-01 | cycle-05/ux-admin-content/findings.md:9 | admin | Fixed: AC-01 to AC-18 and HDR-01, including AC-07 across 320–1024 and AC-11 after a long scroll. | fixed-unverified | #55 #60 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| AC-02 | cycle-01/ux-admin-content/findings.md:48 | admin | True coarse-pointer behaviour: emulation reported pointer:fine, so AC-02 and AC-05 are judged from CSS. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-03 | cycle-01/ux-admin-content/findings.md:13 | admin | \ | open | none identified | UNVERIFIED (Resources part only) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-04 | cycle-01/ux-admin-content/findings.md:14 | admin | \ | open | #67 #68 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-05 | cycle-04/ux-admin-content/findings.md:15 | admin | Not re-driven: AC-07, AC-10, AC-01 to AC-05 and HDR-01. They go to the cycle-5 brief. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-06 | cycle-04/ux-admin-content/findings.md:13 | admin | Fixed: AC-13 (194px at 320), AC-08, AC-09, AC-12 and AC-06 (search persists across reload). | fixed-unverified | #68 #80 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-07 | cycle-05/ux-admin-content/findings.md:9 | admin | Fixed: AC-01 to AC-18 and HDR-01, including AC-07 across 320–1024 and AC-11 after a long scroll. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-08 | cycle-04/ux-admin-content/findings.md:13 | admin | Fixed: AC-13 (194px at 320), AC-08, AC-09, AC-12 and AC-06 (search persists across reload). | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-09 | cycle-04/ux-admin-content/findings.md:13 | admin | Fixed: AC-13 (194px at 320), AC-08, AC-09, AC-12 and AC-06 (search persists across reload). | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-10 | cycle-04/ux-admin-content/findings.md:15 | admin | Not re-driven: AC-07, AC-10, AC-01 to AC-05 and HDR-01. They go to the cycle-5 brief. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-11 | cycle-05/ux-admin-content/findings.md:9 | admin | Fixed: AC-01 to AC-18 and HDR-01, including AC-07 across 320–1024 and AC-11 after a long scroll. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-12 | cycle-04/ux-admin-content/findings.md:13 | admin | Fixed: AC-13 (194px at 320), AC-08, AC-09, AC-12 and AC-06 (search persists across reload). | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-13 | cycle-04/ux-admin-content/findings.md:13 | admin | Fixed: AC-13 (194px at 320), AC-08, AC-09, AC-12 and AC-06 (search persists across reload). | fixed-unverified | #80 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-14 | cycle-04/ux-admin-content/findings.md:5 | admin | \ | open | #88 #89 #90 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-15 | cycle-05/ux-admin-content/findings.md:11 | admin | Not a defect: AC-15. | withdrawn | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-16 | cycle-04/ux-admin-content/findings.md:6 | admin | \ | open | #89 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-17 | cycle-04/ux-admin-content/findings.md:7 | admin | \ | open | #89 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-18 | cycle-06/ux-admin-content/findings.md:20 | admin | AC-18 — remains FIXED at 1440. Real duplicate create POST 409 and edit PUT 409 focused and marked URL with an associated description: step-0… | fixed-unverified | #89 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| AC-19 | cycle-06/ux-admin-content/findings.md:18 | admin | AC-19 — FIXED at 1440; responsive widths UNVERIFIED. Enter stayed on the requested page at 25 (step-070-ac19-enter-25-page3.txt), 50 (step-0… | fixed-unverified | #94 #95 #96 #97 #98 #99 #100 #101 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-20 | cycle-06/ux-admin-content/findings.md:261 | admin | \ | open | #94 #95 #96 #97 #98 #99 #100 #101 | fixed-verified (1440, Categories edit) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AC-21 | cycle-06/ux-admin-content/findings.md:230 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-01 | cycle-06/ux-admin-ai/findings.md:15 | admin | AI-01 FIXED: Relaunch focuses #budget; reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-relaunch-focus.json. | fixed-unverified | #55 #57 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-02 | cycle-06/ux-admin-ai/findings.md:16 | admin | AI-02 / AI-29 FIXED: $0.30 shows the accurate “less than about $0.43” warning; $0.4341 removes it. reports/prod-audit-2026-10-26/cycle-06/ux… | fixed-unverified | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-03 | cycle-06/ux-admin-ai/findings.md:17 | admin | AI-03 FIXED: launch guidance now explicitly says spend can exceed the cap by one turn; run #68 displays $0.3062 against $0.30 without hiding… | fixed-unverified | #68 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-04 | cycle-06/ux-admin-ai/findings.md:18 | admin | AI-04 FIXED: Preview import shows dry-run counts before Pull. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-preview-result.png.… | fixed-unverified | #55 #59 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-05 | cycle-06/ux-admin-ai/findings.md:19 | admin | AI-05 FIXED: draft target is explicitly distinguished from the configured repository. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-06 | cycle-06/ux-admin-ai/findings.md:20 | admin | AI-06 FIXED: invalid target has an associated error and disables Pull/Sync. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-inval… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-07 | cycle-06/ux-admin-ai/findings.md:21 | admin | AI-07 FIXED: fractional batch 2.5 is invalid and disables both launch controls. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/en-batch-… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-08 | cycle-06/ux-admin-ai/findings.md:22 | admin | AI-08 FIXED: malformed enrichment Base URL is rejected inline before confirmation. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/en-144… | fixed-unverified | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-09 | cycle-06/ux-admin-ai/findings.md:23 | admin | AI-09 FIXED: Last enriched is batch #34 with 10 resources, not an empty older batch. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/en-1… | fixed-unverified | #34 #59 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-10 | cycle-06/ux-admin-ai/findings.md:24 | admin | AI-10 FIXED: enrichment history is in a named scrollable region at 820. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/en-820-controls-o… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-11 | cycle-06/ux-admin-ai/findings.md:25 | admin | AI-11 FIXED: GitHub status/date content wraps within the 390 card. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-390-more.png.… | fixed-unverified | #59 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-12 | cycle-06/ux-admin-ai/findings.md:26 | admin | AI-12 FIXED: research note targets pass the 44px sweep at 820/390. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rw-820-targets.json, r… | fixed-unverified | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-13 | cycle-06/ux-admin-ai/findings.md:27 | admin | AI-13 FIXED: compact Show more and Load more … in Job History are distinct. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-full-… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-14 | cycle-06/ux-admin-ai/findings.md:28 | admin | AI-14 FIXED: Follow run #70 navigates to /admin/researcher?jobId=70. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-run-70-activ… | fixed-unverified | #70 | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-15 | cycle-06/ux-admin-ai/findings.md:29 | admin | AI-15 FIXED: job costs are neutral rather than red error text. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-initial.png.… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-16 | cycle-06/ux-admin-ai/findings.md:204 | admin | ISSUES: AI-30 is a new reproducible navigation defect; AI-16 remains an owner/data decision. Thirteen inventory rows have full PASS evidence… | failed | none identified | owner-decision (data; = DATA-TAXO-LABEL) (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| AI-17 | cycle-06/ux-admin-ai/findings.md:31 | admin | AI-17 FIXED: GitHub scroll regions are named, including Recent sync jobs, scrollable. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-… | fixed-unverified | #55 #59 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-18 | cycle-06/ux-admin-ai/findings.md:32 | admin | AI-18 BLOCKED-BY-POLICY: no live Pull was started. | open | #59 #63 #64 | UNVERIFIED (owner rule: GitHub dry run only) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-19 | cycle-06/ux-admin-ai/findings.md:33 | admin | AI-19 FIXED: launch validation clears when the field is corrected. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-error-cleared.… | fixed-unverified | #66 | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-20 | cycle-06/ux-admin-ai/findings.md:34 | admin | AI-20 FIXED: zero-save run says This run saved no discoveries. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/rs-1440-run-68.a11y.txt.… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-21 | cycle-06/ux-admin-ai/findings.md:35 | admin | AI-21 FIXED: enrichment controls are named View logs/details for job #N. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/en-1440-initial.… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-22 | cycle-06/ux-admin-ai/findings.md:36 | admin | AI-22 FIXED: enrichment plain-HTTP confirmation requires acknowledgement and names the endpoint. reports/prod-audit-2026-10-26/cycle-06/ux-a… | fixed-unverified | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-23 | cycle-06/ux-admin-ai/findings.md:37 | admin | AI-23 FIXED: preview now separates 1 import warning and 10 README formatting warnings instead of 1,254 URL false positives. reports/prod-aud… | withdrawn | #69 #70 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-24 | cycle-06/ux-admin-ai/findings.md:38 | admin | AI-24 FIXED: missing repo reports Repository not found (or not public). reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-preview-m… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-25 | cycle-06/ux-admin-ai/findings.md:39 | admin | AI-25 FIXED: failed preview leaves Start Import disabled. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-pull-dialog-missing-rep… | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-26 | cycle-06/ux-admin-ai/findings.md:40 | admin | AI-26 FIXED: history uses type-qualified Job IDs and dates. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-more.a11y.txt.… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-27 | cycle-06/ux-admin-ai/findings.md:41 | admin | AI-27 FIXED: static Last Export content is not exposed as an alert. reports/prod-audit-2026-10-26/cycle-06/ux-admin-ai/gh-1440-more.a11y.txt… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-28 | cycle-06/ux-admin-ai/findings.md:42 | admin | AI-28: superseded by AI-29. | open | #66 | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-29 | cycle-06/ux-admin-ai/findings.md:42 | admin | AI-28: superseded by AI-29. | open | #80 | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AI-30 | cycle-06/ux-admin-ai/findings.md:204 | admin | ISSUES: AI-30 is a new reproducible navigation defect; AI-16 remains an owner/data decision. Thirteen inventory rows have full PASS evidence… | failed | #71 #72 #73 #74 #75 #76 #77 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-01 | cycle-06/ux-admin-ops/findings.md:27 | admin | \ | failed | #55 #59 #60 #61 | UNVERIFIED (intermittent, server-side) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-02 | cycle-06/ux-admin-ops/findings.md:28 | admin | \ | fixed-unverified | #71 #72 #73 #74 #75 #76 #77 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-03 | cycle-06/ux-admin-ops/findings.md:29 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-04 | cycle-06/ux-admin-ops/findings.md:30 | admin | \ | failed | #94 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-05 | cycle-06/ux-admin-ops/findings.md:31 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-06 | cycle-06/ux-admin-ops/findings.md:32 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-07 | cycle-06/ux-admin-ops/findings.md:33 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-08 | cycle-06/ux-admin-ops/findings.md:34 | admin | \ | fixed-unverified | #61 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-09 | cycle-06/ux-admin-ops/findings.md:35 | admin | \ | fixed-unverified | #67 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-10 | cycle-06/ux-admin-ops/findings.md:36 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-11 | cycle-06/ux-admin-ops/findings.md:37 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-12 | cycle-06/ux-admin-ops/findings.md:34 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-13 | cycle-06/ux-admin-ops/findings.md:38 | admin | \ | fixed-unverified | #80 #81 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-14 | cycle-06/ux-admin-ops/findings.md:39 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-15 | cycle-06/ux-admin-ops/findings.md:40 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-16 | cycle-06/ux-admin-ops/findings.md:39 | admin | \ | fixed-unverified | #87 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-17 | cycle-06/ux-admin-ops/findings.md:41 | admin | \ | fixed-unverified | #87 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-18 | cycle-06/ux-admin-ops/findings.md:42 | admin | \ | open | #90 #91 #92 | UNVERIFIED (no ai_enriched_degraded row on prod) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-19 | cycle-06/ux-admin-ops/findings.md:43 | admin | \ | fixed-unverified | #94 #96 #98 #99 #100 #101 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-20 | cycle-06/ux-admin-ops/findings.md:44 | admin | \ | failed | #94 #96 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-21 | cycle-06/ux-admin-ops/findings.md:34 | admin | \ | fixed-unverified | #94 #96 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-22 | cycle-06/ux-admin-ops/findings.md:217 | admin | AO-22 LOW: Markdown offline failure toast omits the export format. | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-23 | cycle-06/ux-admin-ops/findings.md:218 | admin | AO-23 MEDIUM: Offline uncached Export history is presented as zero exports with no error/Retry. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-24 | cycle-06/ux-admin-ops/findings.md:219 | admin | AO-24 LOW: Lowercase reseed enables the destructive confirmation despite the exact-uppercase requirement. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-25 | cycle-06/ux-admin-ops/findings.md:220 | admin | AO-25 MEDIUM: Offline Users search presents unlabelled stale rows under a new query with no error/Retry. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| AO-26 | cycle-06/ux-admin-ops/findings.md:221 | admin | AO-26 MEDIUM: Link Health chart animates despite prefers-reduced-motion: reduce. | open | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| C6-AX | cycle-06/takeover-lanes/L03/findings.md:26 | a11y | C6-AX rows: | open | none identified | fixed-verified for the guest-checkable subset; remainder per row above (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-001 | cycle-06/ux-a11y/findings.md:30 | a11y | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-002 | cycle-06/ux-a11y/findings.md:31 | a11y | \ | open | none identified | fixed-verified for /, category, search; other page types UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-003 | cycle-06/ux-a11y/findings.md:32 | a11y | \ | fixed-unverified | none identified | fixed-verified (/about#main 3 widths; /tag#related-topics-heading 3 widths focus; ring not asserted on mouse path) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-AX-004 | cycle-06/ux-a11y/findings.md:33 | a11y | \ | fixed-unverified | none identified | fixed-verified (1440, 820, 390: /about#main and /tag/hls#related-topics-heading) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-AX-005 | cycle-06/ux-a11y/findings.md:34 | a11y | \ | open | none identified | fixed-verified except backdrop-click close at every width not driven (PARTIAL in lane); 820 backdrop PASS in c17r-pub-pc.md C6-PC-003 (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-006 | cycle-06/ux-a11y/findings.md:35 | a11y | \ | open | #97 | PARTIAL (missing: widths/parts per note; was fixed-verified filter sheet 820/390, cookie dialog 1440); destructive-cancel dialogs UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-007 | cycle-06/ux-a11y/findings.md:36 | a11y | \ | open | none identified | fixed-verified (search-results card, 3 widths); category/home variants UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-008 | cycle-06/ux-a11y/findings.md:37 | a11y | \ | open | none identified | fixed-verified (Home layout group, 1440+820); other groups need the theme picker (forbidden); 390 not driven (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-009 | cycle-06/ux-a11y/findings.md:38 | a11y | \ | open | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified guest /settings 3 widths); signed-in settings/notifications UNVERIFIED (member l (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-010 | cycle-06/ux-a11y/findings.md:39 | a11y | \ | failed | none identified | fixed-verified for signed-out public pages (/, search, category, resource, /advanced, /journeys, /about at 390 here); member/admin UNVERIFIE (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-011 | cycle-06/ux-a11y/findings.md:40 | a11y | \ | open | none identified | UNVERIFIED (accents/systems need the theme picker, forbidden); default theme PASS (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-012 | cycle-06/ux-a11y/findings.md:41 | a11y | \ | open | none identified | UNVERIFIED (tool cannot emulate prefers-reduced-motion in claude-bridge); c17r-ps2.md C6-PS-057 PASS via agent-browser media only (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-013 | cycle-06/ux-a11y/findings.md:42 | a11y | \ | failed | none identified | fixed-verified (820 and 1440); 390 UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-014 | cycle-06/ux-a11y/findings.md:43 | a11y | \ | fixed-unverified | #93 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-AX-015 | cycle-06/ux-a11y/findings.md:44 | a11y | \ | failed | none identified | UNVERIFIED (no screen reader; /admin unmeasured-as-zero needs admin) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-016 | cycle-06/ux-a11y/findings.md:45 | a11y | \ | open | none identified | UNVERIFIED (partial: guest bookmark toast 1440 in labelled live region) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-017 | cycle-06/ux-a11y/findings.md:46 | a11y | \ | open | none identified | UNVERIFIED (no screen reader) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-018 | cycle-06/ux-a11y/findings.md:47 | a11y | \ | open | none identified | UNVERIFIED (touch emulation only) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-019 | cycle-06/ux-a11y/findings.md:48 | a11y | \ | open | none identified | fixed-verified (search 3 widths, advanced 390); progress bars/switches/tables not on walked pages (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-020 | cycle-06/ux-a11y/findings.md:101 | a11y | C6-AX-020 (MEDIUM): /advanced offline ErrorPage lacks offline-specific copy and Retry gives no still-offline feedback. | open | none identified | PARTIAL (1440 and 820 fixed-verified; missing: 390 Retry press) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-AX-021 | cycle-06/ux-a11y/findings.md:102 | a11y | C6-AX-021 (MEDIUM): /admin initial stats failure renders unmeasured values as zero, stays loading and exposes no Retry. | failed | none identified | UNVERIFIED (admin surface; signed-out only lane) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-AX-022 | cycle-06/ux-a11y/findings.md:103 | a11y | C6-AX-022 (MEDIUM): /advanced auto-recovery succeeds after about 34.0 seconds but leaves focus on BODY instead of the recovered H1. | open | none identified | fixed-verified (1440 /advanced; 820 and 390 category) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-MB-001 | cycle-06/ux-member/findings.md:48 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-002 | cycle-06/ux-member/findings.md:49 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 1440; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-003 | cycle-06/ux-member/findings.md:50 | auth | \ | failed | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-004 | cycle-06/ux-member/findings.md:51 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-005 | cycle-06/ux-member/findings.md:52 | auth | \ | fixed-unverified | none identified | fixed-verified (overview only) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-006 | cycle-06/ux-member/findings.md:53 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-007 | cycle-06/ux-member/findings.md:54 | auth | \ | fixed-unverified | none identified | UNVERIFIED (paid) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-008 | cycle-06/ux-member/findings.md:55 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-009 | cycle-06/ux-member/findings.md:56 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-010 | cycle-06/ux-member/findings.md:57 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 1440, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-011 | cycle-06/ux-member/findings.md:58 | auth | \ | fixed-unverified | none identified | fixed-verified (PR #201, prod 93373522: modal 16..374 @390, 16..804 @820) |
+| C6-MB-012 | cycle-06/ux-member/findings.md:59 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-013 | cycle-06/ux-member/findings.md:60 | auth | \ | failed | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-014 | cycle-06/ux-member/findings.md:61 | auth | \ | failed | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-015 | cycle-06/ux-member/findings.md:62 | auth | \ | open | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-016 | cycle-06/ux-member/findings.md:63 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-017 | cycle-06/ux-member/findings.md:64 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-018 | cycle-06/ux-member/findings.md:65 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-019 | cycle-06/ux-member/findings.md:66 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-020 | cycle-06/ux-member/findings.md:67 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-021 | cycle-06/ux-member/findings.md:68 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-022 | cycle-06/ux-member/findings.md:69 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-023 | cycle-06/ux-member/findings.md:70 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-024 | cycle-06/ux-member/findings.md:71 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-025 | cycle-06/ux-member/findings.md:72 | auth | \ | failed | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-026 | cycle-06/ux-member/findings.md:73 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-027 | cycle-06/ux-member/findings.md:74 | auth | \ | failed | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-028 | cycle-06/ux-member/findings.md:75 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 1440; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-029 | cycle-06/ux-member/findings.md:76 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-030 | cycle-06/ux-member/findings.md:77 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-031 | cycle-06/ux-member/findings.md:78 | auth | \ | fixed-unverified | none identified | UNVERIFIED (partial) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-032 | cycle-06/ux-member/findings.md:79 | auth | \ | failed | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-033 | cycle-06/ux-member/findings.md:80 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-034 | cycle-06/ux-member/findings.md:81 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-035 | cycle-06/ux-member/findings.md:82 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-036 | cycle-06/ux-member/findings.md:83 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-037 | cycle-06/ux-member/findings.md:84 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-038 | cycle-06/ux-member/findings.md:85 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-039 | cycle-06/ux-member/findings.md:86 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-040 | cycle-06/ux-member/findings.md:87 | auth | \ | open | none identified | UNVERIFIED (paid) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-041 | cycle-06/ux-member/findings.md:88 | auth | \ | open | none identified | PARTIAL (missing: 1440, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-042 | cycle-06/ux-member/findings.md:89 | auth | \ | open | none identified | fixed-verified (lead measured 1440 1012x32 by design, 820 660x44, 390 258x44 on 54b90e36; PR #199) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-043 | cycle-06/ux-member/findings.md:90 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-044 | cycle-06/ux-member/findings.md:91 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-045 | cycle-06/ux-member/findings.md:92 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-046 | cycle-06/ux-member/findings.md:93 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-047 | cycle-06/ux-member/findings.md:94 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-048 | cycle-06/ux-member/findings.md:95 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-049 | cycle-06/ux-member/findings.md:96 | auth | \ | failed | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-050 | cycle-06/ux-member/findings.md:97 | auth | \ | open | none identified | PARTIAL (missing: 1440; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-051 | cycle-06/ux-member/findings.md:98 | auth | \ | failed | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-052 | cycle-06/ux-member/findings.md:99 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-053 | cycle-06/ux-member/findings.md:100 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-054 | cycle-06/ux-member/findings.md:101 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-055 | cycle-06/ux-member/findings.md:102 | auth | \ | failed | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-056 | cycle-06/ux-member/findings.md:103 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-057 | cycle-06/ux-member/findings.md:104 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-058 | cycle-06/ux-member/findings.md:105 | auth | \ | fixed-unverified | none identified | PARTIAL (missing: 1440, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-059 | cycle-06/ux-member/findings.md:106 | auth | \ | fixed-unverified | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-060 | cycle-06/ux-member/findings.md:107 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-061 | cycle-06/ux-member/findings.md:108 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-062 | cycle-06/ux-member/findings.md:109 | auth | \ | failed | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-063 | cycle-06/ux-member/findings.md:110 | auth | \ | failed | none identified | UNVERIFIED (partial) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-064 | cycle-06/ux-member/findings.md:111 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-065 | cycle-06/ux-member/findings.md:112 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-066 | cycle-06/ux-member/findings.md:113 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-067 | cycle-06/ux-member/findings.md:114 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-068 | cycle-06/ux-member/findings.md:115 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-069 | cycle-06/ux-member/findings.md:116 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-070 | cycle-06/ux-member/findings.md:117 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-071 | cycle-06/ux-member/findings.md:118 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-072 | cycle-06/ux-member/findings.md:119 | auth | \ | open | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-073 | cycle-06/ux-member/findings.md:120 | auth | \ | failed | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-074 | cycle-06/ux-member/findings.md:121 | auth | \ | open | none identified | PARTIAL (missing: 820; per c17r-member2 cells; was fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-075 | cycle-06/ux-member/findings.md:122 | auth | \ | fixed-unverified | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-076 | cycle-06/ux-member/findings.md:123 | auth | \ | fixed-unverified | none identified | UNVERIFIED (partial) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-077 | cycle-06/ux-member/findings.md:124 | auth | \ | open | none identified | UNVERIFIED (real touch) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-078 | cycle-06/ux-member/findings.md:125 | auth | \ | open | none identified | UNVERIFIED (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-079 | cycle-06/ux-member/findings.md:126 | auth | \ | open | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-080 | cycle-06/ux-member/findings.md:127 | auth | \ | failed | none identified | PARTIAL (missing: 820, 390; per c17r-member2 cells; was fixed-verified (1440 only)) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MB-081 | cycle-06/ux-member/findings.md:128 | auth | \ | open | none identified | UNVERIFIED (partial) (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| C6-MEMBER-01 | cycle-06/ux-member/findings.md:50 | public | \ | failed | #115 | UNVERIFIED (member only) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-MEMBER-02 | cycle-06/ux-member/findings.md:127 | public | \ | failed | none identified | UNVERIFIED guest-side partly: guest cards 44x44 (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-001 | cycle-06/ux-public-core/findings.md:42 | public | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-002 | cycle-06/ux-public-core/findings.md:43 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-003 | cycle-06/ux-public-core/findings.md:44 | public | \ | open | none identified | UNVERIFIED (390 Escape/backdrop/link not driven) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-004 | cycle-06/ux-public-core/findings.md:45 | public | \ | open | none identified | fixed-verified (1440 button+Ctrl+K; 820, 390 button and `/`) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-005 | cycle-06/ux-public-core/findings.md:46 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-006 | cycle-06/ux-public-core/findings.md:47 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-007 | cycle-06/ux-public-core/findings.md:48 | public | \ | open | none identified | UNVERIFIED (covered by member lane) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-008 | cycle-06/ux-public-core/findings.md:49 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-009 | cycle-06/ux-public-core/findings.md:50 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-010 | cycle-06/ux-public-core/findings.md:51 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-011 | cycle-06/ux-public-core/findings.md:52 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-012 | cycle-06/ux-public-core/findings.md:53 | public | \ | open | none identified | fixed-verified (1440, 1100; 1250 expanded state; 820/390 n/a, drawer serves the job) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-013 | cycle-06/ux-public-core/findings.md:54 | public | \ | open | none identified | fixed-verified (820, 390; drawer is not used at 1440) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-014 | cycle-06/ux-public-core/findings.md:55 | public | \ | failed | none identified | PARTIAL (load PASS at 3 widths; failure Retry client-handling PASS at 1440 only; 820/390 failure and genuine-empty UNVERIFIED: no request-ab (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-015 | cycle-06/ux-public-core/findings.md:56 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-016 | cycle-06/ux-public-core/findings.md:57 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-017 | cycle-06/ux-public-core/findings.md:58 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-018 | cycle-06/ux-public-core/findings.md:59 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-019 | cycle-06/ux-public-core/findings.md:60 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-020 | cycle-06/ux-public-core/findings.md:61 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-021 | cycle-06/ux-public-core/findings.md:62 | public | \ | open | none identified | fixed-verified (1440, 820, 390: Escape and Close button) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-022 | cycle-06/ux-public-core/findings.md:63 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-023 | cycle-06/ux-public-core/findings.md:64 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-024 | cycle-06/ux-public-core/findings.md:65 | public | \ | open | none identified | fixed-verified (1440, 820, 390; five-item cap not driven) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-025 | cycle-06/ux-public-core/findings.md:66 | public | \ | failed | none identified | PARTIAL (no-results, offline, over-limit PASS at 3 widths; error+Try again client-handling PASS at 1440 only; loading UNVERIFIED; 820/390 er (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-026 | cycle-06/ux-public-core/findings.md:67 | public | \ | open | none identified | UNVERIFIED (home makes no extra fetch to abort) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-027 | cycle-06/ux-public-core/findings.md:68 | public | \ | open | none identified | PARTIAL (public part fixed-verified: ?layout= at 1440/820/390; saved-preference path UNVERIFIED (member-only /api/user/preferences, signed o (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-028 | cycle-06/ux-public-core/findings.md:69 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-029 | cycle-06/ux-public-core/findings.md:70 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-030 | cycle-06/ux-public-core/findings.md:71 | public | \ | open | none identified | fixed-verified (PR #200, prod 87b8ece7: popover 0..406 @390) |
+| C6-PC-031 | cycle-06/ux-public-core/findings.md:72 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-032 | cycle-06/ux-public-core/findings.md:73 | public | \ | open | none identified | fixed-verified (1440, 820, 390; View details/Open Link not rendered on home cards, by design) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-033 | cycle-06/ux-public-core/findings.md:74 | public | \ | open | none identified | fixed-verified (1440, 820, 390; +N not rendered, pills capped at 3, by design) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-034 | cycle-06/ux-public-core/findings.md:75 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-035 | cycle-06/ux-public-core/findings.md:76 | public | \ | open | none identified | UNVERIFIED (member only) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-036 | cycle-06/ux-public-core/findings.md:77 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-037 | cycle-06/ux-public-core/findings.md:78 | public | \ | open | none identified | PARTIAL (populated PASS at 1440, 820, 390; error Retry and genuine-empty UNVERIFIED: no request-abort tool) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-038 | cycle-06/ux-public-core/findings.md:79 | public | \ | open | none identified | fixed-verified (PR #201, prod 93373522: hrefs keep ?kind=) |
+| C6-PC-039 | cycle-06/ux-public-core/findings.md:80 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-040 | cycle-06/ux-public-core/findings.md:81 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-041 | cycle-06/ux-public-core/findings.md:82 | public | \ | open | none identified | PARTIAL (missing: 390 kind select and sort driven by click; 1440, 820 fixed-verified) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-042 | cycle-06/ux-public-core/findings.md:83 | public | \ | fixed-unverified | none identified | fixed-verified (1440 facets; 820 sheet = PC-25; 820 and 390 tag chip + Clear all) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-043 | cycle-06/ux-public-core/findings.md:84 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-044 | cycle-06/ux-public-core/findings.md:85 | public | \ | failed | none identified | fixed-verified (1440, 820, 390; fuzzy/invalid-filter not driven) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-045 | cycle-06/ux-public-core/findings.md:86 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-046 | cycle-06/ux-public-core/findings.md:87 | public | \ | open | none identified | fixed-verified for driven states; loading skeleton and server-error UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-047 | cycle-06/ux-public-core/findings.md:88 | public | \ | open | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-048 | cycle-06/ux-public-core/findings.md:89 | public | \ | open | none identified | fixed-verified (1440, 820, 390; fragment focus on /tag only, Back-to-fragment is PG-08) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-049 | cycle-06/ux-public-core/findings.md:90 | public | \ | open | #82 | fixed-verified (guest 1440, 390); member mutations UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-050 | cycle-06/ux-public-core/findings.md:91 | public | \ | open | none identified | fixed-verified (1440, 820, 390; offline/error states not part of this row's earlier PASS) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-051 | cycle-06/ux-public-core/findings.md:92 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-052 | cycle-06/ux-public-core/findings.md:93 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-053 | cycle-06/ux-public-core/findings.md:94 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-054 | cycle-06/ux-public-core/findings.md:95 | public | \ | failed | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified guest toast 1440); member add/remove UNVERIFIED (member) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-055 | cycle-06/ux-public-core/findings.md:96 | public | \ | open | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified guest local save 1440, 390); member notes/collections UNVERIFIED (member) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-056 | cycle-06/ux-public-core/findings.md:97 | public | \ | open | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified clipboard fallback 1440); native share sheet UNVERIFIED (no real share target) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-057 | cycle-06/ux-public-core/findings.md:98 | public | \ | open | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified guest wall); edit form UNVERIFIED (member) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-058 | cycle-06/ux-public-core/findings.md:99 | public | \ | open | none identified | UNVERIFIED (guest sees sign-in toast only; form needs account) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-059 | cycle-06/ux-public-core/findings.md:100 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-060 | cycle-06/ux-public-core/findings.md:101 | public | \ | failed | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified classification chips UNVERIFIED, no data) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-061 | cycle-06/ux-public-core/findings.md:102 | public | \ | open | none identified | fixed-verified (404/malformed 3 widths); loading/error UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-062 | cycle-06/ux-public-core/findings.md:103 | public | \ | failed | none identified | PARTIAL (missing: widths/parts per note; was fixed-verified offline legs); forced-chunk touch leg UNVERIFIED (touch) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-063 | cycle-06/ux-public-core/findings.md:104 | public | \ | open | none identified | fixed-verified (1440, 820, 390; ?page=999 clamps, see C6-PC-069) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-064 | cycle-06/ux-public-core/findings.md:105 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-065 | cycle-06/ux-public-core/findings.md:106 | public | \ | open | none identified | UNVERIFIED (no shareId to populate); 404 PASS 1440 (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-066 | cycle-06/ux-public-core/findings.md:107 | public | \ | failed | none identified | fixed-verified (820 empty+populated+remove; 1440 empty; 390 populated) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| C6-PC-067 | cycle-06/ux-public-core/findings.md:84 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-068 | cycle-06/ux-public-core/findings.md:85 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-069 | cycle-06/ux-public-core/findings.md:86 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| C6-PC-070 | cycle-06/ux-public-core/findings.md:31 | public | \ | fixed-unverified | none identified | fixed-verified (1440 category, 820 touch exact page, 390 touch exact page) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| MB-01 | cycle-05/ux-member/findings.md:10 | auth | MB-01 to MB-04: fixed. MB-04 at 390: the Undo toast was still up after 12s and restore worked. | fixed-unverified | #2 #3 #4 #5 #6 #55 #59 #60 #61 #62 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-02 | cycle-03/ux-member/findings.md:3 | auth | MB-01, MB-02 and MB-03: fixed on production. | fixed-unverified | #55 #59 #60 #61 #62 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-03 | cycle-03/ux-member/findings.md:3 | auth | MB-01, MB-02 and MB-03: fixed on production. | fixed-unverified | #62 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-04 | cycle-05/ux-member/findings.md:10 | auth | MB-01 to MB-04: fixed. MB-04 at 390: the Undo toast was still up after 12s and restore worked. | fixed-unverified | #66 #72 #74 #75 #79 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-05 | cycle-05/ux-member/findings.md:5 | auth | \ | open | #95 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-06 | cycle-06/ux-a11y/findings.md:24 | auth | Switch focus ring, MB-06, #97 sheet, contrast matrix, signed-in favorite/live-region feedback — UNVERIFIED in this run; no earlier PASS is i… | fixed-unverified | #95 #97 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| MB-07 | cycle-06/ux-member/findings.md:36 | auth | MB-07 stale journey current step: PASS. Journey 9 completed all six steps, then all were undone; final state is currentStepId:217, completed… | fixed-unverified | #95 | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-auth.md) |
+| PC-01 | cycle-06/ux-public-core/findings.md:23 | public | PG-02 and earlier PC-01 through PC-24 — UNVERIFIED as complete re-checks. They were not all re-driven in this run; prior FIXED claims are no… | fixed-unverified | #49 #55 #57 #58 | fixed-verified (1440, 820, 390) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-02 | cycle-05/ux-public-core/findings.md:59 | public | Fixed: PC-02, 03, 04, 05, 06, 07, 09, 13, 15, 16, 17, 18, 19, 21, 22, 23, plus PG-02 and PG-03 (PG-03 checked from DOM and a11y order). | fixed-unverified | #49 | UNVERIFIED (tool cannot set prefers-reduced-motion) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-03 | cycle-01/ux-public-core/findings.md:17 | public | \ | open | #49 #55 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-04 | cycle-01/ux-public-core/findings.md:18 | public | \ | fixed-unverified | #49 #54 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-05 | cycle-01/ux-public-core/findings.md:19 | public | \ | open | #54 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-06 | cycle-01/ux-public-core/findings.md:20 | public | \ | open | #49 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-07 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | #49 #53 | fixed-verified (condition removed) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-08 | cycle-05/ux-public-core/findings.md:45 | public | Fixed: PC-01, PC-08, PC-10, PC-14, and PC-11 in part. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-09 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-10 | cycle-05/ux-public-core/findings.md:45 | public | Fixed: PC-01, PC-08, PC-10, PC-14, and PC-11 in part. | fixed-unverified | #55 #59 #60 #61 #73 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PC-11 | cycle-05/ux-public-core/findings.md:45 | public | Fixed: PC-01, PC-08, PC-10, PC-14, and PC-11 in part. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-12 | cycle-05/ux-public-core/findings.md:46 | public | Still open: PC-12 (owner). | open | #49 #82 | owner-decision (content) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-13 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | #71 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-14 | cycle-05/ux-public-core/findings.md:45 | public | Fixed: PC-01, PC-08, PC-10, PC-14, and PC-11 in part. | fixed-unverified | #73 | fixed-verified (1440, 820, 390; home + category) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PC-15 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | #73 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-16 | cycle-04/ux-public-core/findings.md:11 | public | PC-16: fixed, checked by emulation only. | fixed-unverified | #71 | UNVERIFIED (touch) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-17 | cycle-04/ux-public-core/findings.md:10 | public | Fixed: PC-10, PC-13, PC-14, PC-15, PC-17, PC-18, PC-19, PC-20 (DOM only), PC-21, PC-22, PC-23 (sticky at 1440×900, 1366×768 and 1280×720), a… | fixed-unverified | #71 | fixed-verified (tag page); category hero not re-read (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-18 | cycle-04/ux-public-core/findings.md:10 | public | Fixed: PC-10, PC-13, PC-14, PC-15, PC-17, PC-18, PC-19, PC-20 (DOM only), PC-21, PC-22, PC-23 (sticky at 1440×900, 1366×768 and 1280×720), a… | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-19 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-20 | cycle-05/ux-public-core/findings.md:13 | public | Re-checks: PC-01 to PC-23 and PG-02/03, apart from PC-20 and PC-24. | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-21 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | #72 #73 | fixed-verified (1440, 820) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PC-22 | cycle-04/ux-public-core/findings.md:10 | public | Fixed: PC-10, PC-13, PC-14, PC-15, PC-17, PC-18, PC-19, PC-20 (DOM only), PC-21, PC-22, PC-23 (sticky at 1440×900, 1366×768 and 1280×720), a… | fixed-unverified | #71 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-23 | cycle-05/ux-public-core/findings.md:54 | public | Re-checks not done: PC-02 to PC-07, PC-09, PC-13, PC-15 to PC-19, PC-21 to PC-23, PG-02 and PG-03. | fixed-unverified | #3 #80 #81 #82 | fixed-verified (1440x900, 1366x768; 820/390 n/a by design) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PC-24 | cycle-06/ux-public-core/findings.md:23 | public | PG-02 and earlier PC-01 through PC-24 — UNVERIFIED as complete re-checks. They were not all re-driven in this run; prior FIXED claims are no… | fixed-unverified | #81 #82 #83 #86 | fixed-verified (per #86 / cycle-05 accepted fix: "page" only on /categories, "true" = section membership elsewhere) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PC-25 | cycle-06/ux-public-core/findings.md:33 | public | \ | fixed-unverified | #90 #94 #97 | fixed-verified (accepted state: Done 44px, 12px bottom padding per cycle-06 note) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-01 | cycle-04/ux-a11y/findings.md:12 | public | PG-01..03: observed working, but not re-driven in detail. | open | #55 #59 #60 #61 #62 | fixed-verified focus (1440, 820, 390); announcement UNVERIFIED (screen reader) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PG-02 | cycle-06/ux-public-core/findings.md:23 | public | PG-02 and earlier PC-01 through PC-24 — UNVERIFIED as complete re-checks. They were not all re-driven in this run; prior FIXED claims are no… | fixed-unverified | #62 | PARTIAL (missing: widths/parts per note; was fixed-verified 1440) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-03 | cycle-06/ux-public-core/findings.md:22 | public | PG-03 — scoped 390 card-order check passes, not a full recheck. Keyboard order was Filters & view → View details → Open Link → title, with a… | fixed-unverified | #62 | PARTIAL (missing: widths/parts per note; was fixed-verified a11y/DOM order, 1440) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-04 | cycle-05/ux-a11y/findings.md:8 | public | PG-04: consistent with fixed. It was not re-driven on Slow 3G. | fixed-unverified | #66 #72 #74 | UNVERIFIED (Slow 3G transition not driven) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-05 | cycle-05/ux-a11y/findings.md:7 | public | OF-01 and PG-05: fixed at 820. The page recovered in about 12s and focus went to the new H1. | fixed-unverified | #74 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PG-06 | cycle-05/ux-a11y/findings.md:40 | public | PG-06, PG-07 and PG-09 are fixed. | fixed-unverified | #66 #69 | UNVERIFIED (not driven) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-07 | cycle-05/ux-a11y/findings.md:40 | public | PG-06, PG-07 and PG-09 are fixed. | fixed-unverified | #69 | UNVERIFIED (not driven) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PG-08 | cycle-05/ux-admin-ai/findings.md:24 | public | A first load of /admin/<tab> leaves focus on body, while the same URL with an unmatched fragment focuses the H1. That is consistent with the… | open | #66 #74 #87 #88 #89 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PG-09 | cycle-05/ux-a11y/findings.md:40 | public | PG-06, PG-07 and PG-09 are fixed. | fixed-unverified | #69 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PG-10 | cycle-05/ux-a11y/findings.md:5 | public | PG-10: fixed, Geist keyboard at 820. | fixed-unverified | #3 #80 #81 #82 | fixed-verified (default system: 1440, 820, 390); other themes UNVERIFIED (theme picker forbidden) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PG-11 | cycle-06/ux-public-core/findings.md:113 | public | Full PG-11 fragment matrix and keyboard fragment→page→Back: UNVERIFIED. | open | #95 #99 #103 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-01 | cycle-05/ux-public-secondary/findings.md:8 | public | Fixed: PS-01 to PS-25. | fixed-unverified | #50 #51 #90 | fixed-verified (1440 fine 24px floor, 820, 390 touch 44px) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-02 | cycle-02/ux-public-secondary/findings.md:21 | public | \ | fixed-unverified | none identified | fixed-verified (1440 fine pointer 40px, 820 44px, 390 52px rows) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-03 | cycle-02/ux-public-secondary/findings.md:22 | public | \ | fixed-unverified | #52 | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-04 | cycle-02/ux-public-secondary/findings.md:23 | public | \ | fixed-unverified | #50 #51 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-05 | cycle-03/ux-public-secondary/findings.md:14 | public | ## Re-checks: PS-09..PS-14 FIXED (PS-14 "Use phone" 62x44); PS-05, PS-08 spot-checked OK; PS-01..07 not fully re-driven. | fixed-unverified | #52 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-06 | cycle-02/ux-public-secondary/findings.md:25 | public | \ | fixed-unverified | #71 #72 #73 #74 #75 #76 #77 | fixed-verified (footer wording); truncation not exercised (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-07 | cycle-02/ux-public-secondary/findings.md:26 | public | \ | fixed-unverified | #52 | UNVERIFIED (rule: no theme picker changes) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-08 | cycle-03/ux-public-secondary/findings.md:14 | public | ## Re-checks: PS-09..PS-14 FIXED (PS-14 "Use phone" 62x44); PS-05, PS-08 spot-checked OK; PS-01..07 not fully re-driven. | fixed-unverified | #50 #51 | fixed-verified (SSR h1 present and matching on sampled routes) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-09 | cycle-04/ux-public-secondary/findings.md:30 | public | PS-09 to PS-14, including SSR parity and /sign-in "Use phone". | open | #72 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-10 | cycle-02/ux-public-secondary/findings.md:25 | public | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-11 | cycle-02/ux-public-secondary/findings.md:12 | public | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-12 | cycle-02/ux-public-secondary/findings.md:27 | public | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-13 | cycle-02/ux-public-secondary/findings.md:27 | public | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-14 | cycle-05/ux-public-secondary/findings.md:30 | public | PS-14 re-measure. | open | #72 | fixed-verified (820, 390 coarse 44px; 1440 fine 24px floor) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-15 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | #80 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-16 | cycle-05/ux-public-secondary/findings.md:13 | public | #87 PS-16 and #91 PS-25: chips and the slug filter both work. | open | #87 #91 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-17 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | none identified | fixed-verified (390, 820; 1440 n/a for the 44px rule) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-18 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | #80 | fixed-verified (390, 820) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-19 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | none identified | fixed-verified (390, 820; only the inline footer link is under 44, on the 24px inline floor) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-20 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | none identified | fixed-verified (390, 820) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-21 | cycle-04/ux-public-secondary/findings.md:9 | public | Fixed: PS-15, PS-17, PS-18, PS-19, PS-20 and PS-21. | fixed-unverified | none identified | fixed-verified (specimens sit in 260x44 labels) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-22 | cycle-06/ux-a11y/findings.md:23 | public | PS-22 / offline recovery — PARTIAL. Automatic recovery occurs, but the generic offline copy, silent Retry and recovered-focus requirements f… | failed | #88 #89 #90 #92 | fixed-verified (1440 x2, 820, 390; 4 runs this pass: 989 ms, 3875 ms, 502 ms, 505 ms, no stuck state) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| PS-23 | cycle-05/ux-public-secondary/findings.md:11 | public | PS-23: the filter sheet stays open while toggling, and Done returns focus to the trigger. | fixed-unverified | #88 #89 #90 | PARTIAL (missing: widths/parts per note; was fixed-verified 820) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-24 | cycle-05/ux-public-secondary/findings.md:12 | public | PS-24: rows sit on a 44px pitch. | open | #88 #89 #90 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-25 | cycle-05/ux-public-secondary/findings.md:13 | public | #87 PS-16 and #91 PS-25: chips and the slug filter both work. | open | #87 #90 #91 #92 | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-27 | cycle-05/ux-public-secondary/findings.md:1 | public | # ux-public-secondary, cycle 05 (rev 63a1c79d at start and end): ISSUES, 1 LOW (PS-28; the auditor called it PS-27, renumbered because PS-27… | fixed-unverified | #90 #93 #94 | fixed-verified (offline retry) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-28 | cycle-05/ux-public-secondary/findings.md:5 | public | \ | failed | #90 #93 #94 #97 | fixed-verified at the app level; edge WAF/Referer path UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| PS-29 | cycle-06/ux-public-core/findings.md:20 | public | PS-29 — offline half FIXED; online-unreachable UNVERIFIED. At both 390 and 820, offline copy is explicit, Retry adds “Still offline — reconn… | fixed-unverified | #93 #98 #99 #100 #101 | PARTIAL (offline copy, Retry feedback, reconnect recovery fixed-verified 1440, 820; 390 copy+recovery seen; online-but-unreachable UNVERIFIE (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| T6-01 | cycle-06/takeover-lanes/L01a/findings.md:26 | public | \ | failed | none identified | fixed-verified (1440, 820, 390) (rev 54b90e36; cycle-17/c17r-carry-pub.md) |
+| T6-01-01 | cycle-06/takeover-lanes/L01a/findings.md:13 | public | T6-01-01 from L01 stays LOW and cosmetic. The parent link is not marked as an ancestor. | open | none identified | withdrawn (TRIAGE.md:16, by design) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-01-02 | cycle-06/takeover-lanes/L01a/findings.md:12 | public | T6-01-02 from L01 is withdrawn. With the rail focused, Tab 11 lands on "Source", whose rect is top 459, bottom 503 inside the 600px viewport… | withdrawn | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-02-01 | cycle-06/takeover-lanes/L02/findings.md:30 | public | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-02-02 | cycle-06/takeover-lanes/L02/findings.md:30 | public | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-02-03 | cycle-06/takeover-lanes/L02/findings.md:73 | public | \ | open | none identified | withdrawn (inline text link, by design) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-02-04 | cycle-06/takeover-lanes/L02/findings.md:12 | public | \ | failed | none identified | withdrawn (label is the target) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-02-05 | cycle-06/takeover-lanes/L02/findings.md:13 | public | \ | open | none identified | withdrawn (label wrappers 44px; 24px inline floor) (rev d74699a3; cycle-17/c17r-carry-pub.md) |
+| T6-03-01 | cycle-06/takeover-lanes/L03/findings.md:54 | admin | C6-AX-007: the Tab order is logical, but see T6-03-01. | open | none identified | fixed-verified (1440 only; 390/820 not walked -> PARTIAL for those) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-02 | cycle-06/takeover-lanes/L03/findings.md:10 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-03 | cycle-06/takeover-lanes/L03/findings.md:11 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-04 | cycle-06/takeover-lanes/L03/findings.md:12 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-05 | cycle-06/takeover-lanes/L03/findings.md:13 | admin | \ | open | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-06 | cycle-06/takeover-lanes/L03/findings.md:14 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-07 | cycle-06/takeover-lanes/L03/findings.md:15 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-08 | cycle-06/takeover-lanes/L03/findings.md:16 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-09 | cycle-06/takeover-lanes/L03/findings.md:67 | admin | \ | fixed-unverified | none identified | withdrawn (by design, TRIAGE.md:41) (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| T6-03-10 | cycle-06/takeover-lanes/L03/findings.md:18 | admin | \ | open | none identified | fixed-verified (390 measured; unproven claim in source) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-11 | cycle-06/takeover-lanes/L03/findings.md:19 | admin | \ | open | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-03-12 | cycle-06/takeover-lanes/L03/findings.md:51 | admin | C6-AX-003: direct and same-page fragment navigation worked on tag pages at all three widths. The 390 same-page case failed in agent-browser,… | failed | none identified | withdrawn (no in-app link to that fragment on resource pages; id belongs to TagLanding.tsx:284) (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| T6-03-13 | cycle-06/takeover-lanes/L03/findings.md:21 | admin | \ | open | none identified | fixed-verified (by design) (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| T6-03-14 | cycle-06/takeover-lanes/L03/findings.md:22 | admin | \ | open | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-04-01 | cycle-06/takeover-lanes/L04/findings.md:22 | admin | \ | failed | none identified | UNVERIFIED (member account + write) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-04-02 | cycle-06/takeover-lanes/L04/findings.md:11 | admin | \ | fixed-unverified | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-04-03 | cycle-06/takeover-lanes/L04/findings.md:12 | admin | \ | open | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-05 | cycle-06/takeover-lanes/L05a/findings.md:30 | admin | \ | failed | none identified | UNVERIFIED (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-01 | cycle-06/takeover-lanes/L06a/findings.md:29 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-02 | cycle-06/takeover-lanes/L06a/findings.md:31 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-03 | cycle-06/takeover-lanes/L06a/findings.md:36 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-04 | cycle-06/takeover-lanes/L06a/findings.md:32 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-05 | cycle-06/takeover-lanes/L06a/findings.md:32 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-06 | cycle-06/takeover-lanes/L06a/findings.md:35 | admin | \ | fixed-unverified | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-07 | cycle-06/takeover-lanes/L06a/findings.md:33 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-06-08 | cycle-06/takeover-lanes/L06a/findings.md:33 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-07 | cycle-06/takeover-lanes/L07a/findings.md:33 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-07-01 | cycle-06/takeover-lanes/L07a/findings.md:18 | admin | \ | open | none identified | withdrawn (TRIAGE.md:5/:34) (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| T6-07-02 | cycle-06/takeover-lanes/L07a/findings.md:16 | admin | \ | open | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-08-01 | cycle-06/takeover-lanes/L08/findings.md:27 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-08-02 | cycle-06/takeover-lanes/L08/findings.md:69 | admin | \ | failed | none identified | fixed-verified (rev 54b90e36; cycle-17/c17r-carry-admin.md) |
+| T6-08-03 | cycle-06/takeover-lanes/L08/findings.md:27 | admin | \ | failed | none identified | fixed-verified (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-08-04 | cycle-06/takeover-lanes/L08/findings.md:21 | admin | \ | failed | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-09-01 | cycle-06/takeover-lanes/L09a/findings.md:7 | admin | No new findings. T6-09-01 (earlier lane, EX-20) is withdrawn: with /api/admin/audit-logs fully aborted, Export history shows "Couldn't load… | withdrawn | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-09-02 | cycle-06/takeover-lanes/L09/findings.md:62 | admin | \ | failed | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-09-03 | cycle-06/takeover-lanes/L09/findings.md:77 | admin | \ | open | none identified | UNVERIFIED (touch) (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+| T6-10-NN | cycle-06/takeover-lanes/L10/findings.md:6 | admin | None proven. No T6-10-NN rows. | open | none identified | withdrawn (rev d74699a3; cycle-17/c17r-carry-admin.md) |
+
+## Aliases and clusters
+
+- NEW-001 = RS-38 + LH-24 (cycle-01 admin-ops-ai.md)
+- NEW-002 = CAT-02, SC-02, JN-02 (+ Settings/Onboarding/ApiKeys offline panels)
+- NEW-004 = C6-PS-010 (hsl→HLS)
+- NEW-005 listed by PROGRESS.md as "= RM-02 class"; SUMMARY.md lists them separately (RM-02 PR #155, NEW-005 PR #157)
+- NEW-035 / NEW-036 / NEW-037 / NEW-022 / SH-09 are one family: focus or content lost after an offline or failed-chunk recovery (AX-013 rows)
+- NEW-038 = PS-014; NEW-039 = PS-049; NEW-040 = PS-059 (withdrawn); NEW-042 = EX-20; NEW-043 = LH-14; NEW-044 = PC-066; NEW-045 = GH-17 (inferred from the sweep-16 closing note order, not stated outright)
+- NEW-029 / NEW-030 / NEW-045: same GitHub-panel "loading/failed shown as empty" family
+- NEW-001, 006, 007, 010, 014-021, 023, 025-028, 031, 032, 044: the target-size family (24px/44px hit areas)
+- NEW-002, 029, 030, 034, 042, 043, 045: false-empty / misleading-state family
+
+## Recurrences (reported fixed, then seen again)
+
+- NEW-037: PR #175 shipped and was ineffective (browser caches a failed same-URL import); sweep 15 reopened it on 8103be92; PR #177 (`?retry=n` URL) fixed it, verified on e3eb1fc0.
+- NEW-035: PR #171 ineffective, PR #172 needed (focus flag lost when in-place retry falls back to a reload).
+- Offline chunk/route family returned five times: NEW-005 (#157), NEW-036 (#173), earlier #144, NEW-037 (#175, #177), RM-02. Each fix covered one lazy chunk; the next sweep found another.
+- NEW-030 half-fixed in #169, same defect in the other half resurfaced as NEW-045 (#187).
+- Target-size defects recurred in every sweep 1-9 (new element each time) — 20+ NEW IDs; sweep 5 NEW-016 was a regression of the NEW-015 fix (padded boxes overlapped when the line wrapped).
+- AC-21 (empty parent field feedback) recorded OPEN/REGRESSION after AC-20 fix; also 61 OPEN/REGRESSION rows in Part B.
+- BUG-001 took three PRs (#150, #151, #152) before the owner Clerk account linked.
+- NEW-039: PR #181 merged with the premise only partly confirmed on prod; later verified on local builds and prod (22c3b78d).
+- MEM-bookmark-remove: DELETE turned into an upserting POST; client-only bug in an area earlier audits had passed.
+- MEM-password-leak: a SafeUser type mismatch was a same-cycle regression because esbuild builds do not typecheck.
+- QA debris left on prod across audits: NEW-003 (`[QA-audit-1026]` sub-subcategory visible 3 days), 2026-07-12 QA users/pending rows, sweep 16 QA category 1230 public ~8 min.
+
+## Known flaky areas
+
+- Offline / failed-chunk recovery (lazy routes, contact footer, breadcrumb disclosure, Clerk script) — see recurrences.
+- Admin guard Retry and in-place recovery focus (SH-09 open).
+- Link rot: BUG-033/034/036 returned 503 and were kept after a second check; catalog URLs can fail again — spot re-check.
+- Count model: 2026-07-12 inflated counts (2109 vs 1951) are open in memory; later fixes single-sourced public counts; admin-side counts after the 274-resource approve-all (public 3828→4102) have not been separately re-reconciled except cycle-17 PS-001 facet sum.
+- Researcher: PRs #120, #122, #128, #138, #145-#148 and #174 (orchestrator moved to Sonnet) — paid AI runs were mostly UNVERIFIED in sweeps 15-17.
+- Integration test suites (non-deterministic shared DB; memory vitest-integration-suites-flaky) — not production bugs.
+- Tooling-induced false positives: NEW-012, NEW-040 (sr-only breadcrumb), OBS-1 (2800px viewport); agent-browser tab-strip click quirk at 390.
+
+## Deploy problems on record
+
+- 2026-07-12 deploy fixed ~30 clusters but left count inflation, import defects, inline-style CSP regression.
+- 2026-10-27/28: an earlier record said `37d0771a` was deployed while the live read showed `bc1797b0`; OMP claim that PR125-129 were deployed was stale. Production `/api/version` is the authority.
+- Replit workspace must be reset over empty "Published your App" commits before each deploy; `publish_app` can be refused or pending for ~10 min; SSH was unavailable during part of 10-28.
+- Schema drift on prod (research_discoveries column never pushed) — fixed by ALTER; migration chain history in MEM-migration-chain.
+- Phase 0 of 10-29: origin/main `fc8d47b5` differed from live `87f2ebbf` by a snapshot commit only. 21 deploys (#149-#173) in the 10-29 run, then PRs #174-#189 (15 merged, 1 closed) on 2026-11-03; live == main `bdb94c43` at 2026-11-03T09:17:57Z.
+- Sweeps restarted whenever a deploy changed the revision mid-sweep; clean-sweep counter was still 0 of 2 at stop (sweeps 2-16 each found a new defect or were discovery-only).
+- Production data change by owner order 2026-11-03: approve-all added 274 public resources (3828→4102), so cycle-17 baseline 2 is the reference; 2322 → resource 190896.
+
+## Owner-gated / UNVERIFIED carryovers (not bugs, never exercised)
+
+Member lane (81 rows, needs a throwaway member account, D5); B10 (dev-server proof); U1/U2/U5 researcher refusal paths and any paid AI run beyond the $5 cap; A15/A16/O3/O5 vendor-dashboard evidence; D3 logout/server revocation (never click Sign out — it revokes all owner sessions); GitHub export to the real repo; role/settings/secret changes; real touch (viewport emulation only); signed-in analytics steps on `/submit`. Sweep 15 lane tallies: admin-ops 27 UNVERIFIED + 16 PARTIAL, admin-ai 31 UNVERIFIED + 11 PARTIAL, a11y 50 UNVERIFIED.
+
+
+## Cycle-17 lead re-check on prod (2026-11-03T09:32:01Z, rev bdb94c43, evidence e2e-evidence/c17/ledger-recheck/)
+| ID | result | evidence |
+|---|---|---|
+| MEM-password-leak | fixed-verified: /api/admin/users keys = createdAt,deletionRequestedAt,email,firstName,id,lastName,profileImageUrl,role,updatedAt; 0 bcrypt/password matches in users.json and export-json (4.1 MB) | users.json, export.json |
+| MEM-count-inflation | fixed-verified: admin totalPublic 4102 == public category sum 4102 (rejected 147 excluded) | /api/admin/stats |
+| MEM-audit-defect-4 | fixed-verified: GET /api/researcher/discoveries 200; approve-all of 274 succeeded | approve-all-response.txt |
+| MEM-migration-chain | fixed-verified on prod: migrations applied 34 / journaled 34 | /api/admin/stats |
+| MEM-import-defects | partly fixed: back-to-top junk 0 (186689 -> 404); slug-shaped titles 24 of 4102 (was 441); normalized-URL duplicates 0; BUT 44 same-title clusters with different URLs (homepage vs repo, renamed repos), 9 involving rows from the 2026-11-03 approve-all (e.g. 190705/186352 mediasoup, 190784/186349 MistServer, 190799/185112 OvenPlayer) | all.jsonl |
+| MEM-csp-inline-style | fixed-verified: CSP style-src 'self' 'unsafe-inline' https://fonts.googleapis.com | curl -I / |
+| DATA-DUP-TITLE (new) | open, OWNER DECISION: which copy of each of 44 same-tool clusters to keep (deleting real content needs owner OK). approve-all dedup is URL-only (researchService.ts:1915-1930), so a tool's homepage and repo both pass | all.jsonl |
+| DATA-TAXO-LABEL (new) | open, OWNER DECISION: pre-existing subcategory names lost their punctuation at import, e.g. "RTMPRTSPHTTP Protocol Servers" (slug rtmprtsphttp-protocol-servers, 19 of today's approvals landed there) and "Next-Generation Codecs AV1 VVC". Not created by approve-all (subcategory count stayed 99). Renaming live taxonomy is a content write the run rules reserve for the owner | /api/awesome-list/nav, before-pending.json |
