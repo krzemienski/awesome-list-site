@@ -1908,7 +1908,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const scopeIntro = taxonomyScopeIntro({
         name: match.name,
         level,
-        totalResources: allResources.length,
+        totalResources: unfilteredCount,
         parentNames:
           level === "category"
             ? []

@@ -47,6 +47,10 @@ interface TagListingResponse {
   };
 }
 
+function tileLabel(name: string, count: number) {
+  return `${name}, ${count} ${count === 1 ? "resource" : "resources"}`;
+}
+
 function listingTag(queryKeyUrl: unknown): string | null {
   if (typeof queryKeyUrl !== "string") return null;
   return new URLSearchParams(queryKeyUrl.split("?")[1] ?? "").get("tags");
@@ -284,12 +288,12 @@ export default function TagLanding() {
           <h2 id="related-topics-heading">Explore related topics</h2>
           <div className="taxonomy-child-grid">
             {categories.map((category) => (
-              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="taxonomy-child card hoverable">
+              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="taxonomy-child card hoverable" aria-label={tileLabel(category.value, category.count)}>
                 <span>{category.value}</span><span className="chip mono">{category.count}</span>
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable">
+              <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable" aria-label={tileLabel(`#${tagDisplayName(related)}`, count)}>
                 <span>#{tagDisplayName(related)}</span><span className="chip mono">{count}</span>
               </Link>
             ))}

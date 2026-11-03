@@ -109,9 +109,14 @@ export default function Advanced() {
   if (isLoading && tab !== "recommendations") {
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
-        <div className="discovery-tools-state discovery-tools-state--loading" aria-busy="true">
-          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--title" />
-          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--lede" />
+        <div className="discovery-tools-masthead" aria-busy="true">
+          <div className="discovery-tools-title-row">
+            <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
+            <h1 className="page-title discovery-tools-page-title">{advancedHeading}</h1>
+          </div>
+          <p className="discovery-tools-page-lede">
+            Discover powerful tools for exploring, analyzing, and sharing awesome list data
+          </p>
         </div>
         <div className="discovery-tools-loading-grid">
           {Array(4).fill(0).map((_, i) => (
