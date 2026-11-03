@@ -303,7 +303,7 @@ function ContributionCard({
               onClick={() => trackContributionExternalLinkOpened(item.submission!.url)}
               target="_blank"
               rel="noopener noreferrer"
-              className="account-accent inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
+              className="account-accent inline-flex min-h-8 max-lg:min-h-11 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
               title={item.submission.url}
             >
               <span className="truncate">{item.submission.url}</span>
