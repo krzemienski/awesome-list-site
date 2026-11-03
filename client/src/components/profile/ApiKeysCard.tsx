@@ -16,6 +16,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { Check, Copy, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { focusElement } from "@/hooks/focus-handoff";
 import { trackApiKeyCopied, trackApiKeyCreated, trackApiKeyRevoked } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +107,7 @@ export default function ApiKeysCard() {
   const [revokeError, setRevokeError] = useState<string | null>(null);
   const secretInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const revokedKeyIdRef = useRef<string | null>(null);
 
   const keysQuery = useQuery<{ apiKeys: ApiKeySummary[] }>({
     queryKey: API_KEYS_QUERY_KEY,
@@ -142,8 +144,9 @@ export default function ApiKeysCard() {
   const revokeMutation = useMutation({
     mutationFn: async (id: string) =>
       apiRequest(`/api/user/api-keys/${encodeURIComponent(id)}`, { method: "DELETE" }),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       trackApiKeyRevoked();
+      revokedKeyIdRef.current = id;
       setKeyToRevoke(null);
       setRevokeError(null);
       void queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY });
@@ -388,7 +391,18 @@ export default function ApiKeysCard() {
           }
         }}
       >
-        <AlertDialogContent data-testid="dialog-revoke-api-key">
+        <AlertDialogContent
+          data-testid="dialog-revoke-api-key"
+          onCloseAutoFocus={(event) => {
+            // The row's Revoke button unmounts once the key is revoked, so
+            // Radix's return target is gone; focus the revoked key's row.
+            const id = revokedKeyIdRef.current;
+            if (!id) return;
+            revokedKeyIdRef.current = null;
+            event.preventDefault();
+            focusElement(document.querySelector<HTMLElement>(`[data-testid="row-api-key-${CSS.escape(id)}"]`));
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke “{keyToRevoke?.name}”?</AlertDialogTitle>
             <AlertDialogDescription>

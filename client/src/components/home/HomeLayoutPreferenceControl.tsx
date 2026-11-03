@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from "react";
 import type { HomeLayout } from "@shared/onboarding-values";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { humanizeApiError } from "@/lib/apiError";
 import { useHomeLayout } from "./use-home-layout";
 
 export interface HomeLayoutPreferenceControlProps extends HTMLAttributes<HTMLFieldSetElement> {
@@ -88,9 +89,7 @@ function HomeLayoutPreferenceControl({
         </p>
       ) : isError ? (
         <p className="mt-3 text-sm text-destructive" role="alert">
-          {error instanceof Error
-            ? error.message
-            : "We couldn’t save your home layout. Please try again."}
+          {humanizeApiError(error, "We couldn’t save your home layout. Please try again.")}
         </p>
       ) : null}
     </fieldset>
