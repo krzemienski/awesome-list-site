@@ -35,6 +35,9 @@
 .app-shell-main {
   flex: 1;
   min-width: 0;
+  /* Reserve the first viewport so the footer stays below the fold while a
+     route swaps its skeleton for content; otherwise it jumps into view. */
+  min-height: calc(100svh - var(--shell-header-h));
 }
 
 .app-shell-main > .page-content-wrap {
