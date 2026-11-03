@@ -266,7 +266,7 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
           </CommandItem>
         );
       })}
-      {ContactPaletteItem ? (
+      {ContactPaletteItem && !catalogPending ? (
         <Suspense fallback={null}><ContactPaletteItem closePalette={() => setIsOpen(false)} /></Suspense>
       ) : null}
     </CommandGroup>
@@ -307,7 +307,12 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
           <CommandItem
             key={`recent-${recent}`}
             value={`recent-${recent}`}
-            onSelect={() => setQuery(recent)}
+            onSelect={() =>
+              // A recent entry identical to what is already typed would be a
+              // no-op; treat it as submitting that search instead.
+              recent.toLocaleLowerCase() === queryTrimmed.toLocaleLowerCase()
+                ? commitToSearchPage(recent)
+                : setQuery(recent)}
             disabled={catalogPending}
             className="search-palette-row"
             data-testid={`recent-search-${index}`}
