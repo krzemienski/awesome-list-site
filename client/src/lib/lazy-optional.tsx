@@ -18,6 +18,7 @@ export function retryOptionalChunks() {
   window.dispatchEvent(new Event(RETRY_EVENT));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- props are contravariant; any accepts every component's own props
 export function lazyOptional<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   let failed = false;
   const create = () =>
