@@ -76,6 +76,7 @@ Catalog data edits (reversible, before/after logged in `e2e-evidence/c18-f/appli
 
 P0 journey smoke: 18/18 PASS at 1440 and 375 (`e2e-evidence/c18-final/SM/`).
 
-Owner decisions:
-1. BUG-003. Mixpanel now sends after an explicit "Allow analytics" even when the browser sets Do Not Track (`ignore_dnt`), the same as PostHog and Amplitude. The Privacy Policy does not mention DNT.
-2. Follow-up (not one of the 47). On a throttled first load, text typed into the hero search box before hydration is cleared by hydration.
+Owner decision:
+- BUG-003. Mixpanel now sends after an explicit "Allow analytics" even when the browser sets Do Not Track (`ignore_dnt`), the same as PostHog and Amplitude. The Privacy Policy does not mention DNT.
+
+Follow-up bug (not one of the 47): On a throttled first load, text typed into the hero search box before hydration is cleared by hydration.

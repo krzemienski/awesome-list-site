@@ -1,6 +1,6 @@
 # C18 completion table: 47 findings, production proof
 
-Proof revision for each row is noted. Final revision target: 7c6b1b93 (origin/main, holds #209–#219). Rows marked † are re-checked on the final revision.
+Proof revision for each row is noted. Final revision target: 7c6b1b93 (origin/main, holds #209–#219).
 
 | # | Finding | Fix | Result | Revision | Evidence |
 |---|---|---|---|---|---|
@@ -50,8 +50,8 @@ Proof revision for each row is noted. Final revision target: 7c6b1b93 (origin/ma
 | 44 | BUG-044 compact banner copy | #213 | PASS | 291c8d0d | e2e-evidence/c18-final/FB/bug044-1440x450.png |
 | 45 | BUG-045 375 paginator wrap | #209 | PASS | 291c8d0d | e2e-evidence/c18-final/FB/bug045-375.png |
 | 46 | BUG-046 Uncategorized button | #209 | PASS | 291c8d0d | e2e-evidence/c18-final/FB/bug046-1440.png |
-| 47 | BUG-047 badge vs tiles | #209 | PASS | 291c8d0d | e2e-evidence/c18-final/FB/bug046-1440.png |
+| 47 | BUG-047 badge vs tiles | #209 | PASS (11 SUBCATEGORIES = 11 tiles; 405 = tile sum) | 291c8d0d | e2e-evidence/c18-final/FB/notes.md (BUG-047 row), FB/bug046-1440.png |
 
-P0 smoke (final gate 2): 9 journeys × 1440/375 = 18/18 PASS on 291c8d0d, local state restored — e2e-evidence/c18-final/SM/notes.md. † rows and the palette journey are re-driven on 7c6b1b93.
+P0 smoke (final gate 2): 9 journeys × 1440/375 = 18/18 PASS on 291c8d0d, local state restored — e2e-evidence/c18-final/SM/notes.md. BUG-022 and BUG-043 and the palette journey were re-driven on 7c6b1b93.
 
 Follow-up found during C43 field-safety cell (not one of the 47): on a throttled cold load, text typed into the SSR hero search input before hydration is cleared when React hydrates (e2e-evidence/c18-final/C43/F1-1440-after-hydration.png). The palette correctly does not hijack it.
