@@ -1,6 +1,6 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -79,6 +79,12 @@ export default function PendingEdits() {
   const [editToApprove, setEditToApprove] = useState<ResourceEditWithResource | null>(null);
   const [editToReject, setEditToReject] = useState<ResourceEditWithResource | null>(null);
   const [approveError, setApproveError] = useState<string | null>(null);
+  const [approveSuperseded, setApproveSuperseded] = useState(false);
+  const approveCancelRef = useRef<HTMLButtonElement>(null);
+  // The focused Approve & Merge button unmounts once the edit is superseded.
+  useEffect(() => {
+    if (approveSuperseded) approveCancelRef.current?.focus();
+  }, [approveSuperseded]);
   const [rejectError, setRejectError] = useState<string | null>(null);
 
   const editsQuery = useQuery<ResourceEditWithResource[]>({
@@ -157,6 +163,13 @@ export default function PendingEdits() {
       });
     },
     onError: (error: Error) => {
+      // 409: the server found the resource changed and marked this edit
+      // superseded, so the queue the admin is looking at is stale.
+      if (error instanceof ApiError && error.status === 409) {
+        setApproveSuperseded(true);
+        void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+        void queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] });
+      }
       setApproveError(describeWriteError(error, { fallback: "Failed to approve edit. Please try again.", outcome: NOTHING_CHANGED_OUTCOME }));
       // The dialog remains open so the inline error can be read and retried.
     }
@@ -575,8 +588,8 @@ export default function PendingEdits() {
                         Conflict Detected
                       </h4>
                       <p className="text-sm text-foreground mt-1">
-                        The resource has been modified since this edit was suggested. 
-                        Review changes carefully before approving.
+                        The resource has been modified since this edit was suggested, so it
+                        can no longer be approved. Reject it, or ask the contributor to resubmit.
                       </p>
                     </div>
                   </div>
@@ -649,23 +662,29 @@ export default function PendingEdits() {
       {/* Approve Confirmation Dialog */}
       <AlertDialog open={approveDialogOpen} onOpenChange={(open) => {
         setApproveDialogOpen(open);
-        if (!open) setApproveError(null);
+        if (!open) {
+          setApproveError(null);
+          setApproveSuperseded(false);
+        }
       }}>
         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve Edit Suggestion?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {editToApprove && hasConflict(editToApprove) ? "Edit Out of Date" : "Approve Edit Suggestion?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {editToApprove && hasConflict(editToApprove) ? (
                 <div className="space-y-2">
                   <div className={"flex items-start gap-2 text-[var(--status-warn)]" /* DS-OK: status warn */}>
                     <AlertTriangle className="h-4 w-4 mt-0.5" />
                     <span>
-                      Warning: The resource has been modified since this edit was created.
-                      Approving will overwrite current changes.
+                      This edit can&apos;t be merged: "{editToApprove?.resource?.title}" was changed after it
+                      was suggested, and merging it could undo those newer changes.
                     </span>
                   </div>
                   <p className="text-foreground">
-                    This will merge the suggested changes into the resource "{editToApprove?.resource?.title}".
+                    Reject it with a reason, or ask the contributor to suggest it again against the
+                    current version.
                   </p>
                 </div>
               ) : (
@@ -681,19 +700,22 @@ export default function PendingEdits() {
           )}
           <AlertDialogFooter>
             <AlertDialogCancel
+              ref={approveCancelRef}
               onClick={() => setApproveError(null)}
               data-testid="button-cancel-approve-edit"
             >
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleApproveConfirm}
-              disabled={approveMutation.isPending}
-              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
-              data-testid="button-confirm-approve-edit"
-            >
-              {approveMutation.isPending ? "Approving..." : "Approve & Merge"}
-            </AlertDialogAction>
+            {editToApprove && !hasConflict(editToApprove) && !approveSuperseded && (
+              <AlertDialogAction
+                onClick={handleApproveConfirm}
+                disabled={approveMutation.isPending}
+                className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
+                data-testid="button-confirm-approve-edit"
+              >
+                {approveMutation.isPending ? "Approving..." : "Approve & Merge"}
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
