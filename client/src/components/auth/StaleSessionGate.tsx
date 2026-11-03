@@ -62,9 +62,18 @@ export default function StaleSessionGate({ children }: { children: ReactNode }) 
   const checkedRef = useRef(false);
 
   const retryCheck = useCallback(() => {
+    // NEW-039: clerk-js is loaded once per page, and a script that failed
+    // (offline, blocked proxy) stays failed — ClerkProvider never re-requests
+    // it, so re-running the check would wait on isLoaded forever. Only a fresh
+    // page load gets Clerk again. Once Clerk is loaded, the failure was the
+    // session check, which can simply re-run.
+    if (!isLoaded) {
+      window.location.reload();
+      return;
+    }
     setUnreachable(false);
     setAttempt((n) => n + 1);
-  }, []);
+  }, [isLoaded]);
 
   // If the Clerk runtime never loads (blocked proxy, failed script), isLoaded
   // stays false and the check below never runs; surface Retry instead of an
