@@ -37,6 +37,14 @@
   min-width: 0;
 }
 
+/* Browse routes load a skeleton first and a long list later. With the column
+   shorter than the viewport, the footer sat inside the first screen and the
+   list's arrival pushed it off (CLS 0.14). Main fills the first screen, so the
+   footer starts below the fold and later growth moves nothing visible. */
+.app-shell-row[data-browse-sidebar="true"] .app-shell-main {
+  min-height: calc(100svh - var(--header-height, 0px));
+}
+
 .app-shell-main > .page-content-wrap {
   width: 100%;
   --box-max: var(--shell-page-measure, var(--content-max));
