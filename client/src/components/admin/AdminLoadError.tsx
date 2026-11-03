@@ -1,11 +1,45 @@
 import type { MouseEvent, ReactNode } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { describeLoadError } from "@/lib/apiError";
 import { cn } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 const OFFLINE_MESSAGE = "You're offline; this will load when your connection returns.";
+const BUSY_CAP_MS = 10000;
+const POLL_MS = 100;
+
+/**
+ * Some callers unmount the alert while the retry runs, and a failed retry
+ * re-renders it only when the refetch settles. Once the trigger has left the
+ * DOM, mark its slot busy until no query is fetching, so
+ * handoffFocusOnUnmount waits for the outcome. A caller that keeps the alert
+ * mounted never sets the flag.
+ */
+function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetching: () => boolean): void {
+  let poll: number | undefined;
+  let flagged = false;
+  const stop = () => {
+    observer.disconnect();
+    window.clearTimeout(cap);
+    window.clearTimeout(poll);
+    if (flagged) host.removeAttribute("aria-busy");
+  };
+  const waitForSettle = () => {
+    poll = window.setTimeout(() => (isFetching() ? waitForSettle() : stop()), POLL_MS);
+  };
+  const observer = new MutationObserver(() => {
+    if (trigger.isConnected) return;
+    observer.disconnect();
+    flagged = true;
+    host.setAttribute("aria-busy", "true");
+    waitForSettle();
+  });
+  observer.observe(host, { childList: true, subtree: true });
+  const cap = window.setTimeout(stop, BUSY_CAP_MS);
+}
 
 export interface AdminLoadErrorProps {
   /** What failed to load, phrased to follow "Couldn't load" — e.g. "the audit log". */
@@ -45,6 +79,7 @@ export function AdminLoadError({
   retryTestId,
   className,
 }: AdminLoadErrorProps) {
+  const queryClient = useQueryClient();
   return (
     <Alert
       variant="destructive"
@@ -67,7 +102,19 @@ export function AdminLoadError({
             size="sm"
             onClick={(event) => {
               if (retrying) return;
+              const trigger = event.currentTarget;
+              const host = trigger.closest(".admin-load-error")?.parentElement ?? null;
+              if (host) holdBusyWhileRefetching(host, trigger, () => queryClient.isFetching() > 0);
               onRetry(event);
+              // The alert unmounts while the retry runs. If it fails again the
+              // alert re-renders in the same place: refocus its new Retry,
+              // otherwise the page heading. Registered after onRetry so a
+              // caller's own handoff target fires first and wins.
+              handoffFocusOnUnmount(trigger, () =>
+                host?.isConnected
+                  ? host.querySelector<HTMLElement>(":scope > .admin-load-error button")
+                  : null,
+              );
             }}
             aria-disabled={retrying || undefined}
             aria-busy={retrying || undefined}
