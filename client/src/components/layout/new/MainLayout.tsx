@@ -26,7 +26,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 // Guard the import itself so disabled builds do not emit the contact chunk.
 const ContactDialogHost =
   import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
-    ? lazyOptional(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
+    ? lazyOptional(() => import("@/components/contact/contact-dialog"), (module) => module.ContactDialogHost)
     : null;
 
 /** Mounts the lazy contact host only after hydration. Server-rendered, its
