@@ -805,7 +805,7 @@ export default function Contributions() {
               <button
                 type="button"
                 onClick={() => setPageNotice(null)}
-                className="min-h-8 underline underline-offset-4"
+                className="min-h-8 max-lg:min-h-11 underline underline-offset-4"
               >
                 Dismiss
               </button>
