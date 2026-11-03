@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { cn } from "@/lib/utils";
+import { bookmarkAriaLabel } from "@/lib/a11y-labels";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import type { BookmarkQueueStatus } from "@shared/bookmarkCollections";
@@ -224,11 +225,7 @@ function BookmarkButton({
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
 
-  // Bookmarks work without an account while favorites do not, so the label
-  // says where the bookmark lives. Owned here so it follows auth state.
-  const bookmarkLabel = isBookmarked
-    ? (isAuthenticated ? "Remove bookmark" : "Remove bookmark saved on this device")
-    : (isAuthenticated ? "Add bookmark" : "Bookmark on this device — no sign-in required");
+  const bookmarkLabel = bookmarkAriaLabel(isBookmarked, isAuthenticated);
 
   return (
     <>
@@ -243,7 +240,7 @@ function BookmarkButton({
         onClick={handleClick}
         aria-disabled={bookmark.isPending}
         aria-busy={bookmark.isPending}
-        aria-label={resourceTitle ? `${bookmarkLabel}: ${resourceTitle}` : bookmarkLabel}
+        aria-label={bookmarkAriaLabel(isBookmarked, isAuthenticated, resourceTitle)}
         title={bookmarkLabel}
         aria-pressed={isBookmarked}
         data-testid="button-bookmark"
