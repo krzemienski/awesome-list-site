@@ -32,6 +32,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Static, not lazy: a corpus failure while offline must render this page
 // without fetching another chunk.
@@ -140,11 +141,11 @@ function RouteFallback() {
           replaces this with its real head in the same render that swaps the
           skeleton out. */}
       {pendingTitle ? <SEOHead title={pendingTitle} loading /> : <SEOHead />}
-      <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
-      <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
+      <Skeleton className="h-8 w-2/3 max-w-md" />
+      <Skeleton className="h-4 w-1/2 max-w-sm" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
+          <Skeleton key={i} className="h-36" />
         ))}
       </div>
     </div>
