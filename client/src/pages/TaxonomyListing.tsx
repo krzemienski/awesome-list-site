@@ -165,8 +165,6 @@ export default function TaxonomyListing({ level }: Props) {
   const siteName = publicConfig ? resolveSiteIdentity({ name: publicConfig.site.title }).name : "the catalog";
   const params = new URLSearchParams(search);
   const [page, setPage] = useState(() => strictUrlPage(params.get("page")) ?? 1);
-  // The URL's ?page= is a spelling og-middleware 404s ("abc", "0", "1e3").
-  const pageRejected = strictUrlPage(params.get("page")) === null;
   const [searchTerm, setSearchTerm] = useState(params.get("search") ?? "");
   const [tags, setTags] = useState(() => parseTagsParam(params));
   const [provider, setProvider] = useState(params.get("provider") ?? "");
@@ -255,7 +253,6 @@ export default function TaxonomyListing({ level }: Props) {
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
-    enabled: !pageRejected,
     staleTime: 60_000,
     placeholderData: holdWithinNode(level, slug),
   });
@@ -316,6 +313,15 @@ export default function TaxonomyListing({ level }: Props) {
     staleTime: 60_000,
     placeholderData: holdWithinNode(level, slug),
   });
+  // The faceted result set is keyed by everything but the page. While its
+  // held placeholder belongs to another scope (a search just typed over the
+  // unfiltered facets), its total and page count describe the wrong set.
+  const searchScope = taxonomySearchUrl.replace(/page=\d+&/, "");
+  const settledSearchScope = useRef("");
+  useEffect(() => {
+    if (taxonomySearch.data && !taxonomySearch.isPlaceholderData) settledSearchScope.current = searchScope;
+  }, [searchScope, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
+  const countsPending = serverFilterActive && taxonomySearch.isPlaceholderData && settledSearchScope.current !== searchScope;
   const total = serverFilterActive ? taxonomySearch.data?.total ?? 0 : listingData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -353,7 +359,6 @@ export default function TaxonomyListing({ level }: Props) {
   const paginationReady = searchSettled && (serverFilterActive
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
     : Boolean(listingData && !listing.isPlaceholderData));
-  const pageNotFound = pageRejected;
   const resultsQuery = serverFilterActive ? taxonomySearch : listing;
   const offline = queryUnavailableReason(listing) === "offline" ||
     queryUnavailableReason(resultsQuery) === "offline" ||
@@ -389,12 +394,12 @@ export default function TaxonomyListing({ level }: Props) {
   // and a sibling navigation (same component, new slug) does. Only the real
   // (non-placeholder) listing names the node.
   useEffect(() => {
-    if (!name || listing.isPlaceholderData || pageNotFound) return;
+    if (!name || listing.isPlaceholderData) return;
     const key = `${level}:${slug}`;
     if (trackedCategoryViewRef.current === key) return;
     trackedCategoryViewRef.current = key;
     trackCategoryView(name);
-  }, [level, listing.isPlaceholderData, name, pageNotFound, slug]);
+  }, [level, listing.isPlaceholderData, name, slug]);
 
   useEffect(() => {
     if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {
@@ -439,18 +444,28 @@ export default function TaxonomyListing({ level }: Props) {
     pendingAnalyticsRef.current = null;
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
+  // A ?page= spelling the server also rejects (0, -5, abc, 1e3, 007) shows
+  // page 1; say so rather than rewriting the URL silently.
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("page");
+    if (raw !== null && strictUrlPage(raw) === null) {
+      setPageNotice({ message: `Page “${raw}” doesn't exist, so page 1 is shown.`, resultSet: resultSetKey(1) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydratedRoute]);
+
   const urlSyncInitialized = useRef(false);
   const syncedRoute = useRef(hydratedRoute);
   const replaceNextUrlSync = useRef(false);
   const pushSnapshot = useRef("");
   useEffect(() => {
-    if (!pageRejected && page > totalPages && paginationReady) {
+    if (page > totalPages && paginationReady) {
       // Correct the URL in place: Back to it would only clamp again.
       replaceNextUrlSync.current = true;
       setPageNotice({ message: `Page ${page} is not available; showing page ${totalPages} instead.`, resultSet: resultSetKey(totalPages) });
       setPage(totalPages);
     }
-  }, [page, pageRejected, paginationReady, totalPages]);
+  }, [page, paginationReady, totalPages]);
   const stateHref = `${routeFor(level, slug)}${stateQuery.size ? `?${stateQuery}` : ""}`;
   // Search text is left out so typing replaces the entry instead of pushing.
   const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
@@ -465,9 +480,6 @@ export default function TaxonomyListing({ level }: Props) {
     // (Back from a category never reached Home). Only sync while the
     // document is still on this listing's own path.
     if (!samePath(window.location.pathname, routeFor(level, slug))) return;
-    // Malformed page input retains its rejected URL; numeric pages wait for
-    // their authoritative total before canonical recovery.
-    if (pageNotFound) return;
     // Let the clamp commit first: normalizing view/sort here would consume
     // its replacement flag while the URL still names the unavailable page.
     if (paginationReady && page > totalPages) return;
@@ -482,11 +494,13 @@ export default function TaxonomyListing({ level }: Props) {
     urlSyncInitialized.current = true;
     syncedRoute.current = hydratedRoute;
     pushSnapshot.current = snapshot;
-  }, [hydratedRoute, level, location, page, pageNotFound, paginationReady, slug, snapshot, stateHref, totalPages]);
+  }, [hydratedRoute, level, location, page, paginationReady, slug, snapshot, stateHref, totalPages]);
 
   // An empty tile is a dead end: a subcategory with no approved resources, or
   // one the kind filter has ruled out. The crawler HTML hides them too.
   const childTiles = listingData?.children.filter((child) => child.count > 0) ?? [];
+  // The Uncategorized tile sits in the same grid, so the badge counts it.
+  const tileCount = childTiles.length + ((listingData?.generalCount ?? 0) > 0 ? 1 : 0);
 
   const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);
   const siblingParent = navPlacement?.parent?.slug ? navPlacement.parent : undefined;
@@ -495,7 +509,6 @@ export default function TaxonomyListing({ level }: Props) {
     .sort((a, b) => navTotalCount(b) - navTotalCount(a))
     .slice(0, 8);
 
-  if (pageNotFound) return <NotFound />;
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
@@ -709,7 +722,7 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
-     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{childTiles.length} {childTiles.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
+     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}{tags.length > 0 ? " in total" : ""}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{tileCount} {tileCount === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
     </header>
     {/* Directly under the header's toggle: after the subcategory tiles the
         opened panel landed below the fold at 1440x900 and the click looked inert. */}
@@ -729,7 +742,7 @@ export default function TaxonomyListing({ level }: Props) {
        </div>
     </div>
     {level !== "sub-subcategory" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">{level === "category" ? "Subcategories" : "Topics"}</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor(level === "category" ? "subcategory" : "sub-subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}{/* Resources filed directly under this collection have no child page;
-        without this tile the grid summed short of the category total. */}{listingData.generalCount > 0 && <button type="button" className="taxonomy-child card hoverable" style={{ animationDelay: `${childTiles.length * 30}ms` }} aria-pressed={general} onClick={() => applySelection(general ? "all" : "__general__")} data-testid="taxonomy-child-uncategorized"><span>Uncategorized</span><span className={`chip mono${general ? " accent" : ""}`}>{listingData.generalCount}</span></button>}</div></section>}
+        without this tile the grid summed short of the category total. */}{listingData.generalCount > 0 && <a className="taxonomy-child card hoverable" style={{ animationDelay: `${childTiles.length * 30}ms` }} href={`${routeFor(level, slug)}?${general ? "" : "filter=general"}${kind ? `${general ? "" : "&"}kind=${kind}` : ""}`.replace(/\?$/, "")} aria-current={general ? "true" : undefined} onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return; event.preventDefault(); applySelection(general ? "all" : "__general__"); }} data-testid="taxonomy-child-uncategorized"><span>Uncategorized</span><span className={`chip mono${general ? " accent" : ""}`}>{listingData.generalCount}</span></a>}</div></section>}
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
     <div className="taxonomy-active-filters">{!toolsOpen && scopeNarrowed && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove filter “${scopeLabel}”`} onClick={broadenScope} data-testid="chip-taxonomy-scope">{scopeLabel}<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
@@ -741,7 +754,7 @@ export default function TaxonomyListing({ level }: Props) {
               narrowed from. */}
            {/* Below the category level the count stays screen-reader-only until
                something narrows the list; a scope selection narrows it too. */}
-           <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 ref={resultsHeadingRef} tabIndex={-1} id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
+           <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 ref={resultsHeadingRef} tabIndex={-1} id="taxonomy-results-heading" data-testid="text-results-count" data-total={countsPending ? undefined : total}>{countsPending ? "Updating results…" : level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} ${total === 1 ? "matches" : "match"}` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8 max-lg:min-h-11" onClick={() => { setPageNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8 max-lg:min-h-11" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
@@ -765,7 +778,7 @@ export default function TaxonomyListing({ level }: Props) {
             })}</div>}
           {/* Page navigation stays visible whenever the collection spans more
               than one page: it is primary navigation, not a filter tool. */}
-          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setPageNotice({ message: `Page ${requested} is not available; showing page ${adjusted} instead.`, resultSet: resultSetKey(adjusted) })} /></div>}
+          {totalPages > 1 && !countsPending && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setPageNotice({ message: `Page ${requested} is not available; showing page ${adjusted} instead.`, resultSet: resultSetKey(adjusted) })} /></div>}
         </div>
       </div>
     </div>
