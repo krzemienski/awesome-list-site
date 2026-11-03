@@ -11,3 +11,20 @@ export const loadSearchDialog = () => import("@/components/ui/search-dialog");
 export function preloadSearchDialog(): void {
   loadSearchDialog().catch(() => undefined);
 }
+
+/** Focus the element that opened the palette. A disconnected or body opener
+ * (the palette was opened from an element that has since unmounted) falls
+ * through to the visible header search trigger. Returns whether focus moved. */
+export function focusPaletteOpener(opener: HTMLElement | null): boolean {
+  const target =
+    opener?.isConnected && opener !== document.body
+      ? opener
+      : Array.from(
+          document.querySelectorAll<HTMLElement>(
+            'button.header-search-trigger, button[aria-label="Search resources"], button[aria-label="Search"]',
+          ),
+        ).find((element) => element.getClientRects().length > 0);
+  if (!target?.isConnected) return false;
+  target.focus();
+  return true;
+}

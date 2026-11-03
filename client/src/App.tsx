@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useCallback,
   useLayoutEffect,
   useState,
   lazy,
@@ -37,7 +38,7 @@ import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
-import { loadSearchDialog } from "@/lib/search-dialog-loader";
+import { focusPaletteOpener, loadSearchDialog } from "@/lib/search-dialog-loader";
 
 /**
  * React.lazy caches a rejected import for the life of the lazy object, so a
@@ -168,6 +169,17 @@ function SearchDialogFallback({
   onChange: (value: string) => void;
   onClose: () => void;
 }) {
+  useEffect(() => {
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape" || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k")) {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [onClose]);
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-4 pt-[15vh]"
@@ -176,15 +188,8 @@ function SearchDialogFallback({
       aria-busy="true"
       aria-label="Search resources, categories, and pages"
       data-testid="search-dialog-skeleton"
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          onClose();
-        } else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-          event.preventDefault();
-          event.stopPropagation();
-          onClose();
-        }
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
       }}
     >
       <div className="w-full max-w-lg border border-border bg-background p-5 shadow-2xl">
@@ -212,11 +217,18 @@ function SearchDialogFallback({
  * palette; unmounting on close resets it. */
 function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
   const [draft, setDraft] = useState("");
+  // Captured during this render, before the fallback's autofocused input exists.
+  const [opener] = useState<HTMLElement | null>(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
+  const closeFallback = useCallback(() => {
+    setIsOpen(false);
+    // The fallback unmounts with the palette; restore after that commit.
+    queueMicrotask(() => focusPaletteOpener(opener));
+  }, [setIsOpen, opener]);
   return (
-    <Suspense
-      fallback={<SearchDialogFallback value={draft} onChange={setDraft} onClose={() => setIsOpen(false)} />}
-    >
-      <SearchDialog isOpen setIsOpen={setIsOpen} initialQuery={draft} />
+    <Suspense fallback={<SearchDialogFallback value={draft} onChange={setDraft} onClose={closeFallback} />}>
+      <SearchDialog isOpen setIsOpen={setIsOpen} initialQuery={draft} opener={opener} />
     </Suspense>
   );
 }
