@@ -262,7 +262,9 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   }
 
   componentDidCatch(error: Error) {
-    trackSiteError(isChunkLoadError(error) ? "chunk_load_failed" : "route_crash");
+    if (navigator.onLine !== false) {
+      trackSiteError(isChunkLoadError(error) ? "chunk_load_failed" : "route_crash");
+    }
     if (isChunkLoadError(error)) {
       if (navigator.onLine === false) this.setState({ failedOffline: true });
       // One-shot auto-reload guarded by a TIMESTAMP, not a boolean flag.

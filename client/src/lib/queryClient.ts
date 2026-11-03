@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
 import { humanizeStatusBody } from "./apiError";
+import { isCancelledRequestError } from "./analytics-suppression";
 import { isClerkRequested, whenClerkLoaded } from "./clerk-bridge";
 import { apiFetch } from "./api-fetch";
 
@@ -127,7 +128,7 @@ const getQueryFn: <T>(options: {
       // BUG-038 (run24): a 401 is an expected signed-out/expired-session
       // outcome, not an application error — don't report it to analytics.
       const is401 = error instanceof ApiError && error.status === 401;
-      if (!is401) {
+      if (!is401 && !isCancelledRequestError(error)) {
         trackError('api_error', `${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
 

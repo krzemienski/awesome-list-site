@@ -6,6 +6,9 @@
 //   and cleared on every sign-out path and when a non-admin account signs in
 //   on the device. It is read synchronously, so a signed-in admin's next load
 //   is suppressed before Clerk or the auth check has answered.
+// - Automated browsers. `navigator.webdriver === true` (WebDriver, CDP-driven
+//   Chrome, agent-browser, chrome-devtools MCP, Playwright) is a synchronous
+//   property, so the very first page view is already covered.
 // - QA paths: `/qa-*`, the all-nines sentinel resource ids test runs use, and
 //   the owner sign-in page `/sign-in?admin`.
 //
@@ -45,9 +48,13 @@ export const isSuppressedAnalyticsPath = (pathname: string, search = ''): boolea
   SENTINEL_RESOURCE_PATH.test(pathname) ||
   (/^\/sign-in(\/|$)/.test(pathname) && new URLSearchParams(search).has('admin'));
 
+export const isAutomatedBrowser = (): boolean =>
+  typeof navigator !== 'undefined' && navigator.webdriver === true;
+
 export const isAnalyticsSuppressed = (): boolean => {
   if (typeof window === 'undefined') return false;
   return (
+    isAutomatedBrowser() ||
     isAdminAnalyticsSession() ||
     isSuppressedAnalyticsPath(window.location.pathname, window.location.search)
   );
@@ -81,3 +88,26 @@ export const setAdminAnalyticsSession = (isAdmin: boolean): boolean => {
   syncReplitPageviewOptOut();
   return changed;
 };
+
+const BENIGN_BROWSER_MESSAGE = /^ResizeObserver loop (completed with undelivered notifications|limit exceeded)/;
+
+/**
+ * Window `error` events that are not a fault in this site: browser-internal
+ * ResizeObserver notices, errors from scripts served by another origin
+ * (browser extensions, injected translate/ad tools, third-party tags) and the
+ * opaque "Script error." the browser substitutes for those. Counting them made
+ * the site-error series report visitors' extensions as site bugs.
+ */
+export const isForeignScriptError = (event: { message?: string; filename?: string }): boolean => {
+  if (BENIGN_BROWSER_MESSAGE.test(event.message ?? '')) return true;
+  if (!event.filename) return event.message === 'Script error.';
+  try {
+    return new URL(event.filename, window.location.href).origin !== window.location.origin;
+  } catch {
+    return true;
+  }
+};
+
+/** A request the page itself cancelled (navigation, unmount) is not an API failure. */
+export const isCancelledRequestError = (error: unknown): boolean =>
+  typeof error === 'object' && error !== null && (error as { name?: unknown }).name === 'AbortError';
