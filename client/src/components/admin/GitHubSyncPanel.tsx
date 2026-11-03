@@ -287,7 +287,7 @@ export default function GitHubSyncPanel() {
                 {configuredRepo || (configIsLoading ? "Loading repository…" : "Repository not configured")}
               </CardTitle>
               <p className="ops-github-panel__repository-meta">
-                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueUnavailable ? "sync jobs unavailable" : syncQueueIsLoading ? "loading sync jobs…" : `${syncQueueData?.total ?? 0} sync jobs`}
+                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : syncHistoryUnavailable ? "last sync unavailable" : syncHistoryIsLoading ? "checking last sync…" : "not synced yet"} · {syncQueueUnavailable ? "sync jobs unavailable" : syncQueueIsLoading ? "loading sync jobs…" : `${syncQueueData?.total ?? 0} sync jobs`}
               </p>
               {targetNote && (
                 <p
