@@ -39,7 +39,70 @@ const TAG_DISPLAY_ACRONYMS = new Set([
   "avc", "aws", "cli", "evc", "fpga", "gpu", "gui", "http", "https", "iso", "itu",
   "mkv", "mp4", "p2p", "psnr", "qoe", "rist", "rtp", "rtsp", "smpte", "svta", "tcp",
   "udp", "uhd", "vast", "vfx", "vod", "vp8", "vpaid", "vvc", "w3c", "wcg",
+  "3d", "4k", "5g", "8k", "aac", "acm", "aosp", "asc", "ass", "atsc", "av", "avi",
+  "avif", "avs", "avs2", "avs3", "bbc", "bif", "cabr", "cd", "cdl", "cdm", "cea",
+  "ci", "cmaf", "cms", "cncf", "cpix", "crf", "css", "cta", "ctv", "cuda", "dct",
+  "dmx512", "dns", "dvb", "dvd", "dvr", "ebu", "eia", "eotf", "esp32", "flv", "ftl",
+  "gan", "gav1", "gfvc", "gif", "glsl", "gtk4", "hd", "hdmi", "hdr10", "hlg",
+  "iab", "iec", "ietf", "ima", "ima3", "imsc", "ip", "ipmx", "iptv", "isdb",
+  "jpeg", "json", "jw", "kde", "kvm", "lcevc", "llm", "lut", "m3u8", "midi", "mjpeg",
+  "ml", "mp3", "mpai", "mpd", "mpegif", "mpquic", "ms", "nab", "nasa", "natpe", "nle",
+  "npu", "pcc", "pcm", "pku", "pq", "pq10", "quic", "rfc", "scte", "sd", "sdr", "sfn",
+  "sfu", "speke", "srtp", "ssa", "ssh", "ssim", "tt", "ttml", "ugc", "uhdtv", "ui",
+  "url", "vceg", "vcl", "vesa", "vlc", "vmap", "vr", "wasm", "wav", "wpf",
+  "xl", "xml", "hdr10+", "eev", "vm",
 ]);
+
+/**
+ * Casing for names that are neither plain Title Case nor an all-caps acronym
+ * (ffmpeg -> "FFmpeg", webassembly -> "WebAssembly"). Keyed by the normalized
+ * tag slug. Lives here, beside tagDisplayName(), so the client h1/title, the
+ * server og:title and the related-tag chips all read one display source.
+ */
+const TAG_BRAND_CASING: Record<string, string> = {
+  ffmpeg: "FFmpeg",
+  webassembly: "WebAssembly",
+  webgl: "WebGL",
+  webgpu: "WebGPU",
+  webrtc: "WebRTC",
+  webvtt: "WebVTT",
+  javascript: "JavaScript",
+  typescript: "TypeScript",
+  nodejs: "Node.js",
+  "node-js": "Node.js",
+  graphql: "GraphQL",
+  postgresql: "PostgreSQL",
+  mysql: "MySQL",
+  openai: "OpenAI",
+  youtube: "YouTube",
+  gstreamer: "GStreamer",
+  libvpx: "libvpx",
+  libav: "libav",
+  macos: "macOS",
+  ios: "iOS",
+  tvos: "tvOS",
+  ipados: "iPadOS",
+  dashjs: "dash.js",
+  "dash-js": "dash.js",
+  hlsjs: "hls.js",
+  "hls-js": "hls.js",
+  videojs: "Video.js",
+  "video-js": "Video.js",
+  jquery: "jQuery",
+  opencv: "OpenCV",
+  gocv: "GoCV",
+  buydrm: "BuyDRM",
+  qt: "Qt",
+  webm: "WebM",
+  webp: "WebP",
+  x264: "x264",
+  x265: "x265",
+  "isdb-tb": "ISDB-Tb",
+  iot: "IoT",
+  hbbtv: "HbbTV",
+  voip: "VoIP",
+  "ci-cd": "CI/CD",
+};
 
 export function normalizeTagFilter(tag: string): string {
   const folded = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
@@ -79,7 +142,12 @@ export function tagLandingPath(tag: string): string {
 
 /** Human-readable label for a canonical tag slug. */
 export function tagDisplayName(tag: string): string {
-  return normalizeTagFilter(tag)
+  // The raw key is tried first: some brand keys ("ipados") are not plural-safe.
+  const raw = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  const slug = normalizeTagFilter(tag);
+  const branded = TAG_BRAND_CASING[raw] ?? TAG_BRAND_CASING[slug];
+  if (branded) return branded;
+  return slug
     .split("-")
     .filter(Boolean)
     .map((word) =>
