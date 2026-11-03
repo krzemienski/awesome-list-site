@@ -45,6 +45,7 @@ import { isForeignKeyViolation } from "../../errors/pgErrors";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { buildValidationEnvelope } from "../../contracts/envelope";
 import { createLogger } from "../../lib/logger";
+import { CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
 
 const logger = createLogger("journeys");
 
@@ -709,6 +710,9 @@ export function registerRecommendationRoutes(
         false
       );
 
+      // The anonymous profile above is built from the query string alone (the
+      // session is never read), so the body is identical for every caller.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       // NB-015 (run23): pass embedded resources through the public serializer.
       res.json(stripRecommendationInternals(result.recommendations || []));
     } catch (error) {

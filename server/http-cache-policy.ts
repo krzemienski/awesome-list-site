@@ -14,7 +14,7 @@
  * |   public.ts; not the shared-   |                                          |     |
  * |   collection site read)        |                                          |     |
  * | Developer API with a valid key | private, no-store                        | Key revocation (401) and the per-key standard-tier bucket must apply on every call. |
- * | Non-200 public API results     | no-store                                 | A 404 can flip to 200 the moment a resource is approved — never pin negative results in shared caches. |
+ * | Non-2xx/3xx /api results       | no-store (server/index.ts, one place)    | A 404 can flip to 200 the moment a resource is approved, and a 401/429 is per-caller — never pin negative results in shared caches. Applies to every /api error response, whichever handler produced it. |
  * | Auth/admin/user responses      | private, no-store (default for any /api  | Session-specific. Handlers may set a stricter no-store or, where the |
  * |                                |   request with a session; per-route      |   body is session-independent (/api/home), a public catalog policy.  |
  * |                                |   headers override it)                   |     |
@@ -55,8 +55,11 @@ export const PUBLIC_API_CACHE_CONTROL = "public, max-age=60";
  */
 export const PUBLIC_API_KEYED_CACHE_CONTROL = "private, no-store";
 
-/** Non-200 outcomes on public endpoints (negative results must not stick). */
-export const PUBLIC_API_ERROR_CACHE_CONTROL = "no-store";
+/** Any /api response with status >= 400 (negative results must not stick). */
+export const API_ERROR_CACHE_CONTROL = "no-store";
+
+/** Non-200 outcomes on public endpoints (same policy as every /api error). */
+export const PUBLIC_API_ERROR_CACHE_CONTROL = API_ERROR_CACHE_CONTROL;
 
 /**
  * Default for every /api response to a request that carries a session, so

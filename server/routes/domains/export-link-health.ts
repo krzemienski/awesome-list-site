@@ -1709,7 +1709,10 @@ export function registerAwesomeListDiscoveryRoutes(
       // from the nav tree alone — without downloading the full corpus.
       const payload = await getPublicCacheValue({
         namespace: 'catalog-nav',
-        key: 'complete',
+        // Not 'complete': Home SSR (server/home-ssr-data.ts) fills that key
+        // from HomeNavRepository with a narrower shape, and whichever ran
+        // first would decide whether this response carries totalResourceCount.
+        key: 'api-complete',
         ttlMs: 60_000,
         load: async () => {
           // Keep the source read inside the derived cache loader so generation
@@ -1718,6 +1721,14 @@ export function registerAwesomeListDiscoveryRoutes(
           if (!data?.categories?.length) {
             throw new Error('No awesome list data available');
           }
+          // resourceCount stays the node's DIRECT count: client consumers
+          // (navTotalCount, AppSidebar, AppHeader, og-middleware) sum it
+          // recursively. totalResourceCount is the full descendant count,
+          // matching /api/categories resourceCount semantics.
+          const descendantCount = (node: any): number =>
+            (node.resources || []).length +
+            (node.subcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0) +
+            (node.subSubcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0);
           const nav = {
             title: data.title,
             totalResources: (data.resources || []).length,
@@ -1725,6 +1736,7 @@ export function registerAwesomeListDiscoveryRoutes(
           name: cat.name,
           slug: cat.slug,
           resourceCount: (cat.resources || []).length,
+          totalResourceCount: descendantCount(cat),
           teaser: (() => {
             // Run25 C-03: categories with no DIRECT resources (e.g. Community
             // & Events — everything lives in subcategories) got no teaser, so
@@ -1750,10 +1762,12 @@ export function registerAwesomeListDiscoveryRoutes(
             name: sub.name,
             slug: sub.slug,
             resourceCount: (sub.resources || []).length,
+            totalResourceCount: descendantCount(sub),
             subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
               name: ss.name,
               slug: ss.slug,
               resourceCount: (ss.resources || []).length,
+              totalResourceCount: descendantCount(ss),
             })),
           })),
             })),
@@ -1838,9 +1852,9 @@ export function registerAwesomeListDiscoveryRoutes(
       const kindMatches = (item: any): boolean =>
         requestedKind === undefined ||
         resolveResourceKind(item).kind === requestedKind;
-      const unfilteredCount = flattenListingResources(match.node, level as ListingLevel).length;
-      const allResources = flattenListingResources(match.node, level as ListingLevel)
-        .filter(kindMatches);
+      const unfilteredResources = flattenListingResources(match.node, level as ListingLevel);
+      const unfilteredCount = unfilteredResources.length;
+      const allResources = unfilteredResources.filter(kindMatches);
       const requestedSubcategory =
         typeof req.query.subcategory === "string" ? req.query.subcategory : undefined;
       const requestedSubSubcategory =
@@ -1851,16 +1865,21 @@ export function registerAwesomeListDiscoveryRoutes(
           .filter(kindMatches)
           .map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
       );
-      const countNodeResourcesForKind = (node: any): number => {
-        let total = (node?.resources ?? []).filter(kindMatches).length;
+      const countNodeResources = (
+        node: any,
+        matches: (item: any) => boolean = kindMatches,
+      ): number => {
+        let total = (node?.resources ?? []).filter(matches).length;
         for (const sub of node?.subcategories ?? []) {
-          total += countNodeResourcesForKind(sub);
+          total += countNodeResources(sub, matches);
         }
         for (const subSub of node?.subSubcategories ?? []) {
-          total += countNodeResourcesForKind(subSub);
+          total += countNodeResources(subSub, matches);
         }
         return total;
       };
+      const countNodeResourcesForKind = (node: any): number => countNodeResources(node);
+      const matchesAnyKind = () => true;
 
       const children =
         level === "category"
@@ -1916,10 +1935,18 @@ export function registerAwesomeListDiscoveryRoutes(
                 match.category?.name,
                 level === "sub-subcategory" ? match.subcategory?.name : undefined,
               ].filter((name): name is string => Boolean(name)),
-        childNames: children
-          .filter((child: any) => child.count > 0)
+        // The intro describes the whole scope (like totalResources), not the
+        // kind-filtered view, so ?kind= cannot drop children or formats.
+        childNames: (
+          level === "category"
+            ? match.node.subcategories ?? []
+            : level === "subcategory"
+              ? match.node.subSubcategories ?? []
+              : []
+        )
+          .filter((child: any) => countNodeResources(child, matchesAnyKind) > 0)
           .map((child: any) => child.name),
-        formats: allResources.map((resource: any) => resource.resourceFormat),
+        formats: unfilteredResources.map((resource: any) => resource.resourceFormat),
       };
       const scopeIntro = taxonomyScopeIntro(scopeIntroInput);
       const scopeIntroTagged = taxonomyScopeIntro({ ...scopeIntroInput, tagFiltered: true });
