@@ -7,6 +7,7 @@
 /* The frozen DESCRIPTION label is a block .mono div. Keep the semantic h2
    and its tokenized eyebrow paint, without an inline-flex baseline strut. */
 .resource-detail-description h2,
+.resource-detail-top-next h2,
 .resource-detail-onward h2 { display: block; }
 .resource-detail {
   width: 100%;
@@ -123,6 +124,7 @@
 }
 
 .resource-detail-description h2,
+.resource-detail-top-next h2,
 .resource-detail-onward h2,
 .resource-detail-sections h2 {
   margin-bottom: 10px;
@@ -208,17 +210,18 @@
   font-size: 11px;
   line-height: var(--body-leading);
 }
-/* Under the actions the Related Resources card follows directly, so the short
-   list only shows in the side column. */
-.resource-detail-onward-similar { display: none; }
-.resource-detail-onward-similar-list {
+/* More like this: three short rows under the title, above the fold. */
+.resource-detail-top-next { display: grid; gap: 4px; min-width: 0; margin-bottom: 16px; }
+.resource-detail-top-next h2 { margin-bottom: 0; }
+.resource-detail-top-next ul {
   display: grid;
   align-content: start;
   gap: 4px;
   min-width: 0;
   min-height: calc(3 * 44px + 2 * 4px);
 }
-.resource-detail-onward-similar-item {
+.resource-detail-top-next li { min-width: 0; }
+.resource-detail-top-next-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -230,11 +233,9 @@
   font-size: 13px;
   transition: background var(--motion-fast) var(--motion-ease);
 }
-.resource-detail-onward-similar-list > li,
-.resource-detail-onward-similar-item > span { min-width: 0; }
-a.resource-detail-onward-similar-item:hover { background: var(--surface-2); }
-.resource-detail-onward-similar-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-3); }
-.resource-detail-onward-empty { color: var(--text-2); font-size: 13px; }
+.resource-detail-top-next-item > span { min-width: 0; }
+a.resource-detail-top-next-item:hover { background: var(--surface-2); }
+.resource-detail-top-next-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-3); }
 .resource-detail-onward-tags { display: flex; flex-wrap: wrap; column-gap: 8px; min-width: 0; }
 .resource-detail-onward-tags > li { min-width: 0; max-width: 100%; }
 .resource-detail-onward-tag { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; max-width: 100%; }
@@ -252,5 +253,4 @@ a.resource-detail-onward-similar-item:hover { background: var(--surface-2); }
     width: 300px;
     margin-bottom: 0;
   }
-  .resource-detail-onward-similar { display: grid; }
 }

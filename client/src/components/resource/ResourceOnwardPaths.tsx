@@ -1,22 +1,13 @@
-import type { MouseEvent } from "react";
 import { Link } from "wouter";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SearchEntryButton } from "@/components/search/SearchEntryButton";
 import { trackRelatedCategoryOpened, trackTagInteraction } from "@/lib/analytics";
 import { tagLandingPath } from "@shared/tagNormalize";
 
 /** Analytics `surface` of every link in this panel. */
 export const ONWARD_SURFACE = "resource_onward";
-const SIMILAR_LIMIT = 3;
 const TAG_LIMIT = 6;
-
-export interface OnwardRelated {
-  id: number;
-  title: string;
-  score?: number;
-}
 
 interface CollectionLink {
   name: string;
@@ -25,9 +16,6 @@ interface CollectionLink {
 
 interface ResourceOnwardPathsProps {
   resourceId: number;
-  related: OnwardRelated[];
-  relatedLoading: boolean;
-  onRelatedClick: (event: MouseEvent<HTMLAnchorElement>, related: OnwardRelated, position: number) => void;
   /** Sub-subcategory, or subcategory when there is none. */
   narrowestCollection: CollectionLink | null;
   category: CollectionLink | null;
@@ -44,51 +32,18 @@ interface ResourceOnwardPathsProps {
  */
 export default function ResourceOnwardPaths({
   resourceId,
-  related,
-  relatedLoading,
-  onRelatedClick,
   narrowestCollection,
   category,
   pendingCollectionRows,
   tags,
 }: ResourceOnwardPathsProps) {
   const tagLinks = Array.from(new Map(tags.map((tag) => [tagLandingPath(tag), tag])).entries()).slice(0, TAG_LIMIT);
-  const similar = related.slice(0, SIMILAR_LIMIT);
   const hasCollection = pendingCollectionRows > 0 || narrowestCollection !== null || category !== null;
 
   return (
     <nav className="resource-detail-onward" aria-labelledby="resource-onward-heading" data-testid="resource-onward">
       <h2 id="resource-onward-heading" className="eyebrow">Keep exploring</h2>
       <SearchEntryButton method="resource_page_button" surface={ONWARD_SURFACE} className="w-full" />
-
-      <div className="resource-detail-onward-group resource-detail-onward-similar">
-        <h3 className="resource-detail-onward-label">More like this</h3>
-        <ul className="resource-detail-onward-similar-list">
-          {relatedLoading &&
-            Array.from({ length: SIMILAR_LIMIT }, (_, index) => (
-              <li key={index} aria-hidden="true" className="resource-detail-onward-similar-item">
-                <Skeleton className="inline-block w-3/4">{" "}</Skeleton>
-              </li>
-            ))}
-          {!relatedLoading && similar.length === 0 && (
-            <li className="resource-detail-onward-empty">No close matches yet.</li>
-          )}
-          {!relatedLoading &&
-            similar.map((item, index) => (
-              <li key={item.id}>
-                <a
-                  href={`/resource/${item.id}`}
-                  className="resource-detail-onward-similar-item"
-                  onClick={(event) => onRelatedClick(event, item, index + 1)}
-                  data-testid={`onward-related-${item.id}`}
-                >
-                  <span className="truncate">{item.title}</span>
-                  <ChevronRight aria-hidden="true" />
-                </a>
-              </li>
-            ))}
-        </ul>
-      </div>
 
       {hasCollection && (
         <div className="resource-detail-onward-group">
