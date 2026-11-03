@@ -104,7 +104,7 @@
 
 /* Leaf .sub-item rows keep their 1px transparent hairline in the drawer. */
 .av-sidebar-drawer .av-sidebar-l2-link {
-  padding: 0 0 0 12px;
+  padding: 14px 0 14px 12px;
 }
 
 
