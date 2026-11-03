@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useClerk } from "@clerk/react";
-import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
+import { queryClient, apiRequest, isGoneError } from "@/lib/queryClient";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,13 +74,7 @@ async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOut
     try {
       await apiRequest(`/api/resources/${id}`, { credentials: "include" });
     } catch (error) {
-      if (
-        error instanceof ApiError
-        && (error.status === 404
-          || error.status === 410
-          // Malformed legacy id: /api/resources/:id answers 400 validation_failed.
-          || (error.status === 400 && error.body.includes('"validation_failed"')))
-      ) {
+      if (isGoneError(error)) {
         missing.push(id); // resource no longer exists — drop the save
       } else {
         failed.push(id); // transient trouble — keep the save for a later retry

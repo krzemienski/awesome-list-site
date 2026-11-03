@@ -145,30 +145,32 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 // >= 400 is no-store, whichever handler (route, limiter, 404/405 fallback,
 // error handler) produced it. Patched at writeHead so it overrides a
 // Cache-Control set earlier with setHeader/res.set AND one passed in the
-// writeHead(status, headers) argument (object or raw [name, value, ...]
-// array form). See server/http-cache-policy.ts.
+// writeHead(status, headers) argument (object or flat [name, value, ...]
+// array). The caller's headers are copied, never mutated: a shared constant
+// reused for a 200 and a 404 must stay cacheable for the 200. See
+// server/http-cache-policy.ts.
+function withNoStoreCacheControl(headers: object): object {
+  if (Array.isArray(headers)) {
+    const copy = headers.slice();
+    for (let i = 0; i + 1 < copy.length; i += 2) {
+      if (String(copy[i]).toLowerCase() === "cache-control") copy[i + 1] = API_ERROR_CACHE_CONTROL;
+    }
+    return copy;
+  }
+  const copy: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(headers)) {
+    copy[name] = name.toLowerCase() === "cache-control" ? API_ERROR_CACHE_CONTROL : value;
+  }
+  return copy;
+}
+
 app.use("/api", (_req, res, next) => {
   const writeHead = res.writeHead;
   res.writeHead = function (this: Response, status: number, ...rest: any[]) {
     if (status >= 400) {
       res.setHeader("Cache-Control", API_ERROR_CACHE_CONTROL);
-      const headers = rest.find((arg) => arg !== null && typeof arg === "object");
-      if (Array.isArray(headers)) {
-        // Flat [name, value, ...] or [[name, value], ...] pairs.
-        if (headers.length > 0 && Array.isArray(headers[0])) {
-          for (const pair of headers) {
-            if (String(pair[0]).toLowerCase() === "cache-control") pair[1] = API_ERROR_CACHE_CONTROL;
-          }
-        } else {
-          for (let i = 0; i + 1 < headers.length; i += 2) {
-            if (String(headers[i]).toLowerCase() === "cache-control") headers[i + 1] = API_ERROR_CACHE_CONTROL;
-          }
-        }
-      } else if (headers) {
-        for (const name of Object.keys(headers)) {
-          if (name.toLowerCase() === "cache-control") headers[name] = API_ERROR_CACHE_CONTROL;
-        }
-      }
+      const at = rest.findIndex((arg) => arg !== null && typeof arg === "object");
+      if (at !== -1) rest[at] = withNoStoreCacheControl(rest[at]);
     }
     return (writeHead as any).call(this, status, ...rest);
   } as typeof res.writeHead;

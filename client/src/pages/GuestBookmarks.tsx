@@ -8,7 +8,7 @@ import { bookmarksPageSeo, staticPageHeads } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
-import { queryClient, ApiError } from "@/lib/queryClient";
+import { queryClient, isGoneError } from "@/lib/queryClient";
 import type { Resource } from "@shared/schema";
 import type { ResourceKind } from "@shared/resourceKinds";
 import {
@@ -21,11 +21,6 @@ import { trackAuthPromptShown } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
-
-function isGoneError(error: unknown): boolean {
-  if (!(error instanceof ApiError)) return false;
-  return error.status === 404 || (error.status === 400 && error.body.includes('"validation_failed"'));
-}
 
 // The public resource detail endpoint adds read-time kind resolution to the
 // database row. Keep this response type additive: the server supplies the

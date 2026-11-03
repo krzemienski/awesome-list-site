@@ -27,6 +27,25 @@ export class ApiError extends Error {
   }
 }
 
+function hasValidationFailedBody(body: string): boolean {
+  try {
+    return JSON.parse(body)?.error === "validation_failed";
+  } catch {
+    return false;
+  }
+}
+
+// The resource no longer exists for this caller: 404/410, or a 400
+// validation_failed for a malformed legacy id (/api/resources/:id).
+export function isGoneError(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  return (
+    error.status === 404
+    || error.status === 410
+    || (error.status === 400 && hasValidationFailedBody(error.body))
+  );
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
