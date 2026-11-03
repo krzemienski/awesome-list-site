@@ -32,7 +32,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
-import { focusPageHeading } from "@/hooks/focus-handoff";
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Static, not lazy: a corpus failure while offline must render this page
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
@@ -759,7 +759,12 @@ function Router({
             type="button"
             variant="link"
             className="underline underline-offset-2"
-            onClick={() => void refetchAuth()}
+            onClick={(event) => {
+              // The banner unmounts once the retry succeeds, dropping focus to
+              // <body>; hand it to the recovered page's heading.
+              handoffFocusOnUnmount(event.currentTarget);
+              void refetchAuth();
+            }}
             data-testid="button-auth-retry"
           >
             Retry
