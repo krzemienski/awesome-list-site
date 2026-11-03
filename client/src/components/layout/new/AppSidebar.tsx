@@ -15,6 +15,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { getCategoryGlyph } from "./category-glyphs";
 import {
   Sidebar,
@@ -939,7 +940,10 @@ export default function AppSidebar({
           {onRetryNav && (
             <button
               type="button"
-              onClick={() => onRetryNav()}
+              onClick={(event) => {
+                handoffFocusOnUnmount(event.currentTarget);
+                onRetryNav();
+              }}
               className="btn ghost min-h-[44px]"
               data-testid="sidebar-nav-retry"
             >
