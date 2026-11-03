@@ -17,7 +17,7 @@ import { useMotionTokens } from "./useMotionTokens";
 export function ResearchRunDiscoveries({ discoveries, active }: { discoveries: ResearchDiscovery[]; active: boolean }) {
   const m = useMotionTokens();
   // A reviewed row loses its buttons; keep keyboard focus on that row.
-  const { approve, requestReject, rejectDialog } = useDiscoveryReview((id) => {
+  const { approve, requestApprove, approveDialog, requestReject, rejectDialog } = useDiscoveryReview((id) => {
     requestAnimationFrame(() => focusElement(document.querySelector<HTMLElement>(`[data-testid="run-discovery-${id}"]`)));
   });
 
@@ -68,7 +68,7 @@ export function ResearchRunDiscoveries({ discoveries, active }: { discoveries: R
                 {pending && (
                   <div className="research-run__discovery-actions">
                     <Button size="sm" className={`min-h-11 ${OK_SOLID_BUTTON}`}
-                      onClick={() => approve.mutate(d.id)} disabled={approve.isPending}
+                      onClick={() => requestApprove({ id: d.id, title, url: d.url })} disabled={approve.isPending}
                       aria-label={`Approve discovery: ${title}`} data-testid={`button-run-approve-${d.id}`}>
                       <ThumbsUp className="mr-1 h-3 w-3" />{busy ? "Approving…" : "Approve"}
                     </Button>
@@ -84,6 +84,7 @@ export function ResearchRunDiscoveries({ discoveries, active }: { discoveries: R
           })}
         </AnimatePresence>
       </ul>
+      {approveDialog}
       {rejectDialog}
     </>
   );
