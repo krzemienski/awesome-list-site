@@ -14,6 +14,7 @@ import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
+import { preloadSearchDialog } from "@/lib/search-dialog-loader";
 import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/search-palette";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
@@ -120,12 +121,35 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
     retryOptionalChunks();
   }, [location]);
 
+  // Fetch the palette chunk before anyone asks for it: once the browser is
+  // idle after first paint, and when the pointer or keyboard reaches the
+  // header trigger. The open handlers below call it again, which is a no-op
+  // when the chunk is already loading or loaded.
+  useEffect(() => {
+    const warm = (event: Event) => {
+      if ((event.target as Element | null)?.closest?.(".header-search-trigger")) preloadSearchDialog();
+    };
+    document.addEventListener("pointerover", warm);
+    document.addEventListener("focusin", warm);
+    const hasIdle = "requestIdleCallback" in window;
+    const idle = hasIdle
+      ? window.requestIdleCallback(preloadSearchDialog, { timeout: 3000 })
+      : window.setTimeout(preloadSearchDialog, 1500);
+    return () => {
+      document.removeEventListener("pointerover", warm);
+      document.removeEventListener("focusin", warm);
+      if (hasIdle) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, []);
+
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
   useEffect(() => {
     // One open event per closed → open transition, tagged with its trigger.
     const openPalette = (method: CommandPaletteOpenMethod, surface?: string) => {
       if (!searchOpen) trackCommandPaletteOpened(method, surface);
+      preloadSearchDialog();
       setSearchOpen(true);
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -212,6 +236,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         <AppHeader
           onSearchOpen={() => {
             if (!searchOpen) trackCommandPaletteOpened("header_button");
+            preloadSearchDialog();
             setSearchOpen(true);
           }}
           siteName={publicConfig?.site?.title}

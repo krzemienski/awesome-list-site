@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, type KeyboardEvent } from 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useCommandState } from "cmdk";
+import { focusPaletteOpener } from "@/lib/search-dialog-loader";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, WifiOff, X } from "lucide-react";
 import { useLocation } from "wouter";
@@ -21,6 +22,10 @@ const ContactPaletteItem =
 interface SearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  /** Text typed into the loading fallback before this chunk arrived. */
+  initialQuery?: string;
+  /** Element that opened the palette, captured before any fallback took focus. */
+  opener?: HTMLElement | null;
 }
 
 interface DbSearchResource {
@@ -104,8 +109,8 @@ function PaletteFooter({ showResults, shownResults, totalMatches }: { showResult
   );
 }
 
-export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
-  const [query, setQuery] = useState("");
+export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }: SearchDialogProps) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [recentSearches, setRecentSearches] = useState<string[]>(readRecentSearches);
   const [selectedValue, setSelectedValue] = useState("");
   const selectionInteracted = useRef(false);
@@ -115,7 +120,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   // The palette is mounted by MainLayout only after its trigger opens it, so
   // activeElement here is the real opener (header button or shortcut target).
   const openerRef = useRef<HTMLElement | null>(
-    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+    opener ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null),
   );
 
   // Normalize exactly like the /search page + server matcher so the palette
@@ -243,14 +248,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   };
 
   const restoreOpenerFocus = (event: Event) => {
-    const opener = openerRef.current && openerRef.current !== document.body
-      ? openerRef.current
-      : Array.from(document.querySelectorAll<HTMLElement>('button.header-search-trigger, button[aria-label="Search resources"], button[aria-label="Search"]'))
-          .find((element) => element.getClientRects().length > 0);
-    if (opener?.isConnected) {
-      event.preventDefault();
-      opener.focus();
-    }
+    if (focusPaletteOpener(openerRef.current)) event.preventDefault();
   };
 
   const renderPages = () => (
@@ -382,7 +380,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           }}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            inputRef.current?.focus();
+            const input = inputRef.current;
+            if (!input) return;
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
           }}
           onCloseAutoFocus={restoreOpenerFocus}
         >

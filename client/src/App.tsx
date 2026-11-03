@@ -1,7 +1,7 @@
 import {
   useEffect,
+  useCallback,
   useLayoutEffect,
-  useRef,
   useState,
   lazy,
   Suspense,
@@ -38,6 +38,7 @@ import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
+import { focusPaletteOpener, loadSearchDialog } from "@/lib/search-dialog-loader";
 
 /**
  * React.lazy caches a rejected import for the life of the lazy object, so a
@@ -126,7 +127,7 @@ const Onboarding = lazyRoute(() => import("@/pages/Onboarding"));
 const Terms = lazyRoute(() => import("@/pages/Terms"));
 const Privacy = lazyRoute(() => import("@/pages/Privacy"));
 const CodeOfConduct = lazyRoute(() => import("@/pages/CodeOfConduct"));
-const SearchDialog = lazyRoute(() => import("@/components/ui/search-dialog"));
+const SearchDialog = lazyRoute(loadSearchDialog);
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
@@ -153,22 +154,82 @@ function RouteFallback() {
 }
 
 /** Search-palette Suspense fallback. It occupies the same modal layer as the
- * eventual palette, so opening search on a cold cache has a truthful visible
- * loading state instead of an inert click or a blank page. */
-function SearchDialogFallback() {
+ * eventual palette and owns a real input, so keys typed while the chunk loads
+ * are kept in `value` and handed to SearchDialog as its initial query instead
+ * of landing on the inert page behind. Escape closes it. Enter is ignored
+ * until the palette has loaded: there are no results to open yet, and sending
+ * an unfinished query to /search would navigate away from what the person is
+ * still typing. */
+function SearchDialogFallback({
+  value,
+  onChange,
+  onClose,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape" || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k")) {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [onClose]);
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-4 pt-[15vh]"
-      role="status"
+      role="dialog"
+      aria-modal="true"
       aria-busy="true"
-      aria-label="Loading search"
+      aria-label="Search resources, categories, and pages"
       data-testid="search-dialog-skeleton"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
       <div className="w-full max-w-lg border border-border bg-background p-5 shadow-2xl">
-        <div className="mb-4 h-5 w-32 animate-pulse bg-muted" />
-        <div className="h-11 w-full animate-pulse bg-muted" />
+        <Skeleton className="mb-4 h-5 w-32" />
+        <input
+          type="text"
+          autoFocus
+          aria-label="Search"
+          placeholder="Find resources, categories, or pages…"
+          autoComplete="off"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault();
+          }}
+          className="flex h-11 w-full border border-border bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground"
+        />
       </div>
     </div>
+  );
+}
+
+/** Mounted only while the palette is open. `draft` lives above the Suspense
+ * boundary so what was typed into the fallback survives the swap to the real
+ * palette; unmounting on close resets it. */
+function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
+  const [draft, setDraft] = useState("");
+  // Captured during this render, before the fallback's autofocused input exists.
+  const [opener] = useState<HTMLElement | null>(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
+  const closeFallback = useCallback(() => {
+    setIsOpen(false);
+    // The fallback unmounts with the palette; restore after that commit.
+    queueMicrotask(() => focusPaletteOpener(opener));
+  }, [setIsOpen, opener]);
+  return (
+    <Suspense fallback={<SearchDialogFallback value={draft} onChange={setDraft} onClose={closeFallback} />}>
+      <SearchDialog isOpen setIsOpen={setIsOpen} initialQuery={draft} opener={opener} />
+    </Suspense>
   );
 }
 
@@ -644,11 +705,7 @@ function Router({
     setIsOpen: (open: boolean) => void;
   }) => (
     <RouteErrorBoundary location={location}>
-      {isOpen ? (
-        <Suspense fallback={<SearchDialogFallback />}>
-          <SearchDialog isOpen setIsOpen={setIsOpen} />
-        </Suspense>
-      ) : null}
+      {isOpen ? <SearchPalette setIsOpen={setIsOpen} /> : null}
     </RouteErrorBoundary>
   );
 
