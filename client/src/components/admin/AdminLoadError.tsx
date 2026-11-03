@@ -20,11 +20,12 @@ const POLL_MS = 100;
  */
 function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetching: () => boolean): void {
   let poll: number | undefined;
+  let flagged = false;
   const stop = () => {
     observer.disconnect();
     window.clearTimeout(cap);
     window.clearTimeout(poll);
-    host.removeAttribute("aria-busy");
+    if (flagged) host.removeAttribute("aria-busy");
   };
   const waitForSettle = () => {
     poll = window.setTimeout(() => (isFetching() ? waitForSettle() : stop()), POLL_MS);
@@ -32,6 +33,7 @@ function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetc
   const observer = new MutationObserver(() => {
     if (trigger.isConnected) return;
     observer.disconnect();
+    flagged = true;
     host.setAttribute("aria-busy", "true");
     waitForSettle();
   });
