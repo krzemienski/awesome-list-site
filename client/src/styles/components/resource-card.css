@@ -210,24 +210,6 @@
   object-fit: cover;
 }
 
-.resource-card__scraped-copy {
-  color: var(--text-2);
-  font-size: 0.6875rem;
-  line-height: 1.45;
-}
-
-.resource-card__scraped-copy > span {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.resource-card__scraped-copy--clamp {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
 .resource-card__metadata {
   display: flex;
   flex-wrap: wrap;
