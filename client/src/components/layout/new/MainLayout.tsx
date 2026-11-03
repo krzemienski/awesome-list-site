@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
-import { lazyOptional } from "@/lib/lazy-optional";
+import { lazyOptional, retryOptionalChunks } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
@@ -115,6 +115,10 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   useEffect(() => {
     setSearchOpen(false);
   }, [location, search]);
+
+  useEffect(() => {
+    retryOptionalChunks();
+  }, [location]);
 
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.

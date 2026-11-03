@@ -30,6 +30,7 @@ import {
   type ContactSubmission,
   type ContactSubmissionReceipt,
   useContactConfig,
+  takePendingContactOpen,
 } from "@/lib/contact";
 import "@/styles/pages/contact.css";
 
@@ -84,6 +85,7 @@ export function ContactDialogHost() {
 
   useEffect(() => {
     const onOpen = () => {
+      takePendingContactOpen();
       openerRef.current = document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
@@ -95,6 +97,7 @@ export function ContactDialogHost() {
       setOpen(true);
     };
     window.addEventListener("awesome:open-contact-form", onOpen);
+    if (takePendingContactOpen()) onOpen();
     return () => window.removeEventListener("awesome:open-contact-form", onOpen);
   }, [resetMutation, submissionFailed]);
 
