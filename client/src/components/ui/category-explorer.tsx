@@ -348,7 +348,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
           {/* Active Filters */}
           {(searchTerm || selectedTags.length > 0) && (
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">Active filters:</span>
               {searchTerm && (
                 <Badge variant="secondary" className="text-xs">
