@@ -1,45 +1,62 @@
-# awesome.video audit verdict (2026-11-03)
+# awesome.video audit verdict (2026-11-03, close-out)
 
-**Verdict: PASS WITH OPEN ITEMS.** No known code defect is open on production. Every bug found in this run is fixed, deployed with replit-deploy and re-measured on the live site. Not every inventory row has been driven at every width, and three content decisions belong to the owner, so this is not a clean full-coverage PASS.
+**Verdict: PASS WITH OPEN ITEMS.** Every bug this run found is fixed, deployed with replit-deploy and re-measured on the live site. No ledger row is still failing. Some inventory rows still lack one state or width, and four content questions belong to the owner, so this is not a clean full-coverage PASS.
 
-Final production revision: `93373522` (`/api/version`, health ready 200), equal to `origin/main`.
+Production at close-out: `cf3a8403` (#207, live 16:51:33Z) (`/api/version`, `/api/health/ready` 200), equal to `origin/main`.
 
-## Bugs fixed and verified on production this session
+## Bugs fixed and verified on production in this session
 
-| ID | Defect | PR | Live revision | Prod evidence |
-|---|---|---|---|---|
-| CAT-02/SSC-02/JN-02/AU-20 (+5 surfaces) | Admin load-error Retry dropped keyboard focus to `<body>` | #198 | d74699a3 | Retry -> H1 on 9 surfaces x 3 widths (27/27) |
-| C6-MB-042 (+ Recently-opened sibling) | 32px links at touch widths | #199 | 54b90e36 | 258x44 @390, 660x44 @820, 32px @1440 by design |
-| C6-PC-030 | Home tag popover clipped off the top at 390 | #200 | 87b8ece7 | popover 0..406 @390, Clear all on-screen |
-| C6-MB-011 | Clerk account modal 880px wide, cut off below ~920px | #201 | 93373522 | 16..374 @390, 16..804 @820 |
-| C6-PC-038 | Taxonomy breadcrumb/sibling links dropped `?kind=` | #201 | 93373522 | all hrefs keep `?kind=tools` |
+| ID | Defect | PR | Prod evidence |
+|---|---|---|---|
+| CAT-02/SSC-02/JN-02/AU-20 (+5) | Admin load-error Retry dropped focus to body | #198 | Retry -> H1 on 9 surfaces x 3 widths |
+| C6-MB-042 (+1) | 32px links at touch widths | #199 | 258x44 @390, 660x44 @820 |
+| C6-PC-030 | Tag popover clipped at 390 | #200 | popover 0..406 @390 |
+| C6-MB-011 | Account modal cut off below ~920px | #201 | 16..374 @390, 16..804 @820 |
+| C6-PC-038 | Taxonomy links dropped `?kind=` | #201 | all hrefs keep `?kind=tools` |
+| AI-02 | Researcher low-budget warning missing at $0.30 | #203 | $0.30 warns @1440/390 |
+| C6-MB-028 | Bulk archive-all dropped focus to body | #204 | focus -> H1 / Select all @1440, 820 |
+| MB-073-COPY | Onboarding save showed "Failed to fetch" | #204 | "Could not reach the server..." |
+| AI-22-ACK | Enrichment plain-HTTP ack row 16px tall @820 | #205 | 642x44 @820, 244x56 @390 |
+| MB-015-COPY | Profile name/withdraw toasts showed "Failed to fetch" | #205 | friendly text on both |
+| MB-043-COPY | Contribution withdraw and home-layout errors showed "Failed to fetch" | #206 | friendly text @1440/390 |
+| MB-043-FOCUS | 409 withdraw dropped focus to body | #206 | focus -> contribution row |
+| MB-013-FOCUS, MB-013-RING | Key revoke dropped focus; row had no focus ring | #206, #207 | focus -> revoked row with visible ring @1440/390 |
 
-Earlier in the same run (before this session's resume): SH-09, ED-13, PC-014/025, PC-046-DISMISS, PC-046-SORT, RS-43, all fixed-verified on prod (see PROGRESS.md).
+Also re-checked on production and closed: C6-AX-021 (admin stats failure shows an error card with Retry, no zeros), AI-08 and AI-22 at all three widths, C6-MB-012/014/015/063, C6-PC-054, MEM-audit-defect-4.
 
-## Bug ledger (449 rows, BUG_LEDGER.md)
+## Bug ledger (BUG_LEDGER.md)
+
+459 rows. The inherited "re-check on production" rows were each driven again on production and given one of these statuses.
 
 | Current status | Rows |
 |---|---|
-| fixed-verified on prod | 318 |
-| partial (some widths or states not driven) | 45 |
-| unverified (reason per row) | 62 |
-| withdrawn (by design or tool artefact) | 21 |
-| owner decision | 3 |
+| fixed-verified on production | 371 |
+| partial (one state or width not driven; gap named per row) | 40 |
+| unverified (reason per row) | 20 |
+| withdrawn (by design or a tool artefact) | 23 |
+| owner decision | 5 |
 | still failing | 0 |
-
-The 383 inherited "re-check on prod" rows were each re-checked against production and given one of the statuses above.
 
 ## What was not verified, and why
 
-- **Partial/unverified rows (107)** need one of: a real touch device or screen reader, request-failure injection (the browser tools can't abort requests reliably), a paid or live-write action (enrichment run, GitHub sync, researcher run), data that doesn't exist today (empty discovery queue, no degraded-enrichment log row), or a theme the run rules forbid changing. Each row names its reason.
-- **Test suite:** the repo has none (removed in b4040bfe by owner rule). Gates run instead: `tsc` 0 and `npm run build` 0 on every merged commit. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (logged as a follow-up, not touched).
+- **Partial/unverified rows** each name the gap. The common reasons are: a real touch device or screen reader; data that does not exist on production (an expired API key, more than one page of contributions, notifications a member cannot create, an empty discovery queue); a paid or live-write action (enrichment run, GitHub sync, researcher run); and theme, font or appearance changes, which the run rules forbid.
+- **MEM-migration-chain:** production reports 34 of 34 migrations applied. Replaying the chain on a fresh database was not run, because this run tests on production only.
+- **Test suite:** the repo has none (removed in b4040bfe). Every merged commit passed `npx tsc --noEmit` and `npm run build`. Whole-repo `eslint .` still fails on about 4.4k old type-strictness errors; each fix PR compared eslint before and after on the files it touched.
 
 ## Owner decisions open
 
-1. **PC-12:** resource 190151 "MirrorFly IM Software" is off-topic and has the tag typo "enteprise". Unpublish, fix the tag, or keep it.
-2. **DATA-TAXO-LABEL / AI-16:** some subcategory names lost punctuation at import ("RTMPRTSPHTTP Protocol Servers", "Next-Generation Codecs AV1 VVC"). Renaming live taxonomy is your call.
-3. **EN-17-COPY:** enrichment has no small run; the full run is ~$21 for 3,012 resources.
+1. **PC-12:** resource 190151 "MirrorFly IM Software" is off-topic and has the tag typo "enteprise". Unpublish it, fix the tag, or keep it.
+2. **DATA-TAXO-LABEL / AI-16:** some subcategory names lost punctuation at import ("RTMPRTSPHTTP Protocol Servers"). Renaming live taxonomy is your call.
+3. **DATA-ENTITY-DESC:** resources 189157 and 189065 show a literal `&lt;` in their descriptions. These are imports from before the decoder fix (9a269154); fixing them means editing real content.
+4. **DATA-DUP-TITLE:** 61 groups of resources share a title. Merging or renaming them is a content decision.
+5. **EN-17-COPY:** enrichment has no small run; a full run costs about $21 for 3,012 resources.
 
 ## Test data
 
-Deleted at close-out (14:40Z): QA submission 190920 and audit member `krzemienski+audit202611031301@gmail.com` (with its journey progress, revoked API keys and settings). Earlier fixtures were deleted as they were finished. QA ledger: 0 open. One side effect stays: audit-log row TX#29386 (a `database.exported` entry from a read-only leak check).
+All audit records created on production were deleted and read back (QA ledger: 23 records, 0 open; evidence in `e2e-evidence/c17-cleanup/`):
+
+- Submissions 190921, 190922 and 190923 (`[QA-audit-1103]` titles): `DELETE /api/admin/resources/:id` 200; absent from admin search; public URL 404.
+- Audit member `krzemienski+audit202611031454@gmail.com`: `DELETE /api/admin/users/:id` 200 with the Clerk identity deleted; its journey progress, preferences and revoked API keys cascade with it; absent from the 140-user list.
+- Earlier in the run: submission 190920 and audit member `krzemienski+audit202611031301@gmail.com`, plus fixtures deleted as each lane finished.
+
+One side effect stays: audit-log row TX#29386 (a `database.exported` entry from a read-only leak check).

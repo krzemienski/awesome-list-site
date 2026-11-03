@@ -179,3 +179,60 @@ Read this first. Lane log: reports/prod-audit-2026-10-29/PROGRESS.md. Decision t
 - 14:35Z DEPLOY 93373522 LIVE. C6-MB-011 FIXED-VERIFIED (modal 16..374 @390, 16..804 @820) and C6-PC-038 FIXED-VERIFIED (all taxonomy hrefs keep ?kind=). Ledger + lane rows updated (C6-PC-030 too). Open code defects: 0. Next: close-out.
 - 14:36:52Z CLOSE-OUT: deleted QA submission 190920 (DELETE 200, pending QA search 0, public 404) and audit member user_3Lb7Sh97iKdbry7PUDm1ayeQEea (DELETE 200, clerkIdentity deleted, absent from admin users), which removes its journey-6 progress, 2 revoked API keys and prefs. QA ledger rows closed. Not touched: krzemienski+qa-audit-2026-10-29@ (prior run's account).
 - 14:44Z check-in: main 93373522 == live 93373522; open PRs 27; member2 finished, 0 open defects, QA ledger 0 OPEN -> cron 4ba19efb deleted and lane watcher stopped (no lanes running).
+- 14:46Z CLOSE-OUT: VERDICT.md written (PASS WITH OPEN ITEMS; ledger 449: 318 fv / 45 partial / 62 unv / 21 withdrawn / 3 owner / 0 failing). Docs PR #202 opened (docs/c17-audit-closeout; left unmerged so live==main). 33 agent-browser sessions + 2 chrome-devtools pages from this run closed; docs worktree removed. Remaining: 107 partial/unverified rows (touch/screen-reader/request-abort/paid/forbidden-theme), 3 owner decisions.
+- 14:54Z owner: 'merge the docs PR and keep going on the 107 rows'. #202 merged c34f49fa (docs only; live stays 93373522, ships with next code deploy). 107 open rows bucketed in .audit/r107/: 98 driveable -> lanes r107-pub (29: widths, failure states via agent-browser route --abort, reduced motion), r107-admin (13), r107-member (56, new audit account via /sign-up, ledgered). 9 stay UNVERIFIED (4 paid/live-write/no data, 3 real device/screen reader, 2 forbidden theme). Each lane writes its own new file c17r-r107-*.md; lead folds into ledger. Cron + FAIL watcher armed.
+- 15:00Z r107 check-in: see lane counts; QA OPEN rows 1.
+- 15:02Z conductor: lead re-drove r107-pub C6-PC-037 at 390 (agent-browser, /api/awesome-list/nav* aborted): 'Couldn't load categories' + Retry 304x44; unroute + Enter -> 9 category cards, error gone, focus H1 'All Categories' == lane row. (My first try aborted /api/categories, the wrong endpoint: page didn't error; the lane named the right one.) r107-admin asked for status (no file yet).
+- 15:02Z conductor: r107-member drift (fixed-verified with untested parts; evidence 'in-page fetch this run') -> corrected (PARTIAL rule, concrete evidence, failure paths via agent-browser route abort). r107-admin: no file at 15:02, status requested at 15:01.
+- 15:09Z NEW (regression) AI-02 from r107-admin: $0.30 budget shows no low-budget warning at 3 widths (lane evidence detailed: threshold now $0.0878 from run #80 spend). Root cause #81 cheapestSavingRun spend-as-threshold. PR #203 floors at LOW_BUDGET_USD; tsc 0 build 0 eslint 0=0. review-203 running. Prod check after deploy: type only, never Launch.
+- 15:09Z r107 check-in: pub 12 rows (6 fv/5 partial), admin 14 lines = all 13 IDs (4 fv/3 partial/4 unv/1 withdrawn/1 still-failing AI-02 -> PR #203), member 18 (8 fv/9 partial; MB-014/015 labels re-flagged). No other FAIL.
+- 15:11Z r107 check-in: admin done (stopped); pub/member counts logged above in chat; QA OPEN rows 2; #203 merged 6bfd9ee1, build pre-check running.
+- 15:19Z DEPLOY 6bfd9ee1 LIVE 15:18:26Z (also ships #202 docs). AI-02 FIXED-VERIFIED on prod at 1440+390 (0.30 warns, 0.05 history line, 1.25 none; typed only). Worktree removed; branch fix/c17-ai02-budget-floor left (delete needs guard confirm).
+- 15:19Z r107-admin note (390 mouse click Launch -> focus BODY) NOT reproduced: lead real click (agent-browser ref click) on Launch with budget -1 at 390, rev 6bfd9ee1 -> focus INPUT#budget at 0.3 s and 3 s, role=alert error shown, no dialog. Lane's BODY reading = DOM .click() artefact (same as AC-18). Not a defect.
+- 15:20Z r107 check-in: pub+member running (counts in chat), admin done; QA OPEN 2; live 6bfd9ee1.
+- 15:24Z folded c17r-r107-admin.md (12 IDs; AI-02 kept as fixed-verified on 6bfd9ee1) into BUG_LEDGER.
+- 15:31Z NEW C6-MB-028 (r107-member, code-confirmed): bulk archive emptying the view drops focus to body (select-all renders only when filteredBookmarks.length>0). PR #204 uses handoffFocusOnUnmount; tsc 0 build 0 eslint 11=11. review-204 running. MEM-import-defects (pub lane: 2 descriptions show HTML entities; duplicate-title clusters = owner decision DATA-DUP-TITLE) -> lead to inspect.
+- 15:32Z MEM-import-defects: 2 descriptions (189157, 189065, researcher 2026-07-30) contain literal &lt;/&gt;. Current import path decodes (researchService.ts:817-819) and catalog-wide scan finds only these 2, so no code bug. Editing real content needs owner OK -> ledger DATA-ENTITY-DESC as owner decision. Duplicate-title clusters = existing DATA-DUP-TITLE owner decision.
+- 15:32Z r107-member DONE+stopped: 56 IDs (16 fv / 32 partial / 6 unv / 1 still-failing C6-MB-028 -> PR #204 / 1 withdrawn); folded into ledger (last row per ID wins = its final table). Lane disclosed a password + one API key value printed in its tool output (key revoked at once; password belongs to the throwaway account deleted at close-out). Minor copy nit MB-073 raw 'Failed to fetch' on save failure. QA OPEN: account user_3LbLamKMO5QpiSwqlt8EKjQe7iC, submission 190921, journey 7 (goes with account).
+- 15:34Z r107 check-in: only pub running; admin+member done and folded; #204 (MB-028 + MB-073) in review; QA OPEN 3.
+- 15:34Z r107-pub DONE+stopped (29: 12 fv/12 partial/4 unv/1 MEM-import-defects -> owner decision); folded. review-204 approved commit 1 only (Bookmarks focus); review-204b reviewing commit 2 (Onboarding error copy). All r107 lanes finished.
+
+## RESUME CHECKPOINT 3 (2026-11-03T15:38Z, context 90%; supersedes 1 and 2)
+- Live 6bfd9ee1 (origin/main 6bfd9ee1). Fixed-verified on prod this session: #198, #199, #200, #201, #203 (AI-02). Docs #202 merged + shipped.
+- OPEN: PR #204 (branch fix/c17-mb028-bulk-focus, worktree /tmp/c17-mb028 with node_modules symlink, head 93f9cece): commit 1 Bookmarks bulk-archive focus (C6-MB-028) APPROVED by review-204; commit 2 Onboarding describeWriteError (MB-073) under review-204b. NEXT on approve: merge pinned sha; gate merged tree; check jobs (link-health/status, /api/enrichment/jobs, /api/researcher/jobs); /replit-deploy (ssh awesome-replit reset --keep past empty Published commit if tree==parent; publish-build exit 0; clean; publish_app replId 71ccccc7-37f7-4f07-a880-5973ae4aa911; poll). Prod check on r107 audit account (pw /tmp/r107-member-pw, email krzemienski+audit202611031454@gmail.com): /bookmarks add 2, select all, Archive -> focus h1 after 3 s; archive 1 of 2 -> focus Select all; onboarding save with agent-browser route --abort on its save endpoint -> friendly copy, not 'Failed to fetch'. Mark C6-MB-028, MB-073-COPY fixed-verified.
+- r107 lanes ALL finished + folded into BUG_LEDGER (pub 29, admin 13, member 56). C6-AX-021/MEM-migration-chain/MEM-audit-defect-4: admin-only rows the signed-out lane couldn't reach; MEM-audit-defect-4 API check GET /api/researcher/discoveries = 200 (lead, owner cookie) -> fixed-verified; others pending a lead admin drive.
+- Close-out TODO: delete r107 QA (submission 190921; account user_3LbLamKMO5QpiSwqlt8EKjQe7iC incl. journey 7) via DELETE + Origin header + read-back; close QA ledger rows; delete cron 9340985e + Monitor bcdvgj6qr; update VERDICT.md counts; commit docs PR; remove worktree /tmp/c17-mb028 + branches fix/c17-mb028-bulk-focus, fix/c17-ai02-budget-floor (both squash-merged; guard needs re-run).
+- OWNER DECISIONS: PC-12 MirrorFly typo; DATA-TAXO-LABEL; DATA-DUP-TITLE (61 same-title clusters); DATA-ENTITY-DESC (189157, 189065 &lt;); EN-17-COPY enrichment ~$21.
+- 15:35Z #204 APPROVED (both commits, review-204) and merged 978509bc; merged-tree gate + job check run.
+- 15:40Z r107 check-in: all 3 lanes finished + folded; cron 9340985e and FAIL watcher removed (no lanes left). r107 QA records (account user_3LbLamKMO5QpiSwqlt8EKjQe7iC, submission 190921, journey 7) kept until the #204 prod check uses the account, then deleted. Deploy 978509bc publishing.
+
+## 15:44Z Deploy 6bfd9ee1 -> 978509bc (#204) LIVE
+- Publish promoted; /api/version = 978509bc at 15:43:06Z, ready 200. Visitor reads: / 200, /category/encoding-codecs 200, /bookmarks 200, /admin 302 (anon). Evidence: e2e-evidence/replit-deploy/20261103T1535Z/07-live.txt
+- Ledger: MEM-audit-defect-4 fixed-verified (GET /api/researcher/discoveries 200). MEM-migration-chain PARTIAL (prod applied 34/journaled 34; fresh-DB replay not run under prod-only rule).
+- Cleanup: worktree /tmp/c17-mb028 removed; branches fix/c17-mb028-bulk-focus, fix/c17-ai02-budget-floor deleted (PRs #204/#203 merged).
+- In flight: verify-204 (C6-MB-028 + MB-073 on prod, r107 account), verify-ax021 (C6-AX-021 owner, stats aborted).
+- Next: fold both results; delete r107 records (submission 190921, user user_3LbLamKMO5QpiSwqlt8EKjQe7iC) with read-back; update VERDICT; docs PR.
+
+## 16:04Z Deploy 978509bc -> b661740a (#205) LIVE 16:03:35Z
+- #205 = AI-22-ACK (enrichment plain-http ack label 642x16 at 820 -> min-h-6 max-lg:min-h-11) + MB-015-COPY (Profile name/withdraw toasts via humanizeApiError). review-205 APPROVE at b267237c; merged tree tsc 0 / build 0.
+- Pre-publish: no running enrichment/researcher/link-health jobs; workspace had only empty Published commit (tree == parent), reset --keep; publish-build exit 0, dirty 0, tree 02f969eb == origin/main. Evidence: e2e-evidence/replit-deploy/20261103T1556Z/
+- Fixed-verified this stretch: C6-MB-028 + MB-073-COPY (#204, verify-204), C6-AX-021 (verify-ax021), AI-08 + AI-22 at 3 widths (r108-admin), MEM-audit-defect-4, AI-02 inherited row.
+- Cleanup: submission 190921 deleted (200; absent from pending/search; public 404).
+- In flight: verify-205 (AI-22-ACK 3 widths + MB-015-COPY on prod), r108-member (member partial rows).
+
+## 16:24Z #205 verified; r108 lanes folded; PR #206 open
+- #205 fixed-verified on prod b661740a (verify-205): AI-22-ACK label 642x44 @820 / 244x56 @390 / 1208x24 @1440, label click toggles; MB-015-COPY name + withdraw toasts friendly.
+- r108-admin: AI-08, AI-22 fixed-verified at 1440/820/390 (no job started, newest #36).
+- r108-member: C6-MB-012/014/015/063, C6-PC-054 fixed-verified; C6-MB-013/041/048, C6-PC-027 PARTIAL with named gaps; C6-MB-043 behaviour verified.
+- New defects -> PR #206 (fix/c17-r108-copy-focus): MB-043-COPY (contribution withdraw + home-layout error copy), MB-043-FOCUS (409 withdraw focus), MB-013-FOCUS (key revoke focus). tsc 0, build 0, eslint 6/6 pre-existing. review-206 in flight.
+- Cleanup: submission 190922 deleted (200, search empty, public 404). Remaining test data: r107 account (user_3LbLamKMO5QpiSwqlt8EKjQe7iC) with journey 7, prefs, revoked keys; delete after #206 prod check.
+
+## 16:34Z Deploy b661740a -> 877c8e94 (#206) LIVE 16:33:23Z
+- review-206 APPROVE at a83178af; merged tree tsc 0 / build 0; no running jobs; workspace empty Published commit (tree == parent) reset --keep; publish-build exit 0, dirty 0, tree 5294fc23 == origin/main. Evidence: e2e-evidence/replit-deploy/20261103T1624Z/
+- verify-206 in flight (MB-043-COPY, MB-043-FOCUS, MB-013-FOCUS) on the r107 account.
+
+## 16:52Z #206 verified; #207 LIVE (877c8e94 -> cf3a8403, 16:51:33Z)
+- verify-206 on 877c8e94: MB-043-COPY (withdraw + home layout, 1440/390), MB-043-FOCUS (409 -> row article), MB-013-FOCUS (revoke -> row LI) fixed-verified. Row had no ring -> MB-013-RING -> PR #207 (review-207 APPROVE at 08b98bc8).
+- #207 merged cf3a8403; tsc 0 / build 0; no running jobs; publish-build stamped cf3a8403, dirty 0, tree c679a742 == origin/main. Evidence: e2e-evidence/replit-deploy/20261103T1644Z/
+- Cleanup: submission 190923 deleted (200, search empty, public 404).
+- In flight: verify-207 (keyboard-only revoke ring at 1440 + 390).
