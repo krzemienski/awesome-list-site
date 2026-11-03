@@ -1,5 +1,5 @@
 import { homeHeading } from "@shared/page-headings";
-import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
@@ -617,19 +617,20 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
 // landers left without a second page. A visible field opens /search directly.
 function HomeSearch() {
   const [, navigate] = useLocation();
-  const [value, setValue] = useState("");
-  const submit = (event: FormEvent) => {
+  // Uncontrolled on purpose: the field is server-rendered and usable before
+  // hydration; a controlled value="" would overwrite text typed in that window.
+  // action/method let a pre-hydration Enter submit a native GET to /search?q=.
+  const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const q = value.trim();
+    const q = String(new FormData(event.currentTarget).get("q") ?? "").trim();
     navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
   };
   return (
-    <form role="search" className="home-index-search" onSubmit={submit} data-testid="home-search-form">
+    <form role="search" className="home-index-search" action="/search" method="get" onSubmit={submit} data-testid="home-search-form">
       <Input
         type="search"
         name="q"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
+        defaultValue=""
         placeholder="Search codecs, players…"
         aria-label="Search the catalog"
         enterKeyHint="search"
