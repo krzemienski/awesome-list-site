@@ -262,6 +262,15 @@ exactly as before. The rules live in
   vendor (and Replit's Umami via `umami.disabled`) from the first page view.
   Verified true in agent-browser and the chrome-devtools MCP browser, so audit
   lanes with device emulation send nothing. Real Safari/Chrome report false.
+  There is no separate E2E suite or staging target: audits run against
+  production with agent-browser and the chrome-devtools MCP, and both set
+  `navigator.webdriver`, so those runs send nothing to any vendor. The check
+  is `isAutomatedBrowser()`, one of three terms in `isAnalyticsSuppressed()`
+  (with the admin marker and the QA-path test). `track()` in
+  `client/src/lib/analytics.ts` returns on it first, the vendor SDK start-ups
+  gate on it through `vendorSdksAllowed()`, and the dispatcher in
+  `client/src/lib/analytics-dispatch.ts` re-checks the admin marker. A run that
+  needs events on the wire must use a browser that does not set the flag.
 - **Not site errors.** `site_error` / `error` skip window errors from another
   origin (extensions, translate tools, third-party tags, "Script error."),
   ResizeObserver notices, `AbortError` rejections and cancelled API requests,
