@@ -153,14 +153,8 @@ function resourceMatchesTags(resource: Resource, selectedTags: string[]): boolea
   return normalizedSelectedTags.some((tag) => tags.includes(tag));
 }
 
-function resourceMatchesFilters(
-  resource: Resource,
-  selectedTags: string[],
-  selectedKind: ResourceKind | null,
-): boolean {
-  const matchesTags =
-    selectedTags.length === 0 || resourceMatchesTags(resource, selectedTags);
-  const resolvedKind =
+function resolvedKindOf(resource: Resource): ResourceKind {
+  return (
     resource.resolvedKind ??
     resolveResourceKindFrom({
       storedKind: resource.kind,
@@ -171,8 +165,18 @@ function resourceMatchesFilters(
         resource.subSubcategory,
         ...(resource.metadata?.sourceCategories ?? []),
       ],
-    }).kind;
-  const matchesKind = selectedKind === null || resolvedKind === selectedKind;
+    }).kind
+  );
+}
+
+function resourceMatchesFilters(
+  resource: Resource,
+  selectedTags: string[],
+  selectedKind: ResourceKind | null,
+): boolean {
+  const matchesTags =
+    selectedTags.length === 0 || resourceMatchesTags(resource, selectedTags);
+  const matchesKind = selectedKind === null || resolvedKindOf(resource) === selectedKind;
   return matchesTags && matchesKind;
 }
 
@@ -634,6 +638,26 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return categories;
   }, [corpusFilterActive, navCategories, corpusBaseCategories, selectedTags, selectedKind, sortBy]);
 
+  // Resources matching the tag filter alone: the scope the kind chips count
+  // and the denominator of the "N OF M" header, like a category listing's scope.
+  const tagScopedResources = useMemo(() => {
+    if (selectedTags.length === 0) return [] as Resource[];
+    return corpusBaseCategories
+      .flatMap((category) => getAllResources(category))
+      .filter((resource) => resourceMatchesFilters(resource, selectedTags, null));
+  }, [corpusBaseCategories, selectedTags]);
+
+  const tagScopedKindCounts = useMemo<ResourceKindCounts | undefined>(() => {
+    if (selectedTags.length === 0) return undefined;
+    const counts = { total: tagScopedResources.length, other: 0 } as ResourceKindCounts;
+    for (const kind of STRIP_KINDS) counts[kind] = 0;
+    for (const resource of tagScopedResources) {
+      const kind = resolvedKindOf(resource);
+      counts[kind] = (counts[kind] ?? 0) + 1;
+    }
+    return counts;
+  }, [selectedTags.length, tagScopedResources]);
+
   const filteredCorpusResources = useMemo(() => {
     if (!corpusFilterActive) return [] as Resource[];
     return corpusBaseCategories
@@ -731,8 +755,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,
       matching: corpusFilterActive ? filteredCorpusResources.length : undefined,
+      scopeTotal: selectedTags.length > 0 ? tagScopedResources.length : undefined,
     };
-  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length, selectedTags.length, tagScopedResources.length]);
 
   useEffect(() => {
     const pending = pendingAnalyticsRef.current;
@@ -822,7 +847,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
         recent={filteredRecent}
         featured={filteredFeatured}
         stats={stats}
-        kindCounts={kindCounts}
+        kindCounts={tagScopedKindCounts ?? kindCounts}
         kindCountsLoading={kindCountsLoading}
         kindCountsError={kindCountsUnavailable}
         selectedKind={selectedKind}

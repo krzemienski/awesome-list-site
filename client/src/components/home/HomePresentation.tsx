@@ -40,6 +40,8 @@ export interface HomeStats {
   approvedThisWeek: number;
   /** Resources matching the active kind/tag filter; undefined when unfiltered. */
   matching?: number;
+  /** Resources matching the tag filter alone; undefined when no tag is active. */
+  scopeTotal?: number;
 }
 
 export interface HomePresentationProps {
@@ -273,7 +275,7 @@ function PageMeta({
     layout === "index"
       ? stats.matching === undefined
         ? `INDEX · ${formatCount(stats.total)} ENTRIES`
-        : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.total)} ENTRIES`
+        : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.scopeTotal ?? stats.total)} ENTRIES`
       : `CURATED · WEEK ${isoWeekNumber(new Date())} · ${formatCount(stats.total)} INDEXED`;
   return (
     <div className="home-meta-row">
