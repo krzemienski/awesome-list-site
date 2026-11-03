@@ -548,14 +548,18 @@ export default function LinkHealthDashboard() {
                 </>
               )}
 
-              {isJobInProgress && lastCompletedJob && (
+              {summaryJob && summaryJob !== latestJob && (
                 <p className="text-xs text-muted-foreground" data-testid="text-summary-last-completed">
-                  Showing results from the last completed check ({formatAdminDateTime(checkTime(lastCompletedJob).at)}) while the current check runs.
+                  {isJobInProgress
+                    ? 'Showing results from the last completed check'
+                    : `This check ${latestJob.status === 'failed' ? 'failed' : 'was cancelled'} before it finished. Results below are from the last completed check`}{' '}
+                  (scan #{summaryJob.id}, {formatAdminDateTime(checkTime(summaryJob).at)})
+                  {isJobInProgress ? ' while the current check runs.' : '.'}
                 </p>
               )}
               {approvedTotal != null && summaryCounts.total > 0 && (
                 <p className="text-xs text-muted-foreground" data-testid="text-linkhealth-scope">
-                  Scope: this check covered {summaryCounts.total.toLocaleString()} approved resource URLs
+                  Scope: {summaryJob && summaryJob !== latestJob ? `scan #${summaryJob.id}` : 'this check'} covered {summaryCounts.total.toLocaleString()} approved resource URLs
                   {summaryCounts.total < approvedTotal
                     ? ` — the catalog has since grown to ${approvedTotal.toLocaleString()} approved resources, so run a new check for full coverage.`
                     : " (the full approved catalog at check time)."}
