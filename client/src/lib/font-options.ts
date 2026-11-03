@@ -18,11 +18,11 @@ export type FontOption = { id: string; name: string; stack: string };
 
 export const FONT_OPTIONS: FontOption[] = [
   { id: "system",       name: "System default",  stack: "" },
-  { id: "inter",        name: "Inter",           stack: "'Inter', system-ui, sans-serif" },
+  { id: "inter",        name: "Inter",           stack: "'Inter', 'Inter Fallback', system-ui, sans-serif" },
   { id: "dm-sans",      name: "DM Sans",         stack: "'DM Sans', system-ui, sans-serif" },
   { id: "source-sans",  name: "Source Sans 3",   stack: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif" },
   { id: "ibm-plex",     name: "IBM Plex Sans",   stack: "'IBM Plex Sans', system-ui, sans-serif" },
-  { id: "jetbrains",    name: "JetBrains Mono",  stack: "'JetBrains Mono', ui-monospace, monospace" },
+  { id: "jetbrains",    name: "JetBrains Mono",  stack: "'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace" },
 ];
 
 export const FONT_LS_KEY = "ds-font-override";

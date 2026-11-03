@@ -20,9 +20,9 @@
   --text-4: rgba(244,243,238,0.22);
   --accent: #ff3d52;
   --accent-2: #b84dff;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-body: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
   --display-weight: 500;
   --display-tracking: -0.02em;
   --display-leading: 1.04;
