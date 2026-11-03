@@ -158,14 +158,6 @@
   font-weight: 500;
 }
 
-/* The "Uncategorized" tile is a filter button, not a link: same tile geometry. */
-button.taxonomy-child {
-  width: 100%;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
 /* Pressed must out-rank every system's .card.hoverable:hover border. */
 .taxonomy-child.card.hoverable[aria-current="true"],
 .taxonomy-child.card.hoverable[aria-current="true"]:hover {
