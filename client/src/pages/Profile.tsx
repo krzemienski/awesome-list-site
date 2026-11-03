@@ -254,10 +254,10 @@ export default function Profile({ user }: ProfileProps) {
       setNameDialogOpen(false);
       toast({ title: "Name updated", description: "Your display name has been saved." });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({
         title: "Couldn't update name",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        description: humanizeApiError(err, "Please try again."),
         variant: "destructive",
       });
     },
@@ -300,10 +300,10 @@ export default function Profile({ user }: ProfileProps) {
         description: "Your account will not be deleted.",
       });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({
         title: "Couldn't withdraw request",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        description: humanizeApiError(err, "Please try again."),
         variant: "destructive",
       });
     },
