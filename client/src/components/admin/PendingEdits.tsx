@@ -79,6 +79,12 @@ export default function PendingEdits() {
   const [editToApprove, setEditToApprove] = useState<ResourceEditWithResource | null>(null);
   const [editToReject, setEditToReject] = useState<ResourceEditWithResource | null>(null);
   const [approveError, setApproveError] = useState<string | null>(null);
+  const [approveSuperseded, setApproveSuperseded] = useState(false);
+  const approveCancelRef = useRef<HTMLButtonElement>(null);
+  // The focused Approve & Merge button unmounts once the edit is superseded.
+  useEffect(() => {
+    if (approveSuperseded) approveCancelRef.current?.focus();
+  }, [approveSuperseded]);
   const [rejectError, setRejectError] = useState<string | null>(null);
 
   const editsQuery = useQuery<ResourceEditWithResource[]>({
@@ -160,6 +166,7 @@ export default function PendingEdits() {
       // 409: the server found the resource changed and marked this edit
       // superseded, so the queue the admin is looking at is stale.
       if (error instanceof ApiError && error.status === 409) {
+        setApproveSuperseded(true);
         void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
         void queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] });
       }
@@ -655,7 +662,10 @@ export default function PendingEdits() {
       {/* Approve Confirmation Dialog */}
       <AlertDialog open={approveDialogOpen} onOpenChange={(open) => {
         setApproveDialogOpen(open);
-        if (!open) setApproveError(null);
+        if (!open) {
+          setApproveError(null);
+          setApproveSuperseded(false);
+        }
       }}>
         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
@@ -690,12 +700,13 @@ export default function PendingEdits() {
           )}
           <AlertDialogFooter>
             <AlertDialogCancel
+              ref={approveCancelRef}
               onClick={() => setApproveError(null)}
               data-testid="button-cancel-approve-edit"
             >
               Cancel
             </AlertDialogCancel>
-            {editToApprove && !hasConflict(editToApprove) && (
+            {editToApprove && !hasConflict(editToApprove) && !approveSuperseded && (
               <AlertDialogAction
                 onClick={handleApproveConfirm}
                 disabled={approveMutation.isPending}
