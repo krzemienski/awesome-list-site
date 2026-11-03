@@ -270,7 +270,7 @@
 /* L2 rows (leaf links, and the link + disclosure pair for nested groups). */
 .av-sidebar-shell .av-sidebar-leaf {
   border: 0;
-  gap: 8px;
+  gap: 0 8px;
   line-height: normal;
   margin-block: -8.5px;
   padding: 14px 11px;
