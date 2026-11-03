@@ -615,6 +615,9 @@ function Router({
     logout,
     logoutError,
   } = useAuth();
+  // Refetching an errored query with no data resets its error to null, which
+  // would unmount the banner (and its focused Retry) until the retry fails.
+  const [authRetrying, setAuthRetrying] = useState(false);
   const [location] = useLocation();
   // A signed-in visitor needs Clerk for token refresh and sign-out.
   useEffect(() => {
@@ -748,7 +751,7 @@ function Router({
           query params (e.g. an HTML-shaped ?q= or ?tags=), say so explicitly
           instead of silently rendering the unfiltered page. */}
       <ScrubbedParamsNotice />
-      {authError ? (
+      {authError || authRetrying ? (
         <div
           className="mb-4 flex flex-wrap items-center gap-3 border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm"
           role="alert"
@@ -759,18 +762,18 @@ function Router({
             type="button"
             variant="link"
             className="underline underline-offset-2"
+            aria-disabled={authRetrying}
             onClick={(event) => {
-              // The banner unmounts while the retry is in flight, dropping focus
-              // to <body>. If the retry fails the banner returns: focus its new
-              // Retry; otherwise the recovered page's heading.
-              handoffFocusOnUnmount(event.currentTarget, () =>
-                document.querySelector<HTMLElement>('[data-testid="button-auth-retry"]'),
-              );
-              void refetchAuth();
+              if (authRetrying) return;
+              // On success the banner unmounts; hand focus to the recovered
+              // page's heading. On failure this button stays focused.
+              handoffFocusOnUnmount(event.currentTarget);
+              setAuthRetrying(true);
+              void refetchAuth().finally(() => setAuthRetrying(false));
             }}
             data-testid="button-auth-retry"
           >
-            Retry
+            {authRetrying ? "Retrying…" : "Retry"}
           </Button>
         </div>
       ) : null}
