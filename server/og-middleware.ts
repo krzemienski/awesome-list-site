@@ -2500,12 +2500,11 @@ export function ogInjectionMiddleware() {
     // (shared/page-param.ts parseUrlPageStrict — the exact verdict the
     // hydrated client renders as the same 404 page) doesn't
     // accept as a canonical page spelling (0, -1, abc, 2.5, 1e3, 007 …) is a
-    // 404 on /tag and a page-1 render with a notice on the taxonomy listings.
+    // real 404, never a silent clamp onto page 1's content.
     // Out-of-range pages 404 inside the resolver, which knows totalPages.
     // /search keeps the client's clamp behaviour on purpose (noindex, lenient
     // parsePageNumber on both passes), and every other route ignores ?page.
     let forcedNotFound = false;
-    let pageParamStripped: string | null = null;
     if (/^\/(?:category|subcategory|sub-subcategory|tag)\/[^\/]+$/.test(urlPath)) {
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
       const params = new URLSearchParams(qs);
@@ -2517,16 +2516,7 @@ export function ogInjectionMiddleware() {
           return res.redirect(301, `${urlPath}${rest ? `?${rest}` : ""}`);
         }
         if (parseUrlPageStrict(rawPage).kind !== "page") {
-          if (urlPath.startsWith("/tag/")) {
-            forcedNotFound = true;
-          } else {
-            // Taxonomy listings: not a canonical page spelling, so serve
-            // page 1 (canonical carries no ?page) like the client, which
-            // shows a page-adjusted notice. /tag keeps the strict 404.
-            params.delete("page");
-            const rest = params.toString();
-            pageParamStripped = `${urlPath}${rest ? `?${rest}` : ""}`;
-          }
+          forcedNotFound = true;
         }
       }
     }
@@ -2555,7 +2545,7 @@ export function ogInjectionMiddleware() {
         // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
         // render search results; resolveRoute keys its cache on path + page.
         const resolved = await resolveRouteWithSaturationRetry(
-          pageParamStripped ?? (req.originalUrl || req.url),
+          req.originalUrl || req.url,
           urlPath,
           routeResolutionAbort.signal,
         );
