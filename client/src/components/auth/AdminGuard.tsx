@@ -16,7 +16,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     return (
       <div className="min-h-full flex items-center justify-center bg-background">
         <SEOHead title="Admin Dashboard" noindex />
-        <div className="text-center">
+        <div className="text-center" role="status" aria-busy="true">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Verifying access...</p>
         </div>

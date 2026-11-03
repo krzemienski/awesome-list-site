@@ -760,9 +760,12 @@ function Router({
             variant="link"
             className="underline underline-offset-2"
             onClick={(event) => {
-              // The banner unmounts once the retry succeeds, dropping focus to
-              // <body>; hand it to the recovered page's heading.
-              handoffFocusOnUnmount(event.currentTarget);
+              // The banner unmounts while the retry is in flight, dropping focus
+              // to <body>. If the retry fails the banner returns: focus its new
+              // Retry; otherwise the recovered page's heading.
+              handoffFocusOnUnmount(event.currentTarget, () =>
+                document.querySelector<HTMLElement>('[data-testid="button-auth-retry"]'),
+              );
               void refetchAuth();
             }}
             data-testid="button-auth-retry"
