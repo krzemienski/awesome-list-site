@@ -31,7 +31,7 @@ import {
   hasAdminBypass,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
-import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
+import { API_ERROR_CACHE_CONTROL, HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger, logHttpRequest } from "./lib/logger";
@@ -140,6 +140,19 @@ app.use(operationalRequestContext);
 // Clerk Frontend API proxy (Task #307). Must be mounted before compression and
 // body parsers — it streams raw bytes to Clerk's FAPI in production.
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
+
+// Negative results never stick in a cache: every /api response with status
+// >= 400 is no-store, whichever handler (route, limiter, 404/405 fallback,
+// error handler) produced it. Patched at writeHead so it also wins over a
+// Cache-Control the handler set earlier. See server/http-cache-policy.ts.
+app.use("/api", (_req, res, next) => {
+  const writeHead = res.writeHead;
+  res.writeHead = function (this: Response, status: number, ...rest: any[]) {
+    if (status >= 400) res.setHeader("Cache-Control", API_ERROR_CACHE_CONTROL);
+    return (writeHead as any).call(this, status, ...rest);
+  } as typeof res.writeHead;
+  next();
+});
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
