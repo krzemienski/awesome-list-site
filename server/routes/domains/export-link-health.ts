@@ -1838,6 +1838,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const kindMatches = (item: any): boolean =>
         requestedKind === undefined ||
         resolveResourceKind(item).kind === requestedKind;
+      const unfilteredCount = flattenListingResources(match.node, level as ListingLevel).length;
       const allResources = flattenListingResources(match.node, level as ListingLevel)
         .filter(kindMatches);
       const requestedSubcategory =
@@ -1933,7 +1934,7 @@ export function registerAwesomeListDiscoveryRoutes(
         pageSize: LISTING_PAGE_SIZE,
         total,
         totalPages,
-        totalAll: allResources.length,
+        totalAll: unfilteredCount,
         generalCount: directResources.size,
         scopeIntro,
         scope: { ignoredSubcategory, ignoredSubSubcategory, generalIgnored },

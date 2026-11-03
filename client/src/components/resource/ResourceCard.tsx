@@ -254,7 +254,7 @@ function ResourceCard({
           <ExternalLink className="h-4 w-4 mr-2" />
           <span className="resource-card__visit-label">Open Link</span>
           {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
-          <span className="sr-only">{`${resource.name} (opens in new tab)`}</span>
+          <span className="sr-only">{` ${resource.name} (opens in new tab)`}</span>
         </a>
       </Button>
       {isValidDbResource && showPersonalActions && (
@@ -395,16 +395,6 @@ function ResourceCard({
                   onLoad={(e) => setLoadedImage(e.currentTarget.getAttribute("src"))}
                   onError={(e) => setFailedImage(e.currentTarget.getAttribute("src"))}
                 />
-              </div>
-            )}
-            {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
-              <div className="resource-card__scraped-copy">
-                <span>Page Title:</span> {fullResource.metadata.scrapedTitle}
-              </div>
-            )}
-            {fullResource.metadata.scrapedDescription && fullResource.metadata.scrapedDescription !== resource.description && (
-              <div className="resource-card__scraped-copy resource-card__scraped-copy--clamp">
-                <span>Page Description:</span> {fullResource.metadata.scrapedDescription}
               </div>
             )}
           </div>

@@ -8,7 +8,7 @@ import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { requestClerk } from "@/lib/clerk-bridge";
-import { docsUrl } from "@/lib/docs-url";
+import { docsUrl, shellRepo } from "@/lib/docs-url";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -70,7 +70,8 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     .reduce((sum, node) => sum + totalCount(node), 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const brand = shellBrand(siteName);
-  const docsHref = docsUrl(repoUrl, repoBranch);
+  const repo = shellRepo(repoUrl, repoBranch);
+  const docsHref = docsUrl(repo.repoUrl, repo.repoBranch);
   const signIn = () => {
     const here = window.location.pathname + window.location.search;
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");

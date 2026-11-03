@@ -33,7 +33,7 @@ import {
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
 import ResourceOnwardPaths from "@/components/resource/ResourceOnwardPaths";
-import ResourceTopNextSteps, { TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
+import ResourceTopNextSteps, { TOP_RELATED_LIMIT, TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -638,6 +638,10 @@ export default function ResourceDetail() {
     (a, b) => sharedTagCount(b) - sharedTagCount(a) || (b.score ?? 0) - (a.score ?? 0),
   );
 
+  // The top "More like this" rail already shows the first few; the Related
+  // Resources card lists only the rest so the two never repeat each other.
+  const lowerRelated = topRelated.slice(TOP_RELATED_LIMIT);
+
   // The shared not-found page owns the 404 head, h1 and dead-link telemetry.
   if (resourceMissing) {
     return <NotFound suggestion={{ label: "Search resources", href: "/search" }} />;
@@ -831,11 +835,17 @@ export default function ResourceDetail() {
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
             aria-pressed={isFavorite}
+            aria-label={
+              isFavorite
+                ? (isAuthenticated ? "Remove from favorites" : "Remove from account favorites — sign in required")
+                : (isAuthenticated ? "Add to favorites" : "Favorite to your account — sign in required")
+            }
           >
             {/* BUG-050 (run19): labels stay visible at every width — icon-only
                 buttons at 375px were mystery meat for sighted mobile users. */}
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
             <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
+            {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· account</span>}
           </Button>
           <Button
             variant="outline"
@@ -846,10 +856,15 @@ export default function ResourceDetail() {
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}
-            aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            aria-label={
+              isBookmarked
+                ? (isAuthenticated ? "Remove bookmark" : "Remove bookmark saved on this device")
+                : (isAuthenticated ? "Add bookmark" : "Bookmark on this device — no sign-in required")
+            }
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· this device</span>}
           </Button>
           <Button 
             variant="outline" 
@@ -999,6 +1014,11 @@ export default function ResourceDetail() {
                 <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
               </div>
             )}
+            {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length > 0 && lowerRelated.length === 0 && (
+              <p className="text-sm text-muted-foreground" data-testid="related-all-above">
+                The closest matches are listed under More like this, above.
+              </p>
+            )}
             {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
               <p
                 className="text-sm text-muted-foreground"
@@ -1007,7 +1027,7 @@ export default function ResourceDetail() {
                 No related resources yet. Try this resource&apos;s collection or tags under Keep exploring.
               </p>
             )}
-            {filteredRelatedResources.map((related, index) => (
+            {lowerRelated.map((related, index) => (
               <a
                 key={related.id}
                 href={`/resource/${related.id}`}
