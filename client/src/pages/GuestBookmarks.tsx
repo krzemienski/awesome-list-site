@@ -227,7 +227,7 @@ export default function GuestBookmarks() {
           <Button
             variant="outline"
             size="sm"
-            className="min-h-10"
+            className="min-h-11"
             onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retryFailed(); }}
             data-testid="button-guest-retry-failed"
           >
@@ -249,7 +249,7 @@ export default function GuestBookmarks() {
           <Button
             variant="outline"
             size="sm"
-            className="min-h-10"
+            className="min-h-11"
             onClick={(e) => {
               // C7-V4-01: the banner unmounts on reconnect; hand focus on like Retry does.
               handoffFocusOnUnmount(e.currentTarget);
