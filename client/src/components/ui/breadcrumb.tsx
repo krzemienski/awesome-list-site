@@ -50,7 +50,7 @@ const BreadcrumbLink = React.forwardRef<
   return (
     <Comp
       ref={ref}
-      className={cn("inline-flex min-h-6 items-center transition-colors hover:text-foreground", className)}
+      className={cn("inline-flex min-h-6 max-lg:min-h-11 items-center transition-colors hover:text-foreground", className)}
       {...props}
     />
   )

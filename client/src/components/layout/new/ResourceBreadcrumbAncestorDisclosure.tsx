@@ -105,7 +105,7 @@ export default function ResourceBreadcrumbAncestorDisclosure({
               // WCAG 2.5.8: the control itself is the 24px target. The
               // earlier 20px box relied on a pseudo-element that did not
               // grow the measured box.
-              className="relative !size-6 !min-h-6 !min-w-6 !p-0"
+              className="relative !size-6 !min-h-6 !min-w-6 !p-0 max-lg:!size-11 max-lg:!min-h-11 max-lg:!min-w-11"
               // Lives inside the visually hidden shell breadcrumb: reachable
               // by assistive technology, never an invisible Tab stop.
               tabIndex={-1}
