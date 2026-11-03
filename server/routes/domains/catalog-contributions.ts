@@ -46,6 +46,8 @@
 import type { Express, Response, RequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
+import { buildValidationEnvelope } from "../../contracts/envelope";
+import { boundedIntStringSchema } from "../../contracts/inference";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import {
@@ -141,6 +143,20 @@ export interface CatalogContributionsRoutesContext {
   resourceRepo: ResourceRepository;
   categoryRepo: CategoryRepository;
   auditRepo: AuditRepository;
+}
+
+/**
+ * One policy for a malformed resource id (not a positive int4 integer):
+ * 400 validation_failed in the canonical field-level envelope. A well-formed
+ * id with no row is a 404, answered by the handlers themselves.
+ */
+export function sendInvalidResourceId(res: Response, id: unknown) {
+  const parsed = z.object({ id: boundedIntStringSchema }).safeParse({ id });
+  return res.status(400).json(
+    parsed.success
+      ? { error: 'validation_failed', message: 'Invalid request parameters', fieldErrors: {}, errors: [] }
+      : buildValidationEnvelope(parsed.error, 'Invalid request parameters'),
+  );
 }
 
 export function registerCatalogContributionsRoutes(
@@ -437,6 +453,10 @@ export function registerCatalogContributionsRoutes(
       // Full-set total as a header too, so paged consumers (and the kind
       // strip) can read it without parsing the body.
       res.set('X-Total-Count', String(result.total));
+      // Approved listings are the same for every caller; only the admin-only
+      // pending/rejected listings are session-dependent, and those keep the
+      // session default (private, no-store).
+      if (statusFilter === 'approved') res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json({
         ...result,
         resources: publicResources,
@@ -573,6 +593,9 @@ export function registerCatalogContributionsRoutes(
       // NB-021: honest pagination metadata — repeat with offset=nextOffset
       // until nextOffset is null to retrieve every promised match.
       const nextOffset = offset + resources.length < total ? offset + resources.length : null;
+      // Approved-only search: identical for every caller, so it takes the
+      // public catalog policy like the other catalog reads.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource), search });
     } catch (error) {
       logger.error('Error searching resources:', error);
@@ -620,7 +643,7 @@ export function registerCatalogContributionsRoutes(
   });
 
   // GET /api/resources/check-url - Check if URL already exists (public)
-  app.get('/api/resources/check-url', asyncHandler(async (req, res) => {
+  app.get('/api/resources/check-url', resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // Run15 BUG-037: trim like the submit schema does — a pasted URL with a
       // trailing space must resolve to the same duplicate-check result.
@@ -664,7 +687,7 @@ export function registerCatalogContributionsRoutes(
       // regex and overflow inside PG → 500. Bound-check before the DB.
       const id = parseBoundedInt(req.params.id);
       if (id === null) {
-        return res.status(404).json({ message: 'Resource not found' });
+        return sendInvalidResourceId(res, req.params.id);
       }
       const resource = await resourceRepo.getResource(id);
 
@@ -696,26 +719,25 @@ export function registerCatalogContributionsRoutes(
   app.get('/api/resource/:id(\\d+)', resourceReadLimiter, asyncHandler(getResourceByIdHandler));
 
   app.get('/api/resources/:id/related', resourceReadLimiter, asyncHandler(async (req, res) => {
-    const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
       // NB-008 (run23): bound-check (int4 overflow → 500 otherwise).
       const id = parseBoundedInt(req.params.id);
       if (id === null) {
-        return res.json(empty);
+        return sendInvalidResourceId(res, req.params.id);
       }
       const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 5, 1), 10);
       const resource = await resourceRepo.getResource(id);
       if (!resource) {
-        return res.json(empty);
+        return res.status(404).json({ message: 'Resource not found' });
       }
-      // NEW-006 companion: for a non-approved seed id, return the empty shape
-      // to non-admins — a populated `similar` list would confirm the hidden
-      // id exists and leak its category.
+      // NEW-006 companion: a non-approved seed id answers the same 404 as a
+      // missing id to non-admins — a populated `similar` list, or any other
+      // status code, would confirm the hidden id exists and leak its category.
       if (resource.status !== 'approved') {
         // Clerk migration: req.dbUser IS the resolved user row.
         const requester = req.dbUser;
         if (!requester || requester.role !== 'admin') {
-          return res.json(empty);
+          return res.status(404).json({ message: 'Resource not found' });
         }
       }
       // Pull a pool of approved resources in the same category to rank against.

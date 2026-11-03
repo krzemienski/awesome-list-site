@@ -105,7 +105,7 @@ export function registerPublicApiRoutes(app: Express): void {
    *           minimum: 1
    *           maximum: 100
    *           default: 20
-   *         description: Items per page (max 100)
+   *         description: Items per page (default 20). Values above 100 are clamped to 100; non-numeric or non-positive values return 400.
    *       - in: query
    *         name: category
    *         schema:
