@@ -120,7 +120,7 @@ export default function AdvancedFilter({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-80 p-0" align="start">
+          <PopoverContent className="flex max-h-[var(--radix-popover-content-available-height)] w-[calc(100vw-2rem)] flex-col p-0 sm:w-80" align="start">
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">Filter by Tags</h4>
@@ -155,7 +155,7 @@ export default function AdvancedFilter({
               </div>
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-96 min-h-0 flex-1 overflow-y-auto">
               <Collapsible
                 open={isTagsOpen}
                 onOpenChange={setIsTagsOpen}
