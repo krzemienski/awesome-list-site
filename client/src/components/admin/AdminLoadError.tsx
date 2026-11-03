@@ -1,5 +1,6 @@
 import type { MouseEvent, ReactNode } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { describeLoadError } from "@/lib/apiError";
@@ -7,29 +8,35 @@ import { cn } from "@/lib/utils";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 const OFFLINE_MESSAGE = "You're offline; this will load when your connection returns.";
-const BUSY_CAP_MS = 20000;
+const BUSY_CAP_MS = 10000;
+const POLL_MS = 100;
 
 /**
- * The alert unmounts while its retry runs and the slot is briefly empty, so
- * handoffFocusOnUnmount would settle before a failed retry re-renders the
- * alert. Mark the slot busy until something is rendered back into it.
+ * Some callers unmount the alert while the retry runs, and a failed retry
+ * re-renders it only when the refetch settles. Once the trigger has left the
+ * DOM, mark its slot busy until no query is fetching, so
+ * handoffFocusOnUnmount waits for the outcome. A caller that keeps the alert
+ * mounted never sets the flag.
  */
-function markBusyUntilRerender(host: HTMLElement): void {
-  host.setAttribute("aria-busy", "true");
-  const clear = () => {
+function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetching: () => boolean): void {
+  let poll: number | undefined;
+  const stop = () => {
     observer.disconnect();
     window.clearTimeout(cap);
+    window.clearTimeout(poll);
     host.removeAttribute("aria-busy");
   };
-  // A loading/empty placeholder fills the slot while the refetch runs; only a
-  // re-rendered alert or real content means the slot has settled.
-  const settled = (node: Node) =>
-    node instanceof HTMLElement && !/(^|[\s_-])(empty|skeleton|loading)\b/.test(node.className);
-  const observer = new MutationObserver((records) => {
-    if (records.some((record) => Array.from(record.addedNodes).some(settled))) clear();
+  const waitForSettle = () => {
+    poll = window.setTimeout(() => (isFetching() ? waitForSettle() : stop()), POLL_MS);
+  };
+  const observer = new MutationObserver(() => {
+    if (trigger.isConnected) return;
+    observer.disconnect();
+    host.setAttribute("aria-busy", "true");
+    waitForSettle();
   });
-  observer.observe(host, { childList: true });
-  const cap = window.setTimeout(clear, BUSY_CAP_MS);
+  observer.observe(host, { childList: true, subtree: true });
+  const cap = window.setTimeout(stop, BUSY_CAP_MS);
 }
 
 export interface AdminLoadErrorProps {
@@ -70,6 +77,7 @@ export function AdminLoadError({
   retryTestId,
   className,
 }: AdminLoadErrorProps) {
+  const queryClient = useQueryClient();
   return (
     <Alert
       variant="destructive"
@@ -94,7 +102,7 @@ export function AdminLoadError({
               if (retrying) return;
               const trigger = event.currentTarget;
               const host = trigger.closest(".admin-load-error")?.parentElement ?? null;
-              if (host) markBusyUntilRerender(host);
+              if (host) holdBusyWhileRefetching(host, trigger, () => queryClient.isFetching() > 0);
               onRetry(event);
               // The alert unmounts while the retry runs. If it fails again the
               // alert re-renders in the same place: refocus its new Retry,
