@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /** Analytics `surface` of the links in this block. */
 export const TOP_SURFACE = "resource_top";
-const TOP_RELATED_LIMIT = 3;
+export const TOP_RELATED_LIMIT = 3;
 
 export interface TopRelated {
   id: number;

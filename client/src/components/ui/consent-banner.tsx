@@ -70,6 +70,12 @@ export default function ConsentBanner() {
   const [legacyConsentReconciled, setLegacyConsentReconciled] = useState(
     () => !isInitialHomeHydration,
   );
+  // The server-rendered Home banner is inert until React hydrates: a click on
+  // its buttons before then is dropped and the banner silently stays. Render
+  // them disabled (identically on server and first client render) until the
+  // mount effect proves the handlers are attached.
+  const [interactive, setInteractive] = useState(() => !isInitialHomeHydration);
+  useEffect(() => setInteractive(true), []);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   // Two consumers of the same node: `bannerRef` for the focus move on re-open,
   // and state so the inset hook re-observes if React ever swaps the element.
@@ -264,9 +270,9 @@ export default function ConsentBanner() {
         className="system-consent-banner system-consent-banner--compact outline-none"
         data-testid="consent-banner"
       >
-        <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
-          <p className="system-consent-banner__copy min-w-0 flex-1 truncate text-xs">
-            Analytics cookies?{" "}
+        <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] flex-wrap items-center gap-2 overflow-hidden px-3 py-2">
+          <p className="system-consent-banner__copy min-w-0 flex-1 basis-40 text-xs">
+            Analytics ({vendorList}), only if you allow it.{" "}
             <Link
               href="/privacy"
               className="system-consent-banner__privacy-link"
@@ -291,7 +297,7 @@ export default function ConsentBanner() {
               onClick={() => decide("granted")}
               data-testid="consent-accept"
             >
-              Accept
+              Allow analytics
             </Button>
           </div>
         </div>
@@ -335,6 +341,7 @@ export default function ConsentBanner() {
             variant="ghost"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
+            disabled={!interactive}
             onClick={() => decide("denied")}
             data-testid="consent-decline"
           >
@@ -345,6 +352,7 @@ export default function ConsentBanner() {
             variant="outline"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
+            disabled={!interactive}
             onClick={() => decide("granted")}
             data-testid="consent-accept"
           >
