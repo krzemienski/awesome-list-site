@@ -24,6 +24,8 @@ import { apiFetch } from "@/lib/api-fetch";
 export interface ResearchLaunchGuideHandle {
   /** Bring the budget field into view and focus it ("relaunch with a higher cap"). */
   focusBudget: () => void;
+  /** Focus the first choice of the form ("start another run"). */
+  focusStart: () => void;
 }
 
 interface ResearchLaunchGuideProps {
@@ -80,6 +82,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     focusBudget: () => {
       budgetRef.current?.scrollIntoView({ block: "center" });
       budgetRef.current?.focus();
+    },
+    focusStart: () => {
+      document.getElementById(`research-brief-${briefMode}`)?.focus();
     },
   }));
 

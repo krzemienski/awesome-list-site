@@ -364,6 +364,11 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     guideRef.current?.focusBudget();
   };
 
+  const startNewRun = () => {
+    flushSync(() => setFollowJobId(null));
+    guideRef.current?.focusStart();
+  };
+
   const showHistory = (jobId: number) => {
     flushSync(() => {
       setHistoryJobId(jobId);
@@ -425,7 +430,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               key={followJobId}
               jobId={followJobId}
               focusOnMount={focusRunOnMount}
-              onStartNew={() => setFollowJobId(null)}
+              onStartNew={startNewRun}
               onRelaunchHigherCap={relaunchHigherCap}
               onShowHistory={() => showHistory(followJobId)}
             />
