@@ -89,7 +89,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  /* Wrapped lines: the links' 44px hit boxes overhang 10px each side. */
+  gap: 20px 8px;
   margin-bottom: 24px;
   color: var(--text-3);
   font-family: var(--font-mono);
@@ -101,7 +102,9 @@
 
 .taxonomy-breadcrumbs a {
   display: inline-flex;
-  min-height: 24px;
+  /* 44px target; the negative margin keeps the band's 24px rhythm. */
+  min-height: 44px;
+  margin-block: -10px;
   align-items: center;
   color: var(--text-2);
 }
@@ -156,14 +159,6 @@
   padding: 14px 18px;
   font-size: 14px;
   font-weight: 500;
-}
-
-/* The "Uncategorized" tile is a filter button, not a link: same tile geometry. */
-button.taxonomy-child {
-  width: 100%;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
 /* Pressed must out-rank every system's .card.hoverable:hover border. */

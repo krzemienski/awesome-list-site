@@ -413,8 +413,7 @@ vite-plugin-checker-error-overlay {
   .home-resource-description,
   .resource-card__title-link,
   .resource-card__description,
-  .resource-card__bookmark-note > span,
-  .resource-card__scraped-copy--clamp {
+  .resource-card__bookmark-note > span {
     -webkit-line-clamp: unset !important;
     line-clamp: unset !important;
     overflow: visible !important;

@@ -107,6 +107,13 @@
   padding: 14px 0 14px 12px;
 }
 
+/* The hairline adds 2px to the leaf's block padding, so 14px + 16px line
+   + 14px rendered 46px. 13px keeps a one-line leaf at exactly 44px and a
+   wrapped label still grows the row. */
+.av-sidebar-drawer .av-sidebar-leaf {
+  padding-block: 13px;
+}
+
 
 /*
  * The frozen drawer scrolls as one document: categories retain natural height

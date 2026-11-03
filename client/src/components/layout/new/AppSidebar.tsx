@@ -875,7 +875,7 @@ export default function AppSidebar({
               style={{ padding: "13px 18px" }}
             >
               <div className="flex items-center gap-3">
-                <Skeleton className="size-5 rounded" />
+                <Skeleton className="size-6 rounded" />
                 <Skeleton
                   className="h-3 rounded"
                   style={{ width: `${55 + ((i * 17) % 30)}%` }}
