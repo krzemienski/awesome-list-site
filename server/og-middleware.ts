@@ -316,6 +316,13 @@ function isAdminSignIn(url: string): boolean {
   return new URLSearchParams(url.split("?")[1] || "").has("admin");
 }
 
+// Active ?tags= / legacy ?tag= filters, parsed with the SAME rule as the
+// hydrated client (parseTagsParam -> parseTagFilterValues).
+function activeTagFilters(url: string): string[] {
+  const q = new URLSearchParams(url.split("?")[1] || "");
+  return parseTagFilterValues([...q.getAll("tags"), ...q.getAll("tag")]);
+}
+
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -336,9 +343,14 @@ async function resolveRoute(
   // them into the key so page 2 is not served page 1's cached body (BUG-001).
   // All other params are ignored.
   const page = parsePage(url);
+  // Home's title and shell name the active tags, so the normalised tag set is
+  // part of its key (BUG-029); a tag request can never seed or read plain "/".
+  const homeTags = cleanPath === "/" ? activeTagFilters(url) : [];
   const key = cleanPath === "/sign-in" && isAdminSignIn(url)
     ? "/sign-in?admin"
-    : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
+    : homeTags.length > 0
+      ? `/?tags=${homeTags.join(",")}`
+      : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   return getPublicCacheValue({
     namespace: "route-meta",
     key,
@@ -663,8 +675,7 @@ function homeShellChrome(): string {
  // Home
  if (path === "/" || path === "") {
    const m = defaultMeta(path);
-   const homeParams = new URLSearchParams(url.split("?")[1] || "");
-   const activeTags = parseTagFilterValues([...homeParams.getAll("tags"), ...homeParams.getAll("tag")]);
+   const activeTags = activeTagFilters(url);
    let categories: { name: string; slug: string; count: number }[] = [];
    try {
       const data = await loadHomeNav();
@@ -1316,6 +1327,7 @@ function homeShellChrome(): string {
               .filter((child: any) => countNodeResources(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "subcategory",
@@ -1523,6 +1535,7 @@ function homeShellChrome(): string {
               .filter((child: any) => countNodeResources(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "sub-subcategory",
@@ -1614,6 +1627,7 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           resources: pageResources.map((r: any) => ({

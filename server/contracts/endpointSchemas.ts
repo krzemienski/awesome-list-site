@@ -404,6 +404,7 @@ const awesomeListListingResponseSchema = z.object({
   totalAll: z.number().int().nonnegative(),
   generalCount: z.number().int().nonnegative(),
   scopeIntro: z.string(),
+  scopeIntroTagged: z.string(),
   scope: z.object({
     ignoredSubcategory: z.boolean(),
     ignoredSubSubcategory: z.boolean(),

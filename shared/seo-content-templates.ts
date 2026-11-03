@@ -12,6 +12,9 @@ export interface TaxonomyIntroInput {
   parentNames?: string[];
   childNames?: string[];
   formats?: string[];
+  // A ?tags= filter is active: the blurb's count is the whole-collection total
+  // and says so, because the visible list below it is the filtered subset.
+  tagFiltered?: boolean;
 }
 
 export interface ResourceFactsInput {
@@ -50,7 +53,7 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
   const total = Number.isFinite(input.totalResources)
     ? Math.max(0, input.totalResources)
     : 0;
-  const resourceCount = `${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"}`;
+  const resourceCount = `${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"}${input.tagFiltered ? " in total" : ""}`;
   const parents = list(input.parentNames ?? [], 2);
   const children = list(input.childNames ?? []);
   const formats = list(
