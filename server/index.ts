@@ -31,7 +31,7 @@ import {
   hasAdminBypass,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
-import { API_ERROR_CACHE_CONTROL, HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
+import { API_ERROR_CACHE_CONTROL, HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger, logHttpRequest } from "./lib/logger";
@@ -104,8 +104,8 @@ const buildContentSecurityPolicy = (nonce: string): string =>
     // on its slower non-worker fallback. blob: workers only execute code
     // the page itself constructed, so this does not weaken script-src.
     `worker-src 'self' blob:`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    "font-src 'self' https://fonts.gstatic.com",
+    `style-src 'self' 'unsafe-inline'`,
+    "font-src 'self'",
     // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
     // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
     // so a fixed allowlist would break resource preview images in production.
@@ -656,6 +656,20 @@ void (async () => {
         maxAge: "1y",
         setHeaders: (res) => {
           res.setHeader("Cache-Control", HASHED_ASSET_CACHE_CONTROL);
+        },
+      }),
+    );
+    // C19 H3-06: self-hosted webfonts. The woff2 filenames carry a content
+    // hash, so they cache like /assets; fonts.css and OFL.txt are not hashed
+    // and keep revalidating so a changed @font-face set reaches visitors.
+    app.use(
+      "/fonts",
+      express.static(path.resolve(import.meta.dirname, "public", "fonts"), {
+        setHeaders: (res, filePath) => {
+          res.setHeader(
+            "Cache-Control",
+            filePath.endsWith(".woff2") ? HASHED_ASSET_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL,
+          );
         },
       }),
     );

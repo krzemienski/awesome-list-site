@@ -15,6 +15,7 @@ import type { PostHog } from 'posthog-js';
 import type { IdentityUser } from './analytics-sdk-options';
 import { vendorSdksAllowed } from './analytics';
 import { getAcquisition } from './acquisition';
+import { clearStorageMatching, expireCookiesMatching } from './analytics-storage';
 
 const getKey = (): string | undefined =>
   import.meta.env.VITE_POSTHOG_KEY as string | undefined;
@@ -46,6 +47,8 @@ export const initPosthog = () => {
       disabled = false;
       if (ph) {
         try {
+          // Undo the teardown's persistence/flags kill switches first.
+          ph.set_config(ENABLED_CONFIG);
           if (ph.has_opted_out_capturing()) ph.opt_in_capturing();
           ph.startSessionRecording();
         } catch {
@@ -94,18 +97,39 @@ export const initPosthog = () => {
     });
 };
 
-// Consent revoked after a prior grant.
+// Everything the SDK persists: ph_phc_<key>_posthog (cookie + localStorage),
+// ph_* window/session ids, the __ph_opt_in_out_* consent flag and the
+// ph_cookie_support_ probe. Cookies sit on the parent domain
+// (cross_subdomain_cookie), which expireCookiesMatching covers.
+const POSTHOG_STORAGE_KEY = /^(__)?ph_|posthog/i;
+
+// reset() schedules a flags reload and the SDK keeps re-registering
+// distinct_id / $device_id while persistence is on, which re-creates the
+// cookie and localStorage key right after the sweep (and POSTs /flags). So the
+// kill switches go on BEFORE reset(), and re-grant puts the defaults back.
+const DISABLED_CONFIG = { disable_persistence: true, advanced_disable_flags: true } as const;
+const ENABLED_CONFIG = { disable_persistence: false, advanced_disable_flags: false } as const;
+
+// Consent revoked after a prior grant. Opt-out alone leaves the persisted
+// distinct_id / device_id / replay config behind, so after the SDK stops we
+// reset it (fresh anonymous identity, nothing written) and then remove every
+// key it used — also when the SDK never finished loading on this page.
 export const optOutPosthog = () => {
   disabled = true;
   pending = [];
   identifiedUserId = null;
-  if (!ph) return;
-  try {
-    ph.stopSessionRecording();
-    ph.opt_out_capturing();
-  } catch {
-    // Never let analytics teardown break the UI.
+  if (ph) {
+    try {
+      ph.set_config(DISABLED_CONFIG);
+      ph.stopSessionRecording();
+      ph.opt_out_capturing();
+      ph.reset(true);
+    } catch {
+      // Never let analytics teardown break the UI.
+    }
   }
+  expireCookiesMatching(POSTHOG_STORAGE_KEY);
+  clearStorageMatching(POSTHOG_STORAGE_KEY);
 };
 
 const safePath = (): string | undefined =>

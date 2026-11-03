@@ -7,26 +7,10 @@
  * no-flash behavior without introducing a second hand-maintained font list.
  * The boot only touches fonts when an override is actually stored.
  *
- * A stack is only half of a webfont: something has to download the files.
- * The always-on <link rel="stylesheet"> in `client/index.html` is the ONE
- * request for every family the five design systems name — it is copied
- * byte-for-byte from the design source (awesome-list-site-ds/index.html) so
- * both documents declare the same @font-face set, which pixel parity
- * requires. Switching systems therefore fetches nothing; the map below only
- * covers picker overrides, and the same gate holds it to FONT_OPTIONS — see
- * the rule stated above it. That failure is quieter than a reset: an option
- * whose stack is right but whose stylesheet is missing (or which fetches a
- * family the stack never names) reports the new setting and keeps rendering
- * in the fallback face, so the page just looks unchanged.
- *
- * That gate is offline: it can only catch the two sides DISAGREEING. A family
- * misspelled in BOTH the stack and its URL agrees with itself and passes,
- * while Google Fonts answers 400 and the face never arrives. After editing
- * any URL below, run the opt-in live probe — `npm run validate:webfont-fetch`
- * — which fetches every URL here (plus the pre-paint <link> in
- * `client/index.html`) and requires HTTP 200 AND an @font-face declaring
- * every family the URL asks for. It hits the network, so it is deliberately
- * not part of the validation suite; nothing runs it for you.
+ * Every family a stack names is self-hosted: client/public/fonts/fonts.css
+ * (linked from client/index.html) declares the @font-face set, and nothing
+ * here fetches from a third party, so a stored override never contacts Google
+ * Fonts. A picker option needs its family added to that stylesheet.
  */
 import { getDesignSystems, isSystemId } from "./design-system";
 
@@ -34,11 +18,11 @@ export type FontOption = { id: string; name: string; stack: string };
 
 export const FONT_OPTIONS: FontOption[] = [
   { id: "system",       name: "System default",  stack: "" },
-  { id: "inter",        name: "Inter",           stack: "'Inter', system-ui, sans-serif" },
+  { id: "inter",        name: "Inter",           stack: "'Inter', 'Inter Fallback', system-ui, sans-serif" },
   { id: "dm-sans",      name: "DM Sans",         stack: "'DM Sans', system-ui, sans-serif" },
   { id: "source-sans",  name: "Source Sans 3",   stack: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif" },
   { id: "ibm-plex",     name: "IBM Plex Sans",   stack: "'IBM Plex Sans', system-ui, sans-serif" },
-  { id: "jetbrains",    name: "JetBrains Mono",  stack: "'JetBrains Mono', ui-monospace, monospace" },
+  { id: "jetbrains",    name: "JetBrains Mono",  stack: "'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace" },
 ];
 
 export const FONT_LS_KEY = "ds-font-override";
@@ -52,48 +36,6 @@ export const FONT_BOOT_DATA = {
   stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),
   fallback: FONT_OPTIONS[0].id,
 } as const;
-
-// RULE (enforced by the `accent-drift` gate): a FONT_OPTIONS entry has an
-// entry here IF AND ONLY IF it declares a non-empty stack, and every family
-// the URL fetches must be one that entry's stack names. "System default"
-// (stack: "") is the one option with no webfont — that exemption belongs to
-// the empty stack, not to the id, and is checked in both directions.
-//
-// Families the canonical shell request already carries (Inter, IBM Plex
-// Sans, JetBrains Mono) keep an entry so the picker contract stays uniform;
-// their weights mirror the shell's so the two declarations agree. The
-// per-system faces need no map at all: the shell <link> in client/index.html
-// fetches every family the two kept systems (Editorial, Geist) name (see the
-// header above), so switching systems is attribute-only.
-const FONT_STYLESHEETS: Record<string, string> = {
-  inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
-  "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
-  "source-sans": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
-  "ibm-plex": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
-  jetbrains: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap",
-};
-
-function loadStylesheet(href: string, fontOptionId?: string): void {
-  const alreadyLoaded = Array.from(
-    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
-  ).find((link) => link.href === href);
-  if (alreadyLoaded) {
-    if (fontOptionId) alreadyLoaded.dataset.fontOption = fontOptionId;
-    return;
-  }
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = href;
-  link.dataset.fontHref = href;
-  if (fontOptionId) link.dataset.fontOption = fontOptionId;
-  document.head.appendChild(link);
-}
-
-/** Load an optional picker font only after a visitor has selected it. */
-export function loadFontOverride(id: string): void {
-  const href = FONT_STYLESHEETS[id];
-  if (href) loadStylesheet(href, id);
-}
 
 /** What "System default" means: the given design system's own body face. */
 export function systemFontStack(system: string | null): string | undefined {
@@ -119,7 +61,6 @@ export function applyFontOverride(id: string): void {
   } else {
     root.style.setProperty("--font-body", opt.stack);
     root.style.setProperty("--font-sans", opt.stack);
-    loadFontOverride(opt.id);
   }
 }
 
