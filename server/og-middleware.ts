@@ -335,7 +335,9 @@ async function resolveRoute(
     (/^\/(category|subcategory|sub-subcategory)\//.test(cleanPath) && url.includes("?")) ||
     // Shared collections are revocable. Never let the metadata cache keep a
     // just-unpublished or deleted collection reachable for another 60 seconds.
-    cleanPath.startsWith("/collection/")
+    cleanPath.startsWith("/collection/") ||
+    // Tag-filtered Home titles name arbitrary tags: unbounded key space.
+    (cleanPath === "/" && activeTagFilters(url).length > 0)
   ) {
     return resolveRouteUncached(url, signal);
   }
@@ -343,14 +345,9 @@ async function resolveRoute(
   // them into the key so page 2 is not served page 1's cached body (BUG-001).
   // All other params are ignored.
   const page = parsePage(url);
-  // Home's title and shell name the active tags, so the normalised tag set is
-  // part of its key (BUG-029); a tag request can never seed or read plain "/".
-  const homeTags = cleanPath === "/" ? activeTagFilters(url) : [];
   const key = cleanPath === "/sign-in" && isAdminSignIn(url)
     ? "/sign-in?admin"
-    : homeTags.length > 0
-      ? `/?tags=${homeTags.join(",")}`
-      : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
+    : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   return getPublicCacheValue({
     namespace: "route-meta",
     key,

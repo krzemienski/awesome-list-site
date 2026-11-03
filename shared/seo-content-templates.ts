@@ -53,7 +53,8 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
   const total = Number.isFinite(input.totalResources)
     ? Math.max(0, input.totalResources)
     : 0;
-  const resourceCount = `${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"}${input.tagFiltered ? " in total" : ""}`;
+  const resourceCount = `${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"}`;
+  const countInTotal = input.tagFiltered ? `${resourceCount} in total` : resourceCount;
   const parents = list(input.parentNames ?? [], 2);
   const children = list(input.childNames ?? []);
   const formats = list(
@@ -64,9 +65,9 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
 
   let lead: string;
   if (input.level === "category") {
-    lead = `${input.name} brings together ${resourceCount} from across the video technology landscape.`;
+    lead = `${input.name} brings together ${countInTotal} from across the video technology landscape.`;
   } else if (input.level === "subcategory") {
-    lead = `${input.name} is a focused collection within ${parents || "video technology"}, with ${resourceCount}.`;
+    lead = `${input.name} is a focused collection within ${parents || "video technology"}, with ${countInTotal}.`;
   } else {
     // Task #379 (uxv1-07): a sub-subcategory has two ancestors, and joining them
     // with `list()` produced "part of Encoding & Codecs and Codecs and includes
