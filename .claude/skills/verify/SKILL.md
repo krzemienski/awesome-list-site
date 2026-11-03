@@ -23,7 +23,7 @@ Never use the DATABASE_URL from memory or `.env` (historically production Neon).
 cd <checkout> && BUILD_REVISION=$(git rev-parse HEAD) \
 DOTENV_CONFIG_PATH=/Users/nick/Desktop/awesome-list-site/.env \
 DATABASE_URL=postgresql://localhost:5432/<db> PORT=<port> NODE_ENV=development DISABLE_BACKGROUND_JOBS=1 \
-ANTHROPIC_MODEL=cc/claude-opus-5 VITE_SITE_URL=https://awesome.video VITE_POSTHOG_HOST=https://us.i.posthog.com \
+ANTHROPIC_MODEL=cc/claude-sonnet-5 VITE_SITE_URL=https://awesome.video VITE_POSTHOG_HOST=https://us.i.posthog.com \
 CONTACT_ENABLED=true VITE_CONTACT_VARIANT=b CONTACT_ISSUES_URL=https://github.com/krzemienski/awesome-video/issues \
 VITE_AMPLITUDE_API_KEY=f5338474e281eac273d5ec975dd13c45 VITE_MIXPANEL_TOKEN=47cf526a041e2df05ad1ab433d96d8b2 \
 VITE_POSTHOG_KEY=phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8 \
