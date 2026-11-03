@@ -195,7 +195,7 @@ export function Paginator({
           testId={ids.prev}
         >
           <ChevronLeft className="h-4 w-4" />
-          Previous
+          <span className="max-sm:sr-only">Previous</span>
         </PrevNextLink>
 
         {items.map((item, i) =>
@@ -234,7 +234,7 @@ export function Paginator({
           rel="next"
           testId={ids.next}
         >
-          Next
+          <span className="max-sm:sr-only">Next</span>
           <ChevronRight className="h-4 w-4" />
         </PrevNextLink>
       </div>
