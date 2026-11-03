@@ -186,6 +186,9 @@ export default function ConsentBanner() {
 
   if (!hasAnalyticsVendors) return null;
 
+  // ph-no-capture on the banner and dialog roots keeps PostHog autocapture off
+  // these controls: the Decline/Save click would otherwise be queued while
+  // consent is still on and sent after the visitor said no.
   const decide = (value: "granted" | "denied") => {
     setAnalyticsConsent(value);
     closeBanner();
@@ -211,7 +214,7 @@ export default function ConsentBanner() {
 
   const settingsDialog = (
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-      <DialogContent data-testid="cookie-settings-dialog">
+      <DialogContent className="ph-no-capture" data-testid="cookie-settings-dialog">
         <DialogHeader>
           <DialogTitle>Cookie settings</DialogTitle>
           <DialogDescription>
@@ -270,7 +273,7 @@ export default function ConsentBanner() {
         role="region"
         aria-label="Analytics consent"
         tabIndex={-1}
-        className="system-consent-banner system-consent-banner--compact outline-none"
+        className="system-consent-banner system-consent-banner--compact outline-none ph-no-capture"
         data-testid="consent-banner"
       >
         <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] flex-wrap items-center gap-2 overflow-hidden px-3 py-2">
@@ -311,7 +314,7 @@ export default function ConsentBanner() {
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="system-consent-banner outline-none"
+      className="system-consent-banner outline-none ph-no-capture"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second

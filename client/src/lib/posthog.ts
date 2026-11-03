@@ -48,7 +48,6 @@ export const initPosthog = () => {
       if (ph) {
         try {
           // Undo the teardown's persistence/flags kill switches first.
-          restoreQueuedRequests(ph);
           ph.set_config(ENABLED_CONFIG);
           if (ph.has_opted_out_capturing()) ph.opt_in_capturing();
           ph.startSessionRecording();
@@ -111,26 +110,6 @@ const POSTHOG_STORAGE_KEY = /^(__)?ph_|posthog/i;
 const DISABLED_CONFIG = { disable_persistence: true, advanced_disable_flags: true } as const;
 const ENABLED_CONFIG = { disable_persistence: false, advanced_disable_flags: false } as const;
 
-// Events captured shortly before Decline (incl. the autocaptured click on the
-// Decline button) already sit in the SDK's 3 s request queue; opt-out, reset()
-// and before_send (capture-time only) don't touch them. Every queued or
-// retried request goes through one send function that drops a batch while
-// rateLimiter.serverLimits[batchKey] (the SDK's own 429 back-off state) is in
-// the future, so parking events/recordings far ahead drops everything queued
-// without a request or a retry. Re-grant removes the limits.
-type ServerLimits = Record<string, number | undefined>;
-const serverLimitsOf = (instance: PostHog): ServerLimits | undefined =>
-  (instance as unknown as { rateLimiter?: { serverLimits?: ServerLimits } }).rateLimiter?.serverLimits;
-const DROP_BATCH_KEYS = ['events', 'recordings'] as const;
-const dropQueuedRequests = (instance: PostHog) => {
-  const limits = serverLimitsOf(instance);
-  if (limits) for (const key of DROP_BATCH_KEYS) limits[key] = Number.MAX_SAFE_INTEGER;
-};
-const restoreQueuedRequests = (instance: PostHog) => {
-  const limits = serverLimitsOf(instance);
-  if (limits) for (const key of DROP_BATCH_KEYS) delete limits[key];
-};
-
 // Consent revoked after a prior grant. Opt-out alone leaves the persisted
 // distinct_id / device_id / replay config behind, so after the SDK stops we
 // reset it (fresh anonymous identity, nothing written) and then remove every
@@ -141,7 +120,6 @@ export const optOutPosthog = () => {
   identifiedUserId = null;
   if (ph) {
     try {
-      dropQueuedRequests(ph);
       ph.set_config(DISABLED_CONFIG);
       ph.stopSessionRecording();
       ph.opt_out_capturing();
