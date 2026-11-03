@@ -813,7 +813,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
   return (
     <>
       <SEOHead
-        title={homeSeoTitle(nav.totalResources)}
+        title={homeSeoTitle(nav.totalResources, selectedTags)}
         description={homeSeoDescription(nav.totalResources, nav.categories.length)}
       />
       <HomePresentation

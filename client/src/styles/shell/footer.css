@@ -169,6 +169,8 @@
 @media (max-width: 1100px) {
   .app-footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
   .app-footer-identity { grid-column: 1 / -1; }
+  /* SOURCE card gets a full row so owner/repo never wraps mid-word. */
+  .app-footer-grid > :last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
   .app-footer { padding-block: 36px 24px; padding-inline-start: 20px; margin-top: 56px; }

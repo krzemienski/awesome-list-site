@@ -64,6 +64,7 @@ import { tagScopeIntro, taxonomyScopeIntro } from "@shared/seo-content-templates
 import {
   normalizeTagFilter,
   normalizeTagPathSegment,
+  parseTagFilterValues,
   TAG_LANDING_MIN_RESOURCES,
   tagDisplayName,
   tagLandingPath,
@@ -662,12 +663,14 @@ function homeShellChrome(): string {
  // Home
  if (path === "/" || path === "") {
    const m = defaultMeta(path);
+   const homeParams = new URLSearchParams(url.split("?")[1] || "");
+   const activeTags = parseTagFilterValues([...homeParams.getAll("tags"), ...homeParams.getAll("tag")]);
    let categories: { name: string; slug: string; count: number }[] = [];
    try {
       const data = await loadHomeNav();
       const resourceCount = data.totalResources;
       const categoryCount = data.categories.length;
-     m.title = homeSeoTitle(resourceCount);
+     m.title = homeSeoTitle(resourceCount, activeTags);
      m.description = homeSeoDescription(resourceCount, categoryCount);
      m.image = ogImage("/");
       categories = data.categories.map((c) => ({
@@ -1472,8 +1475,7 @@ function homeShellChrome(): string {
       if (found) {
         const m = defaultMeta(path);
         const categoryName = found.crumbs[1]?.name ?? "Video Development";
-        const categorySlug = found.crumbs[1]?.path?.split("/").pop();
-        const titleCore = subcategorySeoTitleCore(found.name, categoryName, categorySlug);
+        const titleCore = subcategorySeoTitleCore(found.name);
         m.image = ogImage(found.path);
         m.type = "website"; // R5-052: listing/detail pages are not articles
         // BUG-007 (audit 2): mirror the hydrated client page exactly — same
