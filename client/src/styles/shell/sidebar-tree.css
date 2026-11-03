@@ -33,16 +33,20 @@
   color: var(--text);
 }
 
+/* Labels wrap at word boundaries and the row grows with them (BUG-022). The
+   14px block padding plus a 16px line is the 44px minimum a one-line row has
+   always had; the count chip shares the 16px line so it sits level with the
+   first line of a wrapped label. */
 .av-sidebar-l2-link {
-  align-items: center;
+  align-items: flex-start;
   color: var(--text-2);
   display: flex;
   flex: 1 1 auto;
   font-size: 12.5px;
   gap: 8px;
-  line-height: normal;
+  line-height: 16px;
   min-width: 0;
-  padding: 8px 4px 8px 11px;
+  padding: 14px 4px 14px 11px;
 }
 
 .av-sidebar-l2-row.active .av-sidebar-l2-link {
@@ -52,9 +56,8 @@
 .av-sidebar-l2-link > span:first-child {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .av-sidebar-l2-link > span:last-child {
@@ -96,15 +99,15 @@
 
 .av-sidebar-l3-all,
 .av-sidebar-l3-row {
-  align-items: center;
+  align-items: start;
   color: var(--text-3);
   display: grid;
   font-size: 12px;
   gap: 8px;
   grid-template-columns: 14px minmax(0, 1fr) auto;
-  line-height: normal;
+  line-height: 15px;
   min-height: 44px;
-  padding: 8px 11px 8px 0;
+  padding: 14.5px 11px 14.5px 0;
   text-align: left;
   width: 100%;
 }
@@ -113,6 +116,7 @@
   font-size: 11.5px;
   font-style: italic;
   grid-template-columns: 14px minmax(0, 1fr);
+  align-items: center;
   min-height: 44px;
   margin-bottom: 2px;
   padding-block: 4px;
@@ -123,14 +127,13 @@
   color: var(--text-4);
   font-family: var(--font-mono);
   font-size: 11px;
-  line-height: 1;
+  line-height: 15px;
   text-align: center;
 }
 
 .av-sidebar-l3-row > span:nth-child(2) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* The count is information, so it takes --text-3 (the 4.5:1 ink, 0.49 alpha
@@ -173,19 +176,28 @@
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
-/* Leaf taxonomy rows share the V2 L2Row type in both sidebars: one line,
-   ellipsised, with a 10px mono count that takes the accent when active. */
+/* Leaf taxonomy rows share the V2 L2Row type in both sidebars: the label
+   wraps at word boundaries (never ellipsised) beside a 10px mono count that
+   takes the accent when active. Both sit on a 16px line so the count stays
+   level with the first line; 14px block padding keeps the 44px row minimum. */
+.av-sidebar-shell .av-sidebar-leaf,
+.av-sidebar-drawer .av-sidebar-leaf {
+  align-items: flex-start;
+  padding-block: 14px;
+}
+
 .av-sidebar-leaf-label {
   flex: 1 1 auto;
+  line-height: 16px;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .av-sidebar-leaf-count {
   color: var(--text-3);
   font-size: 10px;
+  line-height: 16px;
 }
 
 .av-sidebar-leaf[data-active="true"] .av-sidebar-leaf-count {
@@ -255,7 +267,7 @@
   gap: 8px;
   line-height: normal;
   margin-block: -8.5px;
-  padding: 6px 11px;
+  padding: 14px 11px;
 }
 .av-sidebar-shell .av-sidebar-leaf::before { border: 0; inset: 8.5px 0; }
 .av-sidebar-shell .av-sidebar-leaf:hover,
@@ -284,7 +296,7 @@
   background: transparent;
 }
 .av-sidebar-shell .av-sidebar-l2-link {
-  padding: 0 0 0 11px;
+  padding: 14px 0 14px 11px;
 }
 .av-sidebar-l2-row.active .av-sidebar-nested-count,
 .av-sidebar-l2-row.contains-active .av-sidebar-nested-count {
@@ -319,7 +331,7 @@
 
 .av-sidebar-shell .av-sidebar-l3-row {
   margin-block: -9.5px;
-  padding: 5px 11px 5px 0;
+  padding: 14.5px 11px 14.5px 0;
 }
 .av-sidebar-shell .av-sidebar-l3-row::before { inset: 9.5px 0; }
 
