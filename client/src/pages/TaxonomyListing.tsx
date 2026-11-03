@@ -165,8 +165,6 @@ export default function TaxonomyListing({ level }: Props) {
   const siteName = publicConfig ? resolveSiteIdentity({ name: publicConfig.site.title }).name : "the catalog";
   const params = new URLSearchParams(search);
   const [page, setPage] = useState(() => strictUrlPage(params.get("page")) ?? 1);
-  // The URL's ?page= is a spelling og-middleware 404s ("abc", "0", "1e3").
-  const pageRejected = strictUrlPage(params.get("page")) === null;
   const [searchTerm, setSearchTerm] = useState(params.get("search") ?? "");
   const [tags, setTags] = useState(() => parseTagsParam(params));
   const [provider, setProvider] = useState(params.get("provider") ?? "");
@@ -255,7 +253,6 @@ export default function TaxonomyListing({ level }: Props) {
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
-    enabled: !pageRejected,
     staleTime: 60_000,
     placeholderData: holdWithinNode(level, slug),
   });
@@ -362,7 +359,6 @@ export default function TaxonomyListing({ level }: Props) {
   const paginationReady = searchSettled && (serverFilterActive
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
     : Boolean(listingData && !listing.isPlaceholderData));
-  const pageNotFound = pageRejected;
   const resultsQuery = serverFilterActive ? taxonomySearch : listing;
   const offline = queryUnavailableReason(listing) === "offline" ||
     queryUnavailableReason(resultsQuery) === "offline" ||
@@ -398,12 +394,12 @@ export default function TaxonomyListing({ level }: Props) {
   // and a sibling navigation (same component, new slug) does. Only the real
   // (non-placeholder) listing names the node.
   useEffect(() => {
-    if (!name || listing.isPlaceholderData || pageNotFound) return;
+    if (!name || listing.isPlaceholderData) return;
     const key = `${level}:${slug}`;
     if (trackedCategoryViewRef.current === key) return;
     trackedCategoryViewRef.current = key;
     trackCategoryView(name);
-  }, [level, listing.isPlaceholderData, name, pageNotFound, slug]);
+  }, [level, listing.isPlaceholderData, name, slug]);
 
   useEffect(() => {
     if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {
@@ -448,18 +444,28 @@ export default function TaxonomyListing({ level }: Props) {
     pendingAnalyticsRef.current = null;
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
+  // A ?page= spelling the server also rejects (0, -5, abc, 1e3, 007) shows
+  // page 1; say so rather than rewriting the URL silently.
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("page");
+    if (raw !== null && strictUrlPage(raw) === null) {
+      setPageNotice({ message: `Page “${raw}” doesn't exist, so page 1 is shown.`, resultSet: resultSetKey(1) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydratedRoute]);
+
   const urlSyncInitialized = useRef(false);
   const syncedRoute = useRef(hydratedRoute);
   const replaceNextUrlSync = useRef(false);
   const pushSnapshot = useRef("");
   useEffect(() => {
-    if (!pageRejected && page > totalPages && paginationReady) {
+    if (page > totalPages && paginationReady) {
       // Correct the URL in place: Back to it would only clamp again.
       replaceNextUrlSync.current = true;
       setPageNotice({ message: `Page ${page} is not available; showing page ${totalPages} instead.`, resultSet: resultSetKey(totalPages) });
       setPage(totalPages);
     }
-  }, [page, pageRejected, paginationReady, totalPages]);
+  }, [page, paginationReady, totalPages]);
   const stateHref = `${routeFor(level, slug)}${stateQuery.size ? `?${stateQuery}` : ""}`;
   // Search text is left out so typing replaces the entry instead of pushing.
   const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
@@ -476,9 +482,6 @@ export default function TaxonomyListing({ level }: Props) {
     if (!samePath(window.location.pathname, routeFor(level, slug))) return;
     // Let the clamp commit first: normalizing view/sort here would consume
     // its replacement flag while the URL still names the unavailable page.
-    // Malformed page input retains its rejected URL; numeric pages wait for
-    // their authoritative total before canonical recovery.
-    if (pageNotFound) return;
     if (paginationReady && page > totalPages) return;
     if (page > 1 && !paginationReady && strictUrlPage(new URLSearchParams(window.location.search).get("page")) === page) return;
     if (current !== stateHref) {
@@ -491,7 +494,7 @@ export default function TaxonomyListing({ level }: Props) {
     urlSyncInitialized.current = true;
     syncedRoute.current = hydratedRoute;
     pushSnapshot.current = snapshot;
-  }, [hydratedRoute, level, location, page, pageNotFound, paginationReady, slug, snapshot, stateHref, totalPages]);
+  }, [hydratedRoute, level, location, page, paginationReady, slug, snapshot, stateHref, totalPages]);
 
   // An empty tile is a dead end: a subcategory with no approved resources, or
   // one the kind filter has ruled out. The crawler HTML hides them too.
@@ -506,7 +509,6 @@ export default function TaxonomyListing({ level }: Props) {
     .sort((a, b) => navTotalCount(b) - navTotalCount(a))
     .slice(0, 8);
 
-  if (pageNotFound) return <NotFound />;
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
