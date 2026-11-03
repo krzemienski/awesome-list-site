@@ -672,7 +672,7 @@ export default function TaxonomyListing({ level }: Props) {
   if (provider) broadenParams.set("provider", provider);
   if (format) broadenParams.set("format", format);
   if (skillLevel) broadenParams.set("skillLevel", skillLevel);
-  if (sort !== "default") broadenParams.set(level === "category" ? "sort" : "sortBy", sort);
+  if (sort !== "default" && acceptedSort(sort)) broadenParams.set(level === "category" ? "sort" : "sortBy", sort);
   const broadenBase = level === "category" ? "/search" : back;
   const broadenHref = `${broadenBase}${broadenParams.size ? `?${broadenParams}` : ""}`;
   // C3-V1-03: an empty search/filter result is "Resources (0)"; "Coming soon"
