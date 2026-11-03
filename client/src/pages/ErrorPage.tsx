@@ -92,8 +92,15 @@ export default function ErrorPage({ error, onRetry, retrying }: ErrorPageProps) 
 
   // The raw message names internal request URLs; keep it in the console for
   // debugging rather than on the page.
+  // One report per visit to the error card: every automatic retry that fails
+  // again hands in a new error object, and counting each one turned a single
+  // flaky connection into several "page load failures". A device with no
+  // connection is not a site fault either.
+  const reportedRef = useRef(false);
   useEffect(() => {
     console.error("[ErrorPage]", error);
+    if (reportedRef.current || navigator.onLine === false) return;
+    reportedRef.current = true;
     trackSiteError("page_load_failed");
   }, [error]);
 

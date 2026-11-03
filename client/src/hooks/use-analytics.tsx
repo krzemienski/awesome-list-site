@@ -8,7 +8,11 @@ import {
   trackPageEngagement,
   trackPerformance,
 } from '../lib/analytics';
-import { syncReplitPageviewOptOut } from '../lib/analytics-suppression';
+import {
+  isCancelledRequestError,
+  isForeignScriptError,
+  syncReplitPageviewOptOut,
+} from '../lib/analytics-suppression';
 
 // Single source of GA4 page views + page-engagement duration.
 // gtag is configured with send_page_view:false, so page_view is fired here on
@@ -110,9 +114,11 @@ export const useAnalytics = () => {
     // Only send a safe message shape: raw browser messages can include copied
     // text, route/query values, or third-party URLs.
     const handleError = (event: ErrorEvent) => {
+      if (isForeignScriptError(event)) return;
       trackError('javascript_error', messageShapeOf(event.message));
     };
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (isCancelledRequestError(event.reason)) return;
       trackError(
         'unhandled_promise_rejection',
         messageShapeOf(event.reason instanceof Error ? event.reason.message : event.reason),

@@ -258,6 +258,15 @@ exactly as before. The rules live in
   `/sign-in?admin`. `/admin` and `/bookmarks` are **not** path-blocked:
   visitors' `/bookmarks` stays tracked, and admin pages are covered by the
   session rule.
+- **Automated browsers.** `navigator.webdriver === true` suppresses every
+  vendor (and Replit's Umami via `umami.disabled`) from the first page view.
+  Verified true in agent-browser and the chrome-devtools MCP browser, so audit
+  lanes with device emulation send nothing. Real Safari/Chrome report false.
+- **Not site errors.** `site_error` / `error` skip window errors from another
+  origin (extensions, translate tools, third-party tags, "Script error."),
+  ResizeObserver notices, `AbortError` rejections and cancelled API requests,
+  and every error card or route crash seen while the browser reports offline;
+  `ErrorPage` reports once per visit, not once per automatic retry.
 - **Admin marker.** `localStorage['analytics-admin-session'] = '1'` is set
   when `/api/auth/user` reports `role: "admin"` (any sign-in path, in
   `useAuth`) and right after the owner password sign-in succeeds, before its
