@@ -18,6 +18,7 @@ import {
 import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
 import { initPosthog, optOutPosthog } from "@/lib/posthog";
 import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
+import { clearAcquisition } from "@/lib/acquisition";
 import "@/styles/pages/system-overlays.css";
 import { useHomeBoot } from "@/lib/home-boot";
 
@@ -203,6 +204,8 @@ export default function ConsentBanner() {
       optOutMixpanel();
       optOutPosthog();
       optOutAmplitude();
+      // First-touch UTM/referrer record is analytics-only: withdrawn with consent.
+      clearAcquisition();
     }
   };
 

@@ -15,6 +15,7 @@ import type { PostHog } from 'posthog-js';
 import type { IdentityUser } from './analytics-sdk-options';
 import { vendorSdksAllowed } from './analytics';
 import { getAcquisition } from './acquisition';
+import { clearStorageMatching, expireCookiesMatching } from './analytics-storage';
 
 const getKey = (): string | undefined =>
   import.meta.env.VITE_POSTHOG_KEY as string | undefined;
@@ -94,18 +95,31 @@ export const initPosthog = () => {
     });
 };
 
-// Consent revoked after a prior grant.
+// Everything the SDK persists: ph_phc_<key>_posthog (cookie + localStorage),
+// ph_* window/session ids, the __ph_opt_in_out_* consent flag and the
+// ph_cookie_support_ probe. Cookies sit on the parent domain
+// (cross_subdomain_cookie), which expireCookiesMatching covers.
+const POSTHOG_STORAGE_KEY = /^(__)?ph_|posthog/i;
+
+// Consent revoked after a prior grant. Opt-out alone leaves the persisted
+// distinct_id / device_id / replay config behind, so after the SDK stops we
+// reset it (fresh anonymous identity, nothing written) and then remove every
+// key it used — also when the SDK never finished loading on this page.
 export const optOutPosthog = () => {
   disabled = true;
   pending = [];
   identifiedUserId = null;
-  if (!ph) return;
-  try {
-    ph.stopSessionRecording();
-    ph.opt_out_capturing();
-  } catch {
-    // Never let analytics teardown break the UI.
+  if (ph) {
+    try {
+      ph.stopSessionRecording();
+      ph.opt_out_capturing();
+      ph.reset(true);
+    } catch {
+      // Never let analytics teardown break the UI.
+    }
   }
+  expireCookiesMatching(POSTHOG_STORAGE_KEY);
+  clearStorageMatching(POSTHOG_STORAGE_KEY);
 };
 
 const safePath = (): string | undefined =>
