@@ -448,6 +448,11 @@ button.taxonomy-child {
   min-height: 44px;
   margin: 0;
   white-space: nowrap;
+  /* The tray ignores the pointer at rest so it never blocks the stretched
+     title link, but its controls must still win a press that arrives without
+     a prior hover (click, tap, synthetic input): they sit at z-10 above the
+     title's ::after overlay. */
+  pointer-events: auto;
 }
 
 /* The band right of the mark is 232px on the narrowest (320px) card, so Open
