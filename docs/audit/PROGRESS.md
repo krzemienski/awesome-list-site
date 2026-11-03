@@ -236,3 +236,13 @@ Read this first. Lane log: reports/prod-audit-2026-10-29/PROGRESS.md. Decision t
 - #207 merged cf3a8403; tsc 0 / build 0; no running jobs; publish-build stamped cf3a8403, dirty 0, tree c679a742 == origin/main. Evidence: e2e-evidence/replit-deploy/20261103T1644Z/
 - Cleanup: submission 190923 deleted (200, search empty, public 404).
 - In flight: verify-207 (keyboard-only revoke ring at 1440 + 390).
+
+
+## RESUME CHECKPOINT C18r (2026-11-03 ~21:15Z)
+- Live 291c8d0d = origin/main (#214 C43 fallback, #215 C8/C9/C4, #216 C29/C31, #217 C3 Mixpanel ignore_dnt). ProofPunk run 20261103-174738-b267 STOPPED (T1 blocks deploys); artifacts in .proofpunk/runs/20261103-174738-b267/. Lead roster: .audit/c18/ROSTER.md; final-gate brief: .audit/c18/FINAL-GATE.md.
+- D1 data edits applied 20:52Z: 189028/189660/188769 -> archive.org (e2e-evidence/c18-f/applied.md).
+- Prod PASS so far: C4 (e2e-evidence/c18r-verify-c4/), C8/C9 (c18r-verify-w1/), C29 server titles (c18-final/FB/bug029-curl-titles.txt), FC 12/12 (c18-final/FC/), C20 6/6 + C43 post-hydration (c18r-verify-c43/).
+- Open: PR #218 (L5 pre-hydration Ctrl+K capture, head 3c9b43d8; merged-tree gate tsc0/build0) under sonnet review. After APPROVE: merge (squash, sha) -> replit-deploy -> real-Chrome re-run of BUG-043 (cold Slow3G+4xCPU, Ctrl+K before hydration) + FA home rows + SM home journeys.
+- Running final-gate checkers on 291c8d0d: FA, FB, RC (minus 043/004), SM -> e2e-evidence/c18-final/<slice>/.
+- Then: 47-row completion table (one evidence path each) -> docs/audit VERDICT/BUG_LEDGER update -> docs PR -> cleanup worktrees /tmp/c18-*, .claude/worktrees/agent-*, .proofpunk/wt/*; delete cron e67e4cfb; /oh-my-claudecode:cancel.
+- Owner decision open: C3 Mixpanel now sends despite browser DNT after explicit Allow (matches PostHog/Amplitude).
