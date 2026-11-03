@@ -332,7 +332,7 @@ export default function ApiKeysCard() {
                 return (
                   <li
                     key={key.id}
-                    className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-2 p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-row sm:items-center sm:justify-between"
                     data-testid={`row-api-key-${key.id}`}
                     data-status={status}
                   >
