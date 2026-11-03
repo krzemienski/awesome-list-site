@@ -448,7 +448,18 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                     ) : (
                       <>
                         <span>Search failed. Please try again.</span>
-                        <button type="button" onKeyDown={keepNativeEnter} onClick={() => void resourceQuery.refetch()}>Try again</button>
+                        <button
+                          type="button"
+                          onKeyDown={keepNativeEnter}
+                          onClick={() => {
+                            // This button unmounts while the refetch runs; keep
+                            // the keyboard in the search input, where results land.
+                            inputRef.current?.focus();
+                            void resourceQuery.refetch();
+                          }}
+                        >
+                          Try again
+                        </button>
                       </>
                     )}
                   </div>
