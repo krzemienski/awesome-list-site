@@ -721,8 +721,9 @@ function Router({
     noteLocationChange();
   }, [location]);
 
-  // Routes rendered without MainLayout (unknown URLs) have no palette; do not
-  // leave the pre-hydration key capture swallowing Ctrl/Cmd+K there.
+  // MainLayout hands the capture off when it mounts. App mounting is the
+  // backstop for any render path that returns before MainLayout, so the
+  // pre-hydration listener never outlives the app's first commit.
   useEffect(() => {
     stopPalettePrehydrationCapture();
   }, []);

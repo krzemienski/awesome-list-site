@@ -35,7 +35,12 @@ export function stopPalettePrehydrationCapture(): void {
 /** The request captured before hydration, if any. Stops the capture. */
 export function takePendingPalette(): PendingPalette | undefined {
   stopPalettePrehydrationCapture();
-  return window.__awvPendingPalette;
+  const pending = window.__awvPendingPalette;
+  if (!pending?.open) return undefined;
+  // Consumed: a second read (remount, StrictMode) must not open it again. The
+  // draft stays for SearchPalette until clearPendingPalette.
+  window.__awvPendingPalette = { ...pending, open: false };
+  return pending;
 }
 
 /** Drop the captured request once the palette has taken its draft. */
