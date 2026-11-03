@@ -10,14 +10,14 @@ Live probes ran against the already-running wave-A instance (port 5002, worktree
 ```
 DOTENV_CONFIG_PATH=/Users/nick/Desktop/awesome-list-site/.env \
 DATABASE_URL=postgresql://localhost:5432/<db> PORT=<port> NODE_ENV=development \
-DISABLE_BACKGROUND_JOBS=1 ANTHROPIC_MODEL=cc/claude-opus-5 \
+DISABLE_BACKGROUND_JOBS=1 ANTHROPIC_MODEL=cc/claude-sonnet-5 \
 <VITE_* + CONTACT_* from .replit [userenv.shared]> \
 ./node_modules/.bin/tsx server/index.ts        # Bash run_in_background, cwd = the checkout
 ```
 - `server/index.ts:1` loads `dotenv/config`, so `DOTENV_CONFIG_PATH` selects the .env. `vite.config.ts:2` also loads `dotenv/config`, and `vite.config.ts:194` sets `envDir` to the repo root.
 - Port: `server/index.ts:670` uses `process.env.PORT`, falling back to 5000. Port 5000 is taken by macOS: `lsof` → `ControlCe 754 ... TCP *:5000 (LISTEN)`.
 - DB: `server/db/index.ts:34` uses `connectionString: process.env.DATABASE_URL` and nothing else. `.replit [userenv.shared]` has **no** DATABASE_URL (checked with `sed -n '/userenv/,$p' .replit`). Always pass a local URL explicitly. Never let .env supply it: old memory `~/.claude/.../memory/local-admin-verify-recipe.md:7` says .env's URL is production Neon.
-- `.replit [userenv.shared]` non-secret keys: `VITE_SITE_URL`, `ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_DEFAULT_*_MODEL`, `ANTHROPIC_MODEL=cc/claude-opus-5`, `CONTACT_ISSUES_URL`, `CONTACT_ENABLED=true`, `VITE_CONTACT_VARIANT=b`, `VITE_POSTHOG_HOST=https://us.i.posthog.com`, plus `VITE_AMPLITUDE_API_KEY` / `VITE_MIXPANEL_TOKEN` / `VITE_POSTHOG_KEY` (public client keys, values not copied here). There is no `VITE_GA_MEASUREMENT_ID`, so GA stays off and the consent banner names only Mixpanel/PostHog/Amplitude (`client/src/lib/analytics.ts:38-47`).
+- `.replit [userenv.shared]` non-secret keys: `VITE_SITE_URL`, `ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_DEFAULT_*_MODEL`, `ANTHROPIC_MODEL=cc/claude-sonnet-5`, `CONTACT_ISSUES_URL`, `CONTACT_ENABLED=true`, `VITE_CONTACT_VARIANT=b`, `VITE_POSTHOG_HOST=https://us.i.posthog.com`, plus `VITE_AMPLITUDE_API_KEY` / `VITE_MIXPANEL_TOKEN` / `VITE_POSTHOG_KEY` (public client keys, values not copied here). There is no `VITE_GA_MEASUREMENT_ID`, so GA stays off and the consent banner names only Mixpanel/PostHog/Amplitude (`client/src/lib/analytics.ts:38-47`).
 - Boot sequence in dev: no migrations run (`server/index.ts:528-536`, `markMigrationsNotRequired`). Then `registerRoutes`, the protected-page guard, og-middleware, then `setupVite` (`server/index.ts:593-597`). Vite runs in middleware mode with HMR on the same http server (`server/vite-dev.ts:11-17`). **Any Vite error calls `process.exit(1)`** (`server/vite-dev.ts:25-28`).
 - Ready log line: `Serving on port <p>` (`server/index.ts:684`), followed by `Background jobs disabled (DISABLE_BACKGROUND_JOBS=1)` (`:689-691`). Without that flag, schedulers start and the enrichment watchdog fails pending jobs (`:686-701`).
 - No server hot reload: `package.json:7` runs `tsx server/index.ts` without `--watch`. Restart after any `server/**` or `shared/**` edit. Client code reloads through Vite HMR. Memory: `.agents/memory/dev-server-no-watch.md:6-12`, `~/.claude/.../memory/dev-server-no-watch.md:10-13`.

@@ -252,7 +252,7 @@ preview overrides: `model`, `scoutModel`, `baseUrl` (validated like start),
     "version": 1,
     "endpoint": { "host": "router.hack.ski", "baseUrl": "https://router.hack.ski", "scheme": "https", "source": "env" },
     "credential": { "source": "env", "label": "router via ANTHROPIC_BASE_URL", "tokenLast4": null },
-    "orchestrator": { "model": "cc/claude-opus-5", "source": "ANTHROPIC_MODEL" },
+    "orchestrator": { "model": "cc/claude-sonnet-5", "source": "ANTHROPIC_MODEL" },
     "scout": { "value": "haiku", "model": "cc/claude-haiku-4-5-20251001", "source": "ANTHROPIC_DEFAULT_HAIKU_MODEL" },
     "overrides": { "baseUrl": false, "authToken": false, "model": false, "scoutModel": false, "insecureHttp": false },
     "preflight": { "ok": true, "issues": [] }

@@ -187,7 +187,7 @@ Researcher launch dialog shows the same message. Check with
 `GET /api/researcher/config` (admin).
 
 Values in `.replit` `[userenv.shared]` (October 2026):
-`ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_MODEL=cc/claude-opus-5`,
+`ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_MODEL=cc/claude-sonnet-5` (researcher orchestrator; scouts stay on haiku),
 `ANTHROPIC_DEFAULT_OPUS_MODEL=cc/claude-opus-5`,
 `ANTHROPIC_DEFAULT_SONNET_MODEL=cc/claude-sonnet-5`,
 `ANTHROPIC_DEFAULT_HAIKU_MODEL=cc/claude-haiku-4-5-20251001`,
