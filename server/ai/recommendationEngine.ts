@@ -165,6 +165,8 @@ export class RecommendationEngine {
     forceRefresh: boolean = false,
   ): Promise<{
     recommendations: RecommendationResult[];
+    /** True when the popularity query failed and the list is an unranked fallback. */
+    degraded?: boolean;
   }> {
     // FIXED: Clone profile before merging (done early so cache hit also uses enriched profile)
     // Ensure all required fields have default values
@@ -368,6 +370,7 @@ export class RecommendationEngine {
       );
 
       let recommendations: RecommendationResult[] = [];
+      let degraded = false;
 
       // Cold-start detection: Check if user has minimal interaction history
       const isColdStart = enrichedProfile.viewHistory.length === 0 &&
@@ -467,7 +470,9 @@ export class RecommendationEngine {
             feedbackAdjustment,
           };
         };
-        const popularCandidates = await this.getPopularResources(preferredPool, Math.max(limit * 10, 100));
+        const popular = await this.getPopularResources(preferredPool, Math.max(limit * 10, 100));
+        degraded ||= popular.degraded;
+        const popularCandidates = popular.resources;
         const rankedPreferred = popularCandidates
           .map((resource, index) => ({ resource, comps: blend(resource, index, popularCandidates.length) }))
           .sort((a, b) => b.comps.score - a.comps.score)
@@ -475,12 +480,14 @@ export class RecommendationEngine {
         const chosenUrls = new Set(rankedPreferred.map(r => r.resource.url));
         // Run16 BUG-004: off-preference rows are only appended when the
         // preferred pool can't fill the list, and those padded rows say so.
-        const padCandidates = preferred.length > 0 && rankedPreferred.length < limit
+        const padPopular = preferred.length > 0 && rankedPreferred.length < limit
           ? await this.getPopularResources(
               eligibleResources.filter(r => !chosenUrls.has(r.url)),
               (limit - rankedPreferred.length) * 3
             )
-          : [];
+          : { resources: [] as Resource[], degraded: false };
+        degraded ||= padPopular.degraded;
+        const padCandidates = padPopular.resources;
         const rankedPad = padCandidates
           .map((resource, index) => ({ resource, comps: blend(resource, index, padCandidates.length) }))
           .sort((a, b) => b.comps.score - a.comps.score)
@@ -527,14 +534,18 @@ export class RecommendationEngine {
         }));
 
         recommendations = uniqueByResourceId(recommendations);
-        // Cache and return early for cold-start users
-        this.recommendationCache.set(cacheKey, {
-          recommendations,
-          timestamp: Date.now()
-        });
+        // Cache and return early for cold-start users. A degraded (fallback)
+        // list is never cached, so the next request retries the popularity query.
+        if (!degraded) {
+          this.recommendationCache.set(cacheKey, {
+            recommendations,
+            timestamp: Date.now()
+          });
+        }
 
         return {
-          recommendations
+          recommendations,
+          ...(degraded ? { degraded } : {}),
         };
       }
 
@@ -870,7 +881,10 @@ export class RecommendationEngine {
    * Get popular resources based on view counts and interactions
    * Used for cold-start users with no personalization data
    */
-  private async getPopularResources(resources: Resource[], limit: number): Promise<Resource[]> {
+  private async getPopularResources(
+    resources: Resource[],
+    limit: number,
+  ): Promise<{ resources: Resource[]; degraded: boolean }> {
     try {
       // Fetch interaction-based popularity for ALL resources in a single
       // aggregate query. (Previously this fired one query per resource via
@@ -881,17 +895,21 @@ export class RecommendationEngine {
 
       // Sort by popularity (0 for resources with no interactions, preserving
       // input order among ties) and return the top `limit`.
-      return resources
-        .map(resource => ({ resource, popularityScore: scoreMap.get(resource.id) ?? 0 }))
-        .sort((a, b) => b.popularityScore - a.popularityScore)
-        .slice(0, limit)
-        .map(item => item.resource);
+      return {
+        resources: resources
+          .map(resource => ({ resource, popularityScore: scoreMap.get(resource.id) ?? 0 }))
+          .sort((a, b) => b.popularityScore - a.popularityScore)
+          .slice(0, limit)
+          .map(item => item.resource),
+        degraded: false,
+      };
 
     } catch (error) {
       logger.error('Error fetching popular resources:', error);
-      // Fallback: return random sample of resources
-      const shuffled = [...resources].sort(() => Math.random() - 0.5);
-      return shuffled.slice(0, limit);
+      // Fallback: keep the input order (the catalog's newest-first listing) so
+      // identical inputs give identical output; the caller flags it degraded
+      // and keeps it out of every cache.
+      return { resources: resources.slice(0, limit), degraded: true };
     }
   }
 

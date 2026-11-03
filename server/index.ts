@@ -143,12 +143,33 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 // Negative results never stick in a cache: every /api response with status
 // >= 400 is no-store, whichever handler (route, limiter, 404/405 fallback,
-// error handler) produced it. Patched at writeHead so it also wins over a
-// Cache-Control the handler set earlier. See server/http-cache-policy.ts.
+// error handler) produced it. Patched at writeHead so it overrides a
+// Cache-Control set earlier with setHeader/res.set AND one passed in the
+// writeHead(status, headers) argument (object or raw [name, value, ...]
+// array form). See server/http-cache-policy.ts.
 app.use("/api", (_req, res, next) => {
   const writeHead = res.writeHead;
   res.writeHead = function (this: Response, status: number, ...rest: any[]) {
-    if (status >= 400) res.setHeader("Cache-Control", API_ERROR_CACHE_CONTROL);
+    if (status >= 400) {
+      res.setHeader("Cache-Control", API_ERROR_CACHE_CONTROL);
+      const headers = rest.find((arg) => arg !== null && typeof arg === "object");
+      if (Array.isArray(headers)) {
+        // Flat [name, value, ...] or [[name, value], ...] pairs.
+        if (headers.length > 0 && Array.isArray(headers[0])) {
+          for (const pair of headers) {
+            if (String(pair[0]).toLowerCase() === "cache-control") pair[1] = API_ERROR_CACHE_CONTROL;
+          }
+        } else {
+          for (let i = 0; i + 1 < headers.length; i += 2) {
+            if (String(headers[i]).toLowerCase() === "cache-control") headers[i + 1] = API_ERROR_CACHE_CONTROL;
+          }
+        }
+      } else if (headers) {
+        for (const name of Object.keys(headers)) {
+          if (name.toLowerCase() === "cache-control") headers[name] = API_ERROR_CACHE_CONTROL;
+        }
+      }
+    }
     return (writeHead as any).call(this, status, ...rest);
   } as typeof res.writeHead;
   next();

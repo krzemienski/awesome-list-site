@@ -74,7 +74,13 @@ async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOut
     try {
       await apiRequest(`/api/resources/${id}`, { credentials: "include" });
     } catch (error) {
-      if (error instanceof ApiError && (error.status === 404 || error.status === 410)) {
+      if (
+        error instanceof ApiError
+        && (error.status === 404
+          || error.status === 410
+          // Malformed legacy id: /api/resources/:id answers 400 validation_failed.
+          || (error.status === 400 && error.body.includes('"validation_failed"')))
+      ) {
         missing.push(id); // resource no longer exists — drop the save
       } else {
         failed.push(id); // transient trouble — keep the save for a later retry

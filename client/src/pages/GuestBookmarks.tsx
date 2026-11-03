@@ -22,6 +22,11 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
 
+function isGoneError(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  return error.status === 404 || (error.status === 400 && error.body.includes('"validation_failed"'));
+}
+
 // The public resource detail endpoint adds read-time kind resolution to the
 // database row. Keep this response type additive: the server supplies the
 // value, so the client does not infer or fabricate a fallback kind.
@@ -65,13 +70,14 @@ export default function GuestBookmarks() {
     })),
   });
 
-  // Self-healing: a 404 means the resource is gone — drop that save. Network
-  // or server errors keep the save (never silently lose a guest's list).
+  // Self-healing: a 404 (or a 400 validation_failed for a malformed id) means
+  // the resource can never load — drop that save. Network or server errors
+  // keep the save (never silently lose a guest's list).
   const deadIds = useMemo(
     () =>
       results
         .map((result, index) =>
-          result.error instanceof ApiError && result.error.status === 404
+          isGoneError(result.error)
             ? sortedEntries[index]?.id
             : undefined,
         )
@@ -84,7 +90,7 @@ export default function GuestBookmarks() {
 
   const failedIds = results
     .map((result, index) =>
-      result.error && !(result.error instanceof ApiError && result.error.status === 404)
+      result.error && !isGoneError(result.error)
         ? sortedEntries[index]?.id
         : undefined,
     )
