@@ -4,6 +4,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## November 4, 2026
+
+### Equivalent responsive analytics consent (BUG-044)
+- Keep the full provider and signed-in name/email disclosure visible on short and mobile viewports. Native browser zoom wraps the Privacy Policy link instead of ellipsizing it, with the same Decline / Allow analytics controls and 44px action targets at every size.
+
 ## October 27, 2026
 
 ### Research continuation usage accounting

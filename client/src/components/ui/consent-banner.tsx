@@ -55,19 +55,6 @@ export default function ConsentBanner() {
   // leave that choice exactly as it was.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [draft, setDraft] = useState<"granted" | "denied" | "">("");
-  // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
-  // banner grew tall enough to sit over the /login submit button. Track a
-  // compact breakpoint so we can render a single-row, reduced-copy bar there.
-  // R4-042: ALSO go compact on short viewports (<500px tall, e.g. 812×375
-  // landscape) — the two-row banner covered the Sign-in CTA there; the compact
-  // single-row bar is short enough to leave it reachable at first paint.
-  const isCompactViewport = () =>
-    typeof window !== "undefined" && (window.innerWidth < 360 || window.innerHeight < 500);
-  // A server cannot know the exact visual viewport. Keep the first hydrated
-  // markup equal to SSR, then apply the compact breakpoint in the effect below.
-  const [isCompact, setIsCompact] = useState(
-    () => (isInitialHomeHydration ? false : isCompactViewport()),
-  );
   const [legacyConsentReconciled, setLegacyConsentReconciled] = useState(
     () => !isInitialHomeHydration,
   );
@@ -116,13 +103,6 @@ export default function ConsentBanner() {
   // and visual order the same (WCAG 2.4.3). The one thing flow cannot move is
   // viewport-fixed UI, which reads the shell's --app-bottom-inset instead.
   useAppBottomInset(bannerEl, !choiceMade);
-
-  useEffect(() => {
-    const onResize = () => setIsCompact(isCompactViewport());
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   // Existing installations stored consent only in localStorage. New decisions
   // also set a small same-site cookie for SSR, while this one-time post-hydrate
@@ -259,56 +239,9 @@ export default function ConsentBanner() {
     </Dialog>
   );
 
-  // NB-003 (run18): condensed single-row bar for <360px viewports. Reduced
-  // padding, trimmed copy and inline Accept/Decline buttons keep the banner
-  // short (and max-h capped) so it no longer covers the centred /login submit
-  // button at 320×568. The bar is in flow either way, so the form keeps its
-  // own space; the compact variant just gives the page more of the viewport.
-
   // One stable tree: the dialog stays mounted while the banner appears and
   // disappears, so saving a choice never remounts it (and drops focus return).
-  const banner = choiceMade ? null : isCompact ? (
-      <div
-        ref={attachBanner}
-        role="region"
-        aria-label="Analytics consent"
-        tabIndex={-1}
-        className="system-consent-banner system-consent-banner--compact outline-none ph-no-capture"
-        data-testid="consent-banner"
-      >
-        <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] flex-wrap items-center gap-2 overflow-hidden px-3 py-2">
-          <p className="system-consent-banner__copy min-w-0 flex-1 basis-40 text-xs">
-            Analytics ({vendorList}), only if you allow it.{" "}
-            <Link
-              href="/privacy"
-              className="system-consent-banner__privacy-link"
-              data-testid="consent-privacy-link"
-            >
-              Privacy
-            </Link>
-          </p>
-          <div className="system-consent-banner__actions flex shrink-0 items-center gap-1.5">
-            <Button
-              variant="outline"
-              size="sm"
-              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
-              onClick={() => decide("denied")}
-              data-testid="consent-decline"
-            >
-              Decline
-            </Button>
-            <Button
-              size="sm"
-              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
-              onClick={() => decide("granted")}
-              data-testid="consent-accept"
-            >
-              Allow analytics
-            </Button>
-          </div>
-        </div>
-      </div>
-  ) : (
+  const banner = choiceMade ? null : (
     <div
       ref={attachBanner}
       role="region"
@@ -317,14 +250,11 @@ export default function ConsentBanner() {
       className="system-consent-banner outline-none ph-no-capture"
       data-testid="consent-banner"
     >
-      {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
-          sentence hidden on xs) so the pinned bar takes less of a 375px
-          viewport. */}
       <div className="system-consent-banner__inner mx-auto w-full flex flex-col items-start gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6 sm:py-3 md:px-12">
         <p className="system-consent-banner__copy flex-1 text-xs sm:text-sm">
           We use analytics ({vendorList}) to understand how the site is used — only if you allow
           it.{" "}
-          <span className="hidden sm:inline">
+          <span>
             Decline and none of them load.
             {ANALYTICS_VENDORS.includes("Mixpanel")
               ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
