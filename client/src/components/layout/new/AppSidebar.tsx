@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useEffect, useMemo, useRef, useId, type ReactNode } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useId, type ReactNode } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import {
   Home,
@@ -305,8 +305,8 @@ function DismissibleDetails({ className, children }: { className: string; childr
 /* -------- top-level accordion category -------- */
 
 function MeasuredAccordionBody({
-  id, open, children,
-}: { id: string; open: boolean; children: () => ReactNode }) {
+  id, open, animate, children,
+}: { id: string; open: boolean; animate: boolean; children: () => ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
   // Keep the control's target in the DOM while closed, but delay the expensive
@@ -321,7 +321,10 @@ function MeasuredAccordionBody({
     if (open) setHasBeenOpened(true);
   }, [open]);
 
-  useEffect(() => {
+  // Layout effect: a body that opens because of the route (not a click) must
+  // be measured before first paint, so it never paints collapsed and then
+  // pushes the rows below it down.
+  useLayoutEffect(() => {
     if (!shouldMountContent) return;
     const content = contentRef.current;
     if (!content) return;
@@ -336,7 +339,11 @@ function MeasuredAccordionBody({
 
   return (
     <div id={id} className="accordion-body"
-      style={{ maxHeight: open ? height : 0 }}
+      style={{
+        maxHeight: open ? height : 0,
+        // Only a user toggle animates; route-driven auto-expand snaps open.
+        ...(animate ? null : { transition: "none" }),
+      }}
       {...(!open ? ({ inert: "" } as any) : {})}>
       {shouldMountContent ? (
         <div ref={contentRef} className="flow-root">{children()}</div>
@@ -356,6 +363,7 @@ function CategoryAccordion({
   matchQuery,
   openSubs,
   toggleSub,
+  animate,
 }: {
   cat: NavCategory;
   isOpen: boolean;
@@ -368,6 +376,8 @@ function CategoryAccordion({
   matchQuery: string;
   openSubs: string[];
   toggleSub: (key: string) => void;
+  /** False until the user toggles a group: route-driven opens must not animate. */
+  animate: boolean;
 }) {
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const subKey = (subName: string, subSlug?: string) =>
@@ -465,7 +475,7 @@ function CategoryAccordion({
       </button>
 
       {subs.length > 0 && (
-        <MeasuredAccordionBody id={bodyId} open={isOpen}>
+        <MeasuredAccordionBody id={bodyId} open={isOpen} animate={animate}>
           {() => (
             <div className="accordion-body-inner">
               <a
@@ -566,7 +576,7 @@ function CategoryAccordion({
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>
-                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen}>
+                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen} animate={animate}>
                       {() => (
                         <div className="av-sidebar-l3-tree">
                           <a
@@ -673,6 +683,7 @@ export default function AppSidebar({
     isInitialHomeHydration ? [] : readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY),
   );
   const [openKeysReady, setOpenKeysReady] = useState(!isInitialHomeHydration);
+  const [userToggled, setUserToggled] = useState(false);
   const {
     setOpenMobile,
     isMobile,
@@ -909,26 +920,29 @@ export default function AppSidebar({
                 key={cat.name}
                 cat={cat}
                 isOpen={isOpen}
-                onToggle={() =>
+                animate={userToggled}
+                onToggle={() => {
+                  setUserToggled(true);
                   setOpenCategories((prev) =>
                     prev.includes(catKey) || prev.includes(cat.name)
                       ? prev.filter((c) => c !== catKey && c !== cat.name)
                       : [...prev, catKey],
-                  )
-                }
+                  );
+                }}
                 isActive={catActive}
                 activePath={activePath}
                 generalActive={generalFilterActive}
                 navigate={navigate}
                 matchQuery=""
                 openSubs={openSubcategories}
-                toggleSub={(name) =>
+                toggleSub={(name) => {
+                  setUserToggled(true);
                   setOpenSubcategories((prev) =>
                     prev.includes(name)
                       ? prev.filter((s) => s !== name)
                       : [...prev, name],
-                  )
-                }
+                  );
+                }}
               />
             );
           })}
