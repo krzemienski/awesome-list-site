@@ -248,6 +248,12 @@ vite-plugin-checker-error-overlay {
       filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
+  /* The on-screen first-screen floor must not pad printed pages. */
+  .app-shell-column,
+  .app-shell-main {
+    min-height: 0 !important;
+  }
+
   /* Print is fixed paper paint, outside the five-system theme: the CSS system
      colors Canvas / CanvasText / GrayText are the paper, ink and neutral rule. */
   /* The system colors follow the used color-scheme, and the site is

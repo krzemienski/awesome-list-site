@@ -30,6 +30,13 @@
   /* A word longer than its line (a scraped repo path, a URL) breaks instead
      of spilling past its box, into the gutter and the back-to-top lane. */
   overflow-wrap: break-word;
+  /* Routes are lazy: until a page's content lands, its skeleton is shorter
+     than the viewport, so the footer sits inside the first screen and is
+     pushed out when the content arrives (CLS 0.14-0.17). The column fills the
+     first screen (main is flex: 1 in it, the footer its last child), so the
+     footer starts at the fold on every page and later growth moves nothing
+     visible. Admin has no footer; header + column is exactly one viewport. */
+  min-height: calc(100svh - var(--header-height, 0px));
 }
 
 .app-shell-main {
