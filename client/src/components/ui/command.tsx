@@ -40,7 +40,7 @@ const SELECTED_ITEM = '[cmdk-item][aria-selected="true"]'
  * that, for the initial auto-select, runs in the same pass that registers the
  * items, before the row has re-rendered with aria-selected="true". The id stays
  * undefined until the first arrow key, so the highlighted row is never
- * announced. Mirror the selected row's id onto the combobox and listbox after
+ * announced. Mirror the selected row's id onto the combobox input after
  * every render that can change the selection.
  */
 function useSyncActiveDescendant(input: React.RefObject<HTMLInputElement>) {
@@ -50,14 +50,10 @@ function useSyncActiveDescendant(input: React.RefObject<HTMLInputElement>) {
 
   React.useLayoutEffect(() => {
     const el = input.current
-    const id = el?.closest("[cmdk-root]")?.querySelector(SELECTED_ITEM)?.id
     if (!el) return
-    const list = document.getElementById(el.getAttribute("aria-controls") ?? "")
-    for (const target of [el, list]) {
-      if (!target) continue
-      if (id) target.setAttribute("aria-activedescendant", id)
-      else target.removeAttribute("aria-activedescendant")
-    }
+    const id = el.closest("[cmdk-root]")?.querySelector(SELECTED_ITEM)?.id
+    if (id) el.setAttribute("aria-activedescendant", id)
+    else el.removeAttribute("aria-activedescendant")
   }, [input, value, search, count])
 }
 
@@ -66,7 +62,7 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { trailing?: React.ReactNode }
 >(({ className, trailing, ...props }, ref) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
-  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
+  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement, [])
   useSyncActiveDescendant(inputRef)
 
   return (
