@@ -14,7 +14,7 @@ export const TAG_PLURAL_KEEP = new Set([
   // Names and singular nouns that end in "s" and occur as catalog tags.
   "windows", "aaos", "kinesis", "bioinformatics", "esports", "haptics",
   "jingos", "libopus", "llhls", "lufs", "mpegts", "vorbis", "ptzoptics",
-  "qualabs", "lms", "unityads", "vcms", "series",
+  "qualabs", "lms", "unityads", "vcms", "series", "prometheus",
 ]);
 
 /**
@@ -27,7 +27,7 @@ const RETIRED_TAG_SLUGS: Record<string, string> = {
   jingo: "jingos", libopu: "libopus", llhl: "llhls", luf: "lufs",
   mpegt: "mpegts", "ogg-vorbi": "ogg-vorbis", ptzoptic: "ptzoptics",
   qualab: "qualabs", "tutor-lm": "tutor-lms", unityad: "unityads",
-  vcm: "vcms", "vega-sery": "vega-series",
+  vcm: "vcms", "vega-sery": "vega-series", prometheu: "prometheus",
 };
 
 /** Minimum approved-resource count for an indexable tag landing page. */
@@ -42,16 +42,16 @@ const TAG_DISPLAY_ACRONYMS = new Set([
   "udp", "uhd", "vast", "vfx", "vod", "vp8", "vpaid", "vvc", "w3c", "wcg",
   "3d", "4k", "5g", "8k", "aac", "acm", "aosp", "asc", "ass", "atsc", "av", "avi",
   "avif", "avs", "avs2", "avs3", "bbc", "bif", "cabr", "cd", "cdl", "cdm", "cea",
-  "ci", "cmaf", "cms", "cncf", "cpix", "crf", "css", "cta", "ctv", "cuda", "dct",
+  "ci", "cmaf", "cms", "cncf", "cors", "cpix", "crf", "css", "cta", "ctv", "cuda", "dct",
   "dmx512", "dns", "dvb", "dvd", "dvr", "ebu", "eia", "eotf", "esp32", "flv", "ftl",
-  "gan", "gav1", "gfvc", "gif", "glsl", "gtk4", "hd", "hdmi", "hdr10", "hlg",
+  "gan", "gfvc", "gif", "glsl", "gtk4", "hd", "hdmi", "hdr10", "hlg",
   "iab", "iec", "ietf", "ima", "ima3", "imsc", "ip", "ipmx", "iptv", "isdb",
   "jpeg", "json", "jw", "kde", "kvm", "lcevc", "llm", "lut", "m3u8", "midi", "mjpeg",
   "ml", "mp3", "mpai", "mpd", "mpegif", "mpquic", "ms", "nab", "nasa", "natpe", "nle",
   "npu", "pcc", "pcm", "pku", "pq", "pq10", "quic", "rfc", "scte", "sd", "sdr", "sfn",
   "sfu", "speke", "srtp", "ssa", "ssh", "ssim", "tt", "ttml", "ugc", "uhdtv", "ui",
   "url", "vceg", "vcl", "vesa", "vlc", "vmap", "vr", "wasm", "wav", "wpf",
-  "xl", "xml", "hdr10+", "eev", "vm",
+  "xl", "xml", "hdr10+", "eev", "vm", "ecdn", "bavc",
 ]);
 
 /**
@@ -106,6 +106,17 @@ const TAG_BRAND_CASING = new Map<string, string>(Object.entries({
   hbbtv: "HbbTV",
   voip: "VoIP",
   "ci-cd": "CI/CD",
+  "cea-608": "CEA 608",
+  "scte-35": "SCTE 35",
+  "ms-ssim": "MS SSIM",
+  mpv: "mpv",
+  "risc-v": "RISC-V",
+  "itu-r": "ITU-R",
+  "dash-if": "DASH-IF",
+  "cloud-tv": "CloudTV",
+  "ffmpeg.wasm": "ffmpeg.wasm",
+  "api.video": "api.video",
+  gav1: "gav1",
 }));
 
 export function normalizeTagFilter(tag: string): string {
