@@ -594,7 +594,7 @@
 
 @media (max-width: 639px) {
   .taxonomy-pagination .paginator-pages {
-    gap: 4px;
+    gap: 2px;
   }
 
   .taxonomy-pagination .paginator-pages > span[aria-hidden] {
