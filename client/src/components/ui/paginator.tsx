@@ -17,8 +17,7 @@ import { parsePageInput } from "@/lib/page-param";
  *
  * The jump input applies the shared page rule (lib/page-param.ts): "1e3" and
  * "1000" land on the same clamped page (BUG-022); whole numbers clamp into
- * [1, totalPages]; anything else shows inline validation feedback instead of
- * silently resetting.
+ * [1, totalPages]; invalid or fractional text falls back to page 1 (BUG-041).
  */
 
 const JUMP_INPUT_THRESHOLD = 7;
@@ -29,7 +28,6 @@ export interface PaginatorTestIds {
   next?: string;
   indicator?: string;
   jump?: string;
-  jumpError?: string;
 }
 
 const DEFAULT_TEST_IDS: Required<PaginatorTestIds> = {
@@ -38,7 +36,6 @@ const DEFAULT_TEST_IDS: Required<PaginatorTestIds> = {
   next: "button-next-page",
   indicator: "text-page-indicator",
   jump: "input-page-jump",
-  jumpError: "text-page-jump-error",
 };
 
 interface PaginatorProps {
@@ -48,7 +45,7 @@ interface PaginatorProps {
   makeHref: (page: number) => string;
   /** SPA navigation — setPage + history integration owned by the page. */
   onNavigate: (page: number) => void;
-  onPageAdjusted?: (requested: number, adjusted: number) => void;
+  onPageAdjusted?: (requested: number | string, adjusted: number) => void;
   className?: string;
   testIds?: PaginatorTestIds;
   pageLinkTestId?: (page: number) => string;
@@ -59,7 +56,7 @@ interface PaginatorProps {
  * "…" for gaps (a gap of exactly one page renders that page instead of an
  * ellipsis that would hide a single number).
  */
-function pageWindow(current: number, total: number): Array<number | "ellipsis"> {
+function pageWindow(current: number, total: number): (number | "ellipsis")[] {
   if (total <= JUMP_INPUT_THRESHOLD) {
     return Array.from({ length: total }, (_, i) => i + 1);
   }
@@ -67,7 +64,7 @@ function pageWindow(current: number, total: number): Array<number | "ellipsis"> 
   const pages = Array.from(wanted)
     .filter((p) => p >= 1 && p <= total)
     .sort((a, b) => a - b);
-  const out: Array<number | "ellipsis"> = [];
+  const out: (number | "ellipsis")[] = [];
   let prev = 0;
   for (const p of pages) {
     if (prev) {
@@ -132,7 +129,6 @@ export function Paginator({
 }: PaginatorProps) {
   const ids = { ...DEFAULT_TEST_IDS, ...testIds };
   const [jumpValue, setJumpValue] = useState(String(currentPage));
-  const [jumpError, setJumpError] = useState<string | null>(null);
   // Only text the user typed since the last commit may be committed. Enter
   // resets the box to the shown page; when focus then leaves (a host moving
   // focus to the new results), blur used to re-commit that stale number and
@@ -142,7 +138,6 @@ export function Paginator({
   // Mirror the effective page into the jump box whenever it changes.
   useEffect(() => {
     setJumpValue(String(currentPage));
-    setJumpError(null);
     jumpEditedRef.current = false;
   }, [currentPage]);
 
@@ -158,15 +153,9 @@ export function Paginator({
   const commitJump = () => {
     if (!jumpEditedRef.current) return;
     const n = parsePageInput(jumpValue);
-    if (n == null) {
-      // BUG-022: visible validation feedback — never a silent reset.
-      setJumpError(`Enter a whole number between 1 and ${totalPages}.`);
-      return;
-    }
-    const clamped = Math.min(Math.max(n, 1), totalPages);
+    const clamped = Math.min(Math.max(n ?? 1, 1), totalPages);
     jumpEditedRef.current = false;
-    setJumpError(null);
-    if (clamped !== n) onPageAdjusted?.(n, clamped);
+    if (clamped !== n) onPageAdjusted?.(n ?? jumpValue, clamped);
     if (clamped !== currentPage) onNavigate(clamped);
     // C4-V5A-01: the box mirrors the shown page, not the last request. When
     // the requested page never arrives (offline, then "Stay on page N"),
@@ -256,7 +245,6 @@ export function Paginator({
               onChange={(e) => {
                 jumpEditedRef.current = true;
                 setJumpValue(e.target.value);
-                setJumpError(null);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") commitJump();
@@ -264,23 +252,12 @@ export function Paginator({
               onBlur={commitJump}
               className="h-8 w-16 text-center tabular-nums"
               aria-label={`Page number, 1 to ${totalPages}`}
-              aria-invalid={jumpError ? true : undefined}
-              aria-describedby={jumpError ? `${ids.jump}-error` : undefined}
               data-testid={ids.jump}
             />
             <span aria-hidden="true">/ {totalPages}</span>
           </span>
         )}
       </div>
-      <p
-        id={`${ids.jump}-error`}
-        role="status"
-        aria-live="polite"
-        className={cn("text-xs text-[var(--status-bad)]", !jumpError && "sr-only")}
-        data-testid={ids.jumpError}
-      >
-        {jumpError ?? ""}
-      </p>
     </nav>
   );
 }
