@@ -346,14 +346,13 @@
          same families, weights, styles, axes and unicode-range the former
          Google Fonts css2 request did (Inter, Fraunces, JetBrains Mono, Geist
          and IBM Plex Sans), so pixel parity with the design source holds.
-         The files download when a face is first used; Inter is the default
-         body face of both kept design systems, so it is preloaded. -->
-    <link rel="preload" href="/fonts/inter-bec94a.woff2" as="font" type="font/woff2" crossorigin />
+         Fonts download only when used; no unselected font is preloaded. -->
     <link rel="stylesheet" href="/fonts/fonts.css" />
 
-    <!-- The design system, verbatim from the design source (never edited here;
-         app CSS lives in the Vite bundle, which links after this sheet). -->
+    <!-- Vite generates the six font defaults after this sheet for no-JS SSR. -->
     <link rel="stylesheet" href="/ds/design-system.css" />
+    <style id="font-system-defaults">__AWESOME_VIDEO_FONT_SYSTEM_CSS__</style>
+    <script>window.FONT_SYSTEM_STACKS = __AWESOME_VIDEO_FONT_SYSTEM_STACKS__;</script>
     <!-- Classic, parser-blocking script on purpose: it defines
          window.DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT /
          applyDesignSystem before the boot below runs. -->

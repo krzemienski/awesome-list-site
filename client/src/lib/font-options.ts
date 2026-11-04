@@ -1,5 +1,5 @@
 /**
- * Single source of truth for the I1 Font override picker.
+ * Single source of truth for design-system stacks and the font override picker.
  *
  * The pre-paint boot data is generated from FONT_OPTIONS below and injected
  * into `client/index.html` by Vite. The boot script cannot import TS modules
@@ -12,17 +12,35 @@
  * here fetches from a third party, so a stored override never contacts Google
  * Fonts. A picker option needs its family added to that stylesheet.
  */
-import { getDesignSystems, isSystemId } from "./design-system";
+import { isSystemId, type SystemId } from "./design-system";
 
-export type FontOption = { id: string; name: string; stack: string };
+export interface FontOption { id: string; name: string; stack: string }
+
+const INTER_STACK = "'Inter', 'Inter Fallback', system-ui, sans-serif";
+const GEIST_STACK = "'Geist', 'Inter', 'Inter Fallback', system-ui, sans-serif";
+const MONO_STACK = "'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace";
+
+/** Vite generates the parser-blocking runtime registry and no-JS CSS. */
+export const FONT_SYSTEM_STACKS = {
+  editorial: {
+    "--font-body": INTER_STACK,
+    "--font-display": "'Fraunces', 'Fraunces Fallback', Georgia, serif",
+    "--font-mono": MONO_STACK,
+  },
+  geist: {
+    "--font-body": GEIST_STACK,
+    "--font-display": GEIST_STACK,
+    "--font-mono": MONO_STACK,
+  },
+} as const satisfies Record<SystemId, Record<"--font-body" | "--font-display" | "--font-mono", string>>;
 
 export const FONT_OPTIONS: FontOption[] = [
   { id: "system",       name: "System default",  stack: "" },
-  { id: "inter",        name: "Inter",           stack: "'Inter', 'Inter Fallback', system-ui, sans-serif" },
-  { id: "dm-sans",      name: "DM Sans",         stack: "'DM Sans', system-ui, sans-serif" },
-  { id: "source-sans",  name: "Source Sans 3",   stack: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif" },
-  { id: "ibm-plex",     name: "IBM Plex Sans",   stack: "'IBM Plex Sans', system-ui, sans-serif" },
-  { id: "jetbrains",    name: "JetBrains Mono",  stack: "'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace" },
+  { id: "inter",        name: "Inter",           stack: FONT_SYSTEM_STACKS.editorial["--font-body"] },
+  { id: "dm-sans",      name: "DM Sans",         stack: "'DM Sans', 'DM Sans Fallback', system-ui, sans-serif" },
+  { id: "source-sans",  name: "Source Sans 3",   stack: "'Source Sans 3', 'Source Sans Pro', 'Source Sans 3 Fallback', system-ui, sans-serif" },
+  { id: "ibm-plex",     name: "IBM Plex Sans",   stack: "'IBM Plex Sans', 'IBM Plex Sans Fallback', system-ui, sans-serif" },
+  { id: "jetbrains",    name: "JetBrains Mono",  stack: FONT_SYSTEM_STACKS.editorial["--font-mono"] },
 ];
 
 export const FONT_LS_KEY = "ds-font-override";
@@ -39,7 +57,7 @@ export const FONT_BOOT_DATA = {
 
 /** What "System default" means: the given design system's own body face. */
 export function systemFontStack(system: string | null): string | undefined {
-  return isSystemId(system) ? getDesignSystems()[system].vars["--font-body"] : undefined;
+  return isSystemId(system) ? FONT_SYSTEM_STACKS[system]["--font-body"] : undefined;
 }
 
 export function applyFontOverride(id: string): void {

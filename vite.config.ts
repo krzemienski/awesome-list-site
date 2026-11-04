@@ -4,7 +4,7 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { PRODUCT_PROFILE_BOOT_DATA, THEME_BOOT_DATA } from "./client/src/lib/design-system";
-import { FONT_BOOT_DATA, FONT_OPTIONS } from "./client/src/lib/font-options";
+import { FONT_BOOT_DATA, FONT_OPTIONS, FONT_SYSTEM_STACKS } from "./client/src/lib/font-options";
 
 const workspaceRoot = path.resolve(import.meta.dirname);
 const canonicalSiteUrl = process.env.PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -129,6 +129,8 @@ function productProfileBootRegistry(): Plugin {
 
 function fontBootRegistry(): Plugin {
   const marker = "__AWESOME_VIDEO_FONT_BOOT__";
+  const systemMarker = "__AWESOME_VIDEO_FONT_SYSTEM_STACKS__";
+  const cssMarker = "__AWESOME_VIDEO_FONT_SYSTEM_CSS__";
   const registryFontData = {
     stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),
     fallback: FONT_OPTIONS[0]?.id,
@@ -137,14 +139,29 @@ function fontBootRegistry(): Plugin {
     throw new Error("FONT_BOOT_DATA is stale relative to FONT_OPTIONS");
   }
   const bootData = JSON.stringify(FONT_BOOT_DATA);
+  const systemData = JSON.stringify(FONT_SYSTEM_STACKS);
+  const systemCss = Object.entries(FONT_SYSTEM_STACKS)
+    .map(([id, vars]) => {
+      const selector = id === THEME_BOOT_DATA.defaultSystem ? ":root" : `:root[data-system="${id}"]`;
+      return `${selector}{${Object.entries(vars).map(([key, value]) => `${key}:${value};`).join("")}}`;
+    })
+    .join("\n");
 
   return {
     name: "font-boot-registry",
-    transformIndexHtml(html) {
-      if (!html.includes(marker)) {
-        throw new Error(`font-boot-registry marker ${marker} is missing from client/index.html`);
-      }
-      return html.replaceAll(marker, bootData);
+    transformIndexHtml: {
+      order: "pre",
+      handler(html) {
+        for (const token of [marker, systemMarker, cssMarker]) {
+          if (!html.includes(token)) {
+            throw new Error(`font-boot-registry marker ${token} is missing from client/index.html`);
+          }
+        }
+        return html
+          .replaceAll(marker, bootData)
+          .replaceAll(systemMarker, systemData)
+          .replaceAll(cssMarker, systemCss);
+      },
     },
   };
 }
