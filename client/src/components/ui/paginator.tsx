@@ -173,10 +173,10 @@ export function Paginator({
   return (
     <nav
       aria-label="Pagination"
-      className={cn("flex flex-col items-center gap-2 pt-6", className)}
+      className={cn("@container/paginator flex w-full flex-col items-center gap-2 pt-6", className)}
       data-testid={ids.container}
     >
-      <div className="grid max-w-full grid-cols-2 items-center justify-items-center gap-1.5 sm:flex sm:flex-wrap sm:justify-center">
+      <div className="grid max-w-full grid-cols-2 items-center justify-items-center gap-1.5 @min-[40rem]/paginator:flex @min-[40rem]/paginator:justify-center">
         <PrevNextLink
           enabled={currentPage > 1}
           href={makeHref(currentPage - 1)}
@@ -188,7 +188,7 @@ export function Paginator({
           <span className="max-sm:sr-only">Previous</span>
         </PrevNextLink>
 
-        <div className="paginator-pages col-span-2 row-start-2 flex max-w-full flex-wrap items-center justify-center gap-1.5 sm:contents">
+        <div className="paginator-pages col-span-2 row-start-2 flex max-w-full flex-wrap items-center justify-center gap-1.5 @min-[40rem]/paginator:contents">
           {items.map((item, i) =>
             item === "ellipsis" ? (
               <span
