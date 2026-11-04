@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useEffect, useLayoutEffect, useMemo, useRef, useId, type ReactNode } from "react";
+import { useIsomorphicLayoutEffect } from "@/hooks/use-isomorphic-layout-effect";
+import { useState, useEffect, useMemo, useRef, useId, type ReactNode } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import {
   Home,
@@ -309,6 +310,10 @@ function MeasuredAccordionBody({
 }: { id: string; open: boolean; animate: boolean; children: () => ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
+  // A non-animated open leaves max-height unset until the content has settled,
+  // so nested accordions that open in the same commit never get clipped by a
+  // premature measurement.
+  const [settled, setSettled] = useState(false);
   // Keep the control's target in the DOM while closed, but delay the expensive
   // taxonomy subtree (and its ResizeObserver) until a user opens it once.
   // `open` makes an active route mount immediately; `hasBeenOpened` keeps the
@@ -324,7 +329,7 @@ function MeasuredAccordionBody({
   // Layout effect: a body that opens because of the route (not a click) must
   // be measured before first paint, so it never paints collapsed and then
   // pushes the rows below it down.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!shouldMountContent) return;
     const content = contentRef.current;
     if (!content) return;
@@ -337,10 +342,24 @@ function MeasuredAccordionBody({
     return () => observer.disconnect();
   }, [shouldMountContent]);
 
+  // Once open, re-measure after nested bodies have laid out, then pin the
+  // height so a later user close can transition from a pixel value.
+  useEffect(() => {
+    if (!open) {
+      setSettled(false);
+      return;
+    }
+    const content = contentRef.current;
+    if (content) setHeight(content.scrollHeight);
+    setSettled(true);
+  }, [open]);
+
+  const unclamped = open && !animate && !settled;
+
   return (
     <div id={id} className="accordion-body"
       style={{
-        maxHeight: open ? height : 0,
+        maxHeight: !open ? 0 : unclamped ? "none" : height,
         // Only a user toggle animates; route-driven auto-expand snaps open.
         ...(animate ? null : { transition: "none" }),
       }}
@@ -363,7 +382,7 @@ function CategoryAccordion({
   matchQuery,
   openSubs,
   toggleSub,
-  animate,
+  toggledKey,
 }: {
   cat: NavCategory;
   isOpen: boolean;
@@ -376,12 +395,13 @@ function CategoryAccordion({
   matchQuery: string;
   openSubs: string[];
   toggleSub: (key: string) => void;
-  /** False until the user toggles a group: route-driven opens must not animate. */
-  animate: boolean;
+  /** The group the user just toggled on this route; only it animates. Route-driven opens snap. */
+  toggledKey: string | null;
 }) {
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const subKey = (subName: string, subSlug?: string) =>
     `${catSlug}::${subSlug || slugify(subName)}`;
+  const catAnimate = toggledKey === categoryStorageKey(cat);
   // Tablet can mount both the sidebar and drawer; disclosure IDs must belong
   // to the mounted instance, not just the shared category.
   const instanceId = useId();
@@ -475,7 +495,7 @@ function CategoryAccordion({
       </button>
 
       {subs.length > 0 && (
-        <MeasuredAccordionBody id={bodyId} open={isOpen} animate={animate}>
+        <MeasuredAccordionBody id={bodyId} open={isOpen} animate={catAnimate}>
           {() => (
             <div className="accordion-body-inner">
               <a
@@ -576,7 +596,7 @@ function CategoryAccordion({
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>
-                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen} animate={animate}>
+                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen} animate={toggledKey === subKey(sub.name)}>
                       {() => (
                         <div className="av-sidebar-l3-tree">
                           <a
@@ -683,7 +703,9 @@ export default function AppSidebar({
     isInitialHomeHydration ? [] : readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY),
   );
   const [openKeysReady, setOpenKeysReady] = useState(!isInitialHomeHydration);
-  const [userToggled, setUserToggled] = useState(false);
+  const [toggled, setToggled] = useState<{ key: string; location: string } | null>(null);
+  // A toggle animates only its own group and only on the route it happened on.
+  const toggledKey = toggled && toggled.location === location ? toggled.key : null;
   const {
     setOpenMobile,
     isMobile,
@@ -920,9 +942,9 @@ export default function AppSidebar({
                 key={cat.name}
                 cat={cat}
                 isOpen={isOpen}
-                animate={userToggled}
+                toggledKey={toggledKey}
                 onToggle={() => {
-                  setUserToggled(true);
+                  setToggled({ key: catKey, location });
                   setOpenCategories((prev) =>
                     prev.includes(catKey) || prev.includes(cat.name)
                       ? prev.filter((c) => c !== catKey && c !== cat.name)
@@ -936,7 +958,7 @@ export default function AppSidebar({
                 matchQuery=""
                 openSubs={openSubcategories}
                 toggleSub={(name) => {
-                  setUserToggled(true);
+                  setToggled({ key: name, location });
                   setOpenSubcategories((prev) =>
                     prev.includes(name)
                       ? prev.filter((s) => s !== name)
