@@ -214,11 +214,10 @@
  * V2 desktop tree geometry. SidebarFull paints its rows at their reference
  * heights (All row 36px, L2 rows 27px, L3 rows 25px / 22px). With a fine
  * pointer each row keeps a 44px box that overhangs its neighbours by the
- * difference (negative block margins); every row is positioned, so a later
- * row covers the earlier one's overhang and each row's hit band is its
- * reference pitch (24px or more). A touch pointer gets real 44px rows (end of
- * file). Row paint moves to an inset ::before so hover and active fills stay
- * at the reference size.
+ * difference (negative block margins). Only blank padding may overlap:
+ * label and count spans sit above the neighbouring boxes so later padding
+ * cannot steal visible text. A touch pointer gets real 44px rows (end of
+ * file). Inset paint retains the reference rhythm.
  */
 .av-sidebar-shell .av-sidebar-all-category,
 .av-sidebar-shell .av-sidebar-leaf,
@@ -242,6 +241,17 @@
 .av-sidebar-shell .av-sidebar-leaf > span,
 .av-sidebar-shell .av-sidebar-l2-row > * {
   position: relative;
+}
+
+/* Raise visible content, not the overlapping 44px row box. */
+.av-sidebar-shell .av-sidebar-all-category > span,
+.av-sidebar-shell .av-sidebar-leaf > span,
+.av-sidebar-shell .av-sidebar-l2-link > span,
+.av-sidebar-shell .av-sidebar-l2-toggle > *,
+.av-sidebar-shell .av-sidebar-l3-all > span,
+.av-sidebar-shell .av-sidebar-l3-row > span {
+  position: relative;
+  z-index: 1;
 }
 
 /* Flex columns so adjacent overhangs add instead of collapsing. */
