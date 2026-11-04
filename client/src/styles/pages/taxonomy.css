@@ -592,6 +592,16 @@
   font-size: 13px;
 }
 
+@media (max-width: 639px) {
+  .taxonomy-pagination .paginator-pages {
+    gap: 4px;
+  }
+
+  .taxonomy-pagination .paginator-pages > span[aria-hidden] {
+    padding-inline: 0;
+  }
+}
+
 .taxonomy-pagination [data-testid="pagination-controls"] > div:last-of-type {
   gap: 8px;
   color: var(--text-2);
