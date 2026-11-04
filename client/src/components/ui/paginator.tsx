@@ -107,7 +107,8 @@ function PrevNextLink({
       tabIndex={enabled ? undefined : -1}
       className={cn(
         buttonVariants({ variant: "outline", size: "sm" }),
-        "gap-1",
+        "row-start-1 gap-1",
+        rel === "prev" ? "col-start-1" : "col-start-2",
         !enabled && "pointer-events-none opacity-50",
       )}
       data-testid={testId}
@@ -175,7 +176,7 @@ export function Paginator({
       className={cn("flex flex-col items-center gap-2 pt-6", className)}
       data-testid={ids.container}
     >
-      <div className="flex flex-wrap items-center justify-center gap-1.5">
+      <div className="grid max-w-full grid-cols-2 items-center justify-items-center gap-1.5 sm:flex sm:flex-wrap sm:justify-center">
         <PrevNextLink
           enabled={currentPage > 1}
           href={makeHref(currentPage - 1)}
@@ -187,34 +188,36 @@ export function Paginator({
           <span className="max-sm:sr-only">Previous</span>
         </PrevNextLink>
 
-        {items.map((item, i) =>
-          item === "ellipsis" ? (
-            <span
-              key={`e-${i}`}
-              aria-hidden="true"
-              className="px-1 text-sm text-muted-foreground select-none"
-            >
-              …
-            </span>
-          ) : (
-            <a
-              key={item}
-              href={makeHref(item)}
-              onClick={go(item)}
-              aria-label={item === currentPage ? `Page ${item}, current page` : `Go to page ${item}`}
-              aria-current={item === currentPage ? "page" : undefined}
-              className={cn(
-                linkBase,
-                item === currentPage
-                  ? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text)] font-medium"
-                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
-              )}
-              data-testid={pageLinkTestId(item)}
-            >
-              {item}
-            </a>
-          ),
-        )}
+        <div className="paginator-pages col-span-2 row-start-2 flex max-w-full flex-wrap items-center justify-center gap-1.5 sm:contents">
+          {items.map((item, i) =>
+            item === "ellipsis" ? (
+              <span
+                key={`e-${i}`}
+                aria-hidden="true"
+                className="px-1 text-sm text-muted-foreground select-none"
+              >
+                …
+              </span>
+            ) : (
+              <a
+                key={item}
+                href={makeHref(item)}
+                onClick={go(item)}
+                aria-label={item === currentPage ? `Page ${item}, current page` : `Go to page ${item}`}
+                aria-current={item === currentPage ? "page" : undefined}
+                className={cn(
+                  linkBase,
+                  item === currentPage
+                    ? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text)] font-medium"
+                    : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
+                )}
+                data-testid={pageLinkTestId(item)}
+              >
+                {item}
+              </a>
+            ),
+          )}
+        </div>
 
         <PrevNextLink
           enabled={currentPage < totalPages}

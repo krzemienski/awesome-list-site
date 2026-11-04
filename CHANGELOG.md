@@ -6,6 +6,9 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## November 4, 2026
 
+### Balanced mobile pagination (BUG-045)
+- Keep Previous and Next together above a centered group of page numbers on narrow screens, rather than wrapping Next onto a row by itself. The page summary and existing jump input stay separate; desktop links, modified clicks and BUG-041 page clamping are unchanged.
+
 ### Consistent page jumps (BUG-041)
 - Go-to-page submissions now recover invalid or fractional text to page 1, like direct taxonomy URLs, rather than leaving the visitor on the previous page with a whole-number error. Zero and negative pages still clamp to page 1, and overflow still clamps to the last page, with accessible adjustment feedback.
 
