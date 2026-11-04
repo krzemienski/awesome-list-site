@@ -44,7 +44,7 @@ const TAG_DISPLAY_ACRONYMS = new Set([
   "avif", "avs", "avs2", "avs3", "bbc", "bif", "cabr", "cd", "cdl", "cdm", "cea",
   "ci", "cmaf", "cms", "cncf", "cors", "cpix", "crf", "css", "cta", "ctv", "cuda", "dct",
   "dmx512", "dns", "dvb", "dvd", "dvr", "ebu", "eia", "eotf", "esp32", "flv", "ftl",
-  "gan", "gfvc", "gif", "glsl", "gtk4", "hd", "hdmi", "hdr10", "hlg",
+  "gan", "gav1", "gfvc", "gif", "glsl", "gtk4", "hd", "hdmi", "hdr10", "hlg",
   "iab", "iec", "ietf", "ima", "ima3", "imsc", "ip", "ipmx", "iptv", "isdb",
   "jpeg", "json", "jw", "kde", "kvm", "lcevc", "llm", "lut", "m3u8", "midi", "mjpeg",
   "ml", "mp3", "mpai", "mpd", "mpegif", "mpquic", "ms", "nab", "nasa", "natpe", "nle",
