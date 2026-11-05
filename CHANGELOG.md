@@ -6,6 +6,8 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## November 4, 2026
 
+### Equivalent responsive analytics consent (BUG-044)
+- Keep the full provider and signed-in name/email disclosure visible on short and mobile viewports. Native browser zoom wraps the Privacy Policy link instead of ellipsizing it, with the same Decline / Allow analytics controls and 44px action targets at every size.
 ### Balanced responsive pagination (BUG-045)
 - Keep Previous and Next together above a centered group of page numbers whenever the paginator has limited space, including tablet layouts beside the sidebar, rather than wrapping Next onto a row by itself. Grouping follows the paginator's available width, not the viewport. Narrow numeric spacing also keeps the longest six-number window aligned without reducing 44px targets. The page summary and existing jump input stay separate; wide desktop ordering, modified clicks and BUG-041 page clamping are unchanged.
 
