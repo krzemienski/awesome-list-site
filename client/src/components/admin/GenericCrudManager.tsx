@@ -5,6 +5,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -1685,6 +1686,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const failedParentQueries = parents
     .map((parent, index) => ({ parent, query: parentQueries[index] }))
     .filter(({ query }) => query.isError);
+  // A parent list with no data that is (re)fetching — first load or a Retry
+  // after a failure. The failure banner unmounts meanwhile, so mark the panel
+  // busy: the Retry focus handoff waits on aria-busy instead of guessing.
+  const parentsLoading = parentQueries.some((query) => query.isFetching && query.data === undefined);
 
   // Fetch main entities with resource counts
   // R5-037: Categories/Subcategories/Sub-Subcategories managers all run through
@@ -2863,7 +2868,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="admin-taxonomy-content">
+      <CardContent className="admin-taxonomy-content" aria-busy={parentsLoading || undefined}>
           {searchEnabled && searchQuery && filteredItems ? (
           <p className="admin-taxonomy-results text-sm text-muted-foreground mb-4" data-testid="text-search-results">
               <>Showing {paginationEnabled ? `${Math.min((currentPage - 1) * pageSize + 1, totalItems)}-${Math.min(currentPage * pageSize, totalItems)} of ` : ''}{totalItems} result{totalItems !== 1 ? 's' : ''} (filtered from {items?.length || 0})</>
@@ -2882,7 +2887,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => failedParentQueries.forEach(({ query }) => { void query.refetch(); })}
+              onClick={(event) => {
+                // The banner unmounts once the parents load: hand focus to the
+                // re-rendered Retry if it fails again, otherwise the page h1.
+                handoffFocusOnUnmount(event.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid="button-retry-parents"]'),
+                );
+                failedParentQueries.forEach(({ query }) => { void query.refetch(); });
+              }}
               data-testid="button-retry-parents"
             >
               Retry
