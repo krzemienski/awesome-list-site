@@ -34,6 +34,8 @@
 }
 
 .search-palette [cmdk-input-wrapper] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   padding: 14px 18px;
   border-bottom: var(--hairline-w) solid var(--hairline);
   color: var(--accent-ink);
@@ -47,18 +49,37 @@
 }
 
 .search-palette [cmdk-input] {
+  grid-column: 2;
+  grid-row: 1;
   height: auto;
   padding: 0;
   color: var(--text);
   font-family: inherit;
   font-size: 15px;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   outline: none;
   box-shadow: none;
 }
 
 .search-palette [cmdk-input]::placeholder {
+  color: transparent;
+}
+
+/* Native focused inputs clip their placeholder even with text-overflow.
+   Paint its non-interactive text in the same column so ellipsis survives focus. */
+.search-palette-placeholder {
   color: var(--text-3);
+  font-size: 15px;
+  grid-column: 2;
+  grid-row: 1;
+  line-height: calc(10 / 7);
+  overflow: hidden;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-palette-list {
@@ -302,9 +323,12 @@
 
 .search-palette-close {
   display: inline-flex;
+  grid-column: 3;
+  grid-row: 1;
   flex-shrink: 0;
-  min-width: 24px;
-  min-height: 24px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-block: -10px;
   margin-left: 12px;
   align-items: center;
   justify-content: center;
@@ -324,16 +348,8 @@
   height: 14px;
 }
 
-/* Touch widths: the esc chip keeps its size, centred in a 44px target whose
-   extra height overflows the input wrapper's padding instead of growing it.
-   One-line rows (View all, recent searches) reach the same floor. */
+/* One-line rows (View all, recent searches) retain the touch target floor. */
 @media (max-width: 1024px) {
-  .search-palette-close {
-    min-width: 44px;
-    min-height: 44px;
-    margin-block: -10px;
-  }
-
   .search-palette-row {
     min-height: 44px;
     align-content: center;
@@ -348,5 +364,24 @@
     min-width: 44px;
     min-height: 44px;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-palette [cmdk-input-wrapper] {
+    padding-inline: 12px;
+  }
+
+  .search-palette [cmdk-input] {
+    /* Match canonical mobile controls despite the generic 16px input rule. */
+    font-size: 13px !important;
+  }
+
+  .search-palette-placeholder {
+    font-size: 13px;
+  }
+
+  .search-palette-close {
+    margin-left: 8px;
   }
 }

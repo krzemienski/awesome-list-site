@@ -56,6 +56,17 @@
   position: relative;
 }
 
+/* Keep visible content above adjacent padding overhangs, as on desktop. */
+.av-sidebar-drawer .av-sidebar-all-category > span,
+.av-sidebar-drawer .av-sidebar-leaf > span,
+.av-sidebar-drawer .av-sidebar-l2-link > span,
+.av-sidebar-drawer .av-sidebar-l2-toggle > *,
+.av-sidebar-drawer .av-sidebar-l3-all > span,
+.av-sidebar-drawer .av-sidebar-l3-row > span {
+  position: relative;
+  z-index: 1;
+}
+
 .av-sidebar-drawer .av-sidebar-all-category:hover,
 .av-sidebar-drawer .av-sidebar-leaf:hover,
 .av-sidebar-drawer .av-sidebar-leaf[data-active="true"] {
