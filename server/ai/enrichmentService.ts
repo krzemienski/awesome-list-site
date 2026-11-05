@@ -6,6 +6,7 @@ import { ResourceRepository } from '../repositories/ResourceRepository';
 import { AuditRepository } from '../repositories/AuditRepository';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
+import { checkSingleLink, type SingleLinkCheck } from '../services/linkRemediation';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
 import { classifyKindForStorage } from '../lib/resourceKinds';
 import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../github/importHygiene';
@@ -64,6 +65,7 @@ interface BatchItem {
   kind: string | null;
   metadata: Record<string, any>;
   urlMetadata: UrlMetadata | null;
+  linkCheck: SingleLinkCheck | null;
   submitted: boolean;
 }
 
@@ -517,6 +519,10 @@ export class EnrichmentService {
       } catch (error) {
         logger.error(`Error fetching URL metadata for ${resource.url}:`, error);
       }
+      const linkCheck = await checkSingleLink(resource.url).catch((error) => {
+        logger.error(`Link check failed for ${resource.url}:`, error);
+        return null;
+      });
 
       enrichable.push({
         queueItemId: queueItem.id,
@@ -530,6 +536,7 @@ export class EnrichmentService {
         kind: resource.kind ?? null,
         metadata,
         urlMetadata,
+        linkCheck,
         submitted: false,
       });
     }
@@ -740,6 +747,9 @@ ${taxonomyHint}`;
     if (ai.subSubcategory) ai.subSubcategory = decodeHtmlEntities(ai.subSubcategory);
 
     const scrapedFields = buildScrapedFields(item.urlMetadata, item.metadata);
+    // Same verdict a scheduled scan would reach; a dead link is hidden by the
+    // next scans' remediation, never by enrichment alone.
+    if (item.linkCheck) scrapedFields.linkCheck = item.linkCheck;
 
     const enhancedMetadata = {
       ...item.metadata,

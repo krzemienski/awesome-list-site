@@ -1,0 +1,309 @@
+import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import { linkHealthChecks, linkHealthJobs, resources, type Resource } from "@shared/schema";
+import { db } from "../db";
+import { LinkChecker, browserVerifyLink, registrableDomain } from "../validation/linkChecker";
+import { transitionResourceInTransaction, withResourcePublication } from "../repositories/resourcePublication";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("link-remediation");
+
+/** Scans whose per-link rows are kept; the planner reads streaks across them. */
+export const RETAINED_SCANS = 3;
+/** Consecutive confirmed-dead scans before a resource is hidden. */
+export const DEAD_SCANS_TO_ARCHIVE = 2;
+/** Consecutive scans that must land on the same same-site URL before it replaces the stored one. */
+export const MOVED_SCANS_TO_REWRITE = 2;
+
+export type LinkObservation = "ok" | "dead" | "moved" | "suspect" | "unknown";
+
+export type RemediationKind = "archive" | "restore" | "rewrite-url" | "review" | "watch";
+
+export interface RemediationAction {
+  resourceId: number;
+  title: string;
+  url: string;
+  kind: RemediationKind;
+  reason: string;
+  jobId: number;
+  to?: string;
+}
+
+export interface CheckSnapshot {
+  jobId: number;
+  status: string;
+  httpStatus: number | null;
+  url: string;
+  finalUrl: string | null;
+  errorMessage: string | null;
+}
+
+/** Remediation bookkeeping kept in resources.metadata.linkHealth. */
+export interface LinkHealthMeta {
+  archivedByJob?: number | null;
+  archivedAt?: string | null;
+  previousApprovedAt?: string | null;
+  restoredByJob?: number;
+  ignored?: boolean;
+}
+
+export type RemediationMode = "plan" | "apply";
+
+const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err));
+const linkHealthOf = (metadata: unknown): LinkHealthMeta | undefined =>
+  (metadata as { linkHealth?: LinkHealthMeta } | null)?.linkHealth;
+
+export function remediationMode(): RemediationMode {
+  return process.env.LINK_HEALTH_REMEDIATION === "apply" ? "apply" : "plan";
+}
+
+const AUTH_PATH = /\/(log-?in|sign-?in|sign-?up|auth|sso|account|session)(\/|$|\?)/i;
+
+function sameUrl(a: string, b: string): boolean {
+  const norm = (u: string) => u.replace(/#.*$/, "").replace(/\/+$/, "");
+  return norm(a) === norm(b);
+}
+
+/**
+ * One scan's verdict for one link. Statuses come after the checker's
+ * browser-UA verification pass, so `broken`/`dns_failure` are confirmed dead
+ * (DNS, refused, browser 404/410, SSL) and bot-block shapes are already healthy.
+ */
+export function observe(check: CheckSnapshot): LinkObservation {
+  if (check.status === "broken" || check.status === "dns_failure") return "dead";
+  if (check.status === "suspect") return "suspect";
+  if (check.status !== "healthy") return "unknown";
+  if (!check.finalUrl || sameUrl(check.finalUrl, check.url)) return "ok";
+  try {
+    const from = new URL(check.url);
+    const to = new URL(check.finalUrl);
+    if (registrableDomain(from.hostname) !== registrableDomain(to.hostname)) return "suspect";
+    if (AUTH_PATH.test(to.pathname)) return "ok";
+    if (to.pathname === "/" && from.pathname.length > 1) return "suspect";
+    return "moved";
+  } catch {
+    return "unknown";
+  }
+}
+
+function deadReason(check: CheckSnapshot): string {
+  if (check.status === "dns_failure") return "DNS lookup fails";
+  if (check.httpStatus) return `HTTP ${check.httpStatus}`;
+  return check.errorMessage?.split(" | ")[0] ?? "unreachable";
+}
+
+/**
+ * Decide one resource's action from its recent scans (newest first). Pure: the
+ * same history always yields the same plan, so a dry run and a live run agree.
+ */
+export function planResource(
+  resource: Pick<Resource, "id" | "title" | "url" | "status"> & { linkHealth?: LinkHealthMeta },
+  history: CheckSnapshot[],
+): RemediationAction | null {
+  const latest = history[0];
+  if (!latest || resource.linkHealth?.ignored) return null;
+  const base = { resourceId: resource.id, title: resource.title, url: resource.url, jobId: latest.jobId };
+  const seen = history.map(observe);
+
+  if (resource.status === "archived") {
+    if (!resource.linkHealth?.archivedByJob) return null;
+    return seen[0] === "ok" || seen[0] === "moved"
+      ? { ...base, kind: "restore", reason: "Link answers again" }
+      : null;
+  }
+  if (resource.status !== "approved") return null;
+
+  const deadStreak = seen.findIndex((o) => o !== "dead");
+  const deadCount = deadStreak === -1 ? seen.length : deadStreak;
+  if (deadCount >= DEAD_SCANS_TO_ARCHIVE) {
+    return { ...base, kind: "archive", reason: `Dead in ${deadCount} consecutive scans (${deadReason(latest)})` };
+  }
+  if (deadCount === 1) {
+    return { ...base, kind: "watch", reason: `Dead in the latest scan (${deadReason(latest)}); hidden if the next scan agrees` };
+  }
+
+  if (seen[0] === "moved") {
+    const target = latest.finalUrl!;
+    const stable = history
+      .slice(0, MOVED_SCANS_TO_REWRITE)
+      .every((c, i) => seen[i] === "moved" && c.finalUrl && sameUrl(c.finalUrl, target));
+    return stable && history.length >= MOVED_SCANS_TO_REWRITE
+      ? { ...base, kind: "rewrite-url", to: target, reason: `Same-site redirect stable for ${MOVED_SCANS_TO_REWRITE} scans` }
+      : { ...base, kind: "watch", to: target, reason: "Same-site redirect; rewritten once a second scan agrees" };
+  }
+  if (seen[0] === "suspect") {
+    return { ...base, kind: "review", to: latest.finalUrl ?? undefined, reason: latest.errorMessage ?? "Redirects off-site or looks parked" };
+  }
+  return null;
+}
+
+async function recentCompletedJobIds(): Promise<number[]> {
+  const rows = await db
+    .select({ id: linkHealthJobs.id })
+    .from(linkHealthJobs)
+    .where(eq(linkHealthJobs.status, "completed"))
+    .orderBy(desc(linkHealthJobs.id))
+    .limit(RETAINED_SCANS);
+  return rows.map((r) => r.id);
+}
+
+export async function buildRemediationPlan(): Promise<{ jobId: number | null; actions: RemediationAction[] }> {
+  const jobIds = await recentCompletedJobIds();
+  if (jobIds.length === 0) return { jobId: null, actions: [] };
+
+  const checks = await db
+    .select({
+      jobId: linkHealthChecks.jobId,
+      resourceId: linkHealthChecks.resourceId,
+      status: linkHealthChecks.status,
+      httpStatus: linkHealthChecks.httpStatus,
+      url: linkHealthChecks.url,
+      finalUrl: linkHealthChecks.finalUrl,
+      errorMessage: linkHealthChecks.errorMessage,
+    })
+    .from(linkHealthChecks)
+    .where(inArray(linkHealthChecks.jobId, jobIds))
+    .orderBy(desc(linkHealthChecks.jobId));
+
+  const byResource = new Map<number, CheckSnapshot[]>();
+  for (const c of checks) {
+    const list = byResource.get(c.resourceId) ?? [];
+    list.push(c);
+    byResource.set(c.resourceId, list);
+  }
+
+  const ids = Array.from(byResource.keys());
+  const rows = ids.length
+    ? await db
+        .select({ id: resources.id, title: resources.title, url: resources.url, status: resources.status, metadata: resources.metadata })
+        .from(resources)
+        .where(inArray(resources.id, ids))
+    : [];
+
+  const actions: RemediationAction[] = [];
+  for (const r of rows) {
+    // A history only counts while it tracks the stored URL; an edited URL starts fresh.
+    const history = (byResource.get(r.id) ?? []).filter((c) => sameUrl(c.url, r.url));
+    const action = planResource(
+      { id: r.id, title: r.title, url: r.url, status: r.status ?? "approved", linkHealth: linkHealthOf(r.metadata) },
+      history,
+    );
+    if (action) actions.push(action);
+  }
+  const order: Record<RemediationKind, number> = { archive: 0, restore: 1, "rewrite-url": 2, review: 3, watch: 4 };
+  actions.sort((a, b) => order[a.kind] - order[b.kind] || a.resourceId - b.resourceId);
+  return { jobId: jobIds[0], actions };
+}
+
+export interface AppliedAction extends RemediationAction {
+  outcome: "applied" | "skipped";
+  detail?: string;
+}
+
+async function applyOne(a: RemediationAction, actor?: string): Promise<AppliedAction> {
+  const notes = `link-health job ${a.jobId}: ${a.kind}. ${a.reason}`;
+  if (a.kind === "archive") {
+    await withResourcePublication(async (tx) => {
+      const [row] = await tx.select({ approvedAt: resources.approvedAt }).from(resources).where(eq(resources.id, a.resourceId));
+      const meta: LinkHealthMeta = {
+        archivedByJob: a.jobId,
+        archivedAt: new Date().toISOString(),
+        previousApprovedAt: row?.approvedAt?.toISOString() ?? null,
+      };
+      await transitionResourceInTransaction(tx, a.resourceId, { status: "archived" }, actor, {
+        expectedStatus: "approved", notes, mergeMetadata: { linkHealth: meta },
+      });
+    });
+    return { ...a, outcome: "applied" };
+  }
+  if (a.kind === "restore") {
+    await withResourcePublication(async (tx) => {
+      const [row] = await tx.select({ metadata: resources.metadata }).from(resources).where(eq(resources.id, a.resourceId));
+      const previous = linkHealthOf(row?.metadata)?.previousApprovedAt;
+      const meta: LinkHealthMeta = { archivedByJob: null, archivedAt: null, previousApprovedAt: null, restoredByJob: a.jobId };
+      await transitionResourceInTransaction(tx, a.resourceId, { status: "approved" }, actor, {
+        expectedStatus: "archived", notes, mergeMetadata: { linkHealth: meta },
+      });
+      // A restore is not a new publication: keep its original place in "recently indexed".
+      if (previous) await tx.update(resources).set({ approvedAt: new Date(previous) }).where(eq(resources.id, a.resourceId));
+    });
+    return { ...a, outcome: "applied" };
+  }
+  if (a.kind === "rewrite-url" && a.to) {
+    const [clash] = await db
+      .select({ id: resources.id })
+      .from(resources)
+      .where(and(eq(resources.url, a.to), ne(resources.id, a.resourceId)))
+      .limit(1);
+    if (clash) return { ...a, outcome: "skipped", detail: `Resource ${clash.id} already uses ${a.to}` };
+    await withResourcePublication((tx) =>
+      transitionResourceInTransaction(tx, a.resourceId, { url: a.to }, actor, { expectedStatus: "approved", notes }),
+    );
+    return { ...a, outcome: "applied" };
+  }
+  return { ...a, outcome: "skipped", detail: "Report-only action" };
+}
+
+/** Apply the current plan. Each change is its own audited transaction; one failure never blocks the rest. */
+export async function applyRemediationPlan(actor?: string): Promise<{ jobId: number | null; results: AppliedAction[] }> {
+  const plan = await buildRemediationPlan();
+  const results: AppliedAction[] = [];
+  for (const a of plan.actions) {
+    if (a.kind === "review" || a.kind === "watch") continue;
+    try {
+      results.push(await applyOne(a, actor));
+    } catch (err) {
+      results.push({ ...a, outcome: "skipped", detail: messageOf(err) });
+    }
+  }
+  const applied = results.filter((r) => r.outcome === "applied").length;
+  logger.info(`Remediation for job ${plan.jobId}: ${applied} applied, ${results.length - applied} skipped`);
+  return { jobId: plan.jobId, results };
+}
+
+/** Mark a resource so the planner leaves it alone (an admin judged the link fine), or clear the mark. */
+export async function setLinkHealthIgnored(resourceId: number, ignored: boolean, actor?: string): Promise<void> {
+  await withResourcePublication((tx) =>
+    transitionResourceInTransaction(tx, resourceId, {}, actor, {
+      notes: ignored ? "link-health: admin marked the link as fine; remediation skips it" : "link-health: remediation resumed",
+      mergeMetadata: { linkHealth: { ignored } },
+    }),
+  );
+}
+
+/** Link-health-archived resources stay in every scan so a recovered link is noticed and restored. */
+export const linkHealthArchivedFilter = and(
+  eq(resources.status, "archived"),
+  sql`(${resources.metadata} -> 'linkHealth' ->> 'archivedByJob') is not null`,
+);
+
+export interface SingleLinkCheck {
+  state: "ok" | "broken" | "moved" | "suspect" | "unknown";
+  httpStatus: number | null;
+  finalUrl: string | null;
+  verdict: string | null;
+  checkedAt: string;
+}
+
+/**
+ * Check one URL the way a scan does (fast pass, then a browser-UA re-check of
+ * any failure), for callers that save a URL outside a scan, such as enrichment.
+ */
+export async function checkSingleLink(url: string): Promise<SingleLinkCheck> {
+  const report = await new LinkChecker({ timeout: 15000, retryCount: 1, concurrent: 1 }).checkLinks([{ url }]);
+  const r = report.results[0];
+  let status = r.valid ? (r.suspicion ? "suspect" : "healthy") : "broken";
+  let verdict: string | null = r.suspicionDetail ?? r.error ?? null;
+  if (!r.valid) {
+    const v = await browserVerifyLink(url, 15000);
+    verdict = v.verdict;
+    status = v.confirmedDead ? (String(v.status).includes("ENOTFOUND") ? "dns_failure" : "broken") : "healthy";
+  }
+  const seen = observe({ jobId: 0, status, httpStatus: r.status || null, url, finalUrl: r.finalUrl ?? null, errorMessage: verdict });
+  return {
+    state: seen === "dead" ? "broken" : seen,
+    httpStatus: r.status || null,
+    finalUrl: r.finalUrl ?? null,
+    verdict,
+    checkedAt: new Date().toISOString(),
+  };
+}

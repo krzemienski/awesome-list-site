@@ -1,0 +1,96 @@
+name: Link check (awesome_bot)
+
+# Two vantages on the same policy as the in-app link-health scan:
+#  - catalog: every live URL from production, nightly. Report only; the app's
+#    scheduled scan is what hides, restores and rewrites links.
+#  - docs: links added or changed in a pull request's Markdown. Fails the PR.
+# Bot-block shapes (401/403/405/418/429/999, timeouts) never fail a run; see
+# scripts/awesome-bot-allowlist.txt for the strict dead-link policy.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Check only the first N catalog URLs (0 = all)"
+        default: "0"
+  pull_request:
+    paths:
+      - "**.md"
+      - ".github/workflows/link-check.yml"
+      - "scripts/awesome-bot-allowlist.txt"
+
+permissions:
+  contents: read
+
+env:
+  AWESOME_BOT_VERSION: "1.20.0"
+  AB_FLAGS: >-
+    --allow-dupe --allow-redirect --allow-timeout
+    --allow 401,403,405,406,418,429,451,999
+    --set-timeout 20 --request-delay 0.2
+
+jobs:
+  catalog:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.title, 'link-health') || contains(github.event.pull_request.head.ref, 'link-health')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - run: gem install awesome_bot -v "$AWESOME_BOT_VERSION" --no-document
+      - name: Export production URLs
+        env:
+          LIMIT: ${{ github.event.inputs.limit || (github.event_name == 'pull_request' && '150') || '0' }}
+        run: |
+          curl -fsS https://awesome.video/api/awesome-list \
+            | jq -r '.resources[].url' > urls.txt
+          if [ "$LIMIT" != "0" ]; then head -n "$LIMIT" urls.txt > u && mv u urls.txt; fi
+          sed 's/.*/- <&>/' urls.txt > catalog.md
+          echo "Checking $(wc -l < urls.txt) URLs"
+      - name: awesome_bot
+        id: ab
+        continue-on-error: true
+        run: |
+          allow=$(grep -v '^\s*#' scripts/awesome-bot-allowlist.txt | grep -v '^\s*$' | paste -sd, -)
+          awesome_bot catalog.md $AB_FLAGS ${allow:+--white-list "$allow"}
+      - name: Summary
+        if: always()
+        run: |
+          f=ab-results-catalog.md-filtered.json
+          if [ -f "$f" ]; then
+            n=$(jq '.error | length' "$f" 2>/dev/null || echo "?")
+            { echo "### awesome_bot catalog: $n failing link(s)"; echo; jq -r '.error[]? | "- \(.status) \(.url)"' "$f" | head -200; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### awesome_bot catalog: no failures" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: awesome-bot-catalog
+          path: ab-results-*.json
+          if-no-files-found: ignore
+
+  docs:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - run: gem install awesome_bot -v "$AWESOME_BOT_VERSION" --no-document
+      - name: awesome_bot on changed Markdown
+        run: |
+          files=$(git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" -- '*.md' \
+            | grep -vE '^(e2e-evidence|reports|docs/audit|audit|\.claude|\.agents|awesome-list-site-ds)' || true)
+          if [ -z "$files" ]; then echo "No user-facing Markdown changed"; exit 0; fi
+          allow=$(grep -v '^\s*#' scripts/awesome-bot-allowlist.txt | grep -v '^\s*$' | paste -sd, -)
+          allow="${allow:+$allow,}localhost,127.0.0.1,example.com"
+          awesome_bot $files $AB_FLAGS --white-list "$allow"

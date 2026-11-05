@@ -1,11 +1,11 @@
 import type { LinkHealthJob, LinkHealthCheck, LinkHealthJobRow, LinkHealthCheckRow } from "@shared/schema";
 import { linkHealthJobs, linkHealthChecks, resources as resourcesTable } from "@shared/schema";
 import { db } from "../db";
-import { desc, eq, ne, and, inArray, lt, sql } from "drizzle-orm";
-import { storage } from "../storage";
+import { desc, eq, ne, and, inArray, notInArray, or, sql } from "drizzle-orm";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
 import { createLogger } from "../lib/logger";
+import { RETAINED_SCANS, applyRemediationPlan, linkHealthArchivedFilter, remediationMode } from "./linkRemediation";
 
 const logger = createLogger("link-health");
 
@@ -142,6 +142,23 @@ export const linkHealthService = {
     }));
   },
 
+  /** Start a scan when the newest one is older than the interval. Concurrent callers are serialized by startCheck's lock. */
+  async startCheckIfDue(intervalHours: number): Promise<LinkHealthJob | null> {
+    const [latest] = await db
+      .select({ status: linkHealthJobs.status, createdAt: linkHealthJobs.createdAt })
+      .from(linkHealthJobs)
+      .orderBy(desc(linkHealthJobs.id))
+      .limit(1);
+    if (latest && ['pending', 'processing'].includes(latest.status)) return null;
+    if (latest && Date.now() - latest.createdAt.getTime() < intervalHours * 3600_000) return null;
+    try {
+      return await this.startCheck();
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('already running')) return null;
+      throw err;
+    }
+  },
+
   async startCheck(): Promise<LinkHealthJob> {
     const row = await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(5116, 7)`);
@@ -179,7 +196,11 @@ export const linkHealthService = {
       // Only the catalog read takes the shared heavy-work slot. The sweep
       // itself is network-bound and runs for 20-40 minutes; holding the slot
       // through it made every GitHub sync, export and backup 503 meanwhile.
-      const resources = await runHeavyWork('link-health', () => storage.getAllApprovedResources());
+      // Approved links plus links this system archived, so a recovered link gets restored.
+      const resources = await runHeavyWork('link-health', () => db
+        .select({ id: resourcesTable.id, title: resourcesTable.title, url: resourcesTable.url })
+        .from(resourcesTable)
+        .where(or(eq(resourcesTable.status, 'approved'), linkHealthArchivedFilter)));
       await (async () => {
       const resourcesToCheck = resources.map(r => ({
         id: r.id,
@@ -329,12 +350,21 @@ export const linkHealthService = {
         })
         .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')));
 
-      // Prune per-link rows of older jobs: only the latest completed scan's
-      // checks are ever served, and each scan writes ~1,800 rows.
-      await tx.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
+      // Keep the last RETAINED_SCANS completed scans: remediation reads
+      // consecutive-scan streaks from them. Older per-link rows are pruned.
+      const kept = await tx
+        .select({ id: linkHealthJobs.id })
+        .from(linkHealthJobs)
+        .where(eq(linkHealthJobs.status, 'completed'))
+        .orderBy(desc(linkHealthJobs.id))
+        .limit(RETAINED_SCANS);
+      await tx.delete(linkHealthChecks).where(notInArray(linkHealthChecks.jobId, kept.map(k => k.id)));
 
       logger.info({ jobId }, `Link scan finished: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
+      if (remediationMode() === 'apply') {
+        await applyRemediationPlan().catch((err: unknown) => logger.error('Automatic remediation failed:', err instanceof Error ? err.message : String(err)));
+      }
       })();
     } catch (err: any) {
       if (signal.aborted) return;

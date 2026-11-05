@@ -64,6 +64,7 @@ import {
 import { registerAiJobsRoutes } from "./routes/domains/ai-jobs";
 import { registerContactRoutes } from "./routes/domains/contact";
 import { registerLinkReportRoutes } from "./routes/domains/link-reports";
+import { registerLinkRemediationRoutes } from "./routes/domains/link-remediation";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 import { createLogger } from "./lib/logger";
@@ -314,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     parseBoundedInt,
   });
   registerLinkReportRoutes(app, { isAuthenticated, isAdmin });
+  registerLinkRemediationRoutes(app, { isAuthenticated, isAdmin });
   registerJourneyRoutes(app, {
     isAuthenticated,
     isAdmin,
