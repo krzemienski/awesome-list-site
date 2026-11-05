@@ -1736,7 +1736,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                       hand focus to the table that shows them. */}
                   <button
                     type="button"
-                    className="min-h-6 text-primary underline"
+                    className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary underline"
                     onClick={() => {
                       clearFilters();
                       tableRegionRef.current?.focus();
