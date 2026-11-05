@@ -12,6 +12,7 @@ import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthMethod } from '@shared/schema';
 import { apiFetch } from "@/lib/api-fetch";
+import { humanizeApiError } from "@/lib/apiError";
 
 /**
  * Per-device state that belongs to the person who just signed out: the
@@ -192,7 +193,8 @@ export function useAuth() {
   };
 
   const handleLogoutError = (error: Error) => {
-    const message = `${error.message}. You are still signed in; please try again.`;
+    const reason = humanizeApiError(error, "Sign out failed.").trim();
+    const message = `${/[.!?]$/.test(reason) ? reason : `${reason}.`} You are still signed in; please try again.`;
     setLogoutError(message);
     toast({
       title: 'Sign out failed',

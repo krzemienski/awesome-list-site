@@ -16,6 +16,7 @@ import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
 import { Button } from "@/components/ui/button";
+import { humanizeApiError } from "@/lib/apiError";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -112,7 +113,7 @@ export function Logout() {
       } catch (reason) {
         if (!cancelled) {
           setError(
-            reason instanceof Error ? reason.message : "Sign out failed",
+            humanizeApiError(reason, "Sign out failed."),
           );
         }
       }

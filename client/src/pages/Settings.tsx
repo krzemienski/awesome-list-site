@@ -32,6 +32,7 @@ import NotificationPreferencesCard from "@/components/notifications/Notification
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
 import { useScrollToHash } from "@/lib/nav-history";
 import { trackLearningPreferencesReset, trackLearningPreferencesSaved } from "@/lib/analytics-notifications";
+import { describeWriteError } from "@/lib/apiError";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -207,9 +208,7 @@ export default function Settings() {
       });
     } catch (error) {
       setPreferenceRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t save your learning preferences.",
+        describeWriteError(error, { fallback: "We couldn’t save your learning preferences." }),
       );
     }
   };
@@ -230,9 +229,7 @@ export default function Settings() {
       });
     } catch (error) {
       setPreferenceRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t reset your learning preferences.",
+        describeWriteError(error, { fallback: "We couldn’t reset your learning preferences." }),
       );
       setPendingPreferencesFocus("reset");
     }

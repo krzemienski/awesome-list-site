@@ -18,7 +18,7 @@ import {
 } from "@/lib/analytics-notifications";
 import type { DigestPreview, NotificationPreferencesPatch, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
-import { describeWriteError } from "@/lib/apiError";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 // "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
 const CADENCE_LABELS: Record<(typeof DIGEST_CADENCES)[number], string> = {
@@ -143,7 +143,7 @@ export default function NotificationPreferencesCard() {
     },
     onError: (error) => {
       setSavedMessage(null);
-      setRequestError(describeWriteError(error, { fallback: "We couldn’t save notification preferences." }));
+      setRequestError(describeWriteError(error, { fallback: "We couldn’t save notification preferences.", outcome: NOTHING_CHANGED_OUTCOME }));
     },
   });
 
