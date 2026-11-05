@@ -35,7 +35,7 @@ window.DESIGN_SYSTEMS = {
       '--text-4': 'rgba(244,243,238,0.22)',
 
       /* type */
-      ...window.FONT_SYSTEM_STACKS.editorial,
+      ...(window.FONT_SYSTEM_STACKS || {}).editorial,
       '--display-weight': '500',
       '--display-tracking': '-0.02em',
       '--display-leading':  '1.04',
@@ -87,7 +87,7 @@ window.DESIGN_SYSTEMS = {
       '--text-3': 'rgba(250,250,250,0.38)',
       '--text-4': 'rgba(250,250,250,0.2)',
 
-      ...window.FONT_SYSTEM_STACKS.geist,
+      ...(window.FONT_SYSTEM_STACKS || {}).geist,
       '--display-weight': '600',
       '--display-tracking': '-0.035em',
       '--display-leading':  '1.05',

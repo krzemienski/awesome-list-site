@@ -354,7 +354,9 @@
          same families, weights, styles, axes and unicode-range the former
          Google Fonts css2 request did (Inter, Fraunces, JetBrains Mono, Geist
          and IBM Plex Sans), so pixel parity with the design source holds.
-         Fonts download only when used; no unselected font is preloaded. -->
+         Fonts download only when used. Inter is the default body face of
+         both kept design systems, so it is the one font preloaded. -->
+    <link rel="preload" href="/fonts/inter-bec94a.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
 
     <!-- Vite generates the six font defaults after this sheet for no-JS SSR. -->
