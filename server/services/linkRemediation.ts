@@ -83,9 +83,12 @@ function sameUrl(a: string, b: string): boolean {
 
 // First path segments on github.com that are site sections, not repo owners.
 const GITHUB_RESERVED = new Set([
-  "about", "apps", "collections", "contact", "customer-stories", "enterprise", "events", "explore",
-  "features", "issues", "login", "marketplace", "new", "notifications", "orgs", "organizations",
-  "pricing", "pulls", "search", "security", "settings", "sponsors", "topics", "trending", "users",
+  "about", "account", "advisories", "apps", "codespaces", "collections", "contact", "copilot",
+  "customer-stories", "dashboard", "discussions", "enterprise", "events", "explore", "features",
+  "github", "issues", "join", "login", "logout", "marketplace", "models", "new", "notifications",
+  "orgs", "organizations", "partners", "pricing", "pulls", "readme", "resources", "search",
+  "security", "sessions", "settings", "site", "solutions", "sponsors", "stars", "team", "topics",
+  "trending", "users", "watching",
 ]);
 
 /**
