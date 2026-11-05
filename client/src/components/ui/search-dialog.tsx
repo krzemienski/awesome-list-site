@@ -52,7 +52,7 @@ const PAGES = [
 
 // A pasted paragraph must not blow the empty-state heading out of the palette:
 // echo a bounded prefix and let the browser break whatever is left.
-const SEARCH_PLACEHOLDER = "Find resources, categories, or pages…";
+const SEARCH_PLACEHOLDER = "Search resources…";
 const ECHO_QUERY_MAX = 80;
 const WRAP_ANYWHERE: CSSProperties = { overflowWrap: "anywhere", minWidth: 0, maxWidth: "100%" };
 
