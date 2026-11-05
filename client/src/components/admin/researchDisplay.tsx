@@ -51,14 +51,14 @@ export function humanizeJobError(msg: string): string {
   if (/exited with code \d+/i.test(msg) || /process exited/i.test(msg)) {
     return `The research agent crashed before finishing. This is usually transient — try launching the job again; if it keeps happening, try setting explicit budget/turn limits. (Technical detail: ${msg})`;
   }
-  if (/abort/i.test(msg)) {
-    return `The job was stopped before it could finish. (Technical detail: ${msg})`;
-  }
   if (/reached maximum budget/i.test(msg)) {
     return `The run reached its budget cap and stopped. Relaunch with a higher cap to let it go further. (Technical detail: ${msg})`;
   }
   if (isConfigJobError(msg)) {
     return `The AI provider rejected the request, which usually means a setting such as the model name or API key is wrong. Relaunching will fail the same way until the setting is fixed. (Technical detail: ${msg})`;
+  }
+  if (/abort/i.test(msg)) {
+    return `The job was stopped before it could finish. (Technical detail: ${msg})`;
   }
   // Other raw agent/SDK errors get a plain lead sentence; the server's own
   // plain-language messages (e.g. orphaned by a restart) pass through.
@@ -70,7 +70,8 @@ export function humanizeJobError(msg: string): string {
 
 /** A provider 4xx (bad model, key, or request) fails the same way on every relaunch. */
 export function isConfigJobError(msg: string): boolean {
-  return /API Error:\s*4\d\d\b/i.test(msg);
+  // 408 (timeout) and 429 (rate limit) are retryable, so they are not settings errors.
+  return /API Error:\s*4(?!08|29)\d\d\b/i.test(msg);
 }
 
 // NB-033 (run18): one cost formatter — always $X.XXXX (4 decimals) so the cost

@@ -62,7 +62,7 @@ function endingCopy(outcome: RunOutcome, saved: number, job: ResearchJob): strin
       return saved > 0 ? `Run cancelled — review the ${found} it made before stopping.` : "Run cancelled before it saved a discovery.";
     case "failed":
       if (job.errorMessage && isConfigJobError(job.errorMessage)) {
-        return `Run failed${saved > 0 ? ` — the ${found} are kept` : ""}. ${humanizeJobError(job.errorMessage)}`;
+        return `Run failed${saved > 0 ? ` — the ${found} are kept; review them` : ""}. ${humanizeJobError(job.errorMessage)}`;
       }
       return `Run failed${saved > 0 ? ` — the ${found} are kept; review them, or relaunch` : " — relaunch it"}. ${job.errorMessage ? humanizeJobError(job.errorMessage) : ""}`.trim();
   }
