@@ -109,16 +109,20 @@
             return !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
           }
           var timer = 0;
-          // Removes every listener and the timer. The pending flag is left
-          // alone: a slow but successful hydration still reads it. Also the
-          // disarm path for a dead app (error, rejection, 30 s timeout).
+          // Successful hydration stops capture but keeps the draft for the
+          // palette. A failed boot or timeout cancels that request instead.
           function stop() {
             document.removeEventListener('keydown', onKey, true);
             document.removeEventListener('focusin', onFocusIn, true);
-            window.removeEventListener('error', stop);
-            window.removeEventListener('unhandledrejection', stop);
+            window.removeEventListener('error', cancel);
+            window.removeEventListener('unhandledrejection', cancel);
             document.removeEventListener('DOMContentLoaded', armTimeout);
             clearTimeout(timer);
+            window.__awvStopPaletteCapture = undefined;
+          }
+          function cancel() {
+            window.__awvPendingPalette = undefined;
+            stop();
           }
           function onFocusIn(e) {
             if (isField(e.target)) window.__awvPendingPalette = undefined;
@@ -134,9 +138,8 @@
                 window.__awvPendingPalette = undefined;
                 return;
               }
-              var onBody = t === document.body || t === document.documentElement || t === document;
-              var onTrigger = !!(t && t.closest && t.closest('.header-search-trigger'));
-              if (!onBody && !onTrigger) return;
+              // Focus may stay on a non-field ancestor after a heading click.
+              // The queued palette owns keys there just as it does on body.
               if (k === 'Escape') {
                 e.preventDefault();
                 window.__awvPendingPalette = undefined;
@@ -147,7 +150,7 @@
               } else if (k === 'Backspace') {
                 e.preventDefault();
                 pending.draft = pending.draft.slice(0, -1);
-              } else if (k.length === 1 && (onBody || k !== ' ')) {
+              } else if (k.length === 1) {
                 // ctrl+alt together is AltGr on Windows: printable, so buffered.
                 e.preventDefault();
                 pending.draft += k;
@@ -167,9 +170,9 @@
           window.__awvStopPaletteCapture = stop;
           document.addEventListener('keydown', onKey, true);
           document.addEventListener('focusin', onFocusIn, true);
-          window.addEventListener('error', stop);
-          window.addEventListener('unhandledrejection', stop);
-          function armTimeout() { timer = setTimeout(stop, 30000); }
+          window.addEventListener('error', cancel);
+          window.addEventListener('unhandledrejection', cancel);
+          function armTimeout() { timer = setTimeout(cancel, 30000); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', armTimeout);
           else armTimeout();
         } catch (e) {}
