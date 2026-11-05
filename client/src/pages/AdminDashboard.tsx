@@ -339,7 +339,12 @@ export default function AdminDashboard() {
               subject="the admin dashboard"
               error={error}
               onRetry={(event) => {
-                handoffFocusOnUnmount(event.currentTarget);
+                // The whole error branch is swapped for the loading branch while
+                // the retry runs, so look the new Retry up by test id: if it fails
+                // again focus returns to it, otherwise to the dashboard h1.
+                handoffFocusOnUnmount(event.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid="button-retry-admin-dashboard"]'),
+                );
                 void refetchStats();
               }}
               retrying={statsFetching}

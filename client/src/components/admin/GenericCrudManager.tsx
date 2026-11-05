@@ -5,6 +5,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -2882,7 +2883,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => failedParentQueries.forEach(({ query }) => { void query.refetch(); })}
+              onClick={(event) => {
+                // The banner unmounts once the parents load: hand focus to the
+                // re-rendered Retry if it fails again, otherwise the page h1.
+                handoffFocusOnUnmount(event.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid="button-retry-parents"]'),
+                );
+                failedParentQueries.forEach(({ query }) => { void query.refetch(); });
+              }}
               data-testid="button-retry-parents"
             >
               Retry
