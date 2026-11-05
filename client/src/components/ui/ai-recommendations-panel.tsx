@@ -35,6 +35,7 @@ import {
   hasMeaningfulLearningPreferences,
 } from "@shared/onboarding-values";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
+import { describeLoadError } from "@/lib/apiError";
 import {
   trackRecommendationRestored,
   trackRecommendationSignInClicked,
@@ -558,7 +559,7 @@ export default function AIRecommendationsPanel({
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Recommendations couldn’t load</AlertTitle>
           <AlertDescription className="space-y-3">
-            <p>{error instanceof Error ? error.message : "An unexpected error occurred."}</p>
+            <p>{describeLoadError(error)}</p>
             <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
               Try again
             </Button>

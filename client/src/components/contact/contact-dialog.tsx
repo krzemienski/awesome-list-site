@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError, apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import {
   contactVariant,
   type ContactSubmission,
@@ -218,9 +219,7 @@ export function ContactDialogHost() {
                     ? `Too many contact requests. Please try again${mutation.error.retryAfterSec
                       ? ` in ${mutation.error.retryAfterSec} seconds`
                       : " later"}.`
-                    : mutation.error instanceof Error
-                      ? mutation.error.message
-                      : "The message could not be submitted. Please try again."}
+                    : describeWriteError(mutation.error, { fallback: "The message could not be submitted. Please try again.", outcome: "Your message was not sent. Please try again." })}
                 </p>
               ) : null}
               <p className="text-xs text-muted-foreground">

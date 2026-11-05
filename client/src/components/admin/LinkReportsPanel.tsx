@@ -14,6 +14,7 @@ import {
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime, maskEmail } from "@/lib/utils";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 type ReportStatus = "open" | "resolved" | "dismissed";
 
@@ -61,7 +62,7 @@ export default function LinkReportsPanel() {
     onMutate: () => setActionError(null),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/link-reports"] }),
     onError: (error) =>
-      setActionError(error instanceof Error ? error.message : "The report could not be updated."),
+      setActionError(describeWriteError(error, { fallback: "The report could not be updated.", outcome: NOTHING_CHANGED_OUTCOME })),
   });
 
   const reports = reportsQuery.data?.reports ?? [];
