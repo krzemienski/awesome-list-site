@@ -157,6 +157,9 @@ export function useAIRecommendations(
 
   // Fetch recommendations mutation
   const recommendationsMutation = useMutation({
+    // The panel shows "Waiting for connection…" while paused, so keep the
+    // pause-and-resume behaviour the global default no longer has.
+    networkMode: "online",
     mutationFn: async ({
       profile,
       forceRefresh = false,
