@@ -135,6 +135,9 @@ export function useLearningPreferences() {
   });
 
   const saveThemeMutation = useMutation({
+    // Theme Settings shows "saved on this device, will be saved to your account
+    // when you reconnect" while paused (A-03), so keep pause-and-resume here.
+    networkMode: "online",
     mutationFn: async (
       theme: ThemePreferencesValues,
     ): Promise<LearningPreferencesResponse> => {
