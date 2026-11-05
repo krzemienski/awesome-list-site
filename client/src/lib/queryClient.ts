@@ -319,6 +319,12 @@ export const queryClient = new QueryClient({
     mutations: {
       // Mutations stay non-retried: they are not guaranteed idempotent.
       retry: false,
+      // The default "online" mode pauses a write while the browser is offline
+      // and replays it on reconnect, with no error and no message, so a dialog
+      // just sat there with disabled buttons (C22-MB-075). Send it now so it
+      // fails with the friendly "Could not reach the server" copy instead.
+      // A mutation with its own "Waiting for connection" UI opts back in.
+      networkMode: "always",
     },
   },
 });
