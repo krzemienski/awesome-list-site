@@ -11,6 +11,7 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ### Consistent page jumps (BUG-041)
 - Go-to-page submissions now recover invalid or fractional text to page 1, like direct taxonomy URLs, rather than leaving the visitor on the previous page with a whole-number error. Zero and negative pages still clamp to page 1, and overflow still clamps to the last page, with accessible adjustment feedback.
+- The adjustment notice never echoes an empty box and bounds any echoed text; typed text and `?page=abc` URLs read the same ("Page “abc” doesn't exist, so page 1 is shown."). It is announced through the listing's existing status notice.
 
 ## October 27, 2026
 
