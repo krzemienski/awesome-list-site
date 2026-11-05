@@ -28,7 +28,8 @@ interface RemediationResponse {
   mode: "plan" | "apply";
   nextDueAt: string | null;
   lastCompleted: { id: number; completedAt: string | null; checked: number; healthy: number; broken: number } | null;
-  plan: { jobId: number | null; counts: Partial<Record<RemediationKind, number>>; actions: RemediationAction[] };
+  plan: { jobId: number | null; checked: number; counts: Partial<Record<RemediationKind, number>>; actions: RemediationAction[] };
+  ignored: { id: number; title: string; url: string }[];
 }
 
 const QUERY_KEY = ["/api/admin/link-health/remediation"];
@@ -55,11 +56,15 @@ export default function LinkRemediationPanel() {
   };
 
   const apply = useMutation({
-    mutationFn: (): Promise<{ results: { outcome: string }[] }> =>
+    mutationFn: (): Promise<{ results: { outcome: string }[]; breaker?: string }> =>
       apiRequest("/api/admin/link-health/remediation/apply", { method: "POST" }),
     onSuccess: (data) => {
       const applied = data.results.filter((r) => r.outcome === "applied").length;
-      toast({ title: "Remediation applied", description: `${applied} of ${data.results.length} changes made. Each one is in the resource audit log.` });
+      toast({
+        title: data.breaker ? "Dead links not hidden" : "Remediation applied",
+        description: `${applied} of ${data.results.length} changes made. Each one is in the resource audit log.${data.breaker ? ` ${data.breaker}` : ""}`,
+        variant: data.breaker ? "destructive" : undefined,
+      });
       refresh();
     },
     onError: (error: Error) => toast({
@@ -70,8 +75,12 @@ export default function LinkRemediationPanel() {
   });
 
   const ignore = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/admin/link-health/resources/${id}/ignore`, { method: "POST", body: JSON.stringify({ ignored: true }) }),
-    onSuccess: () => { toast({ title: "Link marked fine", description: "Remediation will leave this resource alone." }); refresh(); },
+    mutationFn: ({ id, ignored }: { id: number; ignored: boolean }) =>
+      apiRequest(`/api/admin/link-health/resources/${id}/ignore`, { method: "POST", body: JSON.stringify({ ignored }) }),
+    onSuccess: (_data, { ignored }) => {
+      toast({ title: ignored ? "Link marked fine" : "Checks resumed", description: ignored ? "Remediation will leave this resource alone." : "Remediation acts on this link again." });
+      refresh();
+    },
     onError: (error: Error) => toast({ title: "Could not update the link", description: describeWriteError(error, { fallback: "The change was not saved." }), variant: "destructive" }),
   });
 
@@ -116,7 +125,7 @@ export default function LinkRemediationPanel() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Apply the remediation plan?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden, ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
+                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden (refused if more than 2% of the catalog at once), ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -150,7 +159,7 @@ export default function LinkRemediationPanel() {
                     <TableCell className="text-sm">{a.reason}</TableCell>
                     <TableCell>
                       {a.kind !== "restore" && (
-                        <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate(a.resourceId)}
+                        <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
                           aria-label={`Mark the link for ${a.title} as fine`}>
                           Link is fine
                         </Button>
@@ -161,6 +170,22 @@ export default function LinkRemediationPanel() {
               </TableBody>
             </Table>
           </TableShell>
+        )}
+        {(data?.ignored.length ?? 0) > 0 && (
+          <details data-testid="remediation-ignored">
+            <summary className="cursor-pointer text-sm">Marked fine by an admin ({data?.ignored.length})</summary>
+            <ul className="mt-2 space-y-1">
+              {data?.ignored.map((r) => (
+                <li key={r.id} className="flex flex-wrap items-center gap-2 text-sm">
+                  <a href={`/resource/${r.id}`} className="hover:underline">{r.title}</a>
+                  <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: r.id, ignored: false })}
+                    aria-label={`Resume link checks for ${r.title}`}>
+                    Resume checks
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </details>
         )}
       </CardContent>
     </Card>

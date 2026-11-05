@@ -513,16 +513,16 @@ export class EnrichmentService {
         continue;
       }
 
-      let urlMetadata: UrlMetadata | null = null;
-      try {
-        urlMetadata = await fetchUrlMetadata(resource.url);
-      } catch (error) {
-        logger.error(`Error fetching URL metadata for ${resource.url}:`, error);
-      }
-      const linkCheck = await checkSingleLink(resource.url).catch((error) => {
-        logger.error(`Link check failed for ${resource.url}:`, error);
-        return null;
-      });
+      const [urlMetadata, linkCheck] = await Promise.all([
+        fetchUrlMetadata(resource.url).catch((error: unknown) => {
+          logger.error(`Error fetching URL metadata for ${resource.url}:`, error);
+          return null;
+        }),
+        checkSingleLink(resource.url).catch((error: unknown) => {
+          logger.error(`Link check failed for ${resource.url}:`, error);
+          return null;
+        }),
+      ]);
 
       enrichable.push({
         queueItemId: queueItem.id,

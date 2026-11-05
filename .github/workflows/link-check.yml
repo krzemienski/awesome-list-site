@@ -3,9 +3,9 @@ name: Link check (awesome_bot)
 # Two vantages on the same policy as the in-app link-health scan:
 #  - catalog: every live URL from production, nightly. Report only; the app's
 #    scheduled scan is what hides, restores and rewrites links.
-#  - docs: links added or changed in a pull request's Markdown. Fails the PR.
-# Bot-block shapes (401/403/405/418/429/999, timeouts) never fail a run; see
-# scripts/awesome-bot-allowlist.txt for the strict dead-link policy.
+#  - docs: links a pull request adds to Markdown. Fails the PR on a dead link.
+# Bot-block shapes (401/403/405/418/429/999, 202, timeouts) never fail a run;
+# see scripts/awesome-bot-allowlist.txt for the strict dead-link policy.
 
 on:
   schedule:
@@ -28,12 +28,16 @@ env:
   AWESOME_BOT_VERSION: "1.20.0"
   AB_FLAGS: >-
     --allow-dupe --allow-redirect --allow-timeout
-    --allow 401,403,405,406,418,429,451,999
+    --allow 202,401,403,405,406,418,429,451,999
     --set-timeout 20 --request-delay 0.2
 
 jobs:
   catalog:
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.title, 'link-health') || contains(github.event.pull_request.head.ref, 'link-health')
+    # Nightly, manual, and same-repo PRs that change this workflow (a 150-URL sample).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.head.ref, 'link-health'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -46,11 +50,12 @@ jobs:
         env:
           LIMIT: ${{ github.event.inputs.limit || (github.event_name == 'pull_request' && '150') || '0' }}
         run: |
-          curl -fsS https://awesome.video/api/awesome-list \
-            | jq -r '.resources[].url' > urls.txt
+          curl -fsS https://awesome.video/api/awesome-list | jq -r '.resources[].url' > urls.txt
+          total=$(wc -l < urls.txt)
+          [ "$total" -gt 100 ] || { echo "Only $total URLs exported; refusing to report a clean catalog"; exit 1; }
           if [ "$LIMIT" != "0" ]; then head -n "$LIMIT" urls.txt > u && mv u urls.txt; fi
           sed 's/.*/- <&>/' urls.txt > catalog.md
-          echo "Checking $(wc -l < urls.txt) URLs"
+          echo "Checking $(wc -l < urls.txt) of $total URLs"
       - name: awesome_bot
         id: ab
         continue-on-error: true
@@ -58,14 +63,21 @@ jobs:
           allow=$(grep -v '^\s*#' scripts/awesome-bot-allowlist.txt | grep -v '^\s*$' | paste -sd, -)
           awesome_bot catalog.md $AB_FLAGS ${allow:+--white-list "$allow"}
       - name: Summary
-        if: always()
         run: |
           f=ab-results-catalog.md-filtered.json
-          if [ -f "$f" ]; then
-            n=$(jq '.error | length' "$f" 2>/dev/null || echo "?")
-            { echo "### awesome_bot catalog: $n failing link(s)"; echo; jq -r '.error[]? | "- \(.status) \(.url)"' "$f" | head -200; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.ab.outcome }}" = "success" ]; then
+            echo "### awesome_bot catalog: no failing links" >> "$GITHUB_STEP_SUMMARY"
+          elif [ -f "$f" ]; then
+            n=$(jq 'length' "$f")
+            { echo "### awesome_bot catalog: $n link(s) to look at"
+              echo
+              echo "The app's scheduled scan decides what is dead (browser re-check, two scans 20 h apart). This list is a second opinion."
+              echo
+              jq -r '.[] | "- \(.status) \(.link) \(.error)"' "$f" | head -300
+            } >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "### awesome_bot catalog: no failures" >> "$GITHUB_STEP_SUMMARY"
+            echo "awesome_bot failed without writing results; see the awesome_bot step log" >&2
+            exit 1
           fi
       - uses: actions/upload-artifact@v4
         if: always()
@@ -86,11 +98,20 @@ jobs:
         with:
           ruby-version: "3.3"
       - run: gem install awesome_bot -v "$AWESOME_BOT_VERSION" --no-document
-      - name: awesome_bot on changed Markdown
+      - name: Links added in this PR
+        env:
+          BASE: ${{ github.base_ref }}
         run: |
-          files=$(git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" -- '*.md' \
-            | grep -vE '^(e2e-evidence|reports|docs/audit|audit|\.claude|\.agents|awesome-list-site-ds)' || true)
-          if [ -z "$files" ]; then echo "No user-facing Markdown changed"; exit 0; fi
+          git diff -U0 "origin/$BASE...HEAD" -- '*.md' \
+            ':!e2e-evidence/**' ':!reports/**' ':!docs/audit/**' ':!audit/**' ':!.claude/**' ':!.agents/**' \
+            | grep '^+' | grep -v '^+++' \
+            | grep -oE 'https?://[^ )>"`'"'"']+' \
+            | grep -vE '^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|example\.(com|org))([:/]|$)|/user/repo/' \
+            | sort -u > added-urls.txt || true
+          echo "$(wc -l < added-urls.txt) added link(s)"
+          sed 's/.*/- <&>/' added-urls.txt > added-links.md
+      - name: awesome_bot on added links
+        run: |
+          if [ ! -s added-urls.txt ]; then echo "No links added"; exit 0; fi
           allow=$(grep -v '^\s*#' scripts/awesome-bot-allowlist.txt | grep -v '^\s*$' | paste -sd, -)
-          allow="${allow:+$allow,}localhost,127.0.0.1,example.com"
-          awesome_bot $files $AB_FLAGS --white-list "$allow"
+          awesome_bot added-links.md $AB_FLAGS ${allow:+--white-list "$allow"}

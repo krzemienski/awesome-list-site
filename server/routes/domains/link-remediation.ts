@@ -1,8 +1,8 @@
 /**
  * Link-health remediation and schedule.
  *
- *   GET  /api/link-health/summary                     public: last scan time and counts
- *   GET  /api/admin/link-health/remediation           admin: schedule, mode, current plan
+ *   GET  /api/link-health/summary                     public: when links were last checked
+ *   GET  /api/admin/link-health/remediation           admin: schedule, mode, current plan, ignored links
  *   POST /api/admin/link-health/remediation/apply     admin: apply the current plan
  *   POST /api/admin/link-health/resources/:id/ignore  admin: { ignored } skip or resume one link
  */
@@ -16,6 +16,7 @@ import { linkHealthIntervalHours } from "../../jobs/linkHealthScheduler";
 import {
   applyRemediationPlan,
   buildRemediationPlan,
+  listIgnoredLinks,
   remediationMode,
   setLinkHealthIgnored,
 } from "../../services/linkRemediation";
@@ -59,16 +60,21 @@ const ignoreBody = z.object({ ignored: z.boolean() });
 
 export function registerLinkRemediationRoutes(app: Express, { isAuthenticated, isAdmin }: LinkRemediationContext): void {
   app.get("/api/link-health/summary", asyncHandler(async (_req, res) => {
-    res.set("Cache-Control", "no-store");
-    res.json(await scheduleSnapshot());
+    const { lastCompleted } = await scheduleSnapshot();
+    res.set("Cache-Control", "public, max-age=300");
+    res.json({
+      lastCheckedAt: lastCompleted?.completedAt ?? null,
+      linksChecked: lastCompleted?.checked ?? 0,
+      linksHealthy: lastCompleted?.healthy ?? 0,
+    });
   }));
 
   app.get("/api/admin/link-health/remediation", isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
-    const [schedule, plan] = await Promise.all([scheduleSnapshot(), buildRemediationPlan()]);
+    const [schedule, plan, ignored] = await Promise.all([scheduleSnapshot(), buildRemediationPlan(), listIgnoredLinks()]);
     const counts: Record<string, number> = {};
     for (const a of plan.actions) counts[a.kind] = (counts[a.kind] ?? 0) + 1;
     res.set("Cache-Control", "no-store");
-    res.json({ ...schedule, plan: { jobId: plan.jobId, counts, actions: plan.actions } });
+    res.json({ ...schedule, plan: { jobId: plan.jobId, checked: plan.checked, counts, actions: plan.actions }, ignored });
   }));
 
   app.post("/api/admin/link-health/remediation/apply", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
@@ -85,7 +91,8 @@ export function registerLinkRemediationRoutes(app: Express, { isAuthenticated, i
     try {
       await setLinkHealthIgnored(id, body.data.ignored, req.dbUser?.id);
     } catch (err) {
-      if (err instanceof Error && err.message === "Resource not found") return res.status(404).json({ message: "Resource not found" });
+      if (err instanceof Error && err.message === "Resource not found") return res.status(404).json({ message: err.message });
+      if (err instanceof Error && err.message === "Only a published resource can be marked") return res.status(409).json({ message: err.message });
       throw err;
     }
     res.json({ id, ignored: body.data.ignored });

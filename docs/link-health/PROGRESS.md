@@ -20,5 +20,7 @@ Branch `feat/link-health-remediation` (from main 32acd9ee).
 - [x] Routes (`server/routes/domains/link-remediation.ts`) and admin panel (`LinkRemediationPanel.tsx`)
 - [x] Enrichment stores `metadata.linkCheck`
 - [x] CI workflow; tsc 0, build 0, no new eslint errors
-- [ ] PR CI run, merge, deploy, production verification
+- [x] PR CI run 1: catalog awesome_bot over 150 URLs ran (2 flagged: AMD timeout, IEEE 202; neither dead by policy). Docs job failed on pre-existing README links -> now checks only added links.
+- [x] Independent review (bug-hunter, sonnet): 2 HIGH, 7 MEDIUM, 4 LOW, verdict MERGE-WITH-FIXES. Fixed: mass-failure breaker (2%) + 20 h dead span; rewrite only path-preserving redirects (error/consent paths -> review); old URL in audit notes; expected-URL guard inside the apply transaction; restore needs 2 confirmed-alive scans and an untouched status; linkHealth merged, never replaced (including whole-metadata writers); stale-only job recovery (90 min) on every tick; schedule from last completed scan + 1 h retry; broken list shows live links only; public summary trimmed; enrichment checks run in parallel; approvedBy restored; CI summary reads the real result shape and fails if awesome_bot wrote nothing.
+- [ ] PR CI run 2, merge, deploy, production verification
 - [ ] Owner reviews the first production plan; switch to `apply`

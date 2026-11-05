@@ -12,27 +12,31 @@ export function linkHealthIntervalHours(): number {
   return Number.isFinite(raw) && raw >= 0 ? raw : 24;
 }
 
-export function initializeLinkHealthScheduler(): void {
-  // A restart kills any in-flight sweep, so mark stuck jobs failed before the
-  // first tick looks for a due scan.
-  const ready = import("../services/linkHealthService").then(async ({ linkHealthService }) => {
-    await linkHealthService.recoverInterruptedJobs();
-    return linkHealthService;
-  });
+async function service() {
+  return (await import("../services/linkHealthService")).linkHealthService;
+}
 
+export function initializeLinkHealthScheduler(): void {
   const hours = linkHealthIntervalHours();
   if (hours === 0) {
     logger.info("Link health schedule off (LINK_HEALTH_INTERVAL_HOURS=0)");
-    ready.catch((err: unknown) => logger.error("Startup recovery failed:", messageOf(err)));
+    void service()
+      .then(s => s.recoverInterruptedJobs())
+      .catch((err: unknown) => logger.error("Interrupted-job recovery failed:", messageOf(err)));
     return;
   }
 
-  // The due check reads the newest job's age from the database, so the
-  // schedule survives restarts and autoscale instances share one cadence.
-  const tick = () => ready
-    .then(service => service.startCheckIfDue(hours))
-    .then(job => { if (job) logger.info(`Scheduled link scan started (job ${job.id}, every ${hours}h)`); })
-    .catch((err: unknown) => logger.error("Scheduled link scan failed to start:", messageOf(err)));
+  // Each tick recovers stale jobs and reads the last completed scan's age from
+  // the database, so the schedule survives restarts and every autoscale
+  // instance shares one cadence; startCheck's lock stops overlapping scans.
+  const tick = async () => {
+    try {
+      const job = await (await service()).startCheckIfDue(hours);
+      if (job) logger.info(`Scheduled link scan started (job ${job.id}, every ${hours}h)`);
+    } catch (err) {
+      logger.error("Scheduled link scan failed to start:", messageOf(err));
+    }
+  };
 
   setTimeout(() => void tick(), 60_000).unref();
   setInterval(() => void tick(), TICK_MS).unref();
