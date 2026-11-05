@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-// I1 — Font override picker. Source-of-truth list + applier live in
-// `client/src/lib/font-options.ts`. The boot script in `client/index.html`
-// duplicates the same map inline for pre-paint application;
-// Keep the two in sync by hand.
+// The picker and Vite-generated prepaint values share font-options.ts.
 import {
   FONT_OPTIONS,
   FONT_LS_KEY,
@@ -147,7 +144,7 @@ export default function ThemeSettings() {
         >
           {accountSync === "local" && <p>Theme choices are saved on this device.</p>}
           {accountSync === "syncing" && <p>Saving theme to your account…</p>}
-          {accountSync === "queued" && <p>You're offline. This theme is saved on this device and will be saved to your account when you reconnect.</p>}
+          {accountSync === "queued" && <p>You&rsquo;re offline. This theme is saved on this device and will be saved to your account when you reconnect.</p>}
           {accountSync === "saved" && <p>Theme saved to your account.</p>}
           {accountSync === "failed" && <>
             <p>{accountSyncError}</p>
@@ -353,7 +350,7 @@ export default function ThemeSettings() {
         <Card
           className="p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]"
           data-testid="preview-card"
-          {...({ inert: "" } as any)}
+          {...{ inert: "" }}
         >
           {/* Typography */}
           <div className="space-y-2">

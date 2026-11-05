@@ -19,6 +19,7 @@ const cssPath = "client/public/ds/design-system.css";
 const bridgePath = "client/src/styles/app-bridge.css";
 const registryPath = "client/public/ds/design-system.js";
 const runtimePath = "client/src/lib/design-system.ts";
+const fontPath = "client/src/lib/font-options.ts";
 const profilePath = "shared/styles/product-profiles.css";
 const outputPath = "artifacts/awesome-video-design-system/tokens.json";
 
@@ -33,8 +34,8 @@ export const RUNTIME_WRAPPER_PATH = runtimePath;
 // load; evaluating it in an isolated context reads the exact values the
 // browser gets, with no hand-maintained copy to drift. Validators import this
 // instead of re-parsing the file.
-export function evaluateCanonicalRegistry(source, filename = registryPath) {
-  const registryWindow = {};
+export function evaluateCanonicalRegistry(source, filename = registryPath, fontSystemStacks = readFontSystemStacks()) {
+  const registryWindow = { FONT_SYSTEM_STACKS: fontSystemStacks };
   vm.runInNewContext(source, { window: registryWindow }, { filename });
   return {
     systems: registryWindow.DESIGN_SYSTEMS,
@@ -48,7 +49,7 @@ export function evaluateCanonicalRegistry(source, filename = registryPath) {
 
 export function readCanonicalRegistry(rootDir = projectRoot, relativePath = registryPath) {
   const source = fs.readFileSync(path.join(rootDir, relativePath), "utf8");
-  return { source, ...evaluateCanonicalRegistry(source, relativePath) };
+  return { source, ...evaluateCanonicalRegistry(source, relativePath, readFontSystemStacks(rootDir)) };
 }
 
 // design-system.ts imports the kept-systems list from shared/; evaluate
@@ -70,10 +71,15 @@ export function readThemeBootData(source = fs.readFileSync(fromRoot(runtimePath)
   return evaluateTsModule(source, path.dirname(fromRoot(runtimePath))).THEME_BOOT_DATA;
 }
 
+function readFontSystemStacks(rootDir = projectRoot) {
+  const filename = path.join(rootDir, fontPath);
+  return evaluateTsModule(fs.readFileSync(filename, "utf8"), path.dirname(filename)).FONT_SYSTEM_STACKS;
+}
+
 // Execute the actual inline boot, not an assumed patch: removing the patch in
 // index.html must change the model just as it changes the browser.
 export function evaluateBootRegistry(source, html, wrapper) {
-  const window = {};
+  const window = { FONT_SYSTEM_STACKS: readFontSystemStacks() };
   const root = { style: { setProperty() {}, removeProperty() {} }, setAttribute() {}, classList: { add() {} } };
   const context = { window, document: { documentElement: root }, localStorage: { getItem() { return null; } }, location: { pathname: "/" } };
   vm.runInNewContext(source, context);
@@ -380,9 +386,9 @@ function main() {
     throw new Error(`${registryPath}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary`);
   }
 
-  // Canonical sheet first, bridge second: the same top-level :root cascade the
-  // browser applies to <html>, last declaration wins.
-  const rootTokens = customProperties(blockAfter(`${css}\n${bridgeCss}`, ":root"));
+  // Match Vite's cascade: canonical sheet, generated font defaults, then bridge.
+  const fontCss = `:root{${Object.entries(readFontSystemStacks()[defaultSystem]).map(([name, value]) => `${name}:${value};`).join("")}}`;
+  const rootTokens = customProperties(blockAfter(`${css}\n${fontCss}\n${bridgeCss}`, ":root"));
   const themes = Object.fromEntries(
     systems.map((system) => [
       system.id,
@@ -428,7 +434,7 @@ function main() {
       "Generated Replit projection of the canonical Awesome.Video runtime design system.",
     _meta: {
       generated: true,
-      edit: [cssPath, registryPath, bridgePath, runtimePath, profilePath],
+      edit: [cssPath, registryPath, bridgePath, runtimePath, fontPath, profilePath],
       contract: "artifacts/awesome-video-design-system/DESIGN.md",
     },
     defaults: {
