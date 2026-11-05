@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ToastActionElement } from "@/components/ui/toast";
-import { describeWriteError } from "@/lib/apiError";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 const NOTE_MAX = 500;
 
@@ -135,7 +135,7 @@ export default function ReportLinkAction({
             </div>
             {submit.isError && (
               <p role="alert" className="text-sm text-destructive" data-testid="report-link-error">
-                {describeWriteError(submit.error, { fallback: "The report could not be sent. Please try again." })}
+                {describeWriteError(submit.error, { fallback: "The report could not be sent. Please try again.", outcome: NOTHING_CHANGED_OUTCOME })}
               </p>
             )}
             <DialogFooter>
