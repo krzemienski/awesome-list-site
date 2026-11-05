@@ -121,7 +121,11 @@ export const optOutPosthog = () => {
   if (ph) {
     try {
       ph.set_config(DISABLED_CONFIG);
-      ph.stopSessionRecording();
+      // stopSessionRecording() flushes the replay buffer, which uploads it
+      // after the visitor declined; dispose discards it instead. A disposed
+      // recorder does not restart, so replay resumes on the next page load
+      // after a re-grant.
+      ph.sessionRecording?.dispose({ discardBufferedEvents: true });
       ph.opt_out_capturing();
       ph.reset(true);
     } catch {
