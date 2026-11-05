@@ -138,7 +138,10 @@
             var pending = window.__awvPendingPalette;
             var isK = (e.metaKey || e.ctrlKey) && k.toLowerCase() === 'k';
             if (pending) {
-              if (isInteractive(t)) {
+              // Asymmetric on purpose: a focus move (onFocusIn) ends the request,
+              // but the key's current target does not. Ctrl+K may be pressed on
+              // a link, and the typed query must still reach the palette.
+              if (isField(t)) {
                 window.__awvPendingPalette = undefined;
                 return;
               }
