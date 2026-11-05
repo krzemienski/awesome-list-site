@@ -110,11 +110,17 @@ export function AdminLoadError({
               // alert re-renders in the same place: refocus its new Retry,
               // otherwise the page heading. Registered after onRetry so a
               // caller's own handoff target fires first and wins.
-              handoffFocusOnUnmount(trigger, () =>
-                host?.isConnected
-                  ? host.querySelector<HTMLElement>(":scope > .admin-load-error button")
-                  : null,
-              );
+              // When a wrapper around the alert unmounts too (e.g. the whole
+              // section is gated on the error), the host is detached: find the
+              // re-rendered Retry by its test id instead (C22-EX-09).
+              handoffFocusOnUnmount(trigger, () => {
+                if (host?.isConnected) {
+                  return host.querySelector<HTMLElement>(":scope > .admin-load-error button");
+                }
+                return retryTestId
+                  ? document.querySelector<HTMLElement>(`[data-testid="${retryTestId}"]`)
+                  : null;
+              });
             }}
             aria-disabled={retrying || undefined}
             aria-busy={retrying || undefined}
