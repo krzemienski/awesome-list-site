@@ -714,7 +714,7 @@ export default function Profile({ user }: ProfileProps) {
                             <h4 className="font-medium truncate">
                               <Link
                                 href={`/resource/${favorite.id}`}
-                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 hover:underline"
+                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 max-lg:min-h-11 max-lg:leading-11 hover:underline"
                                 data-testid={`link-favorite-${favorite.id}`}
                               >
                                 {favorite.title}
@@ -813,7 +813,7 @@ export default function Profile({ user }: ProfileProps) {
                             <h4 className="font-medium truncate">
                               <Link
                                 href={`/resource/${bookmark.id}`}
-                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 hover:underline"
+                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 max-lg:min-h-11 max-lg:leading-11 hover:underline"
                                 data-testid={`link-bookmark-${bookmark.id}`}
                               >
                                 {bookmark.title}
