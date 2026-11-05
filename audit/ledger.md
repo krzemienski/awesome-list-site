@@ -1952,3 +1952,9 @@ The phrase “Appendix B” in the PR re-check contract refers to the cycle-7 de
 - Crawled 62 destinations in isolated Chrome: core public routes, nested taxonomy and aliases, auth/guard redirects, member surfaces, admin guards, not-found paths, and crawl-control documents. Evidence batches: `e2e-evidence/run-20261029T010233Z-full-functional/step-04-route-crawl-batch1.json`, `step-05-route-crawl-batch2.json`, `step-06-route-crawl-batch3.json`, `step-07-route-crawl-aliases-meta.json`, `step-08-iostvos-aliases.json`.
 - Confirmed `/sub-subcategory/iostvos` and `/subsubcategory/iostvos` redirect to canonical `/sub-subcategory/ios-tvos`; `/settings/notifications` and bare `/iostvos` are real 404s; `/sign-in/verify-email-address` returns to the normal sign-in card; `/robots.txt`, `/llms.txt`, and `/sitemap.xml` return 200.
 - Current client source confirms 15 canonical admin strip tabs plus Sub-Subcategories, Digests and Journeys (18 admin sections total).
+
+## C20/C21 close-out (2026-11-05)
+
+- 47 audit findings (2026-11-03) re-proved on production 59dedea0: 44 PASS, 3 UNVERIFIED (BUG-010/018/019: Adobe/O'Reilly Access Denied from this machine), 0 FAIL. Table: docs/audit/C20-COMPLETION.md.
+- Fix waves 1–5: PRs #234–#246. All deployed with replit-deploy; each live revision equalled origin/main.
+- P0 smoke 18/18 PASS (9 journeys × 1440/375). Member/admin flows BLOCKED (no owner session); sign-up skipped by owner.
