@@ -158,6 +158,23 @@ function resourceNoun(count: number): string {
   return count === 1 ? "resource" : "resources";
 }
 
+// Same bound the command palette uses for echoed text (search-dialog ECHO_QUERY_MAX).
+const ECHO_PAGE_TEXT_MAX = 80;
+
+/**
+ * Notice copy for a page request that was replaced. Typed or URL text is
+ * echoed bounded and only when there is something to echo, so a blank box
+ * never reads "Page  is not available" and a pasted paragraph cannot flood
+ * the notice. The wording for text matches the direct ?page=abc notice.
+ */
+function pageAdjustedMessage(requested: number | string, adjusted: number): string {
+  if (typeof requested === "number") return `Page ${requested} is not available; showing page ${adjusted} instead.`;
+  const text = requested.trim();
+  if (!text) return `No page number was entered, so page ${adjusted} is shown.`;
+  const echo = text.length > ECHO_PAGE_TEXT_MAX ? `${text.slice(0, ECHO_PAGE_TEXT_MAX).trimEnd()}…` : text;
+  return `Page “${echo}” doesn't exist, so page ${adjusted} is shown.`;
+}
+
 export default function TaxonomyListing({ level }: Props) {
   const { slug = "" } = useParams<{ slug: string }>();
   const [location] = useLocation();
@@ -450,7 +467,7 @@ export default function TaxonomyListing({ level }: Props) {
   useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get("page");
     if (raw !== null && strictUrlPage(raw) === null) {
-      setPageNotice({ message: `Page “${raw}” doesn't exist, so page 1 is shown.`, resultSet: resultSetKey(1) });
+      setPageNotice({ message: pageAdjustedMessage(raw, 1), resultSet: resultSetKey(1) });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydratedRoute]);
@@ -463,7 +480,7 @@ export default function TaxonomyListing({ level }: Props) {
     if (page > totalPages && paginationReady) {
       // Correct the URL in place: Back to it would only clamp again.
       replaceNextUrlSync.current = true;
-      setPageNotice({ message: `Page ${page} is not available; showing page ${totalPages} instead.`, resultSet: resultSetKey(totalPages) });
+      setPageNotice({ message: pageAdjustedMessage(page, totalPages), resultSet: resultSetKey(totalPages) });
       setPage(totalPages);
     }
   }, [page, paginationReady, totalPages]);
@@ -779,7 +796,7 @@ export default function TaxonomyListing({ level }: Props) {
             })}</div>}
           {/* Page navigation stays visible whenever the collection spans more
               than one page: it is primary navigation, not a filter tool. */}
-          {totalPages > 1 && !countsPending && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setPageNotice({ message: `Page ${requested} is not available; showing page ${adjusted} instead.`, resultSet: resultSetKey(adjusted) })} /></div>}
+          {totalPages > 1 && !countsPending && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setPageNotice({ message: pageAdjustedMessage(requested, adjusted), resultSet: resultSetKey(adjusted) })} /></div>}
         </div>
       </div>
     </div>

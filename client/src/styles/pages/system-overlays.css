@@ -99,14 +99,16 @@
   }
 }
 
-.system-consent-banner--compact .system-consent-banner__copy {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Short windows and native zoom keep the same disclosure, with tighter
+   spacing rather than hidden text or smaller action targets. */
+@media (max-height: 499px) {
+  .system-consent-banner__inner {
+    padding-block: 0.5rem;
+  }
 
-.system-consent-banner--compact .system-consent-banner__action {
-  min-height: 36px;
+  .system-consent-banner__copy {
+    font-size: 0.75rem;
+  }
 }
 
 /* --------------------------------------------------------------------------

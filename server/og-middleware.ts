@@ -114,8 +114,8 @@ export interface RouteMeta {
   keywords?: string;
   /**
    * When true the page is excluded from search: buildMetaTags emits a static
-   * `noindex,nofollow` robots tag and OMITS the self-referencing canonical +
-   * og:url. Two cases use this:
+   * `noindex,nofollow` robots tag and omits og:url and, by default, the
+   * self-referencing canonical. Cases include:
    *   1. Soft-404s (unknown/non-existent route served as the SPA shell) — these
    *      ALSO get HTTP 404 from the middleware because `found` is false.
    *   2. Valid utility pages with no search value (e.g. /sign-in, /sign-up) —
@@ -125,6 +125,8 @@ export interface RouteMeta {
    *      same "Page Not Found" body the client renders.
    */
   noindex?: boolean;
+  /** Emit a self-canonical independently of indexing, e.g. valid low-count tags. */
+  canonical?: boolean;
   /** Opt a valid noindex page into link crawling; soft-404s stay nofollow. */
   follow?: boolean;
   /**
@@ -1381,6 +1383,7 @@ function homeShellChrome(): string {
       const name = tagDisplayNameBranded(slug);
       const canonicalPath = tagLandingPath(slug);
       const m = defaultMeta(canonicalPath);
+      m.canonical = true;
       m.title = `${pagedSeoTitleCore(tagTitleCoreDeduped(name), page)} — ${SITE_NAME}`;
       m.description = pagedSeoDescription(
         tagSeoDescription(name, result.total),
@@ -2050,7 +2053,8 @@ export function buildMetaTags(m: RouteMeta): string {
   const robotsTag = m.noindex
     ? `\n    <meta name="robots" content="noindex, ${m.follow ? "follow" : "nofollow"}" data-react-helmet="true" />`
     : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />`;
-  const canonicalTag = m.noindex
+  const omitCanonical = !(m.canonical ?? !m.noindex);
+  const canonicalTag = omitCanonical
     ? ""
     : `\n    <link rel="canonical" href="${u}" data-react-helmet="true" />`;
   // R5-050: a noindex page may still carry an explicit og:url (the 404 head

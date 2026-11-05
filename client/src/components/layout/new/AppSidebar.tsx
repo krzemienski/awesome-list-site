@@ -126,8 +126,7 @@ function filterCategories(categories: NavCategory[]) {
 }
 
 function formatCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-  return String(n);
+  return n.toLocaleString();
 }
 
 function resourceCountLabel(n: number): string {
@@ -706,6 +705,9 @@ export default function AppSidebar({
   const [toggled, setToggled] = useState<{ key: string; location: string } | null>(null);
   // A toggle animates only its own group and only on the route it happened on.
   const toggledKey = toggled && toggled.location === location ? toggled.key : null;
+  useEffect(() => {
+    setToggled(null);
+  }, [location]);
   const {
     setOpenMobile,
     isMobile,

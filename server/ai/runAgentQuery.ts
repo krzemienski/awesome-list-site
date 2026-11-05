@@ -345,6 +345,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
   // API message ids whose usage has already been attributed to an event —
   // block-split assistant messages repeat the same usage per block.
   const seenUsageMessageIds = new Set<string>();
+  // Search calls share message ids when batched; dedup by invocation instead.
+  const seenSearchToolUseIds = new Set<string>();
   // Usage observed on the stream, per API message. A cancelled run never
   // receives the SDK's final result message, so this is the only record of
   // what it already consumed (turns, tokens, an estimated cost).
@@ -635,11 +637,15 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
 
           for (const tb of toolUseBlocks) {
             const name: string = tb.name;
-            if (name === "WebSearch") {
+            const block = tb as { id?: string; input?: unknown };
+            if (
+              (name === "WebSearch" || name === "mcp__research__search_primary_sources") &&
+              (!block.id || !seenSearchToolUseIds.has(block.id))
+            ) {
+              if (block.id) seenSearchToolUseIds.add(block.id);
               result.webSearchCount++;
               delegations.noteSubagentWebSearch((msg as { parent_tool_use_id?: string | null }).parent_tool_use_id);
             }
-            const block = tb as { id?: string; input?: unknown };
             if (DELEGATION_TOOL_NAMES.has(name) && block.id) delegations.noteToolUse(block.id, block.input);
 
             // Circuit breaker (stall arm): register the in-flight call, then
