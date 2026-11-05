@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { linkHealthChecks, linkHealthJobs, resources, type Resource } from "@shared/schema";
 import { db } from "../db";
-import { LinkChecker, browserVerifyLink, registrableDomain } from "../validation/linkChecker";
+import { LinkChecker, browserVerifyLink, registrableDomain, stripLanguagePrefix } from "../validation/linkChecker";
 import { transitionResourceInTransaction, withResourcePublication } from "../repositories/resourcePublication";
 import { createLogger } from "../lib/logger";
 
@@ -100,11 +100,12 @@ export function observe(check: CheckSnapshot): LinkObservation {
     if (AUTH_PATH.test(to.pathname)) return "ok";
     // Only a redirect that keeps the page is a safe rewrite: the same host
     // (www aside; shared hosts like *.github.io are different owners), the same
-    // query, and the same path or its trailing-slash/index form. Anything else
-    // needs a human.
+    // query (an empty "?" counts as none), and the same path or its
+    // trailing-slash, index or language-prefix form. Anything else needs a human.
     const host = (h: string) => h.toLowerCase().replace(/^www\./, "");
     if (host(from.hostname) !== host(to.hostname) || from.search !== to.search) return "suspect";
-    return normalizePath(from.pathname) === normalizePath(to.pathname) ? "moved" : "suspect";
+    const page = (p: string) => stripLanguagePrefix(normalizePath(p));
+    return page(from.pathname) === page(to.pathname) ? "moved" : "suspect";
   } catch {
     return "unknown";
   }
