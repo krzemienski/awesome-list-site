@@ -372,13 +372,11 @@
     padding-inline: 12px;
   }
 
-  .search-palette [cmdk-input] {
-    /* Match canonical mobile controls despite the generic 16px input rule. */
-    font-size: 13px !important;
-  }
-
+  /* The input keeps the generic 16px rule (mobile-optimizations.css) so iOS
+     Safari does not zoom on focus; the overlay placeholder matches it and
+     ellipsizes when the column is narrow. */
   .search-palette-placeholder {
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .search-palette-close {

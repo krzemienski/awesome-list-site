@@ -108,14 +108,18 @@
           function isField(t) {
             return !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
           }
+          // Anything focusable owns its own keys (Space on a button, Enter on
+          // a link), so a pending request must end once focus lands there.
+          function isInteractive(t) {
+            return !!t && !!t.closest && !!t.closest('a[href],button,input,select,textarea,summary,[role=button],[tabindex]:not([tabindex="-1"]),[contenteditable]');
+          }
           var timer = 0;
           // Successful hydration stops capture but keeps the draft for the
-          // palette. A failed boot or timeout cancels that request instead.
+          // palette. A boot that never completes cancels via the timeout; page
+          // errors are not a signal (third-party scripts throw independently).
           function stop() {
             document.removeEventListener('keydown', onKey, true);
             document.removeEventListener('focusin', onFocusIn, true);
-            window.removeEventListener('error', cancel);
-            window.removeEventListener('unhandledrejection', cancel);
             document.removeEventListener('DOMContentLoaded', armTimeout);
             clearTimeout(timer);
             window.__awvStopPaletteCapture = undefined;
@@ -125,7 +129,7 @@
             stop();
           }
           function onFocusIn(e) {
-            if (isField(e.target)) window.__awvPendingPalette = undefined;
+            if (isInteractive(e.target)) window.__awvPendingPalette = undefined;
           }
           function onKey(e) {
             var k = e.key;
@@ -134,7 +138,7 @@
             var pending = window.__awvPendingPalette;
             var isK = (e.metaKey || e.ctrlKey) && k.toLowerCase() === 'k';
             if (pending) {
-              if (isField(t)) {
+              if (isInteractive(t)) {
                 window.__awvPendingPalette = undefined;
                 return;
               }
@@ -170,8 +174,6 @@
           window.__awvStopPaletteCapture = stop;
           document.addEventListener('keydown', onKey, true);
           document.addEventListener('focusin', onFocusIn, true);
-          window.addEventListener('error', cancel);
-          window.addEventListener('unhandledrejection', cancel);
           function armTimeout() { timer = setTimeout(cancel, 30000); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', armTimeout);
           else armTimeout();
