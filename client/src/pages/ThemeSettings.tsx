@@ -317,7 +317,7 @@ export default function ThemeSettings() {
                 </div>
                 <p
                   className="text-sm text-[color:var(--text-2)]"
-                  style={{ fontFamily: (isActive && f.stack) || systemFontStack(systemId) }}
+                  style={{ fontFamily: f.stack || systemFontStack(systemId) }}
                 >
                   The quick brown fox jumps over the lazy dog. 0123456789
                 </p>

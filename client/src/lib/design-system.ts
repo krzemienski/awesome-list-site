@@ -2,8 +2,10 @@
   Typed wrapper around the canonical design-system runtime.
 
   The tables (DESIGN_SYSTEMS, ACCENTS, SYSTEM_DEFAULT_ACCENT, TYPE_SCALE,
-  SPACE_SCALE) and the applier live in /ds/design-system.js, a verbatim copy of
-  the design source that index.html loads synchronously before first paint.
+  SPACE_SCALE) and the applier live in /ds/design-system.js, a copy of the
+  design source whose font stacks come from window.FONT_SYSTEM_STACKS (built
+  from font-options.ts by vite.config.ts); index.html loads both synchronously
+  before first paint.
   This module reads the window globals, adds types, and provides persistence.
   Boot-only id/default metadata is checked against the canonical tables by
   canonical-token-parity; app-owned accessible text corrections live here.
