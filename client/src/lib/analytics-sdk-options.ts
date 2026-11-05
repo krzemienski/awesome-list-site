@@ -102,6 +102,11 @@ export const posthogInitOptions = (apiHost: string): Partial<PostHogConfig> => (
   // A running SDK drops its own events ($pageview, autocapture, ...) on a
   // QA path or once an admin session starts (analytics-suppression.ts).
   before_send: (event) => (isAnalyticsSuppressed() ? null : event),
+  // opt_out_capturing() stops new captures but not the batch queue: events
+  // queued in the last flush interval still upload after the visitor declines
+  // (request-queue.js never checks consent). Sending each event when it is
+  // captured leaves nothing consented waiting in a queue at withdrawal.
+  request_batching: false,
   debug: import.meta.env.DEV,
 });
 
@@ -120,6 +125,11 @@ export const amplitudeInitOptions = () => ({
     sameSite: 'Lax' as const,
     secure: window.location.protocol === 'https:',
   },
+  // setOptOut(true) only blocks events recorded afterwards; the destination
+  // still uploads its queue on the next flush timer (analytics-core
+  // destination.js has no opt-out hook), i.e. after the visitor declines.
+  // Flushing on the next tick leaves no consented backlog at withdrawal.
+  flushIntervalMillis: 0,
 });
 
 interface AmplitudeEnrichmentEvent {
