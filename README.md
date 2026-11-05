@@ -148,6 +148,23 @@ Exports pass all awesome-lint rules except:
 - `awesome-contributing`: Requires CONTRIBUTING.md in repo
 - `awesome-github`: Requires git repository
 
+## Link Health
+
+Dead links are handled as data, not as bugs. Three checks share one policy.
+
+- **Scheduled scan.** The server starts a full scan of every published link, and of every link it hid itself, when the newest scan is older than `LINK_HEALTH_INTERVAL_HOURS` (default 24; `0` turns it off). The due check reads the database, so the schedule survives restarts and is shared by every autoscale instance. A scan fetches each link, then re-checks every failure with a real browser User-Agent so bot blocks don't count as dead.
+- **Remediation.** After each scan, the planner reads the last three scans of each link and plans one action:
+  - *hide*: confirmed dead (DNS failure, refused connection, or browser-confirmed 404/410 or SSL failure) in consecutive scans at least 20 hours apart. The resource becomes `archived`. One apply never hides more than 2% of the catalog; a larger batch points at the checker or the network, so it is refused.
+  - *restore*: a link it hid answers with a 2xx/3xx in two scans in a row, and nobody changed the resource's status since.
+  - *update URL*: a redirect that keeps the page (http to https, `www.` added or dropped, a trailing slash or `index.html`, same query) lands on the same URL in two scans in a row.
+  - *review*: a redirect to another site or page, an error page, or a parked domain. These are never changed automatically.
+
+  Timeouts and 401/403/429 responses never trigger a change. Hiding needs scans spread over 20 hours, so an interval below 10 hours still waits that long before it hides anything. With `LINK_HEALTH_REMEDIATION=plan` (default) the plan is only shown; `apply` applies it after every scan. Nothing is deleted, and every change is written to the resource audit log with its previous value.
+- **Enrichment.** Each enriched resource stores the same verdict in `metadata.linkCheck`.
+- **CI.** `.github/workflows/link-check.yml` runs awesome_bot 1.20.0 nightly over every production URL (report and artifact only) and on pull requests over changed Markdown (fails on dead links). Known false positives go in `scripts/awesome-bot-allowlist.txt`.
+
+The admin panel's Link Health tab shows the schedule, the plan, an **Apply** button, and a per-link **Link is fine** override that can be undone from the same card. `GET /api/link-health/summary` reports when links were last checked. A failed scan is retried after an hour; a scan no instance finished is marked failed after 90 minutes.
+
 ## Environment Variables
 
 This project requires several environment variables to run. See [ENVIRONMENT.md](docs/ENVIRONMENT.md) for:

@@ -30,6 +30,7 @@ import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/adm
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import LinkReportsPanel from "@/components/admin/LinkReportsPanel";
+import LinkRemediationPanel from "@/components/admin/LinkRemediationPanel";
 import "@/styles/pages/admin-ops-github-links.css";
 import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
 
@@ -491,6 +492,8 @@ export default function LinkHealthDashboard() {
             : `Counts are the totals saved when scan #${lastCompletedJob.id} finished (${formatAdminDateTime(checkTime(lastCompletedJob).at)}).`}
         </p>
       ) : null}
+
+      <LinkRemediationPanel />
 
       <LinkReportsPanel />
 

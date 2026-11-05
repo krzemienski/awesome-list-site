@@ -1,15 +1,18 @@
 import type { LinkHealthJob, LinkHealthCheck, LinkHealthJobRow, LinkHealthCheckRow } from "@shared/schema";
 import { linkHealthJobs, linkHealthChecks, resources as resourcesTable } from "@shared/schema";
 import { db } from "../db";
-import { desc, eq, ne, and, inArray, lt, sql } from "drizzle-orm";
-import { storage } from "../storage";
+import { desc, eq, ne, and, inArray, notInArray, or, lt, sql } from "drizzle-orm";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
 import { createLogger } from "../lib/logger";
+import { RETAINED_SCANS, applyRemediationPlan, linkHealthArchivedFilter, remediationMode } from "./linkRemediation";
 
 const logger = createLogger("link-health");
 
 const scanControllers = new Map<number, AbortController>();
+
+const STALE_JOB_MINUTES = 90;
+const RETRY_AFTER_FAILURE_MINUTES = 60;
 
 export type BrokenLinkCheck = LinkHealthCheck & {
   resource?: { id: number; title: string; category: string };
@@ -69,14 +72,20 @@ export const linkHealthService = {
    * "processing" that also blocks new scans.
    */
   async recoverInterruptedJobs(): Promise<void> {
+    // Only a job far past the longest real sweep (~40 min) is dead. Under
+    // autoscale another instance may be running a fresh sweep right now.
+    const staleBefore = new Date(Date.now() - STALE_JOB_MINUTES * 60_000);
     const interrupted = await db
       .update(linkHealthJobs)
       .set({
         status: 'failed',
-        errorMessage: 'Interrupted by server restart',
+        errorMessage: 'Interrupted (no instance finished it)',
         completedAt: new Date(),
       })
-      .where(inArray(linkHealthJobs.status, ['pending', 'processing']))
+      .where(and(
+        inArray(linkHealthJobs.status, ['pending', 'processing']),
+        lt(linkHealthJobs.createdAt, staleBefore),
+      ))
       .returning({ id: linkHealthJobs.id });
     if (interrupted.length > 0) {
       logger.info(`Marked ${interrupted.length} interrupted job(s) as failed after restart: ${interrupted.map(j => j.id).join(', ')}`);
@@ -117,9 +126,12 @@ export const linkHealthService = {
       .limit(1);
     if (!latestCompleted) return [];
 
+    // Live links only: a link remediation already hid stays in scans (to be
+    // restored when it recovers) but is no longer a problem to act on here.
     const conditions = [
       eq(linkHealthChecks.jobId, latestCompleted.id),
       ne(linkHealthChecks.status, 'healthy'),
+      eq(resourcesTable.status, 'approved'),
     ];
     if (filter && filter !== 'all') {
       conditions.push(eq(linkHealthChecks.status, filter));
@@ -140,6 +152,32 @@ export const linkHealthService = {
       ...checkRowToApi(check),
       resource,
     }));
+  },
+
+  /** Start a scan when the newest one is older than the interval. Concurrent callers are serialized by startCheck's lock. */
+  async startCheckIfDue(intervalHours: number): Promise<LinkHealthJob | null> {
+    await this.recoverInterruptedJobs();
+    const [latest] = await db
+      .select({ status: linkHealthJobs.status, createdAt: linkHealthJobs.createdAt })
+      .from(linkHealthJobs)
+      .orderBy(desc(linkHealthJobs.id))
+      .limit(1);
+    if (latest && ['pending', 'processing'].includes(latest.status)) return null;
+    // A failed or cancelled scan is retried after a short pause, not a full interval.
+    if (latest && latest.status !== 'completed' && Date.now() - latest.createdAt.getTime() < RETRY_AFTER_FAILURE_MINUTES * 60_000) return null;
+    const [lastCompleted] = await db
+      .select({ createdAt: linkHealthJobs.createdAt })
+      .from(linkHealthJobs)
+      .where(eq(linkHealthJobs.status, 'completed'))
+      .orderBy(desc(linkHealthJobs.id))
+      .limit(1);
+    if (lastCompleted && Date.now() - lastCompleted.createdAt.getTime() < intervalHours * 3600_000) return null;
+    try {
+      return await this.startCheck();
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('already running')) return null;
+      throw err;
+    }
   },
 
   async startCheck(): Promise<LinkHealthJob> {
@@ -179,7 +217,11 @@ export const linkHealthService = {
       // Only the catalog read takes the shared heavy-work slot. The sweep
       // itself is network-bound and runs for 20-40 minutes; holding the slot
       // through it made every GitHub sync, export and backup 503 meanwhile.
-      const resources = await runHeavyWork('link-health', () => storage.getAllApprovedResources());
+      // Approved links plus links this system archived, so a recovered link gets restored.
+      const resources = await runHeavyWork('link-health', () => db
+        .select({ id: resourcesTable.id, title: resourcesTable.title, url: resourcesTable.url })
+        .from(resourcesTable)
+        .where(or(eq(resourcesTable.status, 'approved'), linkHealthArchivedFilter)));
       await (async () => {
       const resourcesToCheck = resources.map(r => ({
         id: r.id,
@@ -329,12 +371,21 @@ export const linkHealthService = {
         })
         .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')));
 
-      // Prune per-link rows of older jobs: only the latest completed scan's
-      // checks are ever served, and each scan writes ~1,800 rows.
-      await tx.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
+      // Keep the last RETAINED_SCANS completed scans: remediation reads
+      // consecutive-scan streaks from them. Older per-link rows are pruned.
+      const kept = await tx
+        .select({ id: linkHealthJobs.id })
+        .from(linkHealthJobs)
+        .where(eq(linkHealthJobs.status, 'completed'))
+        .orderBy(desc(linkHealthJobs.id))
+        .limit(RETAINED_SCANS);
+      await tx.delete(linkHealthChecks).where(notInArray(linkHealthChecks.jobId, kept.map(k => k.id)));
 
       logger.info({ jobId }, `Link scan finished: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
+      if (remediationMode() === 'apply') {
+        await applyRemediationPlan().catch((err: unknown) => logger.error('Automatic remediation failed:', err instanceof Error ? err.message : String(err)));
+      }
       })();
     } catch (err: any) {
       if (signal.aborted) return;
