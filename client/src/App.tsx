@@ -38,6 +38,7 @@ import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
+import { isChunkLoadError } from "@/lib/chunk-load-error";
 import {
   clearPendingPalette,
   focusPaletteOpener,
@@ -249,8 +250,6 @@ function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
 // C8-V2-01: Vite rejects a route import with "Unable to preload CSS for …"
 // when the route's stylesheet can't load (offline, rotated hash) — the same
 // failure as a missing script chunk.
-const CHUNK_ERROR_RE =
-  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
 const CONNECTIVITY_PROBE_TIMEOUT_MS = 3000;
 /** Delays between reachability probes after a failed one; then the card waits for a click or `online`. */
@@ -298,10 +297,6 @@ function focusRecoveredHeading(): void {
 }
 
 if (typeof window !== "undefined") restoreRouteRetryFocus();
-
-function isChunkLoadError(error: unknown): boolean {
-  return error instanceof Error && CHUNK_ERROR_RE.test(`${error.name}: ${error.message}`);
-}
 
 interface RouteErrorBoundaryProps {
   location: string;
