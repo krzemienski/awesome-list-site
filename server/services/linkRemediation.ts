@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { linkHealthChecks, linkHealthJobs, resources, type Resource } from "@shared/schema";
 import { db } from "../db";
-import { LinkChecker, browserVerifyLink, registrableDomain } from "../validation/linkChecker";
+import { LinkChecker, browserVerifyLink, registrableDomain, hasEnglishPrefix, stripEnglishPrefix } from "../validation/linkChecker";
 import { transitionResourceInTransaction, withResourcePublication } from "../repositories/resourcePublication";
 import { createLogger } from "../lib/logger";
 
@@ -100,11 +100,16 @@ export function observe(check: CheckSnapshot): LinkObservation {
     if (AUTH_PATH.test(to.pathname)) return "ok";
     // Only a redirect that keeps the page is a safe rewrite: the same host
     // (www aside; shared hosts like *.github.io are different owners), the same
-    // query, and the same path or its trailing-slash/index form. Anything else
-    // needs a human.
+    // query (an empty "?" counts as none), and the same path or its
+    // trailing-slash, index or English-prefix form. Anything else needs a human.
     const host = (h: string) => h.toLowerCase().replace(/^www\./, "");
     if (host(from.hostname) !== host(to.hostname) || from.search !== to.search) return "suspect";
-    return normalizePath(from.pathname) === normalizePath(to.pathname) ? "moved" : "suspect";
+    const fromPath = normalizePath(from.pathname);
+    const toPath = normalizePath(to.pathname);
+    if (fromPath === toPath) return "moved";
+    // An English prefix added or dropped on exactly one side is the same page.
+    if (hasEnglishPrefix(fromPath) === hasEnglishPrefix(toPath)) return "suspect";
+    return stripEnglishPrefix(fromPath) === stripEnglishPrefix(toPath) ? "moved" : "suspect";
   } catch {
     return "unknown";
   }
