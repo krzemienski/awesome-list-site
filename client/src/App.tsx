@@ -247,9 +247,6 @@ function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
 // chunk manifest); if that still fails, the visitor gets an in-app retry
 // card. Vite caches the rejected import promise, so recovery must be a full
 // reload — a soft re-render would replay the same rejection.
-// C8-V2-01: Vite rejects a route import with "Unable to preload CSS for …"
-// when the route's stylesheet can't load (offline, rotated hash) — the same
-// failure as a missing script chunk.
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
 const CONNECTIVITY_PROBE_TIMEOUT_MS = 3000;
 /** Delays between reachability probes after a failed one; then the card waits for a click or `online`. */
