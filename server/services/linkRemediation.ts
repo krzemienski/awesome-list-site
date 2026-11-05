@@ -98,12 +98,13 @@ export function observe(check: CheckSnapshot): LinkObservation {
     if (registrableDomain(from.hostname) !== registrableDomain(to.hostname)) return "suspect";
     if (ERROR_PATH.test(to.pathname)) return "suspect";
     if (AUTH_PATH.test(to.pathname)) return "ok";
-    const fromPath = normalizePath(from.pathname);
-    const toPath = normalizePath(to.pathname);
-    // Only a redirect that keeps the page (scheme, host, trailing slash, or a
-    // deeper path under the original) is a safe rewrite; anything else needs a human.
-    if (toPath === fromPath || (fromPath !== "/" && toPath.startsWith(`${fromPath}/`))) return "moved";
-    return "suspect";
+    // Only a redirect that keeps the page is a safe rewrite: the same host
+    // (www aside; shared hosts like *.github.io are different owners), the same
+    // query, and the same path or its trailing-slash/index form. Anything else
+    // needs a human.
+    const host = (h: string) => h.toLowerCase().replace(/^www\./, "");
+    if (host(from.hostname) !== host(to.hostname) || from.search !== to.search) return "suspect";
+    return normalizePath(from.pathname) === normalizePath(to.pathname) ? "moved" : "suspect";
   } catch {
     return "unknown";
   }
@@ -111,6 +112,9 @@ export function observe(check: CheckSnapshot): LinkObservation {
 
 /** Answered with a 2xx/3xx and no browser re-check was needed. "Not confirmed dead" is not enough to restore. */
 function confirmedAlive(check: CheckSnapshot, seen: LinkObservation): boolean {
+  if (check.finalUrl && !sameUrl(check.finalUrl, check.url)) {
+    try { if (AUTH_PATH.test(new URL(check.finalUrl).pathname)) return false; } catch { return false; }
+  }
   return (seen === "ok" || seen === "moved")
     && check.httpStatus !== null && check.httpStatus >= 200 && check.httpStatus < 400
     && !check.errorMessage;
@@ -273,6 +277,7 @@ async function applyOne(a: RemediationAction, actor?: string): Promise<AppliedAc
   if (a.kind === "archive") {
     await withResourcePublication(async (tx) => {
       const row = await lockPlanned(tx, a);
+      if (row.linkHealth.ignored) throw new Error("An admin marked this link fine");
       const linkHealth: LinkHealthMeta = {
         ...row.linkHealth,
         archivedByJob: a.jobId,
@@ -290,6 +295,7 @@ async function applyOne(a: RemediationAction, actor?: string): Promise<AppliedAc
     await withResourcePublication(async (tx) => {
       const row = await lockPlanned(tx, a);
       const prev = row.linkHealth;
+      if (!prev.archivedByJob) throw new Error("Not hidden by link health");
       const linkHealth: LinkHealthMeta = {
         ...prev, archivedByJob: null, archivedAt: null, previousApprovedAt: null, previousApprovedBy: null, restoredByJob: a.jobId,
       };
@@ -297,12 +303,10 @@ async function applyOne(a: RemediationAction, actor?: string): Promise<AppliedAc
         expectedStatus: "archived", notes, mergeMetadata: { linkHealth },
       });
       // A restore is not a new publication: keep its original place and approver.
-      if (prev.previousApprovedAt || prev.previousApprovedBy) {
-        await tx.update(resources).set({
-          ...(prev.previousApprovedAt ? { approvedAt: new Date(prev.previousApprovedAt) } : {}),
-          ...(prev.previousApprovedBy ? { approvedBy: prev.previousApprovedBy } : {}),
-        }).where(eq(resources.id, a.resourceId));
-      }
+      await tx.update(resources).set({
+        ...(prev.previousApprovedAt ? { approvedAt: new Date(prev.previousApprovedAt) } : {}),
+        approvedBy: prev.previousApprovedBy ?? null,
+      }).where(eq(resources.id, a.resourceId));
     });
     return { ...a, outcome: "applied" };
   }
@@ -361,7 +365,7 @@ export async function setLinkHealthIgnored(resourceId: number, ignored: boolean,
       .where(eq(resources.id, resourceId))
       .for("update");
     if (!row) throw new Error("Resource not found");
-    if (row.status !== "approved") throw new Error("Only a published resource can be marked");
+    if (ignored && row.status !== "approved") throw new Error("Only a published resource can be marked");
     await transitionResourceInTransaction(tx, resourceId, {}, actor, {
       notes: ignored ? "link-health: admin marked the link as fine; remediation skips it" : "link-health: remediation resumed",
       mergeMetadata: { linkHealth: { ...(linkHealthOf(row.metadata) ?? {}), ignored } },

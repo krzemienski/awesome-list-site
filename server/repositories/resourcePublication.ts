@@ -64,11 +64,14 @@ export async function transitionResourceInTransaction(
       patch.url ?? before.url,
     );
   }
-  // metadata.linkHealth belongs to link-health remediation. A writer that
-  // replaces the whole metadata object from an earlier read (enrichment, admin
-  // edits) keeps the stored value unless it sets the key itself.
-  if (!options.mergeMetadata && patch.metadata && !('linkHealth' in patch.metadata)) {
-    data.metadata = sql`${JSON.stringify(patch.metadata)}::jsonb || jsonb_strip_nulls(jsonb_build_object('linkHealth', ${resources.metadata} -> 'linkHealth'))`;
+  // metadata.linkHealth belongs to link-health remediation, which writes it
+  // only through mergeMetadata. A writer that replaces the whole metadata
+  // object from an earlier read (enrichment, admin edits) always keeps the
+  // stored value, even if its stale copy carries the key.
+  if (!options.mergeMetadata && patch.metadata) {
+    const rest = { ...(patch.metadata as Record<string, unknown>) };
+    delete rest.linkHealth;
+    data.metadata = sql`${JSON.stringify(rest)}::jsonb || jsonb_strip_nulls(jsonb_build_object('linkHealth', ${resources.metadata} -> 'linkHealth'))`;
   }
   const [updated] = await tx.update(resources)
     .set(options.mergeMetadata

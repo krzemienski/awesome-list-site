@@ -106,6 +106,7 @@ jobs:
             ':!e2e-evidence/**' ':!reports/**' ':!docs/audit/**' ':!audit/**' ':!.claude/**' ':!.agents/**' \
             | grep '^+' | grep -v '^+++' \
             | grep -oE 'https?://[^ )>"`'"'"']+' \
+            | sed -E 's/[.,;:!?]+$//' \
             | grep -vE '^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|example\.(com|org))([:/]|$)|/user/repo/' \
             | sort -u > added-urls.txt || true
           echo "$(wc -l < added-urls.txt) added link(s)"
