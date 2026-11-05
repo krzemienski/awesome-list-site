@@ -552,3 +552,125 @@ Member lane (81 rows, needs a throwaway member account, D5); B10 (dev-server pro
 | MEM-csp-inline-style | fixed-verified: CSP style-src 'self' 'unsafe-inline' https://fonts.googleapis.com | curl -I / |
 | DATA-DUP-TITLE (new) | open, OWNER DECISION: which copy of each of 44 same-tool clusters to keep (deleting real content needs owner OK). approve-all dedup is URL-only (researchService.ts:1915-1930), so a tool's homepage and repo both pass | all.jsonl |
 | DATA-TAXO-LABEL (new) | open, OWNER DECISION: pre-existing subcategory names lost their punctuation at import, e.g. "RTMPRTSPHTTP Protocol Servers" (slug rtmprtsphttp-protocol-servers, 19 of today's approvals landed there) and "Next-Generation Codecs AV1 VVC". Not created by approve-all (subcategory count stayed 99). Renaming live taxonomy is a content write the run rules reserve for the owner | /api/awesome-list/nav, before-pending.json |
+
+
+## C21 ledger (2026-11-05, session 1feb91c4)
+
+Sources: inherited open rows above (status partial/unverified/owner, extracted by status column), C18-COMPLETION follow-up, C19/C20 gap mining (e2e-evidence/c20/gaps-f7db-publisher.tsv, mined from sessions through 2026-11-04 by C20AuditHistory/C20UnresolvedBranches), run f7db's open failures (.proofpunk/runs/20261104-004700-f7db/c20-triage.json), and the 47 findings of the 2026-11-03 black-box audit (e2e-evidence/c20/matrix.tsv). No Claude transcript newer than those exists except this session's own (checked: ~/.claude/projects/-Users-nick-Desktop-awesome-list-site/*.jsonl newer than 2026-11-04T01:00Z). Every row below is open until a C21 production drive closes it.
+
+| ID | source | area | description | earlier status | current status |
+|---|---|---|---|---|---|
+| DATA-ENTITY-DESC (new) | BUG_LEDGER inherited | see row above | see row above | OWNER DECISION: editing real content needs owner OK (fix = admin edit of 2 descriptions, &lt;/&gt; -> < >) | open (re-test C21) |
+| EN-17-COPY | BUG_LEDGER inherited | see row above | see row above | OWNER DECISION: product call (add a max-resources cap, or relabel 'Batch size'); not changed by the audit | open (re-test C21) |
+| MEM-migration-chain | BUG_LEDGER inherited | see row above | see row above | PARTIAL: prod side fixed-verified (lead, 15:45Z rev 6bfd9ee1: /api/admin/stats database.migrations applied 34  | open (re-test C21) |
+| MEM-import-defects | BUG_LEDGER inherited | see row above | see row above | owner-decision (data: DATA-ENTITY-DESC + DATA-DUP-TITLE) (rev 6bfd9ee1; cycle-17/c17r-r107-pub.md) | open (re-test C21) |
+| AI-14 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (needs a paid run) (rev 93373522; cycle-17/c17r-r107-admin.md) | open (re-test C21) |
+| AI-16 | BUG_LEDGER inherited | see row above | see row above | owner-decision (data; = DATA-TAXO-LABEL) (rev 54b90e36; cycle-17/c17r-carry-admin.md) | open (re-test C21) |
+| AI-18 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (owner rule: GitHub dry run only) (rev 93373522; cycle-17/c17r-r107-admin.md) | open (re-test C21) |
+| AI-29 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: the original $0.4341 threshold no longer exists) (rev 93373522; cycle-17/c17r-r107-admin.md) | open (re-test C21) |
+| AO-01 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (intermittent, server-side) (rev d74699a3; cycle-17/c17r-carry-admin.md) | open (re-test C21) |
+| AO-18 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (no ai_enriched_degraded row on prod) (rev d74699a3; cycle-17/c17r-carry-admin.md) | open (re-test C21) |
+| C6-AX-006 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (filter sheet fixed-verified 820/390; cookie notice is a non-modal region, not a dialog; destructive-c | open (re-test C21) |
+| C6-AX-009 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: keyboard walks 820, 390; focus-ring screenshots) (rev 93373522; cycle-17/c17r-r107-member.md | open (re-test C21) |
+| C6-AX-011 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (accents/systems need the theme picker, forbidden); default theme PASS (rev d74699a3; cycle-17/c17r | open (re-test C21) |
+| C6-AX-015 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (no screen reader; /admin unmeasured-as-zero needs admin) (rev d74699a3; cycle-17/c17r-carry-pub.md | open (re-test C21) |
+| C6-AX-016 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (guest bookmark outcome announced at 1440, 820, 390; favorite/validation/Undo outcomes not driven) (re | open (re-test C21) |
+| C6-AX-017 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (no screen reader) (rev d74699a3; cycle-17/c17r-carry-pub.md) | open (re-test C21) |
+| C6-AX-018 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (real coarse-pointer device; emulated touch only) (rev 6bfd9ee1; cycle-17/c17r-r107-pub.md) | open (re-test C21) |
+| C6-MB-001 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: offline cap, failed-merge visibility; 820/1440 sign-out cycle) (rev 93373522; cycle-17/c17r- | open (re-test C21) |
+| C6-MB-004 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: Sign out at 820/1440; all-devices confirm by rule) (rev 93373522; cycle-17/c17r-r107-member. | open (re-test C21) |
+| C6-MB-007 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (paid) (rev 54b90e36; cycle-17/c17r-carry-auth.md) | open (re-test C21) |
+| C6-MB-013 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (blocked revoke at 1440 and 390: dialog stays open "...The key is still active.", row stays ACTIVE, Re | open (re-test C21) |
+| C6-MB-025 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: partial-failure accounting) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-031 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: loading skeleton, error at 820/1440, offline) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-032 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: cap, offline guest saves, dedup, failed-merge) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-034 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820, 1440 detail Start) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-040 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (paid) (rev 54b90e36; cycle-17/c17r-carry-auth.md) | open (re-test C21) |
+| C6-MB-041 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (390: search ?q=, no-match "No contributions match" + Clear filters, status counts, sort, URL params,  | open (re-test C21) |
+| C6-MB-044 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (needs more than one page of contributions) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-048 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (390: valid submit POST 201, success panel, form reset, pending timeline. Missing: 820/1440 submit. e2 | open (re-test C21) |
+| C6-MB-049 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 1440, 390, pending state) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-050 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (populated unread/Mark read UNVERIFIED: no notifications can be created by a member) (rev 93373522; cy | open (re-test C21) |
+| C6-MB-051 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (no notification data) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-056 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: populated at 820; error/loading variants) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-057 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (no token link) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-058 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: Appearance destination, by rule) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-064 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (rule: no theme/appearance changes) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-065 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (rule: no font changes) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-071 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (minor: Back-from-complete rendering; mid-flow Back/Forward at 820/390 not driven) (rev 93373522; cycl | open (re-test C21) |
+| C6-MB-072 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820 repeat completion) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-073 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820/1440, step-5 save failure) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-075 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820/1440, other surfaces) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-076 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (tool cannot emulate prefers-reduced-motion) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-MB-077 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (real touch) (rev 54b90e36; cycle-17/c17r-carry-auth.md) | open (re-test C21) |
+| C6-MB-078 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820 and 390 keyboard walks, focus-ring screenshots) (rev 93373522; cycle-17/c17r-r107-member | open (re-test C21) |
+| C6-MB-081 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: POST variants and a real delete-withdraw alias on an owned item) (rev 93373522; cycle-17/c17 | open (re-test C21) |
+| C6-MEMBER-02 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (guest Favorite and Bookmark 44x44 and hit at 3 widths; signed-in Favorite mutation geometry UNVERIFIE | open (re-test C21) |
+| C6-PC-007 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820, 1440, Sign out/Theme items by rule) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-PC-014 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (failure+Retry recovery now PASS at 390, 820, plus earlier 1440; genuine-empty tree not driven) (rev 9 | open (re-test C21) |
+| C6-PC-025 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (error+Try again now PASS at 390, 820, plus earlier 1440; loading UNVERIFIED: no delay tool) (rev 9337 | open (re-test C21) |
+| C6-PC-026 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (failure + offline distinctions PASS; inventory APIs /api/home, nav, awesome-list, kinds/counts are no | open (re-test C21) |
+| C6-PC-027 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (signed in at 820: Curated PUT 200 rev 22->23, persists on reload; ?layout=index overrides without a P | open (re-test C21) |
+| C6-PC-035 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: 820, 1440) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-PC-037 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (populated PASS 1440/820/390; error Retry now PASS 390, 820; genuine-empty not driven) (rev 93373522;  | open (re-test C21) |
+| C6-PC-055 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: collection pick inside the Add Bookmark dialog, 1440 re-check) (rev 93373522; cycle-17/c17r- | open (re-test C21) |
+| C6-PC-056 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (clipboard fallback now PASS 820, 390, plus 1440 earlier; native share sheet UNVERIFIED: no real share | open (re-test C21) |
+| C6-PC-057 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: edit + submit; avoided a second queue write) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-PC-058 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (missing: send; avoided a real maintainer report) (rev 93373522; cycle-17/c17r-r107-member.md) | open (re-test C21) |
+| C6-PC-060 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (image failure, dates, empty classification, guest admin-gating PASS at 3 widths per c17r-pc4.md; popu | open (re-test C21) |
+| C6-PC-062 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (offline chunk failure + Retry + reconnect PASS at 3 widths per c17r-pc4.md; online forced-chunk card  | open (re-test C21) |
+| C6-PC-065 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (not-found and failure+Retry PASS 3 widths; populated shared collection UNVERIFIED: no public shareId; | open (re-test C21) |
+| PC-12 | BUG_LEDGER inherited | see row above | see row above | owner-decision (content) (rev d74699a3; cycle-17/c17r-carry-pub.md) | open (re-test C21) |
+| PC-16 | BUG_LEDGER inherited | see row above | see row above | PARTIAL (card sticky-hover fixed-verified under emulated touch at 390; sidebar hover not read; real touch devi | open (re-test C21) |
+| PS-07 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (rule: no theme picker changes) (rev d74699a3; cycle-17/c17r-carry-pub.md) | open (re-test C21) |
+| T6-05 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (reason: no zero-count data; response bodies may not be rewritten) (rev 93373522; cycle-17/c17r-r10 | open (re-test C21) |
+| T6-09-03 | BUG_LEDGER inherited | see row above | see row above | UNVERIFIED (touch) (rev 93373522; cycle-17/c17r-r107-admin.md) | open (re-test C21) |
+| C18-FU-HERO | C18-COMPLETION follow-up | public/home | Text typed into the hero search before hydration is cleared by hydration | fixed-unverified (#223 C19 K1) | open (re-test C21) |
+| GAP-002 | gaps-f7db-publisher.tsv row 2 | branch | fix/admin-content-audit | on-branch-only (mixed);never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-027 | gaps-f7db-publisher.tsv row 27 | branch | fix/c19-priv2 | on-branch-only;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-034 | gaps-f7db-publisher.tsv row 34 | branch | fix/c2-admin-content | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-035 | gaps-f7db-publisher.tsv row 35 | branch | fix/c2-admin-ops | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-039 | gaps-f7db-publisher.tsv row 39 | branch | fix/c2-public-a | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-044 | gaps-f7db-publisher.tsv row 44 | branch | fix/c3-public-followups | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-046 | gaps-f7db-publisher.tsv row 46 | branch | fix/c4-admin-content | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-047 | gaps-f7db-publisher.tsv row 47 | branch | fix/c4-app-error-retry | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-054 | gaps-f7db-publisher.tsv row 54 | branch | fix/c5-admin-ops | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-084 | gaps-f7db-publisher.tsv row 84 | branch | fix/page-param-404-consistency | superseded;NEVER MERGE;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-087 | gaps-f7db-publisher.tsv row 87 | branch | fix/public-npm-lock-20261025 | on-branch-only (mixed);never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-110 | gaps-f7db-publisher.tsv row 110 | branch | fix/rem1029-submit-login-min-h | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-118 | gaps-f7db-publisher.tsv row 118 | branch | fix/rem1029-ui-a11y-2 | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-124 | gaps-f7db-publisher.tsv row 124 | branch | fix/ssr-head-parity | retained-source;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-154 | gaps-f7db-publisher.tsv row 154 | history | Sidebar pointer hitbox overlap | historical-pointer-overlap-failure;never-verified-live;pending-admissi | open (classify/re-test C21) |
+| GAP-156 | gaps-f7db-publisher.tsv row 156 | history | Hero pre-hydration text retention through actual keys | historical-regressed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-158 | gaps-f7db-publisher.tsv row 158 | history | Initial palette active descendant failed after first fix | historical-regressed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-160 | gaps-f7db-publisher.tsv row 160 | history | Repeated palette query Enter did not navigate | historical-regressed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-161 | gaps-f7db-publisher.tsv row 161 | history | Pre-hydration capture edge cases | source-review-risk;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-164 | gaps-f7db-publisher.tsv row 164 | history | Decline after Allow still sent analytics after fix/review | historical-regressed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-167 | gaps-f7db-publisher.tsv row 167 | history | PRIV2 completed only in mocked-network harness; not deployed | on-branch-only;mock-only-historical-evidence;never-verified-live;pendi | open (classify/re-test C21) |
+| GAP-168 | gaps-f7db-publisher.tsv row 168 | history | Mixpanel remaining tab keys | historical-regressed;on-branch-only-cleanup;never-verified-live;pendin | open (classify/re-test C21) |
+| GAP-171 | gaps-f7db-publisher.tsv row 171 | history | DNT override is an agent-selected policy, not owner approval | owner-decision-unresolved;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-172 | gaps-f7db-publisher.tsv row 172 | history | CLS still failed after intermediate fixes | historical-regressed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-174 | gaps-f7db-publisher.tsv row 174 | history | Sidebar toggle replay accepted as leftover | historical-deferred;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-175 | gaps-f7db-publisher.tsv row 175 | history | Nested-category and first-close animation risks | source-review-risk;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-176 | gaps-f7db-publisher.tsv row 176 | history | Font fallback completeness | on-branch-only;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-180 | gaps-f7db-publisher.tsv row 180 | history | 390px palette placeholder clipping remained open | historical-unclosed;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-186 | gaps-f7db-publisher.tsv row 186 | history | Owner-only data changes still outstanding in C19 | owner-only-data-pending;never-verified-live;pending-admission | open (classify/re-test C21) |
+| GAP-187 | gaps-f7db-publisher.tsv row 187 | history | Replit tracker decision still outstanding | owner-decision-unresolved;never-verified-live;pending-admission | open (classify/re-test C21) |
+| F7DB-BUG003-REVOKE | f7db c20-triage | privacy | GA/PostHog/Amplitude request starts after consent withdrawal | failed (L1 never landed) | open (lane-a GAP-PRIV-REVOKE) |
+| BUG-001..BUG-047 | 2026-11-03 black-box audit | all | 47 findings, per-row status in e2e-evidence/c20/matrix.tsv | C18 47/47 PASS on 291c8d0d/7c6b1b93 (pre-C19/C20) | open (baseline lanes A/B/C on b3c25369) |
+
+### C21 status update (08:13Z, rev b3c25369)
+| ID | current status | evidence |
+|---|---|---|
+| F7DB-BUG003-REVOKE / C21-PRIV-01 | fixed (PR #242, merged 2596798a), deploy in progress; prod re-check pending | e2e-evidence/c20/baseline/BUG-003/notes.md |
+| BUG-001..047 | 42 pass on prod; BUG-043 pre-hydration under repro; BUG-011/021/023/025 partial cells; BUG-031/041/044 lane FAILs withdrawn after lead re-check (see e2e-evidence/c20/matrix.tsv) | e2e-evidence/c20/baseline/ |
+| C18-FU-HERO | open (public regression lane) | |
+| fix/c20-fonts + fix/c19-priv2 fonts | PR #243 open (review running) | e2e-evidence/c20/gaps.tsv |
+| 10 retained-source branches | on main; live proof pending in public/member/admin lanes | e2e-evidence/c20/gaps.tsv |
+| member/auth + admin rows | BLOCKED (owner action): admin session cookie; Gmail code access for sign-up | docs/audit/PROGRESS.md |
+
+| C21-PAL3 (GAP-180) | C19 PAL3 / reg-ps HIST-PALETTE-PLACEHOLDER | palette | Placeholder "Find resources, categories, or pages…" ellipsized at 390/375/320 on 03410a85 (input 244/229/174 px at 16px) | historical-unclosed | CLOSED — #245, live 59dedea0, w5-verify PASS 390/375/320 |
+| C20-LINK-403 | F2 | catalog links | BUG-010/018/019 Adobe+O'Reilly return Akamai Access Denied from this IP (browser + curl); archive.org also 429 from this IP | regressed-or-IP-block | OWNER DECISION: repoint to Wayback (content write) or keep |
+| C21-AX-008 | reg-ps | settings a11y | Home layout radios: arrow keys move focus without checking (CDP press_key) | new | WITHDRAWN — held-key (120 ms) selects curated + persists; harness artifact (Radix onFocus click needs key held) |
+| C21-AX-015n | reg-ps | search a11y | Loading skeleton has aria-busy but no announced text | new | CLOSED — #246, live 59dedea0, w5-verify PASS 1440/390 |
+| C21-AX-016n | reg-ps | toasts a11y | Success toasts announced assertive rather than polite | new | CLOSED — #246, live 59dedea0, polite confirmed; error toast assertive UNVERIFIED |

@@ -21,6 +21,15 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Production audit cycles 20–21: deploy pitfalls (November 5, 2026)
+- Each publish adds an empty "Published your App" commit (author Replit Agent) on top of the workspace HEAD, so the next sync is never a fast-forward. Confirm `git rev-parse <commit>^{tree} <commit>^^{tree}` prints one tree twice, then `git reset --keep origin/main` in the workspace. Never publish on top of it.
+- Production can drift ahead of GitHub when a publish is made from workspace-only commits. Before a sync, list `origin/main..HEAD` in the workspace and keep a backup branch of anything that is not an empty publish commit.
+- The site turns off ALL analytics when `navigator.webdriver` is true (`client/src/lib/analytics-suppression.ts`, by design). Every automated browser sets it, so a consent or analytics check sees zero vendor requests whatever the code does. Add the initScript `Object.defineProperty(Navigator.prototype,'webdriver',{get:()=>false,configurable:true})` before judging analytics behaviour.
+- Withdrawing analytics consent must also drop requests that are already queued: PostHog batches every 3 s and its replay buffer every 2 s, and Amplitude flushes every 1 s and enriches events in a setTimeout. `request_batching: false`, `flushIntervalMillis: 0`, discarding the replay buffer on opt-out, and a consent check in the Amplitude enrichment plugin close this (#242, #244).
+- Keyboard checks through chrome-devtools `press_key` release the key at once. Radix radio groups select on arrow keys only while the key is still held (the item's onFocus clicks while an arrow-key flag is set, and roving focus moves in a `setTimeout`). A "focus moves but nothing is selected" result needs a held-key retry before it counts as a FAIL.
+- Several agents driving one chrome-devtools browser collide. Give each lane its own `isolatedContext`, re-select its page by id before every action, and never touch another lane's page.
+- Too many teammate panes fail new spawns with "fork failed: Device not configured". Stop finished teammates before spawning more.
+
 ### Production audit cycle 17: deploy procedure and pitfalls (November 3, 2026)
 - Deploy procedure: `.claude/skills/replit-deploy/SKILL.md`. Done means `/api/version` equals `origin/main` and `/api/health/ready` returns 200, not a publish "success" status.
 - A publish restarts the server and kills running admin jobs. It killed Link Health job 11 at 3880/4102. Check for running jobs (link health, enrichment, researcher) before you publish.

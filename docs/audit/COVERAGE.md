@@ -14,3 +14,19 @@ Denominator: reports/prod-audit-2026-10-26/INVENTORY.md (760 interactions, each 
 | member | 81 + auth flows | sign-up, sign-in, persistence, profile, bookmarks, submit, notifications, member sign-out | cycle-17/c17-member.md (owner-approved audit account) |
 
 Expected result per row is the inventory's Interaction column plus cycle-17/RULES.md acceptance rules.
+
+## C21 (2026-11-05) coverage plan
+
+Same denominator (760 inventory rows x 1440/820/390) plus the 47 black-box findings and the C21 ledger rows (docs/audit/BUG_LEDGER.md "C21 ledger"). Every earlier PASS predates C18/C19/C20 code, so every row is re-driven on the current live revision. Lane files: reports/prod-audit-2026-10-29/cycle-21/<lane>.md; rules: cycle-21/RULES.md.
+
+| Lane | Rows | Scope | Status |
+|---|---|---|---|
+| baseline-a | 8 findings + GAP-PRIV-REVOKE | consent, a11y names, sidebar, header | running (rev b3c25369), e2e-evidence/c20/baseline/ |
+| baseline-b | 18 findings | listings, tags, counters, titles, pagination, palette | running |
+| baseline-c | 21 findings | cards, resource pages, outbound links, catalog data | running |
+| member + auth | C6-MB-*, auth rows (sign up incl. validation and duplicate email, sign in incl. bad credentials, persistence, sign out, profile, submit, bookmarks/favorites) | queued; sign-up needs the audit Gmail inbox |
+| admin | SH, OV, AP, ED, RM, CAT, SSC, JN, US, AU, EX, LH, DB, DG, SC, EN, GH, RS, RW + non-admin denial (UI and API) | queued; BLOCKED until the owner session cookie exists |
+| public inventory regression | C6-PC, C6-PS, C6-AX | queued |
+
+## Owner decisions (C21)
+- 2026-11-05 sign-up coverage skipped by owner. Rows: sign up, sign-up validation errors, duplicate email, email verification → OWNER-SKIPPED (never driven; not counted as PASS).
