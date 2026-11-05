@@ -81,6 +81,30 @@ function sameUrl(a: string, b: string): boolean {
   return norm(a) === norm(b);
 }
 
+// First path segments on github.com that are site sections, not repo owners.
+const GITHUB_RESERVED = new Set([
+  "about", "apps", "collections", "contact", "customer-stories", "enterprise", "events", "explore",
+  "features", "issues", "login", "marketplace", "new", "notifications", "orgs", "organizations",
+  "pricing", "pulls", "search", "security", "settings", "sponsors", "topics", "trending", "users",
+]);
+
+/**
+ * GitHub redirects a repository URL only when the repository was renamed or
+ * transferred, so the same page under a new owner/name is a safe rewrite:
+ * owner/repo may change, everything after it must be identical.
+ */
+function isGitHubRepoMove(from: URL, to: URL): boolean {
+  const host = (h: string) => h.toLowerCase().replace(/^www\./, "");
+  if (host(from.hostname) !== "github.com" || host(to.hostname) !== "github.com") return false;
+  const parts = (u: URL) => u.pathname.replace(/\/+$/, "").split("/").slice(1);
+  const a = parts(from);
+  const b = parts(to);
+  if (a.length < 2 || b.length < 2 || a.length !== b.length) return false;
+  if (GITHUB_RESERVED.has(a[0].toLowerCase()) || GITHUB_RESERVED.has(b[0].toLowerCase())) return false;
+  if (a.slice(0, 2).join("/").toLowerCase() === b.slice(0, 2).join("/").toLowerCase()) return false;
+  return a.slice(2).join("/") === b.slice(2).join("/");
+}
+
 /**
  * One scan's verdict for one link. Statuses come after the checker's
  * browser-UA verification pass, so `broken`/`dns_failure` are confirmed dead
@@ -107,6 +131,7 @@ export function observe(check: CheckSnapshot): LinkObservation {
     const fromPath = normalizePath(from.pathname);
     const toPath = normalizePath(to.pathname);
     if (fromPath === toPath) return "moved";
+    if (isGitHubRepoMove(from, to)) return "moved";
     // An English prefix added or dropped on exactly one side is the same page.
     if (hasEnglishPrefix(fromPath) === hasEnglishPrefix(toPath)) return "suspect";
     return stripEnglishPrefix(fromPath) === stripEnglishPrefix(toPath) ? "moved" : "suspect";
