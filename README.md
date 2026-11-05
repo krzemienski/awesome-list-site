@@ -156,7 +156,7 @@ Dead links are handled as data, not as bugs. Three checks share one policy.
 - **Remediation.** After each scan, the planner reads the last three scans of each link and plans one action:
   - *hide*: confirmed dead (DNS failure, refused connection, or browser-confirmed 404/410 or SSL failure) in consecutive scans at least 20 hours apart. The resource becomes `archived`. One apply never hides more than 2% of the catalog; a larger batch points at the checker or the network, so it is refused.
   - *restore*: a link it hid answers with a 2xx/3xx in two scans in a row, and nobody changed the resource's status since.
-  - *update URL*: a redirect that keeps the page (http to https, `www.` added or dropped, a trailing slash, `index.html` or a language prefix such as `/en/`, same query) lands on the same URL in two scans in a row.
+  - *update URL*: a redirect that keeps the page (http to https, `www.` added or dropped, a trailing slash, `index.html` or an English prefix such as `/en/` or `/en-us/` added or dropped, same query) lands on the same URL in two scans in a row.
   - *review*: a redirect to another site or page, an error page, or a parked domain. These are never changed automatically.
 
   Timeouts and 401/403/429 responses never trigger a change. Hiding needs scans spread over 20 hours, so an interval below 10 hours still waits that long before it hides anything. With `LINK_HEALTH_REMEDIATION=plan` (default) the plan is only shown; `apply` applies it after every scan. Nothing is deleted, and every change is written to the resource audit log with its previous value.

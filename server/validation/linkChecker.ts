@@ -131,11 +131,17 @@ export function detectParkedContent(bodyStart: string): string | null {
   return null;
 }
 
-const LANGUAGE_SEGMENT = /^\/(en|de|fr|es|it|pt|ja|jp|zh|cn|tw|ko|kr|ru|nl|sv|pl|tr|ar|he|hi|id|vi|th|cs|da|fi|no|nb|uk|el|hu|ro)(-[a-z]{2,4})?(?=\/|$)/i;
+// Only an English prefix is treated as the same page: the catalog is English,
+// and other languages or bare segments (/it, /no-code, /id/42) can name real pages.
+const ENGLISH_SEGMENT = /^\/en(-[a-z]{2})?(?=\/|$)/i;
 
-/** A path without its leading language segment ("/en/docs" -> "/docs", "/en-us" -> "/"). */
-export function stripLanguagePrefix(path: string): string {
-  return path.replace(LANGUAGE_SEGMENT, "") || "/";
+/** A path without a leading English segment ("/en/docs" -> "/docs", "/en-us" -> "/"). */
+export function stripEnglishPrefix(path: string): string {
+  return path.replace(ENGLISH_SEGMENT, "") || "/";
+}
+
+export function hasEnglishPrefix(path: string): boolean {
+  return ENGLISH_SEGMENT.test(path);
 }
 
 export function evaluateRedirectSuspicion(
@@ -154,8 +160,8 @@ export function evaluateRedirectSuspicion(
         suspicionDetail: `redirects off-domain: ${origDomain} -> ${finDomain} (${finalUrl})`,
       };
     }
-    // A language root ("/en/" -> "/") is the same home page, not a collapsed deep link.
-    const origPath = stripLanguagePrefix(orig.pathname.replace(/\/+$/, '')).replace(/\/+$/, '');
+    // An English root ("/en/" -> "/") is the same home page, not a collapsed deep link.
+    const origPath = stripEnglishPrefix(orig.pathname.replace(/\/+$/, '')).replace(/\/+$/, '');
     const finPath = fin.pathname.replace(/\/+$/, '');
     // Deep link collapsed to the site root => the referenced content is gone.
     if (origPath.length > 1 && finPath === '' && !fin.search && !fin.hash) {
