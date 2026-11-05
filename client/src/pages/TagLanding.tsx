@@ -200,6 +200,7 @@ export default function TagLanding() {
         resourceCount={data.total}
         pageParam={page}
         noindex={noindex}
+        canonical
         follow={noindex}
       />
       <div className="flex flex-wrap items-start justify-between gap-2">

@@ -8,6 +8,12 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ### Equivalent responsive analytics consent (BUG-044)
 - Keep the full provider and signed-in name/email disclosure visible on short and mobile viewports. Native browser zoom wraps the Privacy Policy link instead of ellipsizing it, with the same Decline / Allow analytics controls and 44px action targets at every size.
+### Balanced responsive pagination (BUG-045)
+- Keep Previous and Next together above a centered group of page numbers whenever the paginator has limited space, including tablet layouts beside the sidebar, rather than wrapping Next onto a row by itself. Grouping follows the paginator's available width, not the viewport. Narrow numeric spacing also keeps the longest six-number window aligned without reducing 44px targets. The page summary and existing jump input stay separate; wide desktop ordering, modified clicks and BUG-041 page clamping are unchanged.
+
+### Consistent page jumps (BUG-041)
+- Go-to-page submissions now recover invalid or fractional text to page 1, like direct taxonomy URLs, rather than leaving the visitor on the previous page with a whole-number error. Zero and negative pages still clamp to page 1, and overflow still clamps to the last page, with accessible adjustment feedback.
+- The adjustment notice never echoes an empty box and bounds any echoed text; typed text and `?page=abc` URLs read the same ("Page “abc” doesn't exist, so page 1 is shown."). It is announced through the listing's existing status notice.
 
 ## October 27, 2026
 

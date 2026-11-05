@@ -52,6 +52,7 @@ const PAGES = [
 
 // A pasted paragraph must not blow the empty-state heading out of the palette:
 // echo a bounded prefix and let the browser break whatever is left.
+const SEARCH_PLACEHOLDER = "Find resources, categories, or pages…";
 const ECHO_QUERY_MAX = 80;
 const WRAP_ANYWHERE: CSSProperties = { overflowWrap: "anywhere", minWidth: 0, maxWidth: "100%" };
 
@@ -401,12 +402,19 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
             <CommandInput
               ref={inputRef}
               aria-label="Search resources, categories, and pages"
-              placeholder="Find resources, categories, or pages…"
+              placeholder={SEARCH_PLACEHOLDER}
               trailing={
-                <DialogPrimitive.Close className="search-palette-close" onKeyDown={keepNativeEnter}>
-                  <kbd className="kbd">esc</kbd>
-                  <span className="sr-only">Close search</span>
-                </DialogPrimitive.Close>
+                <>
+                  {!query && (
+                    <span className="search-palette-placeholder" aria-hidden="true">
+                      {SEARCH_PLACEHOLDER}
+                    </span>
+                  )}
+                  <DialogPrimitive.Close className="search-palette-close" onKeyDown={keepNativeEnter}>
+                    <kbd className="kbd">esc</kbd>
+                    <span className="sr-only">Close search</span>
+                  </DialogPrimitive.Close>
+                </>
               }
               value={query}
               onValueChange={setQuery}
