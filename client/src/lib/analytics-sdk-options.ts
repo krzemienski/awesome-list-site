@@ -6,6 +6,7 @@ import type { Config as MixpanelConfig } from 'mixpanel-browser';
 import type { PostHogConfig } from 'posthog-js';
 import { scrubSdkUrlFields } from './analytics-hygiene';
 import { isAnalyticsSuppressed } from './analytics-suppression';
+import { getAnalyticsConsent } from './analytics';
 
 export interface IdentityUser {
   id: string;
@@ -148,9 +149,12 @@ export const amplitudeUrlScrubPlugin = {
   name: 'awesome-video-url-scrub',
   type: 'enrichment' as const,
   // Also drops every event (autocapture page views included) on a QA path or
-  // in an admin session, like PostHog's before_send.
+  // in an admin session, like PostHog's before_send. Autocapture records the
+  // Decline/Save click before React's handler stores the withdrawal, but the
+  // timeline runs enrichment on a later task, so checking consent here drops
+  // that click instead of uploading it after the visitor said no.
   execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T | null> => {
-    if (isAnalyticsSuppressed()) return Promise.resolve(null);
+    if (isAnalyticsSuppressed() || getAnalyticsConsent() !== 'granted') return Promise.resolve(null);
     for (const field of [event.event_properties, event.user_properties]) {
       if (field && typeof field === 'object') scrubSdkUrlFields(field as Record<string, unknown>);
     }
