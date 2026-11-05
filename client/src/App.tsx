@@ -203,7 +203,7 @@ function SearchDialogFallback({
           type="text"
           autoFocus
           aria-label="Search"
-          placeholder="Find resources, categories, or pages…"
+          placeholder="Search resources…"
           autoComplete="off"
           value={value}
           onChange={(event) => onChange(event.target.value)}
