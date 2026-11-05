@@ -68,8 +68,8 @@ export async function transitionResourceInTransaction(
   // only through mergeMetadata. A writer that replaces the whole metadata
   // object from an earlier read (enrichment, admin edits) always keeps the
   // stored value, even if its stale copy carries the key.
-  if (!options.mergeMetadata && patch.metadata) {
-    const rest = { ...(patch.metadata as Record<string, unknown>) };
+  if (!options.mergeMetadata && 'metadata' in patch) {
+    const rest = { ...((patch.metadata ?? {}) as Record<string, unknown>) };
     delete rest.linkHealth;
     data.metadata = sql`${JSON.stringify(rest)}::jsonb || jsonb_strip_nulls(jsonb_build_object('linkHealth', ${resources.metadata} -> 'linkHealth'))`;
   }
