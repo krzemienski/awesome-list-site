@@ -19,13 +19,16 @@ const POLL_MS = 100;
  * mounted never sets the flag.
  */
 function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetching: () => boolean): void {
+  // Watch from above the host: some callers unmount the host itself along with
+  // the alert (C22-EX-09), and that removal is a mutation on the host's parent.
+  const scope = host.parentElement ?? host;
   let poll: number | undefined;
-  let flagged = false;
+  let busyEl: HTMLElement | null = null;
   const stop = () => {
     observer.disconnect();
     window.clearTimeout(cap);
     window.clearTimeout(poll);
-    if (flagged) host.removeAttribute("aria-busy");
+    busyEl?.removeAttribute("aria-busy");
   };
   const waitForSettle = () => {
     poll = window.setTimeout(() => (isFetching() ? waitForSettle() : stop()), POLL_MS);
@@ -33,11 +36,14 @@ function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetc
   const observer = new MutationObserver(() => {
     if (trigger.isConnected) return;
     observer.disconnect();
-    flagged = true;
-    host.setAttribute("aria-busy", "true");
+    // Mark the slot that is still on the page: the host, or its parent when
+    // the host left with the alert.
+    busyEl = host.isConnected ? host : scope.isConnected ? scope : null;
+    if (!busyEl) return stop();
+    busyEl.setAttribute("aria-busy", "true");
     waitForSettle();
   });
-  observer.observe(host, { childList: true, subtree: true });
+  observer.observe(scope, { childList: true, subtree: true });
   const cap = window.setTimeout(stop, BUSY_CAP_MS);
 }
 
@@ -118,7 +124,7 @@ export function AdminLoadError({
                   return host.querySelector<HTMLElement>(":scope > .admin-load-error button");
                 }
                 return retryTestId
-                  ? document.querySelector<HTMLElement>(`[data-testid="${retryTestId}"]`)
+                  ? document.querySelector<HTMLElement>(`[data-testid="${CSS.escape(retryTestId)}"]`)
                   : null;
               });
             }}
