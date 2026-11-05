@@ -70,4 +70,4 @@ Gates per change: `npx tsc --noEmit`, `npm run build`, and `npx eslint <touched 
 ## Deploy
 
 - Production (https://awesome.video) deploys from GitHub `main` through `.claude/skills/replit-deploy/SKILL.md`. A deploy is done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200.
-- Known pitfalls (the empty "Published your App" commit, analytics turned off under `navigator.webdriver`, held-key radio checks) are in `replit.md` under "Production audit cycles 20–21".
+- Known pitfalls (the empty "Published your App" commit, analytics turned off under `navigator.webdriver`, held-key radio checks) are in `replit.md` under "Production audit cycles 20–21"; cycle 22 root causes (error copy, Retry focus, offline writes) and audit-harness traps are under "Production audit cycle 22".

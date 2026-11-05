@@ -30,3 +30,7 @@ Same denominator (760 inventory rows x 1440/820/390) plus the 47 black-box findi
 
 ## Owner decisions (C21)
 - 2026-11-05 sign-up coverage skipped by owner. Rows: sign up, sign-up validation errors, duplicate email, email verification → OWNER-SKIPPED (never driven; not counted as PASS).
+
+## C22 (2026-11-05) result
+
+Admin + member inventory (613 rows) re-driven on post-C17 code across revisions cc0769a5 → 721f528c. Lane files (local audit workspace, not committed): `reports/prod-audit-2026-10-29/cycle-22/c22-admin-content.md` (SH*, OV, AP, ED, RM, CAT, SC, SSC), `c22-admin-shell.md` (SH, OV, taxonomy states), `c22-admin-ops.md` (LH incl. new LH-REM-01..07 remediation-panel rows, EX, JN, US, AU, DB, DG, EN, GH, RS, RW), `c22-member.md` (C6-MB, C6-PC-007, sign-in validation, signed-out denial). Every row has a verdict; tally and reasons in docs/audit/VERDICT.md (C22). Rules: cycle-22/RULES.md. QA ledger: cycle-22/qa-ledger.md (all closed).

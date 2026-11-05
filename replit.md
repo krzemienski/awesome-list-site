@@ -21,6 +21,17 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Production audit cycle 22: admin + member coverage, root causes (November 5, 2026)
+- Scope: admin (531 inventory rows) and member (82) rows on post-cycle-17 code, driven on the owner session with net-zero writes. Sign-up stays owner-skipped; no non-admin member account exists, so signed-in non-admin denial is UNVERIFIED.
+- Bugs fixed and verified on production this cycle, with causes:
+  - Raw "Failed to fetch" in 8 places (#252): notification prefs save, learning prefs save/reset, report-link, contact fallback, sign-out (two places), admin link-report actions, recommendations load used `error.message`. Route through `describeWriteError` / `describeLoadError` / `humanizeApiError`; pass `NOTHING_CHANGED_OUTCOME` only for single-statement/single-transaction writes.
+  - Admin Retry focus (#253, #257): when a caller unmounts the whole wrapper around an `AdminLoadError` during the refetch, the alert's host is detached, so focus fell to the h1 (or `#main`). `AdminLoadError` now finds the re-rendered Retry by `retryTestId` and holds `aria-busy` from the host's parent. Pass a `retryTestId` to every `AdminLoadError` with `onRetry`. Taxonomy parent-load Retry had no handoff (`GenericCrudManager`, now `aria-busy` while a data-less parent query fetches).
+  - Research run errors (#254): `humanizeJobError` passed unknown SDK text through. Provider 4xx (except 408/429) is a settings error and must not advise "relaunch"; budget stops and other raw SDK errors get plain lead sentences.
+  - Offline writes paused silently (#255): TanStack v5 mutations default to `networkMode: "online"`, which pauses offline with no error and replays later. Global default is now `"always"`; a mutation with its own "waiting for connection" UI opts back into `"online"` (recommendations refresh, theme save).
+  - 24px "Clear filters" in the admin resources empty state (#256): inline buttons need `max-lg:min-h-11` like links.
+- Harness traps (not site bugs), learned the hard way: agent-browser option clicks on Radix Select are no-ops (focus + Enter + Arrow + Enter); `Meta+a` then Backspace deletes one character; `fill` can miss React state; headless never scrolls, so below-fold ref clicks miss; `network route --body` is not honoured, so mocked empty states stay UNVERIFIED; use the full `https://awesome.video/api/...` URL in `network route --abort` (a `**/api/...` glob once failed to match and the write went through).
+- Lane management: a SendMessage to a lane that already sent its final report restarts it; spawn the successor only after its idle notice and don't message it again. Sonnet lanes run out of context at ~100 rows; give each lane about that many.
+
 ### Production audit cycles 20–21: deploy pitfalls (November 5, 2026)
 - Each publish adds an empty "Published your App" commit (author Replit Agent) on top of the workspace HEAD, so the next sync is never a fast-forward. Confirm `git rev-parse <commit>^{tree} <commit>^^{tree}` prints one tree twice, then `git reset --keep origin/main` in the workspace. Never publish on top of it.
 - Production can drift ahead of GitHub when a publish is made from workspace-only commits. Before a sync, list `origin/main..HEAD` in the workspace and keep a backup branch of anything that is not an empty publish commit.
