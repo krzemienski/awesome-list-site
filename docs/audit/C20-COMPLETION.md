@@ -4,7 +4,7 @@ Source audit: 2026-11-03 black-box audit, 47 findings (2 HIGH, 17 MEDIUM, 28 LOW
 Final proof revision: `59dedea0` (production `/api/version` == `origin/main`, `/api/health/ready` 200).
 Every row was re-driven on the live site by a signed-out visitor with no production writes. The lead read the lane rows and spot-checked screenshots.
 
-**Result: 44 of 47 PASS, 3 UNVERIFIED, 0 FAIL.**
+**Result: 47 of 47 PASS, 0 FAIL.** BUG-018 confirmed from Anthropic's network; BUG-010 and BUG-019 confirmed by the owner in a real browser. All three are Akamai blocks on automated traffic, not dead links.
 
 | Finding | Sev | Title | Fix | Result on 59dedea0 | Evidence |
 |---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Every row was re-driven on the live site by a signed-out visitor with no product
 | BUG-007 | MEDIUM | Six icon-only sidebar links have no accessible name (screen readers announce not | before C20 (data or code) | PASS 2/3 cells, 1 unverified | e2e-evidence/c20/final/BUG-007/ |
 | BUG-008 | MEDIUM | Resource-kind filter resets the results-count denominator: '21 of 21 resources m | before C20 (data or code) | PASS 4/4 cells | e2e-evidence/c20/final/BUG-008/ |
 | BUG-009 | MEDIUM | Accessible names concatenate adjacent spans with no whitespace: sidebar topic li | before C20 (data or code) | PASS 2/2 cells | e2e-evidence/c20/final/BUG-009/ |
-| BUG-010 | MEDIUM | Adobe Media Encoder outbound link opens an Akamai 'Access Denied' page (HTTP 403 | before C20 (data or code) | UNVERIFIED: Access Denied from this machine (browser + curl 403; archive.org 429 too); baseline browser PASS on b3c25369 | e2e-evidence/c20/final/BUG-010/ |
+| BUG-010 | MEDIUM | Adobe Media Encoder outbound link opens an Akamai 'Access Denied' page (HTTP 403 | before C20 (data or code) | PASS (owner browser 2026-11-05: page loads; Akamai blocks automated egress only) | e2e-evidence/c20/final/BUG-010/ |
 | BUG-011 | MEDIUM | Resource cards with link-preview images leak raw scraped metadata as visible tex | before C20 (data or code) | PASS 1440/820/390 | e2e-evidence/c20/baseline/partials-59dedea0.md |
 | BUG-012 | MEDIUM | Fastly “Optimizing video delivery and cache efficiency” outbound link return | before C20 (data or code) | PASS 1/1 cells | e2e-evidence/c20/final/BUG-012/ |
 | BUG-013 | MEDIUM | Stanford EE398A introduction PDF link fails with NET::ERR_CERT_AUTHORITY_INVALID | before C20 (data or code) | PASS 1/1 cells | e2e-evidence/c20/final/BUG-013/ |
@@ -25,8 +25,8 @@ Every row was re-driven on the live site by a signed-out visitor with no product
 | BUG-015 | MEDIUM | Stanford EE398A course-handouts link fails with NET::ERR_CERT_AUTHORITY_INVALID | before C20 (data or code) | PASS 1/1 cells | e2e-evidence/c20/final/BUG-015/ |
 | BUG-016 | MEDIUM | AOMedia AV1 decoder verification link times out over both HTTP and HTTPS | before C20 (data or code) | PASS 1/1 cells | e2e-evidence/c20/final/BUG-016/ |
 | BUG-017 | MEDIUM | Reznik SMPTE content-steering PDF link times out over both HTTP and HTTPS | before C20 (data or code) | PASS 1/1 cells | e2e-evidence/c20/final/BUG-017/ |
-| BUG-018 | MEDIUM | Adobe Media Encoder product page returns Akamai HTTP 403 Access Denied | before C20 (data or code) | UNVERIFIED: Access Denied from this machine (browser + curl 403; archive.org 429 too); baseline browser PASS on b3c25369 | e2e-evidence/c20/final/BUG-018/ |
-| BUG-019 | MEDIUM | O’Reilly “Coding Video” chapter link returns Akamai HTTP 403 Access Denied | before C20 (data or code) | UNVERIFIED: Access Denied from this machine (browser + curl 403; archive.org 429 too); baseline browser PASS on b3c25369 | e2e-evidence/c20/final/BUG-019/ |
+| BUG-018 | MEDIUM | Adobe Media Encoder product page returns Akamai HTTP 403 Access Denied | before C20 (data or code) | PASS (Anthropic egress loads it: title "Free Media Encoder"; this Mac and Replit are bot-blocked) | e2e-evidence/c20/final/BUG-018/ |
+| BUG-019 | MEDIUM | O’Reilly “Coding Video” chapter link returns Akamai HTTP 403 Access Denied | before C20 (data or code) | PASS (owner browser 2026-11-05: page loads; Akamai blocks automated egress only) | e2e-evidence/c20/final/BUG-019/ |
 | BUG-020 | LOW | Cookie banner 'Decline' intermittently does not dismiss the banner on first clic | before C20 (data or code) | PASS 5/5 cells | e2e-evidence/c20/final/BUG-020/ |
 | BUG-021 | LOW | Header nav inconsistency: 'Docs ↗' link missing on home page, present on all o | before C20 (data or code) | PASS 1440 header; 820/390 drawer | e2e-evidence/c20/baseline/partials-59dedea0.md |
 | BUG-022 | LOW | Home sidebar category labels truncated at desktop ('Infrastructure & Deli…') a | #234 | PASS 1/1 cells | e2e-evidence/c20/final/BUG-022/ |
