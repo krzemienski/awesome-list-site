@@ -16,7 +16,7 @@ import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import type { AgentEvent, ResearchDiscovery, ResearchJob } from "@shared/schema";
-import { COST_BASIS_NOTE, formatCost, getStatusBadge, humanizeJobError, isActiveJobStatus } from "./researchDisplay";
+import { COST_BASIS_NOTE, formatCost, getStatusBadge, humanizeJobError, isActiveJobStatus, isConfigJobError } from "./researchDisplay";
 import { OUTCOME_LABEL, STEP_LABEL, deriveRunProgress, type RunOutcome } from "./researchRunProgress";
 import { ResearchPhaseTimeline } from "./ResearchPhaseTimeline";
 import { ResearchRunDiscoveries } from "./ResearchRunDiscoveries";
@@ -61,6 +61,9 @@ function endingCopy(outcome: RunOutcome, saved: number, job: ResearchJob): strin
     case "cancelled":
       return saved > 0 ? `Run cancelled — review the ${found} it made before stopping.` : "Run cancelled before it saved a discovery.";
     case "failed":
+      if (job.errorMessage && isConfigJobError(job.errorMessage)) {
+        return `Run failed${saved > 0 ? ` — the ${found} are kept` : ""}. ${humanizeJobError(job.errorMessage)}`;
+      }
       return `Run failed${saved > 0 ? ` — the ${found} are kept; review them, or relaunch` : " — relaunch it"}. ${job.errorMessage ? humanizeJobError(job.errorMessage) : ""}`.trim();
   }
 }
