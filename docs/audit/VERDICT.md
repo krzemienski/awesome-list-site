@@ -80,3 +80,44 @@ Owner decision:
 - BUG-003. Mixpanel now sends after an explicit "Allow analytics" even when the browser sets Do Not Track (`ignore_dnt`), the same as PostHog and Amplitude. The Privacy Policy does not mention DNT.
 
 Follow-up bug (not one of the 47): On a throttled first load, text typed into the hero search box before hydration is cleared by hydration.
+
+## C22 (2026-11-05, admin + member coverage on post-C17 code)
+
+**Verdict: PASS WITH OPEN ITEMS.** The 7 defects this cycle found are fixed, deployed with replit-deploy and re-driven on the live site. No inventory row is failing. Production at close-out: `721f528c` == `origin/main`, `/api/health/ready` 200.
+
+Not a clean full-coverage PASS: 99 rows are UNVERIFIED and 255 PARTIAL, each with a reason in its row. Sign-up is owner-skipped, and signed-in non-admin denial needs a member account that doesn't exist.
+
+### Defects fixed and verified on production
+
+| ID | Defect | PR | Prod evidence |
+|---|---|---|---|
+| C22-MB-055 | Raw "Failed to fetch" in 8 error messages | #252 | notification save offline -> "Could not reach the server…" @1440/390 |
+| C22-SH-14 | Dashboard Retry fails again -> focus `#main` | #253 | -> new Retry; success -> H1 @1440/390 |
+| C22-SC-24 | Taxonomy parent-load Retry success -> focus body | #253 | -> H1; fails again -> new Retry @1440/390 |
+| C22-RS-34 | Failed research run showed raw provider error + "relaunch it" | #254 | settings sentence, no relaunch advice @1440/390 |
+| C22-MB-075 | Offline save paused silently (all writes) | #255 | offline note save -> "Couldn't update your library" toast @1440 |
+| C22-RM-CLEAR | "Clear filters" 76x24 at touch widths | #256 | 76x44 @820/390, 24 @1440 |
+| C22-EX-09 | Export link-check Retry fails again -> focus H1 (wrapper unmounts) | #257 | fast + 1.5 s failure -> new Retry, success -> H1 @1440/390 |
+
+Deploys: cc0769a5 -> 5dc0ce4a -> e79a51bb -> 125a7be3 -> 721f528c (evidence `e2e-evidence/replit-deploy/2026-11-05T21-38-27Z` onward).
+
+### Coverage (613 admin + member inventory rows)
+
+Every row has a C22 verdict line in the lane files `reports/prod-audit-2026-10-29/cycle-22/c22-{admin-content,admin-shell,admin-ops,member}.md` (local audit workspace, not committed, like cycles 17 and 21). Best verdict per row: PASS 247 · PARTIAL 255 · UNVERIFIED 99 · OWNER-BLOCKED 3 · FAIL→FIXED-VERIFIED 2 · n/a or composite 7. PARTIAL mostly means 1440 passed and the 820 or 390 interaction cell was not driven. Public routes were smoke-checked on cc0769a5 by the lead: 18 routes 200, 404, auth redirects, admin APIs 401, no console errors or failed requests at 1440/390. The 47 public findings stand from C20 (47/47).
+
+### Why rows are UNVERIFIED
+- Mocked empty server responses (`agent-browser network route --body` not honoured): 17 admin rows.
+- Paid or external writes: enrichment, researcher launch, recommendations refresh, GitHub sync, link-health scan/apply.
+- Destructive or real-data writes: reseed, DB restore, user role/delete, RM-38/RM-74 on real resources (OWNER-BLOCKED), signing out (revokes every owner session).
+- No member account: non-admin sign-in, signed-in non-admin denial, member sign-out. Sign-up owner-skipped.
+- Tooling: no real touch, reduced-motion emulation, request delay primitive, or screen reader.
+- Server failure paths that need a real conflict: bulk approve/reject 409.
+
+### Notes (not defects)
+Concatenated-URL edit (valid WHATWG URL), sub-subcategory slug uniqueness per level, signed-out /admin redirects instead of a gate button, dialog Retry focus lands on the dialog, research config-load error has no Retry, GitHub heading on config failure, Link Health remediation table unpaginated (259 rows), whole Export tab `aria-busy` for ≤10 s during a link-check retry.
+
+### Test data
+Every C22 write is in `reports/prod-audit-2026-10-29/cycle-22/qa-ledger.md` and closed. Lead read-back at close-out: 0 `[AUDIT] C22` resources (public search 0; 190925–190935 all 404), 0 audit taxonomy items, pendingApprovals 21 (all real), pendingEdits 0, owner collections [], no active API keys, 12 bookmarks, favorites [185551, 186357], name "Admin User", onboarding completed/step 5 with original values, notification prefs original values. Irreversible side effects: preference `updatedAt` / revision counters and `inAppOptedInAt` timestamps changed; values are identical.
+
+### Owner follow-ups
+Create a non-admin audit member account (or allow sign-up) to verify member sign-in, sign-out and non-admin denial. Move the workspace `.env` / `.env.local` values (public VITE_* config and dev host flags, no credentials) to Replit Secrets. Earlier open owner decisions (PC-12, DATA-TAXO-LABEL, DATA-DUP-TITLE, DATA-ENTITY-DESC, EN-17-COPY) are unchanged.
