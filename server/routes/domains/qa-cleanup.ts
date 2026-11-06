@@ -49,7 +49,20 @@ interface LockedRow { title: string; owner: string | null }
 interface DeletableTable {
   lock(tx: Tx, id: number): Promise<LockedRow | undefined>;
   remove(tx: Tx, id: number): Promise<unknown>;
+  /** Rows of users outside the allowlist that the delete would also remove, per table. */
+  foreignRows?(tx: Tx, id: number, allowed: string[]): Promise<Record<string, number>>;
 }
+
+const FOREIGN_ROW_SOURCES: [table: string, resourceColumn: string, userColumn: string | null][] = [
+  ["user_bookmarks", "resource_id", "user_id"],
+  ["user_favorites", "resource_id", "user_id"],
+  ["bookmark_collection_items", "resource_id", "user_id"],
+  ["user_interactions", "resource_id", "user_id"],
+  ["user_recommendation_feedback", "resource_id", "user_id"],
+  ["resource_link_reports", "resource_id", "user_id"],
+  ["resource_edits", "resource_id", "submitted_by"],
+  ["journey_steps", "resource_id", null],
+];
 
 const deleteBodySchema = z.object({
   expectedTitle: z.string().min(1),
@@ -73,10 +86,15 @@ function refuse(status: number, message: string): Refusal {
 /** The newest backup's dump hash, or a refusal when it is missing, stale or different. */
 async function checkBackup(backupSha256: string): Promise<Refusal | null> {
   if (!isBackupStorageConfigured()) return refuse(503, "Backup storage is not configured, so no backup can be verified.");
-  const [newest] = await listDatabaseBackups();
+  let newest: Awaited<ReturnType<typeof listDatabaseBackups>>[number] | undefined;
+  try {
+    [newest] = await listDatabaseBackups();
+  } catch {
+    return refuse(409, "Backup check unavailable. Nothing was deleted.");
+  }
   if (!newest) return refuse(409, "No database backup exists. Take one first.");
   const ageMs = Date.now() - new Date(newest.completedAt).getTime();
-  if (!Number.isFinite(ageMs) || ageMs > QA_BACKUP_MAX_AGE_MS) {
+  if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > QA_BACKUP_MAX_AGE_MS) {
     return refuse(409, "The newest database backup is older than 10 minutes. Take a fresh one.");
   }
   if (newest.dump.sha256.toLowerCase() !== backupSha256.toLowerCase()) {
@@ -95,6 +113,18 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
           .select({ title: resources.title, owner: resources.submittedBy })
           .from(resources).where(eq(resources.id, id)).for("update");
         return row;
+      },
+      async foreignRows(tx, id, allowed) {
+        const counts: Record<string, number> = {};
+        for (const [table, resourceColumn, userColumn] of FOREIGN_ROW_SOURCES) {
+          const others = userColumn
+            ? sql`AND ${sql.identifier(userColumn)} NOT IN (${sql.join(allowed.map((a) => sql`${a}`), sql`, `)})`
+            : sql``;
+          const result = await tx.execute(sql`SELECT count(*)::int AS n FROM ${sql.identifier(table)} WHERE ${sql.identifier(resourceColumn)} = ${id} ${others}`);
+          const n = Number((result.rows[0] as { n?: number } | undefined)?.n ?? 0);
+          if (n > 0) counts[table] = n;
+        }
+        return counts;
       },
       async remove(tx, id) {
         await tx.delete(resourceEdits).where(eq(resourceEdits.resourceId, id));
@@ -200,6 +230,10 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
       if (row.owner === null || !allowed.has(row.owner)) return refuse(403, "Row does not belong to a QA cleanup account");
       if (!row.title.startsWith(QA_PREFIX)) return refuse(409, `Title no longer starts with ${QA_PREFIX}`);
       if (row.title !== expectedTitle) return refuse(409, "expectedTitle does not match the stored title");
+      const foreign = await target.foreignRows?.(tx, id, [...allowed]);
+      if (foreign && Object.keys(foreign).length > 0) {
+        return refuse(409, `Other users' data depends on this row; nothing was deleted: ${JSON.stringify(foreign)}`);
+      }
       await tx.insert(resourceAuditLog).values({
         originalResourceId: tableName === "resources" ? id : null,
         action: "qa_cleanup",
