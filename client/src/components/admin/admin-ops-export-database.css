@@ -719,4 +719,9 @@
 .admin-ops-backup__toggle {
   justify-self: start;
   min-height: 44px;
+  /* `.btn` is nowrap; this label is ~312px, wider than the card at 390
+     (C22-EX-27). Let it wrap inside the card instead of scrolling it. */
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
 }
