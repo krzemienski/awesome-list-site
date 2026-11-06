@@ -7,8 +7,7 @@ the consent-gated tools — Google Analytics 4, Mixpanel, PostHog and Amplitude
 — and the cookie-free Replit Analytics, which also receives events before a
 consent choice (see [Replit Analytics](#replit-analytics)). The rest of the document covers GA4 specifics (gtag.js): where each
 GA4 event is wired, the parameters each carries, first-touch acquisition, the
-PII exclusion policy, and how tracking is validated end-to-end against the real
-GA4 network endpoint. Mixpanel specifics (identity, server-side conversions)
+PII exclusion policy, and how to check tracking by hand. Mixpanel specifics (identity, server-side conversions)
 live in `MIXPANEL.md`.
 
 Measurement ID comes from the `VITE_GA_MEASUREMENT_ID` env var. If it is unset,
@@ -36,9 +35,9 @@ it is turned off, SPA `page_view` counts are inflated (~2×), **and** those
 automatic page views bypass the app's URL hygiene: gtag fills their `dr` with
 the raw previous URL (query string included), so a token in a landing URL can
 reach GA4 through them. Every hit the app itself sends is sanitized (see
-[Property hygiene](#property-hygiene-enforced-in-code)). This was observed
-live during validation on the configured property (an automatic `page_view` with
-the `ae` flag appeared alongside our manual one on the one true SPA navigation).
+[Property hygiene](#property-hygiene-enforced-in-code)). Observed once during an earlier validation run (harness since removed; an
+automatic `page_view` with the `ae` flag appeared alongside our manual one on
+the one true SPA navigation); re-check in the GA4 UI.
 
 > Title-timing note: because `SEOHead` sets `document.title` via `react-helmet`
 > (deferred a tick) and detail-page titles depend on async data, the manual
@@ -586,8 +585,7 @@ tracking plan, applies to all four):
 - Acquisition stores the referrer **hostname** and landing **pathname** only —
   no full referrer URLs or query strings; UTM values are capped at 100 chars.
 
-This is enforced by test: the validation harness scans every raw `/g/collect`
-request body for the throwaway email and password and fails if either appears.
+Enforced in code by `sanitizeEventProps()`; checked by hand in a consented browser.
 
 ## Interaction helpers
 
@@ -607,74 +605,8 @@ exception: it is restored together with its call site in the already-mounted
 JavaScript-error capture, so no unreferenced session hook can silently recreate
 the same measurement gap.
 
-## Validation (real GA4 network, no mocks)
+## Validation
 
-Tracking is validated against the **real** GA4 collection endpoint
-(`https://*.google-analytics.com/g/collect`) with a real browser — no mocks,
-stubs, or fixtures. The harness `scripts/vg2-ga4-validate.mjs` drives a pinned
-Chromium through real user flows, intercepts every `/g/collect` request, decodes
-the batched event payloads, and asserts on event names, parameters, de-duplication,
-and the absence of PII.
+Tracking is verified by hand in a consented real browser (see [Adding an event](#adding-an-event-area-tasks), step 4). There is no validation script: the `vg2-*` harness was removed in `b4040bfe`.
 
-Flows exercised: landing (with UTM query) → consent-gated performance and a real
-interaction for INP → deliberate browser-error capture → search → resource detail view → in-app SPA
-navigation → theme change → taxonomy page → Clerk sign-up → signed-in reload →
-Clerk sign-in → consent revoke and re-grant.
-
-### Gotchas the harness handles
-
-- **gtag batches events** and flushes on `visibilitychange → hidden`. The harness
-  toggles document visibility to force a flush, then polls for the expected event
-  (`waitForEvent`) rather than using a fixed sleep — a freshly loaded page needs
-  several seconds for gtag.js to load and drain its queue.
-- **A search-result click opens the resource's external URL** in a new tab
-  (`window.open`); it does **not** navigate to `/resource/:id`. So the harness
-  reaches `select_content` via the real resource route, not via search results.
-- **The auth conversions need a real Clerk attempt.** The harness registers a
-  throwaway `__qa_test_*+clerk_test@example.com` account through the prebuilt
-  `<SignUp>` card, signs out, signs back in through `<SignIn>`, and deletes the
-  Clerk account afterwards. Registration — and only registration — sits behind
-  Cloudflare Turnstile, which serves headless Chromium an interactive challenge,
-  so the harness attaches a Clerk [Testing Token](https://clerk.com/docs/guides/development/testing/overview)
-  to every Frontend API call and forces `Clerk.client.captchaBypass`. The
-  registration, session, app code and GA4 network path all stay real; only the
-  third-party bot gate is stepped around. Without `CLERK_SECRET_KEY` and a
-  `pk_test_` publishable key these flows are reported as **SKIP**, never as pass.
-
-### Net-zero teardown
-
-Any DB rows created during validation (throwaway `__qa_test_*@example.com` users
-and `qa-test-*` resource submissions) are purged afterward via
-`scripts/vg2-teardown.ts`, returning the database to baseline.
-
-### Running it
-
-```bash
-node scripts/vg2-ga4-validate.mjs   # drives Chromium through the full local flow
-npx tsx scripts/vg2-teardown.ts     # purge throwaway QA rows after the full flow
-```
-
-### Post-publish smoke check
-
-Run the production-safe smoke mode immediately after every publish, using the
-published site's exact URL:
-
-```bash
-node scripts/vg2-ga4-validate.mjs --smoke --base-url https://published.example
-```
-
-Smoke mode uses a fresh browser context and only loads the landing page, checks
-that no GA4 collection request occurs before consent, grants consent through the
-real banner, performs the real `/` keyboard interaction, and waits for an
-`INP` performance event on the wire. It does not load the catalog, call Clerk,
-create accounts, submit resources, or exercise any other mutating flow. It also
-scans every captured payload in raw and percent-decoded form for common PII
-fields and email-shaped values.
-
-The smoke command requires an explicit `--base-url` (or `BASE_URL`) when
-targeting a non-local site. It exits non-zero if consent gating, GA4 delivery,
-INP delivery, or the PII scan fails. The full validator remains the development
-check for the broader event taxonomy and auth flows.
-
-The validator prints event counts, per-assertion results, and sample decoded
-payloads to stdout (and any output paths it is configured with at run time).
+Manual-check tip: gtag batches events and flushes on `visibilitychange → hidden`, so a freshly loaded page can need several seconds before its `/g/collect` request appears. Switch tabs to force a flush rather than waiting.
