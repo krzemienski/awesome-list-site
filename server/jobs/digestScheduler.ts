@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { runDigestCycle } from "../services/digestService";
 import { createLogger } from "../lib/logger";
+import { runWithJobContext } from "../ops/requestContext";
 
 const logger = createLogger("digest");
 
@@ -8,7 +9,10 @@ const RUN_EVERY_MS = 60 * 60 * 1000;
 let timer: NodeJS.Timeout | null = null;
 let running = false;
 
-async function runScheduledCycle(workerId: string): Promise<void> {
+const runScheduledCycle = (workerId: string): Promise<void> =>
+  runWithJobContext("digest", workerId, () => runCycle(workerId));
+
+async function runCycle(workerId: string): Promise<void> {
   if (running) return;
   running = true;
   const startedAt = Date.now();

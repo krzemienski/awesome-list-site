@@ -1,9 +1,10 @@
-import { db } from "../db";
+import { db, pool } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
 import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
+import { runWithJobContext } from "../ops/requestContext";
 
 const logger = createLogger("job-watchdog");
 
@@ -153,7 +154,10 @@ export async function sweepOrphanedJobs(
   };
 }
 
-export async function runOrphanWatchdogStartup(): Promise<void> {
+export const runOrphanWatchdogStartup = (): Promise<void> =>
+  runWithJobContext('orphan-watchdog', 'startup', runStartupSweep);
+
+async function runStartupSweep(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();
     if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
@@ -182,31 +186,65 @@ export async function runOrphanWatchdogStartup(): Promise<void> {
 // worker has started yet, so nothing is legitimately owned.
 const PERIODIC_SWEEP_INTERVAL_MS = 60 * 1000;
 let periodicTimer: NodeJS.Timeout | null = null;
+// A cold sweep reconnects every minute and the pool's 3 s connect timeout
+// sometimes loses: retry once, and call it an ERROR only after repeated misses.
+const RETRY_DELAY_MS = 1000;
+const ERROR_AFTER_CONSECUTIVE_FAILURES = 3;
+let consecutiveFailures = 0;
+
+const isConnectionTimeout = (err: unknown): boolean =>
+  err instanceof Error && /connection timeout/i.test(err.message);
+
+async function runPeriodicSweep(): Promise<OrphanSweepResult> {
+  // Dynamic imports keep the watchdog free of load-order coupling.
+  const [{ enrichmentService }, { syncService }, { researchService }] = await Promise.all([
+    import('../ai/enrichmentService'),
+    import('../github/syncService'),
+    import('../ai/researchService'),
+  ]);
+  const sweep = () =>
+    sweepOrphanedJobs(undefined, {
+      enrichmentJobIds: enrichmentService.getActiveJobIds(),
+      syncQueueIds: syncService.getActiveQueueIds(),
+      researchJobIds: researchService.getActiveJobIds(),
+    });
+  try {
+    return await sweep();
+  } catch (err) {
+    if (!isConnectionTimeout(err)) throw err;
+    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    return sweep();
+  }
+}
+
+function reportSweepFailure(err: unknown): void {
+  consecutiveFailures += 1;
+  const details = {
+    consecutiveFailures,
+    poolTotal: pool.totalCount,
+    poolIdle: pool.idleCount,
+    poolWaiting: pool.waitingCount,
+  };
+  const message = 'Orphan watchdog periodic sweep failed (non-fatal):';
+  if (consecutiveFailures >= ERROR_AFTER_CONSECUTIVE_FAILURES) logger.error(message, err, details);
+  else logger.warn(message, err, details);
+}
 
 export function startOrphanWatchdogPeriodic(): void {
   if (periodicTimer) return; // idempotent — never double-schedule
-  periodicTimer = setInterval(() => void (async () => {
+  periodicTimer = setInterval(() => void runWithJobContext('orphan-watchdog', 'periodic', async () => {
     try {
-      // Dynamic imports keep the watchdog free of load-order coupling.
-      const [{ enrichmentService }, { syncService }, { researchService }] = await Promise.all([
-        import('../ai/enrichmentService'),
-        import('../github/syncService'),
-        import('../ai/researchService'),
-      ]);
-      const r = await sweepOrphanedJobs(undefined, {
-        enrichmentJobIds: enrichmentService.getActiveJobIds(),
-        syncQueueIds: syncService.getActiveQueueIds(),
-        researchJobIds: researchService.getActiveJobIds(),
-      });
+      const r = await runPeriodicSweep();
+      consecutiveFailures = 0;
       if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
         logger.info(
           `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed`,
         );
       }
-    } catch (err: any) {
-      logger.error('❌ Orphan watchdog periodic sweep failed (non-fatal):', err);
+    } catch (err) {
+      reportSweepFailure(err);
     }
-  })(), PERIODIC_SWEEP_INTERVAL_MS);
+  }), PERIODIC_SWEEP_INTERVAL_MS);
   // Never keep the process alive just for the watchdog.
   periodicTimer.unref?.();
 }

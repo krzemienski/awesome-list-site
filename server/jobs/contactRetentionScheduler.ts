@@ -1,6 +1,7 @@
 import { config } from "../config";
 import { ContactRepository, purgeExpiredContactSubmissions } from "../repositories/ContactRepository";
 import { createLogger } from "../lib/logger";
+import { runWithJobContext } from "../ops/requestContext";
 
 const logger = createLogger("contact-retention");
 
@@ -10,7 +11,9 @@ const MAX_BATCHES = 20;
 let timer: NodeJS.Timeout | undefined;
 let running = false;
 
-async function runScheduledCycle(): Promise<void> {
+const runScheduledCycle = (): Promise<void> => runWithJobContext("contact-retention", "hourly", runCycle);
+
+async function runCycle(): Promise<void> {
   if (process.env.NODE_ENV === "test" || process.env.VITEST || running) return;
   running = true;
   let deletedCount = 0;
