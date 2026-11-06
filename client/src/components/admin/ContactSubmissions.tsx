@@ -131,7 +131,10 @@ export default function ContactSubmissions() {
                 variant="outline"
                 size="sm"
                 onClick={(event) => {
-                  handoffFocusOnUnmount(event.currentTarget);
+                  // The panel unmounts while the retry runs: refocus its new
+                  // Try again if the 404 repeats, else the page heading.
+                  handoffFocusOnUnmount(event.currentTarget, () =>
+                    document.querySelector<HTMLElement>('[data-testid="button-contact-submissions-retry"]'));
                   void refetch();
                 }}
                 disabled={isFetching}
