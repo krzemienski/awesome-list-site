@@ -16,9 +16,22 @@ import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
 import { Button } from "@/components/ui/button";
-import { humanizeApiError } from "@/lib/apiError";
+import { Alert } from "@/components/ui/alert";
+import { useOnlineStatus } from "@/hooks/use-online-status";
+import { humanizeApiError, OFFLINE_MESSAGE } from "@/lib/apiError";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Clerk's own requests bypass the app API layer, so offline they just hang.
+function OfflineNotice() {
+  const online = useOnlineStatus();
+  if (online) return null;
+  return (
+    <Alert live="polite" className="max-w-md" data-testid="auth-offline-notice">
+      {OFFLINE_MESSAGE}
+    </Alert>
+  );
+}
 
 export function SignInPage() {
   // A server-guard 302 from /admin#users keeps "#users" on this URL but not in
@@ -55,16 +68,19 @@ export function SignInPage() {
         <AdminPasswordSignIn />
       ) : (
         // C5-V3-01: never a blank body while Clerk's UI can't load.
-        <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
-          <StaleSessionGate>
-            <SignIn
-              routing="path"
-              path={`${basePath}/sign-in`}
-              signUpUrl={`${basePath}/sign-up`}
-              fallback={<ClerkUiFallback flow="sign-in" />}
-            />
-          </StaleSessionGate>
-        </ClerkSlot>
+        <div className="flex flex-col items-center gap-4">
+          <OfflineNotice />
+          <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
+            <StaleSessionGate>
+              <SignIn
+                routing="path"
+                path={`${basePath}/sign-in`}
+                signUpUrl={`${basePath}/sign-up`}
+                fallback={<ClerkUiFallback flow="sign-in" />}
+              />
+            </StaleSessionGate>
+          </ClerkSlot>
+        </div>
       )}
     </div>
   );
@@ -81,16 +97,19 @@ export function SignUpPage() {
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
       <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
-      <ClerkSlot fallback={<ClerkUiFallback flow="sign-up" />}>
-        <StaleSessionGate>
-          <SignUp
-            routing="path"
-            path={`${basePath}/sign-up`}
-            signInUrl={`${basePath}/sign-in`}
-            fallback={<ClerkUiFallback flow="sign-up" />}
-          />
-        </StaleSessionGate>
-      </ClerkSlot>
+      <div className="flex flex-col items-center gap-4">
+        <OfflineNotice />
+        <ClerkSlot fallback={<ClerkUiFallback flow="sign-up" />}>
+          <StaleSessionGate>
+            <SignUp
+              routing="path"
+              path={`${basePath}/sign-up`}
+              signInUrl={`${basePath}/sign-in`}
+              fallback={<ClerkUiFallback flow="sign-up" />}
+            />
+          </StaleSessionGate>
+        </ClerkSlot>
+      </div>
     </div>
   );
 }
