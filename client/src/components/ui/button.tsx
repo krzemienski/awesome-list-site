@@ -3,12 +3,13 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { useFocusSafeDisabled } from "@/hooks/use-focus-safe-disabled"
 
 // Paint (surface, border, radius, ink, weight, hover) comes from the design
 // system's `.btn` classes so every per-system skin applies; the utilities here
 // only size the control to the 44px touch target.
 const buttonVariants = cva(
-  "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "btn disabled:pointer-events-none data-[focus-held]:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -41,13 +42,24 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+    const focusSafe = useFocusSafeDisabled(props)
+    if (asChild) {
+      return (
+        <Slot
+          className={cn(buttonVariants({ variant, size, className }))}
+          data-ds-variant={variant ?? "default"}
+          ref={ref}
+          {...props}
+        />
+      )
+    }
     return (
-      <Comp
+      <button
         className={cn(buttonVariants({ variant, size, className }))}
         data-ds-variant={variant ?? "default"}
         ref={ref}
         {...props}
+        {...focusSafe}
       />
     )
   }

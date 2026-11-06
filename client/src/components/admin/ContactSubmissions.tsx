@@ -11,6 +11,7 @@ import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import { apiFetch } from "@/lib/api-fetch";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 interface ContactSubmission {
   id: string;
@@ -123,13 +124,16 @@ export default function ContactSubmissions() {
               <AlertCircle className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="font-medium mb-1">Contact inbox unavailable</p>
               <p className="text-sm text-muted-foreground mb-4">
-                The contact submissions endpoint returned 404. No inbox data is available.
+                This server isn&apos;t providing the contact inbox right now. Nothing was changed — try again later.
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => { void refetch(); }}
+                onClick={(event) => {
+                  handoffFocusOnUnmount(event.currentTarget);
+                  void refetch();
+                }}
                 disabled={isFetching}
                 data-testid="button-contact-submissions-retry"
               >

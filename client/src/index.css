@@ -152,7 +152,7 @@
      enabled buttons, role=button, links, label[for], selects and summary all
      get a pointer cursor. Disabled buttons keep the default (not-allowed is
      applied by their own styles). */
-  button:not(:disabled),
+  button:not(:disabled):not([aria-disabled="true"]),
   [role="button"],
   a,
   label[for],
