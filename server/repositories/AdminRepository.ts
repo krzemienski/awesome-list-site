@@ -37,7 +37,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { db } from "../db";
 import { createLogger } from "../lib/logger";
-import { isPrivateStorageConfigured, resolvePrivateStorage, storageEnvironment } from "../lib/privateStorage";
+import { PrivateStorageError, resolvePrivateStorage, storageEnvironment, type PrivateStorage } from "../lib/privateStorage";
 import { eq, sql } from "drizzle-orm";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -128,33 +128,55 @@ const latestValidationResults: ValidationResults = {
 };
 
 const logger = createLogger("admin-repository");
-let validationHydration: Promise<void> | null = null;
+let validationHydration: Promise<boolean> | null = null;
 
-function validationStorage() {
-  if (!isPrivateStorageConfigured()) return null;
-  const { client, prefix } = resolvePrivateStorage(`validation/${storageEnvironment()}`);
-  return { client, objectName: `${prefix}latest.json` };
+interface ValidationStorage {
+  client: PrivateStorage["client"];
+  objectName: string;
+}
+let validationStorageCache: ValidationStorage | null | undefined;
+
+/** The App Storage object for this environment, built once; null when no bucket is configured. */
+function validationStorage(): ValidationStorage | null {
+  if (validationStorageCache !== undefined) return validationStorageCache;
+  try {
+    const { client, prefix } = resolvePrivateStorage(`validation/${storageEnvironment()}`);
+    validationStorageCache = { client, objectName: `${prefix}latest.json` };
+  } catch (error) {
+    if (!(error instanceof PrivateStorageError) || error.reason !== "unconfigured") throw error;
+    validationStorageCache = null;
+  }
+  return validationStorageCache;
 }
 
-async function hydrateValidationResults(): Promise<void> {
+/** Resolves true when memory now reflects storage (including "nothing stored yet"), false when the read failed. */
+async function hydrateValidationResults(): Promise<boolean> {
   try {
     const storage = validationStorage();
-    if (!storage) return;
+    if (!storage) return true;
+    const exists = await storage.client.exists(storage.objectName);
+    if (!exists.ok) throw new Error(exists.error?.message ?? "unknown error");
+    if (!exists.value) return true;
     const downloaded = await storage.client.downloadAsText(storage.objectName);
-    if (!downloaded.ok) return;
+    if (!downloaded.ok) throw new Error(downloaded.error?.message ?? "unknown error");
     const stored = JSON.parse(downloaded.value) as ValidationResults;
     // A run that finished before this read wins over the older stored value.
     latestValidationResults.awesomeLint ??= stored.awesomeLint ?? null;
     latestValidationResults.linkCheck ??= stored.linkCheck ?? null;
     latestValidationResults.lastUpdated ??= stored.lastUpdated ?? null;
+    return true;
   } catch (error) {
     logger.error("Could not read the stored validation results", error);
+    return false;
   }
 }
 
-function ensureValidationHydrated(): Promise<void> {
+/** Hydrates once per process; a failed read is not cached, so the next call retries. */
+async function ensureValidationHydrated(): Promise<boolean> {
   validationHydration ??= hydrateValidationResults();
-  return validationHydration;
+  const hydrated = await validationHydration;
+  if (!hydrated) validationHydration = null;
+  return hydrated;
 }
 
 let journaledMigrationCount: number | null | undefined;
@@ -324,7 +346,9 @@ export class AdminRepository {
   }
 
   /**
-   * Store the result of a validation or link-check run for later retrieval.
+   * Store the result of a validation or link-check run for later retrieval. Kept in
+   * memory and persisted to App Storage so it survives restarts; a storage failure
+   * is logged and never fails the run.
    * @param result - The validation result to persist (awesome-lint or link-check)
    */
   async storeValidationResult(result: ValidationStorageItem): Promise<void> {
@@ -335,8 +359,9 @@ export class AdminRepository {
     }
     latestValidationResults.lastUpdated = result.timestamp;
     try {
-      // Hydrate first so the whole-object write keeps the other run type's stored result.
-      await ensureValidationHydrated();
+      // Only write over a stored object we have read: otherwise fields we never
+      // loaded would be replaced by null. Memory keeps the value; the next store retries.
+      if (!(await ensureValidationHydrated())) return;
       const storage = validationStorage();
       if (!storage) return;
       const written = await storage.client.uploadFromText(storage.objectName, JSON.stringify(latestValidationResults));
