@@ -18,7 +18,7 @@ import {
   DatabaseBackupError,
   deleteDatabaseBackup,
   isBackupStorageConfigured,
-  listDatabaseBackups,
+  listDatabaseBackupsDetailed,
   type BackupManifest,
 } from "./databaseBackup";
 
@@ -41,8 +41,22 @@ function expiredBackups(backups: BackupManifest[], now: number): BackupManifest[
     .filter((b) => now - Date.parse(b.completedAt) > KEEP_DAYS * 86_400_000);
 }
 
+/** Backups with a usable completedAt; a bad one is logged and ignored rather than poisoning age maths. */
+function withValidDates(backups: BackupManifest[]): BackupManifest[] {
+  return backups.filter((b) => {
+    if (Number.isFinite(Date.parse(b.completedAt))) return true;
+    logger.warn("Ignoring backup with an invalid completedAt", { backupId: b.id });
+    return false;
+  });
+}
+
 async function pruneBackups(): Promise<number> {
-  const expired = expiredBackups(await listDatabaseBackups(), Date.now());
+  const { backups, unreadable } = await listDatabaseBackupsDetailed();
+  if (unreadable.length > 0) {
+    logger.warn("Skipping prune: some backup manifests were unreadable", { unreadable: unreadable.length });
+    return 0;
+  }
+  const expired = expiredBackups(withValidDates(backups), Date.now());
   for (const backup of expired) await deleteDatabaseBackup(backup.id);
   return expired.length;
 }
@@ -72,8 +86,8 @@ async function recordAudit(manifest: BackupManifest): Promise<void> {
 const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
 
 async function backupIfDue(): Promise<ScheduledBackupResult> {
-  const backups = await listDatabaseBackups();
-  const newest = Math.max(0, ...backups.map((b) => Date.parse(b.completedAt)));
+  const { backups } = await listDatabaseBackupsDetailed();
+  const newest = Math.max(0, ...withValidDates(backups).map((b) => Date.parse(b.completedAt)));
   if (Date.now() - newest < DUE_AFTER_MS) return { status: "skipped" };
 
   let manifest: BackupManifest;
@@ -101,7 +115,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
 
   // Session-level lock on its own connection: the in-flight flag in
   // databaseBackup.ts is per process, and another Autoscale instance may be dumping.
-  const lockClient = new pg.Client({ connectionString: databaseUrl });
+  const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: 5000 });
   lockClient.on("error", (error) => logger.error("Backup lock connection error", { errorClass: errorClass(error) }));
   try {
     await lockClient.connect();

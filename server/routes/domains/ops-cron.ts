@@ -62,11 +62,24 @@ async function purgeContacts(): Promise<JobResult> {
   return { status: "ran", deleted };
 }
 
-async function timed(job: string, run: () => Promise<JobResult>): Promise<JobResult> {
+const DIGEST_TIMEOUT_MS = 60_000;
+const PURGE_TIMEOUT_MS = 30_000;
+const LINK_SCAN_TIMEOUT_MS = 30_000;
+/** How long the request waits for the backup before answering "started" and letting it finish detached. */
+const BACKUP_REQUEST_BUDGET_MS = 30_000;
+
+/** Resolves with `onTimeout` if `work` is still running after `ms`; `work` itself keeps running (it cannot be cancelled). */
+function within<T>(work: Promise<T>, ms: number, onTimeout: T): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const deadline = new Promise<T>((resolve) => { timer = setTimeout(() => resolve(onTimeout), ms); });
+  return Promise.race([work, deadline]).finally(() => clearTimeout(timer));
+}
+
+async function timed(job: string, timeoutMs: number, run: () => Promise<JobResult>): Promise<JobResult> {
   const startedAt = Date.now();
   let result: JobResult;
   try {
-    result = await run();
+    result = await within(run(), timeoutMs, { status: "timeout" });
   } catch (error) {
     // Error text can carry SQL parameters; log the class and code only.
     logger.error("Job failed", {
@@ -80,8 +93,22 @@ async function timed(job: string, run: () => Promise<JobResult>): Promise<JobRes
   return result;
 }
 
+/**
+ * A dump can outlast the request, so the backup runs detached once the request
+ * budget is spent: the response says "started" and the final outcome is logged.
+ * Like the link scan, it then depends on the instance staying up until it ends.
+ */
+function runBackup(): Promise<JobResult> {
+  const finished = runScheduledBackupIfDue().then((r): JobResult => ({ ...r }));
+  void finished.then((r) => logger.info("Backup finished", { status: r.status }));
+  return within(finished, BACKUP_REQUEST_BUDGET_MS, { status: "started" });
+}
+
 export function registerOpsCronRoutes(app: Express): void {
   const limiter = createRateLimiter({ name: "ops-cron", max: 10, windowMs: 15 * 60_000 });
+  // Counts failed authentication only, so guessing is throttled without letting
+  // an attacker on a shared IP use up the real cron's budget.
+  const failedAuthLimiter = createRateLimiter({ name: "ops-cron-auth", max: 20, windowMs: 15 * 60_000 });
 
   const authorize: RequestHandler = (req, res, next) => {
     const expected = process.env.OPS_CRON_TOKEN;
@@ -90,19 +117,21 @@ export function registerOpsCronRoutes(app: Express): void {
       return;
     }
     const supplied = bearerToken(req);
-    if (!supplied || !secretsMatch(supplied, expected)) {
-      res.status(401).json({ message: "Unauthorized" });
+    if (supplied && secretsMatch(supplied, expected)) {
+      next();
       return;
     }
-    next();
+    failedAuthLimiter(req, res, () => {
+      res.status(401).json({ message: "Unauthorized" });
+    });
   };
 
-  app.post("/api/ops/run-due-jobs", limiter, authorize, asyncHandler(async (_req, res) => {
+  app.post("/api/ops/run-due-jobs", authorize, limiter, asyncHandler(async (_req, res) => {
     const jobs = {
-      linkScan: await timed("linkScan", startLinkScan),
-      digest: await timed("digest", runDigest),
-      contactPurge: await timed("contactPurge", purgeContacts),
-      backup: await timed("backup", async () => ({ ...(await runScheduledBackupIfDue()) })),
+      linkScan: await timed("linkScan", LINK_SCAN_TIMEOUT_MS, startLinkScan),
+      digest: await timed("digest", DIGEST_TIMEOUT_MS, runDigest),
+      contactPurge: await timed("contactPurge", PURGE_TIMEOUT_MS, purgeContacts),
+      backup: await timed("backup", BACKUP_REQUEST_BUDGET_MS + 5_000, runBackup),
     };
     res.set("Cache-Control", "no-store");
     res.json({ ranAt: new Date().toISOString(), jobs });

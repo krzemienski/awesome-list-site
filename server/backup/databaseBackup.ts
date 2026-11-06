@@ -478,13 +478,31 @@ export async function createDatabaseBackup(options: {
 // List / read
 // ---------------------------------------------------------------------------
 
-export async function listDatabaseBackups(environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest[]> {
+export interface BackupListing {
+  backups: BackupManifest[];
+  /** Manifest object names that could not be read or parsed; callers that delete must treat any as "unknown state". */
+  unreadable: string[];
+}
+
+export async function listDatabaseBackupsDetailed(environment: BackupEnvironment = backupEnvironment()): Promise<BackupListing> {
   const storage = resolveStorage(environment);
   const objects = unwrap(await storage.client.list({ prefix: storage.prefix }), "list");
   const manifestNames = objects.map((o) => o.name).filter((name) => name.endsWith(".manifest.json"));
-  const manifests = await Promise.all(manifestNames.map(async (name) =>
+  const settled = await Promise.allSettled(manifestNames.map(async (name) =>
     JSON.parse(unwrap(await storage.client.downloadAsText(name), "read")) as BackupManifest));
-  return manifests.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const backups: BackupManifest[] = [];
+  const unreadable: string[] = [];
+  settled.forEach((result, i) => {
+    if (result.status === "fulfilled") return void backups.push(result.value);
+    unreadable.push(manifestNames[i]);
+    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(String(result.reason?.message ?? result.reason)) });
+  });
+  backups.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return { backups, unreadable };
+}
+
+export async function listDatabaseBackups(environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest[]> {
+  return (await listDatabaseBackupsDetailed(environment)).backups;
 }
 
 export async function readBackupManifest(id: string, environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest> {
@@ -501,7 +519,12 @@ export async function deleteDatabaseBackup(id: string, environment: BackupEnviro
   assertBackupId(id);
   const storage = resolveStorage(environment);
   unwrap(await storage.client.delete(`${storage.prefix}${id}.manifest.json`), "manifest delete");
-  unwrap(await storage.client.delete(`${storage.prefix}${id}.dump`), "dump delete");
+  try {
+    unwrap(await storage.client.delete(`${storage.prefix}${id}.dump`), "dump delete");
+  } catch (error) {
+    logger.error("Backup manifest deleted but its dump remains (orphan object)", { backupId: id });
+    throw error;
+  }
 }
 
 // ---------------------------------------------------------------------------
