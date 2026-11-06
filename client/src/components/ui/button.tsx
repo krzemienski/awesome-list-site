@@ -9,7 +9,7 @@ import { useFocusSafeDisabled } from "@/hooks/use-focus-safe-disabled"
 // system's `.btn` classes so every per-system skin applies; the utilities here
 // only size the control to the 44px touch target.
 const buttonVariants = cva(
-  "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "btn disabled:pointer-events-none data-[focus-held]:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
