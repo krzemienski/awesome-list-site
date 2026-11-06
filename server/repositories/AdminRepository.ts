@@ -36,6 +36,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { db } from "../db";
+import { createLogger } from "../lib/logger";
+import { isPrivateStorageConfigured, resolvePrivateStorage, storageEnvironment } from "../lib/privateStorage";
 import { eq, sql } from "drizzle-orm";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -114,16 +116,46 @@ export interface ValidationResults {
 }
 
 /**
- * In-memory holder for the most recent validation results. Validation status is
- * ephemeral (regenerated on demand from the live resource set), so it does not
- * warrant a database table — it only needs to survive between a validate/check
- * run and the subsequent status read within the same server process.
+ * Holder for the most recent validation results. They do not warrant a database
+ * table: every store is also written to the private App Storage bucket, and the
+ * first read after a restart hydrates from it, so the result survives deploys.
+ * Without a bucket (local dev) it lives in this process only.
  */
 const latestValidationResults: ValidationResults = {
   awesomeLint: null,
   linkCheck: null,
   lastUpdated: null,
 };
+
+const logger = createLogger("admin-repository");
+let validationHydration: Promise<void> | null = null;
+
+function validationStorage() {
+  if (!isPrivateStorageConfigured()) return null;
+  const { client, prefix } = resolvePrivateStorage(`validation/${storageEnvironment()}`);
+  return { client, objectName: `${prefix}latest.json` };
+}
+
+async function hydrateValidationResults(): Promise<void> {
+  try {
+    const storage = validationStorage();
+    if (!storage) return;
+    const downloaded = await storage.client.downloadAsText(storage.objectName);
+    if (!downloaded.ok) return;
+    const stored = JSON.parse(downloaded.value) as ValidationResults;
+    // A run that finished before this read wins over the older stored value.
+    latestValidationResults.awesomeLint ??= stored.awesomeLint ?? null;
+    latestValidationResults.linkCheck ??= stored.linkCheck ?? null;
+    latestValidationResults.lastUpdated ??= stored.lastUpdated ?? null;
+  } catch (error) {
+    logger.error("Could not read the stored validation results", error);
+  }
+}
+
+function ensureValidationHydrated(): Promise<void> {
+  validationHydration ??= hydrateValidationResults();
+  return validationHydration;
+}
 
 let journaledMigrationCount: number | null | undefined;
 /** Entries in migrations/meta/_journal.json (same lookup order as server/migrate.ts); cached per process. */
@@ -302,6 +334,16 @@ export class AdminRepository {
       latestValidationResults.linkCheck = result.result;
     }
     latestValidationResults.lastUpdated = result.timestamp;
+    try {
+      // Hydrate first so the whole-object write keeps the other run type's stored result.
+      await ensureValidationHydrated();
+      const storage = validationStorage();
+      if (!storage) return;
+      const written = await storage.client.uploadFromText(storage.objectName, JSON.stringify(latestValidationResults));
+      if (!written.ok) throw new Error(written.error?.message ?? "unknown error");
+    } catch (error) {
+      logger.error("Could not store the validation results in App Storage", error);
+    }
   }
 
   /**
@@ -309,6 +351,7 @@ export class AdminRepository {
    * @returns The latest awesome-lint and link-check results with last-updated time
    */
   async getLatestValidationResults(): Promise<ValidationResults> {
+    await ensureValidationHydrated();
     return { ...latestValidationResults };
   }
 }

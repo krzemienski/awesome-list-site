@@ -46,8 +46,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import pg from "pg";
-import { Client as ObjectStorageClient } from "@replit/object-storage";
 import { createLogger } from "../lib/logger";
+import {
+  isPrivateStorageConfigured,
+  PrivateStorageError,
+  resolvePrivateStorage,
+  storageEnvironment,
+  type PrivateStorage,
+  type StorageEnvironment,
+} from "../lib/privateStorage";
 
 const logger = createLogger("backup");
 
@@ -56,7 +63,7 @@ export const BACKUP_FORMAT_VERSION = 1;
 export const EXCLUDED_SCHEMAS = ["_system"] as const;
 const SYSTEM_SCHEMAS = ["pg_catalog", "information_schema", "pg_toast"];
 
-export type BackupEnvironment = "production" | "development";
+export type BackupEnvironment = StorageEnvironment;
 
 /** An operator-actionable backup/restore failure (message is safe to show). */
 export class DatabaseBackupError extends Error {
@@ -130,37 +137,23 @@ export interface BackupManifest {
 // Environment + storage
 // ---------------------------------------------------------------------------
 
-export function backupEnvironment(): BackupEnvironment {
-  return process.env.REPLIT_DEPLOYMENT === "1" ? "production" : "development";
-}
+export const backupEnvironment = storageEnvironment;
 
-interface BackupStorage {
-  client: ObjectStorageClient;
-  prefix: string;
-}
+export const isBackupStorageConfigured = isPrivateStorageConfigured;
 
-export function isBackupStorageConfigured(): boolean {
-  return Boolean(process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID && process.env.PRIVATE_OBJECT_DIR);
-}
-
-function resolveStorage(environment: BackupEnvironment = backupEnvironment()): BackupStorage {
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  const privateDir = process.env.PRIVATE_OBJECT_DIR;
-  if (!bucketId || !privateDir) {
-    throw new DatabaseBackupError(
-      "Backup storage is not configured: the private App Storage bucket (DEFAULT_OBJECT_STORAGE_BUCKET_ID / PRIVATE_OBJECT_DIR) is missing.",
-    );
+function resolveStorage(environment: BackupEnvironment = backupEnvironment()): PrivateStorage {
+  try {
+    return resolvePrivateStorage(`db-backups/${environment}`);
+  } catch (error) {
+    if (error instanceof PrivateStorageError) {
+      throw new DatabaseBackupError(
+        error.reason === "unconfigured"
+          ? "Backup storage is not configured: the private App Storage bucket (DEFAULT_OBJECT_STORAGE_BUCKET_ID / PRIVATE_OBJECT_DIR) is missing."
+          : "Backup storage is misconfigured: PRIVATE_OBJECT_DIR names no private directory.",
+      );
+    }
+    throw error;
   }
-  // PRIVATE_OBJECT_DIR is "/<bucket>/<dir>"; object names are bucket-relative.
-  const segments = privateDir.split("/").filter(Boolean);
-  if (segments[0] === bucketId) segments.shift();
-  if (segments.length === 0) {
-    throw new DatabaseBackupError("Backup storage is misconfigured: PRIVATE_OBJECT_DIR names no private directory.");
-  }
-  return {
-    client: new ObjectStorageClient({ bucketId }),
-    prefix: `${segments.join("/")}/db-backups/${environment}/`,
-  };
 }
 
 function unwrap<T>(result: { ok: true; value: T } | { ok: false; error: { message?: string } }, action: string): T {
