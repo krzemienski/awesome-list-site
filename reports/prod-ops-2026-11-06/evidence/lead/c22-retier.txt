@@ -1,0 +1,22 @@
+AP (Primary): per-deploy=4 periodic=13 retire=8
+AU (Secondary): periodic=20 retire=7
+C6-MB (Secondary): periodic=50 retire=31
+C6-PC (Secondary): periodic=1
+CAT (Secondary): periodic=18 retire=5
+DB (Primary): periodic=11 retire=3
+DG (Secondary): periodic=2 retire=5
+ED (Incidental): retire=22
+EN (Secondary): periodic=19 retire=12
+EX (Secondary): periodic=20 retire=7
+GH (Secondary): periodic=15 retire=8
+JN (Secondary): periodic=21 retire=8
+LH (Primary): periodic=21 retire=11
+OV (Primary): per-deploy=6 periodic=2 retire=7
+RM (Primary): per-deploy=17 periodic=49 retire=8
+RS (Primary): periodic=40 retire=13
+RW (Secondary): periodic=5 retire=4
+SC (Secondary): periodic=21 retire=4
+SH (Primary): periodic=41 retire=3
+SSC (Secondary): periodic=22 retire=4
+TOTAL per-deploy=27 periodic=414 retire=172
+US (Secondary): periodic=23 retire=2
