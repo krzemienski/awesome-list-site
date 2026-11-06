@@ -20,7 +20,8 @@ cleanup() {
   git worktree prune
   rm -rf "$GATE_ROOT"
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'echo "GATE ABORTED" >&2; exit 130' INT TERM
 
 fail() { # fail <code> <step> <detail>
   echo "GATE FAIL [$2]: $3" >&2
@@ -29,8 +30,15 @@ fail() { # fail <code> <step> <detail>
 
 cd "$MAIN_CLONE" || fail 2 setup "cannot enter $MAIN_CLONE"
 git fetch -q origin main || fail 2 setup "git fetch origin main failed"
-if git fetch -q origin "$BR" 2>/dev/null; then
-  REF="origin/$BR"
+git ls-remote -q --exit-code --heads origin "$BR" >/dev/null 2>&1
+case $? in
+  0) git fetch -q origin "$BR" || fail 2 setup "cannot fetch; refusing to gate a stale ref"
+     REF="origin/$BR" ;;
+  2) REF="" ;; # not on origin: a local-only branch is allowed
+  *) fail 2 setup "cannot fetch; refusing to gate a stale ref (git ls-remote failed)" ;;
+esac
+if [ -n "$REF" ]; then
+  :
 elif git rev-parse --verify -q "refs/heads/$BR" >/dev/null; then
   REF="$BR"
 else
@@ -42,9 +50,13 @@ git worktree add -q --detach "$T" origin/main || fail 2 setup "git worktree add 
 cd "$T" || fail 2 setup "cannot enter scratch worktree"
 
 echo "== step: merge"
-if ! git merge --no-commit --no-ff "$REF"; then
-  git diff --name-only --diff-filter=U
-  fail 10 merge "conflict merging $REF into origin/main"
+if ! MERGE_OUT="$(git merge --no-commit --no-ff "$REF" 2>&1)"; then
+  CONFLICTS="$(git diff --name-only --diff-filter=U)"
+  if [ -n "$CONFLICTS" ]; then
+    echo "$CONFLICTS"
+    fail 10 merge "conflict merging $REF into origin/main"
+  fi
+  fail 2 setup "git merge failed without conflicts: $MERGE_OUT"
 fi
 
 if ! git diff --quiet origin/main -- package.json package-lock.json; then
@@ -57,7 +69,8 @@ ln -s "$MAIN_CLONE/node_modules" node_modules || fail 2 setup "cannot symlink no
 
 # Merge commit object (no ref moved, no hooks) so BUILD_REVISION names the combined tree.
 if [ -f "$(git rev-parse --git-path MERGE_HEAD)" ]; then
-  MERGE_SHA="$(git commit-tree "$(git write-tree)" -p HEAD -p MERGE_HEAD -m "merge-gate $REF")"
+  MERGE_SHA="$(git commit-tree "$(git write-tree)" -p HEAD -p MERGE_HEAD -m "merge-gate $REF")" \
+    || fail 2 setup "git commit-tree failed"
 else
   MERGE_SHA="$(git rev-parse HEAD)"
 fi
