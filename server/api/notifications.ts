@@ -28,6 +28,7 @@ const PREFERENCE_ERROR_MESSAGES: Record<string, string> = {
   pause_too_long: "Reminders can be paused for up to one year.",
   section_required: DIGEST_SECTION_REQUIRED_MESSAGE,
   email_required: "Add an email address before enabling email digests.",
+  email_unverified: "Verify your email address before turning on email digests.",
 };
 
 function userIdOf(request: AuthedRequest): string {
@@ -88,6 +89,7 @@ export function registerNotificationRoutes(
         const saved = await updateNotificationPreferences(
           userIdOf(request),
           parsed.data,
+          request.clerkIdentity?.clerkUserId,
         );
         response.set("Cache-Control", "no-store");
         return response.json(saved);
@@ -95,6 +97,11 @@ export function registerNotificationRoutes(
         const code = error instanceof Error ? error.message : "unknown";
         const message = PREFERENCE_ERROR_MESSAGES[code];
         if (message) return response.status(400).json({ message });
+        if (code === "clerk_unavailable") {
+          return response.status(503).json({
+            message: "We couldn't check your email verification right now. Try again in a moment.",
+          });
+        }
         logger.error("[notifications] Failed to save preferences:", error);
         return response
           .status(500)
