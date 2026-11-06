@@ -14,7 +14,10 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import {
+  clientClass,
+  documentTemplate,
   endpointGroup,
+  recordDocumentRequest,
   recordEndpointLatency,
 } from "./ops/operationalTelemetry";
 import { markMigrationsNotRequired } from "./ops/bootState";
@@ -542,16 +545,23 @@ app.use((req, res, next) => {
         // pseudonymous account id only.
         userId: req.method !== "GET" && req.method !== "HEAD" ? (req as { dbUser?: { id?: string } }).dbUser?.id : undefined,
       });
-    } else if (res.statusCode >= 400 && !path.startsWith("/assets/") && !path.startsWith("/@")) {
-      // Page documents only show up when they fail (404 / 5xx), so missing
+    } else if (!path.startsWith("/assets/") && !path.startsWith("/@")) {
+      // B15: count page documents by template and client class (counts only).
+      // Static files (anything with an extension) are not page views.
+      if ((req.method === "GET" || req.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path)) {
+        recordDocumentRequest(documentTemplate(path), clientClass(req.get("user-agent")), res.statusCode);
+      }
+      // Page documents are logged only when they fail (404 / 5xx), so missing
       // pages are visible in the logs without logging every page view.
-      logHttpRequest({
-        id: res.locals.requestId,
-        method: req.method,
-        path,
-        status: res.statusCode,
-        durationMs: duration,
-      });
+      if (res.statusCode >= 400) {
+        logHttpRequest({
+          id: res.locals.requestId,
+          method: req.method,
+          path,
+          status: res.statusCode,
+          durationMs: duration,
+        });
+      }
     }
   });
 

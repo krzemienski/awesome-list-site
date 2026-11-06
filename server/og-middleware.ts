@@ -266,6 +266,8 @@ interface ResolvedRoute {
   meta: RouteMeta;
   /** false → unknown route / missing entity → soft-404 (HTTP 404 + noindex). */
   found: boolean;
+  /** true → the entity existed publicly and was removed → HTTP 410 instead of 404. */
+  gone?: boolean;
   /**
    * Prerendered semantic body HTML for the SPA shell (Task #80), injected into
    * `<!--app-html-->` so non-JS crawlers see real content. Absent for
@@ -1658,9 +1660,13 @@ function homeShellChrome(): string {
     // slips past the middleware normalizer (which 301s it) soft-404s here.
     // Ids past int4 are 404s too, not a failed lookup that falls back to 200.
     const idNum = parseRouteId(raw);
+    let gone = false;
     if (idNum !== null) {
       try {
         const resource = await storage.getResource(idNum);
+        // B10: an archived resource was public and then removed, so it answers
+        // 410 Gone; rejected rows were never public and stay a plain 404.
+        gone = resource?.status === "archived";
         // Only approved resources are public/indexable (this mirrors the
         // sitemap, which lists approved resources only). A pending/rejected/
         // archived resource resolves to a soft-404 + noindex, no canonical.
@@ -1865,7 +1871,7 @@ function homeShellChrome(): string {
         return { meta: defaultMeta(path), found: true };
       }
     }
-    return { meta: notFoundMeta(path), found: false };
+    return { meta: notFoundMeta(path), found: false, gone };
   }
 
   // /journey/:id — found only if the journey exists.
@@ -2550,6 +2556,7 @@ export function ogInjectionMiddleware() {
 
     let meta: RouteMeta;
     let notFound = false;
+    let gone = false;
     // Task 592 V20: set when route resolution hit a bounded dependency failure
     // on a browser navigation — the SPA shell is still served (with HTTP 503 +
     // Retry-After) so the client can render its own error card and Retry.
@@ -2578,6 +2585,7 @@ export function ogInjectionMiddleware() {
         );
         meta = resolved.meta;
         notFound = !resolved.found;
+        gone = resolved.gone === true;
         bodyHtml = resolved.bodyHtml;
         if (resolved.found && bodyHtml && /^\/resource\/\d+$/.test(urlPath)) {
           headPreload = await routeChunkPreloadTags(RESOURCE_DETAIL_MANIFEST_KEY);
@@ -2658,7 +2666,7 @@ export function ogInjectionMiddleware() {
       // (which already runs before the SPA fallback and owns the HTML rewrite)
       // rather than in the framework-managed server/vite.ts.
       if (notFound && checkHtml() && !res.headersSent) {
-        res.statusCode = 404;
+        res.statusCode = gone ? 410 : 404;
       }
       if (dependencyUnavailable && checkHtml() && !res.headersSent) {
         res.statusCode = 503;
