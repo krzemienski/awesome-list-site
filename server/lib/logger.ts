@@ -4,16 +4,18 @@
  * Every line has the same shape so the workflow console and the published
  * app's logs read the same way:
  *
- *   14:02:07 INFO  [github-sync] Export finished queueId=41 added=3 rid=7f3a1c req="POST /api/admin/export"
+ *   2026-11-06T14:02:07.412Z INFO  [github-sync] Export finished queueId=41 added=3 rid=7f3a1c req="POST /api/admin/export" inst=ab12cd34
  *
- *   - time, level (INFO / WARN / ERROR) and area (one per module, from
+ *   - full ISO time, level (INFO / WARN / ERROR) and area (one per module, from
  *     `createLogger(area)`);
  *   - the message, then `key=value` details. An Error argument becomes
  *     `err="…"` (plus `code`/`status` when it carries them); ERROR lines also
  *     get the scrubbed stack on the following lines;
  *   - inside an HTTP request: a short request id (`rid`) and the method + path,
  *     so every line a request produces can be traced back to it. The request's
- *     own status line is written by `logHttpRequest` when it finishes.
+ *     own status line is written by `logHttpRequest` when it finishes. Inside a
+ *     background job the tag is `job=` and `jobId=` instead;
+ *   - the instance id (`inst`): INSTANCE_ID, else HOSTNAME, else a boot uuid.
  *
  * Nothing secret or personal is written. Before a line is printed:
  *   - detail keys that name a secret or personal field (password, token,
@@ -23,8 +25,12 @@
  *     credentials inside URLs, sensitive query parameters and email
  *     addresses are replaced;
  *   - path segments that look like opaque tokens or emails are replaced.
+ * The record shipped to the log sink (when AXIOM_TOKEN and AXIOM_DATASET are
+ * set) is built from these same scrubbed values; nothing raw reaches it.
  */
+import { randomUUID } from "node:crypto";
 import { getRequestLogContext } from "../ops/requestContext";
+import { getLogSink, type LogRecord } from "./logSink";
 
 export type LogLevel = "info" | "warn" | "error";
 
@@ -38,6 +44,10 @@ const MAX_VALUE_LENGTH = 500;
 const MAX_LINE_LENGTH = 20000;
 const MAX_STACK_LINES = 8;
 const MAX_DEPTH = 4;
+const MAX_SHIPPED_TEXT = 8000;
+
+const INSTANCE = [process.env.INSTANCE_ID, process.env.HOSTNAME].find(Boolean) ?? randomUUID().slice(0, 8);
+const DEPLOYMENT = process.env.REPLIT_DEPLOYMENT === "1" ? "production" : "dev";
 
 // ---------------------------------------------------------------------------
 // Scrubbing
@@ -231,17 +241,19 @@ const errorDetails = (error: Error): Record<string, unknown> => {
 
 const LEVEL_LABEL: Record<LogLevel, string> = { info: "INFO ", warn: "WARN ", error: "ERROR" };
 
-const timestamp = (): string => {
-  const now = new Date();
-  return now.toISOString().slice(11, 19);
-};
+const sinkNotice = (message: string) =>
+  console.error(`${new Date().toISOString()} ERROR [log-sink] ${message} inst=${INSTANCE}`);
 
-const write = (level: LogLevel, line: string) => {
+const write = (level: LogLevel, line: string, record: LogRecord) => {
   const clipped = line.length > MAX_LINE_LENGTH ? `${line.slice(0, MAX_LINE_LENGTH)}…` : line;
   if (level === "error") console.error(clipped);
   else if (level === "warn") console.warn(clipped);
   else console.log(clipped);
+  getLogSink(sinkNotice).push(record);
 };
+
+/** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
+export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNotice).flush(timeoutMs);
 
 const emit = (
   level: LogLevel,
@@ -253,11 +265,13 @@ const emit = (
   const pairs: string[] = [];
   let lineArea = area;
   let stack: string | undefined;
+  const fields: Record<string, unknown> = {};
 
   const addPairs = (record: Record<string, unknown>) => {
     for (const [key, value] of Object.entries(record)) {
       if (value === undefined) continue;
       pairs.push(`${key}=${formatScalar(value)}`);
+      fields[key] = value;
     }
   };
 
@@ -299,25 +313,51 @@ const emit = (
     if (arg !== undefined) words.push(formatScalar(scrubValue(arg)));
   });
 
+  const time = new Date().toISOString();
+  const record: LogRecord = {
+    _time: time,
+    level,
+    area: lineArea,
+    message: "",
+    instance: INSTANCE,
+    deployment: DEPLOYMENT,
+  };
+
   if (options.requestContext !== false) {
     const context = getRequestLogContext();
-    if (context) {
-      pairs.push(`rid=${context.id}`);
-      pairs.push(`req=${JSON.stringify(`${context.method} ${scrubPath(context.path)}`)}`);
+    if (context?.kind === "request") {
+      record.rid = context.id;
+      record.req = `${context.method} ${scrubPath(context.path)}`;
+      pairs.push(`rid=${record.rid}`);
+      pairs.push(`req=${JSON.stringify(record.req)}`);
+    } else if (context?.kind === "job") {
+      record.job = context.job;
+      record.jobId = context.jobId;
+      pairs.push(`job=${formatScalar(record.job)}`);
+      pairs.push(`jobId=${formatScalar(record.jobId)}`);
     }
   }
+  pairs.push(`inst=${formatScalar(INSTANCE)}`);
 
   const message = words.join(" ") || "(no message)";
-  let line = `${timestamp()} ${LEVEL_LABEL[level]} [${lineArea}] ${message}`;
-  if (pairs.length > 0) line += ` ${pairs.join(" ")}`;
+  let line = `${time} ${LEVEL_LABEL[level]} [${lineArea}] ${message}`;
+  line += ` ${pairs.join(" ")}`;
+  record.message = clip(message, MAX_SHIPPED_TEXT);
+  if (Object.keys(fields).length > 0) {
+    const json = JSON.stringify(fields);
+    record.fields = json.length > MAX_SHIPPED_TEXT ? '{"truncated":true}' : json;
+  }
   if (stack) {
     const frames = scrubText(stack)
       .split("\n")
       .slice(1, MAX_STACK_LINES + 1)
       .map((frame) => `    ${frame.trim()}`);
-    if (frames.length > 0) line += `\n${frames.join("\n")}`;
+    if (frames.length > 0) {
+      line += `\n${frames.join("\n")}`;
+      record.stack = clip(frames.join("\n"), MAX_SHIPPED_TEXT);
+    }
   }
-  write(level, line);
+  write(level, line, record);
 };
 
 /** A logger whose lines are tagged with `area` (e.g. "github-sync"). */

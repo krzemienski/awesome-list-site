@@ -38,6 +38,7 @@ import { API_ERROR_CACHE_CONTROL, HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONT
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger, logHttpRequest } from "./lib/logger";
+import { installProcessHandlers } from "./ops/processHandlers";
 import { publicApiCors } from "./middleware/publicApiCors";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const logger = createLogger("startup");
+installProcessHandlers();
 
 /**
  * A development publishable key names its Frontend API host. Allow only that
