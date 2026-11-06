@@ -94,7 +94,9 @@ export default function ContactSubmissions() {
 
   if (isLoading) {
     return (
-      <div data-testid="contact-submissions-shell">
+      // aria-busy: a Try again focus handoff waits for the result instead of
+      // giving up on the skeleton (handoffFocusOnUnmount polls while busy).
+      <div data-testid="contact-submissions-shell" aria-busy="true">
         <TableShell
           title={<Skeleton className="h-5 w-44" />}
           className="admin-ops-contact-shell"
@@ -131,7 +133,10 @@ export default function ContactSubmissions() {
                 variant="outline"
                 size="sm"
                 onClick={(event) => {
-                  handoffFocusOnUnmount(event.currentTarget);
+                  // The panel unmounts while the retry runs: refocus its new
+                  // Try again if the 404 repeats, else the page heading.
+                  handoffFocusOnUnmount(event.currentTarget, () =>
+                    document.querySelector<HTMLElement>('[data-testid="button-contact-submissions-retry"]'));
                   void refetch();
                 }}
                 disabled={isFetching}
