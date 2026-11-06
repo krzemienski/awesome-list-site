@@ -65,8 +65,10 @@ function useReturnFocus(
       parentDialog.current = null
       if (event.defaultPrevented || !target) return
       event.preventDefault()
-      const fallback = () =>
-        parent?.isConnected ? focusElement(parent) : focusPageHeading()
+      // A parent that is itself closing (exit animation) is about to unmount.
+      const liveParent = () =>
+        parent?.isConnected && parent.getAttribute("data-state") !== "closed" ? parent : null
+      const fallback = () => focusElement(liveParent()) || focusPageHeading()
       if (target.isConnected) target.focus({ preventScroll: true })
       // Gone, or no longer focusable (disabled while its request runs).
       if (document.activeElement !== target) {
@@ -75,7 +77,7 @@ function useReturnFocus(
       }
       // The confirm may remove its own opener once the refetch lands (a
       // cancelled job's card), after focus has returned to it.
-      handoffFocusOnUnmount(target, () => (parent?.isConnected ? parent : null))
+      handoffFocusOnUnmount(target, liveParent)
     },
   }
 }
