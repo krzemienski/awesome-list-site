@@ -4,6 +4,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { useReturnFocus } from "@/components/ui/dialog"
+import { useFocusSafeDisabled } from "@/hooks/use-focus-safe-disabled"
 
 const AlertDialog = AlertDialogPrimitive.Root
 
@@ -111,31 +112,39 @@ AlertDialogDescription.displayName =
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Action
-    ref={ref}
-    data-ds-variant="default"
-    className={cn(buttonVariants(), className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const focusSafe = useFocusSafeDisabled(props)
+  return (
+    <AlertDialogPrimitive.Action
+      ref={ref}
+      data-ds-variant="default"
+      className={cn(buttonVariants(), className)}
+      {...props}
+      {...focusSafe}
+    />
+  )
+})
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Cancel
-    ref={ref}
-    data-ds-variant="outline"
-    className={cn(
-      buttonVariants({ variant: "outline" }),
-      "mt-2 sm:mt-0",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const focusSafe = useFocusSafeDisabled(props)
+  return (
+    <AlertDialogPrimitive.Cancel
+      ref={ref}
+      data-ds-variant="outline"
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "mt-2 sm:mt-0",
+        className
+      )}
+      {...props}
+      {...focusSafe}
+    />
+  )
+})
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
 export {
