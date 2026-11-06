@@ -78,6 +78,8 @@ export function humanizeStatusBody(
   return STATUS_FALLBACKS[status] ?? fallback;
 }
 
+export const OFFLINE_MESSAGE = "Could not reach the server. Please check your connection and try again.";
+
 /**
  * Convert an apiRequest/fetch error into a message safe to show users.
  * Prefers structured ApiError props (`status` + `body`); falls back to the
@@ -100,7 +102,7 @@ export function humanizeApiError(error: unknown, fallback = "Something went wron
   if (!match) {
     // Network-level failures ("Failed to fetch") and other non-HTTP errors.
     if (/failed to fetch|networkerror|load failed/i.test(raw)) {
-      return "Could not reach the server. Please check your connection and try again.";
+      return OFFLINE_MESSAGE;
     }
     return looksHumanReadable(raw) ? raw : fallback;
   }
