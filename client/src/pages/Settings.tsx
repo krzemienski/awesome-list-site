@@ -156,18 +156,25 @@ export default function Settings() {
     setPendingPreferencesFocus(null);
   });
 
+  // The Home layout radio saves through the same /api/user/preferences query,
+  // so `preferences` gets a new object identity without its learning values
+  // changing. Reset the draft only when the saved values differ from the ones
+  // last applied, so a layout save leaves unsaved edits alone.
+  const appliedPreferencesKey = useRef<string | null>(null);
   useEffect(() => {
-    setValues(
-      preferences
-        ? {
-            preferredCategories: preferences.preferredCategories,
-            skillLevel: preferences.skillLevel,
-            learningGoals: preferences.learningGoals,
-            preferredResourceTypes: preferences.preferredResourceTypes,
-            timeCommitment: preferences.timeCommitment,
-          }
-        : DEFAULT_LEARNING_PREFERENCES,
-    );
+    const saved = preferences
+      ? {
+          preferredCategories: preferences.preferredCategories,
+          skillLevel: preferences.skillLevel,
+          learningGoals: preferences.learningGoals,
+          preferredResourceTypes: preferences.preferredResourceTypes,
+          timeCommitment: preferences.timeCommitment,
+        }
+      : null;
+    const key = JSON.stringify(saved);
+    if (key === appliedPreferencesKey.current) return;
+    appliedPreferencesKey.current = key;
+    setValues(saved ?? DEFAULT_LEARNING_PREFERENCES);
     setShowEmptyPreferencesEditor(Boolean(preferences));
   }, [preferences]);
 
