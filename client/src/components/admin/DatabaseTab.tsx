@@ -313,7 +313,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               )}
               <AlertTitle className="flex flex-wrap items-center gap-2">
                 {seedResult.totalErrors > 0
-                  ? `Seeding partially failed — ${seedResult.totalErrors} item${seedResult.totalErrors === 1 ? "" : "s"} not imported`
+                  ? `${seedResult.mode === "reseed" ? "Clear & Re-seed" : "Seeding"} partially failed — ${seedResult.totalErrors} item${seedResult.totalErrors === 1 ? "" : "s"} not imported`
                   : seedResult.mode === "reseed" ? "Clear & Re-seed completed" : "Seeding completed"}
                 <StatusChip status={seedResult.totalErrors > 0 ? "Warning" : "Completed"} />
               </AlertTitle>
