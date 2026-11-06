@@ -8,7 +8,7 @@ import { initMixpanel, mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpane
 import { initPosthog, phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
 import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
 import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
-import { isAdminAnalyticsSession, setAdminAnalyticsSession } from '@/lib/analytics-suppression';
+import { hasOwnerSessionHint, isAdminAnalyticsSession, setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthMethod } from '@shared/schema';
 import { apiFetch } from "@/lib/api-fetch";
@@ -141,13 +141,19 @@ async function requestAuthUser(): Promise<AuthResponse> {
 // A browser with no Clerk session hint and no owner-session marker cannot be
 // signed in, so it skips the request (every anonymous document load used to
 // pay one). The owner password cookie (`av_admin_session`) is HttpOnly and
-// invisible here; `analytics-admin-session` is its script-readable twin, set
-// by the owner sign-in and by any /api/auth/user answer with role admin and
-// cleared on every sign-out.
+// invisible here; its script-readable twins are the `av_admin_hint` cookie
+// (set by the owner sign-in, cleared with the session cookie) and the
+// `analytics-admin-session` marker (also set by any /api/auth/user answer with
+// role admin, cleared on every sign-out). Both vanish with site data, and
+// owner cookies minted before the hint existed have neither, so /admin always
+// asks the server.
 const SIGNED_OUT: AuthResponse = { user: null, isAuthenticated: false };
 
 async function fetchAuthUser(): Promise<AuthResponse> {
-  if (!hasClerkSessionHint() && !isAdminAnalyticsSession()) return SIGNED_OUT;
+  const onAdminRoute = /^\/admin(\/|$)/.test(window.location.pathname);
+  if (!onAdminRoute && !hasClerkSessionHint() && !hasOwnerSessionHint() && !isAdminAnalyticsSession()) {
+    return SIGNED_OUT;
+  }
   const auth = await requestAuthUser();
   if (auth.isAuthenticated || !(await renewSessionToken())) return auth;
   return requestAuthUser();

@@ -18,7 +18,7 @@
  *    error propagation when the DB lookup itself failed (so an outage is not
  *    misreported as "signed out").
  */
-import type { Request, RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
 import { eq, or, sql } from "drizzle-orm";
@@ -245,7 +245,24 @@ export const adminCookieOptions = {
   sameSite: "lax" as const,
   path: "/",
 };
+/**
+ * Script-readable twin of the HttpOnly owner cookie. It carries no secret: it
+ * only tells the client a session may exist so useAuth asks /api/auth/user.
+ * Set on admin-login, cleared wherever the session cookie is cleared.
+ */
+export const ADMIN_HINT_COOKIE = "av_admin_hint";
+const adminHintCookieOptions = { ...adminCookieOptions, httpOnly: false };
 const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 8;
+
+export function setAdminSessionCookies(res: Response, token: string): void {
+  res.cookie(ADMIN_SESSION_COOKIE, token, { ...adminCookieOptions, maxAge: ADMIN_SESSION_TTL_MS });
+  res.cookie(ADMIN_HINT_COOKIE, "1", { ...adminHintCookieOptions, maxAge: ADMIN_SESSION_TTL_MS });
+}
+
+export function clearAdminSessionCookies(res: Response): void {
+  res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+  res.clearCookie(ADMIN_HINT_COOKIE, adminHintCookieOptions);
+}
 
 function adminLoginPassword(): string | null {
   const password = process.env.OWNER_PASSWORD;
@@ -383,7 +400,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
       if (auditAdmin && !viaAuditKey && isRevokedAdminSession(req, auditAdmin)) {
         // The owner signed out after this cookie was issued: anonymous, and
         // drop the dead cookie so later requests take the normal path.
-        res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+        clearAdminSessionCookies(res);
       } else if (auditAdmin) {
         req.dbUser = auditAdmin;
         req.authMethod = viaAuditKey ? "audit_key" : "owner_password";
