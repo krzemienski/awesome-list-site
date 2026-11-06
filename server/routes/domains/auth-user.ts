@@ -29,12 +29,11 @@ import { clerkClient } from "@clerk/express";
 import type { User } from "@shared/schema";
 import { UserRepository } from "../../repositories";
 import {
-  ADMIN_SESSION_COOKIE,
-  ADMIN_SESSION_TTL_MS,
-  adminCookieOptions,
   checkAdminPassword,
+  clearAdminSessionCookies,
   issueAdminSessionToken,
   revokeAdminSessions,
+  setAdminSessionCookies,
 } from "../../clerkAuth";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
@@ -135,7 +134,7 @@ export function registerAuthUserRoutes(
         if (!(await revokeAdminSessions(req))) {
           return res.status(401).json({ message: "Unauthorized" });
         }
-        res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+        clearAdminSessionCookies(res);
         return res.json({ message: "Signed out everywhere" });
       }
       const sessions = await clerkClient.sessions.getSessionList({
@@ -170,10 +169,7 @@ export function registerAuthUserRoutes(
     const token = await issueAdminSessionToken();
     if (!token) return res.status(401).json({ message: "Incorrect password" });
     logger.info("Admin password sign-in succeeded");
-    res.cookie(ADMIN_SESSION_COOKIE, token, {
-      ...adminCookieOptions,
-      maxAge: ADMIN_SESSION_TTL_MS,
-    });
+    setAdminSessionCookies(res, token);
     res.set("Cache-Control", "no-store");
     return res.json({ ok: true });
   }));
@@ -186,7 +182,7 @@ export function registerAuthUserRoutes(
   app.post("/api/auth/admin-logout", asyncHandler(async (req, res) => {
     if (res.locals.clerkUserLookupError) throw res.locals.clerkUserLookupError;
     await revokeAdminSessions(req);
-    res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+    clearAdminSessionCookies(res);
     res.set("Cache-Control", "no-store");
     return res.json({ ok: true });
   }));

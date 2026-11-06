@@ -43,6 +43,13 @@ const write = (key: string, value: string | null) => {
 
 export const isAdminAnalyticsSession = (): boolean => read(ADMIN_SESSION_KEY) === '1';
 
+/**
+ * The owner password session lives in an HttpOnly cookie scripts cannot see;
+ * the server sets this script-readable twin (no secret) beside it.
+ */
+export const hasOwnerSessionHint = (): boolean =>
+  typeof document !== 'undefined' && /(?:^|;\s*)av_admin_hint=1(?:;|$)/.test(document.cookie);
+
 export const isSuppressedAnalyticsPath = (pathname: string, search = ''): boolean =>
   pathname.startsWith('/qa-') ||
   SENTINEL_RESOURCE_PATH.test(pathname) ||
