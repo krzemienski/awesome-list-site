@@ -66,6 +66,7 @@ import { registerContactRoutes } from "./routes/domains/contact";
 import { registerLinkReportRoutes } from "./routes/domains/link-reports";
 import { registerLinkRemediationRoutes } from "./routes/domains/link-remediation";
 import { registerNonApiRoutes } from "./routes/non-api";
+import { registerAdminUsageRoutes } from "./routes/domains/admin-usage";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 import { createLogger } from "./lib/logger";
 
@@ -333,6 +334,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     adminRepo,
     sendOperationalFailure,
   });
+
+  registerAdminUsageRoutes(app, { isAuthenticated, isAdmin });
 
   const exportContext: ExportLinkHealthContext = {
     isAuthenticated,
