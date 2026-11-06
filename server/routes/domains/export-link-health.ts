@@ -1780,8 +1780,10 @@ export function registerAwesomeListDiscoveryRoutes(
         },
       });
       res.set('ETag', payload.etag);
-      // Task #327 cache contract: see server/http-cache-policy.ts.
-      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
+      // Same 60 s window as the catalog contract (http-cache-policy.ts), but
+      // stale-while-revalidate instead of must-revalidate: nav is anonymous
+      // and identical for everyone, and every non-Home document load asks.
+      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
       if (req.headers['if-none-match'] === payload.etag) {
         return res.status(304).end();
       }

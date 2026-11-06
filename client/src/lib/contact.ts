@@ -63,7 +63,8 @@ export function useContactConfig(enabled = contactVariant !== null) {
     // Contact configuration is client-only. It is intentionally not part of
     // the bounded anonymous Home SSR payload.
     enabled: enabled && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000,
+    // Process config: only a redeploy changes it, and a redeploy reloads the page.
+    staleTime: Infinity,
   });
 }
 
