@@ -496,6 +496,14 @@ export async function readBackupManifest(id: string, environment: BackupEnvironm
   return JSON.parse(unwrap(await storage.client.downloadAsText(name), "read")) as BackupManifest;
 }
 
+/** Remove one backup. The manifest goes first, so a half-deleted backup is never listed as restorable. */
+export async function deleteDatabaseBackup(id: string, environment: BackupEnvironment = backupEnvironment()): Promise<void> {
+  assertBackupId(id);
+  const storage = resolveStorage(environment);
+  unwrap(await storage.client.delete(`${storage.prefix}${id}.manifest.json`), "manifest delete");
+  unwrap(await storage.client.delete(`${storage.prefix}${id}.dump`), "dump delete");
+}
+
 // ---------------------------------------------------------------------------
 // Restore + verify
 // ---------------------------------------------------------------------------

@@ -93,7 +93,7 @@ export function registerOperationsRoutes(
         status: readiness.ready ? "ready" : "degraded",
         readiness: getReadinessSnapshot(),
         databasePool: {
-          max: 3,
+          max: (pool as unknown as { options: { max: number } }).options.max,
           total: pool.totalCount,
           idle: pool.idleCount,
           active: Math.max(0, pool.totalCount - pool.idleCount),
