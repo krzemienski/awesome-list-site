@@ -81,6 +81,11 @@ type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaP
  * Operations-owned equivalent of the shared Radix ScrollArea. The Radix
  * viewport is the actual scrolling element, so tabindex belongs here rather
  * than on an additional wrapper around the component.
+ *
+ * It scrolls vertically only, so its content must wrap to the viewport width.
+ * Radix wraps viewport children in a content-sized `display:table` box that
+ * ignores the width (NB-018), which clipped long validation warnings at 390
+ * (C22-EX-24); the viewport forces that box to a full-width block.
  */
 export const AdminOpsScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
@@ -92,7 +97,7 @@ export const AdminOpsScrollArea = React.forwardRef<
     {...props}
   >
     <ScrollAreaPrimitive.Viewport
-      className={cn("h-full w-full", viewportClassName)}
+      className={cn("h-full w-full [&>div]:!block [&>div]:!w-full [&>div]:!min-w-0", viewportClassName)}
       tabIndex={0}
       role="region"
       aria-label={scrollLabel}
