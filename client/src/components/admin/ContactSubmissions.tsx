@@ -94,7 +94,9 @@ export default function ContactSubmissions() {
 
   if (isLoading) {
     return (
-      <div data-testid="contact-submissions-shell">
+      // aria-busy: a Try again focus handoff waits for the result instead of
+      // giving up on the skeleton (handoffFocusOnUnmount polls while busy).
+      <div data-testid="contact-submissions-shell" aria-busy="true">
         <TableShell
           title={<Skeleton className="h-5 w-44" />}
           className="admin-ops-contact-shell"
