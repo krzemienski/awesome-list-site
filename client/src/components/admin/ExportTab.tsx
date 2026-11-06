@@ -491,7 +491,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           ) : linkJob ? (
             <>
               <div className="admin-ops-export__link-job-row">
-                <h2>
+                <h2 id="export-link-job-heading">
                   Link check #{linkJob.id}{" "}
                   <StatusChip
                     status={
@@ -505,7 +505,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => { if (!cancelLinkCheckMutation.isPending) cancelLinkCheckMutation.mutate(linkJob.id); }}
+                    onClick={(event) => {
+                      if (cancelLinkCheckMutation.isPending) return;
+                      // The button unmounts once the job is cancelled; keep focus on
+                      // this panel's heading, which now reads "Cancelled" (C22-EX-08).
+                      handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-link-job-heading"));
+                      cancelLinkCheckMutation.mutate(linkJob.id);
+                    }}
                     aria-disabled={cancelLinkCheckMutation.isPending}
                     aria-busy={cancelLinkCheckMutation.isPending}
                     data-testid="button-cancel-export-link-check"
