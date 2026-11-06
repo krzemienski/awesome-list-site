@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { whenClerkLoaded } from '@/lib/clerk-bridge';
+import { hasClerkSessionHint, whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
@@ -8,7 +8,7 @@ import { initMixpanel, mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpane
 import { initPosthog, phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
 import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
 import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
-import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
+import { isAdminAnalyticsSession, setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthMethod } from '@shared/schema';
 import { apiFetch } from "@/lib/api-fetch";
@@ -137,7 +137,17 @@ async function requestAuthUser(): Promise<AuthResponse> {
 // {isAuthenticated:false}, not a 401. After a drop longer than staleTime this
 // refetch ran before Clerk refreshed the cookie and signed a live admin out.
 // When Clerk still holds a session, refresh the token and ask once more.
+//
+// A browser with no Clerk session hint and no owner-session marker cannot be
+// signed in, so it skips the request (every anonymous document load used to
+// pay one). The owner password cookie (`av_admin_session`) is HttpOnly and
+// invisible here; `analytics-admin-session` is its script-readable twin, set
+// by the owner sign-in and by any /api/auth/user answer with role admin and
+// cleared on every sign-out.
+const SIGNED_OUT: AuthResponse = { user: null, isAuthenticated: false };
+
 async function fetchAuthUser(): Promise<AuthResponse> {
+  if (!hasClerkSessionHint() && !isAdminAnalyticsSession()) return SIGNED_OUT;
   const auth = await requestAuthUser();
   if (auth.isAuthenticated || !(await renewSessionToken())) return auth;
   return requestAuthUser();

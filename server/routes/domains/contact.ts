@@ -169,7 +169,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
   app.get("/api/config", (_req, res) => {
     // Pure function of process config: safe to cache briefly at the edge and
     // in the browser; a redeploy is the only thing that changes it.
-    res.set("Cache-Control", "public, max-age=300");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
     const sourceRepository = configuredSourceRepository();
     res.json({
       site: {

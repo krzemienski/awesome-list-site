@@ -33,6 +33,9 @@ const logger = createLogger("db");
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 8,
+  // Keep one client warm: idle clients drop after 30 s, so without a floor the
+  // 60 s orphan-job watchdog reconnects on every sweep under a 3 s timeout.
+  min: 1,
   idleTimeoutMillis: 30000,
   // Bound pool acquisition and server execution. A saturated pool must fail
   // predictably instead of leaving HTTP requests hanging.
