@@ -54,10 +54,14 @@ export const nullSink: LogSink = {
   stats: () => ({ sent: 0, dropped: 0, queued: 0 }),
 };
 
-export function createBufferedSink(transport: LogTransport): LogSink {
+/** Writes the sink's own status line (the logger formats it; the sink never logs through `emit`). */
+export type SinkNotice = (message: string) => void;
+
+export function createBufferedSink(transport: LogTransport, notice: SinkNotice): LogSink {
   const queue: LogRecord[] = [];
   let sent = 0;
   let dropped = 0;
+  let reportedDropped = 0;
   let timer: NodeJS.Timeout | null = null;
   let inFlight: Promise<void> | null = null;
 
@@ -82,11 +86,18 @@ export function createBufferedSink(transport: LogTransport): LogSink {
         await transport(body);
       } catch (error) {
         dropped += batch.length;
-        console.error(`log sink: dropped ${batch.length} records: ${error instanceof Error ? error.message : "send failed"}`);
+        notice(`send failed: ${error instanceof Error ? error.message : "unknown"}`);
         return;
       }
     }
     sent += batch.length;
+  };
+
+  const reportDrops = () => {
+    if (dropped > reportedDropped) {
+      notice(`dropped=${dropped - reportedDropped} total_dropped=${dropped}`);
+      reportedDropped = dropped;
+    }
   };
 
   const flushOnce = (): Promise<void> => {
@@ -94,6 +105,7 @@ export function createBufferedSink(transport: LogTransport): LogSink {
     if (queue.length === 0) return Promise.resolve();
     inFlight = sendWithRetry(takeBatch()).finally(() => {
       inFlight = null;
+      reportDrops();
     });
     return inFlight;
   };
@@ -109,11 +121,7 @@ export function createBufferedSink(transport: LogTransport): LogSink {
       try {
         if (queue.length >= LOG_BUFFER_MAX) {
           const oldestInfo = queue.findIndex((queued) => queued.level === "info");
-          if (oldestInfo === -1) {
-            dropped++;
-            return;
-          }
-          queue.splice(oldestInfo, 1);
+          queue.splice(oldestInfo === -1 ? 0 : oldestInfo, 1);
           dropped++;
         }
         queue.push(record);
@@ -143,9 +151,9 @@ export function createBufferedSink(transport: LogTransport): LogSink {
 let sink: LogSink | null = null;
 
 /** The Axiom sink when AXIOM_TOKEN and AXIOM_DATASET are both set, else the null sink. */
-export function getLogSink(): LogSink {
+export function getLogSink(notice: SinkNotice = console.error): LogSink {
   if (sink) return sink;
   const transport = createAxiomTransport(process.env);
-  sink = transport ? createBufferedSink(transport) : nullSink;
+  sink = transport ? createBufferedSink(transport, notice) : nullSink;
   return sink;
 }

@@ -241,16 +241,19 @@ const errorDetails = (error: Error): Record<string, unknown> => {
 
 const LEVEL_LABEL: Record<LogLevel, string> = { info: "INFO ", warn: "WARN ", error: "ERROR" };
 
+const sinkNotice = (message: string) =>
+  console.error(`${new Date().toISOString()} ERROR [log-sink] ${message} inst=${INSTANCE}`);
+
 const write = (level: LogLevel, line: string, record: LogRecord) => {
   const clipped = line.length > MAX_LINE_LENGTH ? `${line.slice(0, MAX_LINE_LENGTH)}…` : line;
   if (level === "error") console.error(clipped);
   else if (level === "warn") console.warn(clipped);
   else console.log(clipped);
-  getLogSink().push(record);
+  getLogSink(sinkNotice).push(record);
 };
 
 /** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
-export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink().flush(timeoutMs);
+export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNotice).flush(timeoutMs);
 
 const emit = (
   level: LogLevel,
@@ -340,7 +343,10 @@ const emit = (
   let line = `${time} ${LEVEL_LABEL[level]} [${lineArea}] ${message}`;
   line += ` ${pairs.join(" ")}`;
   record.message = clip(message, MAX_SHIPPED_TEXT);
-  if (Object.keys(fields).length > 0) record.fields = clip(JSON.stringify(fields), MAX_SHIPPED_TEXT);
+  if (Object.keys(fields).length > 0) {
+    const json = JSON.stringify(fields);
+    record.fields = json.length > MAX_SHIPPED_TEXT ? '{"truncated":true}' : json;
+  }
   if (stack) {
     const frames = scrubText(stack)
       .split("\n")

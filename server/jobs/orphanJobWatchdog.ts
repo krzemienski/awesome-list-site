@@ -192,8 +192,18 @@ const RETRY_DELAY_MS = 1000;
 const ERROR_AFTER_CONSECUTIVE_FAILURES = 3;
 let consecutiveFailures = 0;
 
-const isConnectionTimeout = (err: unknown): boolean =>
-  err instanceof Error && /connection timeout/i.test(err.message);
+const CONNECTION_TIMEOUT = /connection terminated due to connection timeout|timeout exceeded when trying to connect/i;
+const MAX_CAUSE_DEPTH = 5;
+
+/** Drizzle wraps the pg error in `.cause`, so walk the chain. */
+export function isConnectionTimeout(err: unknown): boolean {
+  let current: unknown = err;
+  for (let depth = 0; depth < MAX_CAUSE_DEPTH && current instanceof Error; depth++) {
+    if (CONNECTION_TIMEOUT.test(current.message)) return true;
+    current = current.cause;
+  }
+  return false;
+}
 
 async function runPeriodicSweep(): Promise<OrphanSweepResult> {
   // Dynamic imports keep the watchdog free of load-order coupling.
