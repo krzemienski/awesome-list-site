@@ -104,10 +104,11 @@ Pre-publish schema diff (#78). `publish_app` is refused whenever the dev schema 
 
 ```bash
 git diff --name-status "$BEFORE" "$TARGET" -- shared/schema.ts migrations
-git diff "$BEFORE" "$TARGET" -- migrations | rg -in "drop |alter column .* type|truncate|delete from"   # destructive check
+git diff -U0 "$BEFORE" "$TARGET" -- migrations | rg -i "^\+[^+]" | rg -iv "^\+\s*--" | rg -i "drop |alter column .* type|truncate|delete from"   # destructive check: added lines only, SQL comments excluded
 ```
 - Empty: no schema change; MCP publish is allowed.
 - `shared/schema.ts` listed (any status A/M/D): the owner publishes from the Publishing pane. Tell them before the sync and report the diff lines so they can review the dialog. The backup in step 5.3b still runs first.
+- The destructive check exits 1 when nothing matches, which is the good result: do not run it under `set -e`.
 - Any destructive migration (a drop, truncate, delete or column type change, per the second command): **STOP**, report the statements, and wait for the owner.
 - Record the result for step 8's `Schema:` line.
 
@@ -167,8 +168,9 @@ Any `STOP` line means: do not publish. Report the job id and `createdAt` and ask
    1. The POST returned 201 and its id is the first list entry (409 means one is in flight: wait and re-run 3a).
    2. The newest `completedAt` is under 10 minutes old.
    3. `tableCount` is at least 42 and `totalRows` is at least 99 % of the previous backup's. `agent_events` grows quickly, so a longer gap can add rows legitimately; a drop is the failure.
-   STOP only on a failed POST or a row drop (or tables under 42); report growth beyond the window without failing. Record `Backup: <id>, <rows>, <age> min, rows vs previous <+x.x%>` for step 8. Do not publish after a STOP.
-4. Call `get_publish_status(replId)` again immediately before `publish_app`. If a publish is in progress, wait for it to finish (poll every 30 s) and redo the pre-publish check before you continue. The user's deploy or publish instruction authorizes calling `publish_app(replId)` yourself. Observed 2026-10-25: when the dev schema differs from production, it refuses with "applying database changes to the live app needs a review that is only available on the Replit website. Do not retry publish_app". Only after that refusal, hand the publish to the owner in the Publishing pane (review the schema diff there); later publishes with no schema change work from MCP again. When the owner does the click, end your turn with one handoff line: the tree is clean and equals TARGET (`<short SHA>`), and what goes live (the commits since BEFORE). Then watch `/api/version` as in step 5.
+   4. No backup is in flight (`inFlight` is false after the POST completes).
+   STOP (do not publish) on every one of: a failed POST (not 201); newest `completedAt` 10 minutes old or more; a backup still in flight; `tableCount` under 42; `totalRows` below 99 % of the previous backup (a row drop). Growth above the window is not a STOP: report it. Record `Backup: <id>, <rows>, <age> min, rows vs previous <+x.x%>` for step 8.
+4. Call `get_publish_status(replId)` again immediately before `publish_app`. If a publish is in progress, wait for it to finish (poll every 30 s) and redo the pre-publish check, 5.3a and 5.3b (a fresh backup, since the old one is now stale) before you continue. The user's deploy or publish instruction authorizes calling `publish_app(replId)` yourself. Observed 2026-10-25: when the dev schema differs from production, it refuses with "applying database changes to the live app needs a review that is only available on the Replit website. Do not retry publish_app". Only after that refusal, hand the publish to the owner in the Publishing pane (review the schema diff there); later publishes with no schema change work from MCP again. When the owner does the click, end your turn with one handoff line: the tree is clean and equals TARGET (`<short SHA>`), and what goes live (the commits since BEFORE). Then watch `/api/version` as in step 5.
 5. The publish is done when `/api/version` changes and the new build is ready, not when `get_publish_status` says success (or `building` / `running`, which only mean Replit is still working). Poll `https://awesome.video/api/version` and `/api/health/ready` every 30 s in a background until-loop (or the Monitor tool); a foreground `sleep` is blocked by the harness. The loop exits only when the revision differs from `$BEFORE` and `/api/health/ready` returns 200 in the same round. Typical time is 1–3 minutes; database migrations can add more. Give up after 20 minutes. If the revision has changed but `/api/health/ready` stays non-200 for more than 2 minutes after the change, report FAIL with the readiness status and body verbatim (`curl -s -w '\n%{http_code}\n' https://awesome.video/api/health/ready`). `get_publish_status` responses are supporting evidence only.
 
 Record each status response verbatim.
