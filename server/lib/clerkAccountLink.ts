@@ -79,15 +79,32 @@ export async function linkClerkUserToRow(
   return { ok: true, clerkUserId, externalId: target.id, changed: true };
 }
 
+type ClerkUserRecord = Awaited<ReturnType<typeof clerkClient.users.getUser>>;
+
+function holdsVerifiedEmail(clerkUser: ClerkUserRecord, email: string): boolean {
+  const wanted = email.toLowerCase();
+  return clerkUser.emailAddresses.some(
+    (e) => e.emailAddress.toLowerCase() === wanted && e.verification?.status === "verified",
+  );
+}
+
 /** True when the Clerk user holds `email` (case-insensitive) as a VERIFIED
  *  address. Throws if Clerk cannot be reached; callers fail closed. */
 export async function clerkUserHasVerifiedEmail(
   clerkUserId: string,
   email: string,
 ): Promise<boolean> {
-  const clerkUser = await clerkClient.users.getUser(clerkUserId);
-  const wanted = email.toLowerCase();
-  return clerkUser.emailAddresses.some(
-    (e) => e.emailAddress.toLowerCase() === wanted && e.verification?.status === "verified",
-  );
+  return holdsVerifiedEmail(await clerkClient.users.getUser(clerkUserId), email);
+}
+
+/** Same check starting from a users row id (no session): the row id is either
+ *  the Clerk user id itself or the externalId of a linked Clerk user. */
+export async function rowEmailIsVerifiedInClerk(rowId: string, email: string): Promise<boolean> {
+  try {
+    return await clerkUserHasVerifiedEmail(rowId, email);
+  } catch (error) {
+    if (clerkStatus(error) !== 404) throw error;
+  }
+  const { data } = await clerkClient.users.getUserList({ externalId: [rowId], limit: 1 });
+  return data.length > 0 && holdsVerifiedEmail(data[0], email);
 }

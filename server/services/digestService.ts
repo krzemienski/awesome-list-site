@@ -41,7 +41,7 @@ import {
   probeEmailTransport,
   sendTransactionalEmail,
 } from "../email";
-import { clerkUserHasVerifiedEmail } from "../lib/clerkAccountLink";
+import { clerkUserHasVerifiedEmail, rowEmailIsVerifiedInClerk } from "../lib/clerkAccountLink";
 import { createLogger } from "../lib/logger";
 
 const logger = createLogger("digest");
@@ -1000,6 +1000,23 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
 
     if (!account?.email) {
       await completeAttempt(job, "skipped", { errorCode: "email_missing" });
+      return;
+    }
+    // One Clerk call per email job (digests are weekly at most). Consent given
+    // before the opt-in check existed may sit on an unverified address.
+    let verified: boolean;
+    try {
+      verified = await rowEmailIsVerifiedInClerk(job.userId, account.email);
+    } catch (error) {
+      logger.error("Digest recipient verification lookup failed", {
+        digestJobId: job.id,
+        errorClass: error instanceof Error ? error.name : "unknown",
+      });
+      await failAttempt(job, "transport_unavailable");
+      return;
+    }
+    if (!verified) {
+      await completeAttempt(job, "skipped", { errorCode: "email_unverified" });
       return;
     }
     const unsubscribeUrl = await createUnsubscribeUrl(job.userId);
