@@ -206,10 +206,8 @@ export default function Profile({ user }: ProfileProps) {
   const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
   const openNameDialog = () => {
-    // Best-effort prefill from the combined display name.
-    const parts = (user?.name || "").trim().split(/\s+/);
-    setEditFirstName(parts[0] === user?.email?.split("@")[0] ? "" : parts[0] || "");
-    setEditLastName(parts.slice(1).join(" "));
+    setEditFirstName(user?.firstName ?? "");
+    setEditLastName(user?.lastName ?? "");
     setNameError(null);
     setNameDialogOpen(true);
   };

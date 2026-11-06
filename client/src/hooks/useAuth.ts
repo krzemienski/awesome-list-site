@@ -66,6 +66,8 @@ export interface AuthUser {
   id: string;
   email?: string;
   name?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   avatar?: string;
   provider?: string;
   role?: string;
