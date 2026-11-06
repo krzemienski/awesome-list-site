@@ -70,6 +70,10 @@ function toClientUser(dbUser: User) {
       [dbUser.firstName, dbUser.lastName].filter(Boolean).join(" ") ||
       dbUser.email?.split("@")[0] ||
       "User",
+    // The stored name parts, so the profile editor never has to split `name`
+    // (which falls back to the email local-part).
+    firstName: dbUser.firstName ?? null,
+    lastName: dbUser.lastName ?? null,
     avatar: dbUser.profileImageUrl,
     role: dbUser.role,
     createdAt: dbUser.createdAt,
