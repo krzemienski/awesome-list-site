@@ -1,0 +1,48 @@
+# C22 613-row matrix breakdown (lead, 2026-11-06T20:37:11Z)
+source: main checkout reports/prod-audit-2026-10-29/cycle-22/rows-{admin-content,admin-ops,member}.md + c22-admin-shell.md, deduped by ID
+
+unique rows:      613
+
+visitor-surface rows: 0 (string match on surface/interaction)
+
+  19 AP P0
+   6 AP P2
+  18 AU P1
+   9 AU P2
+  41 C6-MB P0
+  40 C6-MB P2
+   1 C6-PC P2
+  17 CAT P0
+   6 CAT P2
+  10 DB P1
+   4 DB P2
+   2 DG P1
+   5 DG P2
+  14 ED P0
+   8 ED P2
+  18 EN P1
+  13 EN P2
+  21 EX P1
+   6 EX P2
+  12 GH P1
+  11 GH P2
+  18 JN P0
+  11 JN P2
+  19 LH P1
+  13 LH P2
+   7 OV P0
+   8 OV P2
+  60 RM P0
+  14 RM P2
+  35 RS P1
+  18 RS P2
+   4 RW P1
+   5 RW P2
+  19 SC P0
+   6 SC P2
+  37 SH P1
+   7 SH P2
+  19 SSC P0
+   7 SSC P2
+  21 US P1
+   4 US P2

@@ -1,0 +1,614 @@
+id	surface	interaction	C22 priority	function	bucket	reason	tier1_check
+SH-01	Global desktop header	Activate `Admin`	P1	P7	periodic-monthly	Admin link reaches /admin; sampled monthly	
+SH-02	Global sidebar	Activate `Admin`	P1	P7	retire	sibling of SH-01	
+SH-03	Account menu	Open menu, then activate `Admin`	P1	P7	retire	sibling of SH-01	
+SH-04	Account menu / owner session	Activate `Sign out`	P1	P7	retire	sign-out revokes all owner sessions; never click on prod	
+SH-05	`/sign-in?admin`	Submit correct owner password	P1	P7	tier2-weekly	Primary auth write; wrong password is security guard	NEW-6
+SH-06	`/sign-in?admin`	Submit incorrect password	P1	P7	tier2-weekly	Primary auth write; wrong password is security guard	NEW-6
+SH-07	`/sign-in?admin`	Submit after rate limit is reached	P1	P7	retire	burns the shared 10/900 s login rate limit	
+SH-08	`/sign-in?admin`	Submit while offline	P2	P7	retire	loading/offline/error variant; no guard value	
+SH-09	`/admin` guard	Load while `GET /api/auth/user` is pending	P2	P7	retire	loading/offline/error variant; no guard value	
+SH-10	`/admin` signed out	Activate `Sign in to continue →`	P1	P7	per-deploy	T1 P6 checks, admin view: signed-out /admin shows sign-in, no data	NEW-4
+SH-11	`/admin` signed-in non-admin	Activate `Back to home →`	P1	P7	periodic-monthly	auth guard needs non-admin or expired session	
+SH-12	`/admin` expired session	Activate `Sign in to continue →` after a protected 401	P1	P7	periodic-monthly	auth guard needs non-admin or expired session	
+SH-13	`/admin` initial stats	Open with `GET /api/admin/stats` pending	P2	P7	retire	loading/offline/error variant; no guard value	
+SH-14	`/admin` initial stats failure	Activate dashboard `Retry`	P2	P7	retire	loading/offline/error variant; no guard value	
+SH-15	`/admin/<unknown>`	Open an unknown admin section	P2	P7	retire	loading/offline/error variant; no guard value	
+SH-16	`/admin/:section`, hash, aliases	Open every canonical section and aliases `link-health`, `sub-subcategories`, `sub-subcats`, `github-sync`	P2	P7	periodic-monthly	route alias redirects; sampled monthly	
+SH-17	`/admin#<tab>` and `?tab=`	Change hash/query, then use Back/Forward	P1	P7	per-deploy	T1 admin GETs, UI gap: hash/query tab restore with Back/Forward	NEW-2
+SH-18	Admin tab strip overflow	Activate `Scroll tabs left`	P1	P7	retire	tab-strip a11y; no data or security risk	
+SH-19	Admin tab strip overflow	Activate `Scroll tabs right`	P1	P7	retire	tab-strip a11y; no data or security risk	
+SH-20	Admin tab strip	Use arrow keys, Enter, and Space	P1	P7	retire	tab-strip a11y; no data or security risk	
+SH-21	Strip `Overview`	Activate tab	P1	P7	retire	Overview landing subsumed by OV-09 and T1 admin GETs	
+SH-22	Strip `Approvals`	Activate tab	P1	P7	per-deploy	T1 admin GETs, UI gap: Approvals tab renders for owner	T1-15+NEW-1
+SH-23	Strip `Edits`	Activate tab	P1	I	retire	Edits tab is Incidental (ED area)	
+SH-24	Strip `Enrichment`	Activate tab	P1	S	periodic-monthly	Enrichment tab pass	
+SH-25	Strip `Researcher`	Activate tab	P1	P8	per-deploy	T1 Researcher-job GET, UI gap: Researcher tab renders latest job	T1-19+NEW-1
+SH-26	Strip `Export`	Activate tab	P1	S	periodic-monthly	Export tab pass	
+SH-27	Strip `Database`	Activate tab	P1	P10	per-deploy	T1 backup-age GET, UI gap: Database tab renders table stats	T1-17+NEW-1
+SH-28	Strip `Resources`	Activate tab	P1	P7	per-deploy	T1 admin GETs, UI gap: Resources tab renders for owner	T1-14+NEW-1
+SH-29	Strip `Categories`	Activate tab	P1	S	periodic-monthly	taxonomy tab pass	
+SH-30	Strip `Subcategories`	Activate tab, including return from Sub-Subcats	P1	S	periodic-monthly	taxonomy tab pass	
+SH-31	Strip `Users`	Activate tab	P1	S	periodic-monthly	Users tab pass	
+SH-32	Strip `GitHub`	Activate tab	P1	S	periodic-monthly	GitHub tab pass	
+SH-33	Strip `Link Health`	Activate tab	P1	P9	per-deploy	T1 scan-age GET, UI gap: Link Health tab renders latest scan	T1-18+NEW-1
+SH-34	Strip `Audit`	Activate tab	P1	S	periodic-monthly	Audit tab pass	
+SH-35	Strip `Research`	Activate tab	P1	S	periodic-monthly	Research tab pass	
+SH-36	Masthead `Settings`	Open/close the Settings menu	P1	P7	retire	opens and closes a menu; no state	
+SH-37	Settings menu	Activate `Theme settings`	P1	S	periodic-monthly	Settings menu link; sampled monthly	
+SH-38	Settings menu, pending count > 0	Activate `Pending approvals`	P1	P7	periodic-monthly	Settings menu link to Primary tab; sampled monthly	
+SH-39	Settings menu, rejected count > 0	Activate `Rejected resources`	P1	P7	periodic-monthly	Settings menu link to Primary tab; sampled monthly	
+SH-40	Settings menu	Activate `Sub-Subcats`	P1	S	periodic-monthly	Settings menu link; sampled monthly	
+SH-41	Settings menu	Activate `Journeys`	P1	S	periodic-monthly	Settings menu link; sampled monthly	
+SH-42	Settings menu	Activate `Digests`	P1	S	periodic-monthly	Settings menu link; sampled monthly	
+SH-43	Masthead `New entry`	Activate twice, including while Resources is already open	P1	P7	periodic-monthly	Settings menu link to Primary tab; sampled monthly	
+SH-44	Entire admin shell	Sweep auth, tab, menu, focus, scroll, and motion states at real coarse pointer	P2	P7	retire	loading/offline/error variant; no guard value	
+OV-01	`/admin#overview` Resources card	Activate card or its keyboard equivalent	P0	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-02	Overview Subcategories card	Activate card	P0	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-03	Overview Active users card	Activate card	P0	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-04	Overview Pending approvals card	Activate card	P0	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-05	Overview metric strip	Trigger partial source failure, then `Retry`	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+OV-06	Overview Recent activity	Load activity	P2	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-07	Overview Recent activity	Activate `Retry` after failure	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+OV-08	Overview Recent activity	Load with no audit rows	P2	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+OV-09	Overview Recent activity	Inspect populated six-row feed	P0	P7	per-deploy	T1 admin GETs, UI gap: feed shows rows and matches audit total	T1-14+NEW-1
+OV-10	Overview System health	Inspect all populated health rows	P0	P7	retire	subsumed by T1 ops-health GET ops health ready	
+OV-11	Overview System health	Trigger one and all health-source failures, then `Retry`	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+OV-12	Overview Top categories	Load categories	P2	P7	retire	subsumed by T1 admin GETs; cards only navigate	
+OV-13	Overview Top categories	Activate `Retry` after failure	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+OV-14	Overview Top categories	Load with no approved-resource categories	P2	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+OV-15	Overview Top categories	Inspect top-five populated ranking	P0	P1	per-deploy	T1 P1 checks, admin view: admin top-five equals public category counts	T1-02+NEW-1
+AP-01	`/admin#approvals`	Load queue	P2	P7	retire	subsumed by T1 admin GETs approvals readable	
+AP-02	Approvals queue	Activate `Retry` after a failed load	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+AP-03	Approvals queue offline	Activate `Retry`	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+AP-04	Approvals empty queue	Activate `Check again`, including offline	P2	P7	retire	error/loading/offline/empty variant; no data-loss or security guard	
+AP-05	Approvals populated queue	Inspect table and poll update	P0	P7	per-deploy	T1 admin GETs, UI gap: queue rows equal stats pending count	T1-15+NEW-1
+AP-06	Approvals table header	Toggle `Select all pending resources`	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-07	Approvals row	Toggle row checkbox	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-08	Approvals toolbar	Open `Bulk reject (N)`	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-09	Bulk-reject dialog	Enter short and valid rejection reasons	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-10	Bulk-reject dialog	Cancel via button, X, or Escape	P0	P7	periodic-monthly	Primary dialog cancel; verifies no write	
+AP-11	Bulk-reject confirmation	Confirm selected rejection	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	T2-03
+AP-12	Approvals toolbar	Open `Approve selected (N)` or `Approve all`	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-13	Bulk-approve dialog	Cancel	P0	P7	periodic-monthly	Primary dialog cancel; verifies no write	
+AP-14	Bulk-approve confirmation	Confirm approval	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	NEW-7
+AP-15	Approvals bulk outcome	Inspect success and partial-failure result banner	P2	P7	periodic-monthly	bulk outcome banner; needs bulk run	
+AP-16	Approvals row title	Open external URL icon	P0	P7	periodic-monthly	Primary read of external link; sampled monthly	
+AP-17	Approvals row	Open `Review`	P0	P7	per-deploy	T1 admin GETs, UI gap: Review opens pending-row details, read-only	NEW-3
+AP-18	Resource Details	Activate valid URL	P0	P7	periodic-monthly	Primary read of external link; sampled monthly	
+AP-19	Resource Details	Inspect malformed URL and missing description states	P0	P7	retire	dialog state variant; no data-loss or security guard	
+AP-20	Resource Details	Activate `Close`, X, or Escape	P0	P7	retire	dialog state variant; no data-loss or security guard	
+AP-21	Approvals row	Open `Approve`, then cancel	P0	P7	periodic-monthly	Primary-area interaction; sampled monthly, not blocking	
+AP-22	Approvals row approve confirmation	Confirm approval	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	NEW-7
+AP-23	Approvals row	Open `Reject`, edit reason, then cancel	P2	P7	periodic-monthly	Primary dialog cancel; verifies no write	
+AP-24	Approvals row reject confirmation	Confirm rejection	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	T2-03
+AP-25	Approvals table	Swipe and keyboard-scroll horizontally at narrow widths	P0	P7	retire	admin table layout sweep; T1 P1-P4 covers public pages	
+ED-01	`/admin#edits`	Load edit queue	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-02	Edit queue	Activate `Retry` after failure	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-03	Edit queue offline	Activate `Retry`	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-04	Edit queue empty	Activate `Check again`, including offline	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-05	Edit queue populated	Inspect pending rows and polling	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-06	Edit row resource title	Activate internal resource link	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-07	Edit row external-link icon	Activate external resource URL	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-08	Edit row	Open `Diff`	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-09	Edit Details conflict state	Inspect conflict detected after resource changed	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-10	Edit Details	Activate resource URL	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-11	Edit Details	Activate `Close`, X, or Escape	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-12	Edit row	Open ordinary `Approve`	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-13	Edit row conflict	Open `Approve` on conflicted suggestion	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-14	Approve Edit dialog	Cancel	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-15	Approve Edit confirmation	Confirm `Approve & Merge`	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-16	Approve Edit dialog	Inspect failed approval state	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-17	Edit row	Open `Reject`	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-18	Reject Edit dialog	Enter short and valid reasons	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-19	Reject Edit dialog	Cancel	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-20	Reject Edit confirmation	Confirm rejection	P0	I	retire	Incidental function; retire per PLAN section 1	
+ED-21	Reject Edit dialog	Inspect failed rejection state	P2	I	retire	Incidental function; retire per PLAN section 1	
+ED-22	Edit table	Swipe and keyboard-scroll horizontally	P0	I	retire	Incidental function; retire per PLAN section 1	
+RM-01	`/admin#resources`	Initial load	P0	P7	per-deploy	T1 admin GETs, UI gap: resource list loads with total equal stats	T1-14+NEW-2
+RM-02	Resources table	Activate `Retry` after load failure	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-03	Resources offline	Request another page, then use `Stay on page N` or `Retry`	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-04	Resources empty catalog	Load with zero total	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-05	Resources filtered-empty	Activate inline `Clear filters`	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-06	Resources populated table	Inspect rows, counts, tags, status, and horizontal overflow	P0	P7	per-deploy	T1 admin GETs, UI gap: rows, counts, status render without overflow	NEW-2
+RM-07	Resources header	Type in `Search…`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-08	Resources header	Toggle `Show/Hide filters and tools`	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-09	Resource filters	Type in `Search by title or URL...`	P0	P7	per-deploy	T1 admin GETs, UI gap: title/URL search returns a known resource	NEW-2
+RM-10	Resource filters	Choose each category including `All Categories`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-11	Resource filters	Choose Approved/Pending/Rejected/Withdrawn/All Status	P0	P7	per-deploy	T1 admin GETs, UI gap: status filter counts equal stats	T1-14+NEW-2
+RM-12	Resource sort	Choose `Newest first`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-13	Resource sort	Choose `Oldest first`	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-14	Resource sort	Choose `Title A–Z`	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-15	Resource sort	Choose `Title Z–A`	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-16	Resource filters	Toggle `★ Featured only`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-17	Resource filters	Activate Search submit button or Enter	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-18	Resource filters	Activate `Clear filters` icon	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-19	Resources header checkbox	Toggle `Select all resources on this page`	P2	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-20	Resource row	Toggle row checkbox	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-21	Resource selection bar	Activate `Clear Selection`	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-22	Resource selection bar	Open bulk `Approve`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-23	Bulk Approve dialog	Cancel	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-24	Bulk Approve confirmation	Confirm approval	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	NEW-7
+RM-25	Resource selection bar	Open bulk `Reject`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-26	Bulk Reject dialog	Enter short and valid reasons	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-27	Bulk Reject dialog	Cancel	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-28	Bulk Reject confirmation	Confirm rejection	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	T2-03
+RM-29	Resource selection bar	Open bulk `Delete`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-30	Bulk Delete dialog	Cancel	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-31	Bulk Delete confirmation	Confirm deletion	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	T2-12
+RM-32	Resource row Featured cell	Toggle star on a QA row and induce failure	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-33	Resource row	Activate `View`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-34	Resource row	Activate `Edit`	P0	P7	per-deploy	T1 admin GETs, UI gap: Edit dialog opens populated; closes without save	NEW-3
+RM-35	Resource row	Activate `Delete`	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-36	Delete Resource dialog	Cancel	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-37	Delete Resource confirmation	Delete the auditor's own QA row by ID	P2	P7	tier2-weekly	Primary write; deletes own QA row (Tier 2 cleanup)	T2-12
+RM-38	Delete Resource confirmation	Delete a pre-existing production resource	P0	P7	retire	mutates real production data; QA-row variant covers it	
+RM-39	Resources pagination	Choose 25, 50, and 100 rows per page	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-40	Resources paginator	Use Previous, Next, and numbered page links	P0	P7	per-deploy	T1 admin GETs, UI gap: paginator moves pages without error	NEW-2
+RM-41	Resources page-number input	Type a page and press Enter	P0	P7	periodic-monthly	Primary read/dialog; sampled monthly, not blocking	
+RM-42	Resources page-number input	Commit on blur; try invalid and out-of-range values	P0	P7	retire	variant or sibling of a covered row; no guard value	
+RM-43	Resources deep links	Open `?create=1`, `?resourceId=N`, `?status=rejected`, and `?page=N`, then reload	P0	P7	per-deploy	T1 admin GETs, UI gap: deep links reload to the same state	NEW-2
+RM-44	Edit Resource	Change `Title *`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-45	Edit Resource	Change `URL *`, including duplicate URL	P2	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-46	Edit Resource	Change `Description`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-47	Edit Resource	Change `Category`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-48	Edit Resource	Change `Status` among Approved/Pending/Rejected	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-49	Edit Resource, rejected status	Edit `Rejection reason *`	P2	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-50	Edit Resource	Change `Subcategory`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-51	Edit Resource	Change `Sub-subcategory`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-52	Edit Resource	Change `Kind override`, including Automatic	P2	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-53	Edit Resource	Toggle `Curated placement`	P2	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-54	Edit Resource	Change `Format`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-55	Edit Resource	Change `Provider`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-56	Edit Resource	Change `Skill level`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-57	Edit Resource footer	Activate `Save Changes` on a QA row	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	T2-08
+RM-58	Edit Resource footer	Activate `Cancel`	P0	P7	periodic-monthly	edit-form field; exercised monthly, not saved	
+RM-59	Add Resource	Edit `Title *`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-60	Add Resource	Edit `URL *`, including duplicate URL	P2	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-61	Add Resource	Edit `Description`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-62	Add Resource	Choose required `Category *`	P2	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-63	Add Resource	Choose `Status`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-64	Add Resource	Choose `Subcategory`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-65	Add Resource	Choose `Sub-subcategory`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-66	Add Resource	Choose `Kind override`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-67	Add Resource	Toggle `Feature this resource`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-68	Add Resource	Choose `Format`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-69	Add Resource	Choose `Provider`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-70	Add Resource	Choose `Skill level`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-71	Add Resource footer	Activate `Create Resource` with `[QA-audit-1026]` title	P0	P7	tier2-weekly	Primary write path; QA rows only in Tier 2	NEW-8
+RM-72	Add Resource footer	Activate `Cancel`	P0	P7	periodic-monthly	add-form field; exercised monthly, not saved	
+RM-73	Create/Edit Resource	Exercise client validation, pending, and server-failure states	P2	P7	retire	variant or sibling of a covered row; no guard value	
+RM-74	Edit Resource footer	Activate `Save Changes` on a pre-existing production resource	P0	P7	retire	mutates real production data; QA-row variant covers it	
+CAT-01	`/admin#categories`	Load category list	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-02	Categories	Activate `Retry` after list failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-03	Categories	Search with no matches	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-04	Categories	Inspect populated rows	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-05	Categories header	Toggle `Search`/`Hide search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-06	Categories search	Type name/slug query	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-07	Categories search	Activate `Clear search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-08	Categories header	Open `Add category`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-09	Create Category	Edit `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-10	Create Category	Edit `Slug *` after auto-generation	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-11	Create Category footer	Submit with `[QA-audit-1026]` name	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-12	Create Category footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-13	Create Category	Submit empty name and duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-14	Category row	Activate `Edit`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-15	Edit Category	Change `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-16	Edit Category	Change `Slug *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-17	Edit Category footer	Save a QA category	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-18	Edit Category footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-19	Edit Category	Submit empty name or duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-20	Category row delete flow	Open, cancel, then delete own empty QA category	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+CAT-21	Category row delete confirmation	Delete a pre-existing category	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-22	Categories pagination	Change rows per page and use numbered/Previous/Next/jump controls	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+CAT-23	Edit Category footer	Save a pre-existing category	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-01	`/admin#subcategories`	Load subcategories	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-02	Subcategories	Activate `Retry` after list failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-03	Subcategories	Search with no matches	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-04	Subcategories	Inspect populated rows	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-05	Subcategories header	Toggle `Search`/`Hide search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-06	Subcategories search	Type name/slug query	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-07	Subcategories search	Activate `Clear search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-08	Subcategories header	Open `Add subcategory`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-09	Create Subcategory	Choose `Parent Category *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-10	Create Subcategory	Edit `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-11	Create Subcategory	Edit `Slug *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-12	Create Subcategory footer	Submit with `[QA-audit-1026]` name	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-13	Create Subcategory footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-14	Create Subcategory	Submit missing parent/name or duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-15	Subcategory row	Activate `Edit`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-16	Edit Subcategory	Change `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-17	Edit Subcategory	Change `Slug *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-18	Edit Subcategory	Change `Parent Category *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-19	Edit Subcategory footer	Save a QA subcategory	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-20	Edit Subcategory footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-21	Edit Subcategory	Submit invalid fields or duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-22	Subcategory row delete flow	Open, cancel, then delete own empty QA subcategory	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-23	Subcategory row delete confirmation	Delete a pre-existing subcategory	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SC-24	Subcategories pagination and parent errors	Use 24-row page control/paginator; activate parent-load `Retry`	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SC-25	Edit Subcategory footer	Save a pre-existing subcategory	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-01	`/admin/subsubcategories` or Settings → Sub-Subcats	Load list	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-02	Sub-Subcategories	Activate `Retry` after list failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-03	Sub-Subcategories	Search with no matches	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-04	Sub-Subcategories	Inspect populated rows	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-05	Sub-Subcategories header	Toggle `Search`/`Hide search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-06	Sub-Subcategories search	Type name/slug query	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-07	Sub-Subcategories search	Activate `Clear search`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-08	Sub-Subcategories header	Open `Add sub-subcategory`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-09	Create Sub-Subcategory	Choose `Parent Category *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-10	Create Sub-Subcategory	Choose `Parent Subcategory *`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-11	Create Sub-Subcategory	Edit `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-12	Create Sub-Subcategory	Edit `Slug *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-13	Create Sub-Subcategory footer	Submit with `[QA-audit-1026]` name	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-14	Create Sub-Subcategory footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-15	Create Sub-Subcategory	Submit missing parents/name or duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-16	Sub-Subcategory row	Activate `Edit`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-17	Edit Sub-Subcategory	Change `Name *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-18	Edit Sub-Subcategory	Change `Slug *`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-19	Edit Sub-Subcategory	Change parent Category, then parent Subcategory	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-20	Edit Sub-Subcategory footer	Save a QA row	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-21	Edit Sub-Subcategory footer	Cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-22	Edit Sub-Subcategory	Submit invalid fields or duplicate slug	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-23	Sub-Subcategory row delete flow	Open, cancel, then delete own empty QA row	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-24	Sub-Subcategory row delete confirmation	Delete a pre-existing row	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+SSC-25	Sub-Subcategories pagination and parent errors	Change page size/use paginator; activate parent-load `Retry`	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+SSC-26	Edit Sub-Subcategory footer	Save a pre-existing row	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-01	`/admin/journeys`	Load journeys	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-02	Journeys list	Activate `Retry` after failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-03	Journeys list	Load with no journeys	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-04	Journeys list	Inspect populated journeys	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-05	Journey row	Activate `Steps`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-06	Journey Steps dialog	Load steps	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-07	Journey Steps dialog	Activate `Retry` after request failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-08	Journey Steps dialog offline	Activate `Retry`	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-09	Journey Steps dialog	Open journey with zero steps	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-10	Journey Steps dialog	Inspect populated grouped steps	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-11	Journey Steps dialog	Open `Add step`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-12	Step editor	Edit `Title *`, including blank	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-13	Step editor	Edit `Description`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-14	Step editor resource picker	Toggle `Pick resource`/`Change`/`Close picker`	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-15	Resource picker	Type a title search	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-16	Resource picker results	Choose a resource	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-17	Resource picker selected badge	Activate `Clear resource`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-18	Resource picker	Exercise no-results, error, offline, and `Retry`	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-19	Step editor	Toggle `Mark this step as optional`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-20	Add Step footer	Confirm `Add step` on a real journey	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-21	Step editor footer	Cancel Add/Edit	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-22	Journey step	Activate `Move … up`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-23	Journey step	Activate `Move … down`	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-24	Linked journey resource	Activate resource link	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-25	Multi-resource step	Open remove-resource, cancel, or confirm removal	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-26	Journey step	Open `Edit`, change fields, and save	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-27	Journey step	Open `Delete`, cancel, or confirm	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+JN-28	Journey step mutations	Inspect failure copy on a non-production fixture	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+JN-29	Journey manager and step dialogs	Complete keyboard, 44px-target, focus-return, and reduced-motion sweep	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-01	`/admin#enrichment` stats	Inspect Last enriched, Queue, and Avg cost	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-02	Enrichment jobs	Initial load	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-03	Enrichment jobs	Activate `Retry` after list failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-04	Enrichment jobs	Load with no jobs	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-05	Enrichment jobs	Inspect populated table	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-06	Enrichment `Job controls & monitoring`	Expand/collapse details	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-07	Enrichment jobs	Toggle `Show all N jobs`/`Show fewer`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-08	Enrichment Run job controls	Open Run job from header or Job Control	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-09	Job Control	Choose `All Resources` or `Unenriched Only`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-10	Job Control	Enter batch size 1–50	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-11	Job Control	Enter blank, fractional, 0, negative, or >50 batch size	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-12	Job Control	Toggle advanced enrichment settings	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-13	Advanced enrichment	Edit `Model`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-14	Advanced enrichment	Edit `Base URL`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-15	Advanced enrichment	Edit `Auth Token`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-16	Start Enrichment confirmation	Cancel	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-17	Start Enrichment confirmation	Confirm `Start enrichment`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-18	Start Enrichment confirmation	Open with zero resources matching filter	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-19	Enrichment launch guards	Inspect active job, loading jobs, and failed jobs states	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-20	Start Enrichment confirmation	Inspect failed start on non-production	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-21	Enrichment active job	Observe pending/processing progress	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-22	Active enrichment job	Open `Cancel`	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-23	Cancel Enrichment dialog	Choose `Keep running`	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-24	Cancel Enrichment confirmation	Confirm cancellation	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-25	Cancel Enrichment dialog	Inspect cancellation failure on non-production	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-26	Enrichment job row	Open `Logs`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-27	Enrichment Job Details	Load selected job	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-28	Enrichment Job Details	Activate `Retry` after detail failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-29	Enrichment Job Details	Inspect populated configuration/statistics/resources/errors and close	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EN-30	Job Details Agent Graph and Agent Events	Inspect loading, waiting, empty, populated, and failed states	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EN-31	Agent Events	Expand/collapse a structured event and navigate by keyboard	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+RS-01	`/admin#researcher` Brief step	Choose `Auto-generate at launch`	P2	P8	periodic-monthly	brief form; exercised with launch pass	
+RS-02	Researcher Brief step	Choose `Write my own`	P1	P8	periodic-monthly	brief form; exercised with launch pass	
+RS-03	Custom brief	Activate `Start from a generated brief`	P2	P8	periodic-monthly	brief form; exercised with launch pass	
+RS-04	Custom brief	Edit `Research brief`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-05	Researcher Focus step	Choose category or `All categories`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-06	Researcher Limits	Edit `Stop after (discoveries)`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-07	Researcher Limits	Edit `Budget cap (USD)`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-08	Researcher Limits	Edit `Max turns`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-09	Researcher Endpoint & model	Toggle advanced settings	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-10	Advanced researcher	Edit `Orchestrator model`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-11	Advanced researcher	Edit `Scout model`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-12	Advanced researcher	Edit `Base URL`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-13	Advanced researcher	Edit `Auth token`	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-14	Advanced researcher plain HTTP	Toggle insecure-transport acknowledgement	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-15	Researcher config preview	Change overrides and observe resolution	P1	P8	periodic-monthly	launch-form input; not submitted	
+RS-16	Researcher config preview	Trigger `GET /api/researcher/config` failure	P2	P8	retire	state/error variant; no guard value	
+RS-17	Researcher config preview	Inspect current populated/preflight-blocked summaries	P1	P8	per-deploy	T1 Researcher-job GET, UI gap: config preview resolves; preflight not blocked	T1-19+NEW-1
+RS-18	Researcher active-run notice	Activate `Follow run #N`	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-19	Researcher launch	Submit invalid brief/limits	P1	P8	periodic-monthly	invalid-brief guard on a paid action	
+RS-20	Researcher launch	Open `Launch research run` with valid form	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-21	Launch confirmation	Cancel	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-22	Launch confirmation	Confirm `Launch`	P1	P8	tier2-weekly	Primary write (P8); spends money, needs owner decision D	NONE-D16
+RS-23	Researcher launch guards	Inspect loading/failed jobs, active run, preflight failure, and stale preview states	P2	P8	retire	state/error variant; no guard value	
+RS-24	Launch confirmation	Inspect failed launch on non-production	P2	P8	retire	state/error variant; no guard value	
+RS-25	Research run view	Open `?jobId=N` while detail loads	P2	P8	retire	state/error variant; no guard value	
+RS-26	Research run view missing ID	Open nonexistent `?jobId=N`, then `Start another run`	P2	P8	retire	state/error variant; no guard value	
+RS-27	Research run view	Activate `Retry` after non-404 detail failure	P2	P8	retire	state/error variant; no guard value	
+RS-28	Active research run	Observe phase timeline and discovery/turn/spend meters	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-29	Active research run	Open `Cancel run`	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-30	Cancel Research Run dialog	Dismiss/keep run	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-31	Cancel Research Run confirmation	Confirm cancellation	P1	P8	tier2-weekly	Primary write (P8); spends money, needs owner decision D	NONE-D16
+RS-32	Research run polling	Interrupt job/events/discoveries poll after good data	P2	P8	retire	state/error variant; no guard value	
+RS-33	Research run completed	Inspect completion outcome and review focus	P2	P8	retire	state/error variant; no guard value	
+RS-34	Research run failed/cancelled	Inspect terminal failure/cancel outcome	P2	P8	retire	state/error variant; no guard value	
+RS-35	Research run budget stopped	Activate `Relaunch with a higher cap`	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-36	Research run discoveries	Observe active-empty and ended-empty states	P2	P8	retire	state/error variant; no guard value	
+RS-37	Research run discoveries	Activate `Retry` after discovery-load failure	P2	P8	retire	state/error variant; no guard value	
+RS-38	Research run discovery	Inspect populated item and open external URL	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-39	Discovery review (run, pending table, job details)	Confirm `Approve`	P1	P8	tier2-weekly	Primary write (P8); spends money, needs owner decision D	NONE-D16
+RS-40	Discovery review	Open `Reject`, edit optional reason, then Cancel	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-41	Reject Discovery confirmation	Confirm rejection	P1	P8	tier2-weekly	Primary write (P8); spends money, needs owner decision D	NONE-D16
+RS-42	Ended research run	Activate `Done` or `Review later — go to job history`	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-43	Research run view	Activate `Start another run`	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-44	Research run details	Toggle raw event log and agent graph region	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-45	Research run detail tabs	Switch `Event log` and `Agent graph`; expand an event	P2	P8	retire	state/error variant; no guard value	
+RS-46	Researcher canonical jobs	Exercise loading/error/empty/populated states and `Show more`/`Load more`	P2	P8	retire	state/error variant; no guard value	
+RS-47	`All pending discoveries & full job history`	Expand details and switch `Review Discoveries`/`Job History`	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-48	Pending discoveries	Exercise loading/error/empty/populated states	P2	P8	retire	state/error variant; no guard value	
+RS-49	Pending discoveries	Open `Approve All`, then Cancel	P1	P8	periodic-monthly	launch/cancel dialog on paid action; owner-gated	
+RS-50	Approve All confirmation	Confirm bulk approval	P1	P8	tier2-weekly	Primary write (P8); spends money, needs owner decision D	NONE-D16
+RS-51	Full Job History	Use `Load more`, open row Details, or open active-job Cancel	P1	P8	periodic-monthly	run/history read; needs a run, sampled monthly	
+RS-52	Research Job Details dialog	Inspect loading/error/populated discoveries/log/graph states and close	P2	P8	retire	state/error variant; no guard value	
+RS-53	Researcher end-to-end input/motion/offline sweep	Keyboard-walk launch, run, discovery, history, and dialog controls at 820/390	P2	P8	retire	state/error variant; no guard value	
+GH-01	`/admin#github` repository card	Load `GET /api/config`	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-02	GitHub repository config	Activate `Retry` after config failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-03	GitHub repository config	Load with no configured repository	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-04	GitHub repository card	Open `Pull` with valid target	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-05	GitHub Pull confirmation	Cancel	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-06	GitHub Pull confirmation	Confirm `Start Import`	P1	S	retire	writes to the list repo; owner-run only	
+GH-07	GitHub repository card	Open `Sync now` with valid target	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-08	GitHub Sync confirmation	Cancel	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-09	GitHub Sync confirmation	Confirm `Start Export`	P1	S	retire	writes to the list repo; owner-run only	
+GH-10	GitHub `More`	Toggle More/Less	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-11	Target Repository editor	Enter valid `owner/repository` or GitHub URL	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-12	Target Repository editor	Enter invalid repository	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-13	Target Repository editor	Activate `Reset to configured repository`	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-14	GitHub Sync Status	Observe loading and no-activity states	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-15	GitHub Sync Status	Inspect pending, processing, completed, failed, partial, and committed-despite-error rows	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-16	GitHub Sync Status	Activate `Retry` after queue failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-17	GitHub Sync jobs history	Activate `Retry` after history failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-18	Last sync / history detail	Activate `View Commit on GitHub`	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-19	Sync jobs row	Open `Logs`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+GH-20	Sync job details	Inspect partial/failed errors, then close	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-21	Sync jobs history	Load successful empty history	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+GH-22	Sync jobs history	Inspect populated rows and More/Less full-list behavior	P1	S	periodic-monthly	GitHub tab read or dialog open; sampled monthly	
+GH-23	GitHub dry-run API (no current UI control in 480a3ace)	`POST /api/admin/import-github` with `{repoUrl, dryRun:true, strictMode}` variants	P2	S	retire	API variant; no UI control, writes to catalog	
+RW-01	`/admin#research`	Load research notes	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+RW-02	Research workspace	Activate `Retry` after notes failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+RW-03	Research workspace	Load with no jobs	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+RW-04	Research workspace	Inspect populated notes	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+RW-05	Research note	Open note	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+RW-06	Research note dialog	Load selected job detail	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+RW-07	Research note dialog	Activate `Retry` after detail failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+RW-08	Research note dialog	Activate `Review candidates for job #N`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+RW-09	Research note dialog	Close via X/Escape	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-01	`/admin#export` `Validation controls`	Expand/collapse details	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-02	Export validation controls	Open `Run Validation`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-03	Export job confirmation	Cancel validation	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-04	Export job confirmation	Confirm `Run validation`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-05	Export validation controls	Open `Run Link Check`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-06	Export job confirmation	Cancel link check	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-07	Export job confirmation	Confirm `Run link check`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-08	Export link-check panel	Observe pending/processing/completed/failed/cancelled states	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-09	Export link-check panel	Activate `Retry` after status failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-10	Export link-check panel	Activate `Open Link Health for problem links`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-11	Export active link check	Activate `Cancel link check`	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-12	Export JSON Snapshot card	Activate `Download`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-13	Export CSV card	Activate `Download`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-14	Export README.md card	Activate `Generate`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-15	Export OPML card	Activate `Download`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-16	All four export cards	Exercise offline and live 5xx failures for JSON/CSV/Markdown/OPML	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-17	`Export history & validation results`	Expand/collapse details	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-18	Export history pagination	Activate `Previous exports`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-19	Export history pagination	Activate `Next exports`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-20	Export history	Exercise loading, error+Retry, zero-total, empty-page, and populated states	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-21	Validation Results	Load with no stored awesome-lint result	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-22	Validation Results	Inspect populated valid/invalid summaries	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+EX-23	Validation Results	Toggle `Errors (N)`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-24	Validation Results	Toggle `Warnings (N)`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+EX-25	Full database backup	Activate `Create backup`	P1	P10	tier2-weekly	Primary write; only backup is manual (B1)	NEW-9
+EX-26	Full database backup list	Exercise loading, error+Retry, unconfigured, empty, and populated states	P2	P10	retire	list state variants	
+EX-27	Latest database backup	Toggle `Show contents`/`Hide contents`	P1	P10	periodic-monthly	backup contents read; T1 backup-age GET checks age only	
+DB-01	`/admin#database` stats	Observe loading and populated Tables/Rows/Disk/Migrations	P2	P10	retire	subsumed by T1 admin GETs stats; expand/failure variant	
+DB-02	Database `Database seeding`	Expand/collapse details	P1	P10	retire	subsumed by T1 admin GETs stats; expand/failure variant	
+DB-03	Database seeding	Open `Seed Database`	P1	P10	periodic-monthly	data-loss guard; open dialog and stop before RESEED	
+DB-04	Seed Database confirmation	Cancel	P1	P10	retire	cancel of seed dialog; covered by DB-03/DB-07	
+DB-05	Seed Database confirmation	Confirm `Seed Database`	P1	P10	retire	seed/reseed wipes data; off-limits on production	
+DB-06	Database seeding	Open `Clear & Re-seed`	P1	P10	periodic-monthly	data-loss guard; open dialog and stop before RESEED	
+DB-07	Clear & Re-seed dialog	Type incorrect text, lowercase `reseed`, then exact `RESEED`	P1	P10	periodic-monthly	data-loss guard; open dialog and stop before RESEED	
+DB-08	Clear & Re-seed dialog	Cancel	P1	P10	retire	cancel of seed dialog; covered by DB-03/DB-07	
+DB-09	Clear & Re-seed confirmation	Confirm with exact `RESEED`	P1	P10	retire	seed/reseed wipes data; off-limits on production	
+DB-10	Database seed result	Inspect success result on non-production	P1	P10	retire	non-production only result states	
+DB-11	Database seed result	Inspect partial-failure result on non-production	P2	P10	retire	non-production only result states	
+DB-12	Database seed result	Inspect request failure on non-production	P2	P10	retire	non-production only result states	
+DB-13	Database Tables panel	Inspect populated PostgreSQL table stats	P1	P10	periodic-monthly	table stats read; sampled monthly	
+DB-14	Database Tables panel	Observe missing stats/empty tableStats and upstream stats failure	P2	P10	retire	subsumed by T1 admin GETs stats; expand/failure variant	
+US-01	`/admin/users`	Load users	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-02	Users table	Activate `Retry` after failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-03	Users table	Load empty catalog and zero search matches	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-04	Users table	Inspect populated rows	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-05	Users header	Toggle `Row actions`/`Hide row actions`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-06	Users search	Type email or name	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-07	Users search	Activate `Clear user search`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-08	Users header	Activate `Export CSV`	P2	S	periodic-monthly	users CSV export reads PII; sampled monthly	
+US-09	Users header	Inspect `Invite unavailable` disabled control	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-10	Users table	Activate `Sort by Name` repeatedly	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-11	Users table	Activate `Sort by Email` repeatedly	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-12	Users table	Activate `Sort by Role` repeatedly	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-13	Users table	Activate `Sort by Joined` repeatedly	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-14	User row email	Toggle Reveal/Mask email	P1	S	periodic-monthly	privacy: email masked by default	
+US-15	Other user row	Activate `Edit` role	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-16	Role selector	Close without choosing	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-17	Role selector	Choose `User` or `Admin`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-18	Change user role dialog	Cancel	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-19	Change user role confirmation	Confirm `Change Role`	P1	S	retire	changes or deletes a real account	
+US-20	Current admin row	Inspect self role/delete controls	P1	S	periodic-monthly	security guard: self role/delete disabled	
+US-21	Other user row	Activate `Delete`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-22	Delete user dialog	Cancel	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+US-23	Delete user confirmation	Confirm `Delete User`	P1	S	retire	changes or deletes a real account	
+US-24	Users pagination	Activate Previous and Next at middle and edge pages	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+US-25	Users table	Swipe horizontally at 390/820 and reach Edit	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+LH-01	`/admin/linkhealth`	Initial load	P2	P9	retire	load/error/empty variant; no guard value	
+LH-02	Link Health	Trigger failures in status/history/problem links/coverage, then `Retry`	P2	P9	retire	load/error/empty variant; no guard value	
+LH-03	Link Health	Load before any scan completes	P2	P9	retire	load/error/empty variant; no guard value	
+LH-04	Link Health	Inspect populated completed scan	P1	P9	retire	subsumed by T1 scan-age GET newest scan under 26 h	
+LH-05	Link Health	Open any `Run Link Check`/`Run Check Now`/`Run full check` control	P1	P9	periodic-monthly	scan control; sampled monthly	
+LH-06	Run Link Health confirmation	Cancel	P1	P9	periodic-monthly	scan control; sampled monthly	
+LH-07	Run Link Health confirmation	Confirm `Run check`	P1	P9	tier2-weekly	Primary write; starts a scan	NEW-10
+LH-08	Link Health active scan	Observe pending/processing progress and polling	P1	P9	periodic-monthly	scan control; sampled monthly	
+LH-09	Link Health active scan	Open `Cancel scan`	P1	P9	periodic-monthly	cancel-scan flow needs active scan	
+LH-10	Cancel scan dialog	Choose `Keep scanning`	P1	P9	periodic-monthly	cancel-scan flow needs active scan	
+LH-11	Cancel scan confirmation	Confirm `Cancel scan`	P1	P9	periodic-monthly	cancel-scan flow needs active scan	
+LH-12	Link Health failed/cancelled scan	Inspect terminal reason and open `Run scan again`	P2	P9	retire	load/error/empty variant; no guard value	
+LH-13	Link Health count tiles	Observe no-result state	P1	P9	retire	load/error/empty variant; no guard value	
+LH-14	Link Health counts/status	Observe previous-completed snapshot and `degraded` status	P1	P9	per-deploy	T1 scan-age GET, UI gap: degraded snapshot status matches latest scan	T1-18+NEW-1
+LH-15	Member link reports	Choose `Open` status	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-16	Member link reports	Choose `Resolved` status	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-17	Member link reports	Choose `Dismissed` status	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-18	Member link reports	Exercise loading and error+Retry	P2	P9	retire	load/error/empty variant; no guard value	
+LH-19	Member link reports	Load empty Open/Resolved/Dismissed lists	P2	P9	retire	load/error/empty variant; no guard value	
+LH-20	Member link report row	Open resource title and external resource URL	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-21	Open member link report	Activate `Resolve`	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-22	Open member link report	Activate `Dismiss`	P1	I	retire	member link reports Incidental; zero reports ever	
+LH-23	Link Health Recent failures	Load with no failures, before a scan, and during a scan	P2	P9	retire	load/error/empty variant; no guard value	
+LH-24	Link Health Recent failures	Open a populated resource title and external URL	P1	P9	periodic-monthly	Problem-links read; sampled monthly	
+LH-25	Link Health `More`	Toggle More/Less	P1	P9	periodic-monthly	Problem-links read; sampled monthly	
+LH-26	Link Health Summary	Activate `Run Check Now`	P1	P9	tier2-weekly	Primary write; starts a scan	NEW-10
+LH-27	Link Health Trends	Observe chart loading, populated tooltip/legend, and 390 below-fold layout	P2	P9	retire	load/error/empty variant; no guard value	
+LH-28	Problem Links filter	Choose All Issues, Broken Links, Timeouts, Redirects, and Suspect	P2	P9	periodic-monthly	Problem-links read; sampled monthly	
+LH-29	Problem Links	Exercise loading, unavailable, and filtered-empty states	P2	P9	retire	load/error/empty variant; no guard value	
+LH-30	Problem Links populated table	Scroll both axes and open resource/external links	P2	P9	periodic-monthly	Problem-links read; sampled monthly	
+LH-31	Member link reports	Inspect failed resolve/dismiss on non-production	P2	I	retire	member link reports Incidental; zero reports ever	
+LH-32	Link Health and reports	Complete keyboard, real-touch, reduced-motion, and horizontal/vertical sweep	P2	P9	retire	load/error/empty variant; no guard value	
+DG-01	`/admin/digests`	Load delivery health	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+DG-02	Digest delivery health	Activate `Retry` after initial failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+DG-03	Digest delivery health	Fail a poll after a good snapshot	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+DG-04	Digest delivery health	Activate `Refresh`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+DG-05	Digest delivery health	Inspect populated transport, queue, totals, and failure codes	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+DG-06	Digest jobs by channel/status	Load with no digest jobs	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+DG-07	Recent digest failures	Load with no recent failure codes	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-01	`/admin#audit`	Load audit log	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-02	Audit log	Activate `Retry` after failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-03	Audit log	Load with no matching entries	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-04	Audit log	Inspect populated rows	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-05	Audit header	Toggle audit tools	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-06	Audit Resource ID filter	Enter blank or positive int4 ID and submit	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-07	Audit Resource ID filter	Enter 0, nonnumeric, negative, or >int4 value	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-08	Audit tools	Choose 25/50/100/200 rows and apply	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-09	Audit tools	Activate Search button or Enter	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-10	Audit active filter	Activate `Clear`	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-11	Audit tools	Activate `Refresh`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-12	Audit pagination	Activate `Previous`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-13	Audit pagination	Activate `Next`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-14	Audit row	Activate row via click, Enter, or Space	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-15	Audit row ID cell	Activate `View details for audit entry N`	P1	S	periodic-monthly	Secondary function; one monthly pass per tab	
+AU-16	Audit entry dialog	Close via X/Escape	P1	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-17	Audit status chips	Inspect create/update/delete, auth.*, recommendation invalid, unknown, and degraded rows	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+AU-18	Contact submissions	Load inbox	P2	I	retire	contact inbox Incidental; only QA messages	
+AU-19	Contact submissions 404	Activate `Retry`	P2	I	retire	contact inbox Incidental; only QA messages	
+AU-20	Contact submissions failure	Activate `Retry` after non-404 failure	P2	I	retire	contact inbox Incidental; only QA messages	
+AU-21	Contact submissions	Load successful empty inbox	P2	I	retire	contact inbox Incidental; only QA messages	
+AU-22	Contact submissions	Inspect populated inbox	P1	I	retire	contact inbox Incidental; only QA messages	
+AU-23	Contact submissions pagination	Activate Previous and Next	P1	I	retire	contact inbox Incidental; only QA messages	
+AU-24	Contact submission row	Open via click, Enter, or Space	P1	I	retire	contact inbox Incidental; only QA messages	
+AU-25	Contact submission detail	Toggle `Reveal/Mask reply-to email`	P1	I	retire	contact inbox Incidental; only QA messages	
+AU-26	Contact submission detail revealed email	Activate `mailto:` link	P1	I	retire	contact inbox Incidental; only QA messages	
+AU-27	Contact submission detail	Close via X/Escape	P1	I	retire	contact inbox Incidental; only QA messages	
+C6-PC-007	Account menu, member	Open Profile, Bookmarks, Notifications, Settings, Theme, conditional Admin, Sign out	P2	S	periodic-monthly	account menu links; sampled monthly	
+C6-MB-001	Sign-in/guest merge	Sign in with on-device saves, duplicates, missing and failing resources	P2	P6	tier2-weekly	sign-in and guest merge on audit member	NEW-11
+C6-MB-002	`/profile` tabs	Switch Overview, Favorites, Bookmarks, Submissions, Security and Back/Forward	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-003	Profile display name	Open editor, submit empty/invisible/valid names, cancel and save	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-004	Profile session controls	Open Settings, Sign out and Sign out all devices with confirm/cancel	P2	S	retire	sign-out controls never clicked on production	
+C6-MB-005	Profile overview	Inspect progress, streak, current path and estimated time	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-006	Continue preview	Open dashboard, Resume, open recent or Explore journeys	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-007	Profile recommendations	Refresh, open cards and feedback, open hidden restore	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-008	Favorites tab	Add/remove favorite, open title/external and recover empty/error	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-009	Profile bookmarks tab	Remove/edit notes, open title/external and recover empty/error	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-010	Submissions summary	Open contribution dashboard	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-011	Account security	Open Manage account security	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-012	API keys create/reveal	Name key, choose expiry, create, copy and dismiss secret	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-013	API keys list/revoke	Inspect empty/populated/expired keys, cancel/confirm revoke and handle error	P2	S	periodic-monthly	account security/data-loss guard	
+C6-MB-014	Account deletion	Open/cancel/confirm deletion request and handle failure	P2	S	periodic-monthly	account security/data-loss guard	
+C6-MB-015	Deletion withdrawal	Withdraw pending request	P2	S	periodic-monthly	account security/data-loss guard	
+C6-MB-016	`/bookmarks` summary	Use Active, Saved, Watch next, In progress, Done and Archived cards	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-017	Collection filtering	Use All saved, individual collection and mobile Collection select	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-018	Collection create/rename	Create, rename, submit blank and cancel	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-019	Collection reorder	Move collections up/down including edges	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-020	Collection archive/restore	Archive and restore selected collection	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-021	Collection sharing	Publish link, copy link and unpublish	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-022	Collection deletion	Open/cancel/confirm delete	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-023	Library filters	Change Queue status, Visibility and Sort	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-024	Bookmark selection	Select all shown and individual cards; clear selection	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-025	Bulk queue status	Choose status and Apply	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-026	Bulk Move to collection	Choose destination and Move	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-027	Bulk personal tags	Add and Remove same tag	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-028	Bulk archive/restore	Archive active selections and restore archived selections	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-029	Bookmark notes	Open Note, edit ≤500 chars, save and cancel	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-030	Bookmark card actions	Change queue status, archive/restore, and use resource title/details/external/favorite/bookmark	P0	S	tier2-weekly	bookmark add/remove is in Tier 2	T2-06+T2-07
+C6-MB-031	Library states	Exercise loading, error/Retry, offline, empty library, empty collection and no matches	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-032	Guest-to-member library	Reach cap, go offline, then sign in and inspect merged library	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-033	Journey listing enrollment	Start fresh journey from listing	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-034	Journey detail enrollment	Start fresh journey from detail	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-035	Journey completion state	Complete all steps and undo every step	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-036	Continue-learning flows	Resume, open recent and suggested content	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-037	Helpful feedback	Select/deselect Helpful and trigger save failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-038	Not for me / Already know	Apply both states, reload and inspect recovery	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-039	Hide feedback	Hide, Undo immediately and Restore later	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-040	Recommendation preferences	Edit preferences and refresh results	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-041	`/contributions` filters	Search, filter type/status, and sort	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-042	Contribution cards	Expand edit changes, open submitted URL/public resource, inspect rejected/superseded states	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-043	Contribution withdrawal	Open/cancel/confirm withdraw and handle 409	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-044	Contribution states	Use pagination and render loading, error, offline, no contributions and no matches	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-045	`/submit` form fields	Edit title, URL, description, category, subcategory, sub-subcategory and tags	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-046	Submit URL checks	Enter duplicate, reserved, malformed and server-rejected URLs	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-047	Submit draft/cancel	Restore draft, edit across tabs, Cancel and confirm/keep editing	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-048	Submit success	Submit valid resource and open contributions	P0	S	tier2-weekly	QA submission is the Tier 2 chain start	T2-01+T2-04
+C6-MB-049	Submit auth states	Load while auth pending/failing/signed out and retry auth	P2	S	retire	a11y/offline/state sweep; no data-loss guard	
+C6-MB-050	Populated notification inbox	Open each notification kind and Mark read	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-051	Inbox bulk/states	Mark all read and exercise empty, loading, error/offline and mutation failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-052	Notification preferences	Toggle Email digest/In-app and three sections; change cadence/timezone	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-053	Pause/resume notifications	Pause for 7 days and Resume now	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-054	Unsubscribe all	Disable both channels in one quick action	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-055	Save choices	Save valid changes and trigger server failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-056	Digest preview	Open preview links and render loading/error/empty	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-057	Digest unsubscribe link	GET token page then POST confirmation; revisit used/invalid link	P0	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-058	`/settings` hub	Open Appearance, Account, Security, Bookmarks and Recommendations	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-059	Home layout preference	Select Index/Curated as member and guest	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-060	Learning preferences fields	Change skill, topics, goals, formats and time	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-061	Save learning preferences	Save complete profile	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-062	Reset learning preferences	Cancel/confirm reset and handle failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-063	Learning states	Render loading, load error, no saved preferences and editor	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-064	Theme account writes	Change system and accent as member, force conflict/offline and retry	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-065	Font override	Choose every font and system default, reload and switch tabs	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-066	Onboarding step 1	Choose Beginner, Intermediate or Advanced and Continue	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-067	Onboarding step 2	Toggle topics, attempt zero and choose valid topics	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-068	Onboarding step 3	Toggle goals, attempt zero and choose valid goals	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-069	Onboarding step 4	Toggle formats, attempt zero and choose valid formats	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-070	Onboarding step 5	Select time commitment and Save preferences	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-071	Onboarding navigation/draft	Continue, Back, browser Back/Forward and reload mid-flow	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-072	Onboarding skip/completion	Save and browse later, revisit completed onboarding and complete again	P2	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-073	Onboarding states	Trigger preference/category load failure and save failure	P2	S	retire	variant, cancel or sibling of populated row; no guard value	
+C6-MB-074	Public API key consumption	Use created key against public API and docs	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
+C6-MB-075	**C5-UNVERIFIED: Offline handling**	Take member queries and each mutation offline, then reconnect	P2	S	retire	a11y/offline/state sweep; no data-loss guard	
+C6-MB-076	**C5-UNVERIFIED: Reduced motion**	Use all member surfaces with reduced motion	P2	S	retire	a11y/offline/state sweep; no data-loss guard	
+C6-MB-077	**C5-UNVERIFIED: Touch was checked by emulation only**	Repeat member controls on real touch input	P2	S	retire	a11y/offline/state sweep; no data-loss guard	
+C6-MB-078	**C5-UNVERIFIED: Keyboard walk at 820/390**	Walk every settings and member page at touch widths	P0	S	retire	a11y/offline/state sweep; no data-loss guard	
+C6-MB-079	**C5-UNVERIFIED: Clerk member session out of reach**	Exercise actual non-owner Clerk member auth and return	P0	P6	tier2-weekly	member session sign-in; needs audit account #76	T2-00
+C6-MB-080	**C5-UNVERIFIED: #82 tag-card actions not re-driven**	Re-drive every action on `/tag/hls` cards at touch widths	P0	S	periodic-monthly	tag-card actions at touch width	
+C6-MB-081	Member API aliases/compatibility	Exercise canonical and legacy contribution/bookmark/recommendation routes used by older surfaces	P0	S	periodic-monthly	Secondary function; one monthly pass per tab	
