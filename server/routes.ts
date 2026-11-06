@@ -67,6 +67,7 @@ import { registerLinkReportRoutes } from "./routes/domains/link-reports";
 import { registerLinkRemediationRoutes } from "./routes/domains/link-remediation";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerAdminUsageRoutes } from "./routes/domains/admin-usage";
+import { registerQaCleanupRoutes } from "./routes/domains/qa-cleanup";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 import { registerOpsCronRoutes } from "./routes/domains/ops-cron";
 import { createLogger } from "./lib/logger";
@@ -337,6 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   registerAdminUsageRoutes(app, { isAuthenticated, isAdmin });
+  registerQaCleanupRoutes(app, { isAuthenticated, isAdmin, learningJourneyRepo });
 
   const exportContext: ExportLinkHealthContext = {
     isAuthenticated,
