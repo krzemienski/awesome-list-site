@@ -5,6 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff"
 
 const Dialog = DialogPrimitive.Root
 
@@ -35,7 +36,9 @@ type AutoFocusHandler = (event: Event) => void
  * Radix returns focus only to a <DialogTrigger>. Controlled dialogs opened
  * from a plain button have no trigger, so focus fell to <body> on close
  * (WCAG 2.4.3). Remember what held focus when the dialog opened and restore
- * it, unless the consumer handled close focus itself.
+ * it, unless the consumer handled close focus itself. When the confirm
+ * removed that control (a cancelled job's "Cancel" button, a deleted row's
+ * action), fall back to the page heading rather than <body> (C22-EN-24).
  */
 function useReturnFocus(
   onOpenAutoFocus?: AutoFocusHandler,
@@ -53,9 +56,16 @@ function useReturnFocus(
       onCloseAutoFocus?.(event)
       const target = returnTo.current
       returnTo.current = null
-      if (event.defaultPrevented || !target?.isConnected) return
+      if (event.defaultPrevented || !target) return
       event.preventDefault()
+      if (!target.isConnected) {
+        focusPageHeading()
+        return
+      }
       target.focus({ preventScroll: true })
+      // The confirm may remove its own opener once the refetch lands (a
+      // cancelled job's card), after focus has returned to it.
+      handoffFocusOnUnmount(target)
     },
   }
 }
