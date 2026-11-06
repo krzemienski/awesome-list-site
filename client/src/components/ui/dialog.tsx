@@ -5,6 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff"
 
 const Dialog = DialogPrimitive.Root
 
@@ -35,27 +36,48 @@ type AutoFocusHandler = (event: Event) => void
  * Radix returns focus only to a <DialogTrigger>. Controlled dialogs opened
  * from a plain button have no trigger, so focus fell to <body> on close
  * (WCAG 2.4.3). Remember what held focus when the dialog opened and restore
- * it, unless the consumer handled close focus itself.
+ * it, unless the consumer handled close focus itself. When the confirm
+ * removed that control (a cancelled job's "Cancel" button, a deleted row's
+ * action), fall back to the dialog it was opened from, else the page heading,
+ * rather than <body> (C22-EN-24).
  */
 function useReturnFocus(
   onOpenAutoFocus?: AutoFocusHandler,
   onCloseAutoFocus?: AutoFocusHandler,
 ) {
   const returnTo = React.useRef<HTMLElement | null>(null)
+  // A dialog opened from inside another dialog must keep focus in that one.
+  const parentDialog = React.useRef<HTMLElement | null>(null)
   return {
     onOpenAutoFocus: (event: Event) => {
       const active = document.activeElement
       returnTo.current =
         active instanceof HTMLElement && active !== document.body ? active : null
+      parentDialog.current =
+        returnTo.current?.closest<HTMLElement>('[role="dialog"], [role="alertdialog"]') ?? null
       onOpenAutoFocus?.(event)
     },
     onCloseAutoFocus: (event: Event) => {
       onCloseAutoFocus?.(event)
       const target = returnTo.current
+      const parent = parentDialog.current
       returnTo.current = null
-      if (event.defaultPrevented || !target?.isConnected) return
+      parentDialog.current = null
+      if (event.defaultPrevented || !target) return
       event.preventDefault()
-      target.focus({ preventScroll: true })
+      // A parent that is itself closing (exit animation) is about to unmount.
+      const liveParent = () =>
+        parent?.isConnected && parent.getAttribute("data-state") !== "closed" ? parent : null
+      const fallback = () => focusElement(liveParent()) || focusPageHeading()
+      if (target.isConnected) target.focus({ preventScroll: true })
+      // Gone, or no longer focusable (disabled while its request runs).
+      if (document.activeElement !== target) {
+        fallback()
+        return
+      }
+      // The confirm may remove its own opener once the refetch lands (a
+      // cancelled job's card), after focus has returned to it.
+      handoffFocusOnUnmount(target, liveParent)
     },
   }
 }
