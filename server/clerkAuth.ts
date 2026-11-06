@@ -175,7 +175,7 @@ function skipUserContext(req: Request): boolean {
 }
 
 /** Constant-time string comparison (hash first so lengths never leak). */
-function secretsMatch(candidate: string, expected: string): boolean {
+export function secretsMatch(candidate: string, expected: string): boolean {
   const a = createHash("sha256").update(candidate).digest();
   const b = createHash("sha256").update(expected).digest();
   return timingSafeEqual(a, b);

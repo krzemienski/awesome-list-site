@@ -67,6 +67,7 @@ import { registerLinkReportRoutes } from "./routes/domains/link-reports";
 import { registerLinkRemediationRoutes } from "./routes/domains/link-remediation";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerOperationsRoutes } from "./routes/domains/operations";
+import { registerOpsCronRoutes } from "./routes/domains/ops-cron";
 import { createLogger } from "./lib/logger";
 
 const logger = createLogger("routes");
@@ -384,6 +385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Default-off contact surface (docs/CONTACT-VARIANTS.md "Backend").
   registerContactRoutes(app, { isAuthenticated, isAdmin, contactRepo });
+
+  // Before registerOperationsRoutes: that registrar installs the /api 404 fallbacks.
+  registerOpsCronRoutes(app);
 
   // Must remain last: this registrar mounts method and not-found fallbacks.
   registerOperationsRoutes(app, { isAuthenticated, isAdmin, userRepo });
