@@ -129,10 +129,13 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       setSeedFailure(null);
     },
     onSuccess: (data: SeedDatabaseResponse, options) => {
-      setSeedResult({ ...data, mode: options.clearExisting ? "reseed" : "seed" });
+      const reseed = Boolean(options.clearExisting);
+      setSeedResult({ ...data, mode: reseed ? "reseed" : "seed" });
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({
-        title: data.totalErrors > 0 ? "Database Seeding Partially Failed" : "Database Seeded Successfully",
+        title: data.totalErrors > 0
+          ? reseed ? "Clear & Re-seed Partially Failed" : "Database Seeding Partially Failed"
+          : reseed ? "Clear & Re-seed Completed" : "Database Seeded Successfully",
         variant: data.totalErrors > 0 ? "destructive" : "default",
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
@@ -152,7 +155,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         message,
       });
       toast({
-        title: "Database Seeding Failed",
+        title: options.clearExisting ? "Clear & Re-seed Failed" : "Database Seeding Failed",
         description: message,
         variant: "destructive",
       });
