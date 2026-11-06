@@ -78,3 +78,16 @@ export async function linkClerkUserToRow(
   await clerkClient.users.updateUser(clerkUserId, { externalId: target.id });
   return { ok: true, clerkUserId, externalId: target.id, changed: true };
 }
+
+/** True when the Clerk user holds `email` (case-insensitive) as a VERIFIED
+ *  address. Throws if Clerk cannot be reached; callers fail closed. */
+export async function clerkUserHasVerifiedEmail(
+  clerkUserId: string,
+  email: string,
+): Promise<boolean> {
+  const clerkUser = await clerkClient.users.getUser(clerkUserId);
+  const wanted = email.toLowerCase();
+  return clerkUser.emailAddresses.some(
+    (e) => e.emailAddress.toLowerCase() === wanted && e.verification?.status === "verified",
+  );
+}

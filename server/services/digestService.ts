@@ -41,6 +41,7 @@ import {
   probeEmailTransport,
   sendTransactionalEmail,
 } from "../email";
+import { clerkUserHasVerifiedEmail } from "../lib/clerkAccountLink";
 import { createLogger } from "../lib/logger";
 
 const logger = createLogger("digest");
@@ -176,11 +177,13 @@ export async function getNotificationPreferences(
 /**
  * Saves a full form (PUT) or a quick action's few fields (PATCH). Fields the
  * patch omits keep their stored value, so a pause never writes a time zone the
- * user did not choose.
+ * user did not choose. Turning the email digest on needs the account email
+ * verified in Clerk (`clerkUserId` is the session's Clerk id, not the row id).
  */
 export async function updateNotificationPreferences(
   userId: string,
   patch: NotificationPreferencesPatch,
+  clerkUserId?: string,
 ): Promise<NotificationPreferencesResponse> {
   const now = new Date();
   const [account, existing] = await Promise.all([
@@ -224,6 +227,18 @@ export async function updateNotificationPreferences(
   }
   if (patch.emailDigestEnabled && !account?.email) {
     throw new Error("email_required");
+  }
+  if (patch.emailDigestEnabled && !existing?.emailDigestEnabled && account?.email) {
+    let verified = false;
+    if (clerkUserId) {
+      try {
+        verified = await clerkUserHasVerifiedEmail(clerkUserId, account.email);
+      } catch (error) {
+        logger.error("[digest] Clerk email verification lookup failed:", error);
+        throw new Error("clerk_unavailable");
+      }
+    }
+    if (!verified) throw new Error("email_unverified");
   }
 
   const emailJustEnabled =
