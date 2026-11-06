@@ -77,9 +77,12 @@ async function main(): Promise<number> {
       log(`${rec.status.toUpperCase().padEnd(4)} ${rec.id.padEnd(7)} ${String(rec.ms).padStart(6)} ms  ${rec.detail}`);
     }
   } finally {
-    await browser?.close();
+    run.violations = browser?.violations ?? [];
+    await browser?.close().catch(() => undefined);
   }
-  run.violations = browser?.violations ?? [];
+  if (run.violations.length) {
+    run.records.push(record({ id: "GUARD", tier: 1, kind: "browser", blocking: true, run: () => Promise.resolve({ status: "fail" }) }, { status: "fail", detail: `${run.violations.length} non-GET request(s) to awesome.video aborted` }, 0));
+  }
   const code = exitCode(run);
   const { json, markdown } = writeReport(dir, run, code);
   if (args.schedule) pruneScheduled(outRoot);

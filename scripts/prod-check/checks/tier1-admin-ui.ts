@@ -13,11 +13,18 @@ interface Stats {
   totalRejected: number;
 }
 
-async function withOwner<T>(ctx: Ctx, fn: (kit: KitContext) => Promise<T>): Promise<T> {
-  ctx.http.ownerCookies();
+/** Verifies the owner session with a GET first (a 401 throws AuthExpiredError), then runs fn; owner-page console errors turn a pass into info. */
+async function withOwner(ctx: Ctx, fn: (kit: KitContext) => Promise<Result>): Promise<Result> {
+  await stats(ctx);
   const kit = await ctx.browser!.newContext("owner");
+  const before = ctx.browser!.consoleErrors.length;
   try {
-    return await fn(kit);
+    const result = await fn(kit);
+    const errors = ctx.browser!.consoleErrors.slice(before).filter((e) => e.auth === "owner");
+    if (result.status === "pass" && errors.length) {
+      return { ...result, status: "info", detail: `${result.detail ?? ""}; ${errors.length} console errors on admin pages, e.g. ${errors[0].page}: ${errors[0].text.slice(0, 100)}` };
+    }
+    return result;
   } finally {
     await kit.close();
   }
@@ -144,7 +151,7 @@ register(
     })),
   },
   {
-    id: "NEW-4", tier: 1, kind: "browser", blocking: false,
+    id: "NEW-4", tier: 1, kind: "browser", blocking: true,
     run: (ctx) =>
       withVisitor(ctx, (kit) =>
         onPage(ctx, kit, "NEW-4", async (page): Promise<Result> => {

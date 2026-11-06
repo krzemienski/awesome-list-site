@@ -43,16 +43,15 @@ export function record(check: Check, result: Result, ms: number, authExpired = f
 
 export function exitCode(run: RunSummary): number {
   if (run.violations.length) return EXIT.guard;
-  const ownerChecks = run.records.filter((r) => r.owner);
-  if (ownerChecks.length && ownerChecks.every((r) => r.authExpired)) return EXIT.authExpired;
-  return run.records.some((r) => r.blocking && r.status === "fail" && !r.authExpired) ? EXIT.blockingFailed : EXIT.ok;
+  if (run.records.some((r) => r.authExpired)) return EXIT.authExpired;
+  return run.records.some((r) => r.blocking && r.status === "fail") ? EXIT.blockingFailed : EXIT.ok;
 }
 
 function summaryMarkdown(run: RunSummary, code: number): string {
   const count = (s: Status) => run.records.filter((r) => r.status === s).length;
   const order = { fail: 0, info: 1, skip: 2, pass: 3 } as const;
   const rows = [...run.records].sort((a, b) => order[a.status] - order[b.status]);
-  const verdict = code === EXIT.ok ? "PASS" : `FAIL (exit ${code})`;
+  const verdict = code === EXIT.ok ? "PASS" : code === EXIT.authExpired ? "FAIL (exit 5): owner session expired" : `FAIL (exit ${code})`;
   const lines = [
     `# prod-check ${run.runId}: ${verdict}`,
     "",
