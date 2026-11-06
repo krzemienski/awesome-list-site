@@ -297,6 +297,9 @@
 .admin-ops-validation-group__items {
   color: var(--text);
   line-height: 1.5;
+  min-width: 0;
+  /* Warnings quote long URLs with no spaces. */
+  overflow-wrap: anywhere;
   margin-left: 1.5rem;
   margin-top: 0.25rem;
 }
