@@ -160,7 +160,7 @@ export default function LinkRemediationPanel() {
                     <TableCell>
                       {a.kind !== "restore" && (
                         <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
-                          aria-label={`Mark the link for ${a.title} as fine`}>
+                          aria-label={`Link is fine for ${a.title}`}>
                           Link is fine
                         </Button>
                       )}
@@ -179,7 +179,7 @@ export default function LinkRemediationPanel() {
                 <li key={r.id} className="flex flex-wrap items-center gap-2 text-sm">
                   <a href={`/resource/${r.id}`} className="hover:underline">{r.title}</a>
                   <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: r.id, ignored: false })}
-                    aria-label={`Resume link checks for ${r.title}`}>
+                    aria-label={`Resume checks for ${r.title}`}>
                     Resume checks
                   </Button>
                 </li>
