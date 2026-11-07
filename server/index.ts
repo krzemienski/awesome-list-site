@@ -9,6 +9,7 @@ import { runMigrations } from "./migrate";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import { initializeDigestScheduler } from "./jobs/digestScheduler";
 import { initializeContactRetentionScheduler } from "./jobs/contactRetentionScheduler";
+import { initializeBackupScheduler } from "./jobs/backupScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -765,6 +766,7 @@ void (async () => {
     initializeLinkHealthScheduler();
     initializeDigestScheduler();
     initializeContactRetentionScheduler();
+    initializeBackupScheduler();
   }).on('error', (err) => {
     logger.error(`Server failed to start on port ${port}`, err);
     process.exit(1);
