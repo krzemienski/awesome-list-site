@@ -36,6 +36,7 @@ Check these first; if one is missing, stop and tell the user exactly which, beca
    The `.replit.dev` hostname can change after a cluster migration; if the alias stops resolving, get the new one from the SSH pane.
 
    Run this check first on every deploy. If it fails, the deploy still goes ahead: steps 2–3 use the **Agent sync** (end of step 6) instead of SSH. Tell the user once that SSH is down, because every Agent sync is a paid Agent run.
+3. **Owner admin session.** `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" https://awesome.video/api/admin/stats` must print 200: steps 5.3a and 5.3b need it. On 401, hand the owner `! bash ~/.cache/awesome-audit/refresh-owner.sh` at the start, before the sync, not mid-deploy (the agent cannot read `.env`). Every admin POST, PUT or DELETE also needs `-H 'Origin: https://awesome.video'`: a 403 means that header is missing, a 401 means the session or password is wrong.
 
 ## Steps
 
@@ -82,7 +83,7 @@ The printed HEAD must equal TARGET.
 
 After any publish, run `git fetch` (locally and in the workspace) before you branch, merge or create a worktree, because origin/main may have gained the publish commit.
 
-When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
+Gate every PR with main's copy of the gate, so a branch cannot weaken it: `bash <(git show origin/main:scripts/merge-gate.sh) <branch>`. When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
 
 If `git fetch` fails on auth, the workspace has lost its GitHub connection; stop and tell the user to reconnect it in the Git pane.
 
@@ -145,7 +146,7 @@ Before publishing, list the live audit lanes and tell each that the revision is 
 
 1. Find the app: `search_apps` by URL returns `[]` (2026-11-06), and a name search ("Awesome Video") also returns look-alike apps. Search by name, or take the replId from the `awesome-replit` SSH user (`ssh awesome-replit 'echo $REPL_ID'`), then confirm with `get_publish_status(replId)` that the deployment serves https://awesome.video before any publish. Cache nothing across runs.
 2. `get_publish_status(replId)` first. If a publish is already in progress, wait for it instead of starting another.
-3. Pre-publish check, immediately before step 3a (and before telling the owner to publish). `ask_question(replId, "Run git status --short and git rev-parse HEAD^{tree} and quote both outputs verbatim.")`, or the same commands over SSH. `git status --short` must print nothing at all: no `??` line and no modified file. A `package-lock.json` that step 3's `npm install` rewrote also fails; restore it with `git checkout -- package-lock.json` and check again. HEAD's tree must equal `git rev-parse "$TARGET^{tree}"`. Delete unwanted untracked files now, before the publish, never after. The build guard (step 4) refuses untracked files and a tree that is not main's, but it does not see modified tracked files or ignored files, so this check is the only one for those. Ignored files ship too, so a secret-bearing file such as `.env` must never be in the workspace at all; secrets live in Replit Secrets. If one is there, stop and tell the owner instead of publishing. From here until step 5 ends, make no edit in the workspace, and publish only while no Replit Agent run or other writer is active there: autosave commits untracked files into the build that is being published.
+3. Pre-publish check, immediately before step 3a (and before telling the owner to publish). `ask_question(replId, "Run git status --short and git rev-parse HEAD^{tree} and quote both outputs verbatim.")`, or the same commands over SSH. `git status --short` must print nothing at all: no `??` line and no modified file. A `package-lock.json` that step 3's `npm install` rewrote also fails; restore it with `git checkout -- package-lock.json` and check again. HEAD's tree must equal `git rev-parse "$TARGET^{tree}"`. Delete unwanted untracked files now, before the publish, never after. The build guard (step 4) refuses untracked files and a tree that is not main's, but it does not see modified tracked files or ignored files, so this check is the only one for those. Ignored files ship too, so no secret-bearing file may be in the workspace; secrets live in Replit Secrets. The workspace `.env` is the tracked mirror of public `VITE_*` config (#273): check its key names only (`cut -d= -f1 .env`, never the values) and stop only if a secret key name (a password, token, key or `DATABASE_URL`) appears. From here until step 5 ends, make no edit in the workspace, and publish only while no Replit Agent run or other writer is active there: autosave commits untracked files into the build that is being published.
 3a. (Step 5.3a) Running-jobs check, immediately before step 4 and again after any wait in step 4. A deploy restarts the instance and kills in-process scans (three jobs died "Interrupted by server restart"). Paste this as its own shell call (the `exit 1` ends that shell); it uses the cached owner header file and never prints it. Every probe fails closed:
 
 ```bash
@@ -164,7 +165,7 @@ probe backup /api/admin/database-backups 'if (.inFlight|type)!="boolean" then "b
 ```
 Any `STOP` line means: do not publish. Report the job id and `createdAt` and ask the owner. Never cancel a job to proceed. A 401 on any probe is also a STOP (idle cannot be proven).
 
-3b. (Step 5.3b) Fresh backup, after 3a passes and immediately before step 4. The owner's standing approval (PLAN decision 17) allows exactly one `POST /api/admin/database-backups` per deploy, only after the schema and running-jobs checks pass and just before `publish_app`. It creates a backup and changes no site data; it covers no restore, no deletion and no other POST. Then check, via `GET /api/admin/database-backups` (newest first):
+3b. (Step 5.3b) Fresh backup, after 3a passes and immediately before step 4. The owner's standing approval (PLAN decision 17) allows exactly one `POST /api/admin/database-backups` per deploy, only after the schema and running-jobs checks pass and just before `publish_app`. Send it as `curl -X POST -H @owner.hdr -H 'Origin: https://awesome.video' -H 'Content-Type: application/json' -d '{}' .../api/admin/database-backups`. It creates a backup and changes no site data; it covers no restore, no deletion and no other POST. Then check, via `GET /api/admin/database-backups` (newest first):
    1. The POST returned 201 and its id is the first list entry (409 means one is in flight: wait and re-run 3a).
    2. The newest `completedAt` is under 10 minutes old.
    3. `tableCount` is at least 42 and `totalRows` is at least 99 % of the previous backup's. `agent_events` grows quickly, so a longer gap can add rows legitimately; a drop is the failure.
@@ -177,7 +178,7 @@ Record each status response verbatim.
 
 ### 6. If the publish fails or hangs
 
-`ask_question` is the first route to deployment and runtime logs for any production failure, during a deploy or not. It takes one question at a time: while one runs, another returns "Agent busy, NOT submitted". Merge related questions into one call, wait for its answer, and resend anything that came back NOT submitted. Try, in order:
+For runtime logs, first query the app's own sink: `curl -s -H @owner.hdr "https://awesome.video/api/admin/logs?sinceMinutes=60&limit=500"` (always pass `limit`; records carry `_time`, `level`, `area`, `instance`, `message`). It does not see the build log or a crash before the logger starts. For those, `ask_question` is the next route, during a deploy or not. It takes one question at a time: while one runs, another returns "Agent busy, NOT submitted". Merge related questions into one call, wait for its answer, and resend anything that came back NOT submitted. Try, in order:
 1. `ask_question(replId, "Read the build log and runtime logs of the most recent deployment and quote the first ERROR or FAILED lines verbatim, each with its timestamp.")`. This is read-only but may cost Agent credits. Ask for verbatim timestamped lines, and still quote the answer as Agent's claim, not as the log.
 2. Reproduce over SSH: rerun step 4, and `ssh awesome-replit 'cd ~/workspace; NODE_ENV=production PORT=5099 timeout 30 node dist/index.js'` to catch startup crashes (missing env, port, migration errors).
 3. A stuck publish waiting on the **database conflict dialog** cannot be answered from MCP. Stop and tell the user to open Publishing in Replit and review the schema changes there.
