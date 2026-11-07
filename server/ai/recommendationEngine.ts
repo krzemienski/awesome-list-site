@@ -163,6 +163,7 @@ export class RecommendationEngine {
     userProfile: UserProfile,
     limit: number = 10,
     forceRefresh: boolean = false,
+    useAI: boolean = false,
   ): Promise<{
     recommendations: RecommendationResult[];
     /** True when the popularity query failed and the list is an unranked fallback. */
@@ -282,7 +283,7 @@ export class RecommendationEngine {
         .map((row) => `${row.resourceId}:${row.feedback}`)
         .join(','),
     ].join('|');
-    const cacheKey = `${enrichedProfile.userId}::${limit}::${profileFingerprint}`;
+    const cacheKey = `${enrichedProfile.userId}::${limit}::${useAI ? 'ai' : 'rules'}::${profileFingerprint}`;
     
     // Check cache if not forcing refresh
     if (!forceRefresh) {
@@ -549,8 +550,8 @@ export class RecommendationEngine {
         };
       }
 
-      // Try AI-powered recommendations first if API key is available
-      if (claudeService.isAvailable()) {
+      // Claude is a paid call: only an explicit member request reaches it.
+      if (useAI && claudeService.isAvailable()) {
         try {
           const aiRecommendations = await generateClaudeRecommendations(
             enrichedProfile,

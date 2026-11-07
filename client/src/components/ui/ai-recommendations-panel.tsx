@@ -303,7 +303,11 @@ export default function AIRecommendationsPanel({
       signedIn: isAuthenticated,
       recommendationCount: visibleRecommendations.length,
     });
-    refreshRecommendations(isAuthenticated ? effectiveProfile : undefined);
+    // Only the Refresh button is an explicit request for the paid AI ranking.
+    refreshRecommendations(
+      isAuthenticated ? effectiveProfile : undefined,
+      trigger === "refresh",
+    );
   };
 
   // Same safe-return pattern the legacy /login redirect uses: only an internal
@@ -326,7 +330,13 @@ export default function AIRecommendationsPanel({
       data-testid="button-generate-recommendations"
     >
       <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-      {isPaused ? "Waiting for connection…" : isLoading ? "Refreshing…" : "Refresh recommendations"}
+      {isPaused
+        ? "Waiting for connection…"
+        : isLoading
+          ? "Refreshing…"
+          : isAuthenticated
+            ? "Refresh with AI"
+            : "Refresh recommendations"}
     </Button>
   );
 
