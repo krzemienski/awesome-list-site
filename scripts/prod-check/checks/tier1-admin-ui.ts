@@ -105,14 +105,19 @@ async function resourcesTabProblems(ctx: Ctx, kit: KitContext, page: Page, st: S
   return problems;
 }
 
-async function dialogProblems(kit: KitContext, page: Page): Promise<string[]> {
+async function dialogProblems(kit: KitContext, page: Page): Promise<{ problems: string[]; reviewed: boolean }> {
   const problems: string[] = [];
   await openTab(kit, page, "approvals");
-  await page.getByRole("button", { name: /^Review details for/ }).first().click();
-  const review = page.getByRole("dialog");
-  await review.waitFor({ timeout: 10_000 }).catch(() => problems.push("Review dialog did not open"));
-  if (problems.length === 0 && !(await review.innerText()).includes('Resource Details')) problems.push("Review dialog is not populated");
-  await page.keyboard.press("Escape");
+  // An empty approvals queue has no Review button; only the Edit dialog can be checked then.
+  const reviewButton = page.getByRole("button", { name: /^Review details for/ }).first();
+  const reviewed = (await reviewButton.count()) > 0;
+  if (reviewed) {
+    await reviewButton.click();
+    const review = page.getByRole("dialog");
+    await review.waitFor({ timeout: 10_000 }).catch(() => problems.push("Review dialog did not open"));
+    if (problems.length === 0 && !(await review.innerText()).includes('Resource Details')) problems.push("Review dialog is not populated");
+    await page.keyboard.press("Escape");
+  }
   await openTab(kit, page, "resources");
   await page.getByRole("button", { name: /^Edit / }).first().click();
   const edit = page.getByRole("dialog");
@@ -120,7 +125,7 @@ async function dialogProblems(kit: KitContext, page: Page): Promise<string[]> {
   const fields = await edit.locator("input, textarea").evaluateAll((els) => els.filter((e) => (e as HTMLInputElement).value).length);
   if (fields < 2) problems.push(`Edit dialog has ${fields} populated fields`);
   await edit.getByRole("button", { name: "Cancel" }).click().catch(() => problems.push("Edit dialog has no Cancel button"));
-  return problems;
+  return { problems, reviewed };
 }
 
 register(
@@ -146,8 +151,10 @@ register(
   {
     id: "NEW-3", tier: 1, kind: "browser", blocking: false, needs: ["owner"],
     run: (ctx) => withOwner(ctx, (kit) => onPage(ctx, kit, "NEW-3", async (page) => {
-      const problems = await dialogProblems(kit, page);
-      return verdict(problems, "Review and Edit dialogs open populated and close; nothing saved");
+      const { problems, reviewed } = await dialogProblems(kit, page);
+      return verdict(problems, reviewed
+        ? "Review and Edit dialogs open populated and close; nothing saved"
+        : "Edit dialog opens populated and closes; approvals queue empty, Review dialog not checked; nothing saved");
     })),
   },
   {
