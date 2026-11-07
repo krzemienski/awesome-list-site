@@ -95,7 +95,13 @@ case "$tool" in
     cmd=$(jq -r '.tool_input.command // ""' <<<"$input")
     [[ "$cmd" =~ $SECRET_RE ]] && block "secret reference" "$cmd"
     # globs/expansions next to a sensitive directory name can spell a secret path without matching SECRET_RE
-    nourl=$(printf '%s' "$cmd" | sed -E 's#https?://[^[:space:]]*##g; s#repos/[^[:space:]]*##g')   # URL/API paths may carry ? and awesome-
+    # only a strict gh-api endpoint, or a URL argument of curl, may carry ? or other glob characters
+    nourl=""; read -r -a ctoks <<<"$cmd"
+    for t in "${ctoks[@]}"; do
+      if [[ "${ctoks[0]:-}" == gh && "${ctoks[1]:-}" == api && "$t" =~ ^repos/[A-Za-z0-9._/-]+(\?[A-Za-z0-9._=\&%,-]*)?$ && "$t" != *..* ]]; then continue; fi
+      if [[ "${ctoks[0]:-}" == curl && "$t" =~ ^https?:// ]]; then continue; fi
+      nourl+="$t "
+    done
     [[ "$nourl" =~ (\.cache|\.ssh|\.config|\.aws|\.gnupg|awesome-|owner|Keychains) && "$nourl" =~ [\*\?\[\$\`~\\] ]] && block "glob/expansion near sensitive path" "$cmd"
     while IFS= read -r seg; do check_segment "$seg"; done < <(printf '%s\n' "$cmd" | sed -E 's/(&|\||;|`|\(|\))/\n/g')
     # sh -c / eval wrappers hide the real command: scan their payload as one more segment
