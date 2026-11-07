@@ -12,6 +12,12 @@ MAIN_CHECKOUT="/Users/nick/Desktop/awesome-list-site"
 GH_REPO="krzemienski/awesome-list-site"
 mkdir -p "$STATE_DIR" "$WT_DIR" "$LOG_DIR"
 
+# launchd has no keychain session, so git's osxkeychain helper hangs. Authenticate git through gh (token in hosts.yml).
+export GIT_TERMINAL_PROMPT=0
+export GIT_CONFIG_COUNT=2
+export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
+export GIT_CONFIG_KEY_1=credential.helper GIT_CONFIG_VALUE_1='!gh auth git-credential'
+
 # Pre-merge installs track a branch: echo origin/ops/selfheal > ~/.awesome-selfheal/ref. Delete the file once merged.
 SELFHEAL_REF="${SELFHEAL_REF:-$(cat "$SH_HOME/ref" 2>/dev/null || echo origin/main)}"
 
