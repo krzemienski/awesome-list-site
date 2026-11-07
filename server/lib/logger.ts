@@ -48,7 +48,8 @@ const MAX_SHIPPED_TEXT = 8000;
 
 // Replit Autoscale gives every instance the same HOSTNAME (the app domain), so a per-boot suffix tells them apart.
 const BOOT_ID = randomUUID().slice(0, 8);
-const INSTANCE = process.env.INSTANCE_ID || (process.env.HOSTNAME ? `${process.env.HOSTNAME}-${BOOT_ID}` : BOOT_ID);
+const HOST_TAG = process.env.HOSTNAME ? `${process.env.HOSTNAME}-${BOOT_ID}` : undefined;
+const INSTANCE = [process.env.INSTANCE_ID, HOST_TAG].find(Boolean) ?? BOOT_ID;
 const DEPLOYMENT = process.env.REPLIT_DEPLOYMENT === "1" ? "production" : "dev";
 
 // ---------------------------------------------------------------------------
