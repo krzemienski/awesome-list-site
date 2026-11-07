@@ -76,7 +76,7 @@ interface LogSlice { records: LogRecord[]; scanned: number; failedReads: number;
 const SHED_503_BURST_MAX = 50;
 const SHED_WINDOW_MS = 10 * 60_000;
 const SHED_TEXT = /capacity is temporarily full|\bshed\b/i;
-const isShedRecord = (r: LogRecord) => r.area === "og-middleware" && SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`);
+const isShedRecord = (r: LogRecord) => SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`);
 
 function recordRid(r: LogRecord): string | undefined {
   try {
@@ -127,7 +127,9 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
   if (Number.isNaN(bootMs)) return fail("ops health has no boot time (readiness.migrations.completedAt)");
   const slices = hourSlices(bootMs, Date.now());
   const readSlice = async (since: string, until: string, level: "warn" | "error"): Promise<LogSlice> => {
-    const res = await ctx.http.get(`/api/admin/logs?since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&level=${level}&limit=2000`, { owner: true });
+    const url = `/api/admin/logs?since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&level=${level}&limit=2000`;
+    let res = await ctx.http.get(url, { owner: true });
+    if (res.status !== 200) res = await ctx.http.get(url, { owner: true });
     if (res.status !== 200) throw new Error(`/api/admin/logs answered ${res.status} for ${since}`);
     return res.json<LogSlice>();
   };
@@ -142,8 +144,8 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
   }
   const records = fetched.flatMap((s) => s.records);
   const excluded = records.filter((r) => r.level === "error" && isKnownUnapprove409(r));
-  const shedRids = new Set(records.filter(isShedRecord).map(recordRid));
-  const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && (shedRids.has(recordRid(r)) || SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`));
+  const shedRids = new Set(records.filter(isShedRecord).map(recordRid).filter((rid): rid is string => rid !== undefined));
+  const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && ((recordRid(r) !== undefined && shedRids.has(recordRid(r)!)) || SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`));
   const shed = records.filter(isShed503);
   const cron = records.filter(isCronUnconfigured);
   const tolerated = (r: LogRecord) => isKnownUnapprove409(r) || isShed503(r) || isCronUnconfigured(r);

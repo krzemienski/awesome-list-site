@@ -190,7 +190,7 @@ const bookmarkStep = step("T2-05", ["t2.ready"], async (ctx, { member }) => {
 
 /** C-06 (F-MCON-01): submit under an awesome.video QA URL, withdraw, then prove the public surfaces never showed it. */
 const submitWithdrawStep = step("C-06", ["t2.ready"], async (ctx, { member }) => {
-  const name = `qa-audit-${ctx.runId}-c06`;
+  const name = `${runPrefix(ctx)} qa-audit-c06`;
   const res = await member.call("POST", "/api/resources", {
     title: name,
     url: `${ctx.base}/qa-audit-${ctx.runId}/c06`,
@@ -210,7 +210,7 @@ const submitWithdrawStep = step("C-06", ["t2.ready"], async (ctx, { member }) =>
   const found = (await ctx.http.get(`/api/search?q=${encodeURIComponent(name)}`)).json<{ total: number }>().total;
   if (found !== 0) problems.push(`search for ${name} found ${found}, expected 0`);
   const sitemap = (await ctx.http.get("/sitemap.xml")).text;
-  if ([`/resource/${row.id}<`, `qa-audit-${ctx.runId}`].some((needle) => sitemap.includes(needle))) problems.push("sitemap lists the withdrawn row");
+  if ([`/resource/${row.id}<`, `qa-audit-${ctx.runId}`, name].some((needle) => sitemap.includes(needle))) problems.push("sitemap lists the withdrawn row");
   return verdict(problems, `#${row.id} submitted pending, withdrawn; public 404, search 0, sitemap 0`, { id: row.id });
 });
 

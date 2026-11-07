@@ -292,9 +292,9 @@ register(
           if (new URL(page.url()).pathname.startsWith("/sign-in")) signedOut.push(path);
         }
         await page.close();
-        if (signedOut.length) return fail(`audit member session is signed out (${signedOut.join(", ")} redirected to sign-in), so nothing was proven`);
+        if (signedOut.length) return fail(`member session expired: refresh pp7b-member state (${signedOut.join(", ")} redirected to sign-in)`);
         const offending = posts.filter((p) => p.ai);
-        const values = { recommendationPosts: posts.length, aiOptInPosts: posts.filter((p) => p.ai).length, posts };
+        const values = { recommendationPosts: posts.length, aiOptInPosts: posts.filter((p) => p.ai).length, posts: posts.map((p) => ({ request: p.path, useAI: p.ai, body: p.body })) };
         return offending.length
           ? fail(`${offending.length} POST /api/recommendations on page load (aborted before sending): ${offending.map((p) => p.path).join(", ")}`, values)
           : pass("0 POST /api/recommendations with an AI opt-in while loading / and /profile as the audit member", values);
