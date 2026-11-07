@@ -17,11 +17,8 @@ const ANALYTICS_HOST = /google-analytics|googletagmanager|mixpanel|posthog|ampli
 const CLERK_CARD = ".cl-card, .cl-cardBox";
 const RECOMMENDATIONS_PATH = /^\/api\/recommendations(\/|$)/;
 const LOAD_POST_WATCH_MS = 5_000;
-/**
- * The request-body marker D1 (p5-a1) adds when a person explicitly opts in to a paid recommendation.
- * Null until it ships: every POST /api/recommendations during a passive page load then fails C-07.
- */
-const AI_OPT_IN_FIELD: string | null = null;
+/** D1 (PR #321): the only opt-in to a paid Claude recommendation is `useAI: true` in the POST body; page-load POSTs carry `{}`. */
+const AI_OPT_IN_FIELD = "useAI";
 
 /** Opens a visitor context, runs fn, and always closes it. */
 export async function withVisitor<T>(ctx: Ctx, fn: (kit: KitContext) => Promise<T>, viewport?: { width: number; height: number }): Promise<T> {
@@ -309,7 +306,6 @@ register(
 );
 
 function carriesAiOptIn(body: string): boolean {
-  if (AI_OPT_IN_FIELD === null) return true;
   try {
     return (JSON.parse(body) as Record<string, unknown>)[AI_OPT_IN_FIELD] === true;
   } catch {
