@@ -21,6 +21,7 @@ import { ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "l
 import type { Resource, ResourceEdit } from "@shared/schema";
 import { Link } from "wouter";
 import "./queues-review.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface ResourceEditWithResource extends ResourceEdit {
   resource: Resource;
@@ -290,18 +291,13 @@ export default function PendingEdits() {
             <p>
               {"You're offline, so pending edits can't be loaded. The queue may still contain suggestions awaiting review."}
             </p>
-            <Button
-              aria-disabled={isFetching}
-              aria-busy={isFetching}
-              onClick={(event) => {
-                if (isFetching) return;
-                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-edits-heading"));
-                void refetch();
-              }}
-              data-testid="pending-edits-retry"
-            >
-              {isFetching ? "Retrying…" : "Retry"}
-            </Button>
+            <RetryButton
+              variant="default"
+              busy={isFetching}
+              focusTarget={() => document.getElementById("pending-edits-heading")}
+              onRetry={() => void refetch()}
+              testId="pending-edits-retry"
+            />
           </div>
         ) : (
           <AdminLoadError

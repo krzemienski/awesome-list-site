@@ -33,7 +33,7 @@ import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 // Static, not lazy: a corpus failure while offline must render this page
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
@@ -573,6 +573,7 @@ import {
   needsCorpusRoute,
   type AwesomeListNav,
 } from "@/lib/static-data";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 type HomeRouteProps = {
   nav?: AwesomeListNav;
@@ -821,23 +822,16 @@ function Router({
           data-testid="banner-auth-error"
         >
           <span>We couldn't verify your sign-in status. You can keep browsing as a guest.</span>
-          <Button
-            type="button"
+          <RetryButton
             variant="link"
             className="underline underline-offset-2"
-            aria-disabled={authRetrying}
-            onClick={(event) => {
-              if (authRetrying) return;
-              // On success the banner unmounts; hand focus to the recovered
-              // page's heading. On failure this button stays focused.
-              handoffFocusOnUnmount(event.currentTarget);
+            busy={authRetrying}
+            onRetry={() => {
               setAuthRetrying(true);
               void refetchAuth().finally(() => setAuthRetrying(false));
             }}
-            data-testid="button-auth-retry"
-          >
-            {authRetrying ? "Retrying…" : "Retry"}
-          </Button>
+            testId="button-auth-retry"
+          />
         </div>
       ) : null}
       <RouteErrorBoundary location={location}>

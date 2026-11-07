@@ -26,7 +26,8 @@ import {
   Settings
 } from "lucide-react";
 import { AwesomeList } from "@/types/awesome-list";
-import { countVisibleSubcategories, fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { countVisibleSubcategories } from "@shared/catalog-counts";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { trackToolTabOpened } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";

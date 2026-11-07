@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { apiFetch } from "@/lib/api-fetch";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface JourneyStep {
   id: number;
@@ -220,7 +221,7 @@ function ResourcePicker({
             {unavailable && (
               <div role="alert" className="flex flex-wrap items-center gap-2 p-2 text-sm">
                 {unavailable === "offline" ? "You're offline. Reconnect to search resources." : "Resources could not be loaded."}
-                <Button type="button" variant="outline" onClick={() => void resourcesQuery.refetch()}>Retry</Button>
+                <RetryButton onRetry={() => void resourcesQuery.refetch()} />
               </div>
             )}
             {!unavailable && !isFetching && data && data.resources.length === 0 && (
@@ -559,7 +560,7 @@ function StepsDialog({
             unavailable === "offline" ? (
               <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
                 You&apos;re offline. Reconnect to load journey steps.
-                <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
+                <RetryButton onRetry={() => void stepsQuery.refetch()} />
               </div>
             ) : (
               <AdminLoadError

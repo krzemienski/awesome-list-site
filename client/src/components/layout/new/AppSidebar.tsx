@@ -33,21 +33,15 @@ import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
 import { docsUrl, shellRepo } from "@/lib/docs-url";
 import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
+import { visibleNavCategories } from "@/lib/static-data";
+import type { CatalogNavCategory } from "@shared/catalog-nav";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
  * (name/slug/resourceCount, no resource arrays) so cold loads of non-listing
- * pages never download the 2.7MB corpus. The corpus shape (resources arrays)
- * is still accepted for compatibility.
+ * pages never download the 2.7MB corpus.
  */
-interface NavCategory {
-  name: string;
-  slug?: string;
-  resourceCount?: number;
-  resources?: any[];
-  subcategories?: NavCategory[];
-  subSubcategories?: NavCategory[];
-}
+type NavCategory = CatalogNavCategory;
 
 interface AppSidebarProps {
   categories: NavCategory[];
@@ -68,62 +62,6 @@ interface AppSidebarProps {
 }
 
 /* -------- helpers -------- */
-
-// Resources filed on the node itself, not in any child.
-function directResourceCount(item: any): number {
-  return item.resources ? item.resources.length : (item.resourceCount ?? 0);
-}
-
-function getTotalResourceCount(item: any): number {
-  let total = directResourceCount(item);
-  if (item.subcategories) {
-    total += item.subcategories.reduce(
-      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
-      0,
-    );
-  }
-  if (item.subSubcategories) {
-    total += item.subSubcategories.reduce(
-      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
-      0,
-    );
-  }
-  return total;
-}
-
-function filterCategories(categories: NavCategory[]) {
-  return categories
-    .filter(
-      (cat) =>
-        cat.name !== "Table of contents" &&
-        !cat.name.startsWith("List of") &&
-        !["Contributing", "License", "External Links", "Anti-features"].includes(
-          cat.name,
-        ) &&
-        // Drop top-level categories that contain no resources at all (e.g. the
-        // "Categories"/"Projects"/"Resources" meta-entries). Mirrors the
-        // count>0 filter Home uses so the nav and landing page agree on which
-        // categories are real. Empty SUBcategories are still kept (dimmed)
-        // below — this only removes wholly empty top-level entries.
-        getTotalResourceCount(cat) > 0,
-    )
-    .map((cat) => {
-      // BUG-006: hide wholly empty subcategories / sub-subcategories from the
-      // nav. (This reverses follow-up #51's "keep dimmed empties visible"
-      // decision.) On the clean dev tree every node has resources so this is a
-      // no-op; on prod it removes the empty rows the QA audit flagged. Counts
-      // still reconcile because an empty node contributes 0 to the parent sum.
-      const subcategories = (cat.subcategories ?? [])
-        .map((sub) => ({
-          ...sub,
-          subSubcategories: (sub.subSubcategories ?? []).filter(
-            (ss) => getTotalResourceCount(ss) > 0,
-          ),
-        }))
-        .filter((sub) => getTotalResourceCount(sub) > 0);
-      return { ...cat, subcategories };
-    });
-}
 
 function formatCount(n: number): string {
   return n.toLocaleString();
@@ -411,9 +349,9 @@ function CategoryAccordion({
   // /api/awesome-list hierarchy. The backend folds orphaned resources into the
   // nearest valid node, so this always equals COUNT(*) WHERE category = X and
   // always equals (direct + sum of child badges) — no "mixed validators".
-  const totalCount = getTotalResourceCount(cat);
+  const totalCount = cat.totalResourceCount;
   // Without this row the child badges sum short of the category badge.
-  const catDirectCount = directResourceCount(cat);
+  const catDirectCount = cat.resourceCount;
   const catGeneralPath = `${catPath}?filter=general`;
   const hasGrandchildren = subs.some(
     (sub) => (sub.subSubcategories?.length ?? 0) > 0,
@@ -518,7 +456,7 @@ function CategoryAccordion({
               .map((sub) => {
                 const subSlug = sub.slug || slugify(sub.name);
                 const subPath = `/subcategory/${subSlug}`;
-                const subCount = getTotalResourceCount(sub);
+                const subCount = sub.totalResourceCount;
                 const subSubs = sub.subSubcategories || [];
                 const subActive =
                   activePath === subPath ||
@@ -529,7 +467,7 @@ function CategoryAccordion({
                   );
                 const subIsPage = activePath === subPath && !generalActive;
                 const subOpen = openSubs.includes(subKey(sub.name));
-                const subDirectCount = directResourceCount(sub);
+                const subDirectCount = sub.resourceCount;
                 const subGeneralPath = `${subPath}?filter=general`;
 
                 if (subSubs.length === 0) {
@@ -621,14 +559,14 @@ function CategoryAccordion({
                                   navigate(ssPath);
                                 }}
                                 data-testid={`subsub-${ssSlug}`}
-                                aria-label={`${ss.name}, ${resourceCountLabel(getTotalResourceCount(ss))}`}
+                                aria-label={`${ss.name}, ${resourceCountLabel(ss.totalResourceCount)}`}
                                 data-active={activePath === ssPath || undefined}
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
                               >
                                 <span aria-hidden="true">{index === subSubs.length - 1 && subDirectCount === 0 ? "└" : "├"}</span>
                                 <span title={ss.name}>{ss.name}</span>
-                                <span className="font-mono tabular-nums">{formatCount(getTotalResourceCount(ss))}</span>
+                                <span className="font-mono tabular-nums">{formatCount(ss.totalResourceCount)}</span>
                               </a>
                             );
                           })}
@@ -741,7 +679,7 @@ export default function AppSidebar({
       ?.focus();
   }, [isRailCompact]);
 
-  const filtered = useMemo(() => filterCategories(categories), [categories]);
+  const filtered = useMemo(() => visibleNavCategories(categories), [categories]);
 
   useEffect(() => {
     if (!homeBoot || openKeysReady) return;
@@ -1376,7 +1314,7 @@ export default function AppSidebar({
                     e.preventDefault();
                     navigate(href);
                   }}
-                  title={`${cat.name} · ${formatCount(getTotalResourceCount(cat))}`}
+                  title={`${cat.name} · ${formatCount(cat.totalResourceCount)}`}
                   aria-label={cat.name}
                   data-testid={`rail-${catSlug}`}
                   data-active={catActive || undefined}

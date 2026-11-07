@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
+import { corpusTotalCount, type CorpusCountNode } from "@shared/catalog-counts";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
@@ -81,7 +82,6 @@ import {
   renderSearchContent,
   renderCategoriesContent,
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
@@ -96,6 +96,9 @@ import { ServiceUnavailableError } from "./middleware/errors";
 import { loadHomeNav } from "./home-ssr-data";
 import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
 import { createLogger } from "./lib/logger";
+
+/** A corpus-tree node as this file reads it; the tree source itself is untyped. */
+type CorpusNode = CorpusCountNode & { name: string; slug: string };
 
 const logger = createLogger("og-middleware");
 
@@ -525,36 +528,6 @@ async function getTreeCached(): Promise<any> {
   return storage.getAwesomeListFromDatabase();
 }
 
-/**
- * The Home document is rendered by the exact-tree SSR path after this
- * middleware has rewritten the shell.  Its metadata/body only need the small
- * navigation projection; resolving Home through the legacy full catalog tree
- * duplicated the largest public query before SSR started and made the document
- * TTFB pay for two independent catalog representations.  Keep the recursive
- * count here because HomeNavRepository stores direct counts at each level.
- */
-function homeNavCategoryCount(category: {
-  resourceCount?: number;
-  subcategories?: Array<{
-    resourceCount?: number;
-    subSubcategories?: Array<{ resourceCount?: number }>;
-  }>;
-}): number {
-  return (
-    (category.resourceCount ?? 0) +
-    (category.subcategories ?? []).reduce(
-      (total, subcategory) =>
-        total +
-        (subcategory.resourceCount ?? 0) +
-        (subcategory.subSubcategories ?? []).reduce(
-          (nestedTotal, nested) => nestedTotal + (nested.resourceCount ?? 0),
-          0,
-        ),
-      0,
-    )
-  );
-}
-
 function safeDecode(segment: string): string {
   try {
     return decodeURIComponent(segment);
@@ -688,7 +661,7 @@ function homeShellChrome(): string {
       categories = data.categories.map((c) => ({
        name: c.name,
        slug: c.slug,
-        count: homeNavCategoryCount(c),
+        count: c.totalResourceCount,
      }));
     } catch (error) {
       rethrowBoundedDependencyFailure(error);
@@ -975,10 +948,10 @@ function homeShellChrome(): string {
         const data = await getTreeCached();
         aboutResourceCount = data?.resources?.length;
         aboutCategoryCount = data?.categories?.length;
-        categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
+        categories = (data?.categories ?? []).slice(0, 12).map((c: CorpusNode) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -1218,10 +1191,10 @@ function homeShellChrome(): string {
       let cats: { name: string; slug: string; count: number }[] = [];
       try {
         const data = await getTreeCached();
-        cats = (data?.categories ?? []).map((c: any) => ({
+        cats = (data?.categories ?? []).map((c: CorpusNode) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -1325,17 +1298,17 @@ function homeShellChrome(): string {
             level: "category",
             totalResources: flat.length,
             childNames: (found.node?.subcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
-              .map((child: any) => child.name),
+              .filter((child: CorpusNode) => corpusTotalCount(child) > 0)
+              .map((child: CorpusNode) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
             tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "subcategory",
-          children: (found.node?.subcategories ?? []).map((s: any) => ({
+          children: (found.node?.subcategories ?? []).map((s: CorpusNode) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,
@@ -1534,17 +1507,17 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             childNames: (found.node?.subSubcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
-              .map((child: any) => child.name),
+              .filter((child: CorpusNode) => corpusTotalCount(child) > 0)
+              .map((child: CorpusNode) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
             tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "sub-subcategory",
-          children: (found.node?.subSubcategories ?? []).map((s: any) => ({
+          children: (found.node?.subSubcategories ?? []).map((s: CorpusNode) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,

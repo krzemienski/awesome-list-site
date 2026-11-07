@@ -4,6 +4,7 @@ import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import prettierConfig from "eslint-config-prettier";
+import { editorRules } from "./eslint.guards.config.js";
 
 export default tseslint.config(
   // Base JavaScript rules
@@ -98,6 +99,9 @@ export default tseslint.config(
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+
+  // Repo guard rules (also run alone by `npm run lint:guards` inside the build)
+  ...editorRules,
 
   // Ignore patterns
   {

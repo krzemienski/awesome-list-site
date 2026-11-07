@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { lazyOptional } from "@/lib/lazy-optional";
 import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
-import { countVisibleSubcategories, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { countVisibleSubcategories } from "@shared/catalog-counts";
 import { getCategoryGlyph } from "./category-glyphs";
 import "@/styles/shell/footer.css";
 

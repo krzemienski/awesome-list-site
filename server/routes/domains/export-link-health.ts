@@ -85,7 +85,6 @@ import {
 } from "../../http-cache-policy";
 import {
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
@@ -94,6 +93,8 @@ import {
   type ListingLevel,
 } from "../../seo-content";
 import { normalizeTagFilter } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
+import { loadCatalogNavPayload } from "../../home-ssr-data";
 import { resolveResourceKind } from "../../lib/resourceKinds";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
@@ -1704,81 +1705,9 @@ export function registerAwesomeListDiscoveryRoutes(
   // render resource listings never download the corpus at all.
   app.get("/api/awesome-list/nav", resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
-      // Run23 R-06: each category carries a tiny teaser (first direct
-      // resource's title/description) so the Home grid renders card blurbs
-      // from the nav tree alone — without downloading the full corpus.
-      const payload = await getPublicCacheValue({
-        namespace: 'catalog-nav',
-        // Not 'complete': Home SSR (server/home-ssr-data.ts) fills that key
-        // from HomeNavRepository with a narrower shape, and whichever ran
-        // first would decide whether this response carries totalResourceCount.
-        key: 'api-complete',
-        ttlMs: 60_000,
-        load: async () => {
-          // Keep the source read inside the derived cache loader so generation
-          // invalidation covers both the tree read and this projection.
-          const data = await legacyRepo.getAwesomeListFromDatabase();
-          if (!data?.categories?.length) {
-            throw new Error('No awesome list data available');
-          }
-          // resourceCount stays the node's DIRECT count: client consumers
-          // (navTotalCount, AppSidebar, AppHeader, og-middleware) sum it
-          // recursively. totalResourceCount is the full descendant count,
-          // matching /api/categories resourceCount semantics.
-          const descendantCount = (node: any): number =>
-            (node.resources || []).length +
-            (node.subcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0) +
-            (node.subSubcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0);
-          const nav = {
-            title: data.title,
-            totalResources: (data.resources || []).length,
-            categories: (data.categories || []).map((cat: any) => ({
-          name: cat.name,
-          slug: cat.slug,
-          resourceCount: (cat.resources || []).length,
-          totalResourceCount: descendantCount(cat),
-          teaser: (() => {
-            // Run25 C-03: categories with no DIRECT resources (e.g. Community
-            // & Events — everything lives in subcategories) got no teaser, so
-            // their Home card was the only one missing a "Featured:" line.
-            // Fall back to the first subcategory (then sub-subcategory)
-            // resource in tree order.
-            const first =
-              cat.resources?.[0] ??
-              (cat.subcategories || [])
-                .flatMap((sub: any) => [
-                  ...(sub.resources || []),
-                  ...(sub.subSubcategories || []).flatMap((ss: any) => ss.resources || []),
-                ])
-                .find(Boolean);
-            return first
-              ? {
-                  title: String(first.title || ''),
-                  description: String(first.description || '').slice(0, 200),
-                }
-              : undefined;
-          })(),
-          subcategories: (cat.subcategories || []).map((sub: any) => ({
-            name: sub.name,
-            slug: sub.slug,
-            resourceCount: (sub.resources || []).length,
-            totalResourceCount: descendantCount(sub),
-            subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
-              name: ss.name,
-              slug: ss.slug,
-              resourceCount: (ss.resources || []).length,
-              totalResourceCount: descendantCount(ss),
-            })),
-          })),
-            })),
-          };
-          const body = JSON.stringify(nav);
-          return {
-            body,
-            etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"',
-          };
-        },
-      });
+      // The same cached tree Home SSR renders (HomeNavRepository, the only nav
+      // producer), so a client cache seeded by either one holds one shape.
+      const payload = await loadCatalogNavPayload();
       res.set('ETag', payload.etag);
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
@@ -1865,21 +1794,7 @@ export function registerAwesomeListDiscoveryRoutes(
           .filter(kindMatches)
           .map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
       );
-      const countNodeResources = (
-        node: any,
-        matches: (item: any) => boolean = kindMatches,
-      ): number => {
-        let total = (node?.resources ?? []).filter(matches).length;
-        for (const sub of node?.subcategories ?? []) {
-          total += countNodeResources(sub, matches);
-        }
-        for (const subSub of node?.subSubcategories ?? []) {
-          total += countNodeResources(subSub, matches);
-        }
-        return total;
-      };
-      const countNodeResourcesForKind = (node: any): number => countNodeResources(node);
-      const matchesAnyKind = () => true;
+      const countNodeResourcesForKind = (node: any): number => corpusTotalCount(node, kindMatches);
 
       const children =
         level === "category"
@@ -1944,7 +1859,7 @@ export function registerAwesomeListDiscoveryRoutes(
               ? match.node.subSubcategories ?? []
               : []
         )
-          .filter((child: any) => countNodeResources(child, matchesAnyKind) > 0)
+          .filter((child: any) => corpusTotalCount(child) > 0)
           .map((child: any) => child.name),
         formats: unfilteredResources.map((resource: any) => resource.resourceFormat),
       };

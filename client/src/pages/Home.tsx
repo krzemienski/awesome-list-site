@@ -7,16 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
-  countVisibleSubcategories,
   fetchKindCounts,
-  isRealCategory,
-  navTotalCount,
   STRIP_KINDS,
   visibleNavCategories,
   type AwesomeListNav,
   type AwesomeListNavNode,
   type ResourceKindCounts,
 } from "@/lib/static-data";
+import {
+  countNestedGroups,
+  countVisibleSubcategories,
+  isRealCategory,
+} from "@shared/catalog-counts";
 import {
   resolveResourceKindFrom,
   type ResourceKind,
@@ -104,17 +106,6 @@ interface DisplayCategory {
   count: number;
   teaser?: { title: string; description: string };
   subcategories: AwesomeListNavNode[];
-}
-
-function countNestedGroups(categories: AwesomeListNavNode[]): number {
-  return categories.reduce((total, category) => {
-    const direct = category.subSubcategories?.length ?? 0;
-    const nested = (category.subcategories ?? []).reduce(
-      (subtotal, subcategory) => subtotal + (subcategory.subSubcategories?.length ?? 0),
-      0,
-    );
-    return total + direct + nested;
-  }, 0);
 }
 
 import { categoryGlyph } from "@/lib/category-glyph";
@@ -587,7 +578,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
       .map((category) => ({
         name: category.name,
         slug: category.slug ?? "",
-        count: navTotalCount(category),
+        count: category.totalResourceCount,
         teaser: category.teaser,
         subcategories: category.subcategories ?? [],
       }));
@@ -728,7 +719,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
             return {
               name: subcategory.name,
               slug: subcategory.slug ?? "",
-              count: corpusFilterActive ? matchingResources.length : navTotalCount(subcategory),
+              count: corpusFilterActive ? matchingResources.length : subcategory.totalResourceCount,
               nestedCount: corpusFilterActive
                 ? filteredNestedCount
                 : (subcategory.subSubcategories?.length ?? 0) +

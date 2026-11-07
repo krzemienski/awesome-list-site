@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AwesomeListNav, AwesomeListNavNode } from "@/lib/static-data";
+import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
 import SEOHead from "@/components/layout/SEOHead";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import { getCategorySlug } from "@/lib/utils";
@@ -57,36 +57,8 @@ function normalizeSort(raw: string | null): SortValue {
   return SORT_ALIASES[lower] ?? "name-asc";
 }
 
-function getTotalResourceCount(item: AwesomeListNavNode): number {
-  let total = item.resourceCount || 0;
-  if (item.subcategories) {
-    total += item.subcategories.reduce(
-      (sum: number, sub) => sum + getTotalResourceCount(sub),
-      0,
-    );
-  }
-  if (item.subSubcategories) {
-    total += item.subSubcategories.reduce(
-      (sum: number, ss) => sum + getTotalResourceCount(ss),
-      0,
-    );
-  }
-  return total;
-}
-
 export default function Categories({ nav, isLoading, error, onRetry }: CategoriesProps) {
-  const baseCategories = useMemo(() => {
-    if (!nav?.categories) return [] as AwesomeListNavNode[];
-    return nav.categories.filter(
-      (cat) =>
-        getTotalResourceCount(cat) > 0 &&
-        cat.name !== "Table of contents" &&
-        !cat.name.startsWith("List of") &&
-        !["Contributing", "License", "External Links", "Anti-features"].includes(
-          cat.name,
-        ),
-    );
-  }, [nav?.categories]);
+  const baseCategories = useMemo(() => visibleNavCategories(nav?.categories), [nav?.categories]);
 
   // BUG-015 (run18): seed sort from the URL (with alias support) so a fresh
   // deep-link restores the chosen option.
@@ -117,7 +89,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
   const categories = useMemo(() => {
     const withCounts = baseCategories.map((cat) => ({
       ...cat,
-      displayCount: getTotalResourceCount(cat),
+      displayCount: cat.totalResourceCount,
     }));
     const sorted = [...withCounts];
     switch (sort) {

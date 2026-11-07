@@ -14,37 +14,12 @@ import { cn } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { resourceTags } from "@/lib/tags";
 import { parseTagFilterValues } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
 
 interface CategoryExplorerProps {
   categories: Category[];
   resources: Resource[];
   className?: string;
-}
-
-// BUG-001 (July 2026 audit): the tree nests most resources under
-// category.subcategories[].resources (and their subSubcategories), so
-// `category.resources.length` is the DIRECT-only count and wildly understates
-// totals. Same recursive helper as Home.tsx / AppSidebar.tsx / Categories.tsx —
-// card counts here must agree with the sidebar and home cards.
-function getTotalResourceCount(item: {
-  resources?: Resource[];
-  subcategories?: unknown[];
-  subSubcategories?: unknown[];
-}): number {
-  let total = item.resources?.length || 0;
-  if (item.subcategories) {
-    total += (item.subcategories as any[]).reduce(
-      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
-      0,
-    );
-  }
-  if (item.subSubcategories) {
-    total += (item.subSubcategories as any[]).reduce(
-      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
-      0,
-    );
-  }
-  return total;
 }
 
 // Flatten every resource in a category (direct + subcategories + sub-subs) so
@@ -182,7 +157,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
         case "name":
           return a.name.localeCompare(b.name);
         case "count":
-          return getTotalResourceCount(b) - getTotalResourceCount(a);
+          return corpusTotalCount(b) - corpusTotalCount(a);
         case "activity": {
           // Run16 BUG-023: most recently updated/added first; ties fall back
           // to name so the order is stable and visibly distinct from count.
@@ -234,7 +209,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const getCategoryStats = (category: Category) => {
-    const totalResources = getTotalResourceCount(category);
+    const totalResources = corpusTotalCount(category);
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
       getAllCategoryResources(category).flatMap((r) => resourceTags(r))
@@ -520,7 +495,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               // now cap at the card width and wrap their text.
                               className="min-h-10 max-lg:min-h-11 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
                             >
-                              {subcategory.name} ({getTotalResourceCount(subcategory)})
+                              {subcategory.name} ({corpusTotalCount(subcategory)})
                             </Button>
                           ))}
                         </div>
