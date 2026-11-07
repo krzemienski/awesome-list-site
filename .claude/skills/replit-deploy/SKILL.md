@@ -143,7 +143,7 @@ Safe in the workspace: the image-trim step runs only when `REPLIT_DEPLOYMENT=1` 
 
 Before publishing, list the live audit lanes and tell each that the revision is about to change (pause it or note it per row), and stamp the revision on each row. Evidence is valid only for its stamped revision.
 
-1. Find the app: `search_apps` with `url: "https://awesome.video"` (or `list_apps`), take its `replId`. Cache nothing across runs; the app is identified by URL.
+1. Find the app: `search_apps` by URL returns `[]` (2026-11-06), and a name search ("Awesome Video") also returns look-alike apps. Search by name, or take the replId from the `awesome-replit` SSH user (`ssh awesome-replit 'echo $REPL_ID'`), then confirm with `get_publish_status(replId)` that the deployment serves https://awesome.video before any publish. Cache nothing across runs.
 2. `get_publish_status(replId)` first. If a publish is already in progress, wait for it instead of starting another.
 3. Pre-publish check, immediately before step 3a (and before telling the owner to publish). `ask_question(replId, "Run git status --short and git rev-parse HEAD^{tree} and quote both outputs verbatim.")`, or the same commands over SSH. `git status --short` must print nothing at all: no `??` line and no modified file. A `package-lock.json` that step 3's `npm install` rewrote also fails; restore it with `git checkout -- package-lock.json` and check again. HEAD's tree must equal `git rev-parse "$TARGET^{tree}"`. Delete unwanted untracked files now, before the publish, never after. The build guard (step 4) refuses untracked files and a tree that is not main's, but it does not see modified tracked files or ignored files, so this check is the only one for those. Ignored files ship too, so a secret-bearing file such as `.env` must never be in the workspace at all; secrets live in Replit Secrets. If one is there, stop and tell the owner instead of publishing. From here until step 5 ends, make no edit in the workspace, and publish only while no Replit Agent run or other writer is active there: autosave commits untracked files into the build that is being published.
 3a. (Step 5.3a) Running-jobs check, immediately before step 4 and again after any wait in step 4. A deploy restarts the instance and kills in-process scans (three jobs died "Interrupted by server restart"). Paste this as its own shell call (the `exit 1` ends that shell); it uses the cached owner header file and never prints it. Every probe fails closed:
@@ -177,7 +177,7 @@ Record each status response verbatim.
 
 ### 6. If the publish fails or hangs
 
-`ask_question` is the first route to deployment and runtime logs for any production failure, during a deploy or not. Try, in order:
+`ask_question` is the first route to deployment and runtime logs for any production failure, during a deploy or not. It takes one question at a time: while one runs, another returns "Agent busy, NOT submitted". Merge related questions into one call, wait for its answer, and resend anything that came back NOT submitted. Try, in order:
 1. `ask_question(replId, "Read the build log and runtime logs of the most recent deployment and quote the first ERROR or FAILED lines verbatim, each with its timestamp.")`. This is read-only but may cost Agent credits. Ask for verbatim timestamped lines, and still quote the answer as Agent's claim, not as the log.
 2. Reproduce over SSH: rerun step 4, and `ssh awesome-replit 'cd ~/workspace; NODE_ENV=production PORT=5099 timeout 30 node dist/index.js'` to catch startup crashes (missing env, port, migration errors).
 3. A stuck publish waiting on the **database conflict dialog** cannot be answered from MCP. Stop and tell the user to open Publishing in Replit and review the schema changes there.
@@ -195,7 +195,9 @@ curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready 
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
 
-Then run the read-only production checker and put its summary in the report: `npx tsx scripts/prod-check/index.ts --tier 0,1`. A Tier 0 or Tier 1 failure is a deploy FAIL. The runner lands with PR build/prod-check (#286); until it is merged, say that this check was not run (UNVERIFIED), do not skip the curl proofs above.
+Then run the read-only production checker and put its summary in the report: `npx tsx scripts/prod-check/index.ts --tier 0,1`. A Tier 0 or Tier 1 failure is a deploy FAIL (the runner is on main since #297).
+
+If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` for an already signed-in owner in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Each must load the dashboard. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
 
 Shipped means LIVE equals TARGET. The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. A "success" from `get_publish_status` while `/api/version` still shows BEFORE is not shipped: keep the step 5 poll running (Autoscale cutover). If LIVE is neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build, or a `BUILD_REVISION` was set in the workspace environment.
 
