@@ -75,7 +75,8 @@ interface LogSlice { records: LogRecord[]; scanned: number; failedReads: number;
 /** F027 load-shedding 503 (og-middleware "Uncached route resolution capacity is temporarily full"); only a burst above SHED_503_BURST_MAX in SHED_WINDOW_MS fails C-08. */
 const SHED_503_BURST_MAX = 50;
 const SHED_WINDOW_MS = 10 * 60_000;
-const isShedWarn = (r: LogRecord) => r.level === "warn" && r.area === "og-middleware" && /capacity is temporarily full/i.test(r.message);
+const SHED_TEXT = /capacity is temporarily full|\bshed\b/i;
+const isShedRecord = (r: LogRecord) => r.area === "og-middleware" && SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`);
 
 function recordRid(r: LogRecord): string | undefined {
   try {
@@ -137,8 +138,8 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
   }
   const records = fetched.flatMap((s) => s.records);
   const excluded = records.filter((r) => r.level === "error" && isKnownUnapprove409(r));
-  const shedRids = new Set(records.filter(isShedWarn).map(recordRid));
-  const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && r.level === "error" && shedRids.has(recordRid(r));
+  const shedRids = new Set(records.filter(isShedRecord).map(recordRid));
+  const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && (shedRids.has(recordRid(r)) || SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`));
   const shed = records.filter(isShed503);
   const errors = records.filter((r) => r.level === "error" && !isKnownUnapprove409(r) && !isShed503(r));
   const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !isKnownUnapprove409(r) && !isShed503(r));
