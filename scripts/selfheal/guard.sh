@@ -41,29 +41,20 @@ check_curl() { # whole segment must match one strict shape; no flag parsing
   [[ "$1" =~ $CURL_RE ]] || block "curl outside the strict GET shape" "$1"
 }
 
-check_gh_api() { # tokens after `gh api`
-  local method="" endpoint="" writes=0 prev="" t
+# gh api is read-only: writes go through `gh issue` / `gh pr create` only.
+check_gh_api() { # dequoted tokens after `gh api`
+  local t
   for t in "$@"; do
-    case "$prev" in -X|--method) method=$(printf '%s' "$t" | tr a-z A-Z) ;; esac
     case "$t" in
-      -f|-F|--field|--raw-field|--input|-f?*|-F?*|--field=*|--raw-field=*|--input=*) writes=1 ;;
-      --method=*) method=$(printf '%s' "${t#--method=}" | tr a-z A-Z) ;;
-      -X?*) method=$(printf '%s' "${t#-X}" | tr a-z A-Z) ;;
-      -*) ;;
-      *) if [ -z "$endpoint" ] && [ "$prev" != "-X" ] && [ "$prev" != "--method" ] && [[ "$prev" != -H && "$prev" != --header && "$prev" != --jq && "$prev" != -q && "$prev" != --template && "$prev" != -t ]]; then endpoint="$t"; fi ;;
+      -X*|--method*|-f|-F|-f?*|-F?*|--field*|--raw-field*|--input*) block "gh api write flag" "$*" ;;
+      graphql|*/graphql) block "gh api graphql" "$*" ;;
     esac
-    prev="$t"
   done
-  [[ "$endpoint" =~ graphql ]] && block "gh api graphql" "$*"
-  [ -z "$method" ] && { [ "$writes" -eq 1 ] && method=POST || method=GET; }
-  [ "$method" = GET ] && return 0
-  [[ "$method" =~ ^(POST|PATCH)$ ]] || block "gh api $method" "$*"
-  [[ "$endpoint" =~ ^/?repos/[^/]+/[^/]+/(issues|issues/[0-9]+|issues/[0-9]+/comments|issues/[0-9]+/labels|labels|labels/[^/]+|pulls)$ ]] \
-    || block "gh api write outside issue/label/PR create" "$*"
 }
 
 check_segment() {
-  local seg="$1" toks first
+  local raw="$1" seg toks first
+  seg=$(printf '%s' "$raw" | tr -d "\"'\\\\")   # the shell strips quotes and backslashes before running; check what it will run
   read -r -a toks <<<"$seg"
   [ "${#toks[@]}" -gt 0 ] || return 0
   first="${toks[0]}"
@@ -74,7 +65,7 @@ check_segment() {
   if [ "$first" = npx ] && ! [[ "${toks[1]:-}" =~ ^(tsc|eslint)$ ]]; then block "npx other than tsc/eslint" "$seg"; fi
   [[ "$seg" == *awesome-replit* ]] && block "replit ssh host" "$seg"
 
-  if [ "$first" = curl ]; then check_curl "$(printf "%s" "$seg" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"; fi
+  if [ "$first" = curl ]; then check_curl "$(printf "%s" "$raw" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"; fi
   if [[ "$seg" =~ [Aa]wesome\.video ]] && ! [[ "$first" =~ $TOOLS_OK_FOR_HOST ]]; then block "non-curl client against awesome.video" "$seg"; fi
 
   if [ "$first" = git ]; then
@@ -104,7 +95,8 @@ case "$tool" in
     cmd=$(jq -r '.tool_input.command // ""' <<<"$input")
     [[ "$cmd" =~ $SECRET_RE ]] && block "secret reference" "$cmd"
     # globs/expansions next to a sensitive directory name can spell a secret path without matching SECRET_RE
-    [[ "$cmd" =~ (\.cache|\.ssh|\.config|\.aws|\.gnupg|awesome-|owner|Keychains) && "$cmd" =~ [\*\?\[\$\`~\\] ]] && block "glob/expansion near sensitive path" "$cmd"
+    nourl=$(printf '%s' "$cmd" | sed -E 's#https?://[^[:space:]]*##g; s#repos/[^[:space:]]*##g')   # URL/API paths may carry ? and awesome-
+    [[ "$nourl" =~ (\.cache|\.ssh|\.config|\.aws|\.gnupg|awesome-|owner|Keychains) && "$nourl" =~ [\*\?\[\$\`~\\] ]] && block "glob/expansion near sensitive path" "$cmd"
     while IFS= read -r seg; do check_segment "$seg"; done < <(printf '%s\n' "$cmd" | sed -E 's/(&|\||;|`|\(|\))/\n/g')
     # sh -c / eval wrappers hide the real command: scan their payload as one more segment
     [[ "$cmd" =~ (sh|bash|zsh)[[:space:]]+-c|eval[[:space:]] ]] && block "shell wrapper" "$cmd"
