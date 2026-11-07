@@ -142,18 +142,18 @@ async function queryWeekly(test: SQL): Promise<WeeklyRow[]> {
   const result = await db.execute(sql`
     WITH weeks AS (
       SELECT generate_series(
-        date_trunc('week', now()) - ${`${WEEKLY_SERIES_WEEKS - 1} weeks`}::interval,
-        date_trunc('week', now()),
+        date_trunc('week', now() AT TIME ZONE 'UTC') - ${`${WEEKLY_SERIES_WEEKS - 1} weeks`}::interval,
+        date_trunc('week', now() AT TIME ZONE 'UTC'),
         interval '1 week') AS start
     ),
     events AS (
-      SELECT 'logins' AS kind, date_trunc('week', t.created_at) AS start
+      SELECT 'logins' AS kind, date_trunc('week', t.created_at AT TIME ZONE 'UTC') AS start
         FROM resource_audit_log t JOIN users u ON u.id = t.performed_by
         WHERE t.action = 'auth.login' AND NOT ${test}
       UNION ALL
-      SELECT 'signups', date_trunc('week', u.created_at) FROM users u WHERE NOT ${test}
+      SELECT 'signups', date_trunc('week', u.created_at AT TIME ZONE 'UTC') FROM users u WHERE NOT ${test}
       UNION ALL
-      SELECT 'submissions', date_trunc('week', t.created_at)
+      SELECT 'submissions', date_trunc('week', t.created_at AT TIME ZONE 'UTC')
         FROM resources t JOIN users u ON u.id = t.submitted_by WHERE NOT ${test}
     )
     SELECT to_char(w.start, 'IYYY-"W"IW') AS week,
@@ -181,7 +181,7 @@ async function buildUsageReport() {
     metrics: Object.assign({}, ...tables) as Record<string, MetricCounts>,
     signupsByMonth,
     weekly,
-    notes: "Accounts that were deleted take their history with them (foreign keys cascade), so all-time counts are a floor. logins count auth.login audit rows (one per Clerk session) and start at the deploy that restored them. API-key request counts are not tracked (api_keys_last_used is last use only). digest_last_sent is each user's most recent digest, not a send count.",
+    notes: "submissions counts every status. Accounts that were deleted take their history with them (foreign keys cascade), so all-time counts are a floor. logins count auth.login audit rows (one per Clerk session) and start at the deploy that restored them. API-key request counts are not tracked (api_keys_last_used is last use only). digest_last_sent is each user's most recent digest, not a send count.",
   };
 }
 

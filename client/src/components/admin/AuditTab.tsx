@@ -106,7 +106,7 @@ const ACTION_STATUS: Record<string, string> = {
   "journey.step_deleted": "completed",
   "journey.step_group_deleted": "completed",
   "journey.steps_reordered": "completed",
-  // Legacy rows from the retired local-auth routes; nothing writes these now.
+  // auth.login and auth.register are written by the Clerk session middleware; logout and login_failed are legacy rows from the retired local-auth routes.
   "auth.login": "completed",
   "auth.register": "completed",
   "auth.logout": "completed",

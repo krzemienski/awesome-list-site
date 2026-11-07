@@ -79,8 +79,12 @@ function writeAuthAudit(action: "auth.login" | "auth.register", userId: string, 
 function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
   const key = identity.sessionId ?? `user:${userId}`;
   const seenAt = seenSessions.get(key);
-  if (seenAt !== undefined && (identity.sessionId || Date.now() - seenAt < SESSION_FALLBACK_WINDOW_MS)) return;
+  const seenRecently = seenAt !== undefined && (identity.sessionId || Date.now() - seenAt < SESSION_FALLBACK_WINDOW_MS);
   seenSessions.delete(key);
+  if (seenRecently) {
+    seenSessions.set(key, seenAt);
+    return;
+  }
   seenSessions.set(key, Date.now());
   if (seenSessions.size > SEEN_SESSIONS_MAX) {
     const [oldest] = seenSessions.keys();
@@ -469,11 +473,11 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   try {
     req.dbUser = await ensureDbUser(req, identity);
     req.authMethod = "clerk";
-    if (req.dbUser) recordSignIn(identity, req.dbUser.id);
   } catch (error) {
     logger.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
     res.locals.clerkUserLookupError = error;
   }
+  if (req.dbUser) recordSignIn(identity, req.dbUser.id);
   next();
 });
 
