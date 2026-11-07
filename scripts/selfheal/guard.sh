@@ -35,21 +35,10 @@ check_path() { # tool path
 
 TOOLS_OK_FOR_HOST='^(curl|echo|printf|grep|rg|git|gh|cat|head|tail|jq|sed|awk|wc|sort|uniq|cut|tr|ls)$'
 
-check_curl() { # token array in $@: only plain GET/HEAD shapes with at most one URL
-  local t prev="" urls=0
-  for t in "$@"; do
-    case "$t" in
-      --data*|--form*|--upload-file|--json|--post*|--config|--next|--request=*|--request|--url*) block "curl write/indirect flag" "$*" ;;
-      http://*|https://*) urls=$((urls + 1)) ;;
-      --*) ;;
-      -X) ;;
-      -?*) [[ "$t" =~ ^-[A-Za-z]+$ ]] && { [[ "$t" =~ [XdFTKQ] ]] && block "curl bundled write flag" "$*"; } ;;
-    esac
-    [ "$prev" = "-X" ] && { [[ "$t" =~ ^(GET|HEAD)$ ]] || block "curl non-GET" "$*"; }
-    prev="$t"
-  done
-  [ "$urls" -le 1 ] || block "curl with more than one URL" "$*"
-  return 0
+CURL_RE='^curl( -sS)?( -m [0-9]+)?( -I)? https://awesome\.video/[A-Za-z0-9._~/?&=%:-]*$'
+
+check_curl() { # whole segment must match one strict shape; no flag parsing
+  [[ "$1" =~ $CURL_RE ]] || block "curl outside the strict GET shape" "$1"
 }
 
 check_gh_api() { # tokens after `gh api`
@@ -81,10 +70,10 @@ check_segment() {
   while [[ "$first" == *=* && "${#toks[@]}" -gt 1 ]]; do toks=("${toks[@]:1}"); first="${toks[0]}"; done
   first="${first##*/}"
 
-  [[ "$first" =~ ^(ssh|scp|sftp|rsync|mosh|sudo|launchctl|osascript|nc|ncat|telnet)$ ]] && block "forbidden command $first" "$seg"
+  [[ "$first" =~ ^(wget|ssh|scp|sftp|rsync|mosh|sudo|launchctl|osascript|nc|ncat|telnet)$ ]] && block "forbidden command $first" "$seg"
   [[ "$seg" == *awesome-replit* ]] && block "replit ssh host" "$seg"
 
-  if [ "$first" = curl ]; then check_curl "${toks[@]:1}"; fi
+  if [ "$first" = curl ]; then check_curl "$(printf "%s" "$seg" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"; fi
   if [[ "$seg" =~ [Aa]wesome\.video ]] && ! [[ "$first" =~ $TOOLS_OK_FOR_HOST ]]; then block "non-curl client against awesome.video" "$seg"; fi
 
   if [ "$first" = git ]; then
