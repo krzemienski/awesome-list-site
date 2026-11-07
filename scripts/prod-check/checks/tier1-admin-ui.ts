@@ -105,12 +105,13 @@ async function resourcesTabProblems(ctx: Ctx, kit: KitContext, page: Page, st: S
   return problems;
 }
 
-async function dialogProblems(kit: KitContext, page: Page): Promise<{ problems: string[]; reviewed: boolean }> {
+async function dialogProblems(kit: KitContext, page: Page, pendingApprovals: number): Promise<{ problems: string[]; reviewed: boolean }> {
   const problems: string[] = [];
   await openTab(kit, page, "approvals");
   // An empty approvals queue has no Review button; only the Edit dialog can be checked then.
   const reviewButton = page.getByRole("button", { name: /^Review details for/ }).first();
   const reviewed = (await reviewButton.count()) > 0;
+  if (!reviewed && pendingApprovals > 0) problems.push(`${pendingApprovals} pending approvals but no Review button`);
   if (reviewed) {
     await reviewButton.click();
     const review = page.getByRole("dialog");
@@ -151,7 +152,7 @@ register(
   {
     id: "NEW-3", tier: 1, kind: "browser", blocking: false, needs: ["owner"],
     run: (ctx) => withOwner(ctx, (kit) => onPage(ctx, kit, "NEW-3", async (page) => {
-      const { problems, reviewed } = await dialogProblems(kit, page);
+      const { problems, reviewed } = await dialogProblems(kit, page, (await stats(ctx)).pendingApprovals);
       return verdict(problems, reviewed
         ? "Review and Edit dialogs open populated and close; nothing saved"
         : "Edit dialog opens populated and closes; approvals queue empty, Review dialog not checked; nothing saved");
