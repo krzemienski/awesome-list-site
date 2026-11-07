@@ -42,6 +42,7 @@ import {
   trackRecommendationsRefreshed,
   trackRecommendationsViewed,
 } from "@/lib/analytics-recommendations";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface AIRecommendationsPanelProps {
   resources?: Resource[];
@@ -476,14 +477,7 @@ export default function AIRecommendationsPanel({
               Saved cards are paused until hidden choices can be checked, so no
               dismissed resource is shown by mistake.
             </p>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchFeedbackStates(); }}
-            >
-              Try again
-            </Button>
+            <RetryButton label="Try again" onRetry={() => void refetchFeedbackStates()} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -510,9 +504,7 @@ export default function AIRecommendationsPanel({
                 ? ` Last updated ${new Date(lastUpdatedAt).toLocaleString()}.`
                 : ""}
             </p>
-            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
-              Try again
-            </Button>
+            <RetryButton label="Try again" onRetry={() => retry()} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -560,9 +552,7 @@ export default function AIRecommendationsPanel({
           <AlertTitle>Recommendations couldn’t load</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>{describeLoadError(error)}</p>
-            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
-              Try again
-            </Button>
+            <RetryButton label="Try again" onRetry={() => retry()} />
           </AlertDescription>
         </Alert>
       ) : null}

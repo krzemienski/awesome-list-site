@@ -19,8 +19,9 @@ import {
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // The public resource detail endpoint adds read-time kind resolution to the
 // database row. Keep this response type additive: the server supplies the
@@ -237,15 +238,7 @@ export default function GuestBookmarks() {
               : `${failedIds.length} saved resources couldn't load.`}{" "}
             {failedIds.length === 1 ? "It's" : "They're"} still saved on this device.
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="min-h-11"
-            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retryFailed(); }}
-            data-testid="button-guest-retry-failed"
-          >
-            Retry
-          </Button>
+          <RetryButton onRetry={() => retryFailed()} testId="button-guest-retry-failed" />
         </div>
       )}
 
@@ -259,21 +252,15 @@ export default function GuestBookmarks() {
             You're offline. Your saves are still safe on this device; they'll load
             when you're back online.
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="min-h-11"
-            onClick={(e) => {
-              // C7-V4-01: the banner unmounts on reconnect; hand focus on like Retry does.
-              handoffFocusOnUnmount(e.currentTarget);
+          <RetryButton
+            label="Try again"
+            onRetry={() => {
               for (const entry of sortedEntries) {
                 void queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
               }
             }}
-            data-testid="button-guest-offline-retry"
-          >
-            Try again
-          </Button>
+            testId="button-guest-offline-retry"
+          />
         </div>
       )}
 

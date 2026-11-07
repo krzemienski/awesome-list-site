@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   trackDigestPreviewItemOpened,
   trackNotificationPreferenceChanges,
@@ -19,6 +18,7 @@ import {
 import type { DigestPreview, NotificationPreferencesPatch, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
 const CADENCE_LABELS: Record<(typeof DIGEST_CADENCES)[number], string> = {
@@ -210,7 +210,7 @@ export default function NotificationPreferencesCard() {
         {unavailable ? (
           <div className="border border-destructive/40 bg-destructive/10 p-4 text-sm" role="alert" data-testid={`notification-preferences-${unavailable}`}>
             <p>{unavailable === "offline" ? "You’re offline. Your notification choices will load when your connection is back." : "We couldn’t load your notification choices."}</p>
-            <Button variant="outline" className="mt-3 min-h-[44px]" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget, () => document.getElementById("notification-settings-title")); void preferencesQuery.refetch(); }}>Try again</Button>
+            <RetryButton className="mt-3" label="Try again" focusTarget={() => document.getElementById("notification-settings-title")} onRetry={() => void preferencesQuery.refetch()} />
           </div>
         ) : preferencesQuery.isLoading || !savedValues ? (
           <div className="space-y-3" aria-busy="true"><div className="skeleton h-16 w-full" /><div className="skeleton h-16 w-full" /><div className="skeleton h-10 w-2/3" /></div>

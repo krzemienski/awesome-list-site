@@ -21,6 +21,7 @@ import { ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from
 import type { Resource } from "@shared/schema";
 import { isReservedTestHost } from "@shared/validation";
 import "./queues-review.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // Bulk actions process resources one by one, so a server failure can leave
 // some of the selection already changed.
@@ -471,18 +472,13 @@ export default function PendingResources() {
             <p>
               {"You're offline, so the approvals queue can't be loaded. It may still contain items awaiting review."}
             </p>
-            <Button
-              aria-disabled={isFetching}
-              aria-busy={isFetching}
-              onClick={(event) => {
-                if (isFetching) return;
-                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-resources-heading"));
-                void refetch();
-              }}
-              data-testid="pending-resources-retry"
-            >
-              {isFetching ? "Retrying…" : "Retry"}
-            </Button>
+            <RetryButton
+              variant="default"
+              busy={isFetching}
+              focusTarget={() => document.getElementById("pending-resources-heading")}
+              onRetry={() => void refetch()}
+              testId="pending-resources-retry"
+            />
           </div>
         ) : (
           <AdminLoadError

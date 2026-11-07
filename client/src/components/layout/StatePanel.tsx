@@ -56,31 +56,41 @@ const StatePanel = forwardRef<HTMLDivElement, {
 export default StatePanel;
 
 /**
- * The one retry control every failed-fetch state uses. The state unmounts
- * once the refetch succeeds, so focus is handed on by default; callers that
- * place focus themselves pass handoffFocus={false}.
+ * The one retry control every failed-fetch state uses (the repo guard rejects
+ * a hand-rolled "Retry"/"Try again" button). The state usually unmounts once
+ * the refetch succeeds, so focus is handed on: to `focusTarget()` when given,
+ * else the page heading. Callers that place focus themselves pass
+ * handoffFocus={false}.
  */
-export function RetryButton({ onRetry, testId, label = "Retry", handoffFocus = true, busy = false }: {
+export function RetryButton({
+  onRetry, testId, label = "Retry", handoffFocus = true, focusTarget, busy = false, variant = "outline", className,
+}: {
   onRetry: (e: MouseEvent<HTMLButtonElement>) => void;
   testId?: string;
   label?: string;
   handoffFocus?: boolean;
+  /** Where focus goes when this control unmounts. Default: the page heading. */
+  focusTarget?: () => HTMLElement | null | undefined;
   /** A refetch is in flight: further clicks are ignored. */
   busy?: boolean;
+  variant?: "outline" | "default" | "link";
+  className?: string;
 }) {
   return (
     <Button
-      variant="outline"
+      type="button"
+      variant={variant}
+      className={className}
       onClick={(e) => {
         if (busy) return;
-        if (handoffFocus) handoffFocusOnUnmount(e.currentTarget);
+        if (handoffFocus) handoffFocusOnUnmount(e.currentTarget, focusTarget);
         onRetry(e);
       }}
       aria-disabled={busy || undefined}
       aria-busy={busy || undefined}
       data-testid={testId}
     >
-      <RefreshCw className={cn("h-4 w-4", busy && "animate-spin")} aria-hidden="true" />
+      {variant !== "link" && <RefreshCw className={cn("h-4 w-4", busy && "animate-spin")} aria-hidden="true" />}
       {busy ? "Retrying…" : label}
     </Button>
   );
