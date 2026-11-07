@@ -99,6 +99,12 @@ error_count() { # reads JSON from stdin, prints total errorCount
 }
 git worktree add -q --detach "$B" origin/main || fail 2 setup "git worktree add (baseline) failed"
 ln -s "$MAIN_CLONE/node_modules" "$B/node_modules" || fail 2 setup "cannot symlink node_modules (baseline)"
+# Lint both sides with the merged tree's rules, so a change that adds a rule
+# counts existing violations on both sides (a ratchet) instead of failing
+# every file it touches.
+for cfg in eslint*.config.* tsconfig.eslint.json; do
+  [ -f "$cfg" ] && { cp "$cfg" "$B/$cfg" || fail 2 setup "cannot copy $cfg into the baseline"; }
+done
 worse=0
 while IFS= read -r f; do
   [ -z "$f" ] && continue
