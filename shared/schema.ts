@@ -2124,3 +2124,18 @@ export type UserRecommendationFeedback =
 export const adminResourceWriteSchema = insertResourceSchema.extend(
   adminOnlyResourceFieldsSchema.shape,
 );
+
+/** First-party page-document counts per hour. Counts only: no IP, path or user agent. */
+export const trafficHourly = pgTable(
+  "traffic_hourly",
+  {
+    hour: timestamp("hour", { withTimezone: true }).notNull(),
+    template: text("template").notNull(),
+    clientClass: text("class").notNull(),
+    statusClass: text("status_class").notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.hour, table.template, table.clientClass, table.statusClass] }),
+  ],
+);

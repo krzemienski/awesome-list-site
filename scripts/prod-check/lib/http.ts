@@ -2,6 +2,9 @@ import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
+/** Marks every request from a prod-check run so the server counts it as class `qa`, not human. */
+export const AUDIT_RUN_HEADER = { "x-audit-run": "prod-check" };
+
 export const GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
 const TIMEOUT_MS = 15_000;
 
@@ -81,7 +84,7 @@ export function createHttp(base: string): HttpClient {
         if (res.status === 401) throw new AuthExpiredError("401 from " + url.pathname);
         return { status: res.status, ms: Date.now() - started, text: res.text, json: <T>() => JSON.parse(res.text) as T };
       }
-      const headers: Record<string, string> = { "user-agent": opts.ua ?? "awesome-prod-check/1" };
+      const headers: Record<string, string> = { ...AUDIT_RUN_HEADER, "user-agent": opts.ua ?? "awesome-prod-check/1" };
       if (opts.owner) {
         if (url.host !== baseHost) throw new Error("refusing to send the owner session to another host");
         headers.cookie = ownerCookie();

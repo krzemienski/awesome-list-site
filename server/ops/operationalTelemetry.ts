@@ -212,19 +212,44 @@ export function documentTemplate(path: string): DocTemplate {
   return DOC_TEMPLATE_PREFIXES.find(([prefix]) => path.startsWith(prefix))?.[1] ?? "other";
 }
 
-export type ClientClass = "human" | "bot-search" | "bot-ai" | "bot-other";
+export type ClientClass = "human" | "bot-search" | "bot-ai" | "bot-other" | "qa";
 
 const SEARCH_BOT = /googlebot|bingbot|duckduckbot|yandexbot|baiduspider|slurp/i;
 const AI_BOT = /gptbot|chatgpt-user|oai-searchbot|claudebot|claude-web|anthropic-ai|perplexitybot|applebot|google-extended|ccbot|bytespider|meta-externalagent/i;
 const OTHER_BOT = /bot|crawl|spider|curl|wget|python|go-http|node-fetch|axios|headless|lighthouse/i;
+const AUDIT_UA = /awesome-audit/i;
 
-/** Class only; the caller never keeps the user-agent string. */
-export function clientClass(userAgent: string | undefined): ClientClass {
+/**
+ * Class only; the caller never keeps the user-agent string. Our own audit runs
+ * identify themselves with an `X-Audit-Run` header or an `awesome-audit` UA and
+ * count as `qa`, whatever UA they borrow.
+ */
+export function clientClass(userAgent: string | undefined, auditRunHeader?: string): ClientClass {
   const ua = userAgent ?? "";
+  if (auditRunHeader || AUDIT_UA.test(ua)) return "qa";
   if (SEARCH_BOT.test(ua)) return "bot-search";
   if (AI_BOT.test(ua)) return "bot-ai";
   if (OTHER_BOT.test(ua) || ua === "") return "bot-other";
   return "human";
+}
+
+export interface DocCountDelta {
+  hour: Date;
+  template: DocTemplate;
+  clientClass: ClientClass;
+  statusClass: string;
+  count: number;
+}
+
+const HOUR_MS = 3_600_000;
+/** Counts not yet written to `traffic_hourly`, keyed by hour|template|class|status class. */
+const docDeltas = new Map<string, DocCountDelta>();
+
+function addDocDelta(delta: DocCountDelta): void {
+  const key = `${delta.hour.getTime()}|${delta.template}|${delta.clientClass}|${delta.statusClass}`;
+  const existing = docDeltas.get(key);
+  if (existing) existing.count += delta.count;
+  else docDeltas.set(key, { ...delta });
 }
 
 /** Counts only (`DOC:<template>:<class>:<Nxx>`); no IP, path or UA is stored. */
@@ -233,8 +258,27 @@ export function recordDocumentRequest(
   cls: ClientClass,
   statusCode: number,
 ): void {
-  const label = `DOC:${template}:${cls}:${Math.floor(statusCode / 100)}xx`;
-  updateAggregate(endpointMetrics, label, 0, statusCode >= 500, Infinity);
+  const statusClass = `${Math.floor(statusCode / 100)}xx`;
+  updateAggregate(endpointMetrics, `DOC:${template}:${cls}:${statusClass}`, 0, statusCode >= 500, Infinity);
+  addDocDelta({
+    hour: new Date(Math.floor(Date.now() / HOUR_MS) * HOUR_MS),
+    template,
+    clientClass: cls,
+    statusClass,
+    count: 1,
+  });
+}
+
+/** Hands the unflushed counts to the writer and starts a fresh delta set. */
+export function takeDocDeltas(): DocCountDelta[] {
+  const taken = [...docDeltas.values()];
+  docDeltas.clear();
+  return taken;
+}
+
+/** Puts counts from a failed write back so the next flush retries them. */
+export function restoreDocDeltas(deltas: DocCountDelta[]): void {
+  for (const delta of deltas) addDocDelta(delta);
 }
 
 export function getOperationalTelemetrySnapshot() {

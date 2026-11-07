@@ -1,4 +1,5 @@
 import { createLogger, flushLogs } from "../lib/logger";
+import { flushTraffic } from "./trafficFlush";
 
 const logger = createLogger("process");
 const FLUSH_TIMEOUT_MS = 3000;
@@ -9,8 +10,11 @@ let exiting = false;
 const asError = (reason: unknown): Error =>
   reason instanceof Error ? reason : new Error(typeof reason === "string" ? reason : "non-Error rejection");
 
-async function flushThenExit(code: number): Promise<void> {
+async function flushThenExit(code: number, beforeFlush?: () => Promise<unknown>): Promise<void> {
   try {
+    if (beforeFlush) {
+      await Promise.race([beforeFlush(), new Promise((resolve) => setTimeout(resolve, FLUSH_TIMEOUT_MS))]);
+    }
     await flushLogs(FLUSH_TIMEOUT_MS);
   } finally {
     process.exit(code);
@@ -21,7 +25,7 @@ async function flushThenExit(code: number): Promise<void> {
  * Crash and shutdown visibility. An uncaught exception leaves Node in an
  * undefined state, so it is logged, flushed and followed by exit 1. An
  * unhandled rejection is logged and the server keeps serving (owner decision
- * 18). SIGTERM and SIGINT log one line, flush buffered logs and exit 0.
+ * 18). SIGTERM and SIGINT log one line, write the pending traffic counts, flush buffered logs and exit 0.
  */
 export function installProcessHandlers(): void {
   if (installed) return;
@@ -43,7 +47,7 @@ export function installProcessHandlers(): void {
       if (exiting) return;
       exiting = true;
       logger.warn(`${signal} received; flushing logs and exiting`, { uptimeS: Math.round(process.uptime()) });
-      void flushThenExit(0);
+      void flushThenExit(0, flushTraffic);
     });
   }
 }
