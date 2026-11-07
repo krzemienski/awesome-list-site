@@ -65,7 +65,20 @@ SendMessage({ to: "researcher", summary: "Start", message: "[task context]" })
 npm run build
 ```
 
-Gates per change: `npx tsc --noEmit`, `npm run build`, and `npx eslint <touched files>`. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (and on gitignored `.claude/worktrees`), so lint only what you touch.
+Gates per change: `npm run build` (it runs `tsc --noEmit` and `npm run lint:guards` before bundling) and `npx eslint <touched files>`. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (and on gitignored `.claude/worktrees`), so lint only what you touch.
+
+### Rule table
+
+Each rule names what enforces it. When a correction repeats a rule whose enforcer says "nothing", raise it to a check in the same change.
+
+| Rule | Enforced by |
+|---|---|
+| Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` and the merge gate both run |
+| Catalog subtree counts and the non-category README names come only from `shared/catalog-counts.ts` (`navTotalCount`, `corpusTotalCount`, `countNestedGroups`, `isRealCategory`). Reading one tree level (`.resources.length`) under-counts. | `npm run lint:guards` (`eslint.guards.config.js`) inside `npm run build`; nav nodes are typed `AwesomeListNavNode`, which has no `resources` |
+| A changed file never gains ESLint errors. | `scripts/merge-gate.sh`, eslint step (exit 13) |
+| User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
+
+An exception to a guard goes on the offending line with a reason, an expiry date and the approving human: `// eslint-disable-next-line no-restricted-syntax -- <reason>; expires YYYY-MM-DD; approved by <name>`.
 
 Before merging, run main's copy of the merge gate: `bash <(git show origin/main:scripts/merge-gate.sh) <branch>`. Deploys go through the `replit-deploy` skill, whose pre-publish checks (schema diff, running jobs, one backup per deploy) must pass before `publish_app`, and whose final step runs the read-only prod-check runner `npx tsx scripts/prod-check/index.ts --tier 0,1`.
 
