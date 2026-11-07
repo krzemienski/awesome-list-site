@@ -202,7 +202,7 @@ const editStep = step("T2-06", ["t2.id1", "t2.description0"], async (ctx, { admi
 });
 
 /** Always runs: takes a fresh backup, then deletes every `[QA-` row the server marks deletable, one id per call. */
-const cleanup = step("T2-10", ["t2.ready"], async (ctx, { admin }) => {
+const cleanup = step("T2-10", ["t2.ready"], async (_ctx, { admin }) => {
   const listing = await listQaRows(admin);
   if (listing.status !== 200) return fail(`qa-rows answered ${listing.status}`);
   const found = listing.json<QaRows>();
