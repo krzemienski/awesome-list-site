@@ -40,7 +40,6 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useContactConfig } from "@/lib/contact";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { fetchAwesomeListNav, fetchListingPage, type AwesomeListNav, type ListingLevel } from "@/lib/static-data";
-import { navTotalCount } from "@shared/catalog-counts";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { RESOURCE_KIND_VALUES, type ResourceKind } from "@shared/resourceKinds";
 import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
@@ -524,8 +523,8 @@ export default function TaxonomyListing({ level }: Props) {
   const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);
   const siblingParent = navPlacement?.parent?.slug ? navPlacement.parent : undefined;
   const siblingTiles = (navPlacement?.siblings ?? [])
-    .filter((sibling) => sibling.slug && navTotalCount(sibling) > 0)
-    .sort((a, b) => navTotalCount(b) - navTotalCount(a))
+    .filter((sibling) => sibling.slug && sibling.totalResourceCount > 0)
+    .sort((a, b) => b.totalResourceCount - a.totalResourceCount)
     .slice(0, 8);
 
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
@@ -803,6 +802,6 @@ export default function TaxonomyListing({ level }: Props) {
     </div>
     {/* Where next: most visitors who land on a subcollection leave from it,
         and below lg the sidebar listing its neighbours is hidden. */}
-    {level !== "category" && siblingParent && siblingTiles.length > 0 && <section className="taxonomy-children taxonomy-siblings" aria-labelledby="taxonomy-siblings-heading" data-testid="taxonomy-siblings"><h2 id="taxonomy-siblings-heading">More in {siblingParent.name}</h2><div className="taxonomy-child-grid">{siblingTiles.map((sibling) => <Link key={sibling.slug} className="taxonomy-child card hoverable" href={withKind(routeFor(level, sibling.slug!))} aria-label={tileLabel(sibling.name, navTotalCount(sibling))}><span>{sibling.name}</span><span className="chip mono">{formatTileCount(navTotalCount(sibling))}</span></Link>)}<Link className="taxonomy-child card hoverable" href={withKind(routeFor(level === "subcategory" ? "category" : "subcategory", siblingParent.slug!))} data-testid="taxonomy-siblings-parent"><span>All of {siblingParent.name}</span><span aria-hidden="true">→</span></Link></div></section>}
+    {level !== "category" && siblingParent && siblingTiles.length > 0 && <section className="taxonomy-children taxonomy-siblings" aria-labelledby="taxonomy-siblings-heading" data-testid="taxonomy-siblings"><h2 id="taxonomy-siblings-heading">More in {siblingParent.name}</h2><div className="taxonomy-child-grid">{siblingTiles.map((sibling) => <Link key={sibling.slug} className="taxonomy-child card hoverable" href={withKind(routeFor(level, sibling.slug!))} aria-label={tileLabel(sibling.name, sibling.totalResourceCount)}><span>{sibling.name}</span><span className="chip mono">{formatTileCount(sibling.totalResourceCount)}</span></Link>)}<Link className="taxonomy-child card hoverable" href={withKind(routeFor(level === "subcategory" ? "category" : "subcategory", siblingParent.slug!))} data-testid="taxonomy-siblings-parent"><span>All of {siblingParent.name}</span><span aria-hidden="true">→</span></Link></div></section>}
   </div>;
 }

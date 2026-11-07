@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
-import { navTotalCount } from "@shared/catalog-counts";
 import SEOHead from "@/components/layout/SEOHead";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import { getCategorySlug } from "@/lib/utils";
@@ -90,7 +89,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
   const categories = useMemo(() => {
     const withCounts = baseCategories.map((cat) => ({
       ...cat,
-      displayCount: navTotalCount(cat),
+      displayCount: cat.totalResourceCount,
     }));
     const sorted = [...withCounts];
     switch (sort) {

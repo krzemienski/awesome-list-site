@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
-import { corpusTotalCount, navTotalCount, type CorpusCountNode } from "@shared/catalog-counts";
+import { corpusTotalCount, type CorpusCountNode } from "@shared/catalog-counts";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
@@ -661,7 +661,7 @@ function homeShellChrome(): string {
       categories = data.categories.map((c) => ({
        name: c.name,
        slug: c.slug,
-        count: navTotalCount(c),
+        count: c.totalResourceCount,
      }));
     } catch (error) {
       rethrowBoundedDependencyFailure(error);

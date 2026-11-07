@@ -33,15 +33,15 @@ import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
 import { docsUrl, shellRepo } from "@/lib/docs-url";
 import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
-import { visibleNavCategories, type AwesomeListNavNode } from "@/lib/static-data";
-import { navTotalCount } from "@shared/catalog-counts";
+import { visibleNavCategories } from "@/lib/static-data";
+import type { CatalogNavCategory } from "@shared/catalog-nav";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
  * (name/slug/resourceCount, no resource arrays) so cold loads of non-listing
  * pages never download the 2.7MB corpus.
  */
-type NavCategory = AwesomeListNavNode;
+type NavCategory = CatalogNavCategory;
 
 interface AppSidebarProps {
   categories: NavCategory[];
@@ -349,7 +349,7 @@ function CategoryAccordion({
   // /api/awesome-list hierarchy. The backend folds orphaned resources into the
   // nearest valid node, so this always equals COUNT(*) WHERE category = X and
   // always equals (direct + sum of child badges) — no "mixed validators".
-  const totalCount = navTotalCount(cat);
+  const totalCount = cat.totalResourceCount;
   // Without this row the child badges sum short of the category badge.
   const catDirectCount = cat.resourceCount;
   const catGeneralPath = `${catPath}?filter=general`;
@@ -456,7 +456,7 @@ function CategoryAccordion({
               .map((sub) => {
                 const subSlug = sub.slug || slugify(sub.name);
                 const subPath = `/subcategory/${subSlug}`;
-                const subCount = navTotalCount(sub);
+                const subCount = sub.totalResourceCount;
                 const subSubs = sub.subSubcategories || [];
                 const subActive =
                   activePath === subPath ||
@@ -559,14 +559,14 @@ function CategoryAccordion({
                                   navigate(ssPath);
                                 }}
                                 data-testid={`subsub-${ssSlug}`}
-                                aria-label={`${ss.name}, ${resourceCountLabel(navTotalCount(ss))}`}
+                                aria-label={`${ss.name}, ${resourceCountLabel(ss.totalResourceCount)}`}
                                 data-active={activePath === ssPath || undefined}
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
                               >
                                 <span aria-hidden="true">{index === subSubs.length - 1 && subDirectCount === 0 ? "└" : "├"}</span>
                                 <span title={ss.name}>{ss.name}</span>
-                                <span className="font-mono tabular-nums">{formatCount(navTotalCount(ss))}</span>
+                                <span className="font-mono tabular-nums">{formatCount(ss.totalResourceCount)}</span>
                               </a>
                             );
                           })}
@@ -1314,7 +1314,7 @@ export default function AppSidebar({
                     e.preventDefault();
                     navigate(href);
                   }}
-                  title={`${cat.name} · ${formatCount(navTotalCount(cat))}`}
+                  title={`${cat.name} · ${formatCount(cat.totalResourceCount)}`}
                   aria-label={cat.name}
                   data-testid={`rail-${catSlug}`}
                   data-active={catActive || undefined}

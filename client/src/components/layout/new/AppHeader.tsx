@@ -5,7 +5,7 @@ import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
-import { isRealCategory, navTotalCount } from "@shared/catalog-counts";
+import { isRealCategory } from "@shared/catalog-counts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { requestClerk } from "@/lib/clerk-bridge";
@@ -61,7 +61,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   const unreadCount = notificationState?.unreadCount ?? 0;
   const count = categories
     .filter(c => isRealCategory(c.name))
-    .reduce((sum, node) => sum + navTotalCount(node), 0);
+    .reduce((sum, node) => sum + node.totalResourceCount, 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const brand = shellBrand(siteName);
   const repo = shellRepo(repoUrl, repoBranch);

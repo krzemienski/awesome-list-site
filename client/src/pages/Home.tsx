@@ -18,7 +18,6 @@ import {
   countNestedGroups,
   countVisibleSubcategories,
   isRealCategory,
-  navTotalCount,
 } from "@shared/catalog-counts";
 import {
   resolveResourceKindFrom,
@@ -579,7 +578,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
       .map((category) => ({
         name: category.name,
         slug: category.slug ?? "",
-        count: navTotalCount(category),
+        count: category.totalResourceCount,
         teaser: category.teaser,
         subcategories: category.subcategories ?? [],
       }));
@@ -720,7 +719,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
             return {
               name: subcategory.name,
               slug: subcategory.slug ?? "",
-              count: corpusFilterActive ? matchingResources.length : navTotalCount(subcategory),
+              count: corpusFilterActive ? matchingResources.length : subcategory.totalResourceCount,
               nestedCount: corpusFilterActive
                 ? filteredNestedCount
                 : (subcategory.subSubcategories?.length ?? 0) +

@@ -10,8 +10,8 @@ const SUBTREE = "/^sub(Sub)?[cC]ategories$/";
 const COUNTS_OWNER = "shared/catalog-counts.ts";
 
 const subtreeCount =
-  `Catalog subtree arithmetic lives in ${COUNTS_OWNER}: use navTotalCount (nav nodes), ` +
-  "corpusTotalCount (resources arrays) or countNestedGroups. Hand-written copies drifted and under-counted.";
+  "Don't re-sum the catalog tree: nav nodes carry totalResourceCount (shared/catalog-nav.ts); " +
+  `for resources arrays use corpusTotalCount or countNestedGroups from ${COUNTS_OWNER}. Hand-written copies drifted and under-counted.`;
 
 export const guardRules = [
   {

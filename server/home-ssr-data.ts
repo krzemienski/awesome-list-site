@@ -9,8 +9,9 @@ import { loadHomeFeed } from "./routes/domains/home-feed";
  * repositories/cache namespaces as the JSON endpoints, rather than issuing
  * loopback HTTP from document rendering.
  */
-export async function loadHomeNav() {
-  const payload = await getPublicCacheValue({
+/** The nav tree with its serialized body and ETag, as `/api/awesome-list/nav` sends it. */
+export function loadCatalogNavPayload() {
+  return getPublicCacheValue({
     namespace: "catalog-nav",
     key: "complete",
     ttlMs: 60_000,
@@ -21,9 +22,10 @@ export async function loadHomeNav() {
       return { nav, body, etag: `"${createHash("sha1").update(body).digest("hex")}"` };
     },
   });
-  // The existing API endpoint populated this namespace before SSR existed and
-  // stores only {body, etag}; accept that established cache shape too.
-  return payload.nav ?? JSON.parse(payload.body);
+}
+
+export async function loadHomeNav() {
+  return (await loadCatalogNavPayload()).nav;
 }
 
 export async function loadHomeKindCounts() {

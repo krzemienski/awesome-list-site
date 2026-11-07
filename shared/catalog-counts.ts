@@ -2,23 +2,17 @@
  * The only place catalog tree arithmetic lives: subtree resource totals,
  * nested-group counts, and which top-level entries are real categories.
  *
- * Two tree shapes exist and both nest `subcategories` and `subSubcategories`:
- * - the nav projection (`/api/awesome-list/nav`, HomeNavRepository) stores each
- *   node's DIRECT count in `resourceCount`;
- * - the corpus tree (`/api/awesome-list`) stores `resources` arrays.
- * A node's total is its own resources plus every descendant's. Reading one
- * level (`category.resources.length`) under-counts, which shipped as wrong
- * card, sidebar and SEO counts more than once. Import from here instead of
- * writing another recursive sum; the guard lint rule fails a new one.
+ * Nav nodes (shared/catalog-nav.ts) already carry `totalResourceCount`; read
+ * it, never re-sum. The corpus tree (`/api/awesome-list`) stores `resources`
+ * arrays, and a node's total is its own resources plus every descendant's.
+ * Reading one level (`category.resources.length`) under-counts, which shipped
+ * as wrong card, sidebar and SEO counts more than once. Import from here
+ * instead of writing another recursive sum; the guard lint rule fails a new one.
  */
 
 interface TreeNode<N> {
   subcategories?: readonly N[] | null;
   subSubcategories?: readonly N[] | null;
-}
-
-export interface NavCountNode extends TreeNode<NavCountNode> {
-  resourceCount?: number | null;
 }
 
 export interface CorpusCountNode extends TreeNode<CorpusCountNode> {
@@ -30,11 +24,6 @@ function subtreeTotal<N extends TreeNode<N>>(node: N, own: (node: N) => number):
   for (const child of node.subcategories ?? []) total += subtreeTotal(child, own);
   for (const child of node.subSubcategories ?? []) total += subtreeTotal(child, own);
   return total;
-}
-
-/** Resources in a nav node and all its descendants. */
-export function navTotalCount(node: NavCountNode): number {
-  return subtreeTotal(node, (n) => n.resourceCount ?? 0);
 }
 
 /** Resources in a corpus-tree node and all its descendants, optionally only those matching. */

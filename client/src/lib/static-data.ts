@@ -6,7 +6,8 @@
  */
 
 import type { ResourceKind } from "@shared/resourceKinds";
-import { isRealCategory, navTotalCount } from "@shared/catalog-counts";
+import { isRealCategory } from "@shared/catalog-counts";
+import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
 import { apiRequest, catalogRequestCache } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
@@ -99,29 +100,17 @@ export async function fetchStaticAwesomeList(): Promise<any> {
  * slug resolution. Pages that don't render resource listings use this ~few-KB
  * payload instead of the ~2.7MB corpus.
  */
-export interface AwesomeListNavNode {
-  name: string;
-  slug?: string;
-  resourceCount: number;
-  /** Run23 R-06: first direct resource's blurb so Home cards render nav-only. */
-  teaser?: { title: string; description: string };
-  subcategories?: AwesomeListNavNode[];
-  subSubcategories?: AwesomeListNavNode[];
-}
-
-export interface AwesomeListNav {
-  title?: string;
-  totalResources: number;
-  categories: AwesomeListNavNode[];
-}
+/** The nav tree contract lives in shared/catalog-nav.ts with its one producer. */
+export type AwesomeListNavNode = CatalogNavNode;
+export type AwesomeListNav = CatalogNav;
 
 // C8-V1-01: the taxonomy the public site shows (Home, About, /categories,
 // sidebar): real categories holding resources, with empty subcategories and
 // sub-subcategories pruned. Counts shown to visitors derive from this tree.
 export function visibleNavCategories(
-  categories: AwesomeListNavNode[] | undefined,
-): AwesomeListNavNode[] {
-  const nonEmpty = (node: AwesomeListNavNode) => navTotalCount(node) > 0;
+  categories: CatalogNavCategory[] | undefined,
+): CatalogNavCategory[] {
+  const nonEmpty = (node: AwesomeListNavNode) => node.totalResourceCount > 0;
   return (categories ?? [])
     .filter((cat) => isRealCategory(cat.name) && nonEmpty(cat))
     .map((cat) => ({

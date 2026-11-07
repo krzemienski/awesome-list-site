@@ -74,7 +74,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 | Rule | Enforced by |
 |---|---|
 | Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` and the merge gate both run |
-| Catalog subtree counts and the non-category README names come only from `shared/catalog-counts.ts` (`navTotalCount`, `corpusTotalCount`, `countNestedGroups`, `isRealCategory`). Reading one tree level (`.resources.length`) under-counts. | `npm run lint:guards` (`eslint.guards.config.js`) inside `npm run build`; nav nodes are typed `AwesomeListNavNode`, which has no `resources` |
+| The nav tree has one producer (`HomeNavRepository`) and one type (`shared/catalog-nav.ts`). Every node carries `totalResourceCount`: display it, never re-sum. Corpus-tree counts and the non-category README names come only from `shared/catalog-counts.ts` (`corpusTotalCount`, `countNestedGroups`, `isRealCategory`). | `tsc` (producer and consumers share `CatalogNav`; nav nodes have no `resources`) and `npm run lint:guards` inside `npm run build` |
 | A changed file never gains ESLint errors. | `scripts/merge-gate.sh`, eslint step (exit 13) |
 | User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
 

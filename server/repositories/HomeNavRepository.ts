@@ -1,3 +1,4 @@
+import type { CatalogNav } from "@shared/catalog-nav";
 import { categories, resources, subcategories, subSubcategories } from "@shared/schema";
 import { asc, eq } from "drizzle-orm";
 import { db } from "../db";
@@ -10,30 +11,6 @@ type HomeNavResource = {
   category: string;
   subcategory: string | null;
   subSubcategory: string | null;
-};
-
-type HomeNav = {
-  title: string;
-  totalResources: number;
-  categories: Array<{
-    name: string;
-    slug: string;
-    resourceCount: number;
-    teaser?: {
-      title: string;
-      description: string;
-    };
-    subcategories: Array<{
-      name: string;
-      slug: string;
-      resourceCount: number;
-      subSubcategories: Array<{
-        name: string;
-        slug: string;
-        resourceCount: number;
-      }>;
-    }>;
-  }>;
 };
 
 function appendToMap<K, V>(map: Map<K, V[]>, key: K, value: V): void {
@@ -56,7 +33,7 @@ function appendToMap<K, V>(map: Map<K, V[]>, key: K, value: V): void {
  * contribute to totalResources, but remain absent from category counts.
  */
 export class HomeNavRepository {
-  async getHomeNav(): Promise<HomeNav> {
+  async getHomeNav(): Promise<CatalogNav> {
     const [allResources, categoryRows, subcategoryRows, subSubcategoryRows] = await Promise.all([
       db
         .select({
@@ -165,6 +142,7 @@ export class HomeNavRepository {
             name: subSubcategory.name,
             slug: subSubcategory.slug,
             resourceCount: subSubcategoryResources.length,
+            totalResourceCount: subSubcategoryResources.length,
           };
         });
 
@@ -182,6 +160,7 @@ export class HomeNavRepository {
           name: subcategory.name,
           slug: subcategory.slug,
           resourceCount: subcategoryResources.length,
+          totalResourceCount: subcategoryResources.length + subSubcategoryPlacedIds.size,
           subSubcategories: navSubSubcategories,
           resources: subcategoryResources,
           subSubcategoryResources: subcategorySubSubcategories.map(
@@ -207,6 +186,7 @@ export class HomeNavRepository {
         name: category.name,
         slug: category.slug,
         resourceCount: categoryResources.length,
+        totalResourceCount: categoryResources.length + placedIds.size,
         teaser: first
           ? {
               title: String(first.title || ""),
@@ -217,6 +197,7 @@ export class HomeNavRepository {
           name: subcategory.name,
           slug: subcategory.slug,
           resourceCount: subcategory.resourceCount,
+          totalResourceCount: subcategory.totalResourceCount,
           subSubcategories: subcategory.subSubcategories,
         })),
       };
