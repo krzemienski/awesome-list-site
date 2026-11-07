@@ -25,8 +25,7 @@ async function runCycle(): Promise<void> {
 }
 
 // The 24 h due check, the cross-instance advisory lock and age-based pruning all live in
-// runScheduledBackupIfDue, so this timer may fire as often as it likes and alongside
-// POST /api/ops/run-due-jobs.
+// runScheduledBackupIfDue, so this timer may fire as often as it likes.
 export function initializeBackupScheduler(): void {
   if (timer) return;
   const startup = setTimeout(() => void runCycle(), STARTUP_DELAY_MS);

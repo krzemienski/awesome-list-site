@@ -637,10 +637,11 @@ export function registerAdminContentRoutes(
       logger.info('Resource moved back to pending', { resourceId, admin: userId });
       res.json(updatedResource);
     } catch (error: any) {
-      logger.error('Error unapproving resource:', error);
       if (error?.message?.includes('not approved')) {
+        logger.warn('Unapprove refused: resource is not approved', { resourceId: req.params.id });
         return res.status(409).json({ message: error.message });
       }
+      logger.error('Error unapproving resource:', error);
       res.status(500).json({ message: 'Failed to unapprove resource' });
     }
   }));

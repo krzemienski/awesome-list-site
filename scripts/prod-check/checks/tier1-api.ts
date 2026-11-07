@@ -71,7 +71,6 @@ async function newestBackup(ctx: Ctx): Promise<{ completedAt: string; ageHours: 
 interface LogRecord { _time: string; level: string; area: string; message: string; fields?: string; rid?: string }
 interface LogSlice { records: LogRecord[]; scanned: number; failedReads: number; truncated: boolean }
 
-/** Known benign 409 from POST /api/admin/resources/:id/unapprove, logged at error level. Remove this matcher once D7 ships. */
 /** F027 load-shedding 503 (og-middleware "Uncached route resolution capacity is temporarily full"); only a burst above SHED_503_BURST_MAX in SHED_WINDOW_MS fails C-08. */
 const SHED_503_BURST_MAX = 50;
 const SHED_WINDOW_MS = 10 * 60_000;
@@ -95,12 +94,6 @@ function busiestWindow(times: number[]): number {
   }
   return best;
 }
-
-/** remove once the Replit secret is set; then this 503 must not happen (OPS_CRON_TOKEN not configured, ops-cron.ts) */
-const CRON_UNCONFIGURED_REQS = ["POST /api/ops/run-due-jobs", "GET /api/ops/signals"];
-const isCronUnconfigured = (r: LogRecord) => httpStatus(r) === 503 && CRON_UNCONFIGURED_REQS.some((req) => r.message.includes(req));
-
-const isKnownUnapprove409 = (r: LogRecord) => r.message.includes("Error unapproving resource") && /not approved/i.test(`${r.message} ${r.fields ?? ""}`);
 
 function httpStatus(r: LogRecord): number | undefined {
   try {
@@ -143,17 +136,14 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
     fetched.push(...(await Promise.all(slices.slice(i, i + LOG_SLICE_CONCURRENCY).map(sliceLogs))));
   }
   const records = fetched.flatMap((s) => s.records);
-  const excluded = records.filter((r) => r.level === "error" && isKnownUnapprove409(r));
   const shedRids = new Set(records.filter(isShedRecord).map(recordRid).filter((rid): rid is string => rid !== undefined));
   const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && ((recordRid(r) !== undefined && shedRids.has(recordRid(r)!)) || SHED_TEXT.test(`${r.message} ${r.fields ?? ""}`));
   const shed = records.filter(isShed503);
-  const cron = records.filter(isCronUnconfigured);
-  const tolerated = (r: LogRecord) => isKnownUnapprove409(r) || isShed503(r) || isCronUnconfigured(r);
-  const errors = records.filter((r) => r.level === "error" && !tolerated(r));
-  const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !tolerated(r));
+  const errors = records.filter((r) => r.level === "error" && !isShed503(r));
+  const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !isShed503(r));
   const shedPeak = busiestWindow(shed.map((r) => Date.parse(r._time)));
   const incomplete = fetched.filter((s) => s.truncated || s.failedReads > 0).length;
-  const values = { bootAt, slices: slices.length, scanned: fetched.reduce((n, s) => n + s.scanned, 0), warnOrError: records.length, errors: errors.length, status5xx: serverErrors.length, excludedKnown409: excluded.length, shed503: shed.length, cronUnconfigured: cron.length, shed503Peak10Min: shedPeak, incompleteSlices: incomplete };
+  const values = { bootAt, slices: slices.length, scanned: fetched.reduce((n, s) => n + s.scanned, 0), warnOrError: records.length, errors: errors.length, status5xx: serverErrors.length, shed503: shed.length, shed503Peak10Min: shedPeak, incompleteSlices: incomplete };
   const sample = (list: LogRecord[]) => {
     const groups = new Map<string, number>();
     for (const r of list) {
@@ -168,7 +158,7 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
     ...(shedPeak > SHED_503_BURST_MAX ? [`shed503 burst: ${shedPeak} load-shedding 503s within ${SHED_WINDOW_MS / 60_000} min (limit ${SHED_503_BURST_MAX})`] : []),
     ...(incomplete && !errors.length && !serverErrors.length ? [`${incomplete} log slices were truncated or unreadable, so 0 cannot be proven`] : []),
   ];
-  return verdict(problems, `0 level=error and 0 5xx in ${slices.length} hourly slices since boot ${bootAt} (${excluded.length} known unapprove 409 excluded; cronUnconfigured ${cron.length}; shed503 ${shed.length}, peak ${shedPeak} per 10 min)`, values);
+  return verdict(problems, `0 level=error and 0 5xx in ${slices.length} hourly slices since boot ${bootAt} (shed503 ${shed.length}, peak ${shedPeak} per 10 min)`, values);
 }
 
 async function newestResearcherJob(ctx: Ctx): Promise<Result> {

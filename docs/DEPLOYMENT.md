@@ -76,22 +76,6 @@ Steps:
 Replit provides managed PostgreSQL with separate development and production
 databases. An external PostgreSQL provider also works.
 
-### Ops watch
-
-`.github/workflows/ops-watch.yml` runs every 15 minutes. It calls
-`POST /api/ops/run-due-jobs` (the external cron for when Autoscale has no
-instance up), reads `GET /api/ops/signals`, probes `/api/health/ready` and `/`,
-and opens or comments on one `[ops-watch] <signature>` issue per breach
-(label `ops-watch`; never auto-closed).
-
-Both ops endpoints take `Authorization: Bearer <OPS_CRON_TOKEN>`. Set the same
-random value as the Replit deployment secret `OPS_CRON_TOKEN` and the GitHub
-Actions secret `OPS_CRON_TOKEN`. While the Replit secret is unset the endpoints
-return `503` and the workflow opens a single `[ops-watch] OPS_CRON_TOKEN not
-configured in production` issue. `/api/ops/signals` returns counts and
-timestamps only (revision, boot time, readiness, pool, 5xx and DB error counts,
-top error-log signatures since boot, last backup and link-scan times).
-
 ### Publishing GitHub `main`
 
 Replit is the only production target. Vercel and GitHub Pages are not used,

@@ -13,7 +13,6 @@ type MetricAggregate = {
 const queryMetrics = new Map<string, MetricAggregate>();
 const endpointMetrics = new Map<string, MetricAggregate>();
 let poolErrors = 0;
-let lastServerErrorAt: string | null = null;
 let peakPoolActive = 0;
 let peakPoolWaiting = 0;
 
@@ -176,7 +175,6 @@ export function recordEndpointLatency(
   )
     ? method
     : "OTHER";
-  if (statusCode >= 500) lastServerErrorAt = new Date().toISOString();
   const statusClass = `${Math.floor(statusCode / 100)}xx`;
   const label = `${safeMethod}:${group}:${statusClass}`;
   updateAggregate(endpointMetrics, label, durationMs, statusCode >= 500, 1_000);
@@ -290,6 +288,5 @@ export function getOperationalTelemetrySnapshot() {
       peakActive: peakPoolActive,
       peakWaiting: peakPoolWaiting,
     },
-    lastServerErrorAt,
   };
 }

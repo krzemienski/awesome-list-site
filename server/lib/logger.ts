@@ -29,7 +29,6 @@
  * set) is built from these same scrubbed values; nothing raw reaches it.
  */
 import { randomUUID } from "node:crypto";
-import { recordErrorSignature } from "../ops/errorSignatures";
 import { getRequestLogContext } from "../ops/requestContext";
 import { getLogSink, type LogRecord } from "./logSink";
 
@@ -254,13 +253,6 @@ const write = (level: LogLevel, line: string, record: LogRecord) => {
   else if (level === "warn") console.warn(clipped);
   else console.log(clipped);
   getLogSink(sinkNotice).push(record);
-  if (level === "error") {
-    try {
-      recordErrorSignature(record.area, record.message, record._time);
-    } catch {
-      // counting must never break logging
-    }
-  }
 };
 
 /** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
