@@ -62,6 +62,30 @@ export function loadCredentials(role: ActorRole): Credentials | null {
   return { email, password, id };
 }
 
+const STATE_FILE_DEFAULT = join(homedir(), ".cache", "awesome-audit", "pp7b-member.state.json");
+
+export interface StateCookie {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  expires: number;
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "Strict" | "Lax" | "None";
+}
+
+/** Cookies of the audit member's saved browser state (PROD_CHECK_AUDIT_MEMBER_STATE or the pp7b file); null when unreadable. Values are registered for redaction. */
+export function loadMemberStateCookies(): StateCookie[] | null {
+  try {
+    const state = JSON.parse(readFileSync(process.env.PROD_CHECK_AUDIT_MEMBER_STATE ?? STATE_FILE_DEFAULT, "utf8")) as { cookies?: StateCookie[] };
+    for (const c of state.cookies ?? []) addSecret(c.value);
+    return state.cookies?.length ? state.cookies : null;
+  } catch {
+    return null;
+  }
+}
+
 async function signIn(page: Page, ctx: KitContext, creds: Credentials): Promise<void> {
   await ctx.open(page, "/sign-in");
   const email = page.getByRole("textbox", { name: "Email address" });
