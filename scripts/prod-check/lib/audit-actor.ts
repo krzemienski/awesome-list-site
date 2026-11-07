@@ -10,7 +10,8 @@ export type ActorRole = "Admin" | "Member";
 export interface Credentials {
   email: string;
   password: string;
-  id: string;
+  /** Not secret; Tier 2 requires it, Tier 1 does not. */
+  id?: string;
 }
 
 export interface ApiResponse {
@@ -22,7 +23,7 @@ export interface ApiResponse {
 /** A signed-in audit account: calls are made from inside the page so Clerk keeps the session cookie fresh. */
 export interface Actor {
   readonly role: ActorRole;
-  readonly id: string;
+  readonly id: string | undefined;
   call(method: string, path: string, body?: unknown): Promise<ApiResponse>;
   close(): Promise<void>;
 }
@@ -53,7 +54,7 @@ export function loadCredentials(role: ActorRole): Credentials | null {
   const email = process.env[`PROD_CHECK_AUDIT_${upper}_EMAIL`] ?? fromFile[`${prefix}_EMAIL`];
   const password = process.env[`PROD_CHECK_AUDIT_${upper}_PASSWORD`] ?? fromFile[`${prefix}_PASSWORD`];
   const id = process.env[`PROD_CHECK_AUDIT_${upper}_ID`];
-  if (!email || !password || !id) return null;
+  if (!email || !password) return null;
   addSecret(password);
   addSecret(email);
   return { email, password, id };

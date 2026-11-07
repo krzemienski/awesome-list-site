@@ -26,6 +26,8 @@ export interface GetOptions {
 /** Read-only by construction: there is no method other than GET. */
 export interface HttpClient {
   get(pathOrUrl: string, opts?: GetOptions): Promise<HttpResponse>;
+  /** Routes `owner: true` GETs through this signed-in audit admin instead of the owner cookie file. */
+  useAdmin(admin: { call(method: string, path: string): Promise<{ status: number; text: string }> }): void;
   ownerCookies(): { name: string; value: string }[];
 }
 
@@ -64,10 +66,21 @@ export function createHttp(base: string): HttpClient {
   const baseHost = new URL(base).host;
   let cookie: string | undefined;
   const ownerCookie = () => (cookie ??= loadOwnerCookie());
+  let admin: Parameters<HttpClient["useAdmin"]>[0] | undefined;
 
   return {
+    useAdmin(actor) {
+      admin = actor;
+    },
     async get(pathOrUrl, opts = {}) {
       const url = new URL(pathOrUrl, base);
+      if (opts.owner && admin) {
+        if (url.host !== baseHost) throw new Error("refusing to send the admin session to another host");
+        const started = Date.now();
+        const res = await admin.call("GET", url.pathname + url.search);
+        if (res.status === 401) throw new AuthExpiredError("401 from " + url.pathname);
+        return { status: res.status, ms: Date.now() - started, text: res.text, json: <T>() => JSON.parse(res.text) as T };
+      }
       const headers: Record<string, string> = { "user-agent": opts.ua ?? "awesome-prod-check/1" };
       if (opts.owner) {
         if (url.host !== baseHost) throw new Error("refusing to send the owner session to another host");

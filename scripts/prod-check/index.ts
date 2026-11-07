@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AuthExpiredError, createHttp, redact } from "./lib/http.ts";
 import { createBrowserKit, type BrowserKit } from "./lib/browser.ts";
-import { loadCredentials } from "./lib/audit-actor.ts";
+import { loadCredentials, openActor, type Actor } from "./lib/audit-actor.ts";
 import { select, type Check, type Ctx, type Result } from "./registry.ts";
 import { EXIT, exitCode, linkLatest, pruneScheduled, record, writeReport, type CheckRecord, type RunSummary } from "./report.ts";
 import "./checks/tier0.ts";
@@ -37,8 +37,9 @@ function parse() {
   if (tiers.includes(2)) {
     if (!values["allow-writes"]) throw new UsageError("Tier 2 writes to production: pass --allow-writes");
     if (values.schedule) throw new UsageError("Tier 2 never runs on a schedule");
-    if (!loadCredentials("Admin") || !loadCredentials("Member")) {
-      throw new UsageError("Tier 2 needs the audit admin and member email, password and PROD_CHECK_AUDIT_*_ID");
+    const ids = process.env.PROD_CHECK_AUDIT_ADMIN_ID && process.env.PROD_CHECK_AUDIT_MEMBER_ID;
+    if (!ids || !loadCredentials("Admin") || !loadCredentials("Member")) {
+      throw new UsageError("Tier 2 needs the audit admin and member email and password, plus PROD_CHECK_AUDIT_ADMIN_ID and _MEMBER_ID");
     }
   }
   if (values.base !== PROD_BASE) throw new UsageError(`--base must be ${PROD_BASE}: the owner session is only sent there`);
@@ -71,7 +72,9 @@ async function main(): Promise<number> {
   if (checks.length === 0) throw new UsageError("no checks selected");
   const http = createHttp(args.base);
   let browser: BrowserKit | undefined;
-  if (checks.some((c) => c.kind === "browser")) browser = await createBrowserKit(args.base, http, dir);
+  const adminCreds = checks.some((c) => c.needs?.includes("owner")) ? loadCredentials("Admin") : null;
+  if (adminCreds || checks.some((c) => c.kind === "browser")) browser = await createBrowserKit(args.base, http, dir, args.tiers.includes(2));
+  let admin: Actor | undefined;
 
   const ctx: Ctx = { base: args.base, runId, schedule: args.schedule, outRoot, http, browser, shared: new Map() };
   const run: RunSummary = {
@@ -79,6 +82,12 @@ async function main(): Promise<number> {
     flags: { only: args.only, schedule: args.schedule }, records: [], violations: [],
   };
   try {
+    if (adminCreds && browser) {
+      admin = await openActor(browser, args.base, "Admin", adminCreds).catch(() => {
+        throw new AuthExpiredError("audit admin sign-in failed");
+      });
+      http.useAdmin(admin);
+    }
     run.revision = (await http.get("/api/version")).json<{ revision: string }>().revision;
     for (const check of checks) {
       const rec = await runCheck(check, ctx);
@@ -87,6 +96,7 @@ async function main(): Promise<number> {
     }
   } finally {
     run.violations = browser?.violations ?? [];
+    await admin?.close().catch(() => undefined);
     await browser?.close().catch(() => undefined);
   }
   if (run.violations.length) {
