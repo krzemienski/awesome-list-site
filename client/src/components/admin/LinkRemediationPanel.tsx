@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { formatAdminDateTime } from "@/lib/utils";
@@ -68,7 +68,9 @@ export default function LinkRemediationPanel() {
       });
       refresh();
     },
-    onError: (error: Error) => toast({
+    onError: (error: Error) => error instanceof ApiError && error.status === 409
+      ? toast({ title: "Nothing applied", description: error.message, variant: "destructive" })
+      : toast({
       title: "Remediation failed",
       description: describeWriteError(error, { fallback: "The plan could not be applied.", outcome: "Some changes may have been made. Reload the plan before trying again." }),
       variant: "destructive",
@@ -159,7 +161,7 @@ export default function LinkRemediationPanel() {
                     <TableCell><Badge variant={a.kind === "archive" ? "destructive" : "outline"}>{KIND_LABEL[a.kind]}</Badge></TableCell>
                     <TableCell className="text-sm">{a.reason}</TableCell>
                     <TableCell>
-                      {a.kind !== "restore" && (
+                      {a.kind !== "restore" && a.kind !== "duplicate" && (
                         <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
                           aria-label={`Link is fine for ${a.title}`}>
                           Link is fine
