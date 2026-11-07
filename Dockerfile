@@ -18,6 +18,23 @@ ARG RAILWAY_GIT_COMMIT_SHA
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_CLERK_PROXY_URL=$VITE_CLERK_PROXY_URL
 
+# Other public settings Vite compiles into the bundle. They are publishable
+# (Replit sets them in .replit [userenv.shared]); a container build must pass
+# them explicitly, because runtime env cannot change an already-built bundle.
+# Empty values leave the feature off (no contact UI, analytics vendor absent).
+ARG VITE_CONTACT_VARIANT
+ARG VITE_AMPLITUDE_API_KEY
+ARG VITE_MIXPANEL_TOKEN
+ARG VITE_POSTHOG_KEY
+ARG VITE_POSTHOG_HOST=https://us.i.posthog.com
+ARG VITE_GA_MEASUREMENT_ID
+ENV VITE_CONTACT_VARIANT=$VITE_CONTACT_VARIANT \
+    VITE_AMPLITUDE_API_KEY=$VITE_AMPLITUDE_API_KEY \
+    VITE_MIXPANEL_TOKEN=$VITE_MIXPANEL_TOKEN \
+    VITE_POSTHOG_KEY=$VITE_POSTHOG_KEY \
+    VITE_POSTHOG_HOST=$VITE_POSTHOG_HOST \
+    VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
+
 # Copy package files and the clean-install policy used by this repository.
 COPY package*.json .npmrc ./
 
