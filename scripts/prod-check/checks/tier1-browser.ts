@@ -2,9 +2,26 @@ import type { Page } from "playwright";
 import { register, pass, fail, skip, verdict, type Ctx, type Result } from "../registry.ts";
 import type { KitContext } from "../lib/browser.ts";
 import { loadSitemap, pick, rngFor } from "../lib/sitemap.ts";
+import { loadMemberStateCookies } from "../lib/audit-actor.ts";
+import { redact } from "../lib/http.ts";
 
 const RESOURCE_LINK = 'a[href^="/resource/"]';
 const MOBILE = { width: 390, height: 844 };
+const DESKTOP = { width: 1280, height: 900 };
+const TABLET = { width: 768, height: 1024 };
+const CLS_LIMIT = 0.1;
+const CLS_WINDOW_MS = 5_000;
+const CLS_LOADS = 3;
+const DECLINE_WATCH_MS = 10_000;
+const ANALYTICS_HOST = /google-analytics|googletagmanager|mixpanel|posthog|amplitude/i;
+const CLERK_CARD = ".cl-card, .cl-cardBox";
+const RECOMMENDATIONS_PATH = /^\/api\/recommendations(\/|$)/;
+const LOAD_POST_WATCH_MS = 5_000;
+/**
+ * The request-body marker D1 (p5-a1) adds when a person explicitly opts in to a paid recommendation.
+ * Null until it ships: every POST /api/recommendations during a passive page load then fails C-07.
+ */
+const AI_OPT_IN_FIELD: string | null = null;
 
 /** Opens a visitor context, runs fn, and always closes it. */
 export async function withVisitor<T>(ctx: Ctx, fn: (kit: KitContext) => Promise<T>, viewport?: { width: number; height: number }): Promise<T> {
@@ -128,4 +145,174 @@ register(
       return Promise.resolve(verdict(errors.slice(0, 5).map((e) => `${e.page}: ${e.text.slice(0, 120)}`), "0 console errors on visitor pages", { errors: errors.length }));
     },
   },
+  {
+    id: "C-01", tier: 1, kind: "browser", blocking: true,
+    run: (ctx) =>
+      withVisitor(ctx, (kit) =>
+        onPage(ctx, kit, "C-01", async (page) => {
+          const before = ctx.browser!.consoleErrors.length;
+          await kit.open(page, "/search?q=hls");
+          await page.locator(RESOURCE_LINK).first().waitFor({ timeout: 10_000 }).catch(() => undefined);
+          const cards = await page.locator(RESOURCE_LINK).count();
+          const errors = ctx.browser!.consoleErrors.slice(before);
+          const problems = [
+            ...(cards < 1 ? ["/search?q=hls shows no result card"] : []),
+            ...errors.slice(0, 3).map((e) => `console error: ${e.text.slice(0, 120)}`),
+          ];
+          return verdict(problems, `/search?q=hls shows ${cards} result links, 0 console errors`, { cards, consoleErrors: errors.length });
+        }),
+        DESKTOP,
+      ),
+  },
+  {
+    id: "C-02", tier: 1, kind: "browser", blocking: true,
+    run: (ctx) =>
+      withVisitor(ctx, (kit) =>
+        onPage(ctx, kit, "C-02", async (page) => {
+          const rng = rngFor(ctx.runId, "C-02");
+          const sitemap = await loadSitemap(ctx);
+          const paths = [...pick(sitemap, "tag", 1, rng), ...pick(sitemap, "journey", 1, rng)];
+          if (paths.length < 2) return fail(`sitemap lists ${paths.length} of the 2 wanted page types (tag, journey)`);
+          const problems: string[] = [];
+          for (const path of paths) {
+            await kit.open(page, path);
+            const found = await page.locator(RESOURCE_LINK).first().waitFor({ timeout: 10_000 }).then(() => true, () => false);
+            if (!found) problems.push(`${path} shows no resource link`);
+          }
+          return verdict(problems, `${paths.join(" and ")} answer 200 with resource links`, { paths });
+        }),
+      ),
+  },
+  {
+    id: "C-03", tier: 1, kind: "browser", blocking: true,
+    run: (ctx) =>
+      withVisitor(ctx, async (kit) => {
+        const targets = [{ path: "/", viewport: DESKTOP }, { path: "/subcategory/codecs", viewport: TABLET }];
+        const measured: Record<string, number[]> = {};
+        for (const { path, viewport } of targets) {
+          const key = `${path}@${viewport.width}`;
+          measured[key] = [];
+          for (let i = 0; i < CLS_LOADS; i++) {
+            const page = await kit.newPage();
+            try {
+              await page.setViewportSize(viewport);
+              await page.addInitScript(() => {
+                const w = window as unknown as { __cls: number };
+                w.__cls = 0;
+                new PerformanceObserver((list) => {
+                  for (const e of list.getEntries() as unknown as { value: number; hadRecentInput: boolean }[]) if (!e.hadRecentInput) w.__cls += e.value;
+                }).observe({ type: "layout-shift", buffered: true });
+              });
+              await kit.open(page, path);
+              await page.waitForTimeout(CLS_WINDOW_MS);
+              measured[key].push(Math.round((await page.evaluate(() => (window as unknown as { __cls: number }).__cls)) * 1000) / 1000);
+            } finally {
+              await page.close();
+            }
+          }
+        }
+        const over = Object.entries(measured).flatMap(([key, values]) => values.map((v, i) => ({ key, load: i + 1, v }))).filter((m) => m.v >= CLS_LIMIT);
+        const summary = Object.entries(measured).map(([key, values]) => `${key} ${values.join("/")}`).join("; ");
+        return verdict(over.map((m) => `${m.key} load ${m.load} CLS ${m.v} >= ${CLS_LIMIT}`), `CLS < ${CLS_LIMIT} on every load: ${summary}`, { measured });
+      }),
+  },
+  {
+    id: "C-04", tier: 1, kind: "browser", blocking: true,
+    run: (ctx) =>
+      withVisitor(ctx, (kit) =>
+        onPage(ctx, kit, "C-04", async (page) => {
+          await kit.open(page, "/");
+          const banner = page.getByTestId("consent-banner");
+          if (!(await banner.waitFor({ state: "visible", timeout: 15_000 }).then(() => true, () => false))) return fail("consent banner is not visible in a fresh context");
+          const afterDecline: string[] = [];
+          page.on("request", (req) => {
+            const host = new URL(req.url()).host;
+            if (ANALYTICS_HOST.test(host)) afterDecline.push(host);
+          });
+          await page.getByTestId("consent-decline").click();
+          await page.waitForTimeout(DECLINE_WATCH_MS);
+          const hosts = [...new Set(afterDecline)];
+          return verdict(
+            hosts.map((h) => `request to ${h} after Decline`),
+            `0 analytics requests in ${DECLINE_WATCH_MS / 1000} s after Decline (navigator.webdriver suppresses the SDKs, so this proves Decline, not Accept)`,
+            { hosts },
+          );
+        }),
+      ),
+  },
+  {
+    id: "C-05", tier: 1, kind: "browser", blocking: true,
+    run: (ctx) =>
+      withVisitor(
+        ctx,
+        (kit) =>
+          onPage(ctx, kit, "C-05", async (page) => {
+            const problems: string[] = [];
+            const rects: Record<string, { left: number; right: number }> = {};
+            for (const path of ["/sign-in", "/sign-up"]) {
+              await kit.open(page, path);
+              const card = page.locator(CLERK_CARD).first();
+              if (!(await card.waitFor({ state: "visible", timeout: 15_000 }).then(() => true, () => false))) {
+                problems.push(`${path}: no Clerk card rendered`);
+                continue;
+              }
+              const { left, right } = await card.evaluate((el) => {
+                const r = el.getBoundingClientRect();
+                return { left: Math.round(r.left * 10) / 10, right: Math.round(r.right * 10) / 10 };
+              });
+              rects[path] = { left, right };
+              if (left < 0 || right > MOBILE.width) problems.push(`${path}: Clerk card spans ${left}..${right}, viewport is 0..${MOBILE.width}`);
+            }
+            return verdict(problems, `Clerk card inside 0..${MOBILE.width} on /sign-in and /sign-up`, { rects });
+          }),
+        MOBILE,
+      ),
+  },
+  {
+    id: "C-07", tier: 1, kind: "browser", blocking: true,
+    async run(ctx) {
+      const cookies = loadMemberStateCookies();
+      if (!cookies) return fail("audit member browser state is not readable");
+      const kit = await ctx.browser!.newContext("auditMember", DESKTOP);
+      try {
+        await kit.context.addCookies(cookies);
+        const posts: { path: string; ai: boolean; body: string }[] = [];
+        const signedOut: string[] = [];
+        const page = await kit.newPage();
+        const host = new URL(ctx.base).host;
+        // Registered after the context's own route, so it runs first: nothing but GETs and Clerk's own calls leaves this page.
+        await page.route((url) => url.host === host && url.pathname.startsWith("/api/"), (route) => {
+          const req = route.request();
+          const { pathname } = new URL(req.url());
+          if (req.method() === "GET" || req.method() === "HEAD" || pathname.startsWith("/api/__clerk/")) return route.fallback();
+          const body = req.postData() ?? "";
+          if (RECOMMENDATIONS_PATH.test(pathname)) posts.push({ path: `${req.method()} ${pathname}`, ai: carriesAiOptIn(body), body: redact(body).slice(0, 300) });
+          return route.abort();
+        });
+        for (const path of ["/", "/profile"]) {
+          await kit.open(page, path);
+          await page.waitForTimeout(LOAD_POST_WATCH_MS);
+          if (new URL(page.url()).pathname.startsWith("/sign-in")) signedOut.push(path);
+        }
+        await page.close();
+        if (signedOut.length) return fail(`audit member session is signed out (${signedOut.join(", ")} redirected to sign-in), so nothing was proven`);
+        const offending = posts.filter((p) => p.ai);
+        const values = { recommendationPosts: posts.length, aiOptInPosts: posts.filter((p) => p.ai).length, posts };
+        return offending.length
+          ? fail(`${offending.length} POST /api/recommendations on page load (aborted before sending): ${offending.map((p) => p.path).join(", ")}`, values)
+          : pass("0 POST /api/recommendations with an AI opt-in while loading / and /profile as the audit member", values);
+      } finally {
+        await kit.close();
+      }
+    },
+  },
 );
+
+function carriesAiOptIn(body: string): boolean {
+  if (AI_OPT_IN_FIELD === null) return true;
+  try {
+    return (JSON.parse(body) as Record<string, unknown>)[AI_OPT_IN_FIELD] === true;
+  } catch {
+    return false;
+  }
+}

@@ -5,6 +5,9 @@ import { loadSitemap, pick, rngFor } from "../lib/sitemap.ts";
 const HOUR_MS = 3_600_000;
 const FRESH_SCAN_FAIL_H = 30;
 const FRESH_SCAN_WARN_H = 26;
+const BACKUP_MAX_H = 26;
+const LOG_SLICE_CONCURRENCY = 6;
+const LOG_RETENTION_DAYS = 7;
 const RESEARCHER_OK = new Set(["completed", "cancelled", "budget_stopped"]);
 
 const ageHours = (iso: string) => (Date.now() - new Date(iso).getTime()) / HOUR_MS;
@@ -56,6 +59,79 @@ async function checkSeoPage(ctx: Ctx, path: string): Promise<string[]> {
     }
   }
   return problems;
+}
+
+async function newestBackup(ctx: Ctx): Promise<{ completedAt: string; ageHours: number } | null> {
+  const { backups } = (await ctx.http.get("/api/admin/database-backups", { owner: true })).json<{ backups: { completedAt: string }[] }>();
+  if (!backups.length) return null;
+  const completedAt = backups.map((b) => b.completedAt).sort().at(-1)!;
+  return { completedAt, ageHours: Math.round(ageHours(completedAt) * 10) / 10 };
+}
+
+interface LogRecord { _time: string; level: string; area: string; message: string; fields?: string }
+interface LogSlice { records: LogRecord[]; scanned: number; failedReads: number; truncated: boolean }
+
+/** Known benign 409 from POST /api/admin/resources/:id/unapprove, logged at error level. Remove this matcher once D7 ships. */
+const isKnownUnapprove409 = (r: LogRecord) => r.message.includes("Error unapproving resource") && /not approved/i.test(`${r.message} ${r.fields ?? ""}`);
+
+function httpStatus(r: LogRecord): number | undefined {
+  try {
+    const status = (JSON.parse(r.fields ?? "{}") as { status?: unknown }).status;
+    return typeof status === "number" ? status : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Hourly [since, until] slices covering the deployment's boot to now, so the 2000-record cap per query cannot hide records. */
+function hourSlices(bootMs: number, nowMs: number): [string, string][] {
+  const slices: [string, string][] = [];
+  for (let t = Math.max(bootMs, nowMs - LOG_RETENTION_DAYS * 24 * HOUR_MS); t < nowMs; t += HOUR_MS) {
+    slices.push([new Date(t).toISOString(), new Date(Math.min(t + HOUR_MS, nowMs)).toISOString()]);
+  }
+  return slices;
+}
+
+async function productionLogs(ctx: Ctx): Promise<Result> {
+  const health = await ctx.http.get("/api/admin/operations/health", { owner: true });
+  const bootAt = health.json<{ readiness?: { migrations?: { completedAt?: string } } }>().readiness?.migrations?.completedAt;
+  const bootMs = bootAt ? Date.parse(bootAt) : NaN;
+  if (Number.isNaN(bootMs)) return fail("ops health has no boot time (readiness.migrations.completedAt)");
+  const slices = hourSlices(bootMs, Date.now());
+  const readSlice = async (since: string, until: string, level: "warn" | "error"): Promise<LogSlice> => {
+    const res = await ctx.http.get(`/api/admin/logs?since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&level=${level}&limit=2000`, { owner: true });
+    if (res.status !== 200) throw new Error(`/api/admin/logs answered ${res.status} for ${since}`);
+    return res.json<LogSlice>();
+  };
+  // A warn-heavy hour can hit the 2000 cap; errors are the load-bearing records, so retry that hour at error level only.
+  const sliceLogs = async ([since, until]: [string, string]) => {
+    const warn = await readSlice(since, until, "warn");
+    return warn.truncated ? readSlice(since, until, "error") : warn;
+  };
+  const fetched: LogSlice[] = [];
+  for (let i = 0; i < slices.length; i += LOG_SLICE_CONCURRENCY) {
+    fetched.push(...(await Promise.all(slices.slice(i, i + LOG_SLICE_CONCURRENCY).map(sliceLogs))));
+  }
+  const records = fetched.flatMap((s) => s.records);
+  const excluded = records.filter((r) => r.level === "error" && isKnownUnapprove409(r));
+  const errors = records.filter((r) => r.level === "error" && !isKnownUnapprove409(r));
+  const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !isKnownUnapprove409(r));
+  const incomplete = fetched.filter((s) => s.truncated || s.failedReads > 0).length;
+  const values = { bootAt, slices: slices.length, scanned: fetched.reduce((n, s) => n + s.scanned, 0), warnOrError: records.length, errors: errors.length, status5xx: serverErrors.length, excludedKnown409: excluded.length, incompleteSlices: incomplete };
+  const sample = (list: LogRecord[]) => {
+    const groups = new Map<string, number>();
+    for (const r of list) {
+      const key = `${r.area} ${r.message.slice(0, 60)}${httpStatus(r) ? ` (${httpStatus(r)})` : ""}`;
+      groups.set(key, (groups.get(key) ?? 0) + 1);
+    }
+    return [...groups].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([key, n]) => `${n}x ${key}`).join(" | ");
+  };
+  const problems = [
+    ...(errors.length ? [`${errors.length} level=error since boot: ${sample(errors)}`] : []),
+    ...(serverErrors.length ? [`${serverErrors.length} records with a 5xx status: ${sample(serverErrors)}`] : []),
+    ...(incomplete && !errors.length && !serverErrors.length ? [`${incomplete} log slices were truncated or unreadable, so 0 cannot be proven`] : []),
+  ];
+  return verdict(problems, `0 level=error and 0 5xx in ${slices.length} hourly slices since boot ${bootAt} (${excluded.length} known unapprove 409 excluded)`, values);
 }
 
 async function newestResearcherJob(ctx: Ctx): Promise<Result> {
@@ -159,13 +235,22 @@ register(
   {
     id: "T1-17", tier: 1, kind: "api", blocking: false, needs: ["owner"],
     async run(ctx) {
-      const { backups } = (await ctx.http.get("/api/admin/database-backups", { owner: true })).json<{ backups: { completedAt: string }[] }>();
-      if (!backups.length) return info("no backup listed");
-      const newest = backups.map((b) => b.completedAt).sort().at(-1)!;
-      const age = Math.round(ageHours(newest) * 10) / 10;
-      return info(`newest backup ${age} h old (info only until backup scheduling ships)`, { completedAt: newest, ageHours: age });
+      const newest = await newestBackup(ctx);
+      if (!newest) return info("no backup listed");
+      return info(`newest backup ${newest.ageHours} h old (info only; C-09 enforces the ${BACKUP_MAX_H} h limit)`, newest);
     },
   },
+  {
+    id: "C-09", tier: 1, kind: "api", blocking: true, needs: ["owner"],
+    async run(ctx) {
+      const newest = await newestBackup(ctx);
+      if (!newest) return fail("no backup listed");
+      return newest.ageHours < BACKUP_MAX_H
+        ? pass(`newest backup ${newest.ageHours} h old (limit ${BACKUP_MAX_H} h)`, newest)
+        : fail(`newest backup ${newest.ageHours} h old (limit ${BACKUP_MAX_H} h)`, newest);
+    },
+  },
+  { id: "C-08", tier: 1, kind: "api", blocking: true, needs: ["owner"], run: productionLogs },
   {
     id: "T1-18", tier: 1, kind: "api", blocking: true, needs: ["owner"],
     async run(ctx) {

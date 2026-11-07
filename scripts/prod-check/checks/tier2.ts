@@ -188,6 +188,32 @@ const bookmarkStep = step("T2-05", ["t2.ready"], async (ctx, { member }) => {
   return verdict(problems, `bookmark on #${rid} added, read back, removed`, { resourceId: rid });
 });
 
+/** C-06 (F-MCON-01): submit under an awesome.video QA URL, withdraw, then prove the public surfaces never showed it. */
+const submitWithdrawStep = step("C-06", ["t2.ready"], async (ctx, { member }) => {
+  const name = `qa-audit-${ctx.runId}-c06`;
+  const res = await member.call("POST", "/api/resources", {
+    title: name,
+    url: `${ctx.base}/qa-audit-${ctx.runId}/c06`,
+    description: `QA probe, safe to delete. Created by prod-check C-06 run ${ctx.runId}.`,
+    category: "Media Tools",
+    metadata: { tags: ["qa-probe"] },
+  });
+  if (res.status !== 201) return fail(`submit answered ${res.status}`);
+  const row = res.json<{ id: number; status: string }>();
+  state(ctx).set("t2.idc06", row.id);
+  const problems: string[] = [];
+  if (row.status !== "pending") problems.push(`status ${row.status}, expected pending`);
+  const withdraw = await member.call("POST", `/api/user/contributions/resource/${row.id}/withdraw`);
+  if (withdraw.status !== 200) problems.push(`withdraw answered ${withdraw.status}`);
+  const publicStatus = (await ctx.http.get(`/api/resources/${row.id}`)).status;
+  if (publicStatus !== 404) problems.push(`public GET /api/resources/${row.id} answered ${publicStatus}, expected 404`);
+  const found = (await ctx.http.get(`/api/search?q=${encodeURIComponent(name)}`)).json<{ total: number }>().total;
+  if (found !== 0) problems.push(`search for ${name} found ${found}, expected 0`);
+  const sitemap = (await ctx.http.get("/sitemap.xml")).text;
+  if ([`/resource/${row.id}<`, `qa-audit-${ctx.runId}`].some((needle) => sitemap.includes(needle))) problems.push("sitemap lists the withdrawn row");
+  return verdict(problems, `#${row.id} submitted pending, withdrawn; public 404, search 0, sitemap 0`, { id: row.id });
+});
+
 const editStep = step("T2-06", ["t2.id1", "t2.description0"], async (ctx, { admin }) => {
   const id = num(ctx, "t2.id1")!;
   const original = state(ctx).get("t2.description0") as string;
@@ -238,7 +264,7 @@ export const verifyGone = step("T2-11", ["t2.ready"], async (ctx, { admin }) => 
   if (listing.status !== 200) return fail(`qa-rows answered ${listing.status}`);
   const left = ownRows(ctx, listing.json<QaRows>());
   if (left.length) problems.push(`rows remain: ${left.map(({ table, row }) => `${table}#${row.id}`).join(", ")}`);
-  for (const key of ["t2.id1", "t2.id2"]) {
+  for (const key of ["t2.id1", "t2.id2", "t2.idc06"]) {
     const id = num(ctx, key);
     if (id === undefined) continue;
     const status = (await ctx.http.get(`/api/resources/${id}`)).status;
@@ -255,4 +281,4 @@ export const tier2Wrote = (ctx: Ctx) => ctx.shared.get("t2.ready") !== undefined
 export const closeTier2Actors = (ctx: Ctx) =>
   Promise.all(Object.values((ctx.shared.get("t2.actors") ?? {}) as Record<string, Actor>).map((a) => a.close().catch(() => undefined)));
 
-register(setup, submitStep, queueStep, rejectStep, withdrawStep, bookmarkStep, editStep);
+register(setup, submitStep, queueStep, rejectStep, withdrawStep, bookmarkStep, editStep, submitWithdrawStep);
