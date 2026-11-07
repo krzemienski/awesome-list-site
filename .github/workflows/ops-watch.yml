@@ -65,11 +65,15 @@ jobs:
             [ "$jobs" = 200 ] || b "run-due-jobs did not return 200" "{\"status\":$jobs}"
             if [ "$sig" = 200 ]; then
               rev=$(jq -r .revision out/signals.json)
-              jq -c '.errorLogs.topSignatures[] | select(.count > 0)' out/signals.json | while read -r row; do
-                b "$(jq -r .signature <<<"$row")" "$(jq -c --arg r "$rev" '. + {revision:$r}' <<<"$row")"
+              recent=$(date -u -d "-20 minutes" +%Y-%m-%dT%H:%M:%S)
+              # Only signatures seen in the last 20 minutes breach; older ones are history since boot.
+              jq -c --arg recent "$recent" '.errorLogs.topSignatures[] | select(.count > 0 and .lastAt >= $recent)' out/signals.json | while read -r row; do
+                sig_text=$(jq -r .signature <<<"$row")
+                hash=$(printf '%s' "$sig_text" | sha256sum | cut -c1-8)
+                b "${sig_text%%:*} $hash" "$(jq -c --arg r "$rev" '{count, lastAt, revision:$r}' <<<"$row")"
               done
-              jq -e '.http5xx >= 3' out/signals.json >/dev/null && b "5xx responses since boot at or above 3" "$(jq -c '{http5xx, bootAt, revision}' out/signals.json)"
-              jq -e '.pool.waiting > 0' out/signals.json >/dev/null && b "database pool has waiting requests" "$(jq -c '{pool, bootAt, revision}' out/signals.json)"
+              jq -e --arg recent "$recent" '.http5xx >= 3 and (.lastHttp5xxAt // "") >= $recent' out/signals.json >/dev/null && b "5xx responses" "$(jq -c '{http5xx, lastHttp5xxAt, bootAt, revision}' out/signals.json)"
+              jq -e '.pool.waiting > 0' out/signals.json >/dev/null && b "database pool waiting" "$(jq -c '{pool, bootAt, revision}' out/signals.json)"
             else
               b "signals endpoint did not return 200" "{\"status\":$sig}"
             fi
@@ -96,12 +100,15 @@ jobs:
           gh label create ops-watch --color B60205 --description "Opened by the ops-watch workflow" 2>/dev/null || true
           gh issue list --label ops-watch --state open --limit 200 --json number,title,updatedAt > out/open.json
           cutoff=$(date -u -d "-$COMMENT_EVERY_HOURS hours" +%Y-%m-%dT%H:%M:%SZ)
+          created=0
           while read -r row; do
             title="[ops-watch] $(jq -r .signature <<<"$row")"
-            body=$(printf 'Seen at %s (run %s/%s/actions/runs/%s).\n\nEvidence (counts and timestamps only):\n\n```json\n%s\n```\n' \
+            body=$(printf 'Seen at %s (run %s/%s/actions/runs/%s).\n\nCounts and timestamps only. Full text: GET /api/ops/signals (token-gated).\n\n```json\n%s\n```\n' \
               "$(date -u +%FT%TZ)" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(jq .evidence <<<"$row")")
             found=$(jq -c --arg t "$title" '[.[] | select(.title == $t)][0] // empty' out/open.json)
             if [ -z "$found" ]; then
+              [ "$created" -lt 5 ] || continue
+              created=$((created + 1))
               gh issue create --title "$title" --label ops-watch --body "$body"
             elif [[ "$(jq -r .updatedAt <<<"$found")" < "$cutoff" ]]; then
               gh issue comment "$(jq -r .number <<<"$found")" --body "$body"

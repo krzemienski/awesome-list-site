@@ -253,8 +253,14 @@ const write = (level: LogLevel, line: string, record: LogRecord) => {
   if (level === "error") console.error(clipped);
   else if (level === "warn") console.warn(clipped);
   else console.log(clipped);
-  if (level === "error") recordErrorSignature(record.area, record.message, record._time);
   getLogSink(sinkNotice).push(record);
+  if (level === "error") {
+    try {
+      recordErrorSignature(record.area, record.message, record._time);
+    } catch {
+      // counting must never break logging
+    }
+  }
 };
 
 /** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
@@ -388,12 +394,18 @@ export function logHttpRequest(entry: {
   group?: string;
   /** Pseudonymous account id of a signed-in caller (never an email). */
   userId?: string | number;
+  /** An intentional 503 from ServiceUnavailableError (load shedding): WARN, one signature. */
+  shed?: boolean;
 }): void {
   const level: LogLevel =
-    entry.status >= 500 ? "error" : entry.status >= 400 && entry.status !== 401 ? "warn" : "info";
+    entry.shed ? "warn" : entry.status >= 500 ? "error" : entry.status >= 400 && entry.status !== 401 ? "warn" : "info";
   const details: Record<string, unknown> = { status: entry.status, ms: entry.durationMs };
   if (entry.group) details.group = entry.group;
   if (entry.userId !== undefined) details.user = entry.userId;
   if (entry.id) details.rid = entry.id;
+  if (entry.shed) {
+    emit(level, "http", ["shed", { ...details, req: `${entry.method} ${scrubPath(entry.path)}` }], { requestContext: false });
+    return;
+  }
   emit(level, "http", [`${entry.method} ${scrubPath(entry.path)}`, details], { requestContext: false });
 }

@@ -2566,6 +2566,7 @@ export function ogInjectionMiddleware() {
       } catch (e) {
         if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
+          if (e instanceof ServiceUnavailableError) res.locals.shed = true;
           logger.warn(
             "[og-middleware] bounded dependency failure for",
             urlPath,

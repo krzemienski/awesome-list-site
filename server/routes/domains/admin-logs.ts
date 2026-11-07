@@ -83,13 +83,15 @@ const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { messag
 };
 
 /**
- * Object names in the hours covering [since, until], newest hour first, newest object first.
- * Whole hours are taken until MAX_OBJECTS would be exceeded (always at least one), so the
- * unread remainder starts at an hour boundary: `resumeUntil` is the end of the first skipped hour.
+ * Object names for [since, until], newest hour first, newest object first. An object is named for the
+ * hour it was flushed, and a flush can hold records from just before it, so the hour after `until` is
+ * listed too (records are filtered by timestamp later). One hour contributes at most MAX_OBJECTS names;
+ * whole hours are taken until MAX_OBJECTS would be exceeded (always at least one). `resumeUntil` is the
+ * end of the first skipped hour; `cutHour` says an hour had more objects than the cap.
  */
-async function listWindowObjects(storage: PrivateStorage, since: number, until: number): Promise<{ names: string[]; resumeUntil?: number }> {
+async function listWindowObjects(storage: PrivateStorage, since: number, until: number): Promise<{ names: string[]; resumeUntil?: number; cutHour: boolean }> {
   const hours: number[] = [];
-  for (let hour = Math.floor(until / HOUR_MS) * HOUR_MS; hour >= Math.floor(since / HOUR_MS) * HOUR_MS; hour -= HOUR_MS) hours.push(hour);
+  for (let hour = (Math.floor(until / HOUR_MS) + 1) * HOUR_MS; hour >= Math.floor(since / HOUR_MS) * HOUR_MS; hour -= HOUR_MS) hours.push(hour);
   const perHour: string[][] = [];
   for (let i = 0; i < hours.length; i += LIST_CONCURRENCY) {
     perHour.push(...await Promise.all(hours.slice(i, i + LIST_CONCURRENCY).map(async (hour) =>
@@ -98,11 +100,14 @@ async function listWindowObjects(storage: PrivateStorage, since: number, until: 
         .sort((a, b) => b.localeCompare(a)))));
   }
   const names: string[] = [];
-  for (const [i, hourNames] of perHour.entries()) {
-    if (names.length > 0 && names.length + hourNames.length > MAX_OBJECTS) return { names, resumeUntil: hours[i] + HOUR_MS - 1 };
+  let cutHour = false;
+  for (const [i, listed] of perHour.entries()) {
+    const hourNames = listed.slice(0, MAX_OBJECTS);
+    cutHour ||= hourNames.length < listed.length;
+    if (names.length > 0 && names.length + hourNames.length > MAX_OBJECTS) return { names, resumeUntil: hours[i] + HOUR_MS - 1, cutHour };
     names.push(...hourNames);
   }
-  return { names };
+  return { names, cutHour };
 }
 
 function matches(record: LogRecord, query: LogQuery): boolean {
@@ -127,7 +132,7 @@ function parseLines(jsonl: string): LogRecord[] {
 }
 
 export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promise<LogQueryResult> {
-  const { names, resumeUntil } = await listWindowObjects(storage, query.since, query.until);
+  const { names, resumeUntil, cutHour } = await listWindowObjects(storage, query.since, query.until);
   const found: LogRecord[] = [];
   let failedReads = 0;
   for (let i = 0; i < names.length; i += READ_CONCURRENCY) {
@@ -147,7 +152,7 @@ export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promi
     instances: [...new Set(found.map((record) => record.instance))].sort(),
     scanned: names.length,
     failedReads,
-    truncated: nextUntil !== undefined,
+    truncated: nextUntil !== undefined || cutHour,
     nextUntil,
   };
 }

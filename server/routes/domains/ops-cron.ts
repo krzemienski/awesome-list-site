@@ -142,6 +142,7 @@ async function collectSignals() {
       errors: telemetry.pool.errors,
     },
     http5xx: sumByLabel(telemetry.endpoints, ":5xx", "count"),
+    lastHttp5xxAt: telemetry.lastServerErrorAt,
     dbQueryErrors: Object.values(telemetry.databaseQueries).reduce((sum, value) => sum + value.errors, 0),
     errorLogs: { sinceBoot: errors.total, topSignatures: errors.signatures },
     scheduledBackup: getScheduledBackupState(),
