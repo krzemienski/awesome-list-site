@@ -1,0 +1,95 @@
+# Restore drill 2026-11-06 (PLAN §9 phase 0b, #281): production backup 20261107T010741Z-34d030b3 restored into a scratch Postgres 16 under /tmp on the Replit dev workspace. Production and DATABASE_URL untouched. Verbatim CLI output follows.
+
+
+> rest-express@1.0.0 db:backup
+> tsx scripts/db-backup.ts restore 20261107T010741Z-34d030b3 --environment production
+
+Downloading .private/db-backups/production/20261107T010741Z-34d030b3.dump (5974804 bytes)…
+Checksum verified. Restoring (single transaction)…
+Restore finished. Verifying against the manifest…
+PASS  table set                                          expected 42 tables  actual 42 tables
+PASS  schema: columns                                    expected 419  actual 419
+PASS  schema: primaryKeys                                expected 42  actual 42
+PASS  schema: foreignKeys                                expected 50  actual 50
+PASS  schema: uniqueConstraints                          expected 17  actual 17
+PASS  schema: checkConstraints                           expected 33  actual 33
+PASS  schema: indexes                                    expected 128  actual 128
+PASS  schema: sequences                                  expected 28  actual 28
+PASS  schema: views                                      expected 0  actual 0
+PASS  schema: functions                                  expected 0  actual 0
+PASS  schema: triggers                                   expected 0  actual 0
+PASS  schema: enumTypes                                  expected 0  actual 0
+PASS  schema: extensions                                 expected (none)  actual (none)
+PASS  rows: drizzle.__drizzle_migrations                 expected 34  actual 34
+PASS  rows: public.agent_events                          expected 49602  actual 49602
+PASS  rows: public.api_keys                              expected 33  actual 33
+PASS  rows: public.awesome_lists                         expected 0  actual 0
+PASS  rows: public.bookmark_collection_items             expected 0  actual 0
+PASS  rows: public.bookmark_collections                  expected 0  actual 0
+PASS  rows: public.categories                            expected 9  actual 9
+PASS  rows: public.contact_submissions                   expected 1  actual 1
+PASS  rows: public.deleted_user_tombstones               expected 8  actual 8
+PASS  rows: public.digest_attempts                       expected 3  actual 3
+PASS  rows: public.digest_jobs                           expected 3  actual 3
+PASS  rows: public.digest_unsubscribe_tokens             expected 1  actual 1
+PASS  rows: public.enrichment_jobs                       expected 36  actual 36
+PASS  rows: public.enrichment_queue                      expected 16002  actual 16002
+PASS  rows: public.github_sync_history                   expected 4  actual 4
+PASS  rows: public.github_sync_queue                     expected 49  actual 49
+PASS  rows: public.in_app_notifications                  expected 2  actual 2
+PASS  rows: public.journey_steps                         expected 81  actual 81
+PASS  rows: public.learning_journeys                     expected 5  actual 5
+PASS  rows: public.link_health_checks                    expected 8200  actual 8200
+PASS  rows: public.link_health_jobs                      expected 14  actual 14
+PASS  rows: public.notification_preferences              expected 3  actual 3
+PASS  rows: public.password_reset_tokens                 expected 15  actual 15
+PASS  rows: public.rate_limit_hits                       expected 152  actual 152
+PASS  rows: public.research_discoveries                  expected 2322  actual 2322
+PASS  rows: public.research_jobs                         expected 109  actual 109
+PASS  rows: public.resource_audit_log                    expected 19157  actual 19157
+PASS  rows: public.resource_edits                        expected 35  actual 35
+PASS  rows: public.resource_link_reports                 expected 0  actual 0
+PASS  rows: public.resource_tags                         expected 5060  actual 5060
+PASS  rows: public.resources                             expected 4316  actual 4316
+PASS  rows: public.sessions                              expected 0  actual 0
+PASS  rows: public.sub_subcategories                     expected 32  actual 32
+PASS  rows: public.subcategories                         expected 99  actual 99
+PASS  rows: public.tags                                  expected 1608  actual 1608
+PASS  rows: public.user_bookmarks                        expected 16  actual 16
+PASS  rows: public.user_favorites                        expected 3  actual 3
+PASS  rows: public.user_interactions                     expected 860  actual 860
+PASS  rows: public.user_journey_progress                 expected 15  actual 15
+PASS  rows: public.user_preferences                      expected 4  actual 4
+PASS  rows: public.user_recommendation_feedback          expected 1  actual 1
+PASS  rows: public.users                                 expected 144  actual 144
+PASS  sequence: drizzle.__drizzle_migrations_id_seq      expected 34  actual 34
+PASS  sequence: public.agent_events_id_seq               expected 49602  actual 49602
+PASS  sequence: public.awesome_lists_id_seq              expected 1 (not called)  actual 1 (not called)
+PASS  sequence: public.bookmark_collections_id_seq       expected 196  actual 196
+PASS  sequence: public.categories_id_seq                 expected 1239  actual 1239
+PASS  sequence: public.digest_attempts_id_seq            expected 3  actual 3
+PASS  sequence: public.digest_jobs_id_seq                expected 3  actual 3
+PASS  sequence: public.digest_unsubscribe_tokens_id_seq  expected 1  actual 1
+PASS  sequence: public.enrichment_jobs_id_seq            expected 37  actual 37
+PASS  sequence: public.enrichment_queue_id_seq           expected 20901  actual 20901
+PASS  sequence: public.github_sync_history_id_seq        expected 4  actual 4
+PASS  sequence: public.github_sync_queue_id_seq          expected 49  actual 49
+PASS  sequence: public.in_app_notifications_id_seq       expected 14  actual 14
+PASS  sequence: public.journey_steps_id_seq              expected 283  actual 283
+PASS  sequence: public.learning_journeys_id_seq          expected 10  actual 10
+PASS  sequence: public.link_health_checks_id_seq         expected 35996  actual 35996
+PASS  sequence: public.link_health_jobs_id_seq           expected 14  actual 14
+PASS  sequence: public.research_discoveries_id_seq       expected 2323  actual 2323
+PASS  sequence: public.research_jobs_id_seq              expected 109  actual 109
+PASS  sequence: public.resource_audit_log_id_seq         expected 29827  actual 29827
+PASS  sequence: public.resource_edits_id_seq             expected 142  actual 142
+PASS  sequence: public.resources_id_seq                  expected 190957  actual 190957
+PASS  sequence: public.sub_subcategories_id_seq          expected 3795  actual 3795
+PASS  sequence: public.subcategories_id_seq              expected 2362  actual 2362
+PASS  sequence: public.tags_id_seq                       expected 1698  actual 1698
+PASS  sequence: public.user_interactions_id_seq          expected 922  actual 922
+PASS  sequence: public.user_journey_progress_id_seq      expected 91  actual 91
+PASS  sequence: public.user_preferences_id_seq           expected 17  actual 17
+
+RESTORE VERIFIED: backup 20261107T010741Z-34d030b3 → <host>/drill, 83/83 checks passed in 2234 ms.
+restore exit 0
