@@ -70,6 +70,7 @@ import { registerAdminUsageRoutes } from "./routes/domains/admin-usage";
 import { registerQaCleanupRoutes } from "./routes/domains/qa-cleanup";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 import { registerOpsCronRoutes } from "./routes/domains/ops-cron";
+import { registerAdminLogsRoutes } from "./routes/domains/admin-logs";
 import { createLogger } from "./lib/logger";
 
 const logger = createLogger("routes");
@@ -393,6 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Before registerOperationsRoutes: that registrar installs the /api 404 fallbacks.
   registerOpsCronRoutes(app);
+  registerAdminLogsRoutes(app, { isAuthenticated, isAdmin });
 
   // Must remain last: this registrar mounts method and not-found fallbacks.
   registerOperationsRoutes(app, { isAuthenticated, isAdmin, userRepo });
