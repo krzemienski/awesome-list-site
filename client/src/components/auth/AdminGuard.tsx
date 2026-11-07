@@ -3,13 +3,15 @@ import { Link as WLink } from "wouter";
 import { Shield } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import { signInHrefForCurrentLocation } from "@/lib/returnUrl";
+import { RetryButton } from "@/components/layout/StatePanel";
+import { ApiError } from "@/lib/queryClient";
 
 interface AdminGuardProps {
   children: React.ReactNode;
 }
 
 export default function AdminGuard({ children }: AdminGuardProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, error, refetchAuth } = useAuth();
 
   // Show loading while checking auth
   if (isLoading) {
@@ -26,6 +28,28 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   
   // Check if user is admin before mounting any admin components
   const isAdmin = user?.role === "admin";
+
+  // A failed identity check (network, 5xx) says nothing about the session.
+  // Only a server 401 means "not authenticated"; anything else is retryable.
+  const checkFailed = Boolean(error) && !user && !(error instanceof ApiError && error.status === 401);
+  if (checkFailed) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <SEOHead title="Admin Dashboard" noindex />
+        <h1 className="page-title text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+          <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
+          Admin Dashboard
+        </h1>
+        <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert" data-testid="admin-verify-failed">
+          <p className="text-sm text-[var(--text)] mb-3">
+            We couldn't verify your access. This is usually a network problem,
+            and your session may still be valid.
+          </p>
+          <RetryButton onRetry={() => void refetchAuth()} testId="button-admin-verify-retry" />
+        </div>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     // BUG-008 (run19): distinguish "no session" from "session without the

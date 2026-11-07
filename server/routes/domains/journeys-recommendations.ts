@@ -741,6 +741,10 @@ export function registerRecommendationRoutes(
         return res.status(400).json({ message: 'limit must be a positive integer (max 50)' });
       }
       const forceRefresh = req.query.refresh === 'true';
+      const body = z.object({ useAI: z.boolean().optional() }).safeParse(req.body ?? {});
+      if (!body.success) {
+        return res.status(400).json({ message: 'useAI must be a boolean' });
+      }
       const saved = await userFeatureRepo.getUserPreferences(userId);
       const userProfile: AIUserProfile = {
         userId,
@@ -770,7 +774,8 @@ export function registerRecommendationRoutes(
       const result = await recommendationEngine.generateRecommendations(
         userProfile,
         limit,
-        forceRefresh
+        forceRefresh,
+        body.data.useAI === true
       );
 
       // NB-015 (run23): pass embedded resources through the public serializer.

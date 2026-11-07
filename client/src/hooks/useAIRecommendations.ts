@@ -163,9 +163,11 @@ export function useAIRecommendations(
     mutationFn: async ({
       profile,
       forceRefresh = false,
+      useAI = false,
     }: {
       profile?: UserProfile;
       forceRefresh?: boolean;
+      useAI?: boolean;
     }): Promise<RecommendationsResponse> => {
       const url = `/api/recommendations?limit=${limit}${forceRefresh ? '&refresh=true' : ''}`;
       const finalProfile = profile ?? userProfile;
@@ -179,7 +181,7 @@ export function useAIRecommendations(
           finalProfile
             ? apiRequest(url, {
                 method: 'POST',
-                body: JSON.stringify({}),
+                body: JSON.stringify(useAI ? { useAI: true } : {}),
                 signal: controller.signal,
               })
             : apiRequest(url, { method: 'GET', signal: controller.signal });
@@ -339,8 +341,8 @@ export function useAIRecommendations(
       recommendationsMutation.mutate({ profile }),
     generateRecommendationsAsync: (profile?: UserProfile) =>
       recommendationsMutation.mutateAsync({ profile }),
-    refreshRecommendations: (profile?: UserProfile) =>
-      recommendationsMutation.mutate({ profile, forceRefresh: true }),
+    refreshRecommendations: (profile?: UserProfile, useAI = false) =>
+      recommendationsMutation.mutate({ profile, forceRefresh: true, useAI }),
     clearCache: () => {
       setLocalCache(null);
       setIsStale(false);
