@@ -4,7 +4,7 @@ Layout is mine. Ids only; no credentials. Credentials live in `~/.cache/awesome-
 
 | Time (UTC) | Action | Undo |
 |---|---|---|
-| 2026-11-07 01:48Z | Created mail.tm inbox `awesome-tier2-admin-e30275@fldubai.com` (201) | external, not removed |
+| 2026-11-07 01:48Z | Created mail.tm inbox `<AUDIT_ADMIN_EMAIL in ~/.cache/awesome-audit/audit-admin.env>` (201) | external, not removed |
 | 2026-11-07 01:57Z | Real Clerk sign-up on https://awesome.video/sign-up created production user `user_3Ll7BiTtwPUMFSN96bgs6ClDXYI` (role `user`, no verification step) | owner `DELETE /api/admin/users/:id` |
 | 2026-11-07 01:57Z | `PATCH /api/user/profile` as that user: name "[AUDIT] Tier2 Admin" (200) | patch the name back |
 | 2026-11-07 01:58Z | Promotion `PUT /api/admin/users/:id/role {"role":"admin"}` with the owner header: **401, not applied** (owner.hdr is stale: `/api/admin/stats` also 401). Lead asked to refresh it or run the call. | n/a (no change made) |
