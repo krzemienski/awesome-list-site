@@ -100,3 +100,51 @@ cleans up. Our member lane is read-only and must not touch notification settings
   Final anchors: origin/main = live = 6cb1a93e, ready 200 (unchanged all run). Write proof: evidence/lead/write-proof.md (12,917 GET; 6 telemetry POSTs; 1 owner view-interaction row).
   Cron d354da11 deleted. Committed: PLAN.md, PROGRESS.md, LANE-RULES.md, lanes/, evidence/lead/. NOT committed: evidence/<lane>/ (92 MB raw, cookies redacted).
   RESUME: read PLAN §10 owner answers → execute only approved items in §9 phase order, each through merge gate + replit-deploy; every publish_app and prod write re-confirmed with the owner at the moment.
+
+## APPROVED — 2026-11-06 21:30Z
+Owner said "go" after the plan presentation → all 23 recommended defaults in PLAN §10 accepted. PR #280 merged (origin/main 1b5baba9).
+Standing rules still in force: every publish_app and every production data write is re-confirmed with the owner at that moment
+(brief: "Irreversible steps that need explicit owner confirmation, even after plan approval"). Owner-side actions (Axiom account,
+GA4 SA, uptime monitor, cron-job.org, Replit Secrets OPS_CRON_TOKEN/AXIOM_*, Data recovery page read, audit accounts) are listed
+for the owner; agents do not create accounts or change Secrets.
+
+## Build wave 1 (code PRs, no prod writes; parallel, each in its own worktree off origin/main)
+| Unit | Owner lane | Branch | PLAN refs | Done when (local) |
+|---|---|---|---|---|
+| merge-gate script | inventory | build/merge-gate | #84, §6 | script exits 0 on main, 11 on a seeded type error (shown) |
+| backups scheduled + retention + panel max | admin-ops | build/backups | B1, B4 panel, D2 | tsc+build clean; code path reviewed; prod proof after publish |
+| run-due-jobs endpoint | admin-content | build/run-due | B2, D11 | tsc+build clean; local call with bad/good token → 401/200 |
+| logger + Axiom sink (null sink when unset) | logs | build/logger | B3, D3, D18 | tsc+build clean; local run prints ISO+instance; fake token redacted |
+| pool/cache/refetch + watchdog retry | member | build/perf | B4, B12, B14, B16 | tsc+build clean; local page view shows no config/auth refetch |
+| 410 archived + page-view counting | analytics | build/visitor-signals | B10, B15, D21 | tsc+build clean; local curl archived id → 410 |
+| prod-check runner Tier 0/1 | visitor | build/prod-check | §5, D1 | runner exits 0 against https://awesome.video (read-only), evidence in e2e-evidence/ |
+Wave 2 after wave 1 merges: #76 audit accounts + #77 QA cleanup + Tier 2, #78 pre-publish check into SKILL.md, docs (B11), self-heal loop, B9 usage endpoint.
+Then ONE batched publish (owner yes) → Tier 0+1 on prod.
+- 21:3xZ Owner "go". PR #280 merged (1b5baba9). Issues opened #281-#288 (existing labels only); comments posted on #76/#77/#78/#84.
+  Wave 1 spawned (fresh sonnet agents; old lanes had shut down): b-merge-gate, b-jobs, b-logging, b-load, b-signals, b-runner, b-qa.
+  Rules: BUILD-RULES.md (to be committed with the next docs commit). Check-in cron recreated (10 min).
+- 21:36Z b-docs spawned (build/docs-deploy, Refs #288 #78: doc drift, replit-deploy SKILL steps 3/5.3/5.3b/7/rollback, CLAUDE.md pointer). 8 build agents running; no PRs yet; no /tmp scripts.
+- 21:4xZ PRs: #289 load (changes requested: revert nav SWR), #290 qa-cleanup (review), #291 410+page counts MERGED 15466a49 (review APPROVE + lead gate tsc 0/build 0 on merged tree), #292 jobs/backups (review), #293 logging (review), #294 usage (review), #295 merge gate (review), #296 docs+deploy skill (review). b-runner still building.
+- 21:4xZ #289 MERGED (nav revert verified, lead gate tsc 0/build 0 on merged tree). #292 approved: 3 medium fixes requested. #293 changes needed: watchdog .cause chain (HIGH) + 3 low.
+- 21:44Z check-in: main edb8f077, live 6cb1a93e (unpublished, expected), ready 200. Merged: #289, #291. Open: #290 #294 (review r-290-294), #292 (fixes in flight), #293 (fixes in flight), #295 #296 (review r-295-296). b-runner building (scripts/prod-check/ + tsconfig, no PR yet). /tmp: merge-gate.sh + mg-debug.sh are lane/reviewer copies of the gate script (not wrappers); oldBackup.ts predates this session (11:30), left.
+- 21:4xZ #293 MERGED: lead gate on merged tree tsc 0/build 0; eslint per file no worse (watchdog 2→1); lead tsx proof isConnectionTimeout true/true/false.
+- 21:4xZ #292 MERGED (fixes verified in code: isFinite filter, allSettled + prune skip; lead gate merge 0/tsc 0/build 0). #294 MERGED (review APPROVE; lead gate 0/0/0). #290 sent back: cascade guard (MEDIUM) + 2 low, rebase on main. main 5dc6a420.
+- 21:5xZ #290 MERGED after rebase onto 5dc6a420 (guard verified by lead against schema; both route registrations present; gate merge 0/tsc 0/build 0). Remaining: #295 #296 (review r-295-296), b-runner (no PR yet).
+- 21:54Z check-in: main 9b5bb0d7, live 6cb1a93e (unpublished), ready 200. Open: #295 #296 (review r-295-296), #297 runner (review r-297; lead ran tier1 exit 0 / 0 non-GET; tier0 T0-01 fails correctly pre-publish). 6 of 9 wave-1 PRs merged.
+- 21:5xZ /tmp: removed b-runner probe scripts pc-probe*.mjs (GET-only shape dumps, printed cookie NAMES only) and mg-debug.sh; kept /tmp/merge-gate.sh (reviewer r-295-296 may be using it).
+- 21:5xZ #296 MERGED (4 review fixes verified; gate 0/0/0). Remaining: #295 (fixes in flight), #297 (review r-297).
+- 21:5xZ #295 MERGED (fixes verified: trap exit 130, fetch refusal; lead ran the gate itself: build/merge-gate exit 0, build/prod-check exit 0, no leftover gate worktrees). Remaining: #297 (review r-297).
+- 21:5xZ DEPLOY PRE-CHECK (read-only, replit-deploy steps 1-3 + 5.3a): TARGET c116e9b5, BEFORE (live) 6cb1a93e.
+  schema.ts / migrations / package.json / lockfile: NO change → no npm install, no db:push, publish_app expected to work.
+  Running-jobs check (skill's own block from main): ALL CLEAR, exit 0.
+  Workspace: main @ f0adce375 = empty "Published your App" (tree == 6cb1a93e's tree d752cb3a; kept on replit-agent + gitsafe-backup) → sync = `git reset --keep origin/main` (skill's allowed exception). Clean tree.
+  9 commits go live (#280 docs, #289 #290 #291 #292 #293 #294 #295 #296). Waiting: #297 review; then OWNER YES before workspace sync + 5.3b backup POST + publish_app.
+- 22:04Z check-in: main c116e9b5, live 6cb1a93e (unpublished), ready 200. 8/9 merged; #297 changes requested (expired-session exit code HIGH, NEW-4 blocking), b-runner fixing. Deploy pre-check done (no schema/dep change, jobs clear, workspace on empty publish commit). Awaiting owner "publish".
+- 22:08Z #297 MERGED: lead re-ran bogus-session repro (exit 5, "owner session expired") and real tier 1 (exit 0, 0 non-GET, NEW-4 blocking pass); scripts/merge-gate.sh from main → exit 0. ALL 9 wave-1 PRs merged; main baa3ec4a. Schema/deps still unchanged vs live. Next: owner "publish".
+- 22:14Z PUBLISH STARTED (owner said "publish"). Evidence e2e-evidence/replit-deploy/20261106T221116Z/. Steps: 1 pin TARGET baa3ec4a BEFORE 6cb1a93e (no schema/deps diff); 2 ws `git reset --keep origin/main` past empty publish commit f0adce375 → baa3ec4a, clean; 3 skipped (no install/db:push needed); 4 publish-build exit 0, stamps BUILD_REVISION=baa3ec4a; 5.3a jobs ALL CLEAR; ws tree == target tree; .env present = public VITE_* mirror only (#273), mtime 21:44Z not ours — noted, not secret-bearing; 5.3b backup POST 201 → 20261106T221323Z-5ac18ce5, completedAt 22:13:33Z, 42 tables, 107,968 rows (prev 100,592); publish_app → pending. Polling /api/version.
+- 22:20Z LIVE baa3ec4a (368 s), ready 200, home 200 0.20 s. prod-check: tier 0,1 PASS exit 0 (22 pass, 1 info, 3 non-blocking fails NEW-1..3), tier 3 PASS exit 0, 0 non-GET. REGRESSION from #289: /admin shows "must be signed in" for a valid owner cookie without the localStorage marker (evidence 09-admin-signed-out-regression.png). Admin API checks pass. Hotfix agent b-authfix spawned (fix/owner-session-hint). Second publish needs owner yes.
+- 22:30Z #298 MERGED (hotfix: av_admin_hint cookie + /admin never skips auth fetch). Review APPROVE (2 low: tampered cookie hint survives; client-nav from / to /admin with pre-hint cookie may show cached signed-out until reload). Gate exit 0. main 882a4316. Second publish awaits owner yes.
+- 01:08Z PUBLISH 2 STARTED (owner "publish"): TARGET 882a4316 BEFORE baa3ec4a, no schema/deps; ws reset past empty publish commit e04aadc83 → 882a4316 clean; build exit 0 stamps 882a4316; tree match; jobs ALL CLEAR; backup 20261107T010741Z-34d030b3 (42 tables, 108,038 rows ≥ prev 107,968); publish_app pending. Evidence .claude/worktrees/prod-ops/e2e-evidence/replit-deploy/20261107T010621Z.
+- 01:1xZ (Nov 7) LIVE 882a4316 (399 s), ready 200, home 200 0.24 s. prod-check tier 0,1 PASS exit 0 (25 pass, 0 fail, NEW-1..3 now pass), tier 3 PASS exit 0, 0 non-GET. Live spot-checks: 410/404/200 on archived/rejected/approved; pool max 8; 29 DOC: counters; cache live/expired evictions; POST /api/ops/run-due-jobs → 503 (token unset; no work run; the only non-GET outside the publish steps); /api/admin/usage 200; /api/admin/qa-rows 403 (allowlist unset, deny-by-default).
+  Issues closed with evidence: #285 #286 #287 #288 #84 #78. Commented (awaiting owner setup): #284 #283 #282 #281 #77. Open: #76 (audit account), #85.
+## STATE: WAVE 1 SHIPPED. Owner-side steps remaining (see final report). Wave 2 (audit account #76 → Tier 2; restore drill; self-heal loop) waits on them.
