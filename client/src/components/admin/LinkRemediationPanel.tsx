@@ -11,7 +11,7 @@ import { formatAdminDateTime } from "@/lib/utils";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 
-type RemediationKind = "archive" | "restore" | "rewrite-url" | "review" | "watch";
+type RemediationKind = "archive" | "restore" | "rewrite-url" | "duplicate" | "review" | "watch";
 
 interface RemediationAction {
   resourceId: number;
@@ -38,6 +38,7 @@ const KIND_LABEL: Record<RemediationKind, string> = {
   archive: "Hide (dead)",
   restore: "Restore",
   "rewrite-url": "Update URL",
+  duplicate: "Duplicate",
   review: "Review",
   watch: "Watching",
 };
@@ -125,7 +126,7 @@ export default function LinkRemediationPanel() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Apply the remediation plan?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden (refused if more than 2% of the catalog at once), ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
+                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden (refused if more than 2% of the catalog at once), ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. ${data?.plan.counts.duplicate ?? 0} duplicate listings are not touched. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

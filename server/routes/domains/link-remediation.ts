@@ -79,6 +79,13 @@ export function registerLinkRemediationRoutes(app: Express, { isAuthenticated, i
 
   app.post("/api/admin/link-health/remediation/apply", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     const result = await applyRemediationPlan(req.dbUser?.id);
+    const clashed = result.results.filter((r) => r.clash).length;
+    if (result.results.length === clashed && (clashed > 0 || result.duplicates > 0)) {
+      return res.status(409).json({
+        message: `${clashed + result.duplicates} URL rewrites clash with another resource that already uses the new URL. Merge or archive the duplicate listings instead; nothing was applied.`,
+        ...result,
+      });
+    }
     res.json(result);
   }));
 
