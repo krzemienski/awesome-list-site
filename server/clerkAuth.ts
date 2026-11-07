@@ -27,6 +27,7 @@ import { deletedUserTombstones, users, type AuthMethod, type User } from "@share
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger } from "./lib/logger";
+import { AuditRepository } from "./repositories/AuditRepository";
 
 const logger = createLogger("auth");
 
@@ -35,6 +36,8 @@ export interface ClerkSessionIdentity {
   bridgeUserId: string;
   /** Clerk-native user id (user_...). Use ONLY for Clerk API calls. */
   clerkUserId: string;
+  /** Clerk session id (`sid`); identifies one sign-in. */
+  sessionId?: string;
   email?: string;
   firstName?: string;
   lastName?: string;
@@ -55,6 +58,40 @@ declare global {
   }
 }
 
+const auditRepo = new AuditRepository();
+const SEEN_SESSIONS_MAX = 5000;
+const SESSION_FALLBACK_WINDOW_MS = 30 * 60 * 1000;
+/** Insertion-ordered: the oldest key is evicted first. Value = when the sign-in was recorded. */
+const seenSessions = new Map<string, number>();
+
+const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
+
+function writeAuthAudit(action: "auth.login" | "auth.register", userId: string, notes: string): Promise<void> {
+  return auditRepo.logResourceAudit(null, action, userId, { method: "clerk" }, notes);
+}
+
+/**
+ * One `auth.login` audit row per Clerk session, written the first time this
+ * process sees the session. Without a session id the user is rate-limited to
+ * one row per 30 minutes. The key is claimed before the insert so concurrent
+ * requests of a fresh session cannot write twice; a failed insert releases it.
+ */
+function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
+  const key = identity.sessionId ?? `user:${userId}`;
+  const seenAt = seenSessions.get(key);
+  if (seenAt !== undefined && (identity.sessionId || Date.now() - seenAt < SESSION_FALLBACK_WINDOW_MS)) return;
+  seenSessions.delete(key);
+  seenSessions.set(key, Date.now());
+  if (seenSessions.size > SEEN_SESSIONS_MAX) {
+    const [oldest] = seenSessions.keys();
+    seenSessions.delete(oldest);
+  }
+  writeAuthAudit("auth.login", userId, "Signed in with Clerk").catch((error) => {
+    seenSessions.delete(key);
+    logger.error("[clerkAuth] auth.login audit row failed", { user: userId, errorClass: errorClass(error) });
+  });
+}
+
 function claimString(claims: Record<string, unknown>, key: string): string | undefined {
   const value = claims[key];
   return typeof value === "string" && value.length > 0 ? value : undefined;
@@ -68,6 +105,7 @@ export function getSessionIdentity(req: Request): ClerkSessionIdentity | null {
   return {
     bridgeUserId: claimString(claims, "userId") ?? auth.userId,
     clerkUserId: auth.userId,
+    sessionId: auth.sessionId ?? undefined,
     email: claimString(claims, "email"),
     firstName: claimString(claims, "firstName") ?? claimString(claims, "first_name"),
     lastName: claimString(claims, "lastName") ?? claimString(claims, "last_name"),
@@ -149,6 +187,9 @@ export async function ensureDbUser(
         sign_up_method: "clerk",
       });
       logger.info("New account provisioned from Clerk sign-up", { user: created.id });
+      writeAuthAudit("auth.register", created.id, "Account created from Clerk sign-up").catch((error) => {
+        logger.error("[clerkAuth] auth.register audit row failed", { user: created.id, errorClass: errorClass(error) });
+      });
     }
     return created;
   }
@@ -428,6 +469,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   try {
     req.dbUser = await ensureDbUser(req, identity);
     req.authMethod = "clerk";
+    if (req.dbUser) recordSignIn(identity, req.dbUser.id);
   } catch (error) {
     logger.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
     res.locals.clerkUserLookupError = error;

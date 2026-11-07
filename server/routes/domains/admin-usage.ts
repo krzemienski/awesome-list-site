@@ -1,8 +1,9 @@
 /**
  * DOMAIN ROUTER: Member-feature usage, real vs test (#287)
  *
- *   GET /api/admin/usage   14 metrics x {w28, w90, all} x {real, test} as
- *                          {rows, users}, plus sign-ups by month
+ *   GET /api/admin/usage   16 metrics x {w28, w90, all} x {real, test} as
+ *                          {rows, users}, plus sign-ups by month and a
+ *                          13-week series of logins, sign-ups and submissions
  *
  * One query per table (COUNT ... FILTER), run in parallel, memoised for 60 s.
  * A user is "test" when the name, the email domain or an email token matches
@@ -21,6 +22,7 @@ interface AdminUsageContext {
 
 const MEMO_TTL_MS = 60_000;
 const SIGNUP_MONTHS = 24;
+const WEEKLY_SERIES_WEEKS = 13;
 
 const TEST_NAME_RE = String.raw`^\s*\[(audit|qa)`;
 const TEST_DOMAIN_RE =
@@ -57,6 +59,9 @@ const METRICS: Metric[] = [
   { name: "api_keys_last_used", table: "api_keys", userColumn: "user_id", timeColumn: "last_used_at", where: "last_used_at IS NOT NULL" },
   { name: "digest_opt_ins", table: "notification_preferences", userColumn: "user_id", timeColumn: "email_opted_in_at", where: "email_opted_in_at IS NOT NULL" },
   { name: "notifications_read", table: "in_app_notifications", userColumn: "user_id", timeColumn: "read_at", where: "read_at IS NOT NULL" },
+  { name: "logins", table: "resource_audit_log", userColumn: "performed_by", timeColumn: "created_at", where: "action = 'auth.login'" },
+  // Per-user last send only: no per-send record exists, so rows are users, not emails.
+  { name: "digest_last_sent", table: "notification_preferences", userColumn: "user_id", timeColumn: "last_email_digest_at", where: "last_email_digest_at IS NOT NULL" },
   { name: "interactions", table: "user_interactions", userColumn: "user_id", timeColumn: "timestamp" },
 ];
 
@@ -130,13 +135,44 @@ async function querySignups(test: SQL): Promise<{ month: string; real: number; t
   return result.rows as { month: string; real: number; test: number }[];
 }
 
+interface WeeklyRow { week: string; logins: number; signups: number; submissions: number }
+
+/** Real accounts only; ISO weeks (Monday start), oldest first, empty weeks included. */
+async function queryWeekly(test: SQL): Promise<WeeklyRow[]> {
+  const result = await db.execute(sql`
+    WITH weeks AS (
+      SELECT generate_series(
+        date_trunc('week', now()) - ${`${WEEKLY_SERIES_WEEKS - 1} weeks`}::interval,
+        date_trunc('week', now()),
+        interval '1 week') AS start
+    ),
+    events AS (
+      SELECT 'logins' AS kind, date_trunc('week', t.created_at) AS start
+        FROM resource_audit_log t JOIN users u ON u.id = t.performed_by
+        WHERE t.action = 'auth.login' AND NOT ${test}
+      UNION ALL
+      SELECT 'signups', date_trunc('week', u.created_at) FROM users u WHERE NOT ${test}
+      UNION ALL
+      SELECT 'submissions', date_trunc('week', t.created_at)
+        FROM resources t JOIN users u ON u.id = t.submitted_by WHERE NOT ${test}
+    )
+    SELECT to_char(w.start, 'IYYY-"W"IW') AS week,
+           (count(*) FILTER (WHERE e.kind = 'logins'))::int AS logins,
+           (count(*) FILTER (WHERE e.kind = 'signups'))::int AS signups,
+           (count(*) FILTER (WHERE e.kind = 'submissions'))::int AS submissions
+    FROM weeks w LEFT JOIN events e ON e.start = w.start
+    GROUP BY w.start ORDER BY w.start`);
+  return result.rows as unknown as WeeklyRow[];
+}
+
 async function buildUsageReport() {
   const test = testPredicate();
   const byTable = new Map<string, Metric[]>();
   for (const metric of METRICS) byTable.set(metric.table, [...(byTable.get(metric.table) ?? []), metric]);
 
-  const [signupsByMonth, ...tables] = await Promise.all([
+  const [signupsByMonth, weekly, ...tables] = await Promise.all([
     querySignups(test),
+    queryWeekly(test),
     ...[...byTable].map(([table, metrics]) => queryMetricTable(table, metrics, test)),
   ]);
   return {
@@ -144,7 +180,8 @@ async function buildUsageReport() {
     testDefinition: "heuristic",
     metrics: Object.assign({}, ...tables) as Record<string, MetricCounts>,
     signupsByMonth,
-    notes: "Accounts that were deleted take their history with them (foreign keys cascade), so all-time counts are a floor.",
+    weekly,
+    notes: "Accounts that were deleted take their history with them (foreign keys cascade), so all-time counts are a floor. logins count auth.login audit rows (one per Clerk session) and start at the deploy that restored them. API-key request counts are not tracked (api_keys_last_used is last use only). digest_last_sent is each user's most recent digest, not a send count.",
   };
 }
 
