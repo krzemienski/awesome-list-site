@@ -147,13 +147,13 @@ async function queryWeekly(test: SQL): Promise<WeeklyRow[]> {
         interval '1 week') AS start
     ),
     events AS (
-      SELECT 'logins' AS kind, date_trunc('week', t.created_at AT TIME ZONE 'UTC') AS start
+      SELECT 'logins' AS kind, date_trunc('week', t.created_at) AS start
         FROM resource_audit_log t JOIN users u ON u.id = t.performed_by
         WHERE t.action = 'auth.login' AND NOT ${test}
       UNION ALL
-      SELECT 'signups', date_trunc('week', u.created_at AT TIME ZONE 'UTC') FROM users u WHERE NOT ${test}
+      SELECT 'signups', date_trunc('week', u.created_at) FROM users u WHERE NOT ${test}
       UNION ALL
-      SELECT 'submissions', date_trunc('week', t.created_at AT TIME ZONE 'UTC')
+      SELECT 'submissions', date_trunc('week', t.created_at)
         FROM resources t JOIN users u ON u.id = t.submitted_by WHERE NOT ${test}
     )
     SELECT to_char(w.start, 'IYYY-"W"IW') AS week,

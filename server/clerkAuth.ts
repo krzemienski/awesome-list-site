@@ -79,7 +79,7 @@ function writeAuthAudit(action: "auth.login" | "auth.register", userId: string, 
 function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
   const key = identity.sessionId ?? `user:${userId}`;
   const seenAt = seenSessions.get(key);
-  const seenRecently = seenAt !== undefined && (identity.sessionId || Date.now() - seenAt < SESSION_FALLBACK_WINDOW_MS);
+  const seenRecently = seenAt !== undefined && (identity.sessionId !== undefined || Date.now() - seenAt < SESSION_FALLBACK_WINDOW_MS);
   seenSessions.delete(key);
   if (seenRecently) {
     seenSessions.set(key, seenAt);
