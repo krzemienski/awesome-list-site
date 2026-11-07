@@ -15,7 +15,7 @@
  *     so every line a request produces can be traced back to it. The request's
  *     own status line is written by `logHttpRequest` when it finishes. Inside a
  *     background job the tag is `job=` and `jobId=` instead;
- *   - the instance id (`inst`): INSTANCE_ID, else HOSTNAME, else a boot uuid.
+ *   - the instance id (`inst`): INSTANCE_ID, else HOSTNAME plus a boot uuid, else the boot uuid.
  *
  * Nothing secret or personal is written. Before a line is printed:
  *   - detail keys that name a secret or personal field (password, token,
@@ -46,7 +46,10 @@ const MAX_STACK_LINES = 8;
 const MAX_DEPTH = 4;
 const MAX_SHIPPED_TEXT = 8000;
 
-const INSTANCE = [process.env.INSTANCE_ID, process.env.HOSTNAME].find(Boolean) ?? randomUUID().slice(0, 8);
+// Replit Autoscale gives every instance the same HOSTNAME (the app domain), so a per-boot suffix tells them apart.
+const BOOT_ID = randomUUID().slice(0, 8);
+const HOST_TAG = process.env.HOSTNAME ? `${process.env.HOSTNAME}-${BOOT_ID}` : undefined;
+const INSTANCE = [process.env.INSTANCE_ID, HOST_TAG].find(Boolean) ?? BOOT_ID;
 const DEPLOYMENT = process.env.REPLIT_DEPLOYMENT === "1" ? "production" : "dev";
 
 // ---------------------------------------------------------------------------
