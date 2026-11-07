@@ -68,7 +68,7 @@ export function SignInPage() {
         <AdminPasswordSignIn />
       ) : (
         // C5-V3-01: never a blank body while Clerk's UI can't load.
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex w-full min-w-0 flex-col items-center gap-4">
           <OfflineNotice />
           <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
             <StaleSessionGate>
@@ -97,7 +97,7 @@ export function SignUpPage() {
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
       <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex w-full min-w-0 flex-col items-center gap-4">
         <OfflineNotice />
         <ClerkSlot fallback={<ClerkUiFallback flow="sign-up" />}>
           <StaleSessionGate>
