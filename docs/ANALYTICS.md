@@ -605,6 +605,16 @@ exception: it is restored together with its call site in the already-mounted
 JavaScript-error capture, so no unreferenced session hook can silently recreate
 the same measurement gap.
 
+## Sign-in audit rows and member usage
+
+`auth.register` and `auth.login` rows in `resource_audit_log` stopped on 2026-08-10, when sign-in moved to Clerk. The server now writes them again from `server/clerkAuth.ts`:
+
+- `auth.register`: once, by the request whose insert created the local `users` row.
+- `auth.login`: once per Clerk session id, the first time a process sees it (bounded in-memory set, 5,000 sessions). A server restart can write one more row for a session that is still open. Without a session id, one row per user per 30 minutes.
+- Both rows carry the user id and `{ method: "clerk" }`; no IP address or user agent. Owner-password sign-in (`/api/auth/admin-login`) writes no row.
+
+`GET /api/admin/usage` adds `logins` (audit rows and distinct users), `digest_last_sent` (each user's latest digest, not a send count) and `weekly`: the last 13 ISO weeks of logins, sign-ups and submissions for real accounts. API-key request counts are not tracked; `api_keys_last_used` is last use only. Login history starts at the deploy that restored the rows.
+
 ## Validation
 
 Tracking is verified by hand in a consented real browser (see [Adding an event](#adding-an-event-area-tasks), step 4). There is no validation script: the `vg2-*` harness was removed in `b4040bfe`.
