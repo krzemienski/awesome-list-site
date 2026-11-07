@@ -1,0 +1,25 @@
+{"id":190383,"action":"url","from":"https://videotext.io/?src=directory","to":"https://videotext.io/","http":"200"}
+{"id":190957,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190942,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190533,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190453,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190383,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190350,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190341,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190339,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190336,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190335,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190332,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190203,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190171,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190170,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190169,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190168,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190154,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190153,"action":"approve","http":"200","publicRead":"200","reason":"","prevStatus":"pending"}
+{"id":190943,"action":"reject","http":"200","publicRead":"404","reason":"Duplicate of VideoText (190383): same site, a deep page with a tracking parameter.","prevStatus":"pending"}
+{"id":190338,"action":"reject","http":"200","publicRead":"404","reason":"Duplicate of VideoText (190383): same site, its tools page.","prevStatus":"pending"}
+{"id":190538,"action":"reject","http":"200","publicRead":"404","reason":"Commercial AI video generator with promotional copy; outside this streaming and video-engineering list.","prevStatus":"pending"}
+{"id":190331,"action":"reject","http":"200","publicRead":"404","reason":"Commercial AI image and video generator; outside this streaming and video-engineering list.","prevStatus":"pending"}
+{"id":190155,"action":"reject","http":"200","publicRead":"404","reason":"Consumer photo-to-video web tool; outside this streaming and video-engineering list.","prevStatus":"pending"}
+{"id":190537,"action":"reject","http":"200","publicRead":"404","reason":"Single-purpose consumer web tool (extract a frame); outside this streaming and video-engineering list.","prevStatus":"pending"}
