@@ -38,15 +38,15 @@ jobs:
           auth=(-H "Authorization: Bearer $OPS_CRON_TOKEN")
 
           # D3: the external cron call (the app answers 200 only when it ran the jobs).
-          curl -sS --max-time 240 -o out/jobs.json -w '%{http_code}' -X POST "${auth[@]}" "$SITE/api/ops/run-due-jobs" > out/jobs.code || echo 000 > out/jobs.code
+          curl -sS --max-time 240 -o out/jobs.json -w '%{http_code}\n' -X POST "${auth[@]}" "$SITE/api/ops/run-due-jobs" > out/jobs.code || echo 000 > out/jobs.code
           # W4b: the app's own signals.
-          curl -sS --max-time 30 -o out/signals.json -w '%{http_code}' "${auth[@]}" "$SITE/api/ops/signals" > out/signals.code || echo 000 > out/signals.code
+          curl -sS --max-time 30 -o out/signals.json -w '%{http_code}\n' "${auth[@]}" "$SITE/api/ops/signals" > out/signals.code || echo 000 > out/signals.code
 
           # Tier 0. Ready is retried once so a single slow probe is not a breach.
-          ready() { curl -sS --max-time 10 -o /dev/null -w '%{http_code}' "$SITE/api/health/ready" || echo 000; }
+          ready() { curl -sS --max-time 10 -o /dev/null -w '%{http_code}\n' "$SITE/api/health/ready" || echo 000; }
           code=$(ready); [ "$code" = 200 ] || { sleep 10; code=$(ready); }
           echo "$code" > out/ready.code
-          curl -sS --max-time 15 -o /dev/null -w '%{http_code} %{time_total}' "$SITE/" > out/home.txt || echo "000 15" > out/home.txt
+          curl -sS --max-time 15 -o /dev/null -w '%{http_code} %{time_total}\n' "$SITE/" > out/home.txt || echo "000 15" > out/home.txt
           curl -sS --max-time 10 "$SITE/api/version" | jq -r '.revision // "unknown"' > out/live.rev || echo unknown > out/live.rev
           git ls-remote "https://github.com/$GITHUB_REPOSITORY.git" refs/heads/main | cut -f1 > out/main.rev || echo unknown > out/main.rev
           echo "jobs=$(cat out/jobs.code) signals=$(cat out/signals.code) ready=$(cat out/ready.code) home=$(cat out/home.txt)"
