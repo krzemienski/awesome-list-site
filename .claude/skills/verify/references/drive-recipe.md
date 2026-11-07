@@ -133,7 +133,7 @@ The document arrives with crawler prerender markup, `#ssr-seo-content`, injected
 - Tab triggers are `tab-<id>` (`AdminDashboard.tsx:436`). Hash changes and popstate re-sync the tab (`:137-138`), so a deep link works on load. The old note "hash nav doesn't activate" (`chrome-devtools-lighthouse-workflow.md:15`) predates this; **prefer `/admin/<id>` or clicking `tab-<id>`**.
 - `subsubcategories`, `journeys`, `digests` live in the `button-admin-settings` dropdown (:367-393).
 - Guard states: `admin-authorized`, `text-admin-forbidden`, `link-admin-login`, `text-session-expired` (`components/auth/AdminGuard.tsx:45-83`, `AdminDashboard.tsx:264-318`). Content: `content-overview`, `content-approvals`, …
-- **Researcher tab** `/admin/researcher` (`components/admin/ResearcherTab.tsx`): `button-launch-researcher-canonical` (:638), `button-generate-brief`, "Category focus", `input-target-discoveries`, `button-toggle-advanced-researcher`, `input-research-model` / `-scout-model` / `-baseurl` / `-token`, `text-research-launch-model`, `button-confirm-launch` / `button-cancel-launch` (:1024-1026), `error-research-launch`, `button-research-details-<jobId>`, "Cancel job #<id>", `research-review-panel`, `row-research-discovery-<id>`, "Approve discovery: <title>" / "Reject discovery: <title>", `button-approve-all` → `button-confirm-approve-all`, `button-load-more-jobs`.
+- **Researcher tab** `/admin/researcher` (`components/admin/ResearcherTab.tsx`, launcher in `ResearchLaunchGuide.tsx`): `content-research`, `research-launch-guide`, `button-launch-researcher-canonical`, `button-generate-brief`, "Category focus", `input-target-discoveries`, `button-toggle-advanced-researcher`, `input-research-model` / `-scout-model` / `-baseurl` / `-token`, `research-launch-config` (pre-launch config), `button-confirm-launch` / `button-cancel-launch`, `research-job-config` and `text-research-cost-basis` (job detail), `error-research-launch`, `button-research-details-<jobId>`, "Cancel job #<id>", `research-review-panel`, `row-research-discovery-<id>`, "Approve discovery: <title>" / "Reject discovery: <title>", `button-approve-all` → `button-confirm-approve-all`, `button-load-more-jobs`.
 - **Launching a job spends real model tokens through ANTHROPIC_BASE_URL.** Ask before launching.
 
 **Settings / theme**
@@ -193,7 +193,7 @@ The document arrives with crawler prerender markup, `#ssr-seo-content`, injected
 | user_bookmarks / user_favorites / bookmark_collections | 0 / 0 / 0. Member bookmark lists start empty |
 | resource_edits / resource_link_reports / in_app_notifications / api_keys | 0 / 0 / 0 / 0. Edits queue, link reports, and notifications are empty |
 | enrichment_jobs | 6 |
-| migrations | `users.sessions_revoked_at` exists (0056); `user_preferences_theme_system_check` = editorial/geist only (0057). `drizzle.__drizzle_migrations` has 1 row, because the clone was re-baselined and the chain is not tracked (see memory `migration-chain-incomplete.md`). |
+| migrations | `users.sessions_revoked_at` exists (0056); `user_preferences_theme_system_check` = editorial/geist only (0057). 0058 and 0059 are **not** applied; replay them on each clone (`../SKILL.md` Launch). `drizzle.__drizzle_migrations` has 1 row, because the clone was re-baselined and the chain is not tracked (see memory `migration-chain-incomplete.md`). |
 
 DBs present: `awesome_waves`, `awesome_waves_a`, `awesome_waves_b` (plus many older `awesome_fix_*` / `awesome_*` clones, not mine to drop). Only `awesome_waves_a` had live connections (from :5002).
 
