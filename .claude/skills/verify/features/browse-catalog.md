@@ -22,11 +22,11 @@ A visitor moves from the home dashboard into a category, narrows to a subcategor
 
 Preconditions: guest context, consent decided, local data (9 categories, 1949 approved resources; players-clients has 263).
 
-- **Open a category.** On `/`, click `link-category-players-clients` → URL `/category/players-clients`, `text-results-count` shows the total, cards `card-resource-<id>` render.
-- **Counts agree (BR-COUNT).** On `/category/players-clients` read the header total, the sidebar `row-cat-players-clients` badge, and the subcategory cards plus Uncategorized. They must be equal. Compare the sidebar footer `sidebar-resource-count` with the home total. Cross-check `curl -s localhost:$P/api/categories` `resourceCount` for that slug.
+- **Open a category.** On `/`, click `link-category-players-clients` → URL `/category/players-clients`, `text-results-count` reads "Resources (<total>)" (parse the digits), cards `card-resource-<id>` render.
+- **Counts agree (BR-COUNT).** On `/category/players-clients` read the header total, the sidebar badge on `accordion-cat-players-clients` (the snapshot button "Players & Clients 263 resources"; `row-cat-players-clients` is only the label and holds no count), and the subcategory rows `sub-<slug>` plus `sub-players-clients-uncategorized`. They must be equal. Compare the sidebar footer `sidebar-resource-count` with the home total. Cross-check `curl -s localhost:$P/api/categories` `resourceCount` for that slug.
 - **Narrow and page.** Pick `select-subcategory-filter` → URL gains `?subcategory=`, count drops to that subcategory. Go to page 2 via the paginator link → `?page=2`; scroll down; go to page 3; Back → page 2 at the old scroll; Back again → leaves to the previous page.
 - **Card to detail.** Click `link-resource-title-<id>` on a category, a subcategory (`/subcategory/codecs`) and a sub-subcategory (`/sub-subcategory/av1`) card → each opens `/resource/<id>`.
-- **Drawer (390).** Click `mobile-drawer-trigger` → `.av-sidebar-drawer[data-state="open"]`; scroll inside it; Escape closes it and focus returns to the trigger.
+- **Drawer (390).** Click `mobile-drawer-trigger` → `.av-sidebar-drawer[data-state="open"]`; scroll inside it; Escape removes the drawer from the DOM (check it is absent, not `data-state="closed"`) and `document.activeElement` is the trigger.
 - **Tablet (820).** Deep-link `/sub-subcategory/av1`: the AV1 leaf is visible in the 240px sidebar, and again in the drawer.
 - **Look.** At each width run `references/visual-checklist.md` §2.1 (overflow), §2.2 (shell geometry, sticky header after an 800px instant scroll).
 
