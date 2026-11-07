@@ -59,9 +59,20 @@ if ! MERGE_OUT="$(git merge --no-commit --no-ff "$REF" 2>&1)"; then
   fail 2 setup "git merge failed without conflicts: $MERGE_OUT"
 fi
 
-if ! git diff --quiet origin/main -- package.json package-lock.json; then
+# Only what npm installs can make the symlinked node_modules stale; a change to
+# package.json "scripts" alone cannot.
+install_fields_changed() {
+  git diff --quiet origin/main -- package-lock.json || return 0
+  git diff --quiet origin/main -- package.json && return 1
+  node -e '
+    const pick = (s) => { const p = JSON.parse(s); return JSON.stringify(["dependencies", "devDependencies",
+      "optionalDependencies", "peerDependencies", "overrides", "engines", "workspaces"].map((k) => p[k])); };
+    process.exit(pick(process.argv[1]) === pick(process.argv[2]) ? 1 : 0);
+  ' "$(git show origin/main:package.json)" "$(cat package.json)"
+}
+if install_fields_changed; then
   git diff --stat origin/main -- package.json package-lock.json
-  fail 14 deps "package.json or package-lock.json changed; the symlinked node_modules would be stale. Run npm ci in a scratch tree and check by hand."
+  fail 14 deps "dependencies or package-lock.json changed; the symlinked node_modules would be stale. Run npm ci in a scratch tree and check by hand."
 fi
 
 # Link only now so the merge saw a clean tree (node_modules is in .git/info/exclude).
