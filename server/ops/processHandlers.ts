@@ -21,7 +21,7 @@ async function flushThenExit(code: number): Promise<void> {
  * Crash and shutdown visibility. An uncaught exception leaves Node in an
  * undefined state, so it is logged, flushed and followed by exit 1. An
  * unhandled rejection is logged and the server keeps serving (owner decision
- * 18). SIGTERM flushes buffered logs before exiting 0.
+ * 18). SIGTERM and SIGINT log one line, flush buffered logs and exit 0.
  */
 export function installProcessHandlers(): void {
   if (installed) return;
@@ -38,10 +38,12 @@ export function installProcessHandlers(): void {
     logger.error("Unhandled promise rejection; still serving", asError(reason));
   });
 
-  process.on("SIGTERM", () => {
-    if (exiting) return;
-    exiting = true;
-    logger.warn("SIGTERM received; flushing logs and exiting");
-    void flushThenExit(0);
-  });
+  for (const signal of ["SIGTERM", "SIGINT"] as const) {
+    process.on(signal, () => {
+      if (exiting) return;
+      exiting = true;
+      logger.warn(`${signal} received; flushing logs and exiting`, { uptimeS: Math.round(process.uptime()) });
+      void flushThenExit(0);
+    });
+  }
 }

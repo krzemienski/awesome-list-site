@@ -570,6 +570,7 @@ app.use((req, res, next) => {
           path,
           status: res.statusCode,
           durationMs: duration,
+          shed: res.locals.shed === true,
         });
       }
     }
