@@ -70,7 +70,7 @@ check_segment() {
   while [[ "$first" == *=* && "${#toks[@]}" -gt 1 ]]; do toks=("${toks[@]:1}"); first="${toks[0]}"; done
   first="${first##*/}"
 
-  [[ "$first" =~ ^(wget|ssh|scp|sftp|rsync|mosh|sudo|launchctl|osascript|nc|ncat|telnet)$ ]] && block "forbidden command $first" "$seg"
+  [[ "$first" =~ ^(sh|bash|zsh|dash|ksh|fish|node|deno|bun|python|python3|perl|ruby|php|lua|tclsh|source|\.|exec|xargs|env|wget|ssh|scp|sftp|rsync|mosh|sudo|launchctl|osascript|nc|ncat|telnet)$ ]] && block "forbidden command $first" "$seg"
   [[ "$seg" == *awesome-replit* ]] && block "replit ssh host" "$seg"
 
   if [ "$first" = curl ]; then check_curl "$(printf "%s" "$seg" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"; fi
@@ -104,7 +104,7 @@ case "$tool" in
     [[ "$cmd" =~ $SECRET_RE ]] && block "secret reference" "$cmd"
     # globs/expansions next to a sensitive directory name can spell a secret path without matching SECRET_RE
     [[ "$cmd" =~ (\.cache|\.ssh|\.config|\.aws|\.gnupg|awesome-|owner|Keychains) && "$cmd" =~ [\*\?\[\$\`~\\] ]] && block "glob/expansion near sensitive path" "$cmd"
-    while IFS= read -r seg; do check_segment "$seg"; done < <(printf '%s\n' "$cmd" | sed -E 's/(&&|\|\||;|\|)/\n/g')
+    while IFS= read -r seg; do check_segment "$seg"; done < <(printf '%s\n' "$cmd" | sed -E 's/(&|\||;|`|\(|\))/\n/g')
     # sh -c / eval wrappers hide the real command: scan their payload as one more segment
     [[ "$cmd" =~ (sh|bash|zsh)[[:space:]]+-c|eval[[:space:]] ]] && block "shell wrapper" "$cmd"
     ;;
