@@ -71,6 +71,7 @@ check_segment() {
   first="${first##*/}"
 
   [[ "$first" =~ ^(sh|bash|zsh|dash|ksh|fish|node|deno|bun|python|python3|perl|ruby|php|lua|tclsh|source|\.|exec|xargs|env|wget|ssh|scp|sftp|rsync|mosh|sudo|launchctl|osascript|nc|ncat|telnet)$ ]] && block "forbidden command $first" "$seg"
+  if [ "$first" = npx ] && ! [[ "${toks[1]:-}" =~ ^(tsc|eslint)$ ]]; then block "npx other than tsc/eslint" "$seg"; fi
   [[ "$seg" == *awesome-replit* ]] && block "replit ssh host" "$seg"
 
   if [ "$first" = curl ]; then check_curl "$(printf "%s" "$seg" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"; fi
