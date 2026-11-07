@@ -68,10 +68,33 @@ async function newestBackup(ctx: Ctx): Promise<{ completedAt: string; ageHours: 
   return { completedAt, ageHours: Math.round(ageHours(completedAt) * 10) / 10 };
 }
 
-interface LogRecord { _time: string; level: string; area: string; message: string; fields?: string }
+interface LogRecord { _time: string; level: string; area: string; message: string; fields?: string; rid?: string }
 interface LogSlice { records: LogRecord[]; scanned: number; failedReads: number; truncated: boolean }
 
 /** Known benign 409 from POST /api/admin/resources/:id/unapprove, logged at error level. Remove this matcher once D7 ships. */
+/** F027 load-shedding 503 (og-middleware "Uncached route resolution capacity is temporarily full"); only a burst above SHED_503_BURST_MAX in SHED_WINDOW_MS fails C-08. */
+const SHED_503_BURST_MAX = 50;
+const SHED_WINDOW_MS = 10 * 60_000;
+const isShedWarn = (r: LogRecord) => r.level === "warn" && r.area === "og-middleware" && /capacity is temporarily full/i.test(r.message);
+
+function recordRid(r: LogRecord): string | undefined {
+  try {
+    return r.rid ?? (JSON.parse(r.fields ?? "{}") as { rid?: string }).rid;
+  } catch {
+    return r.rid;
+  }
+}
+
+function busiestWindow(times: number[]): number {
+  const sorted = [...times].sort((a, b) => a - b);
+  let best = 0;
+  for (let lo = 0, hi = 0; hi < sorted.length; hi++) {
+    while (sorted[hi] - sorted[lo] > SHED_WINDOW_MS) lo++;
+    best = Math.max(best, hi - lo + 1);
+  }
+  return best;
+}
+
 const isKnownUnapprove409 = (r: LogRecord) => r.message.includes("Error unapproving resource") && /not approved/i.test(`${r.message} ${r.fields ?? ""}`);
 
 function httpStatus(r: LogRecord): number | undefined {
@@ -114,10 +137,14 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
   }
   const records = fetched.flatMap((s) => s.records);
   const excluded = records.filter((r) => r.level === "error" && isKnownUnapprove409(r));
-  const errors = records.filter((r) => r.level === "error" && !isKnownUnapprove409(r));
-  const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !isKnownUnapprove409(r));
+  const shedRids = new Set(records.filter(isShedWarn).map(recordRid));
+  const isShed503 = (r: LogRecord) => httpStatus(r) === 503 && r.level === "error" && shedRids.has(recordRid(r));
+  const shed = records.filter(isShed503);
+  const errors = records.filter((r) => r.level === "error" && !isKnownUnapprove409(r) && !isShed503(r));
+  const serverErrors = records.filter((r) => (httpStatus(r) ?? 0) >= 500 && !isKnownUnapprove409(r) && !isShed503(r));
+  const shedPeak = busiestWindow(shed.map((r) => Date.parse(r._time)));
   const incomplete = fetched.filter((s) => s.truncated || s.failedReads > 0).length;
-  const values = { bootAt, slices: slices.length, scanned: fetched.reduce((n, s) => n + s.scanned, 0), warnOrError: records.length, errors: errors.length, status5xx: serverErrors.length, excludedKnown409: excluded.length, incompleteSlices: incomplete };
+  const values = { bootAt, slices: slices.length, scanned: fetched.reduce((n, s) => n + s.scanned, 0), warnOrError: records.length, errors: errors.length, status5xx: serverErrors.length, excludedKnown409: excluded.length, shed503: shed.length, shed503Peak10Min: shedPeak, incompleteSlices: incomplete };
   const sample = (list: LogRecord[]) => {
     const groups = new Map<string, number>();
     for (const r of list) {
@@ -129,9 +156,10 @@ async function productionLogs(ctx: Ctx): Promise<Result> {
   const problems = [
     ...(errors.length ? [`${errors.length} level=error since boot: ${sample(errors)}`] : []),
     ...(serverErrors.length ? [`${serverErrors.length} records with a 5xx status: ${sample(serverErrors)}`] : []),
+    ...(shedPeak > SHED_503_BURST_MAX ? [`shed503 burst: ${shedPeak} load-shedding 503s within ${SHED_WINDOW_MS / 60_000} min (limit ${SHED_503_BURST_MAX})`] : []),
     ...(incomplete && !errors.length && !serverErrors.length ? [`${incomplete} log slices were truncated or unreadable, so 0 cannot be proven`] : []),
   ];
-  return verdict(problems, `0 level=error and 0 5xx in ${slices.length} hourly slices since boot ${bootAt} (${excluded.length} known unapprove 409 excluded)`, values);
+  return verdict(problems, `0 level=error and 0 5xx in ${slices.length} hourly slices since boot ${bootAt} (${excluded.length} known unapprove 409 excluded; shed503 ${shed.length}, peak ${shedPeak} per 10 min)`, values);
 }
 
 async function newestResearcherJob(ctx: Ctx): Promise<Result> {
