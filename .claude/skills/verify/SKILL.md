@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Prove awesome.video (React+Vite client, Express server, local Postgres, Clerk) still works and looks right for a real visitor, member or admin after a change. Drives the running app call by call with the chrome-devtools MCP browser at 1440×900, 820×1180 and 390×844, plus single curl reads. Use after any client, server or data change, before calling work done, and for audits. Never writes or runs test scripts.
+description: Prove awesome.video (React+Vite client, Express server, local Postgres, Clerk) still works and looks right for a real visitor, member or admin after a change. Drives the running app call by call with the chrome-devtools MCP browser at 1440×900, 820×1180 and 390×844, plus single curl reads. Use after a publish or deploy to awesome.video, before merging a sign-in, session or admin-cookie change, to check the admin dashboard still loads for a signed-in owner, after any client, server or data change, before calling work done, and for audits. Never writes or runs test scripts.
 ---
 
 # Verify awesome.video as its users
