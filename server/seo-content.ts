@@ -6,6 +6,7 @@ import type { PreferredContactDestination } from "@shared/contact-destination";
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import { searchPageSeo } from "@shared/seo-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
 import { ABOUT_PROJECT, MAINTAINER } from "@shared/about-content";
 
 /** Identical child/general scope policy for crawler and public listing API. */
@@ -64,14 +65,6 @@ export type TaxonomyMatch = {
   subcategory?: any;
 };
 
-/** Count the resources in a node and every descendant, in tree order. */
-export function countNodeResources(node: any): number {
-  let total = Array.isArray(node?.resources) ? node.resources.length : 0;
-  for (const sub of node?.subcategories ?? []) total += countNodeResources(sub);
-  for (const subSub of node?.subSubcategories ?? []) total += countNodeResources(subSub);
-  return total;
-}
-
 export function findCategory(tree: any, slug: string): TaxonomyMatch | null {
   const category = (tree?.categories ?? []).find((item: any) => item.slug === slug);
   if (!category) return null;
@@ -79,7 +72,7 @@ export function findCategory(tree: any, slug: string): TaxonomyMatch | null {
   return {
     name: category.name,
     path,
-    count: countNodeResources(category),
+    count: corpusTotalCount(category),
     crumbs: [{ name: "Home", path: "/" }, { name: category.name, path }],
     node: category,
     category,
@@ -94,7 +87,7 @@ export function findSubcategory(tree: any, slug: string): TaxonomyMatch | null {
     return {
       name: subcategory.name,
       path,
-      count: countNodeResources(subcategory),
+      count: corpusTotalCount(subcategory),
       crumbs: [
         { name: "Home", path: "/" },
         { name: category.name, path: `/category/${category.slug}` },
@@ -119,7 +112,7 @@ export function findSubSubcategory(tree: any, slug: string): TaxonomyMatch | nul
       return {
         name: subSubcategory.name,
         path,
-        count: countNodeResources(subSubcategory),
+        count: corpusTotalCount(subSubcategory),
         crumbs: [
           { name: "Home", path: "/" },
           { name: category.name, path: `/category/${category.slug}` },

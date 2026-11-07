@@ -5,6 +5,7 @@ import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
+import { isRealCategory, navTotalCount } from "@shared/catalog-counts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { requestClerk } from "@/lib/clerk-bridge";
@@ -42,13 +43,6 @@ function shellBrand(siteName?: string): string {
 // Catalog pages reached from Browse (bare /tag redirects to /categories).
 export const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
 
-// Same recursive sum as Home's navTotalCount; never fetch the full corpus.
-function totalCount(node: AwesomeListNavNode): number {
-  return node.resourceCount
-    + (node.subcategories ?? []).reduce((n, child) => n + totalCount(child), 0)
-    + (node.subSubcategories ?? []).reduce((n, child) => n + totalCount(child), 0);
-}
-
 function SearchIcon() {
   return <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="7" cy="7" r="5" /><path d="M11 11 L14 14" />
@@ -66,8 +60,8 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   });
   const unreadCount = notificationState?.unreadCount ?? 0;
   const count = categories
-    .filter(c => !["Table of contents", "Contributing", "License", "External Links", "Anti-features"].includes(c.name) && !c.name.startsWith("List of"))
-    .reduce((sum, node) => sum + totalCount(node), 0);
+    .filter(c => isRealCategory(c.name))
+    .reduce((sum, node) => sum + navTotalCount(node), 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const brand = shellBrand(siteName);
   const repo = shellRepo(repoUrl, repoBranch);

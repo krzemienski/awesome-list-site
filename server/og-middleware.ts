@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
+import { corpusTotalCount, navTotalCount } from "@shared/catalog-counts";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
@@ -81,7 +82,6 @@ import {
   renderSearchContent,
   renderCategoriesContent,
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
@@ -525,36 +525,6 @@ async function getTreeCached(): Promise<any> {
   return storage.getAwesomeListFromDatabase();
 }
 
-/**
- * The Home document is rendered by the exact-tree SSR path after this
- * middleware has rewritten the shell.  Its metadata/body only need the small
- * navigation projection; resolving Home through the legacy full catalog tree
- * duplicated the largest public query before SSR started and made the document
- * TTFB pay for two independent catalog representations.  Keep the recursive
- * count here because HomeNavRepository stores direct counts at each level.
- */
-function homeNavCategoryCount(category: {
-  resourceCount?: number;
-  subcategories?: Array<{
-    resourceCount?: number;
-    subSubcategories?: Array<{ resourceCount?: number }>;
-  }>;
-}): number {
-  return (
-    (category.resourceCount ?? 0) +
-    (category.subcategories ?? []).reduce(
-      (total, subcategory) =>
-        total +
-        (subcategory.resourceCount ?? 0) +
-        (subcategory.subSubcategories ?? []).reduce(
-          (nestedTotal, nested) => nestedTotal + (nested.resourceCount ?? 0),
-          0,
-        ),
-      0,
-    )
-  );
-}
-
 function safeDecode(segment: string): string {
   try {
     return decodeURIComponent(segment);
@@ -688,7 +658,7 @@ function homeShellChrome(): string {
       categories = data.categories.map((c) => ({
        name: c.name,
        slug: c.slug,
-        count: homeNavCategoryCount(c),
+        count: navTotalCount(c),
      }));
     } catch (error) {
       rethrowBoundedDependencyFailure(error);
@@ -978,7 +948,7 @@ function homeShellChrome(): string {
         categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -1221,7 +1191,7 @@ function homeShellChrome(): string {
         cats = (data?.categories ?? []).map((c: any) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -1325,7 +1295,7 @@ function homeShellChrome(): string {
             level: "category",
             totalResources: flat.length,
             childNames: (found.node?.subcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
+              .filter((child: any) => corpusTotalCount(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
             tagFiltered: activeTagFilters(url).length > 0,
@@ -1335,7 +1305,7 @@ function homeShellChrome(): string {
           children: (found.node?.subcategories ?? []).map((s: any) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,
@@ -1534,7 +1504,7 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             childNames: (found.node?.subSubcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
+              .filter((child: any) => corpusTotalCount(child) > 0)
               .map((child: any) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
             tagFiltered: activeTagFilters(url).length > 0,
@@ -1544,7 +1514,7 @@ function homeShellChrome(): string {
           children: (found.node?.subSubcategories ?? []).map((s: any) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,

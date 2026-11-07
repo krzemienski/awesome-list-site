@@ -85,7 +85,6 @@ import {
 } from "../../http-cache-policy";
 import {
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
@@ -94,6 +93,7 @@ import {
   type ListingLevel,
 } from "../../seo-content";
 import { normalizeTagFilter } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
 import { resolveResourceKind } from "../../lib/resourceKinds";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
@@ -1721,14 +1721,9 @@ export function registerAwesomeListDiscoveryRoutes(
           if (!data?.categories?.length) {
             throw new Error('No awesome list data available');
           }
-          // resourceCount stays the node's DIRECT count: client consumers
-          // (navTotalCount, AppSidebar, AppHeader, og-middleware) sum it
-          // recursively. totalResourceCount is the full descendant count,
-          // matching /api/categories resourceCount semantics.
-          const descendantCount = (node: any): number =>
-            (node.resources || []).length +
-            (node.subcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0) +
-            (node.subSubcategories || []).reduce((n: number, c: any) => n + descendantCount(c), 0);
+          // resourceCount stays the node's DIRECT count: consumers sum it with
+          // navTotalCount (shared/catalog-counts). totalResourceCount is the full
+          // descendant count, matching /api/categories resourceCount semantics.
           const nav = {
             title: data.title,
             totalResources: (data.resources || []).length,
@@ -1736,7 +1731,7 @@ export function registerAwesomeListDiscoveryRoutes(
           name: cat.name,
           slug: cat.slug,
           resourceCount: (cat.resources || []).length,
-          totalResourceCount: descendantCount(cat),
+          totalResourceCount: corpusTotalCount(cat),
           teaser: (() => {
             // Run25 C-03: categories with no DIRECT resources (e.g. Community
             // & Events — everything lives in subcategories) got no teaser, so
@@ -1762,12 +1757,12 @@ export function registerAwesomeListDiscoveryRoutes(
             name: sub.name,
             slug: sub.slug,
             resourceCount: (sub.resources || []).length,
-            totalResourceCount: descendantCount(sub),
+            totalResourceCount: corpusTotalCount(sub),
             subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
               name: ss.name,
               slug: ss.slug,
               resourceCount: (ss.resources || []).length,
-              totalResourceCount: descendantCount(ss),
+              totalResourceCount: corpusTotalCount(ss),
             })),
           })),
             })),
@@ -1865,21 +1860,7 @@ export function registerAwesomeListDiscoveryRoutes(
           .filter(kindMatches)
           .map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
       );
-      const countNodeResources = (
-        node: any,
-        matches: (item: any) => boolean = kindMatches,
-      ): number => {
-        let total = (node?.resources ?? []).filter(matches).length;
-        for (const sub of node?.subcategories ?? []) {
-          total += countNodeResources(sub, matches);
-        }
-        for (const subSub of node?.subSubcategories ?? []) {
-          total += countNodeResources(subSub, matches);
-        }
-        return total;
-      };
-      const countNodeResourcesForKind = (node: any): number => countNodeResources(node);
-      const matchesAnyKind = () => true;
+      const countNodeResourcesForKind = (node: any): number => corpusTotalCount(node, kindMatches);
 
       const children =
         level === "category"
@@ -1944,7 +1925,7 @@ export function registerAwesomeListDiscoveryRoutes(
               ? match.node.subSubcategories ?? []
               : []
         )
-          .filter((child: any) => countNodeResources(child, matchesAnyKind) > 0)
+          .filter((child: any) => corpusTotalCount(child) > 0)
           .map((child: any) => child.name),
         formats: unfilteredResources.map((resource: any) => resource.resourceFormat),
       };

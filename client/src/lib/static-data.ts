@@ -6,6 +6,7 @@
  */
 
 import type { ResourceKind } from "@shared/resourceKinds";
+import { isRealCategory, navTotalCount } from "@shared/catalog-counts";
 import { apiRequest, catalogRequestCache } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
@@ -114,23 +115,6 @@ export interface AwesomeListNav {
   categories: AwesomeListNavNode[];
 }
 
-const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
-
-export function isRealCategory(name: string): boolean {
-  return (
-    name !== "Table of contents" &&
-    !name.startsWith("List of") &&
-    !EXCLUDED_CATEGORY_NAMES.includes(name)
-  );
-}
-
-export function navTotalCount(node: AwesomeListNavNode): number {
-  let total = node.resourceCount ?? 0;
-  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
-  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
-  return total;
-}
-
 // C8-V1-01: the taxonomy the public site shows (Home, About, /categories,
 // sidebar): real categories holding resources, with empty subcategories and
 // sub-subcategories pruned. Counts shown to visitors derive from this tree.
@@ -152,10 +136,6 @@ export function visibleNavCategories(
     }));
 }
 
-/** The public subcategory count: subcategories of the visible tree. */
-export function countVisibleSubcategories(categories: AwesomeListNavNode[]): number {
-  return categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
-}
 
 /**
  * Routes whose CONTENT needs the full corpus (resource listings / client-side

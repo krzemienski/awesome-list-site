@@ -24,7 +24,8 @@ import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
 import { searchPageSeo } from "@shared/seo-templates";
-import { fetchAwesomeListNav, navTotalCount, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { fetchAwesomeListNav, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { navTotalCount } from "@shared/catalog-counts";
 import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
