@@ -1,0 +1,85 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Edit",
+      "Write",
+      "Bash(curl -sS -m 30 https://awesome.video/*)",
+      "Bash(curl -sS -m 30 -I https://awesome.video/*)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue reopen *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh api repos/*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git rev-parse *)",
+      "Bash(git branch --show-current)",
+      "Bash(git push -u origin selfheal/*)",
+      "Bash(git push origin selfheal/*)",
+      "Bash(npx tsc --noEmit*)",
+      "Bash(npm run build*)",
+      "Bash(BUILD_REVISION=* npm run build*)",
+      "Bash(npx eslint *)",
+      "Bash(ls *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(jq *)",
+      "Bash(wc *)"
+    ],
+    "deny": [
+      "mcp__*",
+      "mcp__replit__publish_app",
+      "mcp__replit__update_app_using_prompt",
+      "Bash(git push *main*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * HEAD:main*)",
+      "Bash(git reset --hard*)",
+      "Bash(git branch -D*)",
+      "Bash(gh pr merge *)",
+      "Bash(gh repo *)",
+      "Bash(gh release *)",
+      "Bash(gh secret *)",
+      "Bash(gh workflow *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(rsync *)",
+      "Bash(wget *)",
+      "Bash(curl -X *)",
+      "Bash(curl * --data*)",
+      "Bash(curl * -d *)",
+      "Read(~/.cache/awesome-audit/**)",
+      "Read(**/.env*)",
+      "Read(~/.ssh/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.awesome-selfheal/repo/scripts/selfheal/guard.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
