@@ -7,6 +7,7 @@
  * so a broken sink cannot feed itself.
  */
 import { createAxiomTransport } from "./logSinkAxiom";
+import { createStorageTransport, STORAGE_FLUSH_AT, STORAGE_FLUSH_EVERY_MS } from "./logSinkStorage";
 
 export interface LogRecord {
   _time: string;
@@ -57,7 +58,18 @@ export const nullSink: LogSink = {
 /** Writes the sink's own status line (the logger formats it; the sink never logs through `emit`). */
 export type SinkNotice = (message: string) => void;
 
-export function createBufferedSink(transport: LogTransport, notice: SinkNotice): LogSink {
+export interface BufferedSinkOptions {
+  flushAt: number;
+  flushEveryMs: number;
+}
+
+const DEFAULT_SINK_OPTIONS: BufferedSinkOptions = { flushAt: LOG_FLUSH_AT, flushEveryMs: LOG_FLUSH_EVERY_MS };
+
+export function createBufferedSink(
+  transport: LogTransport,
+  notice: SinkNotice,
+  { flushAt, flushEveryMs }: BufferedSinkOptions = DEFAULT_SINK_OPTIONS,
+): LogSink {
   const queue: LogRecord[] = [];
   let sent = 0;
   let dropped = 0;
@@ -112,7 +124,7 @@ export function createBufferedSink(transport: LogTransport, notice: SinkNotice):
 
   const ensureTimer = () => {
     if (timer) return;
-    timer = setInterval(() => void flushOnce(), LOG_FLUSH_EVERY_MS);
+    timer = setInterval(() => void flushOnce(), flushEveryMs);
     timer.unref();
   };
 
@@ -126,7 +138,7 @@ export function createBufferedSink(transport: LogTransport, notice: SinkNotice):
         }
         queue.push(record);
         ensureTimer();
-        if (queue.length >= LOG_FLUSH_AT && !inFlight) setTimeout(() => void flushOnce(), 0).unref();
+        if (queue.length >= flushAt && !inFlight) setTimeout(() => void flushOnce(), 0).unref();
       } catch {
         dropped++;
       }
@@ -150,10 +162,17 @@ export function createBufferedSink(transport: LogTransport, notice: SinkNotice):
 
 let sink: LogSink | null = null;
 
-/** The Axiom sink when AXIOM_TOKEN and AXIOM_DATASET are both set, else the null sink. */
+/**
+ * The Axiom sink when AXIOM_TOKEN and AXIOM_DATASET are both set; else, in a
+ * deployment with the private App Storage bucket, JSONL objects in that bucket;
+ * else the null sink.
+ */
 export function getLogSink(notice: SinkNotice = console.error): LogSink {
   if (sink) return sink;
-  const transport = createAxiomTransport(process.env);
-  sink = transport ? createBufferedSink(transport, notice) : nullSink;
+  const axiom = createAxiomTransport(process.env);
+  const storage = axiom ? undefined : createStorageTransport(process.env, notice);
+  if (axiom) sink = createBufferedSink(axiom, notice);
+  else if (storage) sink = createBufferedSink(storage, notice, { flushAt: STORAGE_FLUSH_AT, flushEveryMs: STORAGE_FLUSH_EVERY_MS });
+  else sink = nullSink;
   return sink;
 }
