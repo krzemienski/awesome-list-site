@@ -1,0 +1,590 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list:
+        - listitem [ref=e4]:
+          - generic [ref=e6]: Sign in to favorite
+          - generic [ref=e7]: Create an account or sign in to save your favorite resources.
+          - button "Sign in" [ref=e8] [cursor=pointer]
+          - button "Dismiss notification" [ref=e9] [cursor=pointer]:
+            - img [ref=e10]
+    - generic [ref=e14]:
+      - link "Skip to main content" [ref=e15] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e16]:
+        - banner [ref=e17]:
+          - generic [ref=e18]:
+            - button "Toggle sidebar" [ref=e19] [cursor=pointer]:
+              - generic [ref=e20]: Toggle sidebar
+            - img
+          - link "AWESOME.VIDEO home" [ref=e21] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e22]: av
+            - generic [ref=e23]: AWESOME.VIDEO home
+          - button "Search 1,949 resources" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+            - generic [ref=e28]: Search 1,949 resources
+          - button "Sign in, account menu" [ref=e29] [cursor=pointer]:
+            - img [ref=e31]
+            - generic [ref=e34]: Sign in, account menu
+        - generic [ref=e36]:
+          - main [ref=e37]:
+            - generic [ref=e38]:
+              - navigation "Breadcrumb" [ref=e39]:
+                - list [ref=e40]:
+                  - listitem [ref=e41]:
+                    - link "Home" [ref=e42] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e43]:
+                    - img [ref=e44]
+                  - listitem:
+                    - link "Encoding & Codecs" [disabled]
+              - generic [ref=e46]:
+                - link "Browse" [ref=e47] [cursor=pointer]:
+                  - /url: /categories
+                  - img
+                  - text: Browse
+                - generic [ref=e48]:
+                  - generic [ref=e50]: ◇
+                  - text: CATEGORY · ENCODING & CODECS
+                  - heading "Encoding & Codecs" [level=1] [ref=e51]
+                  - region "About this collection" [ref=e52]:
+                    - heading "About this collection" [level=2] [ref=e53]
+                    - paragraph [ref=e54]: Encoding & Codecs brings together 35 curated resources from across the video technology landscape. Notable topics include Encoding Tools.
+                  - generic [ref=e55]:
+                    - generic [ref=e56]: 35 resources
+                    - generic [ref=e57]: "Kind: Libraries"
+                    - generic [ref=e58]: 1 subcategory
+                    - button "Close filters" [expanded] [ref=e59] [cursor=pointer]:
+                      - generic [ref=e60]: Close filters
+                - generic [ref=e61]:
+                  - generic [ref=e62]:
+                    - img [ref=e63]
+                    - textbox "Search in Encoding & Codecs" [ref=e66]:
+                      - /placeholder: Search in Encoding & Codecs...
+                  - combobox "Limit Encoding & Codecs by subcategory" [ref=e67] [cursor=pointer]:
+                    - option "All subcategories" [selected]
+                    - option "Uncategorized (7)"
+                    - option "Encoding Tools (28)"
+                    - option "Encoding Tools › FFMPEG (7)"
+                  - combobox "Limit by resource kind" [ref=e68] [cursor=pointer]:
+                    - option "All resource kinds"
+                    - option "Tools"
+                    - option "Libraries" [selected]
+                    - option "Standards"
+                    - option "Events"
+                    - option "Protocols"
+                    - option "Other"
+                  - combobox "Sort resources" [ref=e70] [cursor=pointer]:
+                    - generic: Name Z-A
+                    - img [ref=e71]
+                  - generic "View mode" [ref=e73]:
+                    - generic [ref=e74]: View
+                    - radiogroup [ref=e75]:
+                      - radio "Grid view" [ref=e76] [cursor=pointer]:
+                        - img
+                      - radio "List view" [checked] [ref=e77] [cursor=pointer]:
+                        - img
+                      - radio "Compact view" [ref=e78] [cursor=pointer]:
+                        - img
+                - region "Subcategories" [ref=e79]:
+                  - heading "Subcategories" [level=2] [ref=e80]
+                  - generic [ref=e81]:
+                    - link "Encoding Tools 28" [ref=e82] [cursor=pointer]:
+                      - /url: /subcategory/encoding-tools?kind=libraries
+                      - generic [ref=e83]: Encoding Tools
+                      - generic [ref=e84]: "28"
+                    - button "Uncategorized 7" [ref=e85] [cursor=pointer]:
+                      - generic [ref=e86]: Uncategorized
+                      - generic [ref=e87]: "7"
+                - generic [ref=e88]:
+                  - button "Filters" [ref=e91] [cursor=pointer]:
+                    - img
+                    - text: Filters
+                  - generic "Resources (35)" [ref=e93]:
+                    - heading "Resources (35)" [level=2] [ref=e95]
+                    - generic [ref=e96]:
+                      - generic [ref=e97]:
+                        - generic [ref=e98]:
+                          - generic [ref=e99]:
+                            - heading "Zulko/moviepy" [level=2] [ref=e100]:
+                              - link "Zulko/moviepy" [ref=e101] [cursor=pointer]:
+                                - /url: /resource/888
+                            - generic [ref=e102]: Details
+                          - paragraph [ref=e103]: A tool or resource for effects-compositing-tools.
+                        - generic [ref=e104]:
+                          - 'button "Favorite to your account — sign in required: Zulko/moviepy" [ref=e105] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: Zulko/moviepy" [ref=e107] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e109] [cursor=pointer]:
+                            - /url: https://github.com/Zulko/moviepy
+                            - img
+                      - generic [ref=e110]:
+                        - generic [ref=e111]:
+                          - generic [ref=e112]:
+                            - heading "Xuggler" [level=2] [ref=e113]:
+                              - link "Xuggler" [ref=e114] [cursor=pointer]:
+                                - /url: /resource/1865
+                            - generic [ref=e115]: Details
+                          - paragraph [ref=e116]: An open source Java library (now discontinued) that wrapped FFmpeg functionality, enabling Java developers to decode, encode, and stream video.
+                        - generic [ref=e117]:
+                          - 'button "Favorite to your account — sign in required: Xuggler" [active] [ref=e118] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: Xuggler" [ref=e120] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e122] [cursor=pointer]:
+                            - /url: https://github.com/artclarke/xuggle-xuggler
+                            - img
+                      - generic [ref=e123]:
+                        - generic [ref=e124]:
+                          - generic [ref=e125]:
+                            - heading "Xabe.FFmpeg" [level=2] [ref=e126]:
+                              - link "Xabe.FFmpeg" [ref=e127] [cursor=pointer]:
+                                - /url: /resource/1781
+                            - generic [ref=e128]: Details
+                          - paragraph [ref=e129]: A .NET Standard wrapper for FFmpeg, enabling developers to compose and execute FFmpeg commands in C# with a fluent interface.
+                        - generic [ref=e130]:
+                          - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e131] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e133] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e135] [cursor=pointer]:
+                            - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                            - img
+                      - generic [ref=e136]:
+                        - generic [ref=e137]:
+                          - generic [ref=e138]:
+                            - heading "WritingMinds/ffmpeg-android-java" [level=2] [ref=e139]:
+                              - link "WritingMinds/ffmpeg-android-java" [ref=e140] [cursor=pointer]:
+                                - /url: /resource/859
+                            - generic [ref=e141]: Details
+                          - paragraph [ref=e142]: Android java library for FFmpeg binary compiled using https://github.com/writingminds/ffmpeg-android - WritingMinds/ffmpeg-android-java
+                        - generic [ref=e143]:
+                          - 'button "Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java" [ref=e144] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java" [ref=e146] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e148] [cursor=pointer]:
+                            - /url: https://github.com/WritingMinds/ffmpeg-android-java
+                            - img
+                      - generic [ref=e149]:
+                        - generic [ref=e150]:
+                          - generic [ref=e151]:
+                            - heading "video4j" [level=2] [ref=e152]:
+                              - link "video4j" [ref=e153] [cursor=pointer]:
+                                - /url: /resource/1942
+                            - generic [ref=e154]: Details
+                          - paragraph [ref=e155]: A Java video processing library providing a set of tools and APIs to handle video operations in Java applications.
+                        - generic [ref=e156]:
+                          - 'button "Favorite to your account — sign in required: video4j" [ref=e157] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: video4j" [ref=e159] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e161] [cursor=pointer]:
+                            - /url: https://github.com/metaloom/video4j
+                            - img
+                      - generic [ref=e162]:
+                        - generic [ref=e163]:
+                          - generic [ref=e164]:
+                            - heading "vid.stab" [level=2] [ref=e165]:
+                              - link "vid.stab" [ref=e166] [cursor=pointer]:
+                                - /url: /resource/1892
+                            - generic [ref=e167]: Details
+                          - paragraph [ref=e168]: An open source video stabilization library, used with FFmpeg to stabilize shaky footage by analyzing and smoothing camera motion.
+                        - generic [ref=e169]:
+                          - 'button "Favorite to your account — sign in required: vid.stab" [ref=e170] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: vid.stab" [ref=e172] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e174] [cursor=pointer]:
+                            - /url: https://github.com/georgmartius/vid.stab
+                            - img
+                      - generic [ref=e175]:
+                        - generic [ref=e176]:
+                          - generic [ref=e177]:
+                            - heading "vapoursynth/vapoursynth" [level=2] [ref=e178]:
+                              - link "vapoursynth/vapoursynth" [ref=e179] [cursor=pointer]:
+                                - /url: /resource/1343
+                            - generic [ref=e180]: Details
+                          - paragraph [ref=e181]: A video processing framework with simplicity in mind - vapoursynth/vapoursynth
+                        - generic [ref=e182]:
+                          - 'button "Favorite to your account — sign in required: vapoursynth/vapoursynth" [ref=e183] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: vapoursynth/vapoursynth" [ref=e185] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e187] [cursor=pointer]:
+                            - /url: https://github.com/vapoursynth/vapoursynth
+                            - img
+                      - generic [ref=e188]:
+                        - 'heading "twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [level=2] [ref=e191]':
+                          - 'link "twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e192] [cursor=pointer]':
+                            - /url: /resource/1485
+                        - generic [ref=e193]: Details
+                        - paragraph [ref=e194]: Vireo is a lightweight and versatile video processing library written in C++11 - twitter/vireo
+                        - generic [ref=e195]:
+                          - 'button "Favorite to your account — sign in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e196] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e198] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e200] [cursor=pointer]:
+                            - /url: https://github.com/twitter/vireo
+                            - img
+                      - generic [ref=e201]:
+                        - generic [ref=e202]:
+                          - generic [ref=e203]:
+                            - heading "scikit-video" [level=2] [ref=e204]:
+                              - link "scikit-video" [ref=e205] [cursor=pointer]:
+                                - /url: /resource/1943
+                            - generic [ref=e206]: Details
+                          - paragraph [ref=e207]: A set of video processing routines for use with SciPy, providing basic video reading and writing capabilities for scientific computing workflows in Python.
+                        - generic [ref=e208]:
+                          - 'button "Favorite to your account — sign in required: scikit-video" [ref=e209] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: scikit-video" [ref=e211] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e213] [cursor=pointer]:
+                            - /url: https://github.com/aizvorski/scikit-video
+                            - img
+                      - generic [ref=e214]:
+                        - 'heading "sannies/mp4parser: A Java API to read, write and create MP4 files" [level=2] [ref=e217]':
+                          - 'link "sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e218] [cursor=pointer]':
+                            - /url: /resource/1508
+                        - generic [ref=e219]: Details
+                        - paragraph [ref=e220]: A Java API to read, write and create MP4 files. Contribute to sannies/mp4parser development by creating an account on GitHub.
+                        - generic [ref=e221]:
+                          - 'button "Favorite to your account — sign in required: sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e222] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e224] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e226] [cursor=pointer]:
+                            - /url: https://github.com/sannies/mp4parser
+                            - img
+                      - generic [ref=e227]:
+                        - generic [ref=e228]:
+                          - generic [ref=e229]:
+                            - heading "PyAV" [level=2] [ref=e230]:
+                              - link "PyAV" [ref=e231] [cursor=pointer]:
+                                - /url: /resource/1947
+                            - generic [ref=e232]: Details
+                          - paragraph [ref=e233]: A Pythonic binding for FFmpeg’s libraries (Libav). PyAV allows Python programs to read, write, and manipulate video and audio data by leveraging the powerful FFmpeg backend.
+                        - generic [ref=e234]:
+                          - 'button "Favorite to your account — sign in required: PyAV" [ref=e235] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: PyAV" [ref=e237] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e239] [cursor=pointer]:
+                            - /url: https://github.com/PyAV-Org/PyAV
+                            - img
+                      - generic [ref=e240]:
+                        - generic [ref=e241]:
+                          - generic [ref=e242]:
+                            - heading "OpenShot Library (libopenshot)" [level=2] [ref=e243]:
+                              - link "OpenShot Library (libopenshot)" [ref=e244] [cursor=pointer]:
+                                - /url: /resource/1838
+                            - generic [ref=e245]: Details
+                          - paragraph [ref=e246]: The C++ library behind OpenShot Video Editor that provides core video editing functionalities (timeline, effects, keyframes). libopenshot can be used independently to build custom video editing applications.
+                        - generic [ref=e247]:
+                          - 'button "Favorite to your account — sign in required: OpenShot Library (libopenshot)" [ref=e248] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: OpenShot Library (libopenshot)" [ref=e250] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e252] [cursor=pointer]:
+                            - /url: https://github.com/OpenShot/libopenshot
+                            - img
+                      - generic [ref=e253]:
+                        - generic [ref=e254]:
+                          - generic [ref=e255]:
+                            - heading "nextbreakpoint/ffmpeg4java" [level=2] [ref=e256]:
+                              - link "nextbreakpoint/ffmpeg4java" [ref=e257] [cursor=pointer]:
+                                - /url: /resource/1029
+                            - generic [ref=e258]: Details
+                          - paragraph [ref=e259]: FFmpeg4Java provides a JNI wrapper of FFmpeg library - nextbreakpoint/ffmpeg4java
+                        - generic [ref=e260]:
+                          - 'button "Favorite to your account — sign in required: nextbreakpoint/ffmpeg4java" [ref=e261] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: nextbreakpoint/ffmpeg4java" [ref=e263] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e265] [cursor=pointer]:
+                            - /url: https://github.com/nextbreakpoint/ffmpeg4java
+                            - img
+                      - generic [ref=e266]:
+                        - generic [ref=e267]:
+                          - generic [ref=e268]:
+                            - heading "mltframework/mlt" [level=2] [ref=e269]:
+                              - link "mltframework/mlt" [ref=e270] [cursor=pointer]:
+                                - /url: /resource/896
+                            - generic [ref=e271]: Details
+                          - paragraph [ref=e272]: MLT Multimedia Framework.
+                        - generic [ref=e273]:
+                          - 'button "Favorite to your account — sign in required: mltframework/mlt" [ref=e274] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: mltframework/mlt" [ref=e276] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e278] [cursor=pointer]:
+                            - /url: https://github.com/mltframework/mlt
+                            - img
+                      - generic [ref=e279]:
+                        - generic [ref=e280]:
+                          - generic [ref=e281]:
+                            - heading "MLT Framework" [level=2] [ref=e282]:
+                              - link "MLT Framework" [ref=e283] [cursor=pointer]:
+                                - /url: /resource/1800
+                            - generic [ref=e284]: Details
+                          - paragraph [ref=e285]: An open source multimedia framework for video editing applications. MLT provides a toolkit for developers to build editors (used by Kdenlive, Shotcut) with support for a range of effects and transitions.
+                        - generic [ref=e286]:
+                          - 'button "Favorite to your account — sign in required: MLT Framework" [ref=e287] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: MLT Framework" [ref=e289] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e291] [cursor=pointer]:
+                            - /url: https://www.mltframework.org/
+                            - img
+                      - generic [ref=e292]:
+                        - generic [ref=e293]:
+                          - generic [ref=e294]:
+                            - heading "libVLC" [level=2] [ref=e295]:
+                              - link "libVLC" [ref=e296] [cursor=pointer]:
+                                - /url: /resource/32
+                            - generic [ref=e297]: Details
+                          - paragraph [ref=e298]: libVLC is the core engine and interface of the VLC media player, providing a modular framework for multimedia applications. It supports a wide range of media formats and streaming protocols, enabling developers to integrate powerful video playback and streaming capabilities into their applications.
+                        - generic [ref=e299]:
+                          - 'button "Favorite to your account — sign in required: libVLC" [ref=e300] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: libVLC" [ref=e302] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e304] [cursor=pointer]:
+                            - /url: https://www.videolan.org/vlc/libvlc.html
+                            - img
+                      - generic [ref=e305]:
+                        - generic [ref=e306]:
+                          - generic [ref=e307]:
+                            - heading "libmpeg2" [level=2] [ref=e308]:
+                              - link "libmpeg2" [ref=e309] [cursor=pointer]:
+                                - /url: /resource/1945
+                            - generic [ref=e310]: Details
+                          - paragraph [ref=e311]: A free library for decoding MPEG-1 and MPEG-2 video streams. It's lightweight and portable, used in several open source media players for MPEG-2 playback.
+                        - generic [ref=e312]:
+                          - 'button "Favorite to your account — sign in required: libmpeg2" [ref=e313] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: libmpeg2" [ref=e315] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e317] [cursor=pointer]:
+                            - /url: http://libmpeg2.sourceforge.net/
+                            - img
+                      - generic [ref=e318]:
+                        - generic [ref=e319]:
+                          - generic [ref=e320]:
+                            - heading "Libav" [level=2] [ref=e321]:
+                              - link "Libav" [ref=e322] [cursor=pointer]:
+                                - /url: /resource/1813
+                            - generic [ref=e323]: Details
+                          - paragraph [ref=e324]: A fork of the FFmpeg project that started in 2011 to develop a cleaner codebase. Libav provides similar functionality to FFmpeg (libraries for decoding/encoding and avconv tool) though it's now largely inactive.
+                        - generic [ref=e325]:
+                          - 'button "Favorite to your account — sign in required: Libav" [ref=e326] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: Libav" [ref=e328] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e330] [cursor=pointer]:
+                            - /url: https://libav.org/
+                            - img
+                      - generic [ref=e331]:
+                        - generic [ref=e332]:
+                          - generic [ref=e333]:
+                            - heading "kkroening/ffmpeg-python" [level=2] [ref=e334]:
+                              - link "kkroening/ffmpeg-python" [ref=e335] [cursor=pointer]:
+                                - /url: /resource/885
+                            - generic [ref=e336]: Details
+                          - paragraph [ref=e337]: A tool or resource for ffmpeg-based-tools.
+                        - generic [ref=e338]:
+                          - 'button "Favorite to your account — sign in required: kkroening/ffmpeg-python" [ref=e339] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: kkroening/ffmpeg-python" [ref=e341] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e343] [cursor=pointer]:
+                            - /url: https://github.com/kkroening/ffmpeg-python
+                            - img
+                      - generic [ref=e344]:
+                        - generic [ref=e345]:
+                          - generic [ref=e346]:
+                            - heading "JCodec" [level=2] [ref=e347]:
+                              - link "JCodec" [ref=e348] [cursor=pointer]:
+                                - /url: /resource/1866
+                            - generic [ref=e349]: Details
+                          - paragraph [ref=e350]: A pure Java library for video and audio codecs, including support for H.264 and AAC decoding, aimed at processing media without native dependencies.
+                        - generic [ref=e351]:
+                          - 'button "Favorite to your account — sign in required: JCodec" [ref=e352] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: JCodec" [ref=e354] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e356] [cursor=pointer]:
+                            - /url: https://github.com/jcodec/jcodec
+                            - img
+                      - generic [ref=e357]:
+                        - generic [ref=e358]:
+                          - generic [ref=e359]:
+                            - heading "Intel oneAPI Video Processing Library (oneVPL)" [level=2] [ref=e360]:
+                              - link "Intel oneAPI Video Processing Library (oneVPL)" [ref=e361] [cursor=pointer]:
+                                - /url: /resource/1646
+                            - generic [ref=e362]: Details
+                          - paragraph [ref=e363]: Intel's oneAPI Video Processing Library, the successor to Intel Media SDK. It offers a unified API for GPU-accelerated video encode/decode and processing (Quick Sync Video and other accelerators).
+                        - generic [ref=e364]:
+                          - 'button "Favorite to your account — sign in required: Intel oneAPI Video Processing Library (oneVPL)" [ref=e365] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: Intel oneAPI Video Processing Library (oneVPL)" [ref=e367] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e369] [cursor=pointer]:
+                            - /url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onevpl.html
+                            - img
+                      - generic [ref=e370]:
+                        - generic [ref=e371]:
+                          - generic [ref=e372]:
+                            - heading "gstreamer-rs" [level=2] [ref=e373]:
+                              - link "gstreamer-rs" [ref=e374] [cursor=pointer]:
+                                - /url: /resource/1874
+                            - generic [ref=e375]: Details
+                          - paragraph [ref=e376]: Rust language bindings for the GStreamer multimedia framework, allowing developers to create GStreamer pipelines and plugins in Rust.
+                        - generic [ref=e377]:
+                          - 'button "Favorite to your account — sign in required: gstreamer-rs" [ref=e378] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: gstreamer-rs" [ref=e380] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e382] [cursor=pointer]:
+                            - /url: https://github.com/sdroege/gstreamer-rs
+                            - img
+                      - generic [ref=e383]:
+                        - generic [ref=e384]:
+                          - generic [ref=e385]:
+                            - heading "GStreamer" [level=2] [ref=e386]:
+                              - link "GStreamer" [ref=e387] [cursor=pointer]:
+                                - /url: /resource/1765
+                            - generic [ref=e388]: Details
+                          - paragraph [ref=e389]: An open source multimedia framework in C that allows the construction of graphs for media handling (capture, transcoding, playback) on various platforms.
+                        - generic [ref=e390]:
+                          - 'button "Favorite to your account — sign in required: GStreamer" [ref=e391] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: GStreamer" [ref=e393] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e395] [cursor=pointer]:
+                            - /url: https://gstreamer.freedesktop.org/
+                            - img
+                      - generic [ref=e396]:
+                        - generic [ref=e397]:
+                          - generic [ref=e398]:
+                            - heading "go-astiav" [level=2] [ref=e399]:
+                              - link "go-astiav" [ref=e400] [cursor=pointer]:
+                                - /url: /resource/1599
+                            - generic [ref=e401]: Details
+                          - paragraph [ref=e402]: A comprehensive Go binding for FFmpeg's libav* libraries, facilitating the building of media applications in Go with FFmpeg's capabilities.
+                        - generic [ref=e403]:
+                          - 'button "Favorite to your account — sign in required: go-astiav" [ref=e404] [cursor=pointer]':
+                            - img
+                          - 'button "Bookmark on this device — no sign-in required: go-astiav" [ref=e406] [cursor=pointer]':
+                            - img
+                          - link "Open in new tab" [ref=e408] [cursor=pointer]:
+                            - /url: https://github.com/asticode/go-astiav
+                            - img
+                    - navigation "Pagination" [ref=e410]:
+                      - generic [ref=e411]:
+                        - img
+                        - text: Previous
+                        - link "Page 1, current page" [ref=e412] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=list
+                          - text: "1"
+                        - link "Go to page 2" [ref=e413] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=list&page=2
+                          - text: "2"
+                        - link "Next" [ref=e414] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=list&page=2
+                          - text: Next
+                          - img
+                      - generic [ref=e416]: Page 1 of 2
+                      - status [ref=e417]
+          - contentinfo [ref=e418]:
+            - generic [ref=e419]:
+              - generic [ref=e420]:
+                - paragraph [ref=e421]: ── INDEX
+                - link "awesome.video home" [ref=e422] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e423]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - heading "INDEXED" [level=2] [ref=e426]
+              - paragraph [ref=e427]: 1,949
+              - paragraph [ref=e428]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e429]: live
+              - navigation "Explore categories" [ref=e431]:
+                - heading "EXPLORE" [level=2] [ref=e432]
+                - generic [ref=e433]:
+                  - link "Community & Events" [ref=e434] [cursor=pointer]:
+                    - /url: /category/community-events
+                    - generic [ref=e435]: ◈
+                    - generic [ref=e436]: Community
+                  - link "Encoding & Codecs" [ref=e437] [cursor=pointer]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e438]: ◇
+                    - generic [ref=e439]: Encoding
+                  - link "General Tools" [ref=e440] [cursor=pointer]:
+                    - /url: /category/general-tools
+                    - generic [ref=e441]: ◆
+                    - generic [ref=e442]: General
+                  - link "Infrastructure & Delivery" [ref=e443] [cursor=pointer]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e444]: ▣
+                    - generic [ref=e445]: Infrastructure
+                  - link "Intro & Learning" [ref=e446] [cursor=pointer]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e447]: ▤
+                    - generic [ref=e448]: Intro
+                  - link "Media Tools" [ref=e449] [cursor=pointer]:
+                    - /url: /category/media-tools
+                    - generic [ref=e450]: ▥
+                    - generic [ref=e451]: Media
+                  - link "Players & Clients" [ref=e452] [cursor=pointer]:
+                    - /url: /category/players-clients
+                    - generic [ref=e453]: ▶
+                    - generic [ref=e454]: Players
+                  - link "Protocols & Transport" [ref=e455] [cursor=pointer]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e456]: ⟁
+                    - generic [ref=e457]: Protocols
+                  - link "Standards & Industry" [ref=e458] [cursor=pointer]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e459]: ◉
+                    - generic [ref=e460]: Standards
+              - generic [ref=e461]:
+                - heading "SOURCE" [level=2] [ref=e462]
+                - link "krzemienski/awesome-video" [ref=e463] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e464]
+                  - text: krzemienski
+                  - text: /
+                  - text: awesome-video
+                  - generic [ref=e468]: ↗
+                - paragraph [ref=e469]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e470] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+            - generic [ref=e471]:
+              - generic [ref=e472]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e473]:
+                - link "About" [ref=e474] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e475] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e476] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e477] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - link "Issues ↗" [ref=e478] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e479] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e480]: built with the awesome-list framework
+      - button "Back to top" [ref=e481] [cursor=pointer]:
+        - img
+  - status [ref=e482]: Notification Sign in to favoriteCreate an account or sign in to save your favorite resources.Sign in

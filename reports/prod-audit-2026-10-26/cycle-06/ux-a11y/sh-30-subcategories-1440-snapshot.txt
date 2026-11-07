@@ -1,0 +1,362 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e39]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e40]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [selected, ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Subcategories" [ref=e17] focusable [tabindex]
+            - article
+              - StaticText "Subcategories"
+              - StaticText "99 second-level groupings"
+              - button "Search" [expanded=false, ref=e35]
+              - button "Add subcategory" [ref=e36]
+                - image
+                - StaticText "Add subcategory"
+              - region "Subcategories table, scrollable" [ref=e41] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "NAME" [ref=e169]
+                      - columnheader "SLUG" [ref=e170]
+                      - columnheader "PARENT" [ref=e171]
+                      - columnheader "RESOURCES" [ref=e172]
+                      - columnheader
+                  - row
+                    - cell "Community Groups" [ref=e49]
+                    - cell "community-groups" [ref=e50]
+                    - cell "Community & Events" [ref=e51]
+                    - cell "59" [ref=e52]
+                    - cell "Edit Community Groups Delete Community Groups unavailable: 59 resources still assigned" [ref=e53]
+                      - button "Edit Community Groups" [ref=e173]
+                        - StaticText "Edit"
+                      - button "Delete Community Groups unavailable: 59 resources still assigned" [disabled, ref=e197]
+                        - image
+                  - row
+                    - cell "Events & Conferences" [ref=e54]
+                    - cell "events-conferences" [ref=e55]
+                    - cell "Community & Events" [ref=e56]
+                    - cell "72" [ref=e57]
+                    - cell "Edit Events & Conferences Delete Events & Conferences unavailable: 72 resources still assigned" [ref=e58]
+                      - button "Edit Events & Conferences" [ref=e174]
+                        - StaticText "Edit"
+                      - button "Delete Events & Conferences unavailable: 72 resources still assigned" [disabled, ref=e198]
+                        - image
+                  - row
+                    - cell "Benchmarking & Performance Tools for Codecs" [ref=e59]
+                    - cell "benchmarking-performance-tools-for-codecs" [ref=e60]
+                    - cell "Encoding & Codecs" [ref=e61]
+                    - cell "18" [ref=e62]
+                    - cell "Edit Benchmarking & Performance Tools for Codecs Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" [ref=e63]
+                      - button "Edit Benchmarking & Performance Tools for Codecs" [ref=e175]
+                        - StaticText "Edit"
+                      - button "Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" [disabled, ref=e199]
+                        - image
+                  - row
+                    - cell "Cloud-Based Encoding Solutions" [ref=e64]
+                    - cell "cloud-based-encoding-solutions" [ref=e65]
+                    - cell "Encoding & Codecs" [ref=e66]
+                    - cell "19" [ref=e67]
+                    - cell "Edit Cloud-Based Encoding Solutions Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" [ref=e68]
+                      - button "Edit Cloud-Based Encoding Solutions" [ref=e176]
+                        - StaticText "Edit"
+                      - button "Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" [disabled, ref=e200]
+                        - image
+                  - row
+                    - cell "Codecs" [ref=e69]
+                    - cell "codecs" [ref=e70]
+                    - cell "Encoding & Codecs" [ref=e71]
+                    - cell "69" [ref=e72]
+                    - cell "Edit Codecs Delete Codecs unavailable: 69 resources still assigned" [ref=e73]
+                      - button "Edit Codecs" [ref=e177]
+                        - StaticText "Edit"
+                      - button "Delete Codecs unavailable: 69 resources still assigned" [disabled, ref=e201]
+                        - image
+                  - row
+                    - cell "Comparative Analysis of Codecs" [ref=e74]
+                    - cell "comparative-analysis-of-codecs" [ref=e75]
+                    - cell "Encoding & Codecs" [ref=e76]
+                    - cell "19" [ref=e77]
+                    - cell "Edit Comparative Analysis of Codecs Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" [ref=e78]
+                      - button "Edit Comparative Analysis of Codecs" [ref=e178]
+                        - StaticText "Edit"
+                      - button "Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" [disabled, ref=e202]
+                        - image
+                  - row
+                    - cell "Containerization & Packaging Tools" [ref=e79]
+                    - cell "containerization-packaging-tools" [ref=e80]
+                    - cell "Encoding & Codecs" [ref=e81]
+                    - cell "36" [ref=e82]
+                    - cell "Edit Containerization & Packaging Tools Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" [ref=e83]
+                      - button "Edit Containerization & Packaging Tools" [ref=e179]
+                        - StaticText "Edit"
+                      - button "Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" [disabled, ref=e203]
+                        - image
+                  - row
+                    - cell "Encoding Tools" [ref=e84]
+                    - cell "encoding-tools" [ref=e85]
+                    - cell "Encoding & Codecs" [ref=e86]
+                    - cell "143" [ref=e87]
+                    - cell "Edit Encoding Tools Delete Encoding Tools unavailable: 143 resources still assigned" [ref=e88]
+                      - button "Edit Encoding Tools" [ref=e180]
+                        - StaticText "Edit"
+                      - button "Delete Encoding Tools unavailable: 143 resources still assigned" [disabled, ref=e204]
+                        - image
+                  - row
+                    - cell "FFmpeg-Based Tools" [ref=e89]
+                    - cell "ffmpeg-based-tools" [ref=e90]
+                    - cell "Encoding & Codecs" [ref=e91]
+                    - cell "19" [ref=e92]
+                    - cell "Edit FFmpeg-Based Tools Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" [ref=e93]
+                      - button "Edit FFmpeg-Based Tools" [ref=e181]
+                        - StaticText "Edit"
+                      - button "Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" [disabled, ref=e205]
+                        - image
+                  - row
+                    - cell "Hardware Accelerated Transcoding" [ref=e94]
+                    - cell "hardware-accelerated-transcoding" [ref=e95]
+                    - cell "Encoding & Codecs" [ref=e96]
+                    - cell "25" [ref=e97]
+                    - cell "Edit Hardware Accelerated Transcoding Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" [ref=e98]
+                      - button "Edit Hardware Accelerated Transcoding" [ref=e182]
+                        - StaticText "Edit"
+                      - button "Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" [disabled, ref=e206]
+                        - image
+                  - row
+                    - cell "Hardware Codecs & Acceleration" [ref=e99]
+                    - cell "hardware-codecs-acceleration" [ref=e100]
+                    - cell "Encoding & Codecs" [ref=e101]
+                    - cell "24" [ref=e102]
+                    - cell "Edit Hardware Codecs & Acceleration Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" [ref=e103]
+                      - button "Edit Hardware Codecs & Acceleration" [ref=e183]
+                        - StaticText "Edit"
+                      - button "Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" [disabled, ref=e207]
+                        - image
+                  - row
+                    - cell "Multi-format Packaging Tools" [ref=e104]
+                    - cell "multi-format-packaging-tools" [ref=e105]
+                    - cell "Encoding & Codecs" [ref=e106]
+                    - cell "13" [ref=e107]
+                    - cell "Edit Multi-format Packaging Tools Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" [ref=e108]
+                      - button "Edit Multi-format Packaging Tools" [ref=e184]
+                        - StaticText "Edit"
+                      - button "Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" [disabled, ref=e208]
+                        - image
+                  - row
+                    - cell "Next-Generation Codecs AV1 VVC" [ref=e109]
+                    - cell "next-generation-codecs-av1-vvc" [ref=e110]
+                    - cell "Encoding & Codecs" [ref=e111]
+                    - cell "19" [ref=e112]
+                    - cell "Edit Next-Generation Codecs AV1 VVC Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" [ref=e113]
+                      - button "Edit Next-Generation Codecs AV1 VVC" [ref=e185]
+                        - StaticText "Edit"
+                      - button "Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" [disabled, ref=e209]
+                        - image
+                  - row
+                    - cell "Open Source Encoder Projects" [ref=e114]
+                    - cell "open-source-encoder-projects" [ref=e115]
+                    - cell "Encoding & Codecs" [ref=e116]
+                    - cell "28" [ref=e117]
+                    - cell "Edit Open Source Encoder Projects Delete Open Source Encoder Projects unavailable: 28 resources still assigned" [ref=e118]
+                      - button "Edit Open Source Encoder Projects" [ref=e186]
+                        - StaticText "Edit"
+                      - button "Delete Open Source Encoder Projects unavailable: 28 resources still assigned" [disabled, ref=e210]
+                        - image
+                  - row
+                    - cell "Real-Time Encoding Solutions" [ref=e119]
+                    - cell "real-time-encoding-solutions" [ref=e120]
+                    - cell "Encoding & Codecs" [ref=e121]
+                    - cell "18" [ref=e122]
+                    - cell "Edit Real-Time Encoding Solutions Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" [ref=e123]
+                      - button "Edit Real-Time Encoding Solutions" [ref=e187]
+                        - StaticText "Edit"
+                      - button "Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" [disabled, ref=e211]
+                        - image
+                  - row
+                    - cell "Scripting & Automation Tools" [ref=e124]
+                    - cell "scripting-automation-tools" [ref=e125]
+                    - cell "Encoding & Codecs" [ref=e126]
+                    - cell "17" [ref=e127]
+                    - cell "Edit Scripting & Automation Tools Delete Scripting & Automation Tools unavailable: 17 resources still assigned" [ref=e128]
+                      - button "Edit Scripting & Automation Tools" [ref=e188]
+                        - StaticText "Edit"
+                      - button "Delete Scripting & Automation Tools unavailable: 17 resources still assigned" [disabled, ref=e212]
+                        - image
+                  - row
+                    - cell "Software Codecs" [ref=e129]
+                    - cell "software-codecs" [ref=e130]
+                    - cell "Encoding & Codecs" [ref=e131]
+                    - cell "18" [ref=e132]
+                    - cell "Edit Software Codecs Delete Software Codecs unavailable: 18 resources still assigned" [ref=e133]
+                      - button "Edit Software Codecs" [ref=e189]
+                        - StaticText "Edit"
+                      - button "Delete Software Codecs unavailable: 18 resources still assigned" [disabled, ref=e213]
+                        - image
+                  - row
+                    - cell "Software Transcoding Tools" [ref=e134]
+                    - cell "software-transcoding-tools" [ref=e135]
+                    - cell "Encoding & Codecs" [ref=e136]
+                    - cell "15" [ref=e137]
+                    - cell "Edit Software Transcoding Tools Delete Software Transcoding Tools unavailable: 15 resources still assigned" [ref=e138]
+                      - button "Edit Software Transcoding Tools" [ref=e190]
+                        - StaticText "Edit"
+                      - button "Delete Software Transcoding Tools unavailable: 15 resources still assigned" [disabled, ref=e214]
+                        - image
+                  - row
+                    - cell "API Libraries & SDKs" [ref=e139]
+                    - cell "api-libraries-sdks" [ref=e140]
+                    - cell "General Tools" [ref=e141]
+                    - cell "25" [ref=e142]
+                    - cell "Edit API Libraries & SDKs Delete API Libraries & SDKs unavailable: 25 resources still assigned" [ref=e143]
+                      - button "Edit API Libraries & SDKs" [ref=e191]
+                        - StaticText "Edit"
+                      - button "Delete API Libraries & SDKs unavailable: 25 resources still assigned" [disabled, ref=e215]
+                        - image
+                  - row
+                    - cell "Build Scripts & Automation" [ref=e144]
+                    - cell "build-scripts-automation" [ref=e145]
+                    - cell "General Tools" [ref=e146]
+                    - cell "33" [ref=e147]
+                    - cell "Edit Build Scripts & Automation Delete Build Scripts & Automation unavailable: 33 resources still assigned" [ref=e148]
+                      - button "Edit Build Scripts & Automation" [ref=e192]
+                        - StaticText "Edit"
+                      - button "Delete Build Scripts & Automation unavailable: 33 resources still assigned" [disabled, ref=e216]
+                        - image
+                  - row
+                    - cell "Case Studies & Best Practices in DRM" [ref=e149]
+                    - cell "case-studies-best-practices-in-drm" [ref=e150]
+                    - cell "General Tools" [ref=e151]
+                    - cell "33" [ref=e152]
+                    - cell "Edit Case Studies & Best Practices in DRM Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" [ref=e153]
+                      - button "Edit Case Studies & Best Practices in DRM" [ref=e193]
+                        - StaticText "Edit"
+                      - button "Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" [disabled, ref=e217]
+                        - image
+                  - row
+                    - cell "Command-line Utilities & Wrappers" [ref=e154]
+                    - cell "command-line-utilities-wrappers" [ref=e155]
+                    - cell "General Tools" [ref=e156]
+                    - cell "21" [ref=e157]
+                    - cell "Edit Command-line Utilities & Wrappers Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" [ref=e158]
+                      - button "Edit Command-line Utilities & Wrappers" [ref=e194]
+                        - StaticText "Edit"
+                      - button "Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" [disabled, ref=e218]
+                        - image
+                  - row
+                    - cell "Community & Collaboration Platforms" [ref=e159]
+                    - cell "community-collaboration-platforms" [ref=e160]
+                    - cell "General Tools" [ref=e161]
+                    - cell "19" [ref=e162]
+                    - cell "Edit Community & Collaboration Platforms Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" [ref=e163]
+                      - button "Edit Community & Collaboration Platforms" [ref=e195]
+                        - StaticText "Edit"
+                      - button "Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" [disabled, ref=e219]
+                        - image
+                  - row
+                    - cell "Cross-Platform Media Tools" [ref=e164]
+                    - cell "cross-platform-media-tools" [ref=e165]
+                    - cell "General Tools" [ref=e166]
+                    - cell "23" [ref=e167]
+                    - cell "Edit Cross-Platform Media Tools Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" [ref=e168]
+                      - button "Edit Cross-Platform Media Tools" [ref=e196]
+                        - StaticText "Edit"
+                      - button "Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" [disabled, ref=e220]
+                        - image
+              - StaticText "Rows per page:"
+              - combobox "Items per page" [expanded=false, ref=e37]: 24
+                - generic [ref=e42] clickable [cursor:pointer, onclick]
+                  - StaticText "24"
+              - navigation "Pagination" [ref=e38]
+                - generic [disabled]
+                  - image
+                  - StaticText "Previous"
+                - link "Page 1, current page" [ref=e43]
+                  - StaticText "1"
+                - link "Go to page 2" [ref=e44]
+                  - StaticText "2"
+                - link "Go to page 3" [ref=e45]
+                  - StaticText "3"
+                - link "Go to page 4" [ref=e46]
+                  - StaticText "4"
+                - link "Go to page 5" [ref=e47]
+                  - StaticText "5"
+                - link "Next" [ref=e48]
+                  - StaticText "Next"
+                  - image
+                - StaticText "Page "
+                - StaticText "1"
+                - StaticText " of "
+                - StaticText "5"
+                - status

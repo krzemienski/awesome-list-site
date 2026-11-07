@@ -460,7 +460,7 @@ session store. They still share PostgreSQL for catalog and user application data
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [PostgreSQL Docker Image](https://hub.docker.com/_/postgres)
 
-For cloud platform deployment (Replit, Railway, Vercel, other containers), see
+For cloud platform deployment (Replit, Railway, other containers), see
 [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 For the full environment-variable reference, see [ENVIRONMENT.md](./ENVIRONMENT.md).

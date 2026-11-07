@@ -1,20 +1,23 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import "@/styles/pages/discovery.css";
+import "@/styles/pages/taxonomy.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SearchEntryButton } from "@/components/search/SearchEntryButton";
 import { Paginator } from "@/components/ui/paginator";
 import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { apiRequest } from "@/lib/queryClient";
-import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
+import { trackTagInteraction } from "@/lib/analytics";
+import { strictUrlPage } from "@/lib/page-param";
 import { slugify } from "@/lib/utils";
 import NotFound from "@/pages/not-found";
+import type { Resource } from "@shared/schema";
 import { tagScopeIntro } from "@shared/seo-content-templates";
+import { MAX_PAGE } from "@shared/page-param";
 import {
   pagedSeoDescription,
   pagedSeoTitleCore,
@@ -24,6 +27,8 @@ import {
 } from "@shared/seo-templates";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { scrollBehavior } from "@/lib/scroll-behavior";
+import { formatTileCount, tileLabel } from "@/lib/a11y-labels";
 import { TAG_MAX_LENGTH } from "@shared/validation";
 import {
   normalizeTagFilter,
@@ -36,16 +41,11 @@ import {
 const PAGE_SIZE = 24;
 
 interface TagListingResponse {
-  resources: any[];
+  resources: Resource[];
   total: number;
   facets?: {
     categories?: Array<{ value: string; count: number }>;
   };
-}
-
-// P-05 (same class): pluralize the noun to match the count.
-function resourceNoun(count: number): string {
-  return count === 1 ? "resource" : "resources";
 }
 
 function listingTag(queryKeyUrl: unknown): string | null {
@@ -62,19 +62,19 @@ export default function TagLanding() {
   const [, navigate] = useLocation();
   const { slug: rawSlug = "" } = useParams<{ slug: string }>();
   const slug = normalizeTagPathSegment(rawSlug);
-  const parsedPage = parsePageParamStrict(new URLSearchParams(useSearch()).get("page"));
-  // C8-V1-04: a page past the end shows the last page plus a notice (as the
-  // taxonomy listings do) instead of a 404. `clamp` remembers the last page
-  // once the first fetch for the out-of-range page reveals the total.
-  const [clamp, setClamp] = useState<{ requested: string; slug: string; page: number } | null>(null);
-  const requestedKey = String(parsedPage.page);
-  const activeClamp = clamp && clamp.slug === slug && clamp.requested === requestedKey ? clamp : null;
-  const page = activeClamp ? activeClamp.page : parsedPage.page;
+  // A ?page= the server 404s (malformed, below 1, or past the end) renders
+  // the same not-found page here.
+  const search = useSearch();
+  const urlPage = strictUrlPage(new URLSearchParams(search).get("page"));
+  const page = urlPage ?? 1;
   const offset = (page - 1) * PAGE_SIZE;
+  // The API 400s an offset past int4; no tag has that many pages, so such a
+  // page is past the end like any other and 404s on both passes.
+  const pageReachable = urlPage !== null && offset <= MAX_PAGE;
   // The API rejects over-length tags with a 400 that no retry can fix; the
   // server already answers such URLs 404, so the page must agree.
   const tagIsQueryable = Boolean(slug) && slug.length <= TAG_MAX_LENGTH;
-  const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=true`;
+  const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=categories`;
   const listing = useQuery<TagListingResponse>({
     queryKey: [url],
     queryFn: async () => {
@@ -87,7 +87,7 @@ export default function TagLanding() {
       }
       return apiRequest(url, { method: "GET" });
     },
-    enabled: tagIsQueryable,
+    enabled: tagIsQueryable && pageReachable,
     staleTime: 60_000,
     // Hold the current page only while paging within this tag; another tag's
     // cards and total must never render under the new tag's heading.
@@ -96,29 +96,50 @@ export default function TagLanding() {
   });
 
   const listedTotal = listing.data?.total;
+  const pastLastPage = listedTotal !== undefined && !listing.isPlaceholderData
+    && page > Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
+  // A rejected ?page= disables the query but still reads page 1 from the
+  // cache, so the listing data alone can't tell a 404 from a real view.
+  const notFound = !tagIsQueryable || !pageReachable || pastLastPage;
+
+  // One view event per tag visit, once the real (non-placeholder) total is in,
+  // matching category_viewed on the taxonomy pages.
+  const viewedTagRef = useRef<string | null>(null);
   useEffect(() => {
-    if (listedTotal && !activeClamp && !listing.isPlaceholderData) {
-      const lastPage = Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
-      if (parsedPage.page > lastPage) setClamp({ requested: requestedKey, slug, page: lastPage });
-    }
-  }, [activeClamp, listedTotal, listing.isPlaceholderData, parsedPage.page, requestedKey, slug]);
+    if (notFound || listedTotal === undefined || listing.isPlaceholderData) return;
+    if (viewedTagRef.current === slug) return;
+    viewedTagRef.current = slug;
+    trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
+  }, [listedTotal, listing.isPlaceholderData, notFound, slug]);
+
+  // After a page change, wait for the new page: the intro above the count is
+  // built from its resources and can change height. Then bring the count to
+  // the top and focus it so a screen reader announces the new range.
+  const resultsCountRef = useRef<HTMLHeadingElement>(null);
+  const pendingResultsFocusRef = useRef(false);
+  useEffect(() => {
+    if (!pendingResultsFocusRef.current || !listing.data || listing.isPlaceholderData) return;
+    pendingResultsFocusRef.current = false;
+    resultsCountRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    resultsCountRef.current?.focus({ preventScroll: true });
+  }, [listing.data, listing.isPlaceholderData]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
-    return <Redirect to={`${canonicalPath}${page > 1 ? `?page=${page}` : ""}`} replace />;
+    return <Redirect to={`${canonicalPath}${search ? `?${search}` : ""}`} replace />;
   }
 
-  if (!tagIsQueryable) return <NotFound />;
+  if (notFound) return <NotFound />;
   if (queryUnavailableReason(listing) === "offline") {
     return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" />;
   }
   // isPending, not isLoading: offline the fetch is paused (isLoading false),
   // which fell through to the no-data 404 below.
-  if (listing.isPending || (activeClamp && listing.isPlaceholderData)) {
+  if (listing.isPending) {
     return (
-      <div className="discovery-page space-y-6" aria-busy="true">
-        <PageHeaderSkeleton />
-        <div className="discovery-grid">
+      <div className="taxonomy-page taxonomy-page--tag" aria-busy="true">
+        <div className="taxonomy-loading-header"><PageHeaderSkeleton /></div>
+        <div className="taxonomy-grid">
           {Array.from({ length: 9 }).map((_, index) => <ResourceCardSkeleton key={index} />)}
         </div>
       </div>
@@ -171,7 +192,7 @@ export default function TagLanding() {
     nextPage > 1 ? `${canonicalPath}?page=${nextPage}` : canonicalPath;
 
   return (
-    <div className="discovery-page space-y-4 sm:space-y-6">
+    <div className="taxonomy-page taxonomy-page--tag">
       <SEOHead
         title={pagedSeoTitleCore(titleCore, page)}
         description={pagedSeoDescription(description, page, totalPages)}
@@ -179,70 +200,99 @@ export default function TagLanding() {
         resourceCount={data.total}
         pageParam={page}
         noindex={noindex}
+        canonical
         follow={noindex}
       />
-      <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
-        <Link href="/"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
-      </Button>
-      {/* Task #379 (uxv2-14): the tag total was stated three times — subtitle,
-          badge, and the results heading. It is now stated once, in the results
-          heading below. */}
-      <h1 className="page-title discovery-title discovery-header">{name}</h1>
-      <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
-        <h2 id="tag-scope-heading" className="eyebrow discovery-section-title">About this collection</h2>
-        {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch
-            at this size) keeps the measure readable on wide desktop screens. */}
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
-      </section>
-      {pageNoticeFor(parsedPage, totalPages) && (
-        <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">
-          {pageNoticeFor(parsedPage, totalPages)}
-        </div>
-      )}
-      <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
-        Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
-      </p>
-      <div className="discovery-grid">
-        {data.resources.map((resource, index) => (
-          <ResourceCard
-            key={`${resource.id}-${index}`}
-            resource={{
-              id: String(resource.id),
-              name: resource.title,
-              url: resource.url,
-              description: resource.description ?? "",
-              category: resource.category,
-              tags: Array.from(new Set([slug, ...resourceTags(resource).map(normalizeTagFilter)])),
-            }}
-          />
-        ))}
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <Button asChild variant="ghost" size="sm" className="taxonomy-back">
+          <Link href="/categories"><ArrowLeft size={12} aria-hidden="true" />Browse</Link>
+        </Button>
+        {/* Tag landers rarely continue; site search is the most common next
+            page from a landing, and the header's phone control is icon-only. */}
+        <SearchEntryButton method="listing_page_button" surface="tag_page" />
       </div>
-      <Paginator
-        currentPage={page}
-        totalPages={totalPages}
-        makeHref={makeHref}
-        onNavigate={(nextPage) => {
-          navigate(makeHref(nextPage));
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      />
+      {/* Task #379 (uxv2-14): the tag total is stated once, in the results
+          heading below. */}
+      <header className="taxonomy-header">
+        <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">#</span>TAG · {name.toUpperCase()}</div>
+        <h1 className="taxonomy-title page-title">{name}</h1>
+        <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
+          <h2 id="tag-scope-heading" className="sr-only">About this collection</h2>
+          <p className="taxonomy-description">{intro}</p>
+          {/* The full related-topics section sits under the list; nearly every
+              tag lander left before reaching it, so name the closest few here. */}
+          {(categories.length > 0 || relatedTags.length > 0) && (
+            <p className="mt-2 max-w-prose text-sm leading-7 text-muted-foreground" data-testid="tag-related-shortcut">
+              Related:{" "}
+              {[
+                ...relatedTags.slice(0, 3).map(([related]) => ({ href: tagLandingPath(related), label: `#${tagDisplayName(related)}` })),
+                ...categories.slice(0, 1).map((category) => ({ href: `/category/${slugify(category.value)}`, label: category.value })),
+              ].map((item, index) => (
+                <Fragment key={item.href}>
+                  {index > 0 && ", "}
+                  <Link href={item.href} className="py-1 text-foreground underline underline-offset-4 hover:opacity-80">{item.label}</Link>
+                </Fragment>
+              ))}
+              {" · "}
+              <a href="#related-topics-heading" className="py-1 text-foreground underline underline-offset-4 hover:opacity-80">All related topics</a>
+            </p>
+          )}
+        </section>
+      </header>
+      <div className="taxonomy-results-layout">
+        <div className="taxonomy-results-heading-row">
+          <h2 ref={resultsCountRef} tabIndex={-1} id="tag-results-heading" data-testid="text-results-count" data-total={data.total}>
+            Resources ({data.total})
+          </h2>
+        </div>
+        <div className="taxonomy-grid">
+          {data.resources.map((resource, index) => (
+            <ResourceCard
+              key={`${resource.id}-${index}`}
+              variant="taxonomy"
+              resource={{
+                id: String(resource.id),
+                name: resource.title,
+                url: resource.url,
+                description: resource.description ?? "",
+                category: resource.category,
+                tags: Array.from(new Set([slug, ...resourceTags(resource).map(normalizeTagFilter)])),
+              }}
+              fullResource={resource}
+            />
+          ))}
+        </div>
+        {totalPages > 1 && (
+          <div className="taxonomy-pagination">
+            <Paginator
+              currentPage={page}
+              totalPages={totalPages}
+              makeHref={makeHref}
+              onNavigate={(nextPage) => {
+                pendingResultsFocusRef.current = true;
+                navigate(makeHref(nextPage));
+              }}
+            />
+          </div>
+        )}
+      </div>
       {/* Task #379 (uxv2-13): this chip wall used to sit between the intro and
           the results, so on a 375px viewport the first screen was topics rather
           than resources. Related topics are a "where next" affordance, so they
           belong after the list the visitor came for. The crawler HTML in
           server/seo-content.ts emits the same section in the same position. */}
       {(categories.length > 0 || relatedTags.length > 0) && (
-        <section className="space-y-3" aria-labelledby="related-topics-heading" data-seo-section="related-topics">
-          <h2 id="related-topics-heading" className="text-base font-semibold">Explore related topics</h2>
-          <div className="flex flex-wrap gap-2">
+        <section className="taxonomy-children" aria-labelledby="related-topics-heading" data-seo-section="related-topics">
+          <h2 id="related-topics-heading">Explore related topics</h2>
+          <div className="taxonomy-child-grid">
             {categories.map((category) => (
-              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-11 items-center">
-                <Badge variant="secondary" className="min-h-11 px-3">{category.value} ({category.count})</Badge>
+              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="taxonomy-child card hoverable" aria-label={tileLabel(category.value, category.count)}>
+                <span>{category.value}</span><span className="chip mono">{formatTileCount(category.count)}</span>
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-11 items-center">
-                <Badge variant="outline" className="min-h-11 px-3">#{tagDisplayName(related)} ({count})</Badge>
+              <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable" aria-label={tileLabel(`#${tagDisplayName(related)}`, count)}>
+                <span>#{tagDisplayName(related)}</span><span className="chip mono">{formatTileCount(count)}</span>
               </Link>
             ))}
           </div>

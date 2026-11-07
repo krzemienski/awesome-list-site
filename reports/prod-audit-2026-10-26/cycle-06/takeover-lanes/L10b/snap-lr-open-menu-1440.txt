@@ -1,0 +1,4 @@
+- listbox [ref=e1]
+  - option "Open" [selected, ref=e2]
+  - option "Resolved" [ref=e3]
+  - option "Dismissed" [ref=e4]

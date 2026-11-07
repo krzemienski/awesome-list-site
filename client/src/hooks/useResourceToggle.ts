@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
-import { useToast } from "@/hooks/use-toast";
+import { useToast, type ToastOptions } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -14,6 +14,7 @@ import {
   isGuestStorePersistent,
   removeGuestBookmark,
 } from "@/lib/guestBookmarks";
+import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
 import {
   trackAuthPromptShown,
   trackGuestBookmarkAdded,
@@ -43,16 +44,19 @@ import {
 // - Cache invalidation + R4-081 cross-tab sync after every server-confirmed
 //   change.
 //
-// Surface-specific concerns (visuals, success toasts, Undo actions,
-// analytics, optimistic state storage — local useState vs. query cache) stay
-// in the calling component via the callbacks below.
+// - MB-04: the bookmark-removed toast and its Undo, for members and guests,
+//   so every surface shows one copy and restores the note and collections.
+//
+// Surface-specific concerns (visuals, add/edit toasts, analytics, optimistic
+// state storage — local useState vs. query cache) stay in the calling
+// component via the callbacks below.
 
 export interface ToggleVars {
   remove: boolean;
   notes?: string;
 }
 
-type ShowToast = (opts: any) => void;
+type ShowToast = (opts: ToastOptions) => void;
 
 interface ResourceToggleOptions {
   resourceId: string | number;
@@ -128,7 +132,6 @@ function useResourceToggle(
       trackGuestBookmarkRemoved(opts.resourceId, count);
       showToast({
         description: "Removed from this device's saves",
-        duration: 6000,
         action: createElement(
           ToastAction,
           {
@@ -331,22 +334,101 @@ export function useFavoriteToggle(opts: ResourceToggleOptions) {
 }
 
 export function useBookmarkToggle(opts: ResourceToggleOptions) {
-  return useResourceToggle(opts, {
+  // The saved row as it was when the removal started: Undo puts back its
+  // note, collections and queue state, not just the bookmark. Read before the
+  // surface's optimistic flip, which may drop the row from the cache.
+  const removedRef = useRef<RemovedBookmark | undefined>(undefined);
+  // When the bookmarks list isn't cached the row is read from the server, and
+  // the DELETE waits for that read so it can't remove the row first.
+  const snapshotRef = useRef<Promise<void> | undefined>(undefined);
+  const snapshotLostRef = useRef(false);
+
+  const undoRemoval = async (removed: RemovedBookmark | undefined, showToast: ShowToast) => {
+    try {
+      const lost = removed === undefined && snapshotLostRef.current;
+      const { partial } = await restoreRemovedBookmark(opts.resourceId, removed);
+      opts.onOptimistic(true);
+      showToast(
+        partial || lost
+          ? {
+              title: "Bookmark restored",
+              description: lost
+                ? "Its note and collections couldn't be restored."
+                : "Some collections or queue settings couldn't be restored.",
+              variant: "destructive",
+            }
+          : { description: "Bookmark restored", duration: 2000 },
+      );
+    } catch {
+      showToast({
+        title: "Error",
+        description: "Couldn't restore the bookmark. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return useResourceToggle({
+    ...opts,
+    onOptimistic: (next, vars) => {
+      if (!next) {
+        const sameRow = (entry: { id: number | string }) => String(entry.id) === String(opts.resourceId);
+        const cached = queryClient.getQueryData<(RemovedBookmark & { id: number | string })[]>(["/api/bookmarks"]);
+        removedRef.current = cached?.find(sameRow);
+        snapshotLostRef.current = false;
+        snapshotRef.current = undefined;
+        if (!cached) {
+          snapshotRef.current = apiRequest("/api/bookmarks", { credentials: "include" })
+            .then((rows: (RemovedBookmark & { id: number | string })[]) => {
+              removedRef.current = rows.find(sameRow);
+            })
+            .catch(() => {
+              snapshotLostRef.current = true;
+            });
+        }
+      }
+      opts.onOptimistic(next, vars);
+    },
+    onSuccess: (data, vars, showToast) => {
+      if (vars.remove) {
+        // Run17 BUG-013: removal is one click, so the toast carries Undo.
+        const removed = removedRef.current;
+        void queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
+        showToast({
+          description: "Removed from bookmarks",
+          action: createElement(
+            ToastAction,
+            {
+              altText: "Undo bookmark removal",
+              onClick: () => void undoRemoval(removed, showToast),
+              // Spread: ToastAction's prop type has no data-* attributes.
+              ...{ "data-testid": "button-undo-bookmark-removal" },
+            },
+            "Undo",
+          ),
+        });
+      }
+      opts.onSuccess?.(data, vars, showToast);
+    },
+  }, {
     listKey: "/api/bookmarks",
     serverField: "isBookmarked",
-    buildRequest: (resourceId, vars) =>
-      vars.remove
-        ? apiRequest(`/api/bookmarks/${resourceId}`, {
-            method: "DELETE",
-            credentials: "include",
-          })
-        : apiRequest(`/api/bookmarks/${resourceId}`, {
-            method: "POST",
-            body: JSON.stringify(
-              vars.notes !== undefined ? { notes: vars.notes } : {},
-            ),
-            credentials: "include",
-          }),
+    buildRequest: async (resourceId, vars) => {
+      if (vars.remove) {
+        await snapshotRef.current;
+        return apiRequest(`/api/bookmarks/${resourceId}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      }
+      return apiRequest(`/api/bookmarks/${resourceId}`, {
+        method: "POST",
+        body: JSON.stringify(
+          vars.notes !== undefined ? { notes: vars.notes } : {},
+        ),
+        credentials: "include",
+      });
+    },
     signInTitle: "Sign in to bookmark",
     signInDescription:
       "Create an account or sign in to save resources to your bookmarks.",

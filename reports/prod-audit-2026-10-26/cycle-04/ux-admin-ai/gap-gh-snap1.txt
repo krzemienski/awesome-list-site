@@ -1,0 +1,88 @@
+uid=190_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#github"
+  uid=190_1 region "Notifications (F8)"
+    uid=190_2 list
+  uid=190_3 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=190_5 banner
+    uid=190_6 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=190_9 button "Search 3,825 resources"
+    uid=190_10 navigation "Primary"
+      uid=190_11 link "Browse" url="https://awesome.video/categories"
+      uid=190_13 link "Submit" url="https://awesome.video/submit"
+      uid=190_15 link "About" url="https://awesome.video/about"
+      uid=190_17 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=190_19 link "Admin" url="https://awesome.video/admin"
+    uid=190_21 button "Admin, account menu" expandable haspopup="menu"
+  uid=190_22 main
+    uid=190_23 navigation "Breadcrumb"
+      uid=190_24 link "Home" url="https://awesome.video/"
+      uid=190_26 "Admin"
+    uid=190_27 "Authorized admin area"
+    uid=190_28 "ADMIN CONSOLE · "
+    uid=190_29 "ADMIN USER"
+    uid=190_30 heading "Operations dashboard" level="1"
+    uid=190_31 "Manage the "
+    uid=190_32 "3,825"
+    uid=190_33 " resources, jobs, and contributors that keep the index alive."
+    uid=190_34 button "Settings" expandable haspopup="menu"
+    uid=190_35 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=190_36 status atomic live="polite" relevant="additions text"
+    uid=199_0 button "Scroll tabs left"
+    uid=190_37 tablist "Admin sections" orientation="horizontal"
+      uid=190_38 tab "Overview" selectable
+      uid=190_39 tab "Approvals" selectable
+      uid=190_40 tab "Edits" selectable
+      uid=190_41 tab "Enrichment" selectable
+      uid=190_42 tab "Researcher" selectable
+      uid=190_43 tab "Export" selectable
+      uid=190_44 tab "Database" selectable
+      uid=190_45 tab "Resources" selectable
+      uid=190_46 tab "Categories" selectable
+      uid=190_47 tab "Subcategories" selectable
+      uid=190_48 tab "Users" selectable
+      uid=190_49 tab "GitHub" selectable selected
+      uid=190_50 tab "Link Health" selectable
+      uid=190_51 tab "Audit" selectable
+      uid=190_52 tab "Research" selectable
+    uid=190_53 button "Scroll tabs right"
+    uid=199_1 tabpanel "GitHub"
+      uid=199_2 "krzemienski/awesome-video"
+      uid=199_3 "master"
+      uid=199_4 " · "
+      uid=199_5 "last sync Jul 20, 2026, 02:42 PM"
+      uid=199_6 " · "
+      uid=199_7 "49"
+      uid=199_8 " sync jobs"
+      uid=199_9 button "Preview import"
+      uid=199_10 button "Pull"
+      uid=199_11 button "Sync now"
+      uid=199_12 heading "Sync jobs" level="2"
+      uid=199_13 "Last 5 import/export operations"
+      uid=199_14 "ID"
+      uid=199_15 "TYPE"
+      uid=199_16 "STATUS"
+      uid=199_17 "Job #49"
+      uid=199_18 "Export"
+      uid=199_19 "Jul 20, 2026, 02:42 PM"
+      uid=199_20 "COMPLETED"
+      uid=199_21 button "View logs for export Job #49"
+      uid=199_22 "Job #48"
+      uid=199_23 "Export"
+      uid=199_24 "Jul 18, 2026, 03:12 PM"
+      uid=199_25 "COMPLETED"
+      uid=199_26 button "View logs for export Job #48"
+      uid=199_27 "Job #47"
+      uid=199_28 "Export"
+      uid=199_29 "Jul 18, 2026, 05:30 AM"
+      uid=199_30 "COMPLETED"
+      uid=199_31 button "View logs for export Job #47"
+      uid=199_32 "Job #46"
+      uid=199_33 "Export"
+      uid=199_34 "Jul 17, 2026, 08:54 AM"
+      uid=199_35 "COMPLETED"
+      uid=199_36 button "View logs for export Job #46"
+      uid=199_37 "Job #45"
+      uid=199_38 "Export"
+      uid=199_39 "Jul 17, 2026, 08:32 AM"
+      uid=199_40 "FAILED"
+      uid=199_41 button "View logs for export Job #45"
+      uid=199_42 button "More" expandable

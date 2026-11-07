@@ -1,0 +1,51 @@
+✓ Done
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e35]
+    - link "Admin" [disabled, ref=e36]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings, Journeys section open" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Journeys" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-109-journeys-1440.png
+
+✓ Done
+
+- menuitem "Theme settings" [ref=e1]
+- menuitem "Pending approvals" [ref=e2]
+- menuitem "Rejected resources" [ref=e3]
+- menuitem "Sub-Subcats" [ref=e4]
+- menuitem "Journeys (open)" [ref=e5]
+- menuitem "Digests" [ref=e6]

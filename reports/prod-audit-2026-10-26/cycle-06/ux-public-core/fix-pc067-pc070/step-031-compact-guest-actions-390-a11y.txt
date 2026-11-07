@@ -1,0 +1,498 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list:
+        - listitem [ref=e4]:
+          - generic [ref=e6]: Sign in to favorite
+          - generic [ref=e7]: Create an account or sign in to save your favorite resources.
+          - button "Sign in" [ref=e8] [cursor=pointer]
+          - button "Dismiss notification" [ref=e9] [cursor=pointer]:
+            - img [ref=e10]
+    - generic [ref=e14]:
+      - link "Skip to main content" [ref=e15] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e16]:
+        - banner [ref=e17]:
+          - generic [ref=e18]:
+            - button "Toggle sidebar" [ref=e19] [cursor=pointer]:
+              - generic [ref=e20]: Toggle sidebar
+            - img
+          - link "AWESOME.VIDEO home" [ref=e21] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e22]: av
+            - generic [ref=e23]: AWESOME.VIDEO home
+          - button "Search 1,949 resources" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+            - generic [ref=e28]: Search 1,949 resources
+          - button "Sign in, account menu" [ref=e29] [cursor=pointer]:
+            - img [ref=e31]
+            - generic [ref=e34]: Sign in, account menu
+        - generic [ref=e36]:
+          - main [ref=e37]:
+            - generic [ref=e38]:
+              - navigation "Breadcrumb" [ref=e39]:
+                - list [ref=e40]:
+                  - listitem [ref=e41]:
+                    - link "Home" [ref=e42] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e43]:
+                    - img [ref=e44]
+                  - listitem:
+                    - link "Encoding & Codecs" [disabled]
+              - generic [ref=e46]:
+                - link "Browse" [ref=e47] [cursor=pointer]:
+                  - /url: /categories
+                  - img
+                  - text: Browse
+                - generic [ref=e48]:
+                  - generic [ref=e50]: ◇
+                  - text: CATEGORY · ENCODING & CODECS
+                  - heading "Encoding & Codecs" [level=1] [ref=e51]
+                  - region "About this collection" [ref=e52]:
+                    - heading "About this collection" [level=2] [ref=e53]
+                    - paragraph [ref=e54]: Encoding & Codecs brings together 35 curated resources from across the video technology landscape. Notable topics include Encoding Tools.
+                  - generic [ref=e55]:
+                    - generic [ref=e56]: 35 resources
+                    - generic [ref=e57]: "Kind: Libraries"
+                    - generic [ref=e58]: 1 subcategory
+                    - button "Close filters" [expanded] [ref=e59] [cursor=pointer]:
+                      - generic [ref=e60]: Close filters
+                - generic [ref=e61]:
+                  - generic [ref=e62]:
+                    - img [ref=e63]
+                    - textbox "Search in Encoding & Codecs" [ref=e66]:
+                      - /placeholder: Search in Encoding & Codecs...
+                  - combobox "Limit Encoding & Codecs by subcategory" [ref=e67] [cursor=pointer]:
+                    - option "All subcategories" [selected]
+                    - option "Uncategorized (7)"
+                    - option "Encoding Tools (28)"
+                    - option "Encoding Tools › FFMPEG (7)"
+                  - combobox "Limit by resource kind" [ref=e68] [cursor=pointer]:
+                    - option "All resource kinds"
+                    - option "Tools"
+                    - option "Libraries" [selected]
+                    - option "Standards"
+                    - option "Events"
+                    - option "Protocols"
+                    - option "Other"
+                  - combobox "Sort resources" [ref=e70] [cursor=pointer]:
+                    - generic: Name Z-A
+                    - img [ref=e71]
+                  - generic "View mode" [ref=e73]:
+                    - generic [ref=e74]: View
+                    - radiogroup [ref=e75]:
+                      - radio "Grid view" [ref=e76] [cursor=pointer]:
+                        - img
+                      - radio "List view" [ref=e77] [cursor=pointer]:
+                        - img
+                      - radio "Compact view" [checked] [ref=e78] [cursor=pointer]:
+                        - img
+                - region "Subcategories" [ref=e79]:
+                  - heading "Subcategories" [level=2] [ref=e80]
+                  - generic [ref=e81]:
+                    - link "Encoding Tools 28" [ref=e82] [cursor=pointer]:
+                      - /url: /subcategory/encoding-tools?kind=libraries
+                      - generic [ref=e83]: Encoding Tools
+                      - generic [ref=e84]: "28"
+                    - button "Uncategorized 7" [ref=e85] [cursor=pointer]:
+                      - generic [ref=e86]: Uncategorized
+                      - generic [ref=e87]: "7"
+                - generic [ref=e88]:
+                  - button "Filters" [ref=e91] [cursor=pointer]:
+                    - img
+                    - text: Filters
+                  - generic "Resources (35)" [ref=e93]:
+                    - heading "Resources (35)" [level=2] [ref=e95]
+                    - generic [ref=e96]:
+                      - article [ref=e97]:
+                        - generic [ref=e98]:
+                          - heading "Zulko/moviepy" [level=2] [ref=e99]:
+                            - link "Zulko/moviepy" [ref=e100] [cursor=pointer]:
+                              - /url: /resource/888
+                          - link "Open in new tab" [ref=e101] [cursor=pointer]:
+                            - /url: https://github.com/Zulko/moviepy
+                            - img
+                        - 'button "Favorite to your account — sign in required: Zulko/moviepy" [ref=e103] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: Zulko/moviepy" [ref=e105] [cursor=pointer]':
+                          - img
+                      - article [ref=e107]:
+                        - generic [ref=e108]:
+                          - heading "Xuggler" [level=2] [ref=e109]:
+                            - link "Xuggler" [ref=e110] [cursor=pointer]:
+                              - /url: /resource/1865
+                          - link "Open in new tab" [ref=e111] [cursor=pointer]:
+                            - /url: https://github.com/artclarke/xuggle-xuggler
+                            - img
+                        - 'button "Favorite to your account — sign in required: Xuggler" [active] [ref=e113] [cursor=pointer]':
+                          - img
+                        - 'button "Remove bookmark saved on this device: Xuggler" [pressed] [ref=e115] [cursor=pointer]':
+                          - img
+                      - article [ref=e117]:
+                        - generic [ref=e118]:
+                          - heading "Xabe.FFmpeg" [level=2] [ref=e119]:
+                            - link "Xabe.FFmpeg" [ref=e120] [cursor=pointer]:
+                              - /url: /resource/1781
+                          - link "Open in new tab" [ref=e121] [cursor=pointer]:
+                            - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                            - img
+                        - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e123] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e125] [cursor=pointer]':
+                          - img
+                      - article [ref=e127]:
+                        - generic [ref=e128]:
+                          - heading "WritingMinds/ffmpeg-android-java" [level=2] [ref=e129]:
+                            - link "WritingMinds/ffmpeg-android-java" [ref=e130] [cursor=pointer]:
+                              - /url: /resource/859
+                          - link "Open in new tab" [ref=e131] [cursor=pointer]:
+                            - /url: https://github.com/WritingMinds/ffmpeg-android-java
+                            - img
+                        - 'button "Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java" [ref=e133] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java" [ref=e135] [cursor=pointer]':
+                          - img
+                      - article [ref=e137]:
+                        - generic [ref=e138]:
+                          - heading "video4j" [level=2] [ref=e139]:
+                            - link "video4j" [ref=e140] [cursor=pointer]:
+                              - /url: /resource/1942
+                          - link "Open in new tab" [ref=e141] [cursor=pointer]:
+                            - /url: https://github.com/metaloom/video4j
+                            - img
+                        - 'button "Favorite to your account — sign in required: video4j" [ref=e143] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: video4j" [ref=e145] [cursor=pointer]':
+                          - img
+                      - article [ref=e147]:
+                        - generic [ref=e148]:
+                          - heading "vid.stab" [level=2] [ref=e149]:
+                            - link "vid.stab" [ref=e150] [cursor=pointer]:
+                              - /url: /resource/1892
+                          - link "Open in new tab" [ref=e151] [cursor=pointer]:
+                            - /url: https://github.com/georgmartius/vid.stab
+                            - img
+                        - 'button "Favorite to your account — sign in required: vid.stab" [ref=e153] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: vid.stab" [ref=e155] [cursor=pointer]':
+                          - img
+                      - article [ref=e157]:
+                        - generic [ref=e158]:
+                          - heading "vapoursynth/vapoursynth" [level=2] [ref=e159]:
+                            - link "vapoursynth/vapoursynth" [ref=e160] [cursor=pointer]:
+                              - /url: /resource/1343
+                          - link "Open in new tab" [ref=e161] [cursor=pointer]:
+                            - /url: https://github.com/vapoursynth/vapoursynth
+                            - img
+                        - 'button "Favorite to your account — sign in required: vapoursynth/vapoursynth" [ref=e163] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: vapoursynth/vapoursynth" [ref=e165] [cursor=pointer]':
+                          - img
+                      - article [ref=e167]:
+                        - generic [ref=e168]:
+                          - 'heading "twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [level=2] [ref=e169]':
+                            - 'link "twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e170] [cursor=pointer]':
+                              - /url: /resource/1485
+                          - link "Open in new tab" [ref=e171] [cursor=pointer]:
+                            - /url: https://github.com/twitter/vireo
+                            - img
+                        - 'button "Favorite to your account — sign in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e173] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11" [ref=e175] [cursor=pointer]':
+                          - img
+                      - article [ref=e177]:
+                        - generic [ref=e178]:
+                          - heading "scikit-video" [level=2] [ref=e179]:
+                            - link "scikit-video" [ref=e180] [cursor=pointer]:
+                              - /url: /resource/1943
+                          - link "Open in new tab" [ref=e181] [cursor=pointer]:
+                            - /url: https://github.com/aizvorski/scikit-video
+                            - img
+                        - 'button "Favorite to your account — sign in required: scikit-video" [ref=e183] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: scikit-video" [ref=e185] [cursor=pointer]':
+                          - img
+                      - article [ref=e187]:
+                        - generic [ref=e188]:
+                          - 'heading "sannies/mp4parser: A Java API to read, write and create MP4 files" [level=2] [ref=e189]':
+                            - 'link "sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e190] [cursor=pointer]':
+                              - /url: /resource/1508
+                          - link "Open in new tab" [ref=e191] [cursor=pointer]:
+                            - /url: https://github.com/sannies/mp4parser
+                            - img
+                        - 'button "Favorite to your account — sign in required: sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e193] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: sannies/mp4parser: A Java API to read, write and create MP4 files" [ref=e195] [cursor=pointer]':
+                          - img
+                      - article [ref=e197]:
+                        - generic [ref=e198]:
+                          - heading "PyAV" [level=2] [ref=e199]:
+                            - link "PyAV" [ref=e200] [cursor=pointer]:
+                              - /url: /resource/1947
+                          - link "Open in new tab" [ref=e201] [cursor=pointer]:
+                            - /url: https://github.com/PyAV-Org/PyAV
+                            - img
+                        - 'button "Favorite to your account — sign in required: PyAV" [ref=e203] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: PyAV" [ref=e205] [cursor=pointer]':
+                          - img
+                      - article [ref=e207]:
+                        - generic [ref=e208]:
+                          - heading "OpenShot Library (libopenshot)" [level=2] [ref=e209]:
+                            - link "OpenShot Library (libopenshot)" [ref=e210] [cursor=pointer]:
+                              - /url: /resource/1838
+                          - link "Open in new tab" [ref=e211] [cursor=pointer]:
+                            - /url: https://github.com/OpenShot/libopenshot
+                            - img
+                        - 'button "Favorite to your account — sign in required: OpenShot Library (libopenshot)" [ref=e213] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: OpenShot Library (libopenshot)" [ref=e215] [cursor=pointer]':
+                          - img
+                      - article [ref=e217]:
+                        - generic [ref=e218]:
+                          - heading "nextbreakpoint/ffmpeg4java" [level=2] [ref=e219]:
+                            - link "nextbreakpoint/ffmpeg4java" [ref=e220] [cursor=pointer]:
+                              - /url: /resource/1029
+                          - link "Open in new tab" [ref=e221] [cursor=pointer]:
+                            - /url: https://github.com/nextbreakpoint/ffmpeg4java
+                            - img
+                        - 'button "Favorite to your account — sign in required: nextbreakpoint/ffmpeg4java" [ref=e223] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: nextbreakpoint/ffmpeg4java" [ref=e225] [cursor=pointer]':
+                          - img
+                      - article [ref=e227]:
+                        - generic [ref=e228]:
+                          - heading "mltframework/mlt" [level=2] [ref=e229]:
+                            - link "mltframework/mlt" [ref=e230] [cursor=pointer]:
+                              - /url: /resource/896
+                          - link "Open in new tab" [ref=e231] [cursor=pointer]:
+                            - /url: https://github.com/mltframework/mlt
+                            - img
+                        - 'button "Favorite to your account — sign in required: mltframework/mlt" [ref=e233] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: mltframework/mlt" [ref=e235] [cursor=pointer]':
+                          - img
+                      - article [ref=e237]:
+                        - generic [ref=e238]:
+                          - heading "MLT Framework" [level=2] [ref=e239]:
+                            - link "MLT Framework" [ref=e240] [cursor=pointer]:
+                              - /url: /resource/1800
+                          - link "Open in new tab" [ref=e241] [cursor=pointer]:
+                            - /url: https://www.mltframework.org/
+                            - img
+                        - 'button "Favorite to your account — sign in required: MLT Framework" [ref=e243] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: MLT Framework" [ref=e245] [cursor=pointer]':
+                          - img
+                      - article [ref=e247]:
+                        - generic [ref=e248]:
+                          - heading "libVLC" [level=2] [ref=e249]:
+                            - link "libVLC" [ref=e250] [cursor=pointer]:
+                              - /url: /resource/32
+                          - link "Open in new tab" [ref=e251] [cursor=pointer]:
+                            - /url: https://www.videolan.org/vlc/libvlc.html
+                            - img
+                        - 'button "Favorite to your account — sign in required: libVLC" [ref=e253] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: libVLC" [ref=e255] [cursor=pointer]':
+                          - img
+                      - article [ref=e257]:
+                        - generic [ref=e258]:
+                          - heading "libmpeg2" [level=2] [ref=e259]:
+                            - link "libmpeg2" [ref=e260] [cursor=pointer]:
+                              - /url: /resource/1945
+                          - link "Open in new tab" [ref=e261] [cursor=pointer]:
+                            - /url: http://libmpeg2.sourceforge.net/
+                            - img
+                        - 'button "Favorite to your account — sign in required: libmpeg2" [ref=e263] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: libmpeg2" [ref=e265] [cursor=pointer]':
+                          - img
+                      - article [ref=e267]:
+                        - generic [ref=e268]:
+                          - heading "Libav" [level=2] [ref=e269]:
+                            - link "Libav" [ref=e270] [cursor=pointer]:
+                              - /url: /resource/1813
+                          - link "Open in new tab" [ref=e271] [cursor=pointer]:
+                            - /url: https://libav.org/
+                            - img
+                        - 'button "Favorite to your account — sign in required: Libav" [ref=e273] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: Libav" [ref=e275] [cursor=pointer]':
+                          - img
+                      - article [ref=e277]:
+                        - generic [ref=e278]:
+                          - heading "kkroening/ffmpeg-python" [level=2] [ref=e279]:
+                            - link "kkroening/ffmpeg-python" [ref=e280] [cursor=pointer]:
+                              - /url: /resource/885
+                          - link "Open in new tab" [ref=e281] [cursor=pointer]:
+                            - /url: https://github.com/kkroening/ffmpeg-python
+                            - img
+                        - 'button "Favorite to your account — sign in required: kkroening/ffmpeg-python" [ref=e283] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: kkroening/ffmpeg-python" [ref=e285] [cursor=pointer]':
+                          - img
+                      - article [ref=e287]:
+                        - generic [ref=e288]:
+                          - heading "JCodec" [level=2] [ref=e289]:
+                            - link "JCodec" [ref=e290] [cursor=pointer]:
+                              - /url: /resource/1866
+                          - link "Open in new tab" [ref=e291] [cursor=pointer]:
+                            - /url: https://github.com/jcodec/jcodec
+                            - img
+                        - 'button "Favorite to your account — sign in required: JCodec" [ref=e293] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: JCodec" [ref=e295] [cursor=pointer]':
+                          - img
+                      - article [ref=e297]:
+                        - generic [ref=e298]:
+                          - heading "Intel oneAPI Video Processing Library (oneVPL)" [level=2] [ref=e299]:
+                            - link "Intel oneAPI Video Processing Library (oneVPL)" [ref=e300] [cursor=pointer]:
+                              - /url: /resource/1646
+                          - link "Open in new tab" [ref=e301] [cursor=pointer]:
+                            - /url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onevpl.html
+                            - img
+                        - 'button "Favorite to your account — sign in required: Intel oneAPI Video Processing Library (oneVPL)" [ref=e303] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: Intel oneAPI Video Processing Library (oneVPL)" [ref=e305] [cursor=pointer]':
+                          - img
+                      - article [ref=e307]:
+                        - generic [ref=e308]:
+                          - heading "gstreamer-rs" [level=2] [ref=e309]:
+                            - link "gstreamer-rs" [ref=e310] [cursor=pointer]:
+                              - /url: /resource/1874
+                          - link "Open in new tab" [ref=e311] [cursor=pointer]:
+                            - /url: https://github.com/sdroege/gstreamer-rs
+                            - img
+                        - 'button "Favorite to your account — sign in required: gstreamer-rs" [ref=e313] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: gstreamer-rs" [ref=e315] [cursor=pointer]':
+                          - img
+                      - article [ref=e317]:
+                        - generic [ref=e318]:
+                          - heading "GStreamer" [level=2] [ref=e319]:
+                            - link "GStreamer" [ref=e320] [cursor=pointer]:
+                              - /url: /resource/1765
+                          - link "Open in new tab" [ref=e321] [cursor=pointer]:
+                            - /url: https://gstreamer.freedesktop.org/
+                            - img
+                        - 'button "Favorite to your account — sign in required: GStreamer" [ref=e323] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: GStreamer" [ref=e325] [cursor=pointer]':
+                          - img
+                      - article [ref=e327]:
+                        - generic [ref=e328]:
+                          - heading "go-astiav" [level=2] [ref=e329]:
+                            - link "go-astiav" [ref=e330] [cursor=pointer]:
+                              - /url: /resource/1599
+                          - link "Open in new tab" [ref=e331] [cursor=pointer]:
+                            - /url: https://github.com/asticode/go-astiav
+                            - img
+                        - 'button "Favorite to your account — sign in required: go-astiav" [ref=e333] [cursor=pointer]':
+                          - img
+                        - 'button "Bookmark on this device — no sign-in required: go-astiav" [ref=e335] [cursor=pointer]':
+                          - img
+                    - navigation "Pagination" [ref=e338]:
+                      - generic [ref=e339]:
+                        - img
+                        - text: Previous
+                        - link "Page 1, current page" [ref=e340] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=compact
+                          - text: "1"
+                        - link "Go to page 2" [ref=e341] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=compact&page=2
+                          - text: "2"
+                        - link "Next" [ref=e342] [cursor=pointer]:
+                          - /url: /category/encoding-codecs?sortBy=name-desc&kind=libraries&view=compact&page=2
+                          - text: Next
+                          - img
+                      - generic [ref=e344]: Page 1 of 2
+                      - status [ref=e345]
+          - contentinfo [ref=e346]:
+            - generic [ref=e347]:
+              - generic [ref=e348]:
+                - paragraph [ref=e349]: ── INDEX
+                - link "awesome.video home" [ref=e350] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e351]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - heading "INDEXED" [level=2] [ref=e354]
+              - paragraph [ref=e355]: 1,949
+              - paragraph [ref=e356]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e357]: live
+              - navigation "Explore categories" [ref=e359]:
+                - heading "EXPLORE" [level=2] [ref=e360]
+                - generic [ref=e361]:
+                  - link "Community & Events" [ref=e362] [cursor=pointer]:
+                    - /url: /category/community-events
+                    - generic [ref=e363]: ◈
+                    - generic [ref=e364]: Community
+                  - link "Encoding & Codecs" [ref=e365] [cursor=pointer]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e366]: ◇
+                    - generic [ref=e367]: Encoding
+                  - link "General Tools" [ref=e368] [cursor=pointer]:
+                    - /url: /category/general-tools
+                    - generic [ref=e369]: ◆
+                    - generic [ref=e370]: General
+                  - link "Infrastructure & Delivery" [ref=e371] [cursor=pointer]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e372]: ▣
+                    - generic [ref=e373]: Infrastructure
+                  - link "Intro & Learning" [ref=e374] [cursor=pointer]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e375]: ▤
+                    - generic [ref=e376]: Intro
+                  - link "Media Tools" [ref=e377] [cursor=pointer]:
+                    - /url: /category/media-tools
+                    - generic [ref=e378]: ▥
+                    - generic [ref=e379]: Media
+                  - link "Players & Clients" [ref=e380] [cursor=pointer]:
+                    - /url: /category/players-clients
+                    - generic [ref=e381]: ▶
+                    - generic [ref=e382]: Players
+                  - link "Protocols & Transport" [ref=e383] [cursor=pointer]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e384]: ⟁
+                    - generic [ref=e385]: Protocols
+                  - link "Standards & Industry" [ref=e386] [cursor=pointer]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e387]: ◉
+                    - generic [ref=e388]: Standards
+              - generic [ref=e389]:
+                - heading "SOURCE" [level=2] [ref=e390]
+                - link "krzemienski/awesome-video" [ref=e391] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e392]
+                  - text: krzemienski
+                  - text: /
+                  - text: awesome-video
+                  - generic [ref=e396]: ↗
+                - paragraph [ref=e397]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e398] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+            - generic [ref=e399]:
+              - generic [ref=e400]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e401]:
+                - link "About" [ref=e402] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e403] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e404] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e405] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - link "Issues ↗" [ref=e406] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e407] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e408]: built with the awesome-list framework
+      - button "Back to top" [ref=e409] [cursor=pointer]:
+        - img
+  - status [ref=e410]: Notification Sign in to favoriteCreate an account or sign in to save your favorite resources.Sign in

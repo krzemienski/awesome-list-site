@@ -1,0 +1,296 @@
+7005	RootWebArea	"You're offline — Awesome Video"	focusable=true focused=true
+7103	generic	""	
+7008	generic	""	
+7110	region	"Notifications (F8)"	focusable=true
+7009	link	"Skip to main content"	focusable=true
+7113	generic	""	
+7111	list	""	focusable=true
+7447	StaticText	"Skip to main content"	
+7115	banner	""	
+7147	generic	""	
+-1000003699	InlineTextBox	"Skip to main content"	
+7124	link	"AWESOME.VIDEO home"	focusable=true
+7012	button	"Search 1,949 resources"	focusable=true
+7013	navigation	"Primary"	
+7014	button	"Sign in, account menu"	focusable=true expanded=false
+7148	generic	""	
+7358	main	""	focusable=true
+7025	contentinfo	""	
+7451	StaticText	"AWESOME.VIDEO"	
+7452	StaticText	" home"	
+7453	StaticText	"Search 1,949 resources"	
+7136	link	"Browse"	focusable=true
+7137	link	"Submit"	focusable=true
+7138	link	"About"	focusable=true
+7139	link	"Docs ↗"	focusable=true
+7463	StaticText	"Sign in"	
+7464	StaticText	", account menu"	
+7149	navigation	"Sidebar"	
+7360	navigation	"Breadcrumb"	
+7369	alert	""	
+7526	StaticText	"── INDEX"	
+7382	link	"awesome.video home"	focusable=true
+7383	paragraph	""	
+7386	heading	"INDEXED"	level=2
+7387	paragraph	""	
+7388	paragraph	""	
+7392	navigation	"Explore categories"	
+7423	heading	"SOURCE"	level=2
+7027	link	"krzemienski/ awesome-video"	focusable=true
+7429	paragraph	""	
+7566	StaticText	"© "	
+7567	StaticText	"2026"	
+7568	StaticText	" "	
+7569	StaticText	"awesome.video"	
+7570	StaticText	" · content CC0, code MIT"	
+7435	navigation	"Site policies"	
+7577	StaticText	"built with the awesome-list framework"	
+-1000003700	InlineTextBox	"AWESOME.VIDEO"	
+-1000003701	InlineTextBox	" home"	
+-1000003702	InlineTextBox	"Search 1,949 resources"	
+7458	StaticText	"Browse"	
+7459	StaticText	"Submit"	
+7460	StaticText	"About"	
+7461	StaticText	"Docs ↗"	
+-1000003707	InlineTextBox	"Sign in"	
+-1000003708	InlineTextBox	", account menu"	
+7154	link	"Home"	focusable=true
+7161	generic	""	
+7162	button	"Collapse sidebar"	focusable=true
+7167	button	"Community & Events 91 resources"	focusable=true expanded=false
+7179	button	"Encoding & Codecs 372 resources"	focusable=true expanded=true
+7189	generic	""	
+7217	button	"General Tools 95 resources"	focusable=true expanded=false
+7227	button	"Infrastructure & Delivery 183 resources"	focusable=true expanded=false
+7238	button	"Intro & Learning 227 resources"	focusable=true expanded=false
+7248	button	"Media Tools 304 resources"	focusable=true expanded=false
+7259	button	"Players & Clients 263 resources"	focusable=true expanded=false
+7270	button	"Protocols & Transport 242 resources"	focusable=true expanded=false
+7281	button	"Standards & Industry 172 resources"	focusable=true expanded=false
+7516	StaticText	"1,949 indexed"	
+7517	StaticText	" · live"	
+7298	link	"Source: krzemienski/awesome-video"	focusable=true
+7301	group	""	
+7361	list	""	
+7371	generic	""	
+7372	heading	"You're offline"	level=1
+7523	StaticText	"This page couldn't load because your device has no connection. It will load on its own when you reconnect."	
+7374	paragraph	""	
+7035	button	"Retry"	focusable=true focused=true
+-1000003752	InlineTextBox	"── INDEX"	
+7527	StaticText	"awesome.video"	
+7528	StaticText	"A curated collection of awesome video resources, tools, and technologies for developers and content creators"	
+7529	StaticText	"INDEXED"	
+7530	StaticText	"1,949"	
+7531	StaticText	"9"	
+7532	StaticText	" categories"	
+7389	LineBreak	"\n"	
+7533	StaticText	"18"	
+7534	StaticText	" subcategories"	
+7390	LineBreak	"\n"	
+7391	generic	""	
+7393	heading	"EXPLORE"	level=2
+7395	link	"Community & Events"	focusable=true
+7398	link	"Encoding & Codecs"	focusable=true
+7401	link	"General Tools"	focusable=true
+7404	link	"Infrastructure & Delivery"	focusable=true
+7407	link	"Intro & Learning"	focusable=true
+7410	link	"Media Tools"	focusable=true
+7413	link	"Players & Clients"	focusable=true
+7416	link	"Protocols & Transport"	focusable=true
+7419	link	"Standards & Industry"	focusable=true
+7555	StaticText	"SOURCE"	
+7556	StaticText	"krzemienski"	
+7557	StaticText	"/"	
+7558	StaticText	"awesome-video"	
+7560	StaticText	"Open-source."	
+7430	link	"PRs welcome"	focusable=true
+7562	StaticText	"."	
+7431	LineBreak	"\n"	
+7563	StaticText	"Indexed automatically from "	
+7564	StaticText	"README.md"	
+7565	StaticText	"."	
+-1000003778	InlineTextBox	"© "	
+-1000003779	InlineTextBox	"2026"	
+-1000003780	InlineTextBox	" "	
+-1000003781	InlineTextBox	"awesome.video"	
+-1000003782	InlineTextBox	" · content CC0, code MIT"	
+7436	link	"About"	focusable=true
+7437	link	"Terms"	focusable=true
+7438	link	"Privacy"	focusable=true
+7439	link	"Code of Conduct"	focusable=true
+7440	link	"Issues ↗"	focusable=true
+7441	link	"Sitemap"	focusable=true
+-1000003789	InlineTextBox	"built with the awesome-list framework"	
+-1000003703	InlineTextBox	"Browse"	
+-1000003704	InlineTextBox	"Submit"	
+-1000003705	InlineTextBox	"About"	
+-1000003706	InlineTextBox	"Docs ↗"	
+7156	image	""	
+7465	StaticText	"Home"	
+7466	StaticText	"CATEGORIES"	
+7467	StaticText	" "	
+7468	StaticText	"· 9"	
+7170	generic	""	
+7173	generic	"91 resources"	
+7175	image	""	
+7182	generic	""	
+7185	generic	"372 resources"	
+7187	image	""	
+7192	link	"All in Encoding & Codecs →"	focusable=true
+7195	generic	""	
+7205	generic	""	
+7214	link	"Uncategorized 120 resources"	focusable=true
+7220	generic	""	
+7222	generic	"95 resources"	
+7224	image	""	
+7230	generic	""	
+7233	generic	"183 resources"	
+7235	image	""	
+7241	generic	""	
+7243	generic	"227 resources"	
+7245	image	""	
+7251	generic	""	
+7254	generic	"304 resources"	
+7256	image	""	
+7262	generic	""	
+7265	generic	"263 resources"	
+7267	image	""	
+7273	generic	""	
+7276	generic	"242 resources"	
+7278	image	""	
+7284	generic	""	
+7287	generic	"172 resources"	
+7289	image	""	
+-1000003742	InlineTextBox	"1,949 indexed"	
+-1000003743	InlineTextBox	" · live"	
+7306	DisclosureTriangle	"More navigation"	focusable=true expanded=false
+7362	listitem	""	level=1
+7367	listitem	""	level=1
+7521	StaticText	"OFFLINE"	
+7522	StaticText	"You're offline"	
+-1000003748	InlineTextBox	"This page couldn't load because your device has no connection. It will "	
+-1000003749	InlineTextBox	"load on its own when you reconnect."	
+7524	StaticText	"Still offline — reconnect and try again."	
+7525	StaticText	"Retry"	
+-1000003753	InlineTextBox	"awesome.video"	
+-1000003754	InlineTextBox	"A curated collection of awesome video "	
+-1000003755	InlineTextBox	"resources, tools, and technologies for "	
+-1000003756	InlineTextBox	"developers and content creators"	
+-1000003757	InlineTextBox	"INDEXED"	
+-1000003758	InlineTextBox	"1,949"	
+-1000003759	InlineTextBox	"9"	
+-1000003760	InlineTextBox	" categories"	
+-1000003761	InlineTextBox	"\n"	
+-1000003762	InlineTextBox	"18"	
+-1000003763	InlineTextBox	" subcategories"	
+-1000003764	InlineTextBox	"\n"	
+7535	StaticText	"live"	
+7536	StaticText	"EXPLORE"	
+-1000003767	InlineTextBox	"SOURCE"	
+-1000003768	InlineTextBox	"krzemienski"	
+-1000003769	InlineTextBox	"/"	
+-1000003770	InlineTextBox	"awesome-video"	
+-1000003771	InlineTextBox	"Open-source."	
+7561	StaticText	"PRs welcome"	
+-1000003773	InlineTextBox	"."	
+-1000003774	InlineTextBox	"\n"	
+-1000003775	InlineTextBox	"Indexed automatically from "	
+-1000003776	InlineTextBox	"README.md"	
+-1000003777	InlineTextBox	"."	
+7571	StaticText	"About"	
+7572	StaticText	"Terms"	
+7573	StaticText	"Privacy"	
+7574	StaticText	"Conduct"	
+7575	StaticText	"Issues ↗"	
+7576	StaticText	"Sitemap"	
+-1000003709	InlineTextBox	"Home"	
+-1000003710	InlineTextBox	"CATEGORIES"	
+-1000003711	InlineTextBox	" "	
+-1000003712	InlineTextBox	"· 9"	
+7470	StaticText	"Community & Events"	
+7472	StaticText	"91"	
+7474	StaticText	"Encoding & Codecs"	
+7476	StaticText	"372"	
+7477	StaticText	"All in "	
+7478	StaticText	"Encoding & Codecs"	
+7479	StaticText	" →"	
+7196	link	"Codecs 27 resources"	focusable=true
+7199	button	"Expand 3 nested groups in Codecs"	focusable=true expanded=false
+7206	link	"Encoding Tools 225 resources"	focusable=true
+7209	button	"Expand 1 nested group in Encoding Tools"	focusable=true expanded=false
+7215	generic	""	
+7216	generic	"120 resources"	
+7491	StaticText	"General Tools"	
+7492	StaticText	"95"	
+7494	StaticText	"Infrastructure & Delivery"	
+7496	StaticText	"183"	
+7498	StaticText	"Intro & Learning"	
+7499	StaticText	"227"	
+7501	StaticText	"Media Tools"	
+7503	StaticText	"304"	
+7505	StaticText	"Players & Clients"	
+7507	StaticText	"263"	
+7509	StaticText	"Protocols & Transport"	
+7511	StaticText	"242"	
+7513	StaticText	"Standards & Industry"	
+7515	StaticText	"172"	
+7518	generic	""	
+7363	link	"Home"	focusable=true
+7368	link	"Encoding & Codecs"	disabled=true
+-1000003746	InlineTextBox	"OFFLINE"	
+-1000003747	InlineTextBox	"You're offline"	
+-1000003750	InlineTextBox	"Still offline — reconnect and try again."	
+-1000003751	InlineTextBox	"Retry"	
+-1000003765	InlineTextBox	"live"	
+-1000003766	InlineTextBox	"EXPLORE"	
+-1000003772	InlineTextBox	"PRs welcome"	
+-1000003783	InlineTextBox	"About"	
+-1000003784	InlineTextBox	"Terms"	
+-1000003785	InlineTextBox	"Privacy"	
+-1000003786	InlineTextBox	"Conduct"	
+-1000003787	InlineTextBox	"Issues ↗"	
+-1000003788	InlineTextBox	"Sitemap"	
+-1000003713	InlineTextBox	"Community & Events"	
+-1000003714	InlineTextBox	"91"	
+-1000003715	InlineTextBox	"Encoding & Codecs"	
+-1000003716	InlineTextBox	"372"	
+-1000003717	InlineTextBox	"All in "	
+-1000003718	InlineTextBox	"Encoding & Codecs"	
+-1000003719	InlineTextBox	" →"	
+7480	StaticText	"Codecs"	
+7198	generic	"27 resources"	
+7201	image	""	
+7484	StaticText	"Encoding Tools"	
+7208	generic	"225 resources"	
+7211	image	""	
+7488	StaticText	"Uncategorized"	
+7489	StaticText	"120"	
+-1000003726	InlineTextBox	"General Tools"	
+-1000003727	InlineTextBox	"95"	
+-1000003728	InlineTextBox	"Infrastructure & Delivery"	
+-1000003729	InlineTextBox	"Infrastructure & Deli"	
+-1000003730	InlineTextBox	"…"	
+-1000003731	InlineTextBox	"183"	
+-1000003732	InlineTextBox	"Intro & Learning"	
+-1000003733	InlineTextBox	"227"	
+-1000003734	InlineTextBox	"Media Tools"	
+-1000003735	InlineTextBox	"304"	
+-1000003736	InlineTextBox	"Players & Clients"	
+-1000003737	InlineTextBox	"263"	
+-1000003738	InlineTextBox	"Protocols & Transport"	
+-1000003739	InlineTextBox	"242"	
+-1000003740	InlineTextBox	"Standards & Industry"	
+-1000003741	InlineTextBox	"172"	
+7519	StaticText	"Home"	
+7520	StaticText	"Encoding & Codecs"	
+-1000003720	InlineTextBox	"Codecs"	
+7481	StaticText	"27"	
+-1000003722	InlineTextBox	"Encoding Tools"	
+7485	StaticText	"225"	
+-1000003724	InlineTextBox	"Uncategorized"	
+-1000003725	InlineTextBox	"120"	
+-1000003744	InlineTextBox	"Home"	
+-1000003745	InlineTextBox	"Encoding & Codecs"	
+-1000003721	InlineTextBox	"27"	
+-1000003723	InlineTextBox	"225"	

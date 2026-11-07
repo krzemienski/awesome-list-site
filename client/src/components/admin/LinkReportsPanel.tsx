@@ -14,6 +14,7 @@ import {
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime, maskEmail } from "@/lib/utils";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 type ReportStatus = "open" | "resolved" | "dismissed";
 
@@ -61,7 +62,7 @@ export default function LinkReportsPanel() {
     onMutate: () => setActionError(null),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/link-reports"] }),
     onError: (error) =>
-      setActionError(error instanceof Error ? error.message : "The report could not be updated."),
+      setActionError(describeWriteError(error, { fallback: "The report could not be updated.", outcome: NOTHING_CHANGED_OUTCOME })),
   });
 
   const reports = reportsQuery.data?.reports ?? [];
@@ -122,14 +123,14 @@ export default function LinkReportsPanel() {
               return (
                 <li key={key} className="py-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between" data-testid={`link-report-${key}`}>
                   <div className="min-w-0 space-y-1">
-                    <Link href={`/resource/${report.resourceId}`} className="font-medium underline-offset-4 hover:underline">
+                    <Link href={`/resource/${report.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center font-medium underline-offset-4 hover:underline">
                       {report.resourceTitle}
                     </Link>
                     <a
                       href={report.resourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mono block text-xs text-muted-foreground break-all hover:underline"
+                      className="mono flex min-h-6 max-lg:min-h-11 items-center text-xs text-muted-foreground break-all hover:underline"
                     >
                       {report.resourceUrl}
                     </a>

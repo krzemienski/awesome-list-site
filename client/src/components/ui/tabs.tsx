@@ -14,9 +14,18 @@ const Tabs = React.forwardRef<
 >(({ value, defaultValue, onValueChange, ...props }, ref) => {
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue)
   const currentValue = value ?? uncontrolledValue
+  // Radix Tabs ≥1.2 focuses a trigger on mousedown before activating it, and in
+  // automatic mode that focus already activates it, so one click reports the
+  // same value twice within a single task. Drop the repeat.
+  const pendingValueRef = React.useRef<string | null>(null)
 
   const handleValueChange = React.useCallback(
     (next: string) => {
+      if (pendingValueRef.current === next) return
+      pendingValueRef.current = next
+      queueMicrotask(() => {
+        pendingValueRef.current = null
+      })
       if (value === undefined) setUncontrolledValue(next)
       onValueChange?.(next)
     },

@@ -1,0 +1,200 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - 'region "Research run #73" [ref=e121]':
+                      - generic [ref=e122]:
+                        - generic [ref=e123]:
+                          - 'heading "Research run #73" [level=3] [ref=e124]'
+                          - paragraph [ref=e125]: All categories
+                        - generic [ref=e127]:
+                          - img [ref=e128]
+                          - text: Completed
+                      - paragraph [ref=e131]
+                      - generic [ref=e132]:
+                        - list "Run phases" [ref=e133]:
+                          - listitem [ref=e134]:
+                            - generic [ref=e136]: Planning
+                            - generic [ref=e138]: (not reached)
+                          - listitem [ref=e139]:
+                            - generic [ref=e141]: Scouting
+                            - generic [ref=e143]: (not reached)
+                          - listitem [ref=e144]:
+                            - generic [ref=e146]: Verifying
+                            - generic [ref=e148]: (not reached)
+                          - listitem [ref=e149]:
+                            - generic [ref=e151]: Saving
+                            - generic [ref=e153]: (not reached)
+                          - listitem [ref=e154]:
+                            - generic [ref=e157]:
+                              - text: Done
+                              - generic [ref=e158]: now
+                            - generic [ref=e159]: (current)
+                        - heading "Scouts none ran" [level=4] [ref=e161]:
+                          - img [ref=e162]
+                          - text: Scouts
+                          - generic [ref=e165]: none ran
+                      - generic [ref=e166]:
+                        - generic [ref=e167]:
+                          - term [ref=e168]: Discoveries
+                          - definition [ref=e169]: 0 of 10 saved
+                          - progressbar "Discoveries saved against the target" [ref=e170]
+                        - generic [ref=e172]:
+                          - term [ref=e173]: Turns
+                          - definition [ref=e174]: 155 of 200
+                          - progressbar "Turns used against the cap" [ref=e175]
+                        - generic [ref=e177]:
+                          - term [ref=e178]: Spend
+                          - definition [ref=e179]: $5.4603 of $8.00
+                          - progressbar "Spend against the budget cap" [ref=e180]
+                      - note [ref=e182]:
+                        - img [ref=e183]
+                        - paragraph [ref=e187]: Run finished without saving a discovery. Relaunch with a different focus or brief.
+                      - region "Review discoveries" [ref=e188]:
+                        - heading "Review discoveries" [level=4] [ref=e189]
+                        - paragraph [ref=e190]: This run saved no discoveries.
+                        - generic [ref=e191]:
+                          - button "Done — go to job history" [ref=e192] [cursor=pointer]:
+                            - img
+                            - text: Done — go to job history
+                          - button "Start another run" [ref=e193] [cursor=pointer]:
+                            - img
+                            - text: Start another run
+                      - 'button "Run details: raw event log and agent graph" [ref=e195] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e196]:
+                      - generic [ref=e198]:
+                        - heading "Researcher jobs" [level=2] [ref=e199]
+                        - paragraph [ref=e200]: Recent agentic research runs
+                      - region "Researcher jobs table, scrollable" [ref=e202]:
+                        - table [ref=e203]:
+                          - rowgroup [ref=e204]:
+                            - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e205]:
+                              - columnheader "Status" [ref=e206]
+                              - columnheader "Prompt" [ref=e207]
+                              - columnheader "Found" [ref=e208]
+                              - columnheader "Approved / Rejected" [ref=e209]
+                              - columnheader "Cost" [ref=e210]
+                              - columnheader "Turns" [ref=e211]
+                              - columnheader "Created" [ref=e212]
+                          - rowgroup
+                  - group [ref=e213]:
+                    - generic "All pending discoveries & full job history" [ref=e214] [cursor=pointer]

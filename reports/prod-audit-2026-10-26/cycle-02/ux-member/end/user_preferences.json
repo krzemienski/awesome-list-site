@@ -1,0 +1,33 @@
+{
+ "homeLayout": "index",
+ "preferences": {
+  "createdAt": "2026-10-06T10:29:42.445Z",
+  "homeLayout": "index",
+  "id": 10,
+  "learningGoals": [
+   "learn-fundamentals"
+  ],
+  "onboardingCompletedAt": "2026-10-13T02:16:20.395Z",
+  "onboardingDismissedAt": null,
+  "onboardingStatus": "completed",
+  "onboardingStep": 5,
+  "preferredCategories": [
+   "Encoding & Codecs"
+  ],
+  "preferredResourceTypes": [
+   "video"
+  ],
+  "revision": 41,
+  "skillLevel": "beginner",
+  "themeAccent": "crimson",
+  "themeSystem": "editorial",
+  "timeCommitment": "flexible",
+  "updatedAt": "2026-10-26T17:29:07.972Z",
+  "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4"
+ },
+ "revision": 41,
+ "theme": {
+  "accentId": "crimson",
+  "systemId": "editorial"
+ }
+}

@@ -1,0 +1,164 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Enrichment" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [selected] [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Enrichment" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e120]:
+                      - article [ref=e121]:
+                        - generic [ref=e122]: Last enriched
+                        - generic [ref=e123]: —
+                        - generic [ref=e124]: unavailable
+                      - article [ref=e125]:
+                        - generic [ref=e126]: Queue
+                        - generic [ref=e127]: —
+                        - generic [ref=e128]: unavailable
+                      - article [ref=e129]:
+                        - generic [ref=e130]: Avg cost
+                        - generic [ref=e131]: —
+                        - generic [ref=e132]: per batch
+                    - generic [ref=e133]:
+                      - generic [ref=e134]:
+                        - generic [ref=e135]:
+                          - heading "Enrichment jobs" [level=2] [ref=e136]
+                          - paragraph [ref=e137]: LLM-driven metadata enhancement
+                        - generic [ref=e138]:
+                          - button "Run job" [disabled]:
+                            - img
+                            - text: Run job
+                      - region "Enrichment jobs table, scrollable" [ref=e140]:
+                        - table [ref=e141]:
+                          - rowgroup [ref=e142]:
+                            - row "Job Status Started Completed Actions" [ref=e143]:
+                              - columnheader "Job" [ref=e144]
+                              - columnheader "Status" [ref=e145]
+                              - columnheader "Started" [ref=e146]
+                              - columnheader "Completed" [ref=e147]
+                              - columnheader "Actions" [ref=e148]:
+                                - generic [ref=e149]: Actions
+                          - rowgroup
+                        - alert [ref=e150]:
+                          - img [ref=e151]
+                          - paragraph [ref=e153]: Couldn't load enrichment jobs
+                          - generic [ref=e154]:
+                            - generic [ref=e155]: Could not reach the server. Please check your connection and try again.
+                            - button "Retry" [ref=e156] [cursor=pointer]:
+                              - img
+                              - text: Retry
+                  - group [ref=e157]:
+                    - generic "Job controls & monitoring" [ref=e158] [cursor=pointer]

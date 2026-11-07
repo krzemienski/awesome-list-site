@@ -1,0 +1,325 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e37]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e18]
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [selected, ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+          - tabpanel "Audit" [ref=e17] focusable [tabindex]
+            - generic
+              - sectionheader
+                - heading "Audit log" [level=2, ref=e39]
+                - paragraph
+                  - StaticText "Append-only · 25 events per page"
+                - button "Tools" [expanded=false, ref=e40]
+              - region "Audit log table, scrollable" [ref=e41] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID" [ref=e217]
+                      - columnheader "ACTOR" [ref=e218]
+                      - columnheader "ACTION" [ref=e219]
+                      - columnheader "TARGET" [ref=e220]
+                      - columnheader "STATUS" [ref=e221]
+                      - columnheader "WHEN" [ref=e222]
+                  - row "View details for audit entry 27499" [ref=e42] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27499 View details for audit entry 27499" [ref=e67]
+                      - StaticText "TX#27499"
+                      - button "View details for audit entry 27499" [ref=e223]
+                    - cell "a•••@example.com" [ref=e68]
+                    - cell "categories exported" [ref=e69]
+                    - cell "Admin exported the category tree (OPML, 3825 resources)" [ref=e70]
+                    - cell "COMPLETED" [ref=e71]
+                    - cell "2h ago" [ref=e72]
+                  - row "View details for audit entry 27498" [ref=e43] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27498 View details for audit entry 27498" [ref=e73]
+                      - StaticText "TX#27498"
+                      - button "View details for audit entry 27498" [ref=e224]
+                    - cell "a•••@example.com" [ref=e74]
+                    - cell "database exported" [ref=e75]
+                    - cell "Admin exported non-restorable catalog JSON snapshot (4017 resources, 133 user summaries)" [ref=e76]
+                    - cell "COMPLETED" [ref=e77]
+                    - cell "2h ago" [ref=e78]
+                  - row "View details for audit entry 27497" [ref=e44] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27497 View details for audit entry 27497" [ref=e79]
+                      - StaticText "TX#27497"
+                      - button "View details for audit entry 27497" [ref=e225]
+                    - cell "a•••@example.com" [ref=e80]
+                    - cell "category deleted" [ref=e81]
+                    - cell "Deleted category: [QA-audit-1026] c5 category renamed" [ref=e82]
+                    - cell "COMPLETED" [ref=e83]
+                    - cell "2h ago" [ref=e84]
+                  - row "View details for audit entry 27496" [ref=e45] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27496 View details for audit entry 27496" [ref=e85]
+                      - StaticText "TX#27496"
+                      - button "View details for audit entry 27496" [ref=e226]
+                    - cell "a•••@example.com" [ref=e86]
+                    - cell "subcategory deleted" [ref=e87]
+                    - cell "Deleted subcategory: [QA-audit-1026] c5 subcategory" [ref=e88]
+                    - cell "COMPLETED" [ref=e89]
+                    - cell "2h ago" [ref=e90]
+                  - row "View details for audit entry 27495" [ref=e46] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27495 View details for audit entry 27495" [ref=e91]
+                      - StaticText "TX#27495"
+                      - button "View details for audit entry 27495" [ref=e227]
+                    - cell "a•••@example.com" [ref=e92]
+                    - cell "sub subcategory deleted" [ref=e93]
+                    - cell "Deleted sub-subcategory: [QA-audit-1026] c5 subsub" [ref=e94]
+                    - cell "COMPLETED" [ref=e95]
+                    - cell "2h ago" [ref=e96]
+                  - row "View details for audit entry 27494" [ref=e47] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27494 View details for audit entry 27494" [ref=e97]
+                      - StaticText "TX#27494"
+                      - button "View details for audit entry 27494" [ref=e228]
+                    - cell "a•••@example.com" [ref=e98]
+                    - cell "sub subcategory created" [ref=e99]
+                    - cell "Created sub-subcategory: [QA-audit-1026] c5 subsub under [QA-audit-1026] c5 subcategory" [ref=e100]
+                    - cell "COMPLETED" [ref=e101]
+                    - cell "2h ago" [ref=e102]
+                  - row "View details for audit entry 27493" [ref=e48] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27493 View details for audit entry 27493" [ref=e103]
+                      - StaticText "TX#27493"
+                      - button "View details for audit entry 27493" [ref=e229]
+                    - cell "a•••@example.com" [ref=e104]
+                    - cell "subcategory created" [ref=e105]
+                    - cell "Created subcategory: [QA-audit-1026] c5 subcategory under [QA-audit-1026] c5 category renamed" [ref=e106]
+                    - cell "COMPLETED" [ref=e107]
+                    - cell "2h ago" [ref=e108]
+                  - row "View details for audit entry 27492" [ref=e49] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27492 View details for audit entry 27492" [ref=e109]
+                      - StaticText "TX#27492"
+                      - button "View details for audit entry 27492" [ref=e230]
+                    - cell "a•••@example.com" [ref=e110]
+                    - cell "category updated" [ref=e111]
+                    - cell "Updated category: [QA-audit-1026] c5 category" [ref=e112]
+                    - cell "COMPLETED" [ref=e113]
+                    - cell "2h ago" [ref=e114]
+                  - row "View details for audit entry 27491" [ref=e50] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27491 View details for audit entry 27491" [ref=e115]
+                      - StaticText "TX#27491"
+                      - button "View details for audit entry 27491" [ref=e231]
+                    - cell "a•••@example.com" [ref=e116]
+                    - cell "category updated" [ref=e117]
+                    - cell "Updated category: [QA-audit-1026] c5 category" [ref=e118]
+                    - cell "COMPLETED" [ref=e119]
+                    - cell "2h ago" [ref=e120]
+                  - row "View details for audit entry 27490" [ref=e51] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27490 View details for audit entry 27490" [ref=e121]
+                      - StaticText "TX#27490"
+                      - button "View details for audit entry 27490" [ref=e232]
+                    - cell "a•••@example.com" [ref=e122]
+                    - cell "category updated" [ref=e123]
+                    - cell "Updated category: [QA-audit-1026] c5 category" [ref=e124]
+                    - cell "COMPLETED" [ref=e125]
+                    - cell "2h ago" [ref=e126]
+                  - row "View details for audit entry 27489" [ref=e52] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27489 View details for audit entry 27489" [ref=e127]
+                      - StaticText "TX#27489"
+                      - button "View details for audit entry 27489" [ref=e233]
+                    - cell "a•••@example.com" [ref=e128]
+                    - cell "resources exported" [ref=e129]
+                    - cell "Admin exported 4017 resources (CSV)" [ref=e130]
+                    - cell "COMPLETED" [ref=e131]
+                    - cell "2h ago" [ref=e132]
+                  - row "View details for audit entry 27488" [ref=e53] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27488 View details for audit entry 27488" [ref=e133]
+                      - StaticText "TX#27488"
+                      - button "View details for audit entry 27488" [ref=e234]
+                    - cell "a•••@example.com" [ref=e134]
+                    - cell "recommendation feedback restored" [ref=e135]
+                    - cell "#189969" [ref=e136]
+                    - cell "COMPLETED" [ref=e137]
+                    - cell "2h ago" [ref=e138]
+                  - row "View details for audit entry 27487" [ref=e54] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27487 View details for audit entry 27487" [ref=e139]
+                      - StaticText "TX#27487"
+                      - button "View details for audit entry 27487" [ref=e235]
+                    - cell "a•••@example.com" [ref=e140]
+                    - cell "category updated" [ref=e141]
+                    - cell "Updated category: [QA-audit-1026] c5 category" [ref=e142]
+                    - cell "COMPLETED" [ref=e143]
+                    - cell "2h ago" [ref=e144]
+                  - row "View details for audit entry 27486" [ref=e55] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27486 View details for audit entry 27486" [ref=e145]
+                      - StaticText "TX#27486"
+                      - button "View details for audit entry 27486" [ref=e236]
+                    - cell "a•••@example.com" [ref=e146]
+                    - cell "recommendation feedback hidden" [ref=e147]
+                    - cell "#189969" [ref=e148]
+                    - cell "COMPLETED" [ref=e149]
+                    - cell "2h ago" [ref=e150]
+                  - row "View details for audit entry 27485" [ref=e56] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27485 View details for audit entry 27485" [ref=e151]
+                      - StaticText "TX#27485"
+                      - button "View details for audit entry 27485" [ref=e237]
+                    - cell "a•••@example.com" [ref=e152]
+                    - cell "categories exported" [ref=e153]
+                    - cell "Admin exported the category tree (OPML, 3825 resources)" [ref=e154]
+                    - cell "COMPLETED" [ref=e155]
+                    - cell "2h ago" [ref=e156]
+                  - row "View details for audit entry 27484" [ref=e57] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27484 View details for audit entry 27484" [ref=e157]
+                      - StaticText "TX#27484"
+                      - button "View details for audit entry 27484" [ref=e238]
+                    - cell "a•••@example.com" [ref=e158]
+                    - cell "catalog exported" [ref=e159]
+                    - cell "Admin exported 3825 catalog rows as awesome-list markdown" [ref=e160]
+                    - cell "COMPLETED" [ref=e161]
+                    - cell "2h ago" [ref=e162]
+                  - row "View details for audit entry 27483" [ref=e58] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27483 View details for audit entry 27483" [ref=e163]
+                      - StaticText "TX#27483"
+                      - button "View details for audit entry 27483" [ref=e239]
+                    - cell "a•••@example.com" [ref=e164]
+                    - cell "resources exported" [ref=e165]
+                    - cell "Admin exported 4017 resources (CSV)" [ref=e166]
+                    - cell "COMPLETED" [ref=e167]
+                    - cell "2h ago" [ref=e168]
+                  - row "View details for audit entry 27482" [ref=e59] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27482 View details for audit entry 27482" [ref=e169]
+                      - StaticText "TX#27482"
+                      - button "View details for audit entry 27482" [ref=e240]
+                    - cell "a•••@example.com" [ref=e170]
+                    - cell "database exported" [ref=e171]
+                    - cell "Admin exported non-restorable catalog JSON snapshot (4017 resources, 133 user summaries)" [ref=e172]
+                    - cell "COMPLETED" [ref=e173]
+                    - cell "2h ago" [ref=e174]
+                  - row "View details for audit entry 27481" [ref=e60] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27481 View details for audit entry 27481" [ref=e175]
+                      - StaticText "TX#27481"
+                      - button "View details for audit entry 27481" [ref=e241]
+                    - cell "a•••@example.com" [ref=e176]
+                    - cell "category created" [ref=e177]
+                    - cell "Created category: [QA-audit-1026] c5 category" [ref=e178]
+                    - cell "COMPLETED" [ref=e179]
+                    - cell "2h ago" [ref=e180]
+                  - row "View details for audit entry 27480" [ref=e61] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27480 View details for audit entry 27480" [ref=e181]
+                      - StaticText "TX#27480"
+                      - button "View details for audit entry 27480" [ref=e242]
+                    - cell "a•••@example.com" [ref=e182]
+                    - cell "deleted" [ref=e183]
+                    - cell "[QA-audit-1026] c5 admin-content resource" [ref=e184]
+                    - cell "COMPLETED" [ref=e185]
+                    - cell "2h ago" [ref=e186]
+                  - row "View details for audit entry 27479" [ref=e62] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27479 View details for audit entry 27479" [ref=e187]
+                      - StaticText "TX#27479"
+                      - button "View details for audit entry 27479" [ref=e243]
+                    - cell "a•••@example.com" [ref=e188]
+                    - cell "updated" [ref=e189]
+                    - cell "#190357" [ref=e190]
+                    - cell "COMPLETED" [ref=e191]
+                    - cell "2h ago" [ref=e192]
+                  - row "View details for audit entry 27478" [ref=e63] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27478 View details for audit entry 27478" [ref=e193]
+                      - StaticText "TX#27478"
+                      - button "View details for audit entry 27478" [ref=e244]
+                    - cell "a•••@example.com" [ref=e194]
+                    - cell "updated" [ref=e195]
+                    - cell "#190357" [ref=e196]
+                    - cell "COMPLETED" [ref=e197]
+                    - cell "2h ago" [ref=e198]
+                  - row "View details for audit entry 27477" [ref=e64] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27477 View details for audit entry 27477" [ref=e199]
+                      - StaticText "TX#27477"
+                      - button "View details for audit entry 27477" [ref=e245]
+                    - cell "a•••@example.com" [ref=e200]
+                    - cell "created" [ref=e201]
+                    - cell "[QA-audit-1026] c5 admin-content resource" [ref=e202]
+                    - cell "COMPLETED" [ref=e203]
+                    - cell "2h ago" [ref=e204]
+                  - row "View details for audit entry 27476" [ref=e65] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27476 View details for audit entry 27476" [ref=e205]
+                      - StaticText "TX#27476"
+                      - button "View details for audit entry 27476" [ref=e246]
+                    - cell "a•••@example.com" [ref=e206]
+                    - cell "deleted" [ref=e207]
+                    - cell "[QA-audit-1026] c5 member submit" [ref=e208]
+                    - cell "COMPLETED" [ref=e209]
+                    - cell "2h ago" [ref=e210]
+                  - row "View details for audit entry 27475" [ref=e66] clickable [cursor:pointer, onclick, tabindex]
+                    - cell "TX#27475 View details for audit entry 27475" [ref=e211]
+                      - StaticText "TX#27475"
+                      - button "View details for audit entry 27475" [ref=e247]
+                    - cell "a•••@example.com" [ref=e212]
+                    - cell "withdrawn" [ref=e213]
+                    - cell "#190356" [ref=e214]
+                    - cell "COMPLETED" [ref=e215]
+                    - cell "3h ago" [ref=e216]
+              - paragraph
+                - StaticText "1–25 of 16,829 entries"
+              - button "Previous" [disabled, ref=e35]
+              - button "Next" [ref=e36]

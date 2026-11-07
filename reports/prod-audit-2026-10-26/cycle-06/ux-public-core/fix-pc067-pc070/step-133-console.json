@@ -1,0 +1,788 @@
+{
+  "entries": [
+    {
+      "seq": 1,
+      "ts": 1793085691232.284,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 2,
+      "ts": 1793085691238.437,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 3,
+      "ts": 1793085691334.018,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 4,
+      "ts": 1793085701032.318,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 5,
+      "ts": 1793085701044.318,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 6,
+      "ts": 1793085701070.907,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 7,
+      "ts": 1793085701348.399,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 8,
+      "ts": 1793085701366.016,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 9,
+      "ts": 1793085701374.035,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 10,
+      "ts": 1793085701474.606,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 11,
+      "ts": 1793085701499.618,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 12,
+      "ts": 1793085701506.62,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 14,
+      "ts": 1793085789856.269,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 15,
+      "ts": 1793085789878.56,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 16,
+      "ts": 1793085789883.345,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 18,
+      "ts": 1793085808116.737,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 19,
+      "ts": 1793085808146.494,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 20,
+      "ts": 1793085808199.91,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 21,
+      "ts": 1793085808356.262,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 22,
+      "ts": 1793085808378.701,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 23,
+      "ts": 1793085808427.723,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 25,
+      "ts": 1793085820015.815,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 26,
+      "ts": 1793085820041.369,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 27,
+      "ts": 1793085820052.218,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 28,
+      "ts": 1793085820325.498,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 29,
+      "ts": 1793085820340.6,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 30,
+      "ts": 1793085820398.062,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 31,
+      "ts": 1793085881204.173,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 32,
+      "ts": 1793085881221.689,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 33,
+      "ts": 1793085881304.412,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 34,
+      "ts": 1793085897497.498,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 35,
+      "ts": 1793085897520.324,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 36,
+      "ts": 1793085897547.632,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 37,
+      "ts": 1793085898078.97,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 38,
+      "ts": 1793085898099.455,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 39,
+      "ts": 1793085898120.84,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 40,
+      "ts": 1793085911516.245,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 41,
+      "ts": 1793085911550.293,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 42,
+      "ts": 1793085911577.551,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 43,
+      "ts": 1793085923636.232,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 44,
+      "ts": 1793085923655.192,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 45,
+      "ts": 1793085923732.204,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 46,
+      "ts": 1793085936939.507,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 47,
+      "ts": 1793085936959.237,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 48,
+      "ts": 1793085936971.879,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 49,
+      "ts": 1793085937490.527,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 50,
+      "ts": 1793085937509.929,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 51,
+      "ts": 1793085937609.092,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 52,
+      "ts": 1793085957864.967,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 53,
+      "ts": 1793085957902.428,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 54,
+      "ts": 1793085957911.124,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 55,
+      "ts": 1793085976246.004,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 56,
+      "ts": 1793085976257.815,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 57,
+      "ts": 1793085976290.537,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 58,
+      "ts": 1793085976544.554,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 59,
+      "ts": 1793085976566.845,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 60,
+      "ts": 1793085976608.417,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 61,
+      "ts": 1793085988232.647,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 62,
+      "ts": 1793085988244.716,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 63,
+      "ts": 1793085988293.171,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 64,
+      "ts": 1793086002191.711,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 65,
+      "ts": 1793086002202.211,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 66,
+      "ts": 1793086002233.735,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 67,
+      "ts": 1793086002740.109,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 68,
+      "ts": 1793086002766.912,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 69,
+      "ts": 1793086002797.464,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 70,
+      "ts": 1793086014701.866,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5067/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 71,
+      "ts": 1793086014733.428,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5067/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 72,
+      "ts": 1793086014750.836,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5067/@fs/private/tmp/awesome-list-c6-taxonomy-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=ecc22f73:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    }
+  ],
+  "nextSeq": 72,
+  "dropped": 0
+}

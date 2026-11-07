@@ -1,0 +1,126 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e41]: Authorized admin area
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - generic [ref=e48]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e49]:
+                  - text: Operations
+                  - emphasis [ref=e50]: dashboard
+                - paragraph [ref=e51]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e52]:
+                - button "Settings, Digests section open" [active] [ref=e53] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                  - generic [ref=e54]: · Digests
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]: Digests section open
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Digests" [ref=e113]:
+                - article [ref=e114]:
+                  - generic [ref=e115]:
+                    - generic [ref=e116]:
+                      - img [ref=e117]
+                      - text: Digest delivery health
+                    - paragraph [ref=e119]: Aggregate transport and queue signals only. No message contents, user data, recipient identifiers, or secret tokens are shown.
+                    - generic [ref=e120]:
+                      - paragraph [ref=e121]: Refreshes every 30s
+                      - button "Refresh" [disabled] [ref=e122]:
+                        - img
+                        - text: Refresh

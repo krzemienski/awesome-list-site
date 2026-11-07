@@ -1,0 +1,180 @@
+{
+  "favorites": [
+    186357,
+    185551
+  ],
+  "bookmarks": [
+    {
+      "id": 184751,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 186231,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 186477,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 184763,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 186609,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 186212,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 184789,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 184838,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 185574,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 187911,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 186145,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    },
+    {
+      "id": 184847,
+      "queueStatus": "saved",
+      "tags": [],
+      "collections": []
+    }
+  ],
+  "collections": [],
+  "preferences": {
+    "revision": 58,
+    "skill": "beginner",
+    "topics": [
+      "Encoding & Codecs"
+    ],
+    "goals": [
+      "learn-fundamentals"
+    ],
+    "formats": [
+      "video"
+    ],
+    "time": "flexible",
+    "homeLayout": "index",
+    "theme": {
+      "systemId": "editorial",
+      "accentId": "crimson"
+    },
+    "onboarding": "completed",
+    "step": 5
+  },
+  "notifications": {
+    "emailDigestEnabled": false,
+    "inAppEnabled": false,
+    "includeNewResources": true,
+    "includeWatchNext": true,
+    "includeJourneyStep": true,
+    "cadence": "weekly",
+    "timezone": "America/New_York",
+    "pausedUntil": null,
+    "emailOptedInAt": "2026-10-27T07:16:48.676Z",
+    "emailUnsubscribedAt": "2026-10-27T07:17:24.297Z",
+    "inAppOptedInAt": "2026-10-27T07:16:48.676Z",
+    "updatedAt": "2026-10-27T07:18:27.990Z"
+  },
+  "journeys": [
+    {
+      "id": 9,
+      "current": 217,
+      "completed": [],
+      "completedAt": null
+    },
+    {
+      "id": 7,
+      "current": 198,
+      "completed": [
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        181,
+        182,
+        183
+      ],
+      "completedAt": "2026-10-06T10:42:26.853Z"
+    },
+    {
+      "id": 6,
+      "current": 165,
+      "completed": [
+        172,
+        175,
+        166,
+        167,
+        168,
+        169,
+        171
+      ],
+      "completedAt": null
+    },
+    {
+      "id": 10,
+      "current": 235,
+      "completed": [],
+      "completedAt": null
+    },
+    {
+      "id": 8,
+      "current": 201,
+      "completed": [],
+      "completedAt": null
+    }
+  ],
+  "activeQaKeys": [],
+  "inbox": {
+    "notifications": [],
+    "unreadCount": 0
+  }
+}

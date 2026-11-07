@@ -50,6 +50,8 @@ no PII (enforced by the shared sender's property hygiene).
 | `resource_viewed` | Resource detail opened | `resource_id`, extras from caller | `trackSelectContent('resource', …)` |
 | `resource_link_opened` | Outbound resource link clicked (palette, detail page, resource / taxonomy / home cards) | `resource_title`, `link_url`, `link_domain`, `category`, `surface` | `trackResourceClick` |
 | `resource_card_opened` | Card title / View Details clicked → detail page | `resource_id`, `surface`, `card_control` | `trackResourceCardOpened` |
+| `related_resource_opened` | Related Resources item clicked on a resource page | `resource_id`, `from_resource_id`, `position`, `match_score` | `trackRelatedResourceOpened` |
+| `related_category_opened` | "View all in …" clicked on a resource page | `from_resource_id`, `category` | `trackRelatedCategoryOpened` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category / subcategory / sub-subcategory page, once per resolved node | `category` | `TaxonomyListing` via `trackCategoryView` |
 | `sign_up_completed` | Clerk user is first provisioned into the application DB | `sign_up_method: 'clerk'`, acquisition, `tracked_from: 'server'` | **server** — Clerk JIT provisioning (`server/clerkAuth.ts`) |

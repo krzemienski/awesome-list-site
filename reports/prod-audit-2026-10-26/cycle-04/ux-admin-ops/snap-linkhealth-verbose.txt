@@ -1,0 +1,853 @@
+uid=148_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin/link-health"
+  uid=150_0 ignored
+    uid=150_1 generic
+      uid=150_2 generic
+        uid=148_1 region "Notifications (F8)"
+          uid=148_2 list
+        uid=150_3 ignored
+          uid=148_3 link "Skip to main content" url="https://awesome.video/admin/link-health#main"
+            uid=148_4 "Skip to main content"
+          uid=150_4 generic
+            uid=148_5 banner
+              uid=148_6 link "AWESOME.VIDEO home" url="https://awesome.video/"
+                uid=150_5 ignored
+                  uid=148_7 "AWESOME.VIDEO"
+                  uid=148_8 " home"
+              uid=150_6 ignored
+              uid=148_9 button "Search 3,825 resources"
+                uid=150_7 ignored
+                  uid=150_8 "Search 3,825 resources"
+              uid=148_10 navigation "Primary"
+                uid=148_11 link "Browse" url="https://awesome.video/categories"
+                  uid=148_12 "Browse"
+                uid=148_13 link "Submit" url="https://awesome.video/submit"
+                  uid=148_14 "Submit"
+                uid=148_15 link "About" url="https://awesome.video/about"
+                  uid=148_16 "About"
+                uid=148_17 link "Docs ↗" url="https://awesome.video/design-system"
+                  uid=148_18 "Docs ↗"
+                uid=148_19 link "Admin" url="https://awesome.video/admin"
+                  uid=148_20 "Admin"
+                  uid=150_9 ignored
+              uid=148_21 button "Admin, account menu" expandable haspopup="menu"
+                uid=150_10 ignored
+                  uid=150_11 "Admin"
+                  uid=150_12 ", account menu"
+            uid=150_13 generic
+              uid=150_14 ignored
+                uid=150_15 ignored
+              uid=150_16 ignored
+                uid=150_17 ignored
+              uid=150_18 ignored
+                uid=148_22 main
+                  uid=150_19 ignored
+                    uid=148_23 navigation "Breadcrumb"
+                      uid=150_20 list
+                        uid=150_21 listitem level="1"
+                          uid=148_24 link "Home" url="https://awesome.video/"
+                            uid=148_25 "Home"
+                        uid=150_22 listitem level="1"
+                          uid=148_26 link "Admin" url="https://awesome.video/admin"
+                            uid=148_27 "Admin"
+                        uid=150_23 listitem level="1"
+                          uid=150_24 link "Link Health" disableable disabled
+                            uid=148_28 "Link Health"
+                    uid=150_25 ignored
+                      uid=148_29 "Authorized admin area"
+                    uid=150_26 ignored
+                      uid=150_27 ignored
+                        uid=150_28 ignored
+                          uid=150_29 generic
+                            uid=150_30 ignored
+                              uid=148_30 "ADMIN CONSOLE · "
+                              uid=148_31 "ADMIN USER"
+                          uid=148_32 heading "Operations dashboard" level="1"
+                            uid=150_31 "Operations "
+                            uid=150_32 emphasis
+                              uid=150_33 "dashboard"
+                          uid=150_34 paragraph
+                            uid=148_33 "Manage the "
+                            uid=148_34 "3,825"
+                            uid=148_35 " resources, jobs, and contributors that keep the index alive."
+                        uid=150_35 ignored
+                          uid=148_36 button "Settings" expandable haspopup="menu"
+                            uid=150_36 image
+                            uid=150_37 "Settings"
+                          uid=148_37 button "New entry: add a resource" description="Add a new resource to the catalog"
+                            uid=150_38 image
+                            uid=150_39 "New entry"
+                      uid=148_38 status atomic live="polite" relevant="additions text"
+                      uid=150_40 ignored
+                        uid=150_41 generic
+                          uid=148_39 button "Scroll tabs left"
+                          uid=148_40 tablist "Admin sections" orientation="horizontal"
+                            uid=148_41 tab "Overview" selectable
+                              uid=150_42 ignored
+                                uid=150_43 ignored
+                                uid=150_44 ignored
+                                uid=150_45 ignored
+                                uid=150_46 ignored
+                              uid=150_47 "Overview"
+                            uid=148_42 tab "Approvals" selectable
+                              uid=150_48 ignored
+                                uid=150_49 ignored
+                              uid=150_50 "Approvals"
+                            uid=148_43 tab "Edits" selectable
+                              uid=150_51 ignored
+                                uid=150_52 ignored
+                                uid=150_53 ignored
+                                uid=150_54 ignored
+                                uid=150_55 ignored
+                                uid=150_56 ignored
+                                uid=150_57 ignored
+                              uid=150_58 "Edits"
+                            uid=148_44 tab "Enrichment" selectable
+                              uid=150_59 ignored
+                                uid=150_60 ignored
+                                uid=150_61 ignored
+                                uid=150_62 ignored
+                                uid=150_63 ignored
+                                uid=150_64 ignored
+                              uid=150_65 "Enrichment"
+                            uid=148_45 tab "Researcher" selectable
+                              uid=150_66 ignored
+                                uid=150_67 ignored
+                              uid=150_68 "Researcher"
+                            uid=148_46 tab "Export" selectable
+                              uid=150_69 ignored
+                                uid=150_70 ignored
+                                uid=150_71 ignored
+                              uid=150_72 "Export"
+                            uid=148_47 tab "Database" selectable
+                              uid=150_73 ignored
+                                uid=150_74 ignored
+                                uid=150_75 ignored
+                                uid=150_76 ignored
+                              uid=150_77 "Database"
+                            uid=148_48 tab "Resources" selectable
+                              uid=150_78 ignored
+                                uid=150_79 ignored
+                              uid=150_80 "Resources"
+                            uid=148_49 tab "Categories" selectable
+                              uid=150_81 ignored
+                                uid=150_82 ignored
+                                uid=150_83 ignored
+                                uid=150_84 ignored
+                                uid=150_85 ignored
+                                uid=150_86 ignored
+                                uid=150_87 ignored
+                              uid=150_88 "Categories"
+                            uid=148_50 tab "Subcategories" selectable
+                              uid=150_89 ignored
+                                uid=150_90 ignored
+                                uid=150_91 ignored
+                                uid=150_92 ignored
+                                uid=150_93 ignored
+                                uid=150_94 ignored
+                                uid=150_95 ignored
+                              uid=150_96 "Subcategories"
+                            uid=148_51 tab "Users" selectable
+                              uid=150_97 ignored
+                                uid=150_98 ignored
+                                uid=150_99 ignored
+                                uid=150_100 ignored
+                                uid=150_101 ignored
+                              uid=150_102 "Users"
+                            uid=148_52 tab "GitHub" selectable
+                              uid=150_103 ignored
+                                uid=150_104 ignored
+                                uid=150_105 ignored
+                              uid=150_106 "GitHub"
+                            uid=148_53 tab "Link Health" selectable selected
+                              uid=150_107 ignored
+                                uid=150_108 ignored
+                              uid=150_109 "Link Health"
+                            uid=148_54 tab "Audit" selectable
+                              uid=150_110 ignored
+                                uid=150_111 ignored
+                                uid=150_112 ignored
+                                uid=150_113 ignored
+                                uid=150_114 ignored
+                                uid=150_115 ignored
+                                uid=150_116 ignored
+                              uid=150_117 "Audit"
+                            uid=148_55 tab "Research" selectable
+                              uid=150_118 ignored
+                                uid=150_119 ignored
+                                uid=150_120 ignored
+                                uid=150_121 ignored
+                                uid=150_122 ignored
+                                uid=150_123 ignored
+                              uid=150_124 "Research"
+                          uid=148_56 button "Scroll tabs right"
+                        uid=148_57 tabpanel "Link Health"
+                          uid=150_125 generic
+                            uid=150_126 generic "Link health status summary"
+                              uid=150_127 generic
+                                uid=150_128 generic
+                                  uid=148_58 "Healthy"
+                                uid=150_129 generic
+                                  uid=148_59 "3,809"
+                              uid=150_130 generic
+                                uid=150_131 generic
+                                  uid=148_60 "Redirect"
+                                uid=150_132 generic
+                                  uid=148_61 "0"
+                              uid=150_133 generic
+                                uid=150_134 generic
+                                  uid=148_62 "Broken"
+                                uid=150_135 generic
+                                  uid=148_63 "11"
+                              uid=150_136 generic
+                                uid=150_137 generic
+                                  uid=148_64 "Timeout"
+                                uid=150_138 generic
+                                  uid=148_65 "0"
+                              uid=150_139 generic
+                                uid=150_140 generic
+                                  uid=148_66 "Suspect"
+                                uid=150_141 generic
+                                  uid=148_67 "2"
+                            uid=150_142 paragraph
+                              uid=148_68 "Counts are from scan #8 (Aug 4, 2026, 08:18 PM) for resources still in the catalog. When it finished, the scan recorded 12 broken; 11 of those resources are still listed."
+                            uid=150_143 article
+                              uid=150_144 ignored
+                                uid=150_145 heading "Member reports 0 open Open" level="2"
+                                  uid=150_146 ignored
+                                    uid=148_69 "Member reports"
+                                    uid=150_147 ignored
+                                      uid=148_70 "0"
+                                      uid=148_71 " open"
+                                  uid=148_72 combobox "Report status" expandable haspopup="listbox" value="Open"
+                                    uid=150_148 generic
+                                      uid=150_149 "Open"
+                                uid=150_150 generic
+                                  uid=148_73 "Links that signed-in members reported as broken from a resource page."
+                              uid=150_151 ignored
+                                uid=150_152 paragraph
+                                  uid=148_74 "No open reports."
+                            uid=150_153 article
+                              uid=150_154 ignored
+                                uid=149_0 heading "Link Health Summary COMPLETED" level="2"
+                                  uid=150_155 ignored
+                                    uid=150_156 image
+                                    uid=150_157 "Link Health Summary"
+                                  uid=150_158 ignored
+                                    uid=150_159 "COMPLETED"
+                                uid=150_160 generic
+                                  uid=149_1 "Last check: Aug 4, 2026, 08:18 PM"
+                              uid=150_161 ignored
+                                uid=150_162 paragraph
+                                  uid=149_2 "Scope: this check covered "
+                                  uid=149_3 "3,823"
+                                  uid=149_4 " approved resource URLs"
+                                  uid=149_5 " — the catalog has since grown to 3,825 approved resources, so run a new check for full coverage."
+                                uid=150_163 generic "Detailed link counts"
+                                  uid=150_164 ignored
+                                    uid=149_6 "Checked "
+                                    uid=149_7 "3,823"
+                                  uid=150_165 ignored
+                                    uid=149_8 "Healthy "
+                                    uid=149_9 "3,809"
+                                  uid=150_166 ignored
+                                    uid=149_10 "Broken "
+                                    uid=149_11 "11"
+                                  uid=150_167 ignored
+                                    uid=149_12 "Redirects "
+                                    uid=149_13 "0"
+                                  uid=150_168 ignored
+                                    uid=149_14 "Timeouts "
+                                    uid=149_15 "0"
+                                  uid=150_169 ignored
+                                    uid=149_16 "Suspect "
+                                    uid=149_17 "2"
+                                uid=150_170 paragraph
+                                  uid=149_18 "Checked is every link the scan covered. "
+                                  uid=149_19 "1"
+                                  uid=149_20 " of them belong to resources that are no longer listed, so Healthy plus the problem counts adds up to "
+                                  uid=149_21 "3,822"
+                                  uid=149_22 "."
+                                uid=150_171 ignored
+                                  uid=150_172 ignored
+                                    uid=150_173 generic
+                                      uid=149_23 "Health Percentage"
+                                    uid=150_174 generic
+                                      uid=149_24 "99.6"
+                                      uid=149_25 "%"
+                                  uid=149_26 button "Run Check Now"
+                                    uid=150_175 image
+                                    uid=150_176 "Run Check Now"
+                            uid=150_177 article
+                              uid=150_178 ignored
+                                uid=150_179 ignored
+                                  uid=150_180 image
+                                  uid=149_27 "Link Health Trends"
+                                uid=150_181 generic
+                                  uid=149_28 "Health status trends across the last "
+                                  uid=149_29 "6"
+                                  uid=149_30 " completed "
+                                  uid=149_31 "checks"
+                              uid=150_182 ignored
+                                uid=150_183 ignored
+                                  uid=150_184 generic
+                                    uid=150_185 SvgRoot
+                                      uid=150_186 generic
+                                        uid=149_32 "Jul 21, 2026, 03:47 AM"
+                                      uid=150_187 generic
+                                        uid=149_33 "Jul 21, 2026, 04:36 AM"
+                                      uid=150_188 generic
+                                        uid=149_34 "Aug 4, 2026, 12:54 AM"
+                                      uid=150_189 generic
+                                        uid=149_35 "Aug 4, 2026, 11:03 AM"
+                                      uid=150_190 generic
+                                        uid=149_36 "Aug 4, 2026, 12:21 PM"
+                                      uid=150_191 generic
+                                        uid=149_37 "Aug 4, 2026, 08:18 PM"
+                                      uid=150_192 generic
+                                        uid=149_38 "0"
+                                      uid=150_193 generic
+                                        uid=149_39 "25"
+                                      uid=150_194 generic
+                                        uid=149_40 "50"
+                                      uid=150_195 generic
+                                        uid=149_41 "75"
+                                      uid=150_196 generic
+                                        uid=149_42 "100"
+                                      uid=150_197 generic
+                                        uid=149_43 "Percentage (%)"
+                                    uid=150_198 generic
+                                      uid=150_199 list
+                                        uid=150_200 listitem level="1"
+                                          uid=150_201 image
+                                          uid=149_44 "Healthy"
+                                        uid=150_202 listitem level="1"
+                                          uid=150_203 image
+                                          uid=149_45 "Broken"
+                                        uid=150_204 listitem level="1"
+                                          uid=150_205 image
+                                          uid=149_46 "Redirects"
+                                        uid=150_206 listitem level="1"
+                                          uid=150_207 image
+                                          uid=149_47 "Timeouts"
+                            uid=150_208 generic
+                              uid=150_209 sectionheader
+                                uid=150_210 ignored
+                                  uid=148_75 heading "Recent failures" level="2"
+                                    uid=150_211 "Recent failures"
+                                  uid=150_212 paragraph
+                                    uid=148_76 "Broken, DNS and timeout failures plus links flagged for review from the last sweep"
+                                uid=150_213 ignored
+                                  uid=148_77 button "Run full check"
+                                    uid=150_214 "Run full check"
+                              uid=150_215 ignored
+                                uid=150_216 ignored
+                                  uid=150_217 generic
+                                    uid=148_78 region "Recent failures table, scrollable"
+                                      uid=150_218 table
+                                        uid=150_219 rowgroup
+                                          uid=150_220 row
+                                            uid=150_221 columnheader "RESOURCE"
+                                              uid=148_79 "RESOURCE"
+                                            uid=150_222 columnheader "URL"
+                                              uid=148_80 "URL"
+                                            uid=150_223 columnheader "STATUS"
+                                              uid=148_81 "STATUS"
+                                            uid=150_224 columnheader "LAST CHECKED"
+                                              uid=148_82 "LAST CHECKED"
+                                        uid=150_225 ignored
+                                          uid=150_226 row
+                                            uid=150_227 cell "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders Encoding & Codecs"
+                                              uid=148_83 link "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders" url="https://awesome.video/resource/189956"
+                                                uid=148_84 "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders"
+                                              uid=150_228 ignored
+                                                uid=148_85 "Encoding & Codecs"
+                                            uid=150_229 cell "https://iphome.hhi.de/marpe/download/spie-2017.pdf dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate"
+                                              uid=148_86 link "https://iphome.hhi.de/marpe/download/spie-2017.pdf" url="https://iphome.hhi.de/marpe/download/spie-2017.pdf"
+                                                uid=148_87 "https://iphome.hhi.de/marpe/download/spie-2017.pdf"
+                                              uid=150_230 generic
+                                                uid=148_88 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate"
+                                            uid=150_231 cell "BROKEN"
+                                              uid=148_89 "BROKEN"
+                                            uid=150_232 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_90 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_233 row
+                                            uid=150_234 cell "RTC.ON Conference Community & Events"
+                                              uid=148_91 link "RTC.ON Conference" url="https://awesome.video/resource/189570"
+                                                uid=148_92 "RTC.ON Conference"
+                                              uid=150_235 ignored
+                                                uid=148_93 "Community & Events"
+                                            uid=150_236 cell "https://rtcon.live/ redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)"
+                                              uid=148_94 link "https://rtcon.live/" url="https://rtcon.live/"
+                                                uid=148_95 "https://rtcon.live/"
+                                              uid=150_237 generic
+                                                uid=148_96 "redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)"
+                                            uid=150_238 cell "SUSPECT"
+                                              uid=148_97 "SUSPECT"
+                                            uid=150_239 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_98 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_240 row
+                                            uid=150_241 cell "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery Intro & Learning"
+                                              uid=148_99 link "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery" url="https://awesome.video/resource/189566"
+                                                uid=148_100 "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery"
+                                              uid=150_242 ignored
+                                                uid=148_101 "Intro & Learning"
+                                            uid=150_243 cell "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf dead: 404 confirmed under browser UA"
+                                              uid=148_102 link "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf" url="https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf"
+                                                uid=148_103 "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf"
+                                              uid=150_244 generic
+                                                uid=148_104 "dead: 404 confirmed under browser UA"
+                                            uid=150_245 cell "BROKEN"
+                                              uid=148_105 "BROKEN"
+                                            uid=150_246 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_106 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_247 row
+                                            uid=150_248 cell "RIST VidTrans2018 Technical Poster Protocols & Transport"
+                                              uid=148_107 link "RIST VidTrans2018 Technical Poster" url="https://awesome.video/resource/189475"
+                                                uid=148_108 "RIST VidTrans2018 Technical Poster"
+                                              uid=150_249 ignored
+                                                uid=148_109 "Protocols & Transport"
+                                            uid=150_250 cell "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf dead: 404 confirmed under browser UA"
+                                              uid=148_110 link "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf" url="https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf"
+                                                uid=148_111 "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf"
+                                              uid=150_251 generic
+                                                uid=148_112 "dead: 404 confirmed under browser UA"
+                                            uid=150_252 cell "BROKEN"
+                                              uid=148_113 "BROKEN"
+                                            uid=150_253 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_114 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_254 row
+                                            uid=150_255 cell "JVET VVC Trac — Conformance Bitstream Tracker General Tools"
+                                              uid=148_115 link "JVET VVC Trac — Conformance Bitstream Tracker" url="https://awesome.video/resource/189190"
+                                                uid=148_116 "JVET VVC Trac — Conformance Bitstream Tracker"
+                                              uid=150_256 ignored
+                                                uid=148_117 "General Tools"
+                                            uid=150_257 cell "https://jvet.hhi.fraunhofer.de/trac/vvc/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate"
+                                              uid=148_118 link "https://jvet.hhi.fraunhofer.de/trac/vvc/" url="https://jvet.hhi.fraunhofer.de/trac/vvc/"
+                                                uid=148_119 "https://jvet.hhi.fraunhofer.de/trac/vvc/"
+                                              uid=150_258 generic
+                                                uid=148_120 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate"
+                                            uid=150_259 cell "BROKEN"
+                                              uid=148_121 "BROKEN"
+                                            uid=150_260 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_122 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_261 row
+                                            uid=150_262 cell "HEVC Format Range Extensions (RExt) — Fraunhofer HHI Encoding & Codecs"
+                                              uid=148_123 link "HEVC Format Range Extensions (RExt) — Fraunhofer HHI" url="https://awesome.video/resource/189138"
+                                                uid=148_124 "HEVC Format Range Extensions (RExt) — Fraunhofer HHI"
+                                              uid=150_263 ignored
+                                                uid=148_125 "Encoding & Codecs"
+                                            uid=150_264 cell "https://hevc.hhi.fraunhofer.de/rext dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate"
+                                              uid=148_126 link "https://hevc.hhi.fraunhofer.de/rext" url="https://hevc.hhi.fraunhofer.de/rext"
+                                                uid=148_127 "https://hevc.hhi.fraunhofer.de/rext"
+                                              uid=150_265 generic
+                                                uid=148_128 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate"
+                                            uid=150_266 cell "BROKEN"
+                                              uid=148_129 "BROKEN"
+                                            uid=150_267 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_130 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_268 row
+                                            uid=150_269 cell "FOMS 2024 session notes — Common Media Library Community & Events"
+                                              uid=148_131 link "FOMS 2024 session notes — Common Media Library" url="https://awesome.video/resource/188897"
+                                                uid=148_132 "FOMS 2024 session notes — Common Media Library"
+                                              uid=150_270 ignored
+                                                uid=148_133 "Community & Events"
+                                            uid=150_271 cell "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary dead: 404 confirmed under browser UA"
+                                              uid=148_134 link "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary" url="https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary"
+                                                uid=148_135 "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary"
+                                              uid=150_272 generic
+                                                uid=148_136 "dead: 404 confirmed under browser UA"
+                                            uid=150_273 cell "BROKEN"
+                                              uid=148_137 "BROKEN"
+                                            uid=150_274 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_138 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_275 row
+                                            uid=150_276 cell "CTA-5001-C: WAVE Content Specification Standards & Industry"
+                                              uid=148_139 link "CTA-5001-C: WAVE Content Specification" url="https://awesome.video/resource/188315"
+                                                uid=148_140 "CTA-5001-C: WAVE Content Specification"
+                                              uid=150_277 ignored
+                                                uid=148_141 "Standards & Industry"
+                                            uid=150_278 cell "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf dead: 404 confirmed under browser UA"
+                                              uid=148_142 link "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf" url="https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf"
+                                                uid=148_143 "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf"
+                                              uid=150_279 generic
+                                                uid=148_144 "dead: 404 confirmed under browser UA"
+                                            uid=150_280 cell "BROKEN"
+                                              uid=148_145 "BROKEN"
+                                            uid=150_281 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_146 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_282 row
+                                            uid=150_283 cell "Dolby Vision Profiles and Levels Explained Standards & Industry"
+                                              uid=148_147 link "Dolby Vision Profiles and Levels Explained" url="https://awesome.video/resource/188012"
+                                                uid=148_148 "Dolby Vision Profiles and Levels Explained"
+                                              uid=150_284 ignored
+                                                uid=148_149 "Standards & Industry"
+                                            uid=150_285 cell "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate"
+                                              uid=148_150 link "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US" url="https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US"
+                                                uid=148_151 "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US"
+                                              uid=150_286 generic
+                                                uid=148_152 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate"
+                                            uid=150_287 cell "BROKEN"
+                                              uid=148_153 "BROKEN"
+                                            uid=150_288 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_154 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_289 row
+                                            uid=150_290 cell "Dolby Vision Profile 8/9 FAQ Standards & Industry"
+                                              uid=148_155 link "Dolby Vision Profile 8/9 FAQ" url="https://awesome.video/resource/188004"
+                                                uid=148_156 "Dolby Vision Profile 8/9 FAQ"
+                                              uid=150_291 ignored
+                                                uid=148_157 "Standards & Industry"
+                                            uid=150_292 cell "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate"
+                                              uid=148_158 link "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US" url="https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US"
+                                                uid=148_159 "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US"
+                                              uid=150_293 generic
+                                                uid=148_160 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate"
+                                            uid=150_294 cell "BROKEN"
+                                              uid=148_161 "BROKEN"
+                                            uid=150_295 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_162 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_296 row
+                                            uid=150_297 cell "CTA-5005 WAVE Content Specification Protocols & Transport"
+                                              uid=148_163 link "CTA-5005 WAVE Content Specification" url="https://awesome.video/resource/187932"
+                                                uid=148_164 "CTA-5005 WAVE Content Specification"
+                                              uid=150_298 ignored
+                                                uid=148_165 "Protocols & Transport"
+                                            uid=150_299 cell "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf dead: 404 confirmed under browser UA"
+                                              uid=148_166 link "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf" url="https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf"
+                                                uid=148_167 "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf"
+                                              uid=150_300 generic
+                                                uid=148_168 "dead: 404 confirmed under browser UA"
+                                            uid=150_301 cell "BROKEN"
+                                              uid=148_169 "BROKEN"
+                                            uid=150_302 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_170 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_303 row
+                                            uid=150_304 cell "JVET VVC Test Model (VTM) Reference Software Encoding & Codecs"
+                                              uid=148_171 link "JVET VVC Test Model (VTM) Reference Software" url="https://awesome.video/resource/186816"
+                                                uid=148_172 "JVET VVC Test Model (VTM) Reference Software"
+                                              uid=150_305 ignored
+                                                uid=148_173 "Encoding & Codecs"
+                                            uid=150_306 cell "https://jvet.hhi.fraunhofer.de/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate"
+                                              uid=148_174 link "https://jvet.hhi.fraunhofer.de/" url="https://jvet.hhi.fraunhofer.de/"
+                                                uid=148_175 "https://jvet.hhi.fraunhofer.de/"
+                                              uid=150_307 generic
+                                                uid=148_176 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate"
+                                            uid=150_308 cell "BROKEN"
+                                              uid=148_177 "BROKEN"
+                                            uid=150_309 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_178 "Aug 4, 2026, 08:18 PM"
+                                          uid=150_310 row
+                                            uid=150_311 cell "Popcorn.js Players & Clients"
+                                              uid=148_179 link "Popcorn.js" url="https://awesome.video/resource/184760"
+                                                uid=148_180 "Popcorn.js"
+                                              uid=150_312 ignored
+                                                uid=148_181 "Players & Clients"
+                                            uid=150_313 cell "https://popcornjs.org/ redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)"
+                                              uid=148_182 link "https://popcornjs.org/" url="https://popcornjs.org/"
+                                                uid=148_183 "https://popcornjs.org/"
+                                              uid=150_314 generic
+                                                uid=148_184 "redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)"
+                                            uid=150_315 cell "SUSPECT"
+                                              uid=148_185 "SUSPECT"
+                                            uid=150_316 cell "Aug 4, 2026, 08:18 PM"
+                                              uid=148_186 "Aug 4, 2026, 08:18 PM"
+                            uid=150_317 generic
+                              uid=148_187 button "Less" expandable expanded focusable focused
+                                uid=150_318 "Less"
+                            uid=150_319 article
+                              uid=150_320 ignored
+                                uid=150_321 ignored
+                                  uid=150_322 ignored
+                                    uid=150_323 image
+                                    uid=149_48 "Problem Links"
+                                  uid=150_324 ignored
+                                    uid=149_49 "13"
+                                    uid=149_50 " ISSUES"
+                                uid=150_325 generic
+                                  uid=149_51 "Links that require attention from the latest sweep."
+                              uid=150_326 ignored
+                                uid=150_327 ignored
+                                  uid=149_52 combobox "Filter by link status" expandable haspopup="listbox" value="All Issues"
+                                    uid=150_328 generic
+                                      uid=150_329 "All Issues"
+                                uid=150_330 generic
+                                  uid=150_331 generic
+                                    uid=149_53 region "Problem links table, scrollable"
+                                      uid=150_332 table
+                                        uid=150_333 rowgroup
+                                          uid=150_334 row
+                                            uid=150_335 columnheader "STATUS"
+                                              uid=149_54 "STATUS"
+                                            uid=150_336 columnheader "RESOURCE"
+                                              uid=149_55 "RESOURCE"
+                                            uid=150_337 columnheader "CATEGORY"
+                                              uid=149_56 "CATEGORY"
+                                            uid=150_338 columnheader "URL"
+                                              uid=149_57 "URL"
+                                            uid=150_339 columnheader "FAILURES"
+                                              uid=149_58 "FAILURES"
+                                            uid=150_340 columnheader "FLAGGED"
+                                              uid=149_59 "FLAGGED"
+                                        uid=150_341 ignored
+                                          uid=150_342 row
+                                            uid=150_343 cell "BROKEN"
+                                              uid=150_344 image
+                                              uid=150_345 ignored
+                                                uid=149_60 "BROKEN"
+                                            uid=150_346 cell "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders"
+                                              uid=149_61 link "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders" url="https://awesome.video/resource/189956"
+                                                uid=149_62 "Performance Comparison of AV1, JEM, VP9, and HEVC Encoders"
+                                            uid=150_347 cell "Encoding & Codecs"
+                                              uid=149_63 "Encoding & Codecs"
+                                            uid=150_348 cell "https://iphome.hhi.de/marpe/download/spie-2017.pdf dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate"
+                                              uid=149_64 link "https://iphome.hhi.de/marpe/download/spie-2017.pdf" url="https://iphome.hhi.de/marpe/download/spie-2017.pdf"
+                                                uid=149_65 "https://iphome.hhi.de/marpe/download/spie-2017.pdf"
+                                              uid=150_349 generic
+                                                uid=149_66 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate"
+                                            uid=150_350 cell "1"
+                                              uid=149_67 "1"
+                                            uid=150_351 cell "FLAGGED"
+                                              uid=150_352 image
+                                              uid=149_68 "FLAGGED"
+                                          uid=150_353 row
+                                            uid=150_354 cell "SUSPECT"
+                                              uid=150_355 image
+                                              uid=150_356 ignored
+                                                uid=149_69 "SUSPECT"
+                                            uid=150_357 cell "RTC.ON Conference"
+                                              uid=149_70 link "RTC.ON Conference" url="https://awesome.video/resource/189570"
+                                                uid=149_71 "RTC.ON Conference"
+                                            uid=150_358 cell "Community & Events"
+                                              uid=149_72 "Community & Events"
+                                            uid=150_359 cell "https://rtcon.live/ redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)"
+                                              uid=149_73 link "https://rtcon.live/" url="https://rtcon.live/"
+                                                uid=149_74 "https://rtcon.live/"
+                                              uid=150_360 generic
+                                                uid=149_75 "redirects off-domain: rtcon.live -> swmansion.com (https://rtcon.swmansion.com/)"
+                                            uid=150_361 cell "1"
+                                              uid=149_76 "1"
+                                            uid=150_362 cell "FLAGGED"
+                                              uid=150_363 image
+                                              uid=149_77 "FLAGGED"
+                                          uid=150_364 row
+                                            uid=150_365 cell "BROKEN"
+                                              uid=150_366 image
+                                              uid=150_367 ignored
+                                                uid=149_78 "BROKEN"
+                                            uid=150_368 cell "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery"
+                                              uid=149_79 link "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery" url="https://awesome.video/resource/189566"
+                                                uid=149_80 "Unreeling Netflix: Understanding and Improving Multi-CDN Movie Delivery"
+                                            uid=150_369 cell "Intro & Learning"
+                                              uid=149_81 "Intro & Learning"
+                                            uid=150_370 cell "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf dead: 404 confirmed under browser UA"
+                                              uid=149_82 link "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf" url="https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf"
+                                                uid=149_83 "https://cs.princeton.edu/courses/archive/fall16/cos561/papers/netflix12.pdf"
+                                              uid=150_371 generic
+                                                uid=149_84 "dead: 404 confirmed under browser UA"
+                                            uid=150_372 cell "1"
+                                              uid=149_85 "1"
+                                            uid=150_373 cell "FLAGGED"
+                                              uid=150_374 image
+                                              uid=149_86 "FLAGGED"
+                                          uid=150_375 row
+                                            uid=150_376 cell "BROKEN"
+                                              uid=150_377 image
+                                              uid=150_378 ignored
+                                                uid=149_87 "BROKEN"
+                                            uid=150_379 cell "RIST VidTrans2018 Technical Poster"
+                                              uid=149_88 link "RIST VidTrans2018 Technical Poster" url="https://awesome.video/resource/189475"
+                                                uid=149_89 "RIST VidTrans2018 Technical Poster"
+                                            uid=150_380 cell "Protocols & Transport"
+                                              uid=149_90 "Protocols & Transport"
+                                            uid=150_381 cell "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf dead: 404 confirmed under browser UA"
+                                              uid=149_91 link "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf" url="https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf"
+                                                uid=149_92 "https://static.vsf.tv/activity_groups/rist_poster_for_vidtrans2018feb25.pdf"
+                                              uid=150_382 generic
+                                                uid=149_93 "dead: 404 confirmed under browser UA"
+                                            uid=150_383 cell "1"
+                                              uid=149_94 "1"
+                                            uid=150_384 cell "FLAGGED"
+                                              uid=150_385 image
+                                              uid=149_95 "FLAGGED"
+                                          uid=150_386 row
+                                            uid=150_387 cell "BROKEN"
+                                              uid=150_388 image
+                                              uid=150_389 ignored
+                                                uid=149_96 "BROKEN"
+                                            uid=150_390 cell "JVET VVC Trac — Conformance Bitstream Tracker"
+                                              uid=149_97 link "JVET VVC Trac — Conformance Bitstream Tracker" url="https://awesome.video/resource/189190"
+                                                uid=149_98 "JVET VVC Trac — Conformance Bitstream Tracker"
+                                            uid=150_391 cell "General Tools"
+                                              uid=149_99 "General Tools"
+                                            uid=150_392 cell "https://jvet.hhi.fraunhofer.de/trac/vvc/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate"
+                                              uid=149_100 link "https://jvet.hhi.fraunhofer.de/trac/vvc/" url="https://jvet.hhi.fraunhofer.de/trac/vvc/"
+                                                uid=149_101 "https://jvet.hhi.fraunhofer.de/trac/vvc/"
+                                              uid=150_393 generic
+                                                uid=149_102 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/trac/vvc/ failed, reason: unable to verify the first certificate"
+                                            uid=150_394 cell "1"
+                                              uid=149_103 "1"
+                                            uid=150_395 cell "FLAGGED"
+                                              uid=150_396 image
+                                              uid=149_104 "FLAGGED"
+                                          uid=150_397 row
+                                            uid=150_398 cell "BROKEN"
+                                              uid=150_399 image
+                                              uid=150_400 ignored
+                                                uid=149_105 "BROKEN"
+                                            uid=150_401 cell "HEVC Format Range Extensions (RExt) — Fraunhofer HHI"
+                                              uid=149_106 link "HEVC Format Range Extensions (RExt) — Fraunhofer HHI" url="https://awesome.video/resource/189138"
+                                                uid=149_107 "HEVC Format Range Extensions (RExt) — Fraunhofer HHI"
+                                            uid=150_402 cell "Encoding & Codecs"
+                                              uid=149_108 "Encoding & Codecs"
+                                            uid=150_403 cell "https://hevc.hhi.fraunhofer.de/rext dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate"
+                                              uid=149_109 link "https://hevc.hhi.fraunhofer.de/rext" url="https://hevc.hhi.fraunhofer.de/rext"
+                                                uid=149_110 "https://hevc.hhi.fraunhofer.de/rext"
+                                              uid=150_404 generic
+                                                uid=149_111 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://hevc.hhi.fraunhofer.de/rext failed, reason: unable to verify the first certificate"
+                                            uid=150_405 cell "1"
+                                              uid=149_112 "1"
+                                            uid=150_406 cell "FLAGGED"
+                                              uid=150_407 image
+                                              uid=149_113 "FLAGGED"
+                                          uid=150_408 row
+                                            uid=150_409 cell "BROKEN"
+                                              uid=150_410 image
+                                              uid=150_411 ignored
+                                                uid=149_114 "BROKEN"
+                                            uid=150_412 cell "FOMS 2024 session notes — Common Media Library"
+                                              uid=149_115 link "FOMS 2024 session notes — Common Media Library" url="https://awesome.video/resource/188897"
+                                                uid=149_116 "FOMS 2024 session notes — Common Media Library"
+                                            uid=150_413 cell "Community & Events"
+                                              uid=149_117 "Community & Events"
+                                            uid=150_414 cell "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary dead: 404 confirmed under browser UA"
+                                              uid=149_118 link "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary" url="https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary"
+                                                uid=149_119 "https://foms-workshop.org/foms2024/Notes/CommonMediaLibrary"
+                                              uid=150_415 generic
+                                                uid=149_120 "dead: 404 confirmed under browser UA"
+                                            uid=150_416 cell "1"
+                                              uid=149_121 "1"
+                                            uid=150_417 cell "FLAGGED"
+                                              uid=150_418 image
+                                              uid=149_122 "FLAGGED"
+                                          uid=150_419 row
+                                            uid=150_420 cell "BROKEN"
+                                              uid=150_421 image
+                                              uid=150_422 ignored
+                                                uid=149_123 "BROKEN"
+                                            uid=150_423 cell "CTA-5001-C: WAVE Content Specification"
+                                              uid=149_124 link "CTA-5001-C: WAVE Content Specification" url="https://awesome.video/resource/188315"
+                                                uid=149_125 "CTA-5001-C: WAVE Content Specification"
+                                            uid=150_424 cell "Standards & Industry"
+                                              uid=149_126 "Standards & Industry"
+                                            uid=150_425 cell "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf dead: 404 confirmed under browser UA"
+                                              uid=149_127 link "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf" url="https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf"
+                                                uid=149_128 "https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5001-c_final.pdf"
+                                              uid=150_426 generic
+                                                uid=149_129 "dead: 404 confirmed under browser UA"
+                                            uid=150_427 cell "1"
+                                              uid=149_130 "1"
+                                            uid=150_428 cell "FLAGGED"
+                                              uid=150_429 image
+                                              uid=149_131 "FLAGGED"
+                                          uid=150_430 row
+                                            uid=150_431 cell "BROKEN"
+                                              uid=150_432 image
+                                              uid=150_433 ignored
+                                                uid=149_132 "BROKEN"
+                                            uid=150_434 cell "Dolby Vision Profiles and Levels Explained"
+                                              uid=149_133 link "Dolby Vision Profiles and Levels Explained" url="https://awesome.video/resource/188012"
+                                                uid=149_134 "Dolby Vision Profiles and Levels Explained"
+                                            uid=150_435 cell "Standards & Industry"
+                                              uid=149_135 "Standards & Industry"
+                                            uid=150_436 cell "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate"
+                                              uid=149_136 link "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US" url="https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US"
+                                                uid=149_137 "https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US"
+                                              uid=150_437 generic
+                                                uid=149_138 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/What-is-Dolby-Vision-Profile?language=en_US failed, reason: unable to verify the first certificate"
+                                            uid=150_438 cell "1"
+                                              uid=149_139 "1"
+                                            uid=150_439 cell "FLAGGED"
+                                              uid=150_440 image
+                                              uid=149_140 "FLAGGED"
+                                          uid=150_441 row
+                                            uid=150_442 cell "BROKEN"
+                                              uid=150_443 image
+                                              uid=150_444 ignored
+                                                uid=149_141 "BROKEN"
+                                            uid=150_445 cell "Dolby Vision Profile 8/9 FAQ"
+                                              uid=149_142 link "Dolby Vision Profile 8/9 FAQ" url="https://awesome.video/resource/188004"
+                                                uid=149_143 "Dolby Vision Profile 8/9 FAQ"
+                                            uid=150_446 cell "Standards & Industry"
+                                              uid=149_144 "Standards & Industry"
+                                            uid=150_447 cell "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate"
+                                              uid=149_145 link "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US" url="https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US"
+                                                uid=149_146 "https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US"
+                                              uid=150_448 generic
+                                                uid=149_147 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://professionalsupport.dolby.com/s/article/Dolby-Vision-Profile-20-FAQ?language=en_US failed, reason: unable to verify the first certificate"
+                                            uid=150_449 cell "1"
+                                              uid=149_148 "1"
+                                            uid=150_450 cell "FLAGGED"
+                                              uid=150_451 image
+                                              uid=149_149 "FLAGGED"
+                                          uid=150_452 row
+                                            uid=150_453 cell "BROKEN"
+                                              uid=150_454 image
+                                              uid=150_455 ignored
+                                                uid=149_150 "BROKEN"
+                                            uid=150_456 cell "CTA-5005 WAVE Content Specification"
+                                              uid=149_151 link "CTA-5005 WAVE Content Specification" url="https://awesome.video/resource/187932"
+                                                uid=149_152 "CTA-5005 WAVE Content Specification"
+                                            uid=150_457 cell "Protocols & Transport"
+                                              uid=149_153 "Protocols & Transport"
+                                            uid=150_458 cell "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf dead: 404 confirmed under browser UA"
+                                              uid=149_154 link "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf" url="https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf"
+                                                uid=149_155 "https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf"
+                                              uid=150_459 generic
+                                                uid=149_156 "dead: 404 confirmed under browser UA"
+                                            uid=150_460 cell "1"
+                                              uid=149_157 "1"
+                                            uid=150_461 cell "FLAGGED"
+                                              uid=150_462 image
+                                              uid=149_158 "FLAGGED"
+                                          uid=150_463 row
+                                            uid=150_464 cell "BROKEN"
+                                              uid=150_465 image
+                                              uid=150_466 ignored
+                                                uid=149_159 "BROKEN"
+                                            uid=150_467 cell "JVET VVC Test Model (VTM) Reference Software"
+                                              uid=149_160 link "JVET VVC Test Model (VTM) Reference Software" url="https://awesome.video/resource/186816"
+                                                uid=149_161 "JVET VVC Test Model (VTM) Reference Software"
+                                            uid=150_468 cell "Encoding & Codecs"
+                                              uid=149_162 "Encoding & Codecs"
+                                            uid=150_469 cell "https://jvet.hhi.fraunhofer.de/ dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate"
+                                              uid=149_163 link "https://jvet.hhi.fraunhofer.de/" url="https://jvet.hhi.fraunhofer.de/"
+                                                uid=149_164 "https://jvet.hhi.fraunhofer.de/"
+                                              uid=150_470 generic
+                                                uid=149_165 "dead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://jvet.hhi.fraunhofer.de/ failed, reason: unable to verify the first certificate"
+                                            uid=150_471 cell "1"
+                                              uid=149_166 "1"
+                                            uid=150_472 cell "FLAGGED"
+                                              uid=150_473 image
+                                              uid=149_167 "FLAGGED"
+                                          uid=150_474 row
+                                            uid=150_475 cell "SUSPECT"
+                                              uid=150_476 image
+                                              uid=150_477 ignored
+                                                uid=149_168 "SUSPECT"
+                                            uid=150_478 cell "Popcorn.js"
+                                              uid=149_169 link "Popcorn.js" url="https://awesome.video/resource/184760"
+                                                uid=149_170 "Popcorn.js"
+                                            uid=150_479 cell "Players & Clients"
+                                              uid=149_171 "Players & Clients"
+                                            uid=150_480 cell "https://popcornjs.org/ redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)"
+                                              uid=149_172 link "https://popcornjs.org/" url="https://popcornjs.org/"
+                                                uid=149_173 "https://popcornjs.org/"
+                                              uid=150_481 generic
+                                                uid=149_174 "redirects off-domain: popcornjs.org -> github.com (https://github.com/mozilla/popcorn-js/)"
+                                            uid=150_482 cell "1"
+                                              uid=149_175 "1"
+                                            uid=150_483 cell "FLAGGED"
+                                              uid=150_484 image
+                                              uid=149_176 "FLAGGED"
+          uid=149_177 button "Back to top"
+            uid=150_485 image
+      uid=150_486 generic

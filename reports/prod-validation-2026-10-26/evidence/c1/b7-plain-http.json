@@ -1,0 +1,1 @@
+{"success":false,"message":"A custom base URL requires an auth token — the platform key is never sent to a custom endpoint.","error":"validation_failed","fieldErrors":{},"errors":[]} HTTP400

@@ -19,7 +19,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource } from "@shared/schema";
+import { isReservedTestHost } from "@shared/validation";
 import "./queues-review.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // Bulk actions process resources one by one, so a server failure can leave
 // some of the selection already changed.
@@ -194,6 +196,16 @@ export default function PendingResources() {
     focusAfterRemovalRef.current = null;
   }, [pendingResourceIds]);
 
+  // Success feedback names what changed: one title, or up to three titles
+  // plus "and N more" for bulk actions.
+  const titleFor = (id: number) => pendingResources.find((r) => r.id === id)?.title;
+  const describeTitles = (ids: number[]) => {
+    const titles = ids.map(titleFor).filter((t): t is string => Boolean(t)).map((t) => `"${t}"`);
+    if (titles.length === 0) return "";
+    const shown = titles.slice(0, 3).join(", ");
+    return titles.length > 3 ? `${shown} and ${titles.length - 3} more` : shown;
+  };
+
   const approveMutation = useMutation({
     mutationFn: async (resourceId: number): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/approve`, {
@@ -207,9 +219,10 @@ export default function PendingResources() {
       setApproveDialogOpen(false);
       setResourceToApprove(null);
       setApproveError(null);
+      const approvedTitle = titleFor(resourceId);
       toast({
-        title: "Resource Approved",
-        description: "The resource has been approved and added to the public catalog.",
+        title: "Resource approved",
+        description: `${approvedTitle ? `"${approvedTitle}"` : "The resource"} is now live in the public catalog.`,
       });
     },
     onError: (error: Error) => {
@@ -224,7 +237,8 @@ export default function PendingResources() {
         body: JSON.stringify({ reason })
       });
     },
-    onSuccess: (_data, { resourceId }) => {
+    onSuccess: (_data, { resourceId, reason }) => {
+      const rejectedTitle = titleFor(resourceId);
       planFocusAfterRemoval([resourceId]);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -233,8 +247,8 @@ export default function PendingResources() {
       setRejectionReason("");
       setRejectError(null);
       toast({
-        title: "Resource Rejected",
-        description: "The resource has been rejected.",
+        title: "Resource rejected",
+        description: `${rejectedTitle ? `"${rejectedTitle}"` : "The resource"} was rejected. The contributor will see your reason: "${reason.trim()}"`,
       });
     },
     onError: (error: Error) => {
@@ -253,6 +267,7 @@ export default function PendingResources() {
       }) as BulkResourceResponse;
     },
     onSuccess: (response, ids) => {
+      const names = describeTitles(ids);
       const outcome = {
         action: "approved" as const,
         requested: ids.length,
@@ -268,8 +283,10 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
-        title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources Approved",
-        description: `${response.succeeded} approved${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources approved",
+        description: response.failed > 0
+          ? `${response.succeeded} approved, ${response.failed} failed.${names ? ` Selected: ${names}.` : ""}`
+          : `${response.succeeded} approved${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
@@ -292,6 +309,7 @@ export default function PendingResources() {
       }) as BulkResourceResponse;
     },
     onSuccess: (response, variables) => {
+      const names = describeTitles(variables.ids);
       const outcome = {
         action: "rejected" as const,
         requested: variables.ids.length,
@@ -308,8 +326,10 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
-        title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources Rejected",
-        description: `${response.succeeded} rejected${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources rejected",
+        description: response.failed > 0
+          ? `${response.succeeded} rejected, ${response.failed} failed.${names ? ` Selected: ${names}.` : ""}`
+          : `${response.succeeded} rejected${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
@@ -333,6 +353,22 @@ export default function PendingResources() {
     setRejectError(null);
     setResourceToReject(resource);
     setRejectDialogOpen(true);
+  };
+
+  const handleRejectOpenChange = (open: boolean) => {
+    setRejectDialogOpen(open);
+    if (!open) {
+      setRejectError(null);
+      setRejectionReason("");
+    }
+  };
+
+  const handleBulkRejectOpenChange = (open: boolean) => {
+    setBulkRejectDialogOpen(open);
+    if (!open) {
+      setBulkRejectError(null);
+      setBulkRejectionReason("");
+    }
   };
 
   const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
@@ -436,18 +472,13 @@ export default function PendingResources() {
             <p>
               {"You're offline, so the approvals queue can't be loaded. It may still contain items awaiting review."}
             </p>
-            <Button
-              aria-disabled={isFetching}
-              aria-busy={isFetching}
-              onClick={(event) => {
-                if (isFetching) return;
-                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-resources-heading"));
-                void refetch();
-              }}
-              data-testid="pending-resources-retry"
-            >
-              {isFetching ? "Retrying…" : "Retry"}
-            </Button>
+            <RetryButton
+              variant="default"
+              busy={isFetching}
+              focusTarget={() => document.getElementById("pending-resources-heading")}
+              onRetry={() => void refetch()}
+              testId="pending-resources-retry"
+            />
           </div>
         ) : (
           <AdminLoadError
@@ -667,6 +698,15 @@ export default function PendingResources() {
                     <td>
                       <div className="queue-review-item-title">
                         <span title={resource.title}>{resource.title}</span>
+                        {(isReservedTestHost(resource.url) || resource.title.startsWith("__qa_test_")) && (
+                          <Badge
+                            variant="outline"
+                            title="Looks like a leftover QA probe (reserved test domain or __qa_test_ title). Reject it to clear the queue."
+                            data-testid={`badge-test-entry-${resource.id}`}
+                          >
+                            Test entry
+                          </Badge>
+                        )}
                         <a
                           href={resource.url}
                           target="_blank"
@@ -793,7 +833,7 @@ export default function PendingResources() {
                     href={selectedResource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline flex items-center gap-1 mt-1 min-w-0"
+                    className="text-sm text-primary hover:underline flex min-h-6 max-lg:min-h-11 items-center gap-1 mt-1 min-w-0"
                     data-testid="link-detail-url"
                   >
                     <span className="min-w-0 [overflow-wrap:anywhere]">{selectedResource.url}</span>
@@ -927,10 +967,7 @@ export default function PendingResources() {
       </AlertDialog>
 
       {/* Reject Confirmation Dialog */}
-       <AlertDialog open={rejectDialogOpen} onOpenChange={(open) => {
-         setRejectDialogOpen(open);
-         if (!open) setRejectError(null);
-       }}>
+       <AlertDialog open={rejectDialogOpen} onOpenChange={handleRejectOpenChange}>
         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Resource?</AlertDialogTitle>
@@ -962,19 +999,14 @@ export default function PendingResources() {
                   data-testid="textarea-rejection-reason"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                   {rejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
+                  {rejectionReason.trim().length > 0 && rejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH ? <span className="text-destructive">Too short — add {MIN_REJECTION_REASON_LENGTH - rejectionReason.trim().length} more character{MIN_REJECTION_REASON_LENGTH - rejectionReason.trim().length === 1 ? "" : "s"} to enable Reject. </span> : null}
+                  {rejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
                 </p>
               </div>
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setRejectionReason("");
-                setRejectError(null);
-              }}
-              data-testid="button-cancel-reject"
-            >
+            <AlertDialogCancel data-testid="button-cancel-reject">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -1029,13 +1061,7 @@ export default function PendingResources() {
        </AlertDialog>
 
        {/* Bulk Reject Dialog */}
-       <Dialog open={bulkRejectDialogOpen} onOpenChange={(open) => {
-         setBulkRejectDialogOpen(open);
-         if (!open) {
-           setBulkRejectError(null);
-           setBulkRejectionReason("");
-         }
-       }}>
+       <Dialog open={bulkRejectDialogOpen} onOpenChange={handleBulkRejectOpenChange}>
          <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <DialogHeader>
              <DialogTitle>{bulkRejectIds.length === 1 ? "Reject pending resource?" : "Reject pending resources?"}</DialogTitle>
@@ -1060,13 +1086,14 @@ export default function PendingResources() {
                data-testid="textarea-bulk-rejection-reason"
              />
              <p className="text-xs text-muted-foreground">
+                  {bulkRejectionReason.trim().length > 0 && bulkRejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH ? <span className="text-destructive">Too short — add {MIN_REJECTION_REASON_LENGTH - bulkRejectionReason.trim().length} more character{MIN_REJECTION_REASON_LENGTH - bulkRejectionReason.trim().length === 1 ? "" : "s"} to enable Reject. </span> : null}
                   {bulkRejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to contributors
              </p>
            </div>
            <DialogFooter>
              <Button
                variant="outline"
-               onClick={() => setBulkRejectDialogOpen(false)}
+               onClick={() => handleBulkRejectOpenChange(false)}
                data-testid="button-cancel-bulk-reject"
              >
                Cancel

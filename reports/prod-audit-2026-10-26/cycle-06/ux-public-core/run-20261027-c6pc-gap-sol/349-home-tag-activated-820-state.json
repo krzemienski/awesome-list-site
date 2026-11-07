@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?tags=UDP","title":"Awesome Video","width":820,"height":1180,"touch":true,"scrollY":980,"bodyWidth":814,"online":true,"focus":{"tag":"BODY","id":"","label":null,"text":"\n    \n    \n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--bord","rect":{"x":0,"y":-980,"width":814,"height":4350.296875,"top":-980,"right":814,"bottom":3370.296875,"left":0}},"headings":[{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Home","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

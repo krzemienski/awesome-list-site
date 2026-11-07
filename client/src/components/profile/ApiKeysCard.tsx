@@ -12,9 +12,11 @@
  */
 import { useId, useRef, useState, type FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { Check, Copy, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { focusElement } from "@/hooks/focus-handoff";
 import { trackApiKeyCopied, trackApiKeyCreated, trackApiKeyRevoked } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -105,12 +107,15 @@ export default function ApiKeysCard() {
   const [revokeError, setRevokeError] = useState<string | null>(null);
   const secretInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const revokedKeyIdRef = useRef<string | null>(null);
 
   const keysQuery = useQuery<{ apiKeys: ApiKeySummary[] }>({
     queryKey: API_KEYS_QUERY_KEY,
     queryFn: () => apiRequest("/api/user/api-keys"),
     staleTime: 0,
   });
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const keysUnavailable = queryUnavailableReason(keysQuery);
 
   const createMutation = useMutation({
     // The expiry option rides along as the mutation variable so the success
@@ -139,8 +144,9 @@ export default function ApiKeysCard() {
   const revokeMutation = useMutation({
     mutationFn: async (id: string) =>
       apiRequest(`/api/user/api-keys/${encodeURIComponent(id)}`, { method: "DELETE" }),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       trackApiKeyRevoked();
+      revokedKeyIdRef.current = id;
       setKeyToRevoke(null);
       setRevokeError(null);
       void queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY });
@@ -196,7 +202,7 @@ export default function ApiKeysCard() {
       </CardHeader>
       <CardContent className="space-y-6">
         {created && (
-          <Alert data-testid="panel-api-key-secret">
+          <Alert live="polite" data-testid="panel-api-key-secret">
             <AlertTitle>Copy your new key “{created.apiKey.name}” now</AlertTitle>
             <AlertDescription className="space-y-3">
               <p>
@@ -301,11 +307,15 @@ export default function ApiKeysCard() {
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
             </div>
-          ) : keysQuery.isError && !keysQuery.data ? (
+          ) : keysUnavailable && !keysQuery.data ? (
             <Alert variant="destructive" data-testid="alert-api-keys-load-error">
               <AlertTitle>Couldn&apos;t load your keys</AlertTitle>
               <AlertDescription className="space-y-2">
-                <p>Nothing was changed. Try again.</p>
+                <p>
+                  {keysUnavailable === "offline"
+                    ? "You're offline; your keys will load when your connection returns."
+                    : "Nothing was changed. Try again."}
+                </p>
                 <Button type="button" variant="outline" onClick={() => void keysQuery.refetch()}>
                   Try again
                 </Button>
@@ -322,7 +332,7 @@ export default function ApiKeysCard() {
                 return (
                   <li
                     key={key.id}
-                    className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-2 p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-row sm:items-center sm:justify-between"
                     data-testid={`row-api-key-${key.id}`}
                     data-status={status}
                   >
@@ -381,7 +391,18 @@ export default function ApiKeysCard() {
           }
         }}
       >
-        <AlertDialogContent data-testid="dialog-revoke-api-key">
+        <AlertDialogContent
+          data-testid="dialog-revoke-api-key"
+          onCloseAutoFocus={(event) => {
+            // The row's Revoke button unmounts once the key is revoked, so
+            // Radix's return target is gone; focus the revoked key's row.
+            const id = revokedKeyIdRef.current;
+            if (!id) return;
+            revokedKeyIdRef.current = null;
+            event.preventDefault();
+            focusElement(document.querySelector<HTMLElement>(`[data-testid="row-api-key-${CSS.escape(id)}"]`));
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke “{keyToRevoke?.name}”?</AlertDialogTitle>
             <AlertDialogDescription>

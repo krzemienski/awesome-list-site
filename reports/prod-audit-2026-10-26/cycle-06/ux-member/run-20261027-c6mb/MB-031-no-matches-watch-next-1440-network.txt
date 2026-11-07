@@ -1,0 +1,11 @@
+[7155.327] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.442] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.571] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.823] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.1054] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.1187] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.1200] DELETE https://awesome.video/api/bookmarks/190342 (Fetch) 200
+[7155.1201] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.1203] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.1207] GET https://awesome.video/api/bookmarks (Fetch) 200
+[7155.2248] GET https://awesome.video/api/bookmarks (Fetch) 200

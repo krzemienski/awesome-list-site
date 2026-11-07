@@ -1,0 +1,5 @@
+[6370.1404] POST https://awesome.video/api/bookmarks/190342 (Fetch) 200
+[6370.1598] PATCH https://awesome.video/api/bookmarks/190342/state (Fetch) 200
+[6370.1603] PATCH https://awesome.video/api/bookmarks/190342/state (Fetch) 200
+[6370.1609] PATCH https://awesome.video/api/bookmarks/190342/state (Fetch) 200
+[6370.1616] POST https://awesome.video/api/bookmarks/190342 (Fetch) 200

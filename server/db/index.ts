@@ -11,6 +11,9 @@ import {
 } from '../ops/operationalTelemetry';
 import { isDatabaseUnavailableError } from './errors';
 import { markRequestDatabaseUnavailable } from '../ops/requestContext';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("db");
 
 // Create PostgreSQL connection pool for Neon serverless.
 //
@@ -30,6 +33,9 @@ import { markRequestDatabaseUnavailable } from '../ops/requestContext';
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 8,
+  // Keep one client warm: idle clients drop after 30 s, so without a floor the
+  // 60 s orphan-job watchdog reconnects on every sweep under a 3 s timeout.
+  min: 1,
   idleTimeoutMillis: 30000,
   // Bound pool acquisition and server execution. A saturated pool must fail
   // predictably instead of leaving HTTP requests hanging.
@@ -43,7 +49,7 @@ const pool = new Pool({
 // Add error handler for connection issues
 pool.on('error', (err) => {
   recordPoolError();
-  console.error('Database pool error:', { code: (err as any)?.code ?? 'unknown' });
+  logger.error('Database pool error:', { code: (err as any)?.code ?? 'unknown' });
 });
 
 function markTransientRequestFailure(error: unknown): void {
@@ -66,7 +72,7 @@ pool.on('connect', (client: any) => {
   client.on('error', (err: unknown) => {
     recordPoolError();
     markTransientRequestFailure(err);
-    console.error('Database client error:', { code: (err as any)?.code ?? 'unknown' });
+    logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown' });
   });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {

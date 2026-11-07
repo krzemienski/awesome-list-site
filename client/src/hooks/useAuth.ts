@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { whenClerkLoaded } from '@/lib/clerk-bridge';
+import { hasClerkSessionHint, whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
-import { mpIdentify, mpReset } from '@/lib/mixpanel';
-import { phIdentify, phReset } from '@/lib/posthog';
-import { trackLoggedOut } from '@/lib/analytics';
+import { initMixpanel, mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpanel';
+import { initPosthog, phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
+import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
+import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
+import { hasOwnerSessionHint, isAdminAnalyticsSession, setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
+import type { AuthMethod } from '@shared/schema';
+import { apiFetch } from "@/lib/api-fetch";
+import { humanizeApiError } from "@/lib/apiError";
 
 /**
  * Per-device state that belongs to the person who just signed out: the
@@ -18,23 +23,62 @@ export function clearSignedInClientState(): void {
   safeRemoveItem('submit-resource-draft');
   mpReset();
   phReset();
+  // Every sign-out path ends with a full reload, so a visitor's analytics
+  // start again on the next page.
+  setAdminAnalyticsSession(false);
   notifyCrossTabSync();
 }
 
-interface User {
+// Whether this tab has stopped its vendor SDKs for an admin session. The
+// localStorage marker is shared by every tab, so it cannot tell a tab that
+// started its SDKs as a visitor before another tab set it.
+let vendorsStoppedForAdmin = false;
+
+/**
+ * Admin sessions send nothing to any analytics tool. The marker makes the
+ * next load quiet before auth resolves. Each tab that learns the user is an
+ * admin stops the SDKs it already started under a visitor's grant; when a
+ * non-admin account replaces an admin marker, the SDKs start again (each
+ * init still checks consent and QA paths).
+ */
+function syncAdminAnalytics(role: string | undefined): boolean {
+  const isAdmin = role === 'admin';
+  const markerChanged = setAdminAnalyticsSession(isAdmin);
+  if (isAdmin && !vendorsStoppedForAdmin) {
+    vendorsStoppedForAdmin = true;
+    optOutGA();
+    optOutMixpanel();
+    optOutPosthog();
+    optOutAmplitude();
+  } else if (!isAdmin && (markerChanged || vendorsStoppedForAdmin)) {
+    vendorsStoppedForAdmin = false;
+    initGA();
+    initMixpanel();
+    initPosthog();
+    initAmplitude();
+    // This page's view was dropped while the marker suppressed it.
+    trackPageView(window.location.href);
+  }
+  return isAdmin;
+}
+
+export interface AuthUser {
   id: string;
   email?: string;
   name?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   avatar?: string;
   provider?: string;
   role?: string;
   createdAt?: string;
   // Run22 BUG-020: pending private account-deletion request (null = none).
   deletionRequestedAt?: string | null;
+  authMethod: AuthMethod;
 }
 
 interface AuthResponse {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
 }
 
@@ -45,6 +89,35 @@ function logoutRequestSignal(): AbortSignal {
 }
 
 /**
+ * End both kinds of session, then confirm the server no longer sees one.
+ * Every sign-out path (account menu and the /logout route) runs this.
+ */
+export async function signOutAndVerify(): Promise<void> {
+  // End the owner password session too (no-op for Clerk-only sessions), or
+  // the server would still see the admin after Clerk signs out.
+  await apiFetch('/api/auth/admin-logout', {
+    method: 'POST',
+    credentials: 'include',
+    signal: logoutRequestSignal(),
+  });
+  // Clerk loads on demand (backlog X-03); waiting for it to load matters on a
+  // direct /logout load, where signOut() would otherwise only queue
+  // (C3-V3-02). The bridged signOut skips Clerk's after-sign-out navigation;
+  // callers do the full reload once the server confirms.
+  const clerk = await whenClerkLoaded();
+  await clerk.signOut();
+  const authCheck = await apiFetch('/api/auth/user', {
+    credentials: 'include',
+    cache: 'no-store',
+    signal: logoutRequestSignal(),
+  });
+  const authState = authCheck.ok ? await authCheck.json() : null;
+  if (!authCheck.ok || authState?.isAuthenticated !== false) {
+    throw new Error('The server could not confirm that your session ended');
+  }
+}
+
+/**
  * Task #307 (Clerk migration): sessions are Clerk cookies now, but the app's
  * identity endpoint stays /api/auth/user — it overlays app-specific columns
  * (role, deletionRequestedAt, joined display name) that Clerk doesn't own.
@@ -52,7 +125,7 @@ function logoutRequestSignal(): AbortSignal {
  * from POST /api/auth/logout to Clerk's signOut().
  */
 async function requestAuthUser(): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/user', { credentials: 'include' });
+  const res = await apiFetch('/api/auth/user', { credentials: 'include' });
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new ApiError(res.status, text);
@@ -64,7 +137,23 @@ async function requestAuthUser(): Promise<AuthResponse> {
 // {isAuthenticated:false}, not a 401. After a drop longer than staleTime this
 // refetch ran before Clerk refreshed the cookie and signed a live admin out.
 // When Clerk still holds a session, refresh the token and ask once more.
+//
+// A browser with no Clerk session hint and no owner-session marker cannot be
+// signed in, so it skips the request (every anonymous document load used to
+// pay one). The owner password cookie (`av_admin_session`) is HttpOnly and
+// invisible here; its script-readable twins are the `av_admin_hint` cookie
+// (set by the owner sign-in, cleared with the session cookie) and the
+// `analytics-admin-session` marker (also set by any /api/auth/user answer with
+// role admin, cleared on every sign-out). Both vanish with site data, and
+// owner cookies minted before the hint existed have neither, so /admin always
+// asks the server.
+const SIGNED_OUT: AuthResponse = { user: null, isAuthenticated: false };
+
 async function fetchAuthUser(): Promise<AuthResponse> {
+  const onAdminRoute = /^\/admin(\/|$)/.test(window.location.pathname);
+  if (!onAdminRoute && !hasClerkSessionHint() && !hasOwnerSessionHint() && !isAdminAnalyticsSession()) {
+    return SIGNED_OUT;
+  }
   const auth = await requestAuthUser();
   if (auth.isAuthenticated || !(await renewSessionToken())) return auth;
   return requestAuthUser();
@@ -94,7 +183,7 @@ export function useAuth() {
   // harmless. Reset lives in the logout mutation below.
   const authedUser = data?.user ?? null;
   useEffect(() => {
-    if (authedUser?.id) {
+    if (authedUser?.id && !syncAdminAnalytics(authedUser.role)) {
       const identity = {
         id: authedUser.id,
         name: authedUser.name,
@@ -106,34 +195,9 @@ export function useAuth() {
       phIdentify(identity);
     }
     // Identify once per signed-in user id (session start/restore), not on
-    // every profile-field refetch.
+    // every profile-field refetch. Admins are never identified.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedUser?.id]);
-
-  /** Sign out via Clerk, then confirm the server no longer sees a session. */
-  const clerkSignOutAndVerify = async () => {
-    // Clear the owner password cookie too (no-op for Clerk-only sessions),
-    // or the server would still see the admin after Clerk signs out.
-    await fetch('/api/auth/admin-logout', {
-      method: 'POST',
-      credentials: 'include',
-      signal: logoutRequestSignal(),
-    });
-    // Clerk loads on demand (backlog X-03); the bridged signOut skips Clerk's
-    // after-sign-out navigation, and finishLogout does the full reload once
-    // the server confirms (C3-V3-02).
-    const clerk = await whenClerkLoaded();
-    await clerk.signOut();
-    const authCheck = await fetch('/api/auth/user', {
-      credentials: 'include',
-      cache: 'no-store',
-      signal: logoutRequestSignal(),
-    });
-    const authState = authCheck.ok ? await authCheck.json() : null;
-    if (!authCheck.ok || authState?.isAuthenticated !== false) {
-      throw new Error('The server could not confirm that your session ended');
-    }
-  };
 
   const finishLogout = (scope: 'this_device' | 'all_devices') => {
       // Before clearSignedInClientState resets the analytics identities, so
@@ -147,7 +211,8 @@ export function useAuth() {
   };
 
   const handleLogoutError = (error: Error) => {
-    const message = `${error.message}. You are still signed in; please try again.`;
+    const reason = humanizeApiError(error, "Sign out failed.").trim();
+    const message = `${/[.!?]$/.test(reason) ? reason : `${reason}.`} You are still signed in; please try again.`;
     setLogoutError(message);
     toast({
       title: 'Sign out failed',
@@ -160,7 +225,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       setLogoutError(null);
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('this_device'),
     onError: handleLogoutError,
@@ -172,7 +237,7 @@ export function useAuth() {
   const logoutAllMutation = useMutation({
     mutationFn: async () => {
       setLogoutError(null);
-      const response = await fetch('/api/auth/logout-all', {
+      const response = await apiFetch('/api/auth/logout-all', {
         method: 'POST',
         credentials: 'include',
         signal: logoutRequestSignal(),
@@ -181,7 +246,7 @@ export function useAuth() {
         const body = await response.json().catch(() => null);
         throw new Error(body?.message || 'Sign out failed');
       }
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('all_devices'),
     onError: handleLogoutError,

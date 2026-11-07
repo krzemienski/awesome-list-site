@@ -190,10 +190,25 @@ Import resources from any awesome-list repository.
    ```
    https://raw.githubusercontent.com/user/repo/main/README.md
    ```
-3. Options:
-   - **Dry Run**: Preview without importing
-   - **Strict Mode**: Fail on validation errors
-4. Click Import
+3. Click Import. The panel has no option controls.
+
+   Dry run is API-only, and Strict Mode is not available:
+   - **Dry Run**: `POST /api/admin/import-github` with
+     `{"repoUrl": "...", "dryRun": true}`. It writes nothing (no resources,
+     categories, or queue/history rows) and returns the plan synchronously:
+     the counts, `wouldCreateTaxonomy` for headings with no matching taxonomy
+     node, `warnings` for plan notes such as taxonomy merges, and the README's
+     awesome-lint findings in `validationWarnings`. The queued `POST /api/github/import` rejects
+     `dryRun` with a 400. Against the full awesome-video README it answers in
+     about 10 seconds on production. With the taxonomy in sync,
+     `wouldCreateTaxonomy` is empty. An entry there means an upstream heading
+     names no existing node, so check its spelling before you run the real
+     import. Headings keep `&`, `/` and `-`, so `iOS/tvOS` matches the
+     existing `ios-tvos` node.
+   - **Strict Mode**: not available. `POST /api/admin/import-github` accepts a
+     `strictMode` field, but the import service never reads it, so it changes
+     nothing and the panel has no such control.
+4. Wait for the queued import to finish
 5. Review results:
    - Imported count
    - Updated count
@@ -289,20 +304,83 @@ See [AI-SERVICES.md](./AI-SERVICES.md) for the enrichment pipeline internals.
 ## Research Agent
 
 The **Researcher** tab runs an AI research agent that discovers new candidate
-resources from the web (backed by `server/ai/researchService.ts`).
+resources from the web (backed by `server/ai/researchService.ts`). The tab
+walks you from launch, through the live run, to reviewing what it found.
 
-### Running a Research Job
-1. Admin → **Researcher**
-2. Provide the topic/query and options, then start the job
-3. Monitor progress and the live agent event log
+### Launching a run
+Admin → **Researcher**. The launch card has five steps:
 
-### Reviewing Discoveries
-1. Discovered candidates appear in the discoveries list
-2. **Approve** to add a discovery into the resource catalog
-3. **Reject** to discard it
+1. **Brief** — *Auto-generate at launch* (a gap-aware brief built from the
+   catalog and past runs) or *Write my own*. "Start from a generated brief"
+   fills the text box with a brief you can edit. A custom brief needs at least
+   10 characters.
+2. **Focus** — one category, or all categories.
+3. **Limits** — *Stop after* N new discoveries, a *Budget cap* in USD
+   (default $3.00) and *Max turns* (default 40). A blank field means no cap.
+4. **Endpoint & model** (optional) — override the orchestrator model, the
+   scout model, or the base URL + auth token. Leave them empty to use the
+   server's configuration. The step heading counts active overrides.
+5. **About to run on** — the endpoint host, credential source, orchestrator
+   model and scout model the run will use, resolved by the server
+   (`GET /api/researcher/config`) and refreshed as you edit step 4. Each
+   override is marked **Override**. If the configuration cannot launch (a
+   missing environment variable, a base URL without a token, an invalid URL,
+   or an unconfirmed plain-`http://` endpoint), the server's message appears
+   here and **Launch research run** stays disabled. A plain-`http://` base URL
+   needs the confirmation checkbox in step 4.
 
-Endpoints: `POST /api/researcher/start`, `GET /api/researcher/jobs`,
-`GET /api/researcher/discoveries`, `POST /api/researcher/discoveries/:id/approve|reject`.
+**Launch research run** asks for confirmation, then starts the run. Only one
+run can be active; while one is going, the card offers **Follow run #N**
+instead. Launching works whether or not the lower "All pending discoveries &
+full job history" panel is open.
+
+### Following a run
+After launch the card becomes the live run view (opening the tab while a run
+is active, or a `?jobId=N` link, opens the same view):
+
+- **Phase timeline** — Planning → Scouting → Verifying → Saving → Done, with
+  the time each phase started. A run can move back and forth between phases;
+  the timeline shows the current one. The last step reads Done, Stopped at
+  budget, Cancelled or Failed.
+- **Scouts** — one card per scout the agent sends out, with its task, and when
+  it reports: web searches, candidate URLs and duration.
+- **Discoveries** — each saved discovery appears in the list as it is saved,
+  with progress against the *Stop after* target.
+- **Turns** and **Spend** — the server counts these when the run ends, so
+  during the run they show the caps; afterwards, the real values against the
+  caps. A cost marked *lower bound* comes from a run that did not finish
+  normally (cancel or abort) and undercounts.
+- **Cancel run** stops the run; discoveries saved so far are kept.
+- **Run details** opens the raw agent event log and the agent communication
+  graph.
+
+Phase changes, saved discoveries and the ending are announced to screen
+readers. Animations are skipped when the system asks for reduced motion.
+
+### Reviewing a run's discoveries
+When the run ends, the view says how it ended and what to do next (for
+example "Budget cap reached — review the 2 saved discoveries, or relaunch with
+a higher cap", with a **Relaunch with a higher cap** button that returns to the
+launch steps at the budget field). Keyboard focus moves to **Review
+discoveries**:
+
+- **Approve** adds the discovery to the catalog as an approved resource.
+- **Reject** asks for an optional reason and marks it rejected.
+
+Then **Done — go to job history** (or **Review later**) shows the jobs table
+with the run highlighted, or **Start another run** returns to the launch
+steps.
+
+Discoveries from every run that still need review are under **All pending
+discoveries & full job history → Review Discoveries** (with **Approve All**);
+**Job History** lists every run with its cost, turns and errors.
+
+Endpoints: `GET /api/researcher/config`, `POST /api/researcher/start`,
+`GET /api/researcher/jobs`, `GET /api/researcher/jobs/:id`,
+`GET /api/researcher/jobs/:id/events`, `DELETE /api/researcher/jobs/:id`,
+`GET /api/researcher/discoveries`,
+`POST /api/researcher/discoveries/:id/approve|reject`. See
+[AI-SERVICES.md](./AI-SERVICES.md) ("Researcher run contract").
 
 ## Learning Journeys
 
@@ -310,8 +388,10 @@ The **Journeys** tab manages curated learning journeys and their ordered steps.
 
 ### Managing Journeys
 1. Admin → **Journeys**
-2. Create/edit/delete journeys (title, description, difficulty, published state)
+2. Pick an existing journey and edit its details (`PUT /api/admin/journeys/:id`)
 3. Add, reorder, or remove steps that reference resources
+
+The admin panel cannot create or delete a journey: there is no create control and no `POST /api/admin/journeys` route. New journeys come only from the seed CLI (`server/cli/seedJourneys.ts`), which calls Claude for each journey and inserts it as `published`. With no journeys in the database, the tab shows "No journeys yet."
 
 Only **published** journeys are visible to end users on `/journeys`.
 

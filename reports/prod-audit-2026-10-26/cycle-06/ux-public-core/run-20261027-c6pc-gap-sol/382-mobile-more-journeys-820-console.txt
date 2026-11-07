@@ -1,0 +1,7 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":true,"isLandscape":false,"width":820,"height":1180}
+Emulating color scheme: dark
+## Console messages
+Showing 1-1 of 1 (Page 1 of 1).
+msgid=75 [warn] Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <h1.page-title journeys-page__title>
+Ancestor with aria-hidden: <div#root> (0 args)

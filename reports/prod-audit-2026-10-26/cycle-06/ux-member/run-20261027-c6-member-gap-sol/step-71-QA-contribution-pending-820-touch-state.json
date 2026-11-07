@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/contributions",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<input class=\"input file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed min-h-11 pl-10\" maxlength=\"100\" placeholder=\"Search your contributions\" aria-label=\"Search your contributions\" data-testid=\"input-contributions-search\" value=\"[QA-audit-1026] MDN VideoFrame clone audit\">",
+  "umami": "1",
+  "consent": "denied"
+}

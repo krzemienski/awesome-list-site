@@ -1,0 +1,997 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Close filters" [expanded] [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Close filters
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - img [ref=e26]
+          - textbox "Search in Encoding & Codecs" [active] [ref=e29]:
+            - /placeholder: Search in Encoding & Codecs...
+        - combobox "Limit Encoding & Codecs by subcategory" [ref=e30] [cursor=pointer]:
+          - option "All subcategories" [selected]
+          - option "Uncategorized (120)"
+          - option "Codecs (27)"
+          - option "Codecs › AV1 (5)"
+          - option "Codecs › HEVC (10)"
+          - option "Codecs › VP9 (1)"
+          - option "Encoding Tools (225)"
+          - option "Encoding Tools › FFMPEG (65)"
+        - combobox "Limit by resource kind" [ref=e31] [cursor=pointer]:
+          - option "All resource kinds" [selected]
+          - option "Tools"
+          - option "Libraries"
+          - option "Standards"
+          - option "Events"
+          - option "Protocols"
+          - option "Other"
+        - combobox "Sort resources" [ref=e33] [cursor=pointer]:
+          - generic: Name Z-A
+          - img [ref=e34]
+        - generic "View mode" [ref=e36]:
+          - generic [ref=e37]: View
+          - radiogroup [ref=e38]:
+            - radio "Grid view" [checked] [ref=e39] [cursor=pointer]:
+              - img
+            - radio "List view" [ref=e40] [cursor=pointer]:
+              - img
+            - radio "Compact view" [ref=e41] [cursor=pointer]:
+              - img
+      - region "Subcategories" [ref=e42]:
+        - heading "Subcategories" [level=2] [ref=e43]
+        - generic [ref=e44]:
+          - link "Codecs 27" [ref=e45] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e46]: Codecs
+            - generic [ref=e47]: "27"
+          - link "Encoding Tools 225" [ref=e48] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e49]: Encoding Tools
+            - generic [ref=e50]: "225"
+          - button "Uncategorized 120" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: Uncategorized
+            - generic [ref=e53]: "120"
+      - generic [ref=e54]:
+        - button "Filters" [ref=e57] [cursor=pointer]:
+          - img
+          - text: Filters
+        - generic "Resources (372)" [ref=e59]:
+          - heading "Resources (372)" [level=2] [ref=e61]
+          - generic [ref=e62]:
+            - article [ref=e63] [cursor=pointer]:
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: ◇
+                  - generic [ref=e67]:
+                    - link "View details for Zulko/moviepy" [ref=e68]:
+                      - /url: /resource/888
+                      - img [ref=e70]
+                      - generic [ref=e72]: View Details
+                    - button "Show 2 more tags" [ref=e73]: +2 more
+                    - generic [ref=e74]:
+                      - link "Open Link Zulko/moviepy (opens in new tab)" [ref=e75]:
+                        - /url: https://github.com/Zulko/moviepy
+                        - img
+                        - generic [ref=e76]: Open Link
+                        - generic [ref=e77]: Zulko/moviepy (opens in new tab)
+                      - 'button "Suggest an edit: Zulko/moviepy" [ref=e78]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Zulko/moviepy" [ref=e81]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Zulko/moviepy" [ref=e83]':
+                    - img
+                - heading "Zulko/moviepy" [level=2] [ref=e86]:
+                  - link "Zulko/moviepy" [ref=e87]:
+                    - /url: /resource/888
+                - paragraph [ref=e88]: A tool or resource for effects-compositing-tools.
+              - generic [ref=e90]:
+                - generic [ref=e91]: Encoding & Codecs
+                - generic [ref=e92]: Libraries
+                - link "Filter by tag python" [ref=e93]:
+                  - /url: /tag/python
+                  - generic [ref=e94]: "#python"
+                - link "Filter by tag video-editing" [ref=e95]:
+                  - /url: /tag/video-editing
+                  - generic [ref=e96]: "#video-editing"
+                - link "Filter by tag effects" [ref=e97]:
+                  - /url: /tag/effect
+                  - generic [ref=e98]: "#effects"
+            - article [ref=e99] [cursor=pointer]:
+              - generic [ref=e100]:
+                - generic [ref=e101]:
+                  - generic [ref=e102]: ◇
+                  - generic [ref=e103]:
+                    - link "View details for zolinux/MediaArchiver" [ref=e104]:
+                      - /url: /resource/1431
+                      - img [ref=e106]
+                      - generic [ref=e108]: View Details
+                    - button "Show 1 more tag" [ref=e109]: +1 more
+                    - generic [ref=e110]:
+                      - link "Open Link zolinux/MediaArchiver (opens in new tab)" [ref=e111]:
+                        - /url: https://github.com/zolinux/MediaArchiver
+                        - img
+                        - generic [ref=e112]: Open Link
+                        - generic [ref=e113]: zolinux/MediaArchiver (opens in new tab)
+                      - 'button "Suggest an edit: zolinux/MediaArchiver" [ref=e114]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: zolinux/MediaArchiver" [ref=e117]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: zolinux/MediaArchiver" [ref=e119]':
+                    - img
+                - heading "zolinux/MediaArchiver" [level=2] [ref=e122]:
+                  - link "zolinux/MediaArchiver" [ref=e123]:
+                    - /url: /resource/1431
+                - paragraph [ref=e124]: Transcode video files using FFMPEG and python3.
+              - generic [ref=e126]:
+                - generic [ref=e127]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e128]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e129]: "#ffmpeg"
+                - link "Filter by tag transcoding" [ref=e130]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e131]: "#transcoding"
+                - link "Filter by tag python" [ref=e132]:
+                  - /url: /tag/python
+                  - generic [ref=e133]: "#python"
+            - article [ref=e134] [cursor=pointer]:
+              - generic [ref=e135]:
+                - generic [ref=e136]:
+                  - generic [ref=e137]: ◇
+                  - generic [ref=e138]:
+                    - link "View details for ZaifSenpai/Batch-Py-Remux" [ref=e139]:
+                      - /url: /resource/1025
+                      - img [ref=e141]
+                      - generic [ref=e143]: View Details
+                    - button "Show 2 more tags" [ref=e144]: +2 more
+                    - generic [ref=e145]:
+                      - link "Open Link ZaifSenpai/Batch-Py-Remux (opens in new tab)" [ref=e146]:
+                        - /url: https://github.com/ZaifSenpai/Batch-Py-Remux
+                        - img
+                        - generic [ref=e147]: Open Link
+                        - generic [ref=e148]: ZaifSenpai/Batch-Py-Remux (opens in new tab)
+                      - 'button "Suggest an edit: ZaifSenpai/Batch-Py-Remux" [ref=e149]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: ZaifSenpai/Batch-Py-Remux" [ref=e152]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: ZaifSenpai/Batch-Py-Remux" [ref=e154]':
+                    - img
+                - heading "ZaifSenpai/Batch-Py-Remux" [level=2] [ref=e157]:
+                  - link "ZaifSenpai/Batch-Py-Remux" [ref=e158]:
+                    - /url: /resource/1025
+                - paragraph [ref=e159]: Convert mkv video to hevc (h.265).
+              - generic [ref=e161]:
+                - generic [ref=e162]: Encoding & Codecs
+                - link "Filter by tag python" [ref=e163]:
+                  - /url: /tag/python
+                  - generic [ref=e164]: "#python"
+                - link "Filter by tag video-conversion" [ref=e165]:
+                  - /url: /tag/video-conversion
+                  - generic [ref=e166]: "#video-conversion"
+                - link "Filter by tag hevc" [ref=e167]:
+                  - /url: /tag/hevc
+                  - generic [ref=e168]: "#hevc"
+            - article [ref=e169] [cursor=pointer]:
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]: ◇
+                  - generic [ref=e173]:
+                    - link "View details for Yamdi (Yet Another Metadata Injector)" [ref=e174]:
+                      - /url: /resource/1753
+                      - img [ref=e176]
+                      - generic [ref=e178]: View Details
+                    - button "Show 2 more tags" [ref=e179]: +2 more
+                    - generic [ref=e180]:
+                      - link "Open Link Yamdi (Yet Another Metadata Injector) (opens in new tab)" [ref=e181]:
+                        - /url: http://yamdi.sourceforge.net/
+                        - img
+                        - generic [ref=e182]: Open Link
+                        - generic [ref=e183]: Yamdi (Yet Another Metadata Injector) (opens in new tab)
+                      - 'button "Suggest an edit: Yamdi (Yet Another Metadata Injector)" [ref=e184]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Yamdi (Yet Another Metadata Injector)" [ref=e187]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Yamdi (Yet Another Metadata Injector)" [ref=e189]':
+                    - img
+                - heading "Yamdi (Yet Another Metadata Injector)" [level=2] [ref=e192]:
+                  - link "Yamdi (Yet Another Metadata Injector)" [ref=e193]:
+                    - /url: /resource/1753
+                - paragraph [ref=e194]: A simple, fast tool to inject metadata (onMetaData) into FLV files. Yamdi can also insert an onLastSecond event and is often used to prepare live-recorded FLV files for on-demand playback by adding missing metadata for durations and keyframes.
+              - generic [ref=e196]:
+                - generic [ref=e197]: Encoding & Codecs
+                - link "Filter by tag metadata" [ref=e198]:
+                  - /url: /tag/metadata
+                  - generic [ref=e199]: "#metadata"
+                - link "Filter by tag FLV" [ref=e200]:
+                  - /url: /tag/flv
+                  - generic [ref=e201]: "#FLV"
+                - link "Filter by tag encoding" [ref=e202]:
+                  - /url: /tag/encoding
+                  - generic [ref=e203]: "#encoding"
+            - article [ref=e204] [cursor=pointer]:
+              - generic [ref=e205]:
+                - generic [ref=e206]:
+                  - generic [ref=e207]: ◇
+                  - generic [ref=e208]:
+                    - link "View details for xyk2/cloud-transcoder" [ref=e209]:
+                      - /url: /resource/1459
+                      - img [ref=e211]
+                      - generic [ref=e213]: View Details
+                    - button "Show 3 more tags" [ref=e214]: +3 more
+                    - generic [ref=e215]:
+                      - link "Open Link xyk2/cloud-transcoder (opens in new tab)" [ref=e216]:
+                        - /url: https://github.com/xyk2/cloud-transcoder
+                        - img
+                        - generic [ref=e217]: Open Link
+                        - generic [ref=e218]: xyk2/cloud-transcoder (opens in new tab)
+                      - 'button "Suggest an edit: xyk2/cloud-transcoder" [ref=e219]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: xyk2/cloud-transcoder" [ref=e222]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: xyk2/cloud-transcoder" [ref=e224]':
+                    - img
+                - heading "xyk2/cloud-transcoder" [level=2] [ref=e227]:
+                  - link "xyk2/cloud-transcoder" [ref=e228]:
+                    - /url: /resource/1459
+                - paragraph [ref=e229]: Transcoding long (>1 hour) videos quickly and cost-effectively on GCP to adaptive HLS and MP4 mezzanine files. Up to 40x $ savings. - xyk2/cloud-transcoder
+              - generic [ref=e231]:
+                - generic [ref=e232]: Encoding & Codecs
+                - link "Filter by tag transcoding" [ref=e233]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e234]: "#transcoding"
+                - link "Filter by tag cloud" [ref=e235]:
+                  - /url: /tag/cloud
+                  - generic [ref=e236]: "#cloud"
+                - link "Filter by tag GCP" [ref=e237]:
+                  - /url: /tag/gcp
+                  - generic [ref=e238]: "#GCP"
+            - article [ref=e239] [cursor=pointer]:
+              - generic [ref=e240]:
+                - generic [ref=e241]:
+                  - generic [ref=e242]: ◇
+                  - generic [ref=e243]:
+                    - link "View details for XVC Codec (Divideon)" [ref=e244]:
+                      - /url: /resource/1750
+                      - img [ref=e246]
+                      - generic [ref=e248]: View Details
+                    - button "Show 2 more tags" [ref=e249]: +2 more
+                    - generic [ref=e250]:
+                      - link "Open Link XVC Codec (Divideon) (opens in new tab)" [ref=e251]:
+                        - /url: https://github.com/divideon/xvc
+                        - img
+                        - generic [ref=e252]: Open Link
+                        - generic [ref=e253]: XVC Codec (Divideon) (opens in new tab)
+                      - 'button "Suggest an edit: XVC Codec (Divideon)" [ref=e254]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: XVC Codec (Divideon)" [ref=e257]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: XVC Codec (Divideon)" [ref=e259]':
+                    - img
+                - heading "XVC Codec (Divideon)" [level=2] [ref=e262]:
+                  - link "XVC Codec (Divideon)" [ref=e263]:
+                    - /url: /resource/1750
+                - paragraph [ref=e264]: XVC is a proprietary but openly documented video codec by Divideon that claims high compression efficiency. An open source evaluation implementation was released for research purposes. XVC serves as a modern codec design to compare against standards like HEVC and AV1 in compression efficiency research.
+              - generic [ref=e266]:
+                - generic [ref=e267]: Encoding & Codecs
+                - link "Filter by tag codec" [ref=e268]:
+                  - /url: /tag/codec
+                  - generic [ref=e269]: "#codec"
+                - link "Filter by tag research" [ref=e270]:
+                  - /url: /tag/research
+                  - generic [ref=e271]: "#research"
+                - link "Filter by tag compression" [ref=e272]:
+                  - /url: /tag/compression
+                  - generic [ref=e273]: "#compression"
+            - article [ref=e274] [cursor=pointer]:
+              - generic [ref=e275]:
+                - generic [ref=e276]:
+                  - generic [ref=e277]: ◇
+                  - generic [ref=e278]:
+                    - link "View details for xvc" [ref=e279]:
+                      - /url: /resource/561
+                      - img [ref=e281]
+                      - generic [ref=e283]: View Details
+                    - button "Show 2 more tags" [ref=e284]: +2 more
+                    - generic [ref=e285]:
+                      - link "Open Link xvc (opens in new tab)" [ref=e286]:
+                        - /url: https://xvc.io/
+                        - img
+                        - generic [ref=e287]: Open Link
+                        - generic [ref=e288]: xvc (opens in new tab)
+                      - 'button "Suggest an edit: xvc" [ref=e289]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: xvc" [ref=e292]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: xvc" [ref=e294]':
+                    - img
+                - heading "xvc" [level=2] [ref=e297]:
+                  - link "xvc" [ref=e298]:
+                    - /url: /resource/561
+                - paragraph [ref=e299]: xvc is a modern and flexible open-source video codec that offers high compression performance at reasonable encoding and decoding complexity. It is based on technologies from standards like AVC/H.264 and HEVC, and includes additional advancements to enhance video compression efficiency.
+              - generic [ref=e301]:
+                - generic [ref=e302]: Encoding & Codecs
+                - link "Filter by tag video codec" [ref=e303]:
+                  - /url: /tag/video-codec
+                  - generic [ref=e304]: "#video codec"
+                - link "Filter by tag compression" [ref=e305]:
+                  - /url: /tag/compression
+                  - generic [ref=e306]: "#compression"
+                - link "Filter by tag encoding" [ref=e307]:
+                  - /url: /tag/encoding
+                  - generic [ref=e308]: "#encoding"
+            - article [ref=e309] [cursor=pointer]:
+              - generic [ref=e310]:
+                - generic [ref=e311]:
+                  - generic [ref=e312]: ◇
+                  - generic [ref=e313]:
+                    - link "View details for Xuggler" [ref=e314]:
+                      - /url: /resource/1865
+                      - img [ref=e316]
+                      - generic [ref=e318]: View Details
+                    - button "Show 2 more tags" [ref=e319]: +2 more
+                    - generic [ref=e320]:
+                      - link "Open Link Xuggler (opens in new tab)" [ref=e321]:
+                        - /url: https://github.com/artclarke/xuggle-xuggler
+                        - img
+                        - generic [ref=e322]: Open Link
+                        - generic [ref=e323]: Xuggler (opens in new tab)
+                      - 'button "Suggest an edit: Xuggler" [ref=e324]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Xuggler" [ref=e327]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Xuggler" [ref=e329]':
+                    - img
+                - heading "Xuggler" [level=2] [ref=e332]:
+                  - link "Xuggler" [ref=e333]:
+                    - /url: /resource/1865
+                - paragraph [ref=e334]: An open source Java library (now discontinued) that wrapped FFmpeg functionality, enabling Java developers to decode, encode, and stream video.
+              - generic [ref=e336]:
+                - generic [ref=e337]: Encoding & Codecs
+                - generic [ref=e338]: Libraries
+                - link "Filter by tag java" [ref=e339]:
+                  - /url: /tag/java
+                  - generic [ref=e340]: "#java"
+                - link "Filter by tag ffmpeg" [ref=e341]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e342]: "#ffmpeg"
+                - link "Filter by tag encoding" [ref=e343]:
+                  - /url: /tag/encoding
+                  - generic [ref=e344]: "#encoding"
+            - article [ref=e345] [cursor=pointer]:
+              - generic [ref=e346]:
+                - generic [ref=e347]:
+                  - generic [ref=e348]: ◇
+                  - generic [ref=e349]:
+                    - link "View details for XMedia Recode" [ref=e350]:
+                      - /url: /resource/1775
+                      - img [ref=e352]
+                      - generic [ref=e354]: View Details
+                    - button "Show 2 more tags" [ref=e355]: +2 more
+                    - generic [ref=e356]:
+                      - link "Open Link XMedia Recode (opens in new tab)" [ref=e357]:
+                        - /url: https://www.xmedia-recode.de/en/
+                        - img
+                        - generic [ref=e358]: Open Link
+                        - generic [ref=e359]: XMedia Recode (opens in new tab)
+                      - 'button "Suggest an edit: XMedia Recode" [ref=e360]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: XMedia Recode" [ref=e363]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: XMedia Recode" [ref=e365]':
+                    - img
+                - heading "XMedia Recode" [level=2] [ref=e368]:
+                  - link "XMedia Recode" [ref=e369]:
+                    - /url: /resource/1775
+                - paragraph [ref=e370]: A free Windows tool for converting media files to various formats. It supports a broad array of codecs (built on FFmpeg) and provides fine control over encoding settings.
+              - generic [ref=e372]:
+                - generic [ref=e373]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e374]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e375]: "#ffmpeg"
+                - link "Filter by tag media conversion" [ref=e376]:
+                  - /url: /tag/media-conversion
+                  - generic [ref=e377]: "#media conversion"
+                - link "Filter by tag encoding" [ref=e378]:
+                  - /url: /tag/encoding
+                  - generic [ref=e379]: "#encoding"
+            - article [ref=e380] [cursor=pointer]:
+              - generic [ref=e381]:
+                - generic [ref=e382]:
+                  - generic [ref=e383]: ◇
+                  - generic [ref=e384]:
+                    - link "View details for xiph/rav1e" [ref=e385]:
+                      - /url: /resource/1365
+                      - img [ref=e387]
+                      - generic [ref=e389]: View Details
+                    - button "Show 1 more tag" [ref=e390]: +1 more
+                    - generic [ref=e391]:
+                      - link "Open Link xiph/rav1e (opens in new tab)" [ref=e392]:
+                        - /url: https://github.com/xiph/rav1e
+                        - img
+                        - generic [ref=e393]: Open Link
+                        - generic [ref=e394]: xiph/rav1e (opens in new tab)
+                      - 'button "Suggest an edit: xiph/rav1e" [ref=e395]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: xiph/rav1e" [ref=e398]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: xiph/rav1e" [ref=e400]':
+                    - img
+                - heading "xiph/rav1e" [level=2] [ref=e403]:
+                  - link "xiph/rav1e" [ref=e404]:
+                    - /url: /resource/1365
+                - paragraph [ref=e405]: The fastest and safest AV1 encoder.
+              - generic [ref=e407]:
+                - generic [ref=e408]: Encoding & Codecs
+                - link "Filter by tag encoder" [ref=e409]:
+                  - /url: /tag/encoder
+                  - generic [ref=e410]: "#encoder"
+                - link "Filter by tag AV1" [ref=e411]:
+                  - /url: /tag/av1
+                  - generic [ref=e412]: "#AV1"
+                - link "Filter by tag codec" [ref=e413]:
+                  - /url: /tag/codec
+                  - generic [ref=e414]: "#codec"
+            - article [ref=e415] [cursor=pointer]:
+              - generic [ref=e416]:
+                - generic [ref=e417]:
+                  - generic [ref=e418]: ◇
+                  - generic [ref=e419]:
+                    - link "View details for Xiph.Org Foundation Projects" [ref=e420]:
+                      - /url: /resource/277
+                      - img [ref=e422]
+                      - generic [ref=e424]: View Details
+                    - button "Show 2 more tags" [ref=e425]: +2 more
+                    - generic [ref=e426]:
+                      - link "Open Link Xiph.Org Foundation Projects (opens in new tab)" [ref=e427]:
+                        - /url: https://xiph.org/
+                        - img
+                        - generic [ref=e428]: Open Link
+                        - generic [ref=e429]: Xiph.Org Foundation Projects (opens in new tab)
+                      - 'button "Suggest an edit: Xiph.Org Foundation Projects" [ref=e430]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Xiph.Org Foundation Projects" [ref=e433]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Xiph.Org Foundation Projects" [ref=e435]':
+                    - img
+                - heading "Xiph.Org Foundation Projects" [level=2] [ref=e438]:
+                  - link "Xiph.Org Foundation Projects" [ref=e439]:
+                    - /url: /resource/277
+                - paragraph [ref=e440]: The Xiph.Org Foundation develops free and open protocols and software for multimedia, including well-known projects like the Vorbis audio codec and the Theora video codec. Their work focuses on providing open-source alternatives for multimedia processing, making them valuable resources for developers seeking royalty-free codecs.
+              - generic [ref=e442]:
+                - generic [ref=e443]: Encoding & Codecs
+                - link "Filter by tag open source" [ref=e444]:
+                  - /url: /tag/open-source
+                  - generic [ref=e445]: "#open source"
+                - link "Filter by tag audio codec" [ref=e446]:
+                  - /url: /tag/audio-codec
+                  - generic [ref=e447]: "#audio codec"
+                - link "Filter by tag video codec" [ref=e448]:
+                  - /url: /tag/video-codec
+                  - generic [ref=e449]: "#video codec"
+            - article [ref=e450] [cursor=pointer]:
+              - generic [ref=e451]:
+                - generic [ref=e452]:
+                  - generic [ref=e453]: ◇
+                  - generic [ref=e454]:
+                    - link "View details for Xabe.FFmpeg" [ref=e455]:
+                      - /url: /resource/1781
+                      - img [ref=e457]
+                      - generic [ref=e459]: View Details
+                    - button "Show 3 more tags" [ref=e460]: +3 more
+                    - generic [ref=e461]:
+                      - link "Open Link Xabe.FFmpeg (opens in new tab)" [ref=e462]:
+                        - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                        - img
+                        - generic [ref=e463]: Open Link
+                        - generic [ref=e464]: Xabe.FFmpeg (opens in new tab)
+                      - 'button "Suggest an edit: Xabe.FFmpeg" [ref=e465]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e468]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e470]':
+                    - img
+                - heading "Xabe.FFmpeg" [level=2] [ref=e473]:
+                  - link "Xabe.FFmpeg" [ref=e474]:
+                    - /url: /resource/1781
+                - paragraph [ref=e475]: A .NET Standard wrapper for FFmpeg, enabling developers to compose and execute FFmpeg commands in C# with a fluent interface.
+              - generic [ref=e477]:
+                - generic [ref=e478]: Encoding & Codecs
+                - generic [ref=e479]: Libraries
+                - link "Filter by tag ffmpeg" [ref=e480]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e481]: "#ffmpeg"
+                - link "Filter by tag .NET" [ref=e482]:
+                  - /url: /tag/.net
+                  - generic [ref=e483]: "#.NET"
+                - link "Filter by tag encoding" [ref=e484]:
+                  - /url: /tag/encoding
+                  - generic [ref=e485]: "#encoding"
+            - article [ref=e486] [cursor=pointer]:
+              - generic [ref=e487]:
+                - generic [ref=e488]:
+                  - generic [ref=e489]: ◇
+                  - generic [ref=e490]:
+                    - link "View details for x265 Documentation — x265 documentation" [ref=e491]:
+                      - /url: /resource/1256
+                      - img [ref=e493]
+                      - generic [ref=e495]: View Details
+                    - button "Show 2 more tags" [ref=e496]: +2 more
+                    - generic [ref=e497]:
+                      - link "Open Link x265 Documentation — x265 documentation (opens in new tab)" [ref=e498]:
+                        - /url: https://x265.readthedocs.io/en/master/
+                        - img
+                        - generic [ref=e499]: Open Link
+                        - generic [ref=e500]: x265 Documentation — x265 documentation (opens in new tab)
+                      - 'button "Suggest an edit: x265 Documentation — x265 documentation" [ref=e501]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: x265 Documentation — x265 documentation" [ref=e504]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x265 Documentation — x265 documentation" [ref=e506]':
+                    - img
+                - heading "x265 Documentation — x265 documentation" [level=2] [ref=e509]:
+                  - link "x265 Documentation — x265 documentation" [ref=e510]:
+                    - /url: /resource/1256
+                - paragraph [ref=e511]: A tool or resource for open-source-encoder-projects.
+              - generic [ref=e513]:
+                - generic [ref=e514]: Encoding & Codecs
+                - link "Filter by tag encoder" [ref=e515]:
+                  - /url: /tag/encoder
+                  - generic [ref=e516]: "#encoder"
+                - link "Filter by tag x265" [ref=e517]:
+                  - /url: /tag/x265
+                  - generic [ref=e518]: "#x265"
+                - link "Filter by tag hevc" [ref=e519]:
+                  - /url: /tag/hevc
+                  - generic [ref=e520]: "#hevc"
+            - article [ref=e521] [cursor=pointer]:
+              - generic [ref=e522]:
+                - generic [ref=e523]:
+                  - generic [ref=e524]: ◇
+                  - generic [ref=e525]:
+                    - link "View details for x265 (H.265/HEVC Encoder)" [ref=e526]:
+                      - /url: /resource/1635
+                      - img [ref=e528]
+                      - generic [ref=e530]: View Details
+                    - button "Show 2 more tags" [ref=e531]: +2 more
+                    - generic [ref=e532]:
+                      - link "Open Link x265 (H.265/HEVC Encoder) (opens in new tab)" [ref=e533]:
+                        - /url: https://x265.org/
+                        - img
+                        - generic [ref=e534]: Open Link
+                        - generic [ref=e535]: x265 (H.265/HEVC Encoder) (opens in new tab)
+                      - 'button "Suggest an edit: x265 (H.265/HEVC Encoder)" [ref=e536]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: x265 (H.265/HEVC Encoder)" [ref=e539]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x265 (H.265/HEVC Encoder)" [ref=e541]':
+                    - img
+                - heading "x265 (H.265/HEVC Encoder)" [level=2] [ref=e544]:
+                  - link "x265 (H.265/HEVC Encoder)" [ref=e545]:
+                    - /url: /resource/1635
+                - paragraph [ref=e546]: A high-performance open source H.265/HEVC encoder. x265 is used to create HEVC video streams and is known for being very configurable to balance quality/speed.
+              - generic [ref=e548]:
+                - generic [ref=e549]: Encoding & Codecs
+                - link "Filter by tag encoder" [ref=e550]:
+                  - /url: /tag/encoder
+                  - generic [ref=e551]: "#encoder"
+                - link "Filter by tag HEVC" [ref=e552]:
+                  - /url: /tag/hevc
+                  - generic [ref=e553]: "#HEVC"
+                - link "Filter by tag H.265" [ref=e554]:
+                  - /url: /tag/h.265
+                  - generic [ref=e555]: "#H.265"
+            - article [ref=e556] [cursor=pointer]:
+              - generic [ref=e557]:
+                - generic [ref=e558]:
+                  - generic [ref=e559]: ◇
+                  - generic [ref=e560]:
+                    - 'link "View details for x264: H.264 Video Encoder" [ref=e561]':
+                      - /url: /resource/169
+                      - img [ref=e563]
+                      - generic [ref=e565]: View Details
+                    - button "Show 2 more tags" [ref=e566]: +2 more
+                    - 'link "Open Link x264: H.264 Video Encoder (opens in new tab)" [ref=e568]':
+                      - /url: https://github.com/mirror/x264
+                      - img
+                      - generic [ref=e569]: Open Link
+                      - generic [ref=e570]: "x264: H.264 Video Encoder (opens in new tab)"
+                    - 'button "Suggest an edit: x264: H.264 Video Encoder" [ref=e571]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: x264: H.264 Video Encoder" [ref=e574]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x264: H.264 Video Encoder" [ref=e576]':
+                    - img
+                - 'heading "x264: H.264 Video Encoder" [level=2] [ref=e579]':
+                  - 'link "x264: H.264 Video Encoder" [ref=e580]':
+                    - /url: /resource/169
+                - paragraph [ref=e581]: x264 is a free software library for encoding video streams into the H.264/MPEG-4 AVC format. It is widely used due to its high performance and quality, making it a staple in video encoding applications.
+              - generic [ref=e583]:
+                - generic [ref=e584]: Encoding & Codecs
+                - link "Filter by tag H.264" [ref=e585]:
+                  - /url: /tag/h.264
+                  - generic [ref=e586]: "#H.264"
+                - link "Filter by tag video encoding" [ref=e587]:
+                  - /url: /tag/video-encoding
+                  - generic [ref=e588]: "#video encoding"
+                - link "Filter by tag MPEG-4" [ref=e589]:
+                  - /url: /tag/mpeg-4
+                  - generic [ref=e590]: "#MPEG-4"
+            - article [ref=e591] [cursor=pointer]:
+              - generic [ref=e592]:
+                - generic [ref=e593]:
+                  - generic [ref=e594]: ◇
+                  - generic [ref=e595]:
+                    - link "View details for x264 FFmpeg Options Guide - Linux Encoding" [ref=e596]:
+                      - /url: /resource/1201
+                      - img [ref=e598]
+                      - generic [ref=e600]: View Details
+                    - button "Show 2 more tags" [ref=e601]: +2 more
+                    - generic [ref=e602]:
+                      - link "Open Link x264 FFmpeg Options Guide - Linux Encoding (opens in new tab)" [ref=e603]:
+                        - /url: https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+                        - img
+                        - generic [ref=e604]: Open Link
+                        - generic [ref=e605]: x264 FFmpeg Options Guide - Linux Encoding (opens in new tab)
+                      - 'button "Suggest an edit: x264 FFmpeg Options Guide - Linux Encoding" [ref=e606]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e609]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e611]':
+                    - img
+                - heading "x264 FFmpeg Options Guide - Linux Encoding" [level=2] [ref=e614]:
+                  - link "x264 FFmpeg Options Guide - Linux Encoding" [ref=e615]:
+                    - /url: /resource/1201
+                - paragraph [ref=e616]: A tool or resource for encoding-transcoding-guides.
+              - generic [ref=e618]:
+                - generic [ref=e619]: Encoding & Codecs
+                - link "Filter by tag encoding" [ref=e620]:
+                  - /url: /tag/encoding
+                  - generic [ref=e621]: "#encoding"
+                - link "Filter by tag linux" [ref=e622]:
+                  - /url: /tag/linux
+                  - generic [ref=e623]: "#linux"
+                - link "Filter by tag x264" [ref=e624]:
+                  - /url: /tag/x264
+                  - generic [ref=e625]: "#x264"
+            - article [ref=e626] [cursor=pointer]:
+              - generic [ref=e627]:
+                - generic [ref=e628]:
+                  - generic [ref=e629]: ◇
+                  - generic [ref=e630]:
+                    - link "View details for x264 (H.264/AVC Encoder)" [ref=e631]:
+                      - /url: /resource/1634
+                      - img [ref=e633]
+                      - generic [ref=e635]: View Details
+                    - button "Show 2 more tags" [ref=e636]: +2 more
+                    - generic [ref=e637]:
+                      - link "Open Link x264 (H.264/AVC Encoder) (opens in new tab)" [ref=e638]:
+                        - /url: https://code.videolan.org/videolan/x264
+                        - img
+                        - generic [ref=e639]: Open Link
+                        - generic [ref=e640]: x264 (H.264/AVC Encoder) (opens in new tab)
+                      - 'button "Suggest an edit: x264 (H.264/AVC Encoder)" [ref=e641]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: x264 (H.264/AVC Encoder)" [ref=e644]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x264 (H.264/AVC Encoder)" [ref=e646]':
+                    - img
+                - heading "x264 (H.264/AVC Encoder)" [level=2] [ref=e649]:
+                  - link "x264 (H.264/AVC Encoder)" [ref=e650]:
+                    - /url: /resource/1634
+                - paragraph [ref=e651]: The most widely used open source H.264/AVC video encoder, known for its high quality and efficiency across many profiles and presets.
+              - generic [ref=e653]:
+                - generic [ref=e654]: Encoding & Codecs
+                - link "Filter by tag h264" [ref=e655]:
+                  - /url: /tag/h264
+                  - generic [ref=e656]: "#h264"
+                - link "Filter by tag encoder" [ref=e657]:
+                  - /url: /tag/encoder
+                  - generic [ref=e658]: "#encoder"
+                - link "Filter by tag video-codec" [ref=e659]:
+                  - /url: /tag/video-codec
+                  - generic [ref=e660]: "#video-codec"
+            - article [ref=e661] [cursor=pointer]:
+              - generic [ref=e662]:
+                - generic [ref=e663]:
+                  - generic [ref=e664]: ◇
+                  - generic [ref=e665]:
+                    - link "View details for WritingMinds/ffmpeg-android-java" [ref=e666]:
+                      - /url: /resource/859
+                      - img [ref=e668]
+                      - generic [ref=e670]: View Details
+                    - button "Show 2 more tags" [ref=e671]: +2 more
+                    - generic [ref=e672]:
+                      - link "Open Link WritingMinds/ffmpeg-android-java (opens in new tab)" [ref=e673]:
+                        - /url: https://github.com/WritingMinds/ffmpeg-android-java
+                        - img
+                        - generic [ref=e674]: Open Link
+                        - generic [ref=e675]: WritingMinds/ffmpeg-android-java (opens in new tab)
+                      - 'button "Suggest an edit: WritingMinds/ffmpeg-android-java" [ref=e676]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java" [ref=e679]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java" [ref=e681]':
+                    - img
+                - heading "WritingMinds/ffmpeg-android-java" [level=2] [ref=e684]:
+                  - link "WritingMinds/ffmpeg-android-java" [ref=e685]:
+                    - /url: /resource/859
+                - paragraph [ref=e686]: Android java library for FFmpeg binary compiled using https://github.com/writingminds/ffmpeg-android - WritingMinds/ffmpeg-android-java
+              - generic [ref=e688]:
+                - generic [ref=e689]: Encoding & Codecs
+                - generic [ref=e690]: Libraries
+                - link "Filter by tag ffmpeg" [ref=e691]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e692]: "#ffmpeg"
+                - link "Filter by tag android" [ref=e693]:
+                  - /url: /tag/android
+                  - generic [ref=e694]: "#android"
+                - link "Filter by tag encoding" [ref=e695]:
+                  - /url: /tag/encoding
+                  - generic [ref=e696]: "#encoding"
+            - article [ref=e697] [cursor=pointer]:
+              - generic [ref=e698]:
+                - generic [ref=e699]:
+                  - generic [ref=e700]: ◇
+                  - generic [ref=e701]:
+                    - link "View details for Wirecast" [ref=e702]:
+                      - /url: /resource/29
+                      - img [ref=e704]
+                      - generic [ref=e706]: View Details
+                    - button "Show 2 more tags" [ref=e707]: +2 more
+                    - generic [ref=e708]:
+                      - link "Open Link Wirecast (opens in new tab)" [ref=e709]:
+                        - /url: https://www.telestream.net/wirecast/
+                        - img
+                        - generic [ref=e710]: Open Link
+                        - generic [ref=e711]: Wirecast (opens in new tab)
+                      - 'button "Suggest an edit: Wirecast" [ref=e712]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Wirecast" [ref=e715]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Wirecast" [ref=e717]':
+                    - img
+                - heading "Wirecast" [level=2] [ref=e720]:
+                  - link "Wirecast" [ref=e721]:
+                    - /url: /resource/29
+                - paragraph [ref=e722]: Wirecast is a professional live video streaming production software that enables users to create high-quality live-streamed events. It supports multiple cameras, graphics, and media sources, making it suitable for broadcasting and live event production.
+              - generic [ref=e724]:
+                - generic [ref=e725]: Encoding & Codecs
+                - link "Filter by tag live-streaming" [ref=e726]:
+                  - /url: /tag/live-streaming
+                  - generic [ref=e727]: "#live-streaming"
+                - link "Filter by tag production" [ref=e728]:
+                  - /url: /tag/production
+                  - generic [ref=e729]: "#production"
+                - link "Filter by tag broadcasting" [ref=e730]:
+                  - /url: /tag/broadcasting
+                  - generic [ref=e731]: "#broadcasting"
+            - article [ref=e732] [cursor=pointer]:
+              - generic [ref=e733]:
+                - generic [ref=e734]:
+                  - generic [ref=e735]: ◇
+                  - generic [ref=e736]:
+                    - link "View details for WinFF" [ref=e737]:
+                      - /url: /resource/1799
+                      - img [ref=e739]
+                      - generic [ref=e741]: View Details
+                    - button "Show 1 more tag" [ref=e742]: +1 more
+                    - generic [ref=e743]:
+                      - link "Open Link WinFF (opens in new tab)" [ref=e744]:
+                        - /url: https://winff.org/
+                        - img
+                        - generic [ref=e745]: Open Link
+                        - generic [ref=e746]: WinFF (opens in new tab)
+                      - 'button "Suggest an edit: WinFF" [ref=e747]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: WinFF" [ref=e750]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: WinFF" [ref=e752]':
+                    - img
+                - heading "WinFF" [level=2] [ref=e755]:
+                  - link "WinFF" [ref=e756]:
+                    - /url: /resource/1799
+                - paragraph [ref=e757]: A graphical user interface for FFmpeg that runs on Windows and Linux. WinFF makes it easy to convert multiple media files by providing presets and a batch-processing interface.
+              - generic [ref=e759]:
+                - generic [ref=e760]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e761]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e762]: "#ffmpeg"
+                - link "Filter by tag media conversion" [ref=e763]:
+                  - /url: /tag/media-conversion
+                  - generic [ref=e764]: "#media conversion"
+                - link "Filter by tag batch processing" [ref=e765]:
+                  - /url: /tag/batch-processing
+                  - generic [ref=e766]: "#batch processing"
+            - article [ref=e767] [cursor=pointer]:
+              - generic [ref=e768]:
+                - generic [ref=e769]:
+                  - generic [ref=e770]: ◇
+                  - generic [ref=e771]:
+                    - 'link "View details for webmquicktime: QuickTime Components for WebM" [ref=e772]':
+                      - /url: /resource/162
+                      - img [ref=e774]
+                      - generic [ref=e776]: View Details
+                    - button "Show 2 more tags" [ref=e777]: +2 more
+                    - 'link "Open Link webmquicktime: QuickTime Components for WebM (opens in new tab)" [ref=e779]':
+                      - /url: https://chromium.googlesource.com/webm/webmquicktime/
+                      - img
+                      - generic [ref=e780]: Open Link
+                      - generic [ref=e781]: "webmquicktime: QuickTime Components for WebM (opens in new tab)"
+                    - 'button "Suggest an edit: webmquicktime: QuickTime Components for WebM" [ref=e782]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: webmquicktime: QuickTime Components for WebM" [ref=e785]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: webmquicktime: QuickTime Components for WebM" [ref=e787]':
+                    - img
+                - 'heading "webmquicktime: QuickTime Components for WebM" [level=2] [ref=e790]':
+                  - 'link "webmquicktime: QuickTime Components for WebM" [ref=e791]':
+                    - /url: /resource/162
+                - paragraph [ref=e792]: webmquicktime offers QuickTime components for WebM, enabling QuickTime-based applications to support WebM video playback and encoding, thus expanding compatibility with the WebM format.
+              - generic [ref=e794]:
+                - generic [ref=e795]: Encoding & Codecs
+                - link "Filter by tag WebM" [ref=e796]:
+                  - /url: /tag/webm
+                  - generic [ref=e797]: "#WebM"
+                - link "Filter by tag QuickTime" [ref=e798]:
+                  - /url: /tag/quicktime
+                  - generic [ref=e799]: "#QuickTime"
+                - link "Filter by tag components" [ref=e800]:
+                  - /url: /tag/component
+                  - generic [ref=e801]: "#components"
+            - article [ref=e802] [cursor=pointer]:
+              - generic [ref=e803]:
+                - generic [ref=e804]:
+                  - generic [ref=e805]: ◇
+                  - generic [ref=e806]:
+                    - 'link "View details for webmdshow: DirectShow Filters for WebM" [ref=e807]':
+                      - /url: /resource/161
+                      - img [ref=e809]
+                      - generic [ref=e811]: View Details
+                    - button "Show 2 more tags" [ref=e812]: +2 more
+                    - 'link "Open Link webmdshow: DirectShow Filters for WebM (opens in new tab)" [ref=e814]':
+                      - /url: https://chromium.googlesource.com/webm/webmdshow/
+                      - img
+                      - generic [ref=e815]: Open Link
+                      - generic [ref=e816]: "webmdshow: DirectShow Filters for WebM (opens in new tab)"
+                    - 'button "Suggest an edit: webmdshow: DirectShow Filters for WebM" [ref=e817]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: webmdshow: DirectShow Filters for WebM" [ref=e820]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: webmdshow: DirectShow Filters for WebM" [ref=e822]':
+                    - img
+                - 'heading "webmdshow: DirectShow Filters for WebM" [level=2] [ref=e825]':
+                  - 'link "webmdshow: DirectShow Filters for WebM" [ref=e826]':
+                    - /url: /resource/161
+                - paragraph [ref=e827]: webmdshow provides DirectShow filters for WebM, allowing developers to integrate WebM playback and encoding capabilities into Windows applications using the DirectShow framework.
+              - generic [ref=e829]:
+                - generic [ref=e830]: Encoding & Codecs
+                - link "Filter by tag WebM" [ref=e831]:
+                  - /url: /tag/webm
+                  - generic [ref=e832]: "#WebM"
+                - link "Filter by tag DirectShow" [ref=e833]:
+                  - /url: /tag/directshow
+                  - generic [ref=e834]: "#DirectShow"
+                - link "Filter by tag filters" [ref=e835]:
+                  - /url: /tag/filter
+                  - generic [ref=e836]: "#filters"
+            - article [ref=e837] [cursor=pointer]:
+              - generic [ref=e838]:
+                - generic [ref=e839]:
+                  - generic [ref=e840]: ◇
+                  - generic [ref=e841]:
+                    - 'link "View details for webm-tools: WebM Utilities" [ref=e842]':
+                      - /url: /resource/160
+                      - img [ref=e844]
+                      - generic [ref=e846]: View Details
+                    - button "Show 2 more tags" [ref=e847]: +2 more
+                    - 'link "Open Link webm-tools: WebM Utilities (opens in new tab)" [ref=e849]':
+                      - /url: https://chromium.googlesource.com/webm/webm-tools/
+                      - img
+                      - generic [ref=e850]: Open Link
+                      - generic [ref=e851]: "webm-tools: WebM Utilities (opens in new tab)"
+                    - 'button "Suggest an edit: webm-tools: WebM Utilities" [ref=e852]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: webm-tools: WebM Utilities" [ref=e855]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: webm-tools: WebM Utilities" [ref=e857]':
+                    - img
+                - 'heading "webm-tools: WebM Utilities" [level=2] [ref=e860]':
+                  - 'link "webm-tools: WebM Utilities" [ref=e861]':
+                    - /url: /resource/160
+                - paragraph [ref=e862]: webm-tools is a collection of utilities for working with WebM files, including tools for handling alpha channels, encryption, and streaming-related tasks. These tools assist developers in managing and processing WebM video content.
+              - generic [ref=e864]:
+                - generic [ref=e865]: Encoding & Codecs
+                - generic [ref=e866]: Tools & SDKs
+                - link "Filter by tag WebM" [ref=e867]:
+                  - /url: /tag/webm
+                  - generic [ref=e868]: "#WebM"
+                - link "Filter by tag utilities" [ref=e869]:
+                  - /url: /tag/utility
+                  - generic [ref=e870]: "#utilities"
+                - link "Filter by tag alpha channel" [ref=e871]:
+                  - /url: /tag/alpha-channel
+                  - generic [ref=e872]: "#alpha channel"
+            - article [ref=e873] [cursor=pointer]:
+              - generic [ref=e874]:
+                - generic [ref=e875]:
+                  - generic [ref=e876]: ◇
+                  - generic [ref=e877]:
+                    - link "View details for VVenC and VVdeC" [ref=e878]:
+                      - /url: /resource/106
+                      - img [ref=e880]
+                      - generic [ref=e882]: View Details
+                    - button "Show 2 more tags" [ref=e883]: +2 more
+                    - generic [ref=e884]:
+                      - link "Open Link VVenC and VVdeC (opens in new tab)" [ref=e885]:
+                        - /url: https://arxiv.org/abs/2107.13385
+                        - img
+                        - generic [ref=e886]: Open Link
+                        - generic [ref=e887]: VVenC and VVdeC (opens in new tab)
+                      - 'button "Suggest an edit: VVenC and VVdeC" [ref=e888]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VVenC and VVdeC" [ref=e891]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VVenC and VVdeC" [ref=e893]':
+                    - img
+                - heading "VVenC and VVdeC" [level=2] [ref=e896]:
+                  - link "VVenC and VVdeC" [ref=e897]:
+                    - /url: /resource/106
+                - paragraph [ref=e898]: VVenC is a fast and efficient VVC encoder developed by Fraunhofer HHI, while VVdeC is a live decoder for VVC. Together, they provide an open-source end-to-end toolchain for the Versatile Video Coding (VVC) standard, enabling significant bit-rate reductions for the same subjective video quality compared to previous standards.
+              - generic [ref=e900]:
+                - generic [ref=e901]: Encoding & Codecs
+                - link "Filter by tag VVC" [ref=e902]:
+                  - /url: /tag/vvc
+                  - generic [ref=e903]: "#VVC"
+                - link "Filter by tag video encoding" [ref=e904]:
+                  - /url: /tag/video-encoding
+                  - generic [ref=e905]: "#video encoding"
+                - link "Filter by tag video decoding" [ref=e906]:
+                  - /url: /tag/video-decoding
+                  - generic [ref=e907]: "#video decoding"
+          - navigation "Pagination" [ref=e909]:
+            - generic [ref=e910]:
+              - img
+              - text: Previous
+              - link "Page 1, current page" [ref=e911] [cursor=pointer]:
+                - /url: /category/encoding-codecs?sortBy=name-desc
+                - text: "1"
+              - link "Go to page 2" [ref=e912] [cursor=pointer]:
+                - /url: /category/encoding-codecs?sortBy=name-desc&page=2
+                - text: "2"
+              - generic [ref=e913]: …
+              - link "Go to page 16" [ref=e914] [cursor=pointer]:
+                - /url: /category/encoding-codecs?sortBy=name-desc&page=16
+                - text: "16"
+              - link "Next" [ref=e915] [cursor=pointer]:
+                - /url: /category/encoding-codecs?sortBy=name-desc&page=2
+                - text: Next
+                - img
+            - generic [ref=e916]:
+              - generic [ref=e917]: Page 1 of 16
+              - generic [ref=e918]:
+                - generic [ref=e919] [cursor=pointer]: Go to page
+                - textbox "Page number, 1 to 16" [ref=e920]: "1"
+                - generic [ref=e921]: / 16
+            - status [ref=e922]

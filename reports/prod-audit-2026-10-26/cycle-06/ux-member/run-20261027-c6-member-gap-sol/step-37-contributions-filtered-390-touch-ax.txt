@@ -1,0 +1,217 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - generic [ref=e23]:
+        - main [ref=e24]:
+          - generic [ref=e25]:
+            - navigation "Breadcrumb" [ref=e26]:
+              - list [ref=e27]:
+                - listitem [ref=e28]:
+                  - link "Home" [ref=e29] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e30]:
+                  - img [ref=e31]
+                - listitem:
+                  - link "Your Contributions" [disabled]
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - generic [ref=e35]: // Contributor dashboard
+                - generic [ref=e36]:
+                  - generic [ref=e37]:
+                    - heading "Your contributions" [level=1] [ref=e38]
+                    - paragraph [ref=e39]: Follow every resource submission and edit suggestion from review to outcome, then see the impact of accepted work.
+                  - link "Submit a resource" [ref=e40] [cursor=pointer]:
+                    - /url: /submit
+                    - img
+                    - text: Submit a resource
+              - region "Recorded impact" [ref=e41]:
+                - generic [ref=e43]:
+                  - heading "Recorded impact" [level=2] [ref=e44]
+                  - paragraph [ref=e45]: Definitions are shown under every metric.
+                - generic [ref=e46]:
+                  - article [ref=e47]:
+                    - generic [ref=e48]:
+                      - generic [ref=e49]:
+                        - generic [ref=e50]: Accepted contributions
+                        - img [ref=e51]
+                      - paragraph [ref=e54]: "3"
+                      - paragraph [ref=e55]: Resource submissions and edit suggestions that moderators approved.
+                  - article [ref=e56]:
+                    - generic [ref=e57]:
+                      - generic [ref=e58]:
+                        - generic [ref=e59]: Live resources improved
+                        - img [ref=e60]
+                      - paragraph [ref=e62]: "2"
+                      - paragraph [ref=e63]: Currently public resources you submitted or improved with an approved edit. Each resource is counted once.
+                  - article [ref=e64]:
+                    - generic [ref=e65]:
+                      - generic [ref=e66]:
+                        - generic [ref=e67]: Distinct signed-in viewers
+                        - img [ref=e68]
+                      - paragraph [ref=e71]: "3"
+                      - paragraph [ref=e72]: Distinct signed-in accounts with a recorded resource detail view across those currently public resources. Each account is counted once.
+                  - article [ref=e73]:
+                    - generic [ref=e74]:
+                      - generic [ref=e75]:
+                        - generic [ref=e76]: Awaiting review
+                        - img [ref=e77]
+                      - paragraph [ref=e80]: "0"
+                      - paragraph [ref=e81]: Your resource submissions and edit suggestions still pending.
+              - region "Contribution timeline" [ref=e82]:
+                - generic [ref=e83]:
+                  - heading "Contribution timeline" [level=2] [ref=e84]
+                  - paragraph [ref=e85]: This private timeline is visible only to you.
+                - article [ref=e86]:
+                  - generic [ref=e88]:
+                    - generic [ref=e89]:
+                      - img [ref=e90]
+                      - textbox "Search your contributions" [ref=e93]
+                    - combobox "Filter by contribution type" [ref=e94] [cursor=pointer]:
+                      - generic: Resource submissions
+                      - img [ref=e95]
+                    - combobox "Filter by status" [ref=e97] [cursor=pointer]:
+                      - generic: Rejected (1)
+                      - img [ref=e98]
+                    - combobox "Sort contributions" [active] [ref=e100] [cursor=pointer]:
+                      - generic: Oldest activity
+                      - img [ref=e101]
+                - paragraph [ref=e103]: 1 matching contribution
+                - article [ref=e105]:
+                  - generic [ref=e106]:
+                    - generic [ref=e107]:
+                      - img [ref=e109]
+                      - generic [ref=e112]:
+                        - generic [ref=e113]:
+                          - generic [ref=e114]: Resource submission
+                          - generic "Not accepted after review." [ref=e115]:
+                            - img [ref=e116]
+                            - text: Rejected
+                        - heading "Valid Title" [level=2] [ref=e120]
+                        - generic [ref=e121]:
+                          - generic [ref=e122]: Submitted 3 months ago
+                          - generic [ref=e123]: Status changed 3 months ago
+                    - generic [ref=e124]:
+                      - paragraph [ref=e125]: This is a valid description of adequate length.
+                      - link "https://example" [ref=e126] [cursor=pointer]:
+                        - /url: https://example
+                        - generic [ref=e127]: https://example
+                        - img [ref=e128]
+                      - generic [ref=e132]: Community & Events
+                    - alert [ref=e133]:
+                      - img [ref=e134]
+                      - generic [ref=e138]: Review outcome
+                      - generic [ref=e139]: A contributor-facing reason was not provided for this decision.
+                    - paragraph [ref=e141]: Not accepted after review.
+        - contentinfo [ref=e142]:
+          - generic [ref=e143]:
+            - generic [ref=e144]:
+              - paragraph [ref=e145]: ── INDEX
+              - link "awesome.video home" [ref=e146] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e147]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e149]:
+              - heading "INDEXED" [level=2] [ref=e150]
+              - paragraph [ref=e151]: 3,826
+              - paragraph [ref=e152]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e153]: live
+            - navigation "Explore categories" [ref=e155]:
+              - heading "EXPLORE" [level=2] [ref=e156]
+              - generic [ref=e157]:
+                - link "Community & Events" [ref=e158] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e159]: ◈
+                  - generic [ref=e160]: Community
+                - link "Encoding & Codecs" [ref=e161] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e162]: ◇
+                  - generic [ref=e163]: Encoding
+                - link "General Tools" [ref=e164] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e165]: ◆
+                  - generic [ref=e166]: General
+                - link "Infrastructure & Delivery" [ref=e167] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e168]: ▣
+                  - generic [ref=e169]: Infrastructure
+                - link "Intro & Learning" [ref=e170] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e171]: ▤
+                  - generic [ref=e172]: Intro
+                - link "Media Tools" [ref=e173] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e174]: ▥
+                  - generic [ref=e175]: Media
+                - link "Players & Clients" [ref=e176] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e177]: ▶
+                  - generic [ref=e178]: Players
+                - link "Protocols & Transport" [ref=e179] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e180]: ⟁
+                  - generic [ref=e181]: Protocols
+                - link "Standards & Industry" [ref=e182] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e183]: ◉
+                  - generic [ref=e184]: Standards
+            - generic [ref=e185]:
+              - heading "SOURCE" [level=2] [ref=e186]
+              - link "krzemienski/awesome-video" [ref=e187] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e188]
+                - generic [ref=e190]:
+                  - text: krzemienski
+                  - generic [ref=e191]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e192]: ↗
+              - paragraph [ref=e193]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e194] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e196] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e197]:
+            - generic [ref=e198]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e199]:
+              - link "About" [ref=e200] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e201] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e202] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e203] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e204] [cursor=pointer]
+              - link "Issues ↗" [ref=e205] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e206] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e207]: built with the awesome-list framework
+    - button "Back to top" [ref=e208] [cursor=pointer]:
+      - img

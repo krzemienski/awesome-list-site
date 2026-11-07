@@ -1,0 +1,10 @@
+- generic
+  - dialog "Rename collection"
+    - heading "Rename collection" [level=2, ref=e1]
+    - paragraph
+    - form
+      - LabelText [ref=e3] clickable [cursor:pointer]
+      - textbox "Name" [ref=e4]
+      - button "Cancel" [ref=e5]
+      - button "Save name" [disabled, ref=e6]
+    - button "Close" [ref=e2]

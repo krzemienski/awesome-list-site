@@ -1,0 +1,793 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab [selected]:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - article:
+                              - generic: Last enriched
+                              - generic: 27h ago
+                              - generic: "batch #34 · 10 resources · cancelled"
+                            - article:
+                              - generic: Queue
+                              - generic: "0"
+                              - generic: idle
+                            - article:
+                              - generic: Avg cost
+                              - generic: $0.03
+                              - generic: per batch
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Enrichment jobs
+                                - paragraph: LLM-driven metadata enhancement
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Run job
+                            - generic:
+                              - region:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: Job
+                                      - columnheader: Status
+                                      - columnheader: Started
+                                      - columnheader: Completed
+                                      - columnheader:
+                                        - generic: Actions
+                                  - rowgroup:
+                                    - row:
+                                      - cell: "#34"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:33:50 AM
+                                      - cell: 10/26/2026, 12:34:47 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#33"
+                                      - cell:
+                                        - generic: cancelled
+                                      - cell: 10/26/2026, 12:30:14 AM
+                                      - cell: 10/26/2026, 12:33:13 AM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#32"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell: 7/16/2026, 9:45:33 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#31"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#30"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:45:31 PM
+                                      - cell: 7/16/2026, 9:45:32 PM
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "#29"
+                                      - cell:
+                                        - generic: completed
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell: 7/16/2026, 9:41:27 PM
+                                      - cell:
+                                        - button: Logs
+                              - generic:
+                                - button: Show all 33 jobs
+                        - group:
+                          - generic: Job controls & monitoring
+                          - article:
+                            - generic:
+                              - generic:
+                                - img
+                                - text: Job Control
+                              - generic: Configure and start a new batch enrichment job
+                            - generic:
+                              - paragraph: "Tag coverage: 1,089 of 3,826 approved resources have tags (28.5%). Run an enrichment job with the \"Unenriched Only\" filter to close the 2,737-resource gap."
+                              - generic:
+                                - generic:
+                                  - text: Filter
+                                  - combobox:
+                                    - generic: Unenriched Only
+                                    - img
+                                  - paragraph: Choose which resources to enrich
+                                - generic:
+                                  - text: Batch Size
+                                  - spinbutton: "10"
+                                  - paragraph: Resources per batch (1-50)
+                              - generic:
+                                - button [expanded]:
+                                  - generic:
+                                    - img
+                                    - text: Custom Model & Endpoint (optional)
+                                  - img
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - img
+                                      - text: Model
+                                    - textbox:
+                                      - /placeholder: cc/claude-haiku-4-5-20251001 (default)
+                                      - text: audit-preview-model
+                                  - generic:
+                                    - generic:
+                                      - img
+                                      - text: Base URL
+                                    - textbox:
+                                      - /placeholder: https://router.hack.ski (default)
+                                      - text: https://example.com/v1
+                                    - paragraph: http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.
+                                  - generic:
+                                    - generic:
+                                      - img
+                                      - text: Auth Token
+                                    - textbox:
+                                      - /placeholder: Required if a base URL is set (blank = server default credentials)
+                                      - text: ••••••••••••••••••••••••
+                                    - paragraph: Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Start Enrichment
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img
+                                  - text: Job History
+                                - generic: 33 total jobs
+                              - generic: Complete history of all enrichment jobs
+                            - generic:
+                              - region:
+                                - generic:
+                                  - table:
+                                    - rowgroup:
+                                      - row:
+                                        - columnheader: ID
+                                        - columnheader: Status
+                                        - columnheader: Started
+                                        - columnheader: Ended
+                                        - columnheader: Processed
+                                        - columnheader: Success Rate
+                                        - columnheader: Actions
+                                    - rowgroup:
+                                      - row:
+                                        - cell: "#34"
+                                        - cell:
+                                          - generic: cancelled
+                                        - cell: Oct 26, 2026, 12:33 AM
+                                        - cell: Oct 26, 2026, 12:34 AM
+                                        - cell: 10 / 2746
+                                        - cell:
+                                          - generic: 10/10 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#33"
+                                        - cell:
+                                          - generic: cancelled
+                                        - cell: Oct 26, 2026, 12:30 AM
+                                        - cell: Oct 26, 2026, 12:33 AM
+                                        - cell: 30 / 2776
+                                        - cell:
+                                          - generic: 30/30 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#32"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Nothing to process
+                                        - cell:
+                                          - generic: N/A
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#31"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Nothing to process
+                                        - cell:
+                                          - generic: N/A
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#30"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Jul 16, 2026, 09:45 PM
+                                        - cell: Nothing to process
+                                        - cell:
+                                          - generic: N/A
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#29"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 16, 2026, 09:41 PM
+                                        - cell: Jul 16, 2026, 09:41 PM
+                                        - cell: Nothing to process
+                                        - cell:
+                                          - generic: N/A
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#28"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 7, 2026, 12:54 PM
+                                        - cell: Jul 7, 2026, 12:54 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#27"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 7, 2026, 12:53 PM
+                                        - cell: Jul 7, 2026, 12:53 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#26"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 6, 2026, 01:30 PM
+                                        - cell: Jul 6, 2026, 01:30 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#25"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jul 5, 2026, 10:57 PM
+                                        - cell: Jul 5, 2026, 10:57 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#24"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: failed
+                                          - generic: ended in error after 10/10 succeeded
+                                        - cell: Jun 26, 2026, 08:21 AM
+                                        - cell: Jun 26, 2026, 08:54 AM
+                                        - cell: 10 / 2364
+                                        - cell:
+                                          - generic: 10/10 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#23"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jun 25, 2026, 05:57 PM
+                                        - cell: Jun 25, 2026, 05:57 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#22"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Jun 3, 2026, 01:17 AM
+                                        - cell: Jun 3, 2026, 01:17 AM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#21"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Feb 11, 2026, 11:38 PM
+                                        - cell: Feb 11, 2026, 11:38 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#20"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Feb 11, 2026, 11:20 PM
+                                        - cell: Feb 11, 2026, 11:20 PM
+                                        - cell: 9 / 9
+                                        - cell:
+                                          - generic: 8/9 ok (89%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#19"
+                                        - cell:
+                                          - generic: cancelled
+                                        - cell: Feb 11, 2026, 11:19 PM
+                                        - cell:
+                                          - text: Mar 22, 2026, 10:45 PM
+                                          - generic: end recorded at cleanup, not when processing stopped
+                                        - cell: 11 / 19
+                                        - cell:
+                                          - generic: 10/11 ok (91%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#18"
+                                        - cell:
+                                          - generic: cancelled
+                                        - cell: Feb 11, 2026, 11:17 PM
+                                        - cell:
+                                          - text: Mar 22, 2026, 10:45 PM
+                                          - generic: end recorded at cleanup, not when processing stopped
+                                        - cell: 14 / 32
+                                        - cell:
+                                          - generic: 13/14 ok (93%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#17"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Dec 1, 2025, 01:43 AM
+                                        - cell: Dec 1, 2025, 01:45 AM
+                                        - cell: 31 / 31
+                                        - cell:
+                                          - generic: 31/31 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#16"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 19, 2025, 12:57 AM
+                                        - cell: Nov 19, 2025, 12:57 AM
+                                        - cell: 3 / 3
+                                        - cell:
+                                          - generic: 2/3 ok (67%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#15"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 19, 2025, 12:57 AM
+                                        - cell: Nov 19, 2025, 12:57 AM
+                                        - cell: 4 / 4
+                                        - cell:
+                                          - generic: 3/4 ok (75%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#14"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 08:05 PM
+                                        - cell: Nov 18, 2025, 08:05 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#13"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 08:04 PM
+                                        - cell: Nov 18, 2025, 08:04 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#12"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 08:04 PM
+                                        - cell: Nov 18, 2025, 08:04 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#11"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 07:54 PM
+                                        - cell: Nov 18, 2025, 07:54 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#10"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 07:52 PM
+                                        - cell: Nov 18, 2025, 07:52 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#8"
+                                        - cell:
+                                          - generic: cancelled
+                                        - cell: Nov 18, 2025, 07:22 PM
+                                        - cell:
+                                          - text: Mar 22, 2026, 10:45 PM
+                                          - generic: end recorded at cleanup, not when processing stopped
+                                        - cell: 78 / 2192
+                                        - cell:
+                                          - generic: 78/78 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#7"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: failed
+                                          - generic: ended in error after 8/8 succeeded
+                                        - cell: Nov 18, 2025, 07:15 PM
+                                        - cell:
+                                          - text: May 20, 2026, 06:47 AM
+                                          - generic: end recorded at cleanup, not when processing stopped
+                                        - cell: 8 / 2192
+                                        - cell:
+                                          - generic: 8/8 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#6"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 07:14 PM
+                                        - cell: Nov 18, 2025, 07:14 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#5"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 06:50 PM
+                                        - cell: Nov 18, 2025, 06:50 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#4"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 06:46 PM
+                                        - cell: Nov 18, 2025, 06:46 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1 skipped
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#3"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 06:38 PM
+                                        - cell: Nov 18, 2025, 06:38 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1/1 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#2"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: completed
+                                        - cell: Nov 18, 2025, 06:27 PM
+                                        - cell: Nov 18, 2025, 06:27 PM
+                                        - cell: 1 / 1
+                                        - cell:
+                                          - generic: 1/1 ok (100%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                      - row:
+                                        - cell: "#1"
+                                        - cell:
+                                          - generic:
+                                            - img
+                                            - text: failed
+                                          - generic: ended in error after 31/49 succeeded
+                                        - cell: Nov 18, 2025, 06:25 PM
+                                        - cell:
+                                          - text: May 20, 2026, 06:47 AM
+                                          - generic: end recorded at cleanup, not when processing stopped
+                                        - cell: 32 / 32
+                                        - cell:
+                                          - generic: 31/32 ok (97%)
+                                        - cell:
+                                          - button:
+                                            - img
+                                            - text: View Details
+                                - paragraph: Processed = resources attempted out of the job's target. Success rate = successful ÷ processed (not ÷ target). A job marked failed with successes means the run stopped on an error after those resources were enriched — open View Details for the error.
+      - button:
+        - img
+  - alertdialog "Start enrichment job?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Start enrichment job?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: This starts a Claude AI enrichment run over unenriched resources in batches of 10 on example.com (custom endpoint). The job runs in the background and incurs real API cost.
+    - generic [ref=e6]:
+      - paragraph [ref=e7]:
+        - text: It will process
+        - strong [ref=e8]: 2,737
+        - text: resources (274 batches of 10), not just one batch.
+      - paragraph [ref=e9]: Recent runs cost about $0.006 per resource, so this run could cost around $15.98. You can cancel it while it runs.
+    - generic [ref=e10]:
+      - button "Cancel" [active] [ref=e11] [cursor=pointer]
+      - button "Start enrichment" [ref=e12] [cursor=pointer]

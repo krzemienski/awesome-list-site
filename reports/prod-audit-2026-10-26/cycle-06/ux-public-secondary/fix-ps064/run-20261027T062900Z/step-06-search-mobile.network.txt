@@ -1,0 +1,8 @@
+[39803.338] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=video (Fetch) 200
+[39803.673] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=video (Fetch) 200
+[39803.675] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=ffmpeg (Fetch) 200
+[39803.676] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=ffmpeg&sort=name-asc (Fetch) 200
+[39803.678] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=ffmpeg&tags=ffmpeg&sort=name-asc (Fetch) 200
+[39803.1014] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=ffmpeg&tags=ffmpeg&sort=name-asc (Fetch) 200
+[39803.1016] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=video&tags=ffmpeg&sort=name-asc (Fetch) 200
+[39803.1018] GET http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=video&tags=ffmpeg&sort=newest (Fetch) 200

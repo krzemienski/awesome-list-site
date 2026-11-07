@@ -1,0 +1,56 @@
+[
+ {
+  "category": "Standards & Industry",
+  "createdAt": "2026-01-20T20:30:27.860Z",
+  "description": "Audacity is an open-source audio editor available for all major platforms. It offers a range of features for recording and editing audio, making it a valuable tool for developers working with audio components in video projects.",
+  "favoritedAt": "2026-07-16T18:07:00.088Z",
+  "id": 185551,
+  "kind": "tools",
+  "metadata": {
+   "tags": [
+    "audio editing",
+    "open-source",
+    "Cross-platform",
+    "recording",
+    "editing"
+   ]
+  },
+  "provider": "unknown",
+  "resolvedKind": "tools",
+  "resourceFormat": "unknown",
+  "resourceId": 185551,
+  "skillLevel": "unknown",
+  "status": "approved",
+  "subSubcategory": null,
+  "subcategory": null,
+  "title": "Audacity",
+  "url": "https://audacity.sourceforge.net/"
+ },
+ {
+  "category": "Encoding & Codecs",
+  "createdAt": "2026-01-20T20:31:02.213Z",
+  "description": "An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image formats and tools.",
+  "favoritedAt": "2026-07-16T02:08:29.524Z",
+  "id": 186357,
+  "kind": "standards",
+  "metadata": {
+   "tags": [
+    "codec",
+    "AV1",
+    "open-source",
+    "video compression",
+    "royalty-free"
+   ]
+  },
+  "provider": "unknown",
+  "resolvedKind": "standards",
+  "resourceFormat": "unknown",
+  "resourceId": 186357,
+  "skillLevel": "unknown",
+  "status": "approved",
+  "subSubcategory": null,
+  "subcategory": null,
+  "title": "Alliance for Open Media (AOMedia)",
+  "url": "https://aomedia.org/"
+ }
+]

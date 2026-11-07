@@ -1,0 +1,163 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Enrichment" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [selected, ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Enrichment" [ref=e12] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "LAST ENRICHED"
+                - StaticText "26h ago"
+                - StaticText "batch #34 · 10 resources · cancelled"
+              - article
+                - StaticText "QUEUE"
+                - StaticText "0"
+                - StaticText "idle"
+              - article
+                - StaticText "AVG COST"
+                - StaticText "$0.03"
+                - StaticText "per batch"
+              - generic
+                - sectionheader
+                  - heading "Enrichment jobs" [level=2, ref=e35]
+                  - paragraph
+                    - StaticText "LLM-driven metadata enhancement"
+                  - button "Run job" [ref=e36]
+                - region "Enrichment jobs table, scrollable" [ref=e33] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "JOB" [ref=e67]
+                        - columnheader "STATUS" [ref=e68]
+                        - columnheader "STARTED" [ref=e69]
+                        - columnheader "COMPLETED" [ref=e70]
+                        - columnheader "ACTIONS" [ref=e71]
+                          - StaticText "ACTIONS"
+                    - row
+                      - cell "#34" [ref=e37]
+                        - StaticText "#34"
+                      - cell "CANCELLED" [ref=e38]
+                      - cell "10/26/2026, 12:33:50 AM" [ref=e39]
+                      - cell "10/26/2026, 12:34:47 AM" [ref=e40]
+                      - cell "View logs for job #34" [ref=e41]
+                        - button "View logs for job #34" [ref=e72]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#33" [ref=e42]
+                        - StaticText "#33"
+                      - cell "CANCELLED" [ref=e43]
+                      - cell "10/26/2026, 12:30:14 AM" [ref=e44]
+                      - cell "10/26/2026, 12:33:13 AM" [ref=e45]
+                      - cell "View logs for job #33" [ref=e46]
+                        - button "View logs for job #33" [ref=e73]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#32" [ref=e47]
+                        - StaticText "#32"
+                      - cell "COMPLETED" [ref=e48]
+                      - cell "7/16/2026, 9:45:33 PM" [ref=e49]
+                      - cell "7/16/2026, 9:45:33 PM" [ref=e50]
+                      - cell "View logs for job #32" [ref=e51]
+                        - button "View logs for job #32" [ref=e74]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#31" [ref=e52]
+                        - StaticText "#31"
+                      - cell "COMPLETED" [ref=e53]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e54]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e55]
+                      - cell "View logs for job #31" [ref=e56]
+                        - button "View logs for job #31" [ref=e75]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#30" [ref=e57]
+                        - StaticText "#30"
+                      - cell "COMPLETED" [ref=e58]
+                      - cell "7/16/2026, 9:45:31 PM" [ref=e59]
+                      - cell "7/16/2026, 9:45:32 PM" [ref=e60]
+                      - cell "View logs for job #30" [ref=e61]
+                        - button "View logs for job #30" [ref=e76]
+                          - StaticText "Logs"
+                    - row
+                      - cell "#29" [ref=e62]
+                        - StaticText "#29"
+                      - cell "COMPLETED" [ref=e63]
+                      - cell "7/16/2026, 9:41:27 PM" [ref=e64]
+                      - cell "7/16/2026, 9:41:27 PM" [ref=e65]
+                      - cell "View logs for job #29" [ref=e66]
+                        - button "View logs for job #29" [ref=e77]
+                          - StaticText "Logs"
+                - button "Show all 33 jobs" [expanded=false, ref=e34]
+              - group
+                - DisclosureTriangle "Job controls & monitoring" [expanded=false]

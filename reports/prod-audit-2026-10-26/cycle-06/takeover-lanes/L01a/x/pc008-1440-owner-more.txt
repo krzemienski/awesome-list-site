@@ -1,0 +1,2 @@
+"{\"open\":true,\"links\":[[\"Submit Resource\",\"/submit\"],[\"Learning Journeys\",\"/journeys\"],[\"Advanced\",\"/advanced\"],[\"Theme\",\"/settings/theme\"],[\"Home dashboard\",\"/?context=account\"],[\"Admin\",\"/admin\"],[\"About\",\"/about\"]]}"
+More>Admin -> "{\"p\":\"/admin\",\"moreOpen\":false}"

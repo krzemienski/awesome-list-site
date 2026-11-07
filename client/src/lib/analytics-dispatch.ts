@@ -8,18 +8,29 @@
 //   Mixpanel   mpTrack      (mixpanel.ts)
 //   PostHog    phCapture    (posthog.ts)
 //   Amplitude  ampTrack     (amplitude.ts)
+//   Replit     replitTrack  (replit-analytics.ts) — platform-injected Umami
+//                                             tracker; page views are its own
+//
+// Admin sessions and QA paths: nothing is sent (track() decides; queued
+// events are re-checked here). See analytics-suppression.ts.
+//
+// Consent: the four banner-named vendors only get events after a grant.
+// Replit Analytics is cookie-free and carries no identifiers, so it also gets
+// events while the visitor has not chosen; an explicit Decline stops it too.
 //
 // Each vendor dispatcher keeps its own consent gate, pre-SDK buffer and revoke
 // kill switch, so this module adds no new queueing semantics — it only
 // decides WHICH vendors get the event and guarantees they all receive the same
-// cleaned properties. It is loaded with a dynamic import after consent, so
-// neither the hygiene rules nor the fan-out ship in the pre-consent entry
-// bundle (the vendor wrappers it calls are already there; their SDKs are not).
+// cleaned properties. It is loaded with a dynamic import on the first event,
+// so neither the hygiene rules nor the fan-out ship in the entry bundle (the
+// vendor wrappers it calls are already there; their SDKs are not).
 import { getAnalyticsConsent, sendGaEvent } from './analytics';
 import { gaPageContext, sanitizeEventProps } from './analytics-hygiene';
 import { mpTrack } from './mixpanel';
 import { phCapture } from './posthog';
 import { ampTrack } from './amplitude';
+import { replitTrack } from './replit-analytics';
+import { isAdminAnalyticsSession } from './analytics-suppression';
 
 type EventProps = Record<string, unknown>;
 
@@ -31,6 +42,10 @@ export interface AnalyticsDispatchRequest {
   ga: { name: string; params: EventProps } | null;
   /** False for legacy GA4-only events (page_view, performance, ...). */
   product: boolean;
+  /** Replit Analytics; sent without a grant unless the visitor declined. */
+  replit: boolean;
+  /** location.href when track() received the event, before the chunk loaded. */
+  pageUrl: string;
 }
 
 const EVENT_NAME = /^[a-z][a-z0-9_]*$/;
@@ -49,12 +64,20 @@ const safely = (send: () => void) => {
 export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
   // Re-checked here as well as in track(): events queued while this chunk
   // was loading must not go out if consent was revoked in the meantime.
-  if (getAnalyticsConsent() !== 'granted') return;
+  // Same for an admin session that started while this chunk was loading.
+  if (isAdminAnalyticsSession()) return;
+  const consent = getAnalyticsConsent();
+  if (consent === 'denied') return;
+  const granted = consent === 'granted';
+  if (!granted && !request.replit) return;
   if (import.meta.env.DEV && !EVENT_NAME.test(request.name)) {
     console.warn(`[analytics] event "${request.name}" is not snake_case — see docs/ANALYTICS.md`);
   }
 
   const props = sanitizeEventProps(request.props);
+  if (request.replit) safely(() => replitTrack(request.name, props, request.pageUrl));
+  if (!granted) return;
+
   if (request.ga) {
     const gaParams =
       request.ga.params === request.props ? props : sanitizeEventProps(request.ga.params);

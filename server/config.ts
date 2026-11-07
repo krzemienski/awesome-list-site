@@ -1,8 +1,11 @@
 import { createHmac } from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml';
 import type { ResourceKindTagMappings } from '@shared/resourceKinds';
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("config");
 
 interface SiteConfig {
   title: string;
@@ -231,7 +234,7 @@ function loadConfig(): AwesomeListConfig {
   try {
     if (fs.existsSync(configPath)) {
       const configFile = fs.readFileSync(configPath, 'utf8');
-      const yamlConfig = yaml.load(configFile) as Partial<AwesomeListConfig>;
+      const yamlConfig = loadYaml(configFile) as Partial<AwesomeListConfig>;
       
       // Merge with defaults, environment variables take precedence
       return {
@@ -259,7 +262,7 @@ function loadConfig(): AwesomeListConfig {
       };
     }
   } catch (error) {
-    console.warn('Could not load config file, using defaults:', error);
+    logger.warn('Could not load config file, using defaults:', error);
   }
   
   return defaultConfig;

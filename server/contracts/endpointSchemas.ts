@@ -24,6 +24,7 @@
  */
 import { z } from "zod";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
+import { AUTH_METHODS } from "@shared/schema";
 import { RESOURCE_FORMAT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_SKILL_LEVEL_VALUES, RESOURCE_SEARCH_SORT_VALUES } from "@shared/resourceFacets";
 import { RECOMMENDATION_FEEDBACK_VALUES, RECOMMENDATION_SIGNAL_CODES } from "@shared/recommendations";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
@@ -187,6 +188,7 @@ const clientUserSchema = z
     role: z.string(),
     createdAt: timestampField,
     deletionRequestedAt: timestampField,
+    authMethod: z.enum(AUTH_METHODS),
   })
   .passthrough();
 
@@ -402,6 +404,7 @@ const awesomeListListingResponseSchema = z.object({
   totalAll: z.number().int().nonnegative(),
   generalCount: z.number().int().nonnegative(),
   scopeIntro: z.string(),
+  scopeIntroTagged: z.string(),
   scope: z.object({
     ignoredSubcategory: z.boolean(),
     ignoredSubSubcategory: z.boolean(),
@@ -751,4 +754,100 @@ export function registerCoreEndpointSchemas(): void {
     description: "Updated resource row after metadata.featured was toggled",
     schema: adminResourceRowSchema,
   });
+
+  registerDocumentedHandlerQueries();
+}
+
+/**
+ * Query parameters the handlers below actually read. Routes not listed here
+ * (and not given a schema above) document no query parameters at all; the
+ * bounded generic guard still runs at request time for every route, so these
+ * entries only change the OpenAPI description, never runtime behaviour.
+ */
+function registerDocumentedHandlerQueries(): void {
+  const text = (description: string) =>
+    z.string().max(MAX_PARAM_LENGTH).optional().describe(description);
+  const digits = (description: string) =>
+    z.string().regex(/^\d+$/).optional().describe(description);
+  const trueFalse = (description: string) =>
+    z.enum(["true", "false"]).optional().describe(description);
+  const documented: Array<[method: string, path: string, name: string, shape: z.ZodRawShape]> = [
+    ["get", "/api/resources/check-url", "CheckUrlQuery", {
+      url: z.string().max(MAX_PARAM_LENGTH).describe("Resource URL to check for an existing entry (required; surrounding whitespace is trimmed)"),
+    }],
+    ["get", "/api/resources/:id/related", "RelatedResourcesQuery", {
+      limit: digits("Number of related resources (default 5, clamped to 1–10)"),
+    }],
+    ["get", "/api/subcategories", "SubcategoriesQuery", {
+      categoryId: digits("Only subcategories of this category id"),
+    }],
+    ["get", "/api/sub-subcategories", "SubSubcategoriesQuery", {
+      subcategoryId: digits("Only sub-subcategories of this subcategory id"),
+    }],
+    ["get", "/api/awesome-list", "AwesomeListQuery", {
+      category: text("Category display name"),
+      subcategory: text("Subcategory display name"),
+      subSubcategory: text("Sub-subcategory display name"),
+    }],
+    ["get", "/api/journeys", "JourneysQuery", {
+      category: text("Only journeys in this category"),
+    }],
+    ["get", "/api/recommendations", "AnonymousRecommendationsQuery", {
+      categories: z.string().max(1000).optional().describe("Comma-separated preferred categories"),
+      goals: z.string().max(1000).optional().describe("Comma-separated learning goals"),
+      types: z.string().max(1000).optional().describe("Comma-separated preferred resource types"),
+      skillLevel: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+      timeCommitment: z.enum(["daily", "weekly", "flexible"]).optional(),
+      limit: digits("Number of recommendations (default 10, max 50)"),
+    }],
+    ["post", "/api/recommendations", "AuthenticatedRecommendationsQuery", {
+      limit: digits("Number of recommendations (default 10, max 50)"),
+      refresh: z.literal("true").optional().describe("Bypass cached recommendations and generate fresh ones"),
+    }],
+    ["get", "/api/collections", "CollectionsQuery", {
+      includeArchived: trueFalse("Include archived collections (default false)"),
+    }],
+    ["get", "/api/user/contributions", "UserContributionsQuery", {
+      type: z.enum(["all", "resource", "edit"]).optional().describe("Contribution type (default all)"),
+      status: z.enum(["all", "pending", "approved", "rejected", "withdrawn", "superseded"]).optional().describe("Review status (default all)"),
+      sort: z.enum(["newest", "oldest"]).optional().describe("Sort order (default newest)"),
+      q: z.string().max(100).optional().describe("Search within your contributions"),
+      page: digits("Page number ≥ 1 (default 1)"),
+      limit: digits("Items per page (default 12, max 50)"),
+    }],
+    ["get", "/api/health/ai", "AiHealthQuery", {
+      deep: z.enum(["1", "true"]).optional().describe("Run a live model probe (admin only)"),
+    }],
+    ["patch", "/api/admin/journeys/:journeyId/steps/:stepId", "JourneyStepGroupQuery", {
+      group: z.literal("true").optional().describe("Apply to every row of the logical step"),
+    }],
+    ["delete", "/api/admin/journeys/:journeyId/steps/:stepId", "JourneyStepGroupQuery", {
+      group: z.literal("true").optional().describe("Apply to every row of the logical step"),
+    }],
+    ["get", "/api/enrichment/jobs", "EnrichmentJobsQuery", {
+      limit: digits("Number of jobs (default 50, 1–100)"),
+    }],
+    ["get", "/api/enrichment/jobs/:id/events", "AgentEventsQuery", {
+      afterSeq: digits("Only events after this sequence number"),
+    }],
+    ["get", "/api/researcher/config", "ResearcherConfigQuery", {
+      model: text("Preview an orchestrator model override"),
+      scoutModel: text("Preview a scout model override"),
+      baseUrl: text("Preview a base URL override (validated like POST /api/researcher/start)"),
+      hasAuthToken: z.literal("1").optional().describe("Preview as if an override auth token were supplied"),
+      allowInsecureHttp: z.literal("1").optional().describe("Preview with a plain-http override confirmed"),
+    }],
+    ["get", "/api/researcher/jobs", "ResearcherJobsQuery", {
+      limit: digits("Number of jobs (default 20, clamped to 1–200)"),
+    }],
+    ["get", "/api/researcher/jobs/:id/events", "AgentEventsQuery", {
+      afterSeq: digits("Only events after this sequence number"),
+    }],
+    ["get", "/api/researcher/discoveries", "ResearcherDiscoveriesQuery", {
+      jobId: digits("Discoveries of this research job (default: all pending)"),
+    }],
+  ];
+  for (const [method, path, name, shape] of documented) {
+    setRouteQuerySchema(method, path, { name, schema: z.object(shape), guard: genericQuerySchema });
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "step": {
+    "createdAt": "2026-10-27T06:57:10.634Z",
+    "description": "Temporary QA-owned audit step; removed by exact ID after this run.",
+    "id": 262,
+    "isOptional": true,
+    "journeyId": 6,
+    "resourceId": null,
+    "stepNumber": 7,
+    "title": "[QA-audit-1026] gap journey step"
+  }
+}

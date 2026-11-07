@@ -14,6 +14,13 @@ The application-specific policy is:
   `200` with `{ user, isAuthenticated }`.
 - `POST /api/auth/logout-all` uses Clerk's backend API to revoke every active
   session for the caller. Current-device sign-out is handled by Clerk's client.
+- The owner password session (`POST /api/auth/admin-login`, `OWNER_PASSWORD`)
+  is a stateless signed cookie for `admin@example.com`. Sign-out
+  (`POST /api/auth/admin-logout`, called by every client sign-out path) and
+  `logout-all` both end it on the server by setting `users.sessions_revoked_at`.
+  Any owner cookie issued at or before that time is rejected, including copies
+  of it. The cookie has no per-device identity, so either call ends every owner
+  session, not only the caller's.
 - Cookie-authenticated mutations pass the application's same-origin CSRF checks.
 - The `sessions` and `password_reset_tokens` tables are retained legacy schema
   artifacts; current authentication code does not read or write them.

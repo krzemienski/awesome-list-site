@@ -13,6 +13,9 @@
  */
 import { ServiceUnavailableError } from "../middleware/errors";
 import { afterCommit } from "../db";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("public-cache");
 
 export const PUBLIC_CACHE_SCHEMA_VERSION = 1;
 
@@ -47,7 +50,9 @@ type CacheMetrics = {
   rejectedRebuilds: number;
 };
 
-const MAX_ENTRIES = 512;
+// ~2,700 legitimate route-meta keys plus ~300 other keys (reports/prod-ops
+// B14); the byte cap below, not this count, bounds memory.
+const MAX_ENTRIES = 4096;
 // A serialized filtered catalog variant includes the full category tree as
 // well as its filtered flat resource list (roughly 1–3 MB depending on the
 // branch). The previous 24 MB cap evicted useful hot variants after only a
@@ -69,7 +74,8 @@ const invalidations: Record<PublicCacheInvalidationReason, number> = {
 };
 let generation = 1;
 let bytes = 0;
-let evictions = 0;
+let evictedLive = 0;
+let evictedExpired = 0;
 
 function namespaceMetrics(namespace: PublicCacheNamespace): CacheMetrics {
   const current = metrics.get(namespace) ?? {
@@ -105,13 +111,38 @@ function removeEntry(key: string): void {
   entries.delete(key);
 }
 
+/**
+ * Entries past their TTL are dead weight: drop them all before any live entry
+ * is considered for eviction, and count the two kinds apart so the snapshot
+ * shows whether live data is really being thrown away.
+ */
+function sweepExpired(now: number): void {
+  for (const [key, entry] of entries) {
+    if (entry.expiresAt > now) continue;
+    removeEntry(key);
+    evictedExpired++;
+  }
+}
+
 function evictToBounds(): void {
+  if (entries.size <= MAX_ENTRIES && bytes <= MAX_BYTES) return;
+  sweepExpired(Date.now());
   while (entries.size > MAX_ENTRIES || bytes > MAX_BYTES) {
     const oldest = entries.keys().next().value as string | undefined;
     if (!oldest) break;
     removeEntry(oldest);
-    evictions++;
+    evictedLive++;
   }
+}
+
+/** An unresolved route (soft 404) is never stored: crawler junk would fill the cache. */
+function isUncacheable(namespace: PublicCacheNamespace, value: unknown): boolean {
+  return (
+    namespace === "route-meta" &&
+    typeof value === "object" &&
+    value !== null &&
+    (value as { found?: unknown }).found === false
+  );
 }
 
 export async function getPublicCacheValue<T>(options: {
@@ -167,6 +198,8 @@ export async function getPublicCacheValue<T>(options: {
         continue;
       }
 
+      if (isUncacheable(options.namespace, value)) return value;
+
       const entry: CacheEntry<T> = {
         value,
         expiresAt: Date.now() + options.ttlMs,
@@ -198,13 +231,7 @@ function clearPublicCache(reason: PublicCacheInvalidationReason): void {
   invalidations[reason]++;
   entries.clear();
   bytes = 0;
-  console.log(
-    JSON.stringify({
-      event: "ops.public_cache_invalidated",
-      reason,
-      generation,
-    }),
-  );
+  logger.info("Public cache cleared", { reason, generation });
 }
 
 export function getPublicCacheSnapshot() {
@@ -221,7 +248,7 @@ export function getPublicCacheSnapshot() {
     entries: entries.size,
     bytes,
     inFlight: inFlight.size,
-    evictions,
+    evictions: { live: evictedLive, expired: evictedExpired },
     invalidations: { ...invalidations },
     namespaces: Object.fromEntries(metrics.entries()),
   };

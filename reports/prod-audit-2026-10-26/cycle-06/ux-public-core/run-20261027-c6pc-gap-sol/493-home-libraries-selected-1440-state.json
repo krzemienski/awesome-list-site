@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?layout=index&kind=libraries","title":"Awesome Video — 3826+ Curated Video & Streaming Resources","width":1440,"height":900,"touch":false,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"BUTTON","id":"","label":"Libraries, 745 resources","text":"Libraries 745","rect":{"x":846.390625,"y":107,"width":125.46875,"height":44,"top":107,"right":971.859375,"bottom":151,"left":846.390625}},"headings":[{"text":"~/awesome.videoAwesome Video Resources","id":""},{"text":"Hand-picked highlights","id":"home-index-featured-title"},{"text":"Categories","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Home","label":null,"current":"page"},{"text":"Libraries 745","label":"Libraries, 745 resources","current":null}],"status":[],"analyticsDisabled":"1"}
+```

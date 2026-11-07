@@ -1,0 +1,16 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subsubcategories"
+  uid=251_21 main
+    uid=252_0 tabpanel "Subcategories"
+      uid=258_136 navigation "Pagination"
+        uid=258_153 status atomic live="polite" relevant="additions text"
+  uid=260_0 listbox orientation="vertical"
+    uid=260_1 option "Community & Events" focusable focused
+    uid=260_2 option "Encoding & Codecs"
+    uid=260_3 option "General Tools"
+    uid=260_4 option "Infrastructure & Delivery"
+    uid=260_5 option "Intro & Learning"
+    uid=260_6 option "Media Tools"
+    uid=260_7 option "Players & Clients"
+    uid=260_8 option "Protocols & Transport"
+    uid=260_9 option "Standards & Industry"
+    uid=260_10 option "[QA-audit-1026] c4 category"

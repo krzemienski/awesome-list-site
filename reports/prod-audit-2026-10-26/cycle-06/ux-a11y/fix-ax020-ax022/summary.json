@@ -1,0 +1,676 @@
+{
+  "scope": [
+    "C6-AX-020",
+    "C6-AX-022"
+  ],
+  "base": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "branch": "fix/c6-ax020-advanced-offline-recovery",
+  "clone": "/tmp/awesome-c6-ax020-ax022.N3IHuj",
+  "runtime": {
+    "origin": "http://127.0.0.1:5167",
+    "database": "isolated loopback awesome_c2_pubsec",
+    "mode": "development",
+    "backgroundJobsDisabled": true,
+    "analyticsConsent": "denied",
+    "umamiDisabled": true
+  },
+  "proofMethod": "Real Express/Vite app and local PostgreSQL. Owned server SIGSTOP/SIGCONT creates genuine dependency unavailability; native Chrome CDP offline emulation drops real packets. Cache clearing/removal prepares data-less app queries; manual module warmup avoids confusing chunk-offline and catalog-offline branches. No fake Responses, mocks, test files or validation scripts. Captured raw Accessibility.getFullAXTree, screenshots, focus/network state. Final restored online.",
+  "scenarios": [
+    {
+      "name": "1440-offline-initial-final",
+      "state": {
+        "at": 1793087022156,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "1440-offline-keyboard-retry-space-final",
+      "state": {
+        "at": 1793087035763,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Still offline — reconnect and try again.Retry",
+        "stillOffline": "Still offline — reconnect and try again.",
+        "focus": {
+          "tag": "BUTTON",
+          "text": "Retry",
+          "testId": "button-error-page-retry",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "1440-online-server-failure-final",
+      "state": {
+        "at": 1793087014651,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "Something went wrong",
+        "errorPage": true,
+        "copy": "Error · unavailableSomething went wrongThe catalog couldn't be loaded. This is usually a brief network or server problem. Please try again.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "1440-auto-recovered-focused-final",
+      "state": {
+        "at": 1793087053775,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "H1",
+          "text": "Advanced Features",
+          "testId": null,
+          "isH1": true
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "1440-background-refetch-no-focus-theft-final",
+      "state": {
+        "at": 1793087070772,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "INPUT",
+          "text": "",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "1440-ordinary-navigation-user-focus-final",
+      "state": {
+        "at": 1793087081250,
+        "url": "http://127.0.0.1:5167/about",
+        "online": true,
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "touch": 0,
+        "coarse": false,
+        "h1": "A field journal for video engineers",
+        "errorPage": false,
+        "focus": {
+          "tag": "BUTTON",
+          "text": "What is Awesome Video?",
+          "testId": "button-about-faq-0",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-offline-initial-final-native",
+      "state": {
+        "at": 1793087341689,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-offline-retry-final-pointer",
+      "state": {
+        "at": 1793087413074,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Still offline — reconnect and try again.Retry",
+        "stillOffline": "Still offline — reconnect and try again.",
+        "focus": {
+          "tag": "BUTTON",
+          "text": "Retry",
+          "testId": "button-error-page-retry",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-online-server-failure-final",
+      "state": {
+        "at": 1793087014583,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Something went wrong",
+        "errorPage": true,
+        "copy": "Error · unavailableSomething went wrongThe catalog couldn't be loaded. This is usually a brief network or server problem. Please try again.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-auto-recovered-focused-final",
+      "state": {
+        "at": 1793087426660,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "H1",
+          "text": "Advanced Features",
+          "testId": null,
+          "isH1": true
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-background-refetch-no-focus-theft-final",
+      "state": {
+        "at": 1793087453845,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "INPUT",
+          "text": "",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "820-ordinary-navigation-user-focus-final",
+      "state": {
+        "at": 1793087463412,
+        "url": "http://127.0.0.1:5167/about",
+        "online": true,
+        "width": 820,
+        "height": 1180,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "A field journal for video engineers",
+        "errorPage": false,
+        "focus": {
+          "tag": "BUTTON",
+          "text": "What is Awesome Video?",
+          "testId": "button-about-faq-0",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-offline-initial-final",
+      "state": {
+        "at": 1793086779070,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-offline-retry-final",
+      "state": {
+        "at": 1793086779145,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Still offline — reconnect and try again.Retry",
+        "stillOffline": "Still offline — reconnect and try again.",
+        "focus": {
+          "tag": "BUTTON",
+          "text": "Retry",
+          "testId": "button-error-page-retry",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-online-server-failure-final",
+      "state": {
+        "at": 1793087014506,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Something went wrong",
+        "errorPage": true,
+        "copy": "Error · unavailableSomething went wrongThe catalog couldn't be loaded. This is usually a brief network or server problem. Please try again.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-auto-recovered-focused-final",
+      "state": {
+        "at": 1793086810861,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "H1",
+          "text": "Advanced Features",
+          "testId": null,
+          "isH1": true
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-background-refetch-input-final",
+      "state": {
+        "at": 1793086854121,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "INPUT",
+          "text": "",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-ordinary-navigation-user-focus",
+      "state": {
+        "at": 1793086907878,
+        "url": "http://127.0.0.1:5167/about",
+        "online": true,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "A field journal for video engineers",
+        "errorPage": false,
+        "focus": {
+          "tag": "BUTTON",
+          "text": "What is Awesome Video?",
+          "testId": "button-about-faq-0",
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-click-free-offline-body-final",
+      "state": {
+        "at": 1793087648536,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": false,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "You're offline",
+        "errorPage": true,
+        "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Retry",
+        "focus": {
+          "tag": "BODY",
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(-",
+          "testId": null,
+          "isH1": false
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    },
+    {
+      "name": "390-click-free-auto-recovered-focused-final",
+      "state": {
+        "at": 1793087659839,
+        "url": "http://127.0.0.1:5167/advanced",
+        "online": true,
+        "width": 390,
+        "height": 844,
+        "dpr": 1,
+        "touch": 1,
+        "coarse": true,
+        "h1": "Advanced Features",
+        "errorPage": false,
+        "focus": {
+          "tag": "H1",
+          "text": "Advanced Features",
+          "testId": null,
+          "isH1": true
+        },
+        "navigation": [
+          {
+            "type": "navigate",
+            "name": "http://127.0.0.1:5167/about",
+            "start": 0
+          }
+        ],
+        "consent": "denied",
+        "umamiDisabled": "1",
+        "overflow": 0
+      }
+    }
+  ],
+  "verdicts": {
+    "offlineCopy": "PASS at 1440, 820 touch, 390 touch",
+    "offlineRetry": "PASS exact Still offline — reconnect and try again. at all widths; keyboard Tab+Space at 1440, emulated touch at 390, trusted pointer with touch emulation active at 820",
+    "onlineServerCopy": "PASS generic online failure copy at all widths",
+    "automaticRecoveryFocus": "PASS no Retry after reconnect; recovered #main H1 Advanced Features focused at all widths; additional fully click-free BODY→H1 at 390",
+    "ordinaryRefetch": "PASS real refetchQueries with focused category search input retains INPUT at all widths",
+    "ordinaryNavigation": "PASS real About link plus focused FAQ control remains on control at all widths",
+    "reloadLoop": "PASS captured document navigation stays at one through same-document recovery; Vite process restart exploratory failure excluded from final evidence"
+  },
+  "unverified": [
+    "Production behavior after deployment (no deployment performed).",
+    "Screen-reader speech output; AX trees are not speech proof.",
+    "Physical touch device behavior; tablet/mobile are Chromium touch emulation.",
+    "Independent full screenshot color/contrast, all themes and whole-app accessibility audit.",
+    "User explicitly moving focus outside the error panel during the pending recovery itself: guards implemented and ordinary navigation/refetch controls proven, but that exact negative-control recovery could not be completed before closeout.",
+    "HTTP 5xx response variant: real connection-refused and request-timeout server failures were exercised online; no fake HTTP response used."
+  ],
+  "limitations": [
+    "The browser wrappers and shared MCP driver were unreliable for offline emulation; final proof uses a dedicated owned native Chrome CDP browser.",
+    "A late optional navigation-away negative control left the held ErrorPage until reconnect; no PASS is claimed for that optional sequence. Final navigation restored normal About online.",
+    "Build emitted existing dependency PURE-annotation and bundle-size warnings; build exit was zero."
+  ],
+  "checksFile": "checks.json"
+}

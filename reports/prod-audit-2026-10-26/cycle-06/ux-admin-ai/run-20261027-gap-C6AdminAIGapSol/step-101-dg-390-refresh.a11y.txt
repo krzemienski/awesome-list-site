@@ -1,0 +1,142 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - navigation "Breadcrumb" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "Home" [ref=e29] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e30]:
+                - img [ref=e31]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e33]: Authorized admin area
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e40]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e41]:
+                  - text: Operations
+                  - emphasis [ref=e42]: dashboard
+                - paragraph [ref=e43]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e44]:
+                - button "Settings, Digests section open" [ref=e45] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                  - generic [ref=e46]: · Digests
+                - 'button "New entry: add a resource" [ref=e47] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e48]: Digests section open
+            - generic [ref=e49]:
+              - generic [ref=e50]:
+                - tablist "Admin sections" [ref=e51]:
+                  - tab "Overview" [ref=e52] [cursor=pointer]:
+                    - img [ref=e53]
+                    - text: Overview
+                  - tab "Approvals" [ref=e58] [cursor=pointer]:
+                    - img [ref=e59]
+                    - text: Approvals
+                  - tab "Edits" [ref=e61] [cursor=pointer]:
+                    - img [ref=e62]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Researcher
+                  - tab "Export" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Export
+                  - tab "Database" [ref=e72] [cursor=pointer]:
+                    - img [ref=e73]
+                    - text: Database
+                  - tab "Resources" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Resources
+                  - tab "Categories" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e82] [cursor=pointer]:
+                    - img [ref=e83]
+                    - text: Subcategories
+                  - tab "Users" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Users
+                  - tab "GitHub" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Link Health
+                  - tab "Audit" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: Audit
+                  - tab "Research" [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e102] [cursor=pointer]:
+                  - img [ref=e103]
+              - tabpanel "Digests" [ref=e105]:
+                - article [ref=e106]:
+                  - generic [ref=e107]:
+                    - generic [ref=e108]:
+                      - img [ref=e109]
+                      - text: Digest delivery health
+                    - paragraph [ref=e111]: Aggregate transport and queue signals only. No message contents, user data, recipient identifiers, or secret tokens are shown.
+                    - generic [ref=e112]:
+                      - paragraph [ref=e113]: Updated 03:29:14 AM · refreshes every 30s
+                      - button "Refresh" [disabled] [active] [ref=e114]:
+                        - img
+                        - text: Refresh
+                  - generic [ref=e116]:
+                    - generic [ref=e117]:
+                      - article [ref=e118]:
+                        - generic [ref=e120]:
+                          - img [ref=e121]
+                          - text: Transport
+                        - generic [ref=e127]: Available
+                      - article [ref=e128]:
+                        - generic [ref=e130]:
+                          - img [ref=e131]
+                          - text: Queue total
+                        - generic [ref=e134]: "0"
+                      - article [ref=e135]:
+                        - generic [ref=e137]:
+                          - img [ref=e138]
+                          - text: Oldest queued
+                        - generic [ref=e141]: None
+                    - generic [ref=e142]:
+                      - heading "Digest jobs by channel and status" [level=2] [ref=e143]
+                      - generic [ref=e145]:
+                        - paragraph [ref=e146]: In App
+                        - generic [ref=e148]:
+                          - term [ref=e149]: Sent
+                          - definition [ref=e150]: "1"
+                    - generic [ref=e151]:
+                      - heading "Recent failure codes" [level=2] [ref=e152]:
+                        - img [ref=e153]
+                        - text: Recent failure codes
+                      - paragraph [ref=e155]: No recent failure codes recorded.

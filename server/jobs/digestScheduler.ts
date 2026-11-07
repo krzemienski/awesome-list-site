@@ -1,25 +1,34 @@
 import crypto from "crypto";
 import { runDigestCycle } from "../services/digestService";
+import { createLogger } from "../lib/logger";
+import { runWithJobContext } from "../ops/requestContext";
+
+const logger = createLogger("digest");
 
 const RUN_EVERY_MS = 60 * 60 * 1000;
 let timer: NodeJS.Timeout | null = null;
 let running = false;
 
-async function runScheduledCycle(workerId: string): Promise<void> {
+const runScheduledCycle = (workerId: string): Promise<void> =>
+  runWithJobContext("digest", workerId, () => runCycle(workerId));
+
+async function runCycle(workerId: string): Promise<void> {
   if (running) return;
   running = true;
+  const startedAt = Date.now();
+  logger.info("Digest cycle started");
   try {
     const result = await runDigestCycle({ workerId, limit: 20 });
-    if (result.recovered || result.queued || result.processed) {
-      console.log(
-        `[digest] cycle recovered=${result.recovered} queued=${result.queued} processed=${result.processed}`,
-      );
-    }
+    logger.info("Digest cycle finished", {
+      recovered: result.recovered,
+      queued: result.queued,
+      processed: result.processed,
+      ms: Date.now() - startedAt,
+    });
   } catch (error) {
-    console.error(
-      "[digest] scheduled cycle failed:",
-      error instanceof Error ? error.message : "unknown error",
-    );
+    logger.error("Digest cycle failed; retrying next hour", {
+      reason: error instanceof Error ? error.message : "unknown error",
+    });
   } finally {
     running = false;
   }
@@ -37,5 +46,5 @@ export function initializeDigestScheduler(): void {
     void runScheduledCycle(workerId);
   }, RUN_EVERY_MS);
   timer.unref();
-  console.log("Digest scheduler initialized (hourly)");
+  logger.info("Digest scheduler initialized (hourly)");
 }

@@ -41,6 +41,8 @@ import {
   X,
 } from "lucide-react";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { apiFetch } from "@/lib/api-fetch";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface JourneyStep {
   id: number;
@@ -131,13 +133,17 @@ function ResourcePicker({
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  // Picking an option or pressing Clear unmounts the focused control; without
+  // a handoff Radix drops focus onto the dialog container. The toggle stays
+  // mounted in every state, so it receives focus.
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const resourcesQuery = useQuery<{ resources: ResourceLite[]; total: number }>({
     queryKey: ["/api/resources", { search: query, limit: 10 }],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: "10" });
       if (query.trim()) params.set("search", query.trim());
-      const res = await fetch(`/api/resources?${params.toString()}`, {
+      const res = await apiFetch(`/api/resources?${params.toString()}`, {
         credentials: "include",
       });
       if (!res.ok) throw new ApiError(res.status, "Failed to search resources");
@@ -152,7 +158,7 @@ function ResourcePicker({
     queryKey: ["/api/resources/picker", value],
     queryFn: async () => {
       if (!value) return null;
-      const res = await fetch(`/api/resources/${value}`, { credentials: "include" });
+      const res = await apiFetch(`/api/resources/${value}`, { credentials: "include" });
       if (!res.ok) return null;
       const json = await res.json();
       return { id: json.id, title: json.title, url: json.url };
@@ -174,8 +180,11 @@ function ResourcePicker({
             </span>
             <button
               type="button"
-              onClick={() => onChange(null)}
-              className="inline-flex shrink-0 items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+              onClick={() => {
+                onChange(null);
+                toggleRef.current?.focus();
+              }}
+              className="inline-flex shrink-0 items-center justify-center min-h-11 min-w-11 min-[1025px]:min-h-8 min-[1025px]:min-w-8 -my-1 hover:opacity-80"
               aria-label="Clear resource"
               data-testid="step-resource-clear"
             >
@@ -186,6 +195,7 @@ function ResourcePicker({
           <span className="text-sm text-muted-foreground">No resource linked</span>
         )}
         <Button
+          ref={toggleRef}
           type="button"
           size="sm"
           variant="outline"
@@ -211,7 +221,7 @@ function ResourcePicker({
             {unavailable && (
               <div role="alert" className="flex flex-wrap items-center gap-2 p-2 text-sm">
                 {unavailable === "offline" ? "You're offline. Reconnect to search resources." : "Resources could not be loaded."}
-                <Button type="button" variant="outline" onClick={() => void resourcesQuery.refetch()}>Retry</Button>
+                <RetryButton onRetry={() => void resourcesQuery.refetch()} />
               </div>
             )}
             {!unavailable && !isFetching && data && data.resources.length === 0 && (
@@ -224,6 +234,7 @@ function ResourcePicker({
                 onClick={() => {
                   onChange(r.id);
                   setOpen(false);
+                  toggleRef.current?.focus();
                 }}
                 className="w-full text-left p-2 hover:bg-accent text-sm"
                 data-testid={`step-resource-option-${r.id}`}
@@ -290,7 +301,13 @@ function StepEditor({
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               data-testid="step-title-input"
+              aria-describedby={form.title.trim() ? undefined : "step-title-required"}
             />
+            {!form.title.trim() && (
+              <p id="step-title-required" className="text-xs text-muted-foreground" data-testid="step-title-required">
+                A title is required before you can {submitLabel.toLowerCase().startsWith("add") ? "add" : "save"} this step.
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="step-description">Description</Label>
@@ -322,7 +339,7 @@ function StepEditor({
               onCheckedChange={(v) => setForm((f) => ({ ...f, isOptional: !!v }))}
               data-testid="step-optional-checkbox"
             />
-            <Label htmlFor="step-optional" className="cursor-pointer">
+            <Label htmlFor="step-optional" className="inline-flex min-h-6 max-lg:min-h-11 cursor-pointer items-center">
               Mark this step as optional
             </Label>
           </div>
@@ -367,7 +384,7 @@ function StepsDialog({
   const stepsQuery = useQuery<{ steps: JourneyStep[] }>({
     queryKey: ["/api/admin/journeys", journeyId, "steps"],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/journeys/${journeyId}/steps`, {
+      const res = await apiFetch(`/api/admin/journeys/${journeyId}/steps`, {
         credentials: "include",
       });
       if (!res.ok) throw new ApiError(res.status, "Failed to fetch steps");
@@ -401,8 +418,8 @@ function StepsDialog({
           isOptional: form.isOptional,
         }),
       }),
-    onSuccess: () => {
-      toast({ title: "Step added" });
+    onSuccess: (_data, form) => {
+      toast({ title: "Step added", description: `"${form.title}" is now live on the journey page.` });
       setCreateOpen(false);
       invalidate();
     },
@@ -423,8 +440,8 @@ function StepsDialog({
           }),
         });
     },
-    onSuccess: () => {
-      toast({ title: "Step saved" });
+    onSuccess: (_data, { form }) => {
+      toast({ title: "Step saved", description: `Changes to "${form.title}" are live.` });
       setEditingGroup(null);
       invalidate();
     },
@@ -438,8 +455,8 @@ function StepsDialog({
           method: "DELETE",
         });
     },
-    onSuccess: () => {
-      toast({ title: "Step deleted" });
+    onSuccess: (_data, group) => {
+      toast({ title: "Step deleted", description: `Step ${group.stepNumber} ("${group.rows[0]?.title ?? "untitled"}") was removed and the remaining steps renumbered.` });
       setDeletingGroup(null);
       invalidate();
     },
@@ -543,7 +560,7 @@ function StepsDialog({
             unavailable === "offline" ? (
               <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
                 You&apos;re offline. Reconnect to load journey steps.
-                <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
+                <RetryButton onRetry={() => void stepsQuery.refetch()} />
               </div>
             ) : (
               <AdminLoadError
@@ -624,7 +641,7 @@ function StepsDialog({
                             href={`/resource/${row.resourceId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-[32px] min-w-0 items-center gap-1 underline-offset-2 hover:underline"
+                            className="inline-flex min-h-11 min-[1025px]:min-h-[32px] min-w-0 items-center gap-1 underline-offset-2 hover:underline"
                             title={`${resourceLabel(row)} (#${row.resourceId})`}
                             aria-label={`Open ${resourceLabel(row)} in a new tab`}
                             data-testid={`step-resource-link-${row.id}`}
@@ -638,7 +655,7 @@ function StepsDialog({
                               variant="ghost"
                               size="icon"
                               onClick={() => setRemovingRow(row)}
-                              className="h-8 w-8 min-h-[32px] min-w-[32px] shrink-0 -my-1 hover:opacity-80"
+                              className="h-11 w-11 min-h-11 min-w-11 min-[1025px]:h-8 min-[1025px]:w-8 min-[1025px]:min-h-8 min-[1025px]:min-w-8 shrink-0 -my-1 hover:opacity-80"
                               aria-label={`Remove ${resourceLabel(row)} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >
@@ -773,10 +790,10 @@ function StepsDialog({
 }
 
 export default function JourneyStepsManager() {
-  const { data, isLoading, error, refetch, isFetching } = useQuery<{ journeys: AdminJourney[] }>({
+  const journeysQuery = useQuery<{ journeys: AdminJourney[] }>({
     queryKey: ["/api/admin/journeys"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/journeys", { credentials: "include" });
+      const res = await apiFetch("/api/admin/journeys", { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, "Failed to fetch journeys");
       return res.json();
     },
@@ -786,6 +803,9 @@ export default function JourneyStepsManager() {
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
+  const { data, isLoading, error, refetch, isFetching } = journeysQuery;
+  // Paused offline is not "No journeys yet." (sweep NEW-002).
+  const unavailable = queryUnavailableReason(journeysQuery);
 
   const [activeJourney, setActiveJourney] = useState<AdminJourney | null>(null);
 
@@ -808,10 +828,11 @@ export default function JourneyStepsManager() {
             <Skeleton className="h-16 w-full" />
           </div>
         )}
-        {error && (
+        {unavailable && (
           <AdminLoadError
             subject="journeys"
             error={error}
+            offline={unavailable === "offline"}
             note={data ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
@@ -819,7 +840,7 @@ export default function JourneyStepsManager() {
             retryTestId="button-retry-journeys"
           />
         )}
-        {!isLoading && !error && (data?.journeys?.length ?? 0) === 0 && (
+        {!isLoading && !unavailable && (data?.journeys?.length ?? 0) === 0 && (
           <p className="text-sm text-muted-foreground">No journeys yet.</p>
         )}
         <div className="space-y-2">

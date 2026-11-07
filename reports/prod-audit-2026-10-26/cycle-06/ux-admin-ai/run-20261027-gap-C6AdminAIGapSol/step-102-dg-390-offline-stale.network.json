@@ -1,0 +1,60 @@
+[
+  {
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/stats",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50"
+  },
+  {
+    "method": "GET",
+    "url": "https://awesome.video/api/admin/digests/health"
+  }
+]

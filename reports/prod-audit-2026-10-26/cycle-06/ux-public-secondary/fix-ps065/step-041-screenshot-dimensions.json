@@ -1,0 +1,102 @@
+{
+  "capturedAt": "2026-10-27T07:33:22.559Z",
+  "method": "Reading PNG IHDR bytes from actual saved screenshots",
+  "images": [
+    {
+      "file": "step-005-footer-1440.png",
+      "bytes": 91372,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-007-desktop-encoding-route.png",
+      "bytes": 203978,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-009-desktop-general-route.png",
+      "bytes": 181757,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-010-desktop-general-route-settled.png",
+      "bytes": 188193,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-012-footer-1440-keyboard-focus.png",
+      "bytes": 91344,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-016-footer-820.png",
+      "bytes": 79634,
+      "width": 820,
+      "height": 1180
+    },
+    {
+      "file": "step-018-tablet-encoding-route.png",
+      "bytes": 135270,
+      "width": 820,
+      "height": 1180
+    },
+    {
+      "file": "step-019-tablet-general-route.png",
+      "bytes": 135221,
+      "width": 820,
+      "height": 1180
+    },
+    {
+      "file": "step-021-footer-820-keyboard-focus.png",
+      "bytes": 170101,
+      "width": 820,
+      "height": 1180
+    },
+    {
+      "file": "step-025-footer-390-lower.png",
+      "bytes": 47876,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "step-026-footer-390-upper.png",
+      "bytes": 42862,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "step-028-phone-encoding-route.png",
+      "bytes": 52856,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "step-029-phone-general-route.png",
+      "bytes": 50918,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "step-031-footer-390-keyboard-focus.png",
+      "bytes": 40329,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "step-033-footer-1440-focus-visible.png",
+      "bytes": 91214,
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "step-035-footer-820-focus-visible.png",
+      "bytes": 75953,
+      "width": 820,
+      "height": 1180
+    }
+  ]
+}

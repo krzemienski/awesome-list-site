@@ -1,0 +1,17 @@
+- dialog "Create Category"
+  - form
+    - heading "Create Category" [level=2, ref=e2]
+    - LabelText [ref=e3] clickable [cursor:pointer]
+    - textbox "Name *" [ref=e4]
+    - LabelText [ref=e5] clickable [cursor:pointer]
+    - textbox "Slug *" [ref=e6]
+    - button "Cancel" [ref=e7]
+    - button "Create" [ref=e8]
+  - button "Close" [ref=e1]
+- heading "Create Category" [level=2, ref=e2]
+- LabelText [ref=e3] clickable [cursor:pointer]
+- textbox "Name *" [ref=e4]
+- LabelText [ref=e5] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e6]
+- button "Cancel" [ref=e7]
+- button "Create" [ref=e8]

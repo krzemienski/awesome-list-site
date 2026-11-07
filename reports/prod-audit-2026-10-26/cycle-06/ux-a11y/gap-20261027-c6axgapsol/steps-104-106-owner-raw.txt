@@ -1,0 +1,25 @@
+✓ Done
+
+https://awesome.video/admin/unknown-c6-gap
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,826 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e12]
+    - link "Page Not Found" [disabled, ref=e13]
+  - heading "Page Not Found" [level=1, ref=e9]
+  - link "Browse all categories" [ref=e10]
+  - link "Go home" [ref=e11]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-104-owner-404-820.png
+
+✓ Done
+
+https://awesome.video/admin/unknown-c6-gap

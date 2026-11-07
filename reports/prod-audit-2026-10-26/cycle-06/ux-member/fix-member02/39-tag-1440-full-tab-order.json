@@ -1,0 +1,72 @@
+[
+  {
+    "name": "View details for Nimble Streamer",
+    "testId": "link-view-details-1923",
+    "focusVisible": false,
+    "width": 44,
+    "height": 44
+  },
+  {
+    "name": "Show 5 more tags",
+    "testId": "button-more-tags-1923",
+    "focusVisible": true,
+    "width": 61.828125,
+    "height": 44
+  },
+  {
+    "name": "Open LinkNimble Streamer (opens in new tab)",
+    "testId": "button-visit-1923",
+    "focusVisible": true,
+    "width": 44,
+    "height": 44
+  },
+  {
+    "name": "Suggest an edit: Nimble Streamer",
+    "testId": "button-suggest-edit-1923",
+    "focusVisible": true,
+    "width": 44,
+    "height": 44
+  },
+  {
+    "name": "Favorite to your account — sign in required: Nimble Streamer",
+    "testId": "button-favorite",
+    "focusVisible": true,
+    "width": 44,
+    "height": 44
+  },
+  {
+    "name": "Bookmark on this device — no sign-in required: Nimble Streamer",
+    "testId": "button-bookmark",
+    "focusVisible": true,
+    "width": 44,
+    "height": 44
+  },
+  {
+    "name": "Nimble Streamer",
+    "testId": "link-resource-title-1923",
+    "focusVisible": true,
+    "width": 298.65625,
+    "height": 44
+  },
+  {
+    "name": "Browse resources tagged hls",
+    "testId": "tag-pill-1923-hls",
+    "focusVisible": true,
+    "width": 49.609375,
+    "height": 44
+  },
+  {
+    "name": "Browse resources tagged live-streaming",
+    "testId": "tag-pill-1923-live-streaming",
+    "focusVisible": true,
+    "width": 125.515625,
+    "height": 44
+  },
+  {
+    "name": "Browse resources tagged server",
+    "testId": "tag-pill-1923-server",
+    "focusVisible": true,
+    "width": 70.3125,
+    "height": 44
+  }
+]

@@ -1,9 +1,11 @@
 import * as React from "react";
 import { useState, useMemo, useCallback, ReactNode, useRef, useEffect } from "react";
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -14,14 +16,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
+import { describeWriteError, extractFieldErrors, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
+import { parsePageInput } from "@/lib/page-param";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "@/styles/pages/admin-catalog-taxonomy.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -369,7 +374,7 @@ function MultiSelect({ value, onChange, config, id, "data-testid": testId }: Mul
     queryKey: [config?.queryKey || config?.fetchUrl],
     queryFn: async () => {
       if (!config?.fetchUrl) return [];
-      const response = await fetch(config.fetchUrl, { credentials: 'include' });
+      const response = await apiFetch(config.fetchUrl, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch options');
       return response.json();
     },
@@ -1071,13 +1076,48 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // successful delete, focus a neighbouring row's Edit button (or Add) instead.
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const editButtonRefs = useRef(new Map<number, HTMLButtonElement>());
+  const tableScrollCue = useHorizontalScrollCue();
   const deleteFocusTargetRef = useRef<HTMLElement | null>(null);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const searchToggleRef = useRef<HTMLButtonElement>(null);
+  // AC-09: the field only becomes focusable once the open class commits.
+  const focusSearchOnOpenRef = useRef(false);
+  useEffect(() => {
+    if (!toolsOpen || !focusSearchOnOpenRef.current) return;
+    focusSearchOnOpenRef.current = false;
+    searchInputRef.current?.focus();
+  }, [toolsOpen]);
+  const openSearchTools = () => {
+    focusSearchOnOpenRef.current = true;
+    setToolsOpen(true);
+  };
+  const closeSearchTools = () => {
+    setToolsOpen(false);
+    // An empty field leaves the layout when closed; keep focus on the toggle.
+    if (searchInputRef.current?.parentElement?.contains(document.activeElement)) {
+      searchToggleRef.current?.focus();
+    }
+  };
+  // The shared paginator emits real ?page=N links. Initialize from and write
+  // back to that parameter so direct loads, Back/Forward and copied links open
+  // the same page instead of always snapping to page 1.
+  const readUrlPage = () => parsePageInput(new URLSearchParams(window.location.search).get("page") ?? "") ?? 1;
+  const writeUrlPage = (page: number, replace = false) => {
+    const url = new URL(window.location.href);
+    if (page > 1) url.searchParams.set("page", String(page));
+    else url.searchParams.delete("page");
+    window.history[replace ? "replaceState" : "pushState"](null, "", url.pathname + url.search + url.hash);
+  };
+  const [currentPage, setCurrentPage] = useState(readUrlPage);
+  useEffect(() => {
+    const onPopState = () => setCurrentPage(readUrlPage());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
@@ -1461,6 +1501,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   }, [parents, customFields]);
 
   const [formData, setFormData] = useState<Record<string, string | string[]>>(initialFormData);
+  const [slugEditedByHand, setSlugEditedByHand] = useState(false);
   const [validationErrors, setValidationErrors] = useState<FieldValidationErrors>({});
 
   /**
@@ -1565,6 +1606,52 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   };
 
+  // Field errors mark their inputs and focus the first enabled field;
+  // errors that name no field in the dialog stay in the banner.
+  const dialogFieldNames = [...parents.map(p => p.fieldName), "name", "slug", ...customFields.filter(f => f.type !== "file" && f.type !== "multiselect").map(f => f.name)];
+  const fieldErrorProps = (mode: "create" | "edit", name: string) =>
+    validationErrors[name]
+      ? { "aria-invalid": true as const, "aria-describedby": `${mode}-${name}-error` }
+      : {};
+  const showFieldErrors = (mode: "create" | "edit", errors: FieldValidationErrors, banner: string | null) => {
+    setValidationErrors(errors);
+    setFormError(banner);
+    requestAnimationFrame(() => {
+      for (const name of dialogFieldNames) {
+        if (!errors[name]) continue;
+        const field = document.getElementById(`${mode}-${name}`);
+        if (field && !field.matches(":disabled, [aria-disabled='true']")) {
+          field.focus();
+          break;
+        }
+      }
+    });
+  };
+  const showMissingFields = (mode: "create" | "edit", fields: string[], labels: string[]) => {
+    const inline: FieldValidationErrors = {};
+    const unmapped: string[] = [];
+    fields.forEach((field, i) => {
+      if (dialogFieldNames.includes(field)) inline[field] = `${labels[i]} is required`;
+      else unmapped.push(labels[i]);
+    });
+    const banner = unmapped.length > 0 ? `${unmapped.join(", ")} ${unmapped.length === 1 ? "is" : "are"} required` : null;
+    showFieldErrors(mode, inline, banner);
+  };
+  const showServerFormError = (mode: "create" | "edit", error: Error, fallback: string) => {
+    const serverFieldErrors = extractFieldErrors(error);
+    const inline: FieldValidationErrors = {};
+    const other: string[] = [];
+    for (const [field, message] of Object.entries(serverFieldErrors ?? {})) {
+      if (dialogFieldNames.includes(field)) inline[field] = message;
+      else other.push(`${field}: ${message}`);
+    }
+    if (Object.keys(inline).length === 0) {
+      setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
+      return;
+    }
+    showFieldErrors(mode, inline, other.length > 0 ? other.join(" ") : null);
+  };
+
   // The app shell already keeps this lightweight, cached taxonomy tree warm.
   // Reusing its query gives catalog rows authoritative child counts without
   // downloading the full resource corpus or adding a second tree shape.
@@ -1579,7 +1666,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     queries: parents.map(parent => ({
       queryKey: [parent.queryKey],
       queryFn: async (): Promise<BaseEntityWithCount[]> => {
-        const response = await fetch(parent.fetchUrl, {
+        const response = await apiFetch(parent.fetchUrl, {
           credentials: 'include'
         });
         if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${parent.label.toLowerCase()}`);
@@ -1599,6 +1686,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const failedParentQueries = parents
     .map((parent, index) => ({ parent, query: parentQueries[index] }))
     .filter(({ query }) => query.isError);
+  // A parent list with no data that is (re)fetching — first load or a Retry
+  // after a failure. The failure banner unmounts meanwhile, so mark the panel
+  // busy: the Retry focus handoff waits on aria-busy instead of guessing.
+  const parentsLoading = parentQueries.some((query) => query.isFetching && query.data === undefined);
 
   // Fetch main entities with resource counts
   // R5-037: Categories/Subcategories/Sub-Subcategories managers all run through
@@ -1606,17 +1697,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // second tab's create/edit/delete becomes visible on focus (or after a
   // mutation invalidates [queryKey]) instead of staying stale until a hard
   // refresh.
-  const {
-    data: items,
-    isLoading,
-    isError: itemsIsError,
-    error: itemsError,
-    isFetching: itemsIsFetching,
-    refetch: refetchItems,
-  } = useQuery<T[]>({
+  const itemsQuery = useQuery<T[]>({
     queryKey: [queryKey],
     queryFn: async () => {
-      const response = await fetch(fetchUrl, {
+      const response = await apiFetch(fetchUrl, {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${entityNamePlural.toLowerCase()}`);
@@ -1625,10 +1709,24 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+  const {
+    data: items,
+    isLoading,
+    error: itemsError,
+    isFetching: itemsIsFetching,
+    refetch: refetchItems,
+  } = itemsQuery;
+  // A fetch started offline is paused, not failed: without this it fell
+  // through to "No <entities> match your search." (sweep NEW-002).
+  const itemsUnavailable = queryUnavailableReason(itemsQuery);
+  const itemsIsError = itemsUnavailable !== null;
 
-  const resolvedDescription = typeof description === "function"
-    ? description(items, navTree)
-    : description;
+  // The count descriptions read "0 …" when the list never loaded; show none then.
+  const resolvedDescription = typeof description !== "function"
+    ? description
+    : itemsUnavailable && !items
+      ? null
+      : description(items, navTree);
 
   // Filter items based on search query
   const orderedItems = useMemo(() => {
@@ -1666,10 +1764,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     if (prevSearchRef.current !== searchQuery) {
       prevSearchRef.current = searchQuery;
       setCurrentPage(1);
+      writeUrlPage(1, true);
       return;
     }
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
+      writeUrlPage(1, true);
     }
   }, [searchQuery, totalPages, currentPage]);
 
@@ -1709,12 +1809,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Pagination handlers
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    const next = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(next);
+    writeUrlPage(next);
   };
 
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setCurrentPage(1); // Reset to first page when changing page size
+    writeUrlPage(1, true);
   };
 
   // Bulk selection helpers
@@ -1778,7 +1881,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const createMutation = useMutation({
     mutationFn: async (data: Record<string, any> | FormData) => {
       if (data instanceof FormData) {
-        const response = await fetch(createUrl, {
+        const response = await apiFetch(createUrl, {
           method: 'POST',
           credentials: 'include',
           body: data
@@ -1813,8 +1916,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} created successfully`
+        title: `${entityName} created`,
+        description: newEntity?.name ? `"${newEntity.name}" was added.` : `The ${entityName.toLowerCase()} was added.`
       });
       setCreateDialogOpen(false);
       setFormData(initialFormData);
@@ -1827,7 +1930,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-02/07: keep the dialog open and show the server rejection inline so
       // the operator can correct the offending field (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to create ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
+      showServerFormError("create", error, `Failed to create ${entityName.toLowerCase()}`);
     }
   });
 
@@ -1835,7 +1938,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const updateMutation = useMutation({
     mutationFn: async ({ id, data, previousData }: { id: number; data: Record<string, any> | FormData; previousData?: T }) => {
       if (data instanceof FormData) {
-        const response = await fetch(updateUrl(id), {
+        const response = await apiFetch(updateUrl(id), {
           method: 'PATCH',
           credentials: 'include',
           body: data
@@ -1871,8 +1974,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} updated successfully`
+        title: `${entityName} updated`,
+        description: (updatedEntity?.name || previousData?.name) ? `Changes to "${updatedEntity?.name || previousData?.name}" were saved.` : `Your changes were saved.`
       });
       setEditDialogOpen(false);
       setSelectedItem(null);
@@ -1885,7 +1988,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-03/07: inline banner, dialog stays open (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to update ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
+      showServerFormError("edit", error, `Failed to update ${entityName.toLowerCase()}`);
     }
   });
 
@@ -1916,8 +2019,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} deleted successfully`
+        title: `${entityName} deleted`,
+        description: previousData?.name ? `"${previousData.name}" was deleted.` : `The ${entityName.toLowerCase()} was deleted.`
       });
       const rows = paginatedItems || [];
       const index = rows.findIndex(item => item.id === id);
@@ -1930,7 +2033,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
-        title: "Error",
+        title: `Could not delete ${entityName.toLowerCase()}`,
         description: describeWriteError(error, { fallback: `Failed to delete ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }),
         variant: "destructive"
       });
@@ -1969,8 +2072,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
       toast({
-        title: "Success",
-        description: `${deletedIds.length} ${deletedIds.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} deleted successfully`
+        title: `${deletedIds.length === 1 ? entityName : entityNamePlural} deleted`,
+        description: `${deletedIds.length} ${deletedIds.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} deleted.`
       });
       setBulkDeleteDialogOpen(false);
       clearSelection();
@@ -1978,7 +2081,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
-        title: "Error",
+        title: `Could not delete ${entityNamePlural.toLowerCase()}`,
         description: describeWriteError(error, {
           fallback: `Failed to delete ${entityNamePlural.toLowerCase()}`,
           outcome: `Some ${entityNamePlural.toLowerCase()} may already be deleted. Refresh the list, then try again.`,
@@ -2089,6 +2192,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     const noOptions = !!parent.filterBy && !awaitingFilter && options.length === 0;
     const id = `${mode}-${parent.fieldName}`;
     const hintId = `${id}-empty-hint`;
+    const errorProps = fieldErrorProps(mode, parent.fieldName);
 
     return (
       <div key={parent.fieldName} className="space-y-2">
@@ -2100,7 +2204,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         >
           <SelectTrigger
             id={id}
-            aria-describedby={noOptions ? hintId : undefined}
+            {...errorProps}
+            aria-describedby={[errorProps["aria-describedby"], noOptions ? hintId : null].filter(Boolean).join(" ") || undefined}
             data-testid={`select-${mode}-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
           >
             <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
@@ -2113,6 +2218,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             ))}
           </SelectContent>
         </Select>
+        {validationErrors[parent.fieldName] && (
+          <p id={`${id}-error`} role={awaitingFilter || noOptions ? "alert" : undefined} className="text-xs text-destructive" data-testid={`error-${id}`}>
+            {validationErrors[parent.fieldName]}
+          </p>
+        )}
         {noOptions && (
           <p id={hintId} className="text-xs text-muted-foreground" data-testid={`hint-${id}-empty`}>
             {parent.emptyHint ?? "No options are available for this selection yet."}
@@ -2178,24 +2288,24 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   /**
    * Run16 BUG-033: shared name/slug sanity checks for taxonomy CRUD —
    * length caps plus a case-insensitive duplicate check against the loaded
-   * list (excluding the row being edited). Returns an error string or null.
+   * list (excluding the row being edited). Returns the failing field's message or null.
    */
-  const validateNameSlug = (excludeId?: number): string | null => {
+  const validateNameSlug = (excludeId?: number): FieldValidationErrors | null => {
     const name = String(formData.name ?? "").trim();
     const slug = String(formData.slug ?? "").trim();
-    if (name.length > 100) return "Name must be 100 characters or fewer";
-    if (slug.length > 100) return "Slug must be 100 characters or fewer";
+    if (name.length > 100) return { name: "Name must be 100 characters or fewer" };
+    if (slug.length > 100) return { slug: "Slug must be 100 characters or fewer" };
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-      return "Slug may only contain lowercase letters, numbers, and hyphens";
+      return { slug: "Slug may only contain lowercase letters, numbers, and hyphens" };
     }
     const dupName = (items || []).find(
       i => i.id !== excludeId && i.name.trim().toLowerCase() === name.toLowerCase()
     );
-    if (dupName) return `A ${entityName.toLowerCase()} named "${dupName.name}" already exists`;
+    if (dupName) return { name: `A ${entityName.toLowerCase()} named "${dupName.name}" already exists` };
     const dupSlug = (items || []).find(
       i => i.id !== excludeId && i.slug.trim().toLowerCase() === slug.toLowerCase()
     );
-    if (dupSlug) return `The slug "${dupSlug.slug}" is already in use`;
+    if (dupSlug) return { slug: `The slug "${dupSlug.slug}" is already in use` };
     return null;
   };
 
@@ -2228,26 +2338,21 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       // P1-02/07: keep the dialog open with an inline banner instead of a
       // transient toast that vanished along with the user's typed input.
-      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
+      showMissingFields("create", [...missingFields, ...missingFileFields, ...missingMultiSelectFields], fieldLabels);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks before hitting the API.
     const nameSlugError = validateNameSlug();
     if (nameSlugError) {
-      setFormError(nameSlugError);
+      showFieldErrors("create", nameSlugError, null);
       return;
     }
 
     // Run custom validation rules
     const fieldErrors = await validateAllFields();
     if (Object.keys(fieldErrors).length > 0) {
-      setValidationErrors(fieldErrors);
-      const errorFields = Object.keys(fieldErrors).map(fieldName => {
-        const customField = customFields.find(f => f.name === fieldName);
-        return customField?.label.replace(" *", "") || fieldName;
-      });
-      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
+      showFieldErrors("create", fieldErrors, null);
       return;
     }
 
@@ -2340,26 +2445,21 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       });
 
       // P1-03/07: inline banner, dialog stays open (see handleCreate).
-      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
+      showMissingFields("edit", missingFields, fieldLabels);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks (excluding the row itself).
     const nameSlugError = validateNameSlug(selectedItem.id);
     if (nameSlugError) {
-      setFormError(nameSlugError);
+      showFieldErrors("edit", nameSlugError, null);
       return;
     }
 
     // Run custom validation rules
     const fieldErrors = await validateAllFields();
     if (Object.keys(fieldErrors).length > 0) {
-      setValidationErrors(fieldErrors);
-      const errorFields = Object.keys(fieldErrors).map(fieldName => {
-        const customField = customFields.find(f => f.name === fieldName);
-        return customField?.label.replace(" *", "") || fieldName;
-      });
-      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
+      showFieldErrors("edit", fieldErrors, null);
       return;
     }
 
@@ -2447,6 +2547,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const openCreateDialog = () => {
     setFormData(initialFormData);
+    setSlugEditedByHand(false);
     setFileData({});
     setFilePreviews({});
     setValidationErrors({});
@@ -2535,16 +2636,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Only the create dialog auto-slugs. An existing slug is a public URL, so
   // the edit dialog leaves it alone unless the admin edits the slug field.
+  // Once the admin types a slug by hand, later Name edits leave it alone;
+  // emptying the slug hands it back to the name.
   const handleNameChange = (name: string) => {
-    setFormData({ ...formData, name, slug: generateSlug(name) });
+    setFormData(slugEditedByHand ? { ...formData, name } : { ...formData, name, slug: generateSlug(name) });
     setFormError(null);
+    clearFieldError("name");
+    clearFieldError("slug");
   };
 
   // Like a parent pick, editing a field the banner names makes it stale; the
   // next submit re-validates everything.
   const handleFieldEdit = (field: "name" | "slug", value: string) => {
+    if (field === "slug") setSlugEditedByHand(value !== "");
     setFormData({ ...formData, [field]: value });
     setFormError(null);
+    clearFieldError(field);
   };
 
   const handleParentChange = (parentFieldName: string, value: string) => {
@@ -2558,9 +2665,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     setFormData(newFormData);
-    // A "Parent … is required" banner is stale once a parent is picked; the
-    // next submit re-validates everything.
     setFormError(null);
+    clearFieldError(parentFieldName);
   };
 
   return (
@@ -2576,9 +2682,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               <Icon className="h-5 w-5" />
               {entityNamePlural}
             </CardTitle>
-            <CardDescription className="admin-taxonomy-description">
-              {resolvedDescription}
-            </CardDescription>
+            {resolvedDescription ? (
+              <CardDescription className="admin-taxonomy-description">
+                {resolvedDescription}
+              </CardDescription>
+            ) : null}
           </div>
           <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
             {searchEnabled && (
@@ -2586,7 +2694,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setToolsOpen((open) => !open)}
+                ref={searchToggleRef}
+                onClick={toolsOpen ? closeSearchTools : openSearchTools}
                 aria-expanded={toolsOpen}
                 data-testid={`button-more-${testIdEntityPlural}`}
               >
@@ -2677,6 +2786,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape" && toolsOpen) {
+                      e.preventDefault();
+                      closeSearchTools();
+                    }
+                  }}
                   className="pl-8 pr-8"
                   data-testid={`input-search-${testIdEntityPlural}`}
                 />
@@ -2692,7 +2807,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                       setToolsOpen(true);
                       searchInputRef.current?.focus();
                     }}
-                    className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="admin-taxonomy-search-clear absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     aria-label="Clear search"
                     data-testid="button-clear-search"
                   >
@@ -2753,7 +2868,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="admin-taxonomy-content">
+      <CardContent className="admin-taxonomy-content" aria-busy={parentsLoading || undefined}>
           {searchEnabled && searchQuery && filteredItems ? (
           <p className="admin-taxonomy-results text-sm text-muted-foreground mb-4" data-testid="text-search-results">
               <>Showing {paginationEnabled ? `${Math.min((currentPage - 1) * pageSize + 1, totalItems)}-${Math.min(currentPage * pageSize, totalItems)} of ` : ''}{totalItems} result{totalItems !== 1 ? 's' : ''} (filtered from {items?.length || 0})</>
@@ -2772,7 +2887,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => failedParentQueries.forEach(({ query }) => { void query.refetch(); })}
+              onClick={(event) => {
+                // The banner unmounts once the parents load: hand focus to the
+                // re-rendered Retry if it fails again, otherwise the page h1.
+                handoffFocusOnUnmount(event.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid="button-retry-parents"]'),
+                );
+                failedParentQueries.forEach(({ query }) => { void query.refetch(); });
+              }}
               data-testid="button-retry-parents"
             >
               Retry
@@ -2783,6 +2905,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <AdminLoadError
             subject={entityNamePlural.toLowerCase()}
             error={itemsError}
+            offline={itemsUnavailable === "offline"}
             note={items ? "The list below may be out of date." : undefined}
             onRetry={() => { void refetchItems(); }}
             retrying={itemsIsFetching}
@@ -2799,7 +2922,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         ) : (
           <>
-          <div className="admin-taxonomy-table-scroll">
+          <div className="relative">
+          {tableScrollCue.showCue && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid={`gradient-scroll-cue-${testIdEntityPlural}`}
+            />
+          )}
+          <div
+            ref={tableScrollCue.ref}
+            className="admin-taxonomy-table-scroll focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label={`${entityNamePlural} table, scrollable`}
+            onKeyDown={tableScrollCue.onKeyDown}
+          >
             <table className="table admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
               <thead>
                 <tr>
@@ -2826,19 +2964,6 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 </tr>
               </thead>
               <tbody>
-                {/* Run17 BUG-032: a filter with zero matches renders an explicit
-                    empty row instead of headers floating over nothing. */}
-                {(!paginatedItems || paginatedItems.length === 0) && (
-                  <tr>
-                    <td
-                      colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
-                      className="text-center py-8 text-muted-foreground"
-                      data-testid={`empty-${testIdEntityPlural}`}
-                    >
-                      No {entityNamePlural.toLowerCase()} match your search.
-                    </td>
-                  </tr>
-                )}
                 {paginatedItems?.map((item) => (
                   <tr key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
                     {bulkOperationsEnabled && (
@@ -2870,7 +2995,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
                               {item.resourceCount}
                             </Badge>
-                          ) : col.key === "actions" ? (
+                          ) : col.key === "actions" ? (() => {
+                            const blocker = getDeleteBlocker(item);
+                            return (
+                            <>
                             <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
                                 ref={(el) => {
@@ -2889,33 +3017,42 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               {/* Run16 BUG-081: disabled delete gets a visible reason.
                                   The title lives on a wrapping span because disabled
                                   buttons swallow hover events in some browsers. */}
-                              {(() => {
-                                const blocker = getDeleteBlocker(item);
-                                return (
-                                  <span
-                                    className="admin-taxonomy-delete-action inline-block"
-                                    title={blocker
-                                      ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
-                                      : undefined}
-                                  >
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => openDeleteDialog(item)}
-                                      disabled={!!blocker}
-                                      className="admin-taxonomy-row-action"
-                                      aria-label={blocker
-                                        ? `Delete ${item.name} unavailable: ${blocker.reason}`
-                                        : `Delete ${item.name}`}
-                                      data-testid={`button-delete-${item.id}`}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </span>
-                                );
-                              })()}
+                              <span
+                                className="admin-taxonomy-delete-action inline-block"
+                                title={blocker
+                                  ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
+                                  : undefined}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openDeleteDialog(item)}
+                                  disabled={!!blocker}
+                                  className="admin-taxonomy-row-action"
+                                  aria-label={blocker
+                                    ? `Delete ${item.name} unavailable: ${blocker.reason}`
+                                    : `Delete ${item.name}`}
+                                  data-testid={`button-delete-${item.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </span>
                             </div>
-                          ) : (
+                            {/* AC-05: touch has no tooltip, so the title above
+                                never showed. The button's aria-label already
+                                carries the reason, so this copy is visual only. */}
+                            {blocker && (
+                              <p
+                                className="admin-taxonomy-delete-reason"
+                                aria-hidden="true"
+                                data-testid={`text-delete-blocked-${item.id}`}
+                              >
+                                Delete locked: {blocker.reason}
+                              </p>
+                            )}
+                            </>
+                            );
+                          })() : (
                             item[col.key]
                           )
                         )}
@@ -2926,6 +3063,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </tbody>
             </table>
           </div>
+          </div>
+          {/* Run17 BUG-032: a filter with zero matches says so instead of leaving
+              headers over nothing. It sits outside the horizontal scroller, where
+              a cell spanning the full table width cut it off on narrow screens. */}
+          {(!paginatedItems || paginatedItems.length === 0) && (
+            <p className="py-8 text-center text-sm text-muted-foreground" data-testid={`empty-${testIdEntityPlural}`}>
+              No {entityNamePlural.toLowerCase()} match your search.
+            </p>
+          )}
+          {tableScrollCue.showCue && (
+            <p className="admin-taxonomy-scroll-hint mt-2 text-xs text-muted-foreground" data-testid={`hint-swipe-${testIdEntityPlural}-table`}>
+              Swipe the table sideways to see all columns, including Edit/Delete.
+            </p>
+          )}
 
           {/* Pagination Controls — Task 275: shared numbered paginator (same
               component as the public listings) so any page is reachable in ≤2
@@ -3009,8 +3160,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
                 onChange={(e) => handleNameChange(e.target.value)}
+                {...fieldErrorProps("create", "name")}
                 data-testid="input-create-name"
               />
+              {validationErrors.name && (
+                <p id="create-name-error" className="text-xs text-destructive" data-testid="error-create-name">
+                  {validationErrors.name}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="create-slug">{formFields.slug.label}</Label>
@@ -3019,8 +3176,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
                 onChange={(e) => handleFieldEdit("slug", e.target.value)}
+                {...fieldErrorProps("create", "slug")}
                 data-testid="input-create-slug"
               />
+              {validationErrors.slug && (
+                <p id="create-slug-error" className="text-xs text-destructive" data-testid="error-create-slug">
+                  {validationErrors.slug}
+                </p>
+              )}
               {formFields.slug.helpText && (
                 <p className="text-xs text-muted-foreground">
                   {formFields.slug.helpText}
@@ -3136,6 +3299,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
+                    {...fieldErrorProps("create", field.name)}
                     data-testid={`input-create-${field.name}`}
                   />
                 ) : (
@@ -3158,6 +3322,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={validationErrors[field.name] ? "border-destructive" : ""}
+                    {...fieldErrorProps("create", field.name)}
                     data-testid={`input-create-${field.name}`}
                   />
                 )}
@@ -3167,7 +3332,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
                 {validationErrors[field.name] && (
-                  <p className="text-xs text-destructive" data-testid={`error-create-${field.name}`}>
+                  <p id={`create-${field.name}-error`} className="text-xs text-destructive" data-testid={`error-create-${field.name}`}>
                     {validationErrors[field.name]}
                   </p>
                 )}
@@ -3240,8 +3405,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
                 onChange={(e) => handleFieldEdit("name", e.target.value)}
+                {...fieldErrorProps("edit", "name")}
                 data-testid="input-edit-name"
               />
+              {validationErrors.name && (
+                <p id="edit-name-error" className="text-xs text-destructive" data-testid="error-edit-name">
+                  {validationErrors.name}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-slug">{formFields.slug.label}</Label>
@@ -3250,8 +3421,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
                 onChange={(e) => handleFieldEdit("slug", e.target.value)}
+                {...fieldErrorProps("edit", "slug")}
                 data-testid="input-edit-slug"
               />
+              {validationErrors.slug && (
+                <p id="edit-slug-error" className="text-xs text-destructive" data-testid="error-edit-slug">
+                  {validationErrors.slug}
+                </p>
+              )}
             </div>
             {/* Custom Fields (including file uploads) */}
             {getVisibleCustomFields('edit', selectedItem || undefined).map((field) => {
@@ -3375,6 +3552,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
+                    {...fieldErrorProps("edit", field.name)}
                     data-testid={`input-edit-${field.name}`}
                   />
                 ) : (
@@ -3397,6 +3575,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={validationErrors[field.name] ? "border-destructive" : ""}
+                    {...fieldErrorProps("edit", field.name)}
                     data-testid={`input-edit-${field.name}`}
                   />
                 )}
@@ -3406,7 +3585,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
                 {validationErrors[field.name] && (
-                  <p className="text-xs text-destructive" data-testid={`error-edit-${field.name}`}>
+                  <p id={`edit-${field.name}-error`} className="text-xs text-destructive" data-testid={`error-edit-${field.name}`}>
                     {validationErrors[field.name]}
                   </p>
                 )}

@@ -4,7 +4,10 @@ import { LegalPolicyContent, legalPolicies, type LegalPolicyPath } from "@shared
 import type { PreferredContactDestination } from "@shared/contact-destination";
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
+import { searchPageSeo } from "@shared/seo-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
+import { ABOUT_PROJECT, MAINTAINER } from "@shared/about-content";
 
 /** Identical child/general scope policy for crawler and public listing API. */
 export function scopeTaxonomyResources(
@@ -45,9 +48,10 @@ export function scopeTaxonomyResources(
 // It mirrors the visible client page — same headings, same summaries, the same
 // internal links — so it is progressive enhancement, NOT cloaking. On boot,
 // client/src/main.tsx calls createRoot().render(), which REPLACES this content
-// with the live React app. We deliberately do NOT set window.__INITIAL_DATA__,
-// so there is no hydration step and therefore no hydration-mismatch risk; this
-// markup is purely the pre-JavaScript / crawler view.
+// with the live React app. There is no hydration step and therefore no
+// hydration-mismatch risk; this markup is purely the pre-JavaScript / crawler
+// view. (Resource pages also embed their API responses as inert JSON — see
+// renderResourceBoot — so the app's first render is the finished page.)
 
 export type Crumb = { name: string; path?: string };
 
@@ -61,14 +65,6 @@ export type TaxonomyMatch = {
   subcategory?: any;
 };
 
-/** Count the resources in a node and every descendant, in tree order. */
-export function countNodeResources(node: any): number {
-  let total = Array.isArray(node?.resources) ? node.resources.length : 0;
-  for (const sub of node?.subcategories ?? []) total += countNodeResources(sub);
-  for (const subSub of node?.subSubcategories ?? []) total += countNodeResources(subSub);
-  return total;
-}
-
 export function findCategory(tree: any, slug: string): TaxonomyMatch | null {
   const category = (tree?.categories ?? []).find((item: any) => item.slug === slug);
   if (!category) return null;
@@ -76,7 +72,7 @@ export function findCategory(tree: any, slug: string): TaxonomyMatch | null {
   return {
     name: category.name,
     path,
-    count: countNodeResources(category),
+    count: corpusTotalCount(category),
     crumbs: [{ name: "Home", path: "/" }, { name: category.name, path }],
     node: category,
     category,
@@ -91,7 +87,7 @@ export function findSubcategory(tree: any, slug: string): TaxonomyMatch | null {
     return {
       name: subcategory.name,
       path,
-      count: countNodeResources(subcategory),
+      count: corpusTotalCount(subcategory),
       crumbs: [
         { name: "Home", path: "/" },
         { name: category.name, path: `/category/${category.slug}` },
@@ -116,7 +112,7 @@ export function findSubSubcategory(tree: any, slug: string): TaxonomyMatch | nul
       return {
         name: subSubcategory.name,
         path,
-        count: countNodeResources(subSubcategory),
+        count: corpusTotalCount(subSubcategory),
         crumbs: [
           { name: "Home", path: "/" },
           { name: category.name, path: `/category/${category.slug}` },
@@ -462,7 +458,6 @@ export function renderSearchContent(opts: {
   totalPages?: number;
 }): string {
   const q = String(opts.query ?? "").trim();
-  const heading = q ? `Search results for “${escapeHtml(q)}”` : "Search";
   const links: LinkItem[] = opts.results.map((r) => ({
     href: internalHref(`/resource/${r.id}`),
     label: r.title,
@@ -492,7 +487,7 @@ export function renderSearchContent(opts: {
           q,
         )}”. Try a different term or browse the categories below.</p>`;
   return shell(
-    `<h1>${heading}</h1>` +
+    `<h1>${searchPageSeo.heading}</h1>` +
       body +
       `<h2>Browse</h2>${linkList([
         { href: internalHref("/categories"), label: "All categories" },
@@ -610,6 +605,19 @@ export function renderResourceContent(opts: {
   );
 }
 
+// The resource page's first API responses, embedded so the app renders the
+// page from them instead of a loading skeleton (client/src/lib/resource-boot.ts
+// seeds them into the query cache). Same public projection as
+// GET /api/resources/:id and GET /api/resources/:id/related. A JSON data block
+// never executes; escaping "<" keeps any "</script" inside text inert.
+export function renderResourceBoot(opts: { resource: unknown; related?: unknown }): string {
+  const json = JSON.stringify(opts)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+  return `<script type="application/json" id="resource-boot">${json}</script>`;
+}
+
 export function renderJourneysContent(opts: {
   heading: string;
   description: string;
@@ -663,13 +671,48 @@ export function renderJourneyContent(opts: {
   );
 }
 
+/** Semantic equivalent of About's public copy; no interactive preferences. */
+function renderAboutContent(catalogSummary: string): string {
+  const project = ABOUT_PROJECT;
+  const paragraph = (text: string) => `<p>${escapeHtml(text)}</p>`;
+  const section = (heading: string, description: string, body: string) =>
+    `<section><h2>${escapeHtml(heading)}</h2>${paragraph(description)}${body}</section>`;
+  const descriptions = (items: { name: string; description: string }[]) =>
+    `<dl>${items.map(item => `<dt>${escapeHtml(item.name)}</dt><dd>${escapeHtml(item.description)}</dd>`).join("")}</dl>`;
+  const link = (url: string, label: string) =>
+    `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
+
+  return `<article data-seo-section="about-project">` +
+    paragraph(`${catalogSummary}${project.introLead} ${project.sourceName} ${project.introDescription}`) +
+    `<dl>${project.facts.map(fact => `<dt>${escapeHtml(fact.title)}</dt><dd>${escapeHtml(fact.description)}</dd>`).join("")}</dl>` +
+    section("About the maintainer", MAINTAINER.role,
+      MAINTAINER.bio.map(paragraph).join("") +
+      `<p>${link(MAINTAINER.profileUrl, `${MAINTAINER.name} on GitHub`)}</p>`) +
+    section(project.sourcesHeading, project.sourcesDescription,
+      project.sources.map(source =>
+        `<h3>${link(source.url, source.name)}</h3>` +
+        paragraph(source.description) +
+        paragraph(`${source.label} · ${source.license}`),
+      ).join("")) +
+    section(project.featuresHeading, project.featuresDescription,
+      descriptions(project.features.map(feature => ({ name: feature.label, description: feature.desc })))) +
+    section(project.technologyHeading, project.technologyDescription, descriptions(project.technologies)) +
+    section(project.accessibilityHeading, project.accessibilityDescription,
+      `<ul>${project.accessibility.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`) +
+    section(project.creditsHeading, project.creditsDescription,
+      paragraph(project.creditsIntro) +
+      `<ul>${project.credits.map(credit => `<li>${link(credit.url, credit.name)} — ${escapeHtml(credit.description)}</li>`).join("")}</ul>`) +
+    `</article>`;
+}
+
 export function renderStaticPageContent(opts: {
   heading: string;
-  description: string;
+  description?: string;
   paragraphs?: string[];
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
   faqs?: { question: string; answer: string }[];
+  about?: { catalogSummary: string };
   policy?: { path: LegalPolicyPath; contactDestination: PreferredContactDestination | null };
   form?: {
     action: string;
@@ -771,7 +814,7 @@ export function renderStaticPageContent(opts: {
         `</form>`;
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
-      `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      (opts.description ? `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` : "") +
       (opts.policy
         ? `<p>Last updated: ${escapeHtml(legalPolicies[opts.policy.path].updated)}</p>` +
           `<article data-seo-section="legal-policy">` +
@@ -779,6 +822,7 @@ export function renderStaticPageContent(opts: {
           `</article>`
         : "") +
       paras +
+      (opts.about ? renderAboutContent(opts.about.catalogSummary) : "") +
       formHtml +
       faqHtml +
       `<h2>Explore</h2>${linkList(nav)}` +

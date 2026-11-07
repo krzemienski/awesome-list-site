@@ -7,18 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-// I1 — Font override picker. Source-of-truth list + applier live in
-// `client/src/lib/font-options.ts`. The boot script in `client/index.html`
-// duplicates the same map inline for pre-paint application;
-// Keep the two in sync by hand.
+// The picker and Vite-generated prepaint values share font-options.ts.
 import {
   FONT_OPTIONS,
   FONT_LS_KEY,
   applyFontOverride,
   resolveFontOverrideId,
+  systemFontStack,
 } from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import { isSystemId } from "@/lib/design-system";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import "@/styles/pages/account.css";
@@ -128,9 +127,9 @@ export default function ThemeSettings() {
         </Link>
         {/* docs/11 page head: eyebrow, display heading, lede. */}
         <div className="eyebrow theme-page__eyebrow">── Settings · Theme</div>
-        <h1 className="page-title theme-page__title">Theme Settings</h1>
+        <h1 className="page-title theme-page__title">{staticPageHeads["/settings/theme"].heading}</h1>
         <p className="theme-page__lede">
-          Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
+          {staticPageHeads["/settings/theme"].lead}{" "}
           <span role="status" aria-live="polite" aria-atomic="true" className="theme-page__status" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
@@ -145,7 +144,7 @@ export default function ThemeSettings() {
         >
           {accountSync === "local" && <p>Theme choices are saved on this device.</p>}
           {accountSync === "syncing" && <p>Saving theme to your account…</p>}
-          {accountSync === "queued" && <p>You're offline. This theme is saved on this device and will be saved to your account when you reconnect.</p>}
+          {accountSync === "queued" && <p>You&rsquo;re offline. This theme is saved on this device and will be saved to your account when you reconnect.</p>}
           {accountSync === "saved" && <p>Theme saved to your account.</p>}
           {accountSync === "failed" && <>
             <p>{accountSyncError}</p>
@@ -318,7 +317,7 @@ export default function ThemeSettings() {
                 </div>
                 <p
                   className="text-sm text-[color:var(--text-2)]"
-                  style={{ fontFamily: f.stack || undefined }}
+                  style={{ fontFamily: f.stack || systemFontStack(systemId) }}
                 >
                   The quick brown fox jumps over the lazy dog. 0123456789
                 </p>
@@ -351,7 +350,7 @@ export default function ThemeSettings() {
         <Card
           className="p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]"
           data-testid="preview-card"
-          {...({ inert: "" } as any)}
+          {...{ inert: "" }}
         >
           {/* Typography */}
           <div className="space-y-2">

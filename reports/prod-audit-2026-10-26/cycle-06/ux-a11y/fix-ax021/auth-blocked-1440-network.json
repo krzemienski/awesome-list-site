@@ -1,0 +1,36 @@
+[
+  {
+    "event": "request",
+    "requestId": "7962D78A4332DAC93F54911C03234074",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/admin"
+  },
+  {
+    "event": "request",
+    "requestId": "7962D78A4332DAC93F54911C03234074",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/sign-in?redirect_url=%2Fadmin",
+    "redirect": {
+      "status": 302,
+      "url": "/admin"
+    }
+  },
+  {
+    "event": "response",
+    "requestId": "7962D78A4332DAC93F54911C03234074",
+    "status": 200,
+    "url": "http://127.0.0.1:5071/sign-in?redirect_url=%2Fadmin"
+  },
+  {
+    "event": "request",
+    "requestId": "32539.1391",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/api/auth/user"
+  },
+  {
+    "event": "response",
+    "requestId": "32539.1391",
+    "status": 200,
+    "url": "http://127.0.0.1:5071/api/auth/user"
+  }
+]

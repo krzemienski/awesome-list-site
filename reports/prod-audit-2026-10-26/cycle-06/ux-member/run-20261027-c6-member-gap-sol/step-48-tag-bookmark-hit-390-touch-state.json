@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/tag/hls",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 123,
+  "active": "<div role=\"dialog\" id=\"radix-:r8:\" data-state=\"open\" class=\"fixed left-[50%] top-[50%] z-50 grid w-[calc(100vw-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 break-words min-w-0 [overflow-wrap:anywhere] [&amp;&gt;*]:min-w-0 max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-[var(--radius)] border bg-popover p-6 shadow-[var(--shadow-lg)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=clos",
+  "umami": "1",
+  "consent": "denied"
+}

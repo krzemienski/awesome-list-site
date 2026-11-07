@@ -2,6 +2,7 @@ import * as React from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@/lib/utils";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "./admin-ops-primitives.css";
 
 const AdminOpsScrollBar = React.forwardRef<
@@ -26,43 +27,80 @@ const AdminOpsScrollBar = React.forwardRef<
 ));
 AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
+const DEFAULT_SCROLL_HINT = "Swipe the table sideways to see all columns.";
+
 /**
  * Operations-owned equivalent of the shared Table primitive. The viewport
  * wrapper intentionally owns the focus target so every operations table has
  * one keyboard-discoverable horizontal scroll region without changing the
- * shared UI contract.
+ * shared UI contract. `scrollLabel` names that focus target as a region so a
+ * screen reader announces what Tab landed on. Whenever the table is wider
+ * than its viewport, at any screen width, a hint above it and a right-edge
+ * fade say that more columns sit off-screen.
  */
 export const AdminOpsTable = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto" tabIndex={0}>
-    <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
-  </div>
-));
+  React.HTMLAttributes<HTMLTableElement> & { scrollLabel: string; scrollHint?: string }
+>(({ className, scrollLabel, scrollHint = DEFAULT_SCROLL_HINT, ...props }, ref) => {
+  const scrollCue = useHorizontalScrollCue();
+  return (
+    <>
+      {scrollCue.overflows ? (
+        <p className="admin-ops-table-scroll-hint text-xs text-muted-foreground">{scrollHint}</p>
+      ) : null}
+      <div className="relative w-full">
+        {scrollCue.showCue ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent"
+          />
+        ) : null}
+        <div
+          ref={scrollCue.ref}
+          className="relative w-full overflow-auto"
+          tabIndex={0}
+          role="region"
+          aria-label={scrollLabel}
+          onKeyDown={scrollCue.onKeyDown}
+        >
+          <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+        </div>
+      </div>
+    </>
+  );
+});
 AdminOpsTable.displayName = "Table";
 
 type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   viewportClassName?: string;
+  /** The viewport is always a tab stop, so it always needs a region name. */
+  scrollLabel: string;
 };
 
 /**
  * Operations-owned equivalent of the shared Radix ScrollArea. The Radix
  * viewport is the actual scrolling element, so tabindex belongs here rather
  * than on an additional wrapper around the component.
+ *
+ * It scrolls vertically only, so its content must wrap to the viewport width.
+ * Radix wraps viewport children in a content-sized `display:table` box that
+ * ignores the width (NB-018), which clipped long validation warnings at 390
+ * (C22-EX-24); the viewport forces that box to a full-width block.
  */
 export const AdminOpsScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   AdminOpsScrollAreaProps
->(({ className, viewportClassName, children, ...props }, ref) => (
+>(({ className, viewportClassName, scrollLabel, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
     {...props}
   >
     <ScrollAreaPrimitive.Viewport
-      className={cn("h-full w-full", viewportClassName)}
+      className={cn("h-full w-full [&>div]:!block [&>div]:!w-full [&>div]:!min-w-0", viewportClassName)}
       tabIndex={0}
+      role="region"
+      aria-label={scrollLabel}
     >
       {children}
     </ScrollAreaPrimitive.Viewport>
@@ -131,6 +169,7 @@ const STATUS_VARIANTS: Record<string, string> = {
   running: "warn",
   warning: "warn",
   stale: "warn",
+  degraded: "warn",
   partial: "warn",
   budget_stopped: "warn",
   admin: "accent",

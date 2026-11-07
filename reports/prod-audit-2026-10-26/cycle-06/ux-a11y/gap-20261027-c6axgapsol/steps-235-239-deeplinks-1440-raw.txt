@@ -1,0 +1,593 @@
+✓ Admin — Awesome Video
+  https://awesome.video/admin/export
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Export" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-235-direct-export-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/database
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Database" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-236-direct-database-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/resources
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Resources" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-237-direct-resources-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/categories
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Categories" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-238-direct-categories-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/subcategories
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Subcategories" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-239-direct-subcategories-1440.png
+
+[14106.1695] GET https://awesome.video/api/admin/stats (Fetch) 200
+[14106.1696] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.10] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.182] GET https://awesome.video/api/config (Fetch) 200
+[50845.183] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.194] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.194] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.245] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.246] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.247] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.248] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.248] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.249] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.250] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.252] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.253] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.254] GET https://awesome.video/api/categories (Fetch) 200
+[50845.255] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.256] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.257] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.258] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.259] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.260] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.261] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.262] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.263] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.264] GET https://awesome.video/api/categories (Fetch) 200
+[50845.265] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.266] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.268] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.269] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.270] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.271] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.272] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.273] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.274] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.275] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.285] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.347] GET https://awesome.video/api/config (Fetch) 200
+[50845.348] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.356] GET https://awesome.video/api/home (Fetch) 200
+[50845.357] GET https://awesome.video/api/resources/kinds/counts (Fetch) 200
+[50845.360] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.361] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.364] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.364] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.365] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.365] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.366] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.367] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.369] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.370] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.371] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.373] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.420] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.421] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.422] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.423] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.424] GET https://awesome.video/api/categories (Fetch) 200
+[50845.425] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.426] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.427] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.428] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.429] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.430] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.431] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.432] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.433] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.434] GET https://awesome.video/api/categories (Fetch) 200
+[50845.435] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.436] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.437] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.438] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.439] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.440] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.441] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.442] GET https://awesome.video/api/admin/stats (Fetch)
+[50845.452] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.501] GET https://awesome.video/api/config (Fetch) 200
+[50845.502] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.513] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.513] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.565] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.566] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.567] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.568] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.568] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.569] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.570] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.572] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.573] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.575] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.576] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.577] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.578] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.579] GET https://awesome.video/api/categories (Fetch) 200
+[50845.580] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.581] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.582] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.583] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.584] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.585] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.586] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.587] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.588] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.589] GET https://awesome.video/api/categories (Fetch) 200
+[50845.590] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.591] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.592] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.593] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.594] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.595] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.605] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.654] GET https://awesome.video/api/config (Fetch) 200
+[50845.655] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.666] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.666] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.717] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.718] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.719] POST https://awesome.video/api/telemetry/dead-link (Fetch)
+[50845.720] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.721] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.721] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.722] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.723] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.725] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.726] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.727] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.729] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.730] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.740] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.789] GET https://awesome.video/api/config (Fetch) 200
+[50845.790] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.801] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.852] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.853] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.801] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.854] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.855] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.855] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.856] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.857] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.859] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.860] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.862] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.863] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.864] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.865] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.866] GET https://awesome.video/api/categories (Fetch) 200
+[50845.867] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.868] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.869] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.870] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.871] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.872] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.873] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.874] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.875] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.876] GET https://awesome.video/api/categories (Fetch) 200
+[50845.877] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.878] GET https://awesome.video/api/categories (Fetch) 200
+[50845.879] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.880] GET https://awesome.video/api/sub-subcategories (Fetch) 200
+[50845.881] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[50845.882] GET https://awesome.video/api/admin/resources?page=1&limit=1 (Fetch) 200
+[50845.883] GET https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true (Fetch) 200
+[50845.888] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.889] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[50845.899] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.961] GET https://awesome.video/api/config (Fetch) 200
+[50845.962] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.970] GET https://awesome.video/api/home (Fetch) 200
+[50845.971] GET https://awesome.video/api/resources/kinds/counts (Fetch) 200
+[50845.974] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.975] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.978] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.978] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.979] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.979] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.980] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.981] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.983] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.984] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.986] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.987] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.988] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.989] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1036] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1037] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1038] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.1039] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1040] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.1041] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.1042] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.1043] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.1044] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.1045] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.1046] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.1047] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.1048] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.1049] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1050] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.1051] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1052] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1053] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1063] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1112] GET https://awesome.video/api/config (Fetch) 200
+[50845.1113] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1124] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1124] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1175] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1176] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1177] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1178] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1178] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1179] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1180] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1182] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1183] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.1184] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1185] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.1186] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.1187] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.1188] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.1189] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.1190] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.1191] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.1192] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.1193] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.1194] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1195] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1196] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1198] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1199] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1200] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.1201] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1202] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1203] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1204] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1205] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1206] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1207] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1208] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1209] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1210] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1220] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1269] GET https://awesome.video/api/config (Fetch) 200
+[50845.1270] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1281] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1281] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1332] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1333] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1334] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1335] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1335] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1336] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1337] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1339] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1340] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1342] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1343] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1344] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1345] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.1346] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1347] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.1348] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.1349] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.1350] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.1351] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.1352] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.1353] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.1354] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.1355] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.1356] GET https://awesome.video/api/categories (Fetch) 200
+[50845.1357] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.1358] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1359] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1360] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1362] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1363] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1364] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1365] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1366] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1367] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1376] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1426] GET https://awesome.video/api/config (Fetch) 200
+[50845.1427] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1438] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1438] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1489] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1490] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1491] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1492] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1492] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1493] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1494] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1496] GET https://awesome.video/api/admin/pending-resources (Fetch)
+[50845.1497] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch)
+[50845.1498] GET https://awesome.video/api/categories (Fetch)
+[50845.1499] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.1500] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch)
+[50845.1501] GET https://awesome.video/api/admin/operations/health (Fetch)
+[50845.1502] GET https://awesome.video/api/health/ai (Fetch)
+[50845.1503] GET https://awesome.video/api/github/sync-status (Fetch)
+[50845.1504] GET https://awesome.video/api/github/sync-history (Fetch)
+[50845.1505] GET https://awesome.video/api/admin/link-health/status (Fetch)
+[50845.1506] GET https://awesome.video/api/admin/link-health/history (Fetch)
+[50845.1507] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch)
+[50845.1508] GET https://awesome.video/api/categories (Fetch)
+[50845.1509] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1510] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1512] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1513] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1517] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1572] GET https://awesome.video/api/config (Fetch) 200
+[50845.1573] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1584] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1584] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1635] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1636] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1637] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1638] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1638] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1639] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1640] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1642] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1643] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1644] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1646] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1647] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.1657] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1706] GET https://awesome.video/api/config (Fetch) 200
+[50845.1707] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1718] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1718] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1719] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1770] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1771] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1772] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1719] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1773] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1774] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1776] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1778] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1780] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1781] GET https://awesome.video/api/admin/resource-edits (Fetch) 200
+[50845.1782] GET https://awesome.video/api/admin/resource-edits/recent (Fetch)
+[50845.1792] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1841] GET https://awesome.video/api/config (Fetch) 200
+[50845.1842] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1853] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1853] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.1904] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.1905] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.1906] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.1907] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.1907] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.1908] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1909] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.1911] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1912] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1913] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1915] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.1916] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.1917] GET https://awesome.video/api/enrichment/jobs (Fetch) 200
+[50845.1918] GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+[50845.1928] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.1977] GET https://awesome.video/api/config (Fetch) 200
+[50845.1978] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.1989] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.1989] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2040] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2041] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2042] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2043] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2043] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2044] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2045] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2047] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2048] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2050] GET https://awesome.video/api/researcher/config (Fetch) 200
+[50845.2051] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.2052] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+[50845.2053] GET https://awesome.video/api/researcher/discoveries (Fetch) 200
+[50845.2054] GET https://awesome.video/api/awesome-list (Fetch) 200
+[50845.2055] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2056] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2057] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2067] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.2116] GET https://awesome.video/api/config (Fetch) 200
+[50845.2117] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2128] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.2179] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2180] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2181] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2128] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2182] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2182] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2183] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2184] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2186] GET https://awesome.video/api/admin/database-backups (Fetch)
+[50845.2187] GET https://awesome.video/api/admin/validation-status (Fetch) 200
+[50845.2188] GET https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported (Fetch) 200
+[50845.2189] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.2190] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2191] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2193] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2194] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2204] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.2253] GET https://awesome.video/api/config (Fetch) 200
+[50845.2254] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2265] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.2265] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2316] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2317] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2318] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2319] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2319] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2320] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2321] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2323] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2324] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2326] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2327] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2337] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.2386] GET https://awesome.video/api/config (Fetch) 200
+[50845.2387] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2398] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.2398] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2449] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2450] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2451] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2452] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2452] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2453] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2454] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2456] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2457] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2459] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2460] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2461] GET https://awesome.video/api/categories (Fetch) 200
+[50845.2462] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.2463] GET https://awesome.video/api/sub-subcategories (Fetch) 200
+[50845.2464] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[50845.2465] GET https://awesome.video/api/admin/resources?page=1&limit=1 (Fetch) 200
+[50845.2466] GET https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true (Fetch) 200
+[50845.2476] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.2525] GET https://awesome.video/api/config (Fetch) 200
+[50845.2526] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2537] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.2537] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2588] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2589] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2590] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2591] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2591] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2592] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2593] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2595] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2596] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2597] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2599] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2600] GET https://awesome.video/api/admin/categories (Fetch) 200
+[50845.2610] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.2659] GET https://awesome.video/api/config (Fetch) 200
+[50845.2660] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.2671] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.2671] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.2722] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.2723] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.2724] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.2725] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.2725] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.2726] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2727] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.2729] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2730] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2731] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2733] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.2734] GET https://awesome.video/api/admin/categories (Fetch)
+[50845.2735] GET https://awesome.video/api/admin/subcategories (Fetch)
+

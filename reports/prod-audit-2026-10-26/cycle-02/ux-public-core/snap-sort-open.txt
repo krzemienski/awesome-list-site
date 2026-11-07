@@ -1,0 +1,9 @@
+uid=307_0 RootWebArea "Open-Source Video Players & Client SDKs — Awesome Video" url="https://awesome.video/category/players-clients"
+  uid=307_159 main
+    uid=307_212 generic "Resources (447)"
+      uid=307_674 navigation "Pagination"
+        uid=307_691 status atomic live="polite" relevant="additions text"
+  uid=316_0 listbox orientation="vertical"
+    uid=316_1 option "Default" focusable focused selected
+    uid=316_2 option "Name A-Z"
+    uid=316_3 option "Name Z-A"

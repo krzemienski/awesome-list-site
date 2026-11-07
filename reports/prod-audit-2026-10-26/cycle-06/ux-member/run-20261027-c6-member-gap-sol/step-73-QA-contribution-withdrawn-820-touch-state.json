@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/contributions?q=%5BQA-audit-1026%5D+MDN+VideoFrame+clone+audit",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 658,
+  "active": "<article class=\"account-contribution-card relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2\" tabindex=\"-1\" data-testid=\"contribution-resource-190364\"><div class=\"flex flex-col gap-4 p-4 sm:p-5\"><div class=\"flex min-w-0 items-start gap-3\"><div class=\"account-kind-icon flex h-10 w-10 shrink-0 items-center justify-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" str",
+  "umami": "1",
+  "consent": "denied"
+}

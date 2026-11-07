@@ -1,0 +1,28 @@
+- generic
+  - dialog "Create Category"
+    - form
+      - heading "Create Category" [level=2, ref=e2]
+      - paragraph
+        - StaticText "Add a new category to organize your resources."
+      - generic
+        - LabelText [ref=e7] clickable [cursor:pointer]
+          - StaticText "Name *"
+        - textbox "Name *" [ref=e8]: [QA-audit-1026] c6 race create
+          - StaticText "[QA-audit-1026] c6 race create"
+      - LabelText [ref=e3] clickable [cursor:pointer]
+        - StaticText "Slug *"
+      - textbox "Slug *" [ref=e4]: qa-audit-1026-c6-race-create
+        - StaticText "qa-audit-1026-c6-race-create"
+      - paragraph
+        - StaticText "The slug \"qa-audit-1026-c6-race-create\" is already in use"
+      - paragraph
+        - StaticText "Auto-generated from name. Edit if needed."
+      - button "Cancel" [ref=e5]
+        - image
+        - StaticText "Cancel"
+      - button "Create" [ref=e6]
+        - image
+        - StaticText "Create"
+    - button "Close" [ref=e1]
+      - image
+      - StaticText "Close"

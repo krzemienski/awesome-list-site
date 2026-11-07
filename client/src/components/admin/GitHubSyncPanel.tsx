@@ -5,18 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+// The history table wraps its cells instead of scrolling, so it uses the
+// shared Table, whose wrapper is not a keyboard stop.
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
 import {
   AdminOpsScrollArea as ScrollArea,
-  AdminOpsTable as Table,
   StatusChip,
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
@@ -25,11 +27,12 @@ import {
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { GitHubImportPreview, ImportPreviewConfirmNote, useImportPreview } from "@/components/admin/GitHubImportPreview";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
   id: number;
-  /** Display id: "Run #n" for history rows, "Job #n" for queue rows. */
+  /** Display id: "Job #n" for a run with a queue job (as Recent Sync Jobs shows it), else "Run #n". */
   label: string;
   direction: string;
   // ADM-03/04: sync-history rows now carry their outcome so failed/orphaned
@@ -56,6 +59,9 @@ interface SyncQueueItem {
   action: string;
   status: string;
   errorMessage?: string;
+  /** The export's commit landed on GitHub; only post-commit bookkeeping failed. */
+  committedDespiteError?: boolean;
+  commitSha?: string;
   importResult?: { imported?: number; updated?: number; skipped?: number; errors?: number; outcome?: string; errorMessages?: string[] };
   createdAt: string;
   processedAt?: string;
@@ -100,36 +106,43 @@ export default function GitHubSyncPanel() {
   // "not a repo!!" used to be accepted and fail minutes later in the queue.
   const normalizedRepo = normalizeGithubRepoInput(repoUrl);
   const repoInvalid = repoUrl.trim().length > 0 && !normalizedRepo;
+  const repoMissing = repoUrlTouched && repoUrl.trim().length === 0;
   const repositoryExample = configuredRepo ?? "owner/repository";
+  // Pull and Sync now act on the edited target, so the header says so
+  // whenever that target is not the configured repository, or is unusable.
+  const targetNote = repoUrlTouched && !normalizedRepo
+    ? "Pull and Sync now stay off until Target Repository holds a repository (owner/repository)."
+    : normalizedRepo && configuredRepo && normalizedRepo !== configuredRepo
+      ? `Pull and Sync now target ${normalizedRepo}, not the configured repository.`
+      : null;
+
+  const importPreview = useImportPreview(normalizedRepo);
+  // The preview reads the README the same way a Pull does, so a preview of
+  // this target that could not plan means the Pull would stop the same way.
+  const importBlocked = confirmAction === "import" && importPreview.current?.kind === "stopped";
 
   const resetRepository = () => {
     if (configuredRepo) {
+      importPreview.retarget();
       setRepoUrlTouched(false);
       setRepoUrl(configuredRepo);
     }
   };
 
-  const {
-    data: syncHistory,
-    isLoading: syncHistoryIsLoading,
-    isError: syncHistoryIsError,
-    error: syncHistoryError,
-    isFetching: syncHistoryIsFetching,
-    refetch: refetchSyncHistory,
-  } = useQuery<SyncHistory[]>({
+  const syncHistoryQuery = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
     staleTime: 0,
     refetchOnWindowFocus: true,
   });
-
   const {
-    data: syncQueueData,
-    isLoading: syncQueueIsLoading,
-    isError: syncQueueIsError,
-    error: syncQueueError,
-    isFetching: syncQueueIsFetching,
-    refetch: refetchSyncQueue,
-  } = useQuery<SyncQueueResponse>({
+    data: syncHistory,
+    isLoading: syncHistoryIsLoading,
+    error: syncHistoryError,
+    isFetching: syncHistoryIsFetching,
+    refetch: refetchSyncHistory,
+  } = syncHistoryQuery;
+
+  const syncQueueQuery = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -137,6 +150,16 @@ export default function GitHubSyncPanel() {
       (item) => item.status === 'pending' || item.status === 'processing'
     ) ? 3000 : false,
   });
+  const {
+    data: syncQueueData,
+    isLoading: syncQueueIsLoading,
+    error: syncQueueError,
+    isFetching: syncQueueIsFetching,
+    refetch: refetchSyncQueue,
+  } = syncQueueQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const syncHistoryUnavailable = queryUnavailableReason(syncHistoryQuery);
+  const syncQueueUnavailable = queryUnavailableReason(syncQueueQuery);
 
   useEffect(() => {
     if (syncQueueData) {
@@ -155,6 +178,7 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
+      importPreview.clear();
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
@@ -263,15 +287,35 @@ export default function GitHubSyncPanel() {
                 {configuredRepo || (configIsLoading ? "Loading repository…" : "Repository not configured")}
               </CardTitle>
               <p className="ops-github-panel__repository-meta">
-                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
+                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : syncHistoryUnavailable ? "last sync unavailable" : syncHistoryIsLoading ? "checking last sync…" : "not synced yet"} · {syncQueueUnavailable ? "sync jobs unavailable" : syncQueueIsLoading ? "loading sync jobs…" : `${syncQueueData?.total ?? 0} sync jobs`}
               </p>
+              {targetNote && (
+                <p
+                  id="repo-target-note"
+                  className={`ops-github-panel__repository-target${normalizedRepo ? "" : " ops-github-panel__repository-target--blocked"}`}
+                  data-testid="text-repo-target"
+                >
+                  {targetNote}
+                </p>
+              )}
             </div>
             <div className="ops-github-panel__repository-actions">
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
+                  onClick={importPreview.run}
+                  disabled={importPreview.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
+                  data-testid="button-preview-import"
+                >
+                  {importPreview.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {importPreview.isPending ? "Previewing..." : "Preview import"}
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setConfirmAction("import")}
                   disabled={importMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-import-github"
                 >
                   {importMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -280,6 +324,7 @@ export default function GitHubSyncPanel() {
                 <Button
                   onClick={() => setConfirmAction("export")}
                   disabled={exportMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-export-github"
                 >
                   {exportMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -307,12 +352,13 @@ export default function GitHubSyncPanel() {
                 placeholder={repositoryExample}
                 value={repoUrl}
                 onChange={(e) => {
+                  importPreview.retarget();
                   setRepoUrlTouched(true);
                   setRepoUrl(e.target.value);
                 }}
-                className={`font-mono text-sm ${repoInvalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                aria-invalid={repoInvalid}
-                aria-describedby={repoInvalid ? "repo-url-error" : undefined}
+                className={`font-mono text-sm ${repoInvalid || repoMissing ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                aria-invalid={repoInvalid || repoMissing}
+                aria-describedby={repoInvalid || repoMissing ? "repo-url-error" : undefined}
                 data-testid="input-repo-url"
               />
               <Button
@@ -326,9 +372,10 @@ export default function GitHubSyncPanel() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-            {repoInvalid ? (
+            {repoInvalid || repoMissing ? (
               <p id="repo-url-error" className="text-xs text-destructive" role="alert" data-testid="text-repo-url-error">
-                Not a valid repository. Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
+                {repoMissing ? "Enter a repository to pull from or sync to." : "Not a valid repository."}{" "}
+                Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
@@ -336,6 +383,7 @@ export default function GitHubSyncPanel() {
               </p>
             )}
           </div>}
+          <GitHubImportPreview state={importPreview} />
         </CardContent>
       </Card>
 
@@ -363,7 +411,7 @@ export default function GitHubSyncPanel() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!syncQueue.length && !lastSync && !syncQueueIsError && !syncHistoryIsError && (
+            {!syncQueue.length && !lastSync && !syncQueueUnavailable && !syncHistoryUnavailable && (
               <div className="ops-github-panel__empty-state">
                 <Clock className="h-5 w-5" aria-hidden="true" />
                 <div>
@@ -382,7 +430,7 @@ export default function GitHubSyncPanel() {
               </p>
             )}
             {failureIsCurrent && (
-              <Alert variant="destructive" data-testid="alert-sync-failures">
+              <Alert variant="destructive" live="polite" data-testid="alert-sync-failures">
                 <XCircle className="h-4 w-4" />
                 <AlertDescription className="space-y-1">
                   <p className="font-semibold">
@@ -405,10 +453,10 @@ export default function GitHubSyncPanel() {
               const lastSyncFailed = lastSync.status === 'failed';
               const lastSyncPartial = lastSync.status === 'partial';
               return (
-              <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
+              <Alert variant={lastSyncFailed ? 'destructive' : undefined} live="polite" data-testid="alert-last-sync">
                 {lastSyncFailed || lastSyncPartial ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="ops-github-panel__last-sync-head">
                     <span className="font-semibold">
                         Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
@@ -423,8 +471,8 @@ export default function GitHubSyncPanel() {
                         partial · {lastSync.errorMessages?.length ?? 0} failed
                       </StatusChip>
                     )}
-                    <Badge variant="outline">
-                      <Clock className="h-3 w-3 mr-1" />
+                    <Badge variant="outline" className="ops-github-panel__last-sync-date" data-testid="badge-last-sync-date">
+                      <Clock className="h-3 w-3 mr-1 shrink-0" />
                       {formatSyncDate(lastSync.createdAt)}
                     </Badge>
                   </div>
@@ -478,10 +526,11 @@ export default function GitHubSyncPanel() {
               );
             })()}
 
-             {syncQueueIsError ? (
+             {syncQueueUnavailable ? (
                <AdminLoadError
                  subject="the sync queue"
                  error={syncQueueError}
+                 offline={syncQueueUnavailable === "offline"}
                  onRetry={() => { void refetchSyncQueue(); }}
                  retrying={syncQueueIsFetching}
                  testId="alert-sync-queue-error"
@@ -490,20 +539,21 @@ export default function GitHubSyncPanel() {
              ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
-                <ScrollArea className="h-[200px] rounded border">
+                <ScrollArea className="h-[200px] rounded border" scrollLabel="Recent sync jobs, scrollable">
                   <div className="p-2 space-y-2">
                     {dedupedQueue.map(({ item, count }) => (
                       <div
                         key={item.id}
                         className="p-2 rounded bg-muted/50 text-sm space-y-1"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                             {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[var(--status-ok)]" /* DS-OK: status ok */} />}
                             {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[var(--status-bad)]" /* DS-OK: status bad */} />}
                             {(item.status === 'pending' || item.status === 'processing') && (
                               <RefreshCw className={"h-4 w-4 text-[var(--status-warn)] animate-spin" /* DS-OK: status warn */} />
                             )}
+                            <span className="whitespace-nowrap font-mono text-xs" data-testid={`sync-queue-id-${item.id}`}>{`Job #${item.id}`}</span>
                             <span className="font-medium capitalize">{item.action}</span>
                             {item.branch && (
                               <span className="font-mono text-xs text-muted-foreground" title="Branch recorded for this job">
@@ -529,6 +579,11 @@ export default function GitHubSyncPanel() {
                             Imported: {item.importResult.imported ?? 0}; updated: {item.importResult.updated ?? 0}; skipped: {item.importResult.skipped ?? 0}; failed: {item.importResult.errors ?? 0}.
                           </p>
                         )}
+                        {item.committedDespiteError && item.errorMessage && (
+                          <p className="text-xs text-muted-foreground break-words pl-6" data-testid={`sync-queue-committed-note-${item.id}`}>
+                            {item.errorMessage}
+                          </p>
+                        )}
                         {(item.status === 'failed' || item.status === 'partial') && (
                           item.importResult?.errorMessages && item.importResult.errorMessages.length > 0 ? (
                             <ul className="ops-github-panel__error-list" data-testid={`sync-queue-errors-${item.id}`}>
@@ -549,7 +604,7 @@ export default function GitHubSyncPanel() {
           </CardContent>
         </Card>}
 
-       {syncHistoryIsError ? (
+       {syncHistoryUnavailable ? (
          <TableShell
            title="Sync jobs"
            sub="The sync history could not be loaded."
@@ -558,11 +613,20 @@ export default function GitHubSyncPanel() {
            <AdminLoadError
              subject="sync history"
              error={syncHistoryError}
+             offline={syncHistoryUnavailable === "offline"}
              onRetry={() => { void refetchSyncHistory(); }}
              retrying={syncHistoryIsFetching}
              testId="alert-sync-history-error"
              retryTestId="button-retry-sync-history"
            />
+         </TableShell>
+       ) : syncHistoryIsLoading ? (
+         <TableShell
+           title="Sync jobs"
+           sub="Loading the sync history…"
+           className="ops-github-panel__history-shell"
+         >
+           <p className="ops-github-panel__history-empty" role="status">Loading sync history…</p>
          </TableShell>
        ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell
@@ -585,8 +649,11 @@ export default function GitHubSyncPanel() {
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
                        <TableCell className="font-mono text-xs">{sync.label}</TableCell>
-                       <TableCell className="ops-github-panel__history-direction">
-                         {sync.direction}
+                       <TableCell>
+                         <span className="ops-github-panel__history-direction">{sync.direction}</span>
+                         <span className="block text-xs text-muted-foreground" data-testid={`sync-history-date-${sync.id}`}>
+                           {formatSyncDate(sync.createdAt)}
+                         </span>
                       </TableCell>
                       <TableCell>
                          {sync.status && (
@@ -649,14 +716,14 @@ export default function GitHubSyncPanel() {
               {confirmAction === "import" ? (
                 <>
                   This pulls the resource list from{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>{" "}
-                  and updates the database to match — new resources are added and
-                  existing ones may be updated.
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>{" "}
+                  and updates the database to match.{" "}
+                  <ImportPreviewConfirmNote preview={importPreview.current} />
                 </>
               ) : (
                 <>
                   This pushes the approved catalog as a commit to{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>,
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>,
                   rewriting its README resource list.
                 </>
               )}
@@ -665,6 +732,7 @@ export default function GitHubSyncPanel() {
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-sync-action">Cancel</AlertDialogCancel>
             <AlertDialogAction
+              disabled={importBlocked}
               onClick={() => {
                 if (confirmAction === "import") importMutation.mutate();
                 if (confirmAction === "export") exportMutation.mutate();
@@ -684,7 +752,11 @@ export default function GitHubSyncPanel() {
             <DialogTitle>Sync {selectedHistory?.label}</DialogTitle>
             <DialogDescription>
               {selectedHistory
-                ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}`
+                ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}${
+                    // Name the repository: older runs may have targeted a
+                    // different repo than the one configured today.
+                    selectedHistory.repositoryUrl ? ` · ${normalizeGithubRepoInput(selectedHistory.repositoryUrl) ?? selectedHistory.repositoryUrl}` : ""
+                  }`
                 : "Sync job details"}
             </DialogDescription>
           </DialogHeader>
@@ -742,7 +814,7 @@ export default function GitHubSyncPanel() {
                   href={selectedHistory.commitUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn ghost inline-flex w-fit items-center gap-2"
+                  className="btn ghost inline-flex w-fit items-center gap-2 max-lg:min-h-11"
                 >
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />
                   View commit on GitHub

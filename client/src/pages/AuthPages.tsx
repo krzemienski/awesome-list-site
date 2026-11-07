@@ -3,11 +3,12 @@
  * out of the anonymous entry bundle; the Clerk widgets render through
  * <ClerkSlot>, i.e. inside the lazily mounted Clerk runtime.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { SignIn, SignUp } from "@clerk/react";
+import { useLocation, useSearch } from "wouter";
 import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
-import { ClerkSlot, useClerkBridge, requestClerk } from "@/lib/clerk-bridge";
-import { clearSignedInClientState } from "@/hooks/useAuth";
+import { ClerkSlot } from "@/lib/clerk-bridge";
+import { clearSignedInClientState, signOutAndVerify } from "@/hooks/useAuth";
 import { trackLoggedOut } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
@@ -15,15 +16,43 @@ import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
 import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import { useOnlineStatus } from "@/hooks/use-online-status";
+import { humanizeApiError, OFFLINE_MESSAGE } from "@/lib/apiError";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Clerk's own requests bypass the app API layer, so offline they just hang.
+function OfflineNotice() {
+  const online = useOnlineStatus();
+  if (online) return null;
+  return (
+    <Alert live="polite" className="max-w-md" data-testid="auth-offline-notice">
+      {OFFLINE_MESSAGE}
+    </Alert>
+  );
+}
 
 export function SignInPage() {
   // A server-guard 302 from /admin#users keeps "#users" on this URL but not in
   // redirect_url; fold it in before Clerk reads the parameter (idempotent).
   // Unsafe redirect_url values are dropped first so Clerk never sees them.
-  sanitizeRedirectParam();
-  foldInheritedHashIntoRedirect();
+  // Both rewrite history, which wouter broadcasts to every location
+  // subscriber, so they run in a layout effect (not during render) and the
+  // sign-in form mounts only after they have, still before first paint.
+  // The sanitizer runs again on every in-app navigation that changes this URL
+  // (e.g. /sign-in → /sign-in?redirect_url=…), because the page stays mounted.
+  const [location] = useLocation();
+  const search = useSearch();
+  const [urlReady, setUrlReady] = useState(false);
+  useLayoutEffect(() => {
+    sanitizeRedirectParam();
+  }, [location, search]);
+  useLayoutEffect(() => {
+    foldInheritedHashIntoRedirect();
+    setUrlReady(true);
+  }, []);
+  if (!urlReady) return null;
   // /sign-in?admin shows the owner password form instead of Clerk.
   const adminPasswordMode =
     typeof window !== "undefined" &&
@@ -39,16 +68,19 @@ export function SignInPage() {
         <AdminPasswordSignIn />
       ) : (
         // C5-V3-01: never a blank body while Clerk's UI can't load.
-        <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
-          <StaleSessionGate>
-            <SignIn
-              routing="path"
-              path={`${basePath}/sign-in`}
-              signUpUrl={`${basePath}/sign-up`}
-              fallback={<ClerkUiFallback flow="sign-in" />}
-            />
-          </StaleSessionGate>
-        </ClerkSlot>
+        <div className="flex flex-col items-center gap-4">
+          <OfflineNotice />
+          <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
+            <StaleSessionGate>
+              <SignIn
+                routing="path"
+                path={`${basePath}/sign-in`}
+                signUpUrl={`${basePath}/sign-up`}
+                fallback={<ClerkUiFallback flow="sign-in" />}
+              />
+            </StaleSessionGate>
+          </ClerkSlot>
+        </div>
       )}
     </div>
   );
@@ -65,59 +97,42 @@ export function SignUpPage() {
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
       <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
-      <ClerkSlot fallback={<ClerkUiFallback flow="sign-up" />}>
-        <StaleSessionGate>
-          <SignUp
-            routing="path"
-            path={`${basePath}/sign-up`}
-            signInUrl={`${basePath}/sign-in`}
-            fallback={<ClerkUiFallback flow="sign-up" />}
-          />
-        </StaleSessionGate>
-      </ClerkSlot>
+      <div className="flex flex-col items-center gap-4">
+        <OfflineNotice />
+        <ClerkSlot fallback={<ClerkUiFallback flow="sign-up" />}>
+          <StaleSessionGate>
+            <SignUp
+              routing="path"
+              path={`${basePath}/sign-up`}
+              signInUrl={`${basePath}/sign-in`}
+              fallback={<ClerkUiFallback flow="sign-up" />}
+            />
+          </StaleSessionGate>
+        </ClerkSlot>
+      </div>
     </div>
   );
 }
 
 // SPA-side /logout. Both direct and client-side navigation render this route,
-// which signs out via Clerk and confirms invalidation before redirecting.
+// which runs the same sign-out as the account menu (owner password cookie and
+// Clerk) and confirms invalidation before redirecting.
 export function Logout() {
-  const { loaded, clerk } = useClerkBridge();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    requestClerk();
-  }, []);
-
-  useEffect(() => {
-    // C3-V3-02: on a direct /logout load Clerk is still loading, and signOut()
-    // then only queues the call and resolves at once — the server check below
-    // saw a live session, and the queued signOut later routed to "/"
-    // client-side, leaving the cached signed-in user in the header.
-    if (!loaded || !clerk) return;
     let cancelled = false;
     const doSignOut = async () => {
       try {
-        // The bridged signOut skips Clerk's own navigation so the full reload
-        // below, not a client-side route change, ends the signed-in page.
-        await clerk.signOut();
+        await signOutAndVerify();
         // Before the identity reset, so the event stays on this account.
         trackLoggedOut("this_device");
         clearSignedInClientState();
-        const authCheck = await fetch("/api/auth/user", {
-          credentials: "include",
-          cache: "no-store",
-          signal: AbortSignal.timeout(5_000),
-        });
-        const state = authCheck.ok ? await authCheck.json() : null;
-        if (!authCheck.ok || state?.isAuthenticated !== false) {
-          throw new Error("The server could not confirm that your session ended");
-        }
         if (!cancelled) window.location.replace("/");
       } catch (reason) {
         if (!cancelled) {
           setError(
-            reason instanceof Error ? reason.message : "Sign out failed",
+            humanizeApiError(reason, "Sign out failed."),
           );
         }
       }
@@ -126,7 +141,7 @@ export function Logout() {
     return () => {
       cancelled = true;
     };
-  }, [loaded, clerk]);
+  }, []);
   return (
     // min-h-full, not min-h-screen: this screen renders inside the app shell's
     // <main>, and a row that claims a viewport height of its own pushes the

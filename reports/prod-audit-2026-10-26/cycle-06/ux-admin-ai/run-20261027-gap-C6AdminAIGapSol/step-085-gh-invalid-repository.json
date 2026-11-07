@@ -1,0 +1,27 @@
+{
+  "status": 422,
+  "body": {
+    "success": false,
+    "outcome": "failed",
+    "imported": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      "Import failed: Invalid GitHub repository URL: not a repo"
+    ],
+    "totalErrors": 1,
+    "warnings": [],
+    "validationPassed": false,
+    "validationStats": {
+      "totalLines": 0,
+      "totalResources": 0,
+      "totalCategories": 0
+    },
+    "validationErrors": [],
+    "validationWarnings": [],
+    "dryRun": true,
+    "wouldCreateTaxonomy": [],
+    "runError": "Invalid GitHub repository URL: not a repo",
+    "message": "Dry run of not a repo stopped before planning: Invalid GitHub repository URL: not a repo. Nothing was written."
+  }
+}

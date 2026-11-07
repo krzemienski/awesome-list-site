@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/submit",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 88,
+  "active": "<button type=\"button\" role=\"combobox\" aria-expanded=\"false\" aria-autocomplete=\"none\" dir=\"ltr\" data-state=\"closed\" class=\"select flex min-h-[44px] items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&amp;&gt;span]:line-clamp-1 submit-control\" data-testid=\"select-category\" id=\":ra:-form-item\" aria-invalid=\"false\" aria-describedby=\":ra",
+  "umami": "1",
+  "consent": "denied"
+}

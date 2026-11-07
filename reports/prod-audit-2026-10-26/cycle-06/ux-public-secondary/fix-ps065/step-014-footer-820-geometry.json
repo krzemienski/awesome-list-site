@@ -1,0 +1,627 @@
+{
+  "capturedAt": "2026-10-27T07:24:49.177Z",
+  "url": "http://127.0.0.1:5165/about",
+  "title": "About — Awesome Video",
+  "viewport": {
+    "width": 820,
+    "height": 1180,
+    "dpr": 1,
+    "coarse": true,
+    "touchPoints": 1
+  },
+  "document": {
+    "scrollWidth": 820,
+    "clientWidth": 820,
+    "bodyScrollWidth": 820,
+    "horizontalOverflow": 0
+  },
+  "footerRect": {
+    "x": 0,
+    "y": 343.6171875,
+    "width": 820,
+    "height": 836.390625,
+    "top": 343.6171875,
+    "right": 820,
+    "bottom": 1180.0078125,
+    "left": 0
+  },
+  "gridColumns": "218.664px 218.664px 218.672px",
+  "targets": [
+    {
+      "index": 0,
+      "name": "awesome.video home",
+      "href": "/",
+      "explore": false,
+      "rect": {
+        "x": 40,
+        "y": 420.6171875,
+        "width": 195.046875,
+        "height": 44,
+        "top": 420.6171875,
+        "right": 235.046875,
+        "bottom": 464.6171875,
+        "left": 40
+      },
+      "style": {
+        "fontSize": "28px",
+        "lineHeight": "29.4px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "12px",
+        "display": "flex",
+        "outline": "rgb(244, 243, 238) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/",
+        "bottom": "/"
+      }
+    },
+    {
+      "index": 1,
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 609.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 609.0078125,
+        "right": 509.328125,
+        "bottom": 653.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/community-events",
+        "bottom": "/category/community-events"
+      }
+    },
+    {
+      "index": 2,
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 653.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 653.0078125,
+        "right": 509.328125,
+        "bottom": 697.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/encoding-codecs",
+        "bottom": "/category/encoding-codecs"
+      }
+    },
+    {
+      "index": 3,
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 697.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 697.0078125,
+        "right": 509.328125,
+        "bottom": 741.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/general-tools",
+        "bottom": "/category/general-tools"
+      }
+    },
+    {
+      "index": 4,
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 741.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 741.0078125,
+        "right": 509.328125,
+        "bottom": 785.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/infrastructure-delivery",
+        "bottom": "/category/infrastructure-delivery"
+      }
+    },
+    {
+      "index": 5,
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 785.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 785.0078125,
+        "right": 509.328125,
+        "bottom": 829.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/intro-learning",
+        "bottom": "/category/intro-learning"
+      }
+    },
+    {
+      "index": 6,
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 829.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 829.0078125,
+        "right": 509.328125,
+        "bottom": 873.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/media-tools",
+        "bottom": "/category/media-tools"
+      }
+    },
+    {
+      "index": 7,
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 873.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 873.0078125,
+        "right": 509.328125,
+        "bottom": 917.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/players-clients",
+        "bottom": "/category/players-clients"
+      }
+    },
+    {
+      "index": 8,
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 917.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 917.0078125,
+        "right": 509.328125,
+        "bottom": 961.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/protocols-transport",
+        "bottom": "/category/protocols-transport"
+      }
+    },
+    {
+      "index": 9,
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "explore": true,
+      "rect": {
+        "x": 290.6640625,
+        "y": 961.0078125,
+        "width": 218.6640625,
+        "height": 44,
+        "top": 961.0078125,
+        "right": 509.328125,
+        "bottom": 1005.0078125,
+        "left": 290.6640625
+      },
+      "style": {
+        "fontSize": "13px",
+        "lineHeight": "20.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/category/standards-industry",
+        "bottom": "/category/standards-industry"
+      }
+    },
+    {
+      "index": 10,
+      "name": "krzemienski/awesome-video↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "explore": false,
+      "rect": {
+        "x": 541.328125,
+        "y": 609.0078125,
+        "width": 218.671875,
+        "height": 60.390625,
+        "top": 609.0078125,
+        "right": 760,
+        "bottom": 669.3984375,
+        "left": 541.328125
+      },
+      "style": {
+        "fontSize": "12px",
+        "lineHeight": "19.2px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "12px",
+        "display": "inline-flex",
+        "outline": "rgb(244, 243, 238) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "https://github.com/krzemienski/awesome-video",
+        "bottom": "https://github.com/krzemienski/awesome-video"
+      }
+    },
+    {
+      "index": 11,
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "explore": false,
+      "rect": {
+        "x": 619.6796875,
+        "y": 681.3984375,
+        "width": 72.9921875,
+        "height": 24,
+        "top": 681.3984375,
+        "right": 692.671875,
+        "bottom": 705.3984375,
+        "left": 619.6796875
+      },
+      "style": {
+        "fontSize": "11.5px",
+        "lineHeight": "18.4px",
+        "minHeight": "24px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "inline-flex",
+        "outline": "rgba(244, 243, 238, 0.66) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+        "bottom": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md"
+      }
+    },
+    {
+      "index": 12,
+      "name": "About",
+      "href": "/about",
+      "explore": false,
+      "rect": {
+        "x": 400.9921875,
+        "y": 1050.0078125,
+        "width": 44,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 444.9921875,
+        "bottom": 1094.0078125,
+        "left": 400.9921875
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/about",
+        "bottom": "/about"
+      }
+    },
+    {
+      "index": 13,
+      "name": "Terms",
+      "href": "/terms",
+      "explore": false,
+      "rect": {
+        "x": 458.9921875,
+        "y": 1050.0078125,
+        "width": 44,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 502.9921875,
+        "bottom": 1094.0078125,
+        "left": 458.9921875
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/terms",
+        "bottom": "/terms"
+      }
+    },
+    {
+      "index": 14,
+      "name": "Privacy",
+      "href": "/privacy",
+      "explore": false,
+      "rect": {
+        "x": 516.9921875,
+        "y": 1050.0078125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 565.5078125,
+        "bottom": 1094.0078125,
+        "left": 516.9921875
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/privacy",
+        "bottom": "/privacy"
+      }
+    },
+    {
+      "index": 15,
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "explore": false,
+      "rect": {
+        "x": 579.5078125,
+        "y": 1050.0078125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 628.0234375,
+        "bottom": 1094.0078125,
+        "left": 579.5078125
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/code-of-conduct",
+        "bottom": "/code-of-conduct"
+      }
+    },
+    {
+      "index": 16,
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "explore": false,
+      "rect": {
+        "x": 642.0234375,
+        "y": 1050.0078125,
+        "width": 55.4609375,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 697.484375,
+        "bottom": 1094.0078125,
+        "left": 642.0234375
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "https://github.com/krzemienski/awesome-video/issues",
+        "bottom": "https://github.com/krzemienski/awesome-video/issues"
+      }
+    },
+    {
+      "index": 17,
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "explore": false,
+      "rect": {
+        "x": 711.484375,
+        "y": 1050.0078125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050.0078125,
+        "right": 760,
+        "bottom": 1094.0078125,
+        "left": 711.484375
+      },
+      "style": {
+        "fontSize": "10.5px",
+        "lineHeight": "16.8px",
+        "minHeight": "44px",
+        "marginTop": "0px",
+        "marginBottom": "0px",
+        "display": "flex",
+        "outline": "rgba(244, 243, 238, 0.49) none 3px",
+        "outlineOffset": "0px"
+      },
+      "edgeHits": {
+        "top": "/sitemap.xml",
+        "bottom": "/sitemap.xml"
+      }
+    }
+  ],
+  "adjacentExplore": [
+    {
+      "first": "Community & Events",
+      "second": "Encoding & Codecs",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Encoding & Codecs",
+      "second": "General Tools",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "General Tools",
+      "second": "Infrastructure & Delivery",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Infrastructure & Delivery",
+      "second": "Intro & Learning",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Intro & Learning",
+      "second": "Media Tools",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Media Tools",
+      "second": "Players & Clients",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Players & Clients",
+      "second": "Protocols & Transport",
+      "pitch": 44,
+      "gap": 0
+    },
+    {
+      "first": "Protocols & Transport",
+      "second": "Standards & Industry",
+      "pitch": 44,
+      "gap": 0
+    }
+  ],
+  "intersections": [],
+  "active": {
+    "name": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);\">\n        <p style=\"font-size:20px;font-weight:700;margin:0 0 12px;\">Awesome Video</p>\n        <p style=\"margin:0 0 8px;\">This app requires JavaScript to browse thousands of curated video development resources.</p>\n        <p style=\"margin:0;\">Please enable JavaScript, or view the source list at\n          <a href=\"https://github.com/krzemienski/awesome-video\" style=\"color:var(--accent);\">github.com/krzemienski/awesome-video</a>.</p>\n      </div>\n    \n    \n      \n        \n        \n        \n      \n    \n    Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 1,949 resourcesSearch 1,949 resources…⌘KBrowseSubmitAboutDocs ↗Sign inSign in, account menuavAWESOME.VIDEO home, 1,949 resourcesHomeCATEGORIES · 9◈Community & EventsL391◇Encoding & CodecsL3372All in Encoding & Codecs →Codecs27+3Encoding Tools225+1Uncategorized120◆General Tools95All in General Tools →DRM17Uncategorized78▣Infrastructure & DeliveryL3183▤Intro & Learning227▥Media ToolsL3304▶Players & ClientsL3263⟁Protocols & TransportL3242◉Standards & IndustryL31721,949 indexed · liveSubmit ResourceLearning JourneysAdvancedThemeHome dashboardAboutHomeAboutABOUT THIS PROJECTA field journal for video engineersawesome.video is a hand-curated index of 1,949 resources across 9 domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. awesome.video is the web home of awesome-video — a community-curated list of the best streaming and video-development tools, frameworks, libraries, and learning resources, maintained by Nick Krzemienski on GitHub.01The source listResources on this site are drawn from the open-source awesome-video repository.02Open sourceThe curated list and the platform that renders it are open source on GitHub.03Human reviewedNew submissions are reviewed by maintainers before they are published.04For video buildersBrowse practical tools, frameworks, libraries, and learning resources for the video pipeline.About the maintainerCreator & maintainer of awesome-videoawesome.video is curated and maintained by Nick Krzemienski, a video engineer and long-time contributor to the streaming media community and the creator of the open-source awesome-video list. He started the list to share the encoders, players, codecs, specifications, and learning resources he relies on with the wider video development community.The awesome-video list has become one of the most referenced open-source collections in the space, with more than 1,800 stars on GitHub. Every resource on this site is drawn from and kept in sync with that repository, so the directory reflects tools that working video engineers actually use.Nick Krzemienski on GitHubNeed your account or personal data deleted? Sign in and use Profile → Security → Delete account & data — it’s private and authenticated, so you never have to post personal details publicly.Questions or corrections? No public contact destination is configured yet.Review the Terms of Use and Privacy Policy for the site’s legal and data practices.Open source at its coreThe curated list that feeds this site, and the platform that renders itawesome-videoA curated list of awesome streaming video tools, frameworks, libraries, and learning resources. Every resource on this site is sourced from and kept in sync with this repository.The source listCC0-1.0awesome-list-siteThe open-source platform that powers this site — it transforms any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.The engineMITFeaturesBuilt for speed, accessibility, and user experienceResponsive DesignMobile-firstFast PerformanceOptimized SPAFuzzy SearchFind anythingMultiple ThemesCustomizableAccessibleWCAG compliantSEO OptimizedDiscoverableKeyboard Shortcuts⌘K or / to searchComponent Libraryshadcn/uiTechnology StackModern web technologies for optimal performanceReactUI component frameworkTailwind CSSUtility-first stylingshadcn/uiComponent primitivesFuse.jsFuzzy search engineFramer MotionSmooth animationsTypeScriptType safetyAccessibility FirstFollowing WCAG 2.1 AA guidelines for inclusive designProper heading structureKeyboard navigationSufficient color contrastAppropriate ARIA attributesRespect for user motion preferencesScreen reader optimizedCreditsBuilt with open source technologiesThis project was built with dedication using open source technologies. Special thanks to:Nick KrzemienskiMaintainershadcn/uiComponentsTailwind CSSStylingFrequently asked questionsQuick answers about the site, the list, and how to contributeWhat is Awesome Video?Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes 1,949 reviewed resources drawn from the open-source krzemienski/awesome-video list maintained by Nick Krzemienski on GitHub.Is Awesome Video free to use?Yes. Browsing, search, and learning journeys are completely free and require no account. The underlying resource list (krzemienski/awesome-video) and the platform that renders it are open source on GitHub.How are resources curated?Every resource is sourced from the community-maintained krzemienski/awesome-video GitHub repository. New submissions are reviewed by maintainers before being published, and the site database stays in sync with the list, so quality and relevance are checked by humans rather than scraped automatically.What topics does Awesome Video cover?The directory spans the full video pipeline: encoding and codecs (AV1, HEVC, H.264), adaptive streaming protocols such as HLS and MPEG-DASH, FFmpeg tooling, video players for web and mobile, media processing infrastructure, quality testing, learning courses, and community events and conferences.How do I suggest a new resource?Use the Submit page (/submit). Sign in, provide the resource URL, title, and category, and a maintainer will review your suggestion before it is published to the directory.What are the best video codecs for developers?The most widely used video codecs are H.264/AVC for maximum device compatibility, H.265/HEVC for higher efficiency on 4K and HDR content, AV1 for royalty-free next-generation compression, and VP9 for web streaming. Awesome Video curates encoders, specifications, and comparison resources for each of these codecs in its encoding and codecs category.What are the best free video encoding tools?FFmpeg is the most popular free, open-source tool for encoding, transcoding, and processing video, and it powers a large share of the industry. Other widely used free tools include HandBrake for desktop transcoding, Shaka Packager and Bento4 for packaging HLS and DASH, and GPAC for MP4 and streaming workflows. All are catalogued in Awesome Video's encoding and tooling categories.What streaming protocols should I use?HLS (HTTP Live Streaming) and MPEG-DASH are the two dominant adaptive bitrate protocols for on-demand and live video, with CMAF used to share a single set of media segments between them. WebRTC is preferred for real-time, sub-second latency use cases, while RTMP is still common for ingest. Awesome Video's streaming category collects specifications, servers, and players for each.What are the best open-source video players for the web?Popular open-source web players include Video.js, Plyr, and Vidstack for general playback, plus hls.js, dash.js, and Google's Shaka Player for adaptive HLS and MPEG-DASH streaming in the browser. Awesome Video lists players and player SDKs for web, mobile, and smart-TV platforms in its players category.How do I get started with video development?A good path is to learn the fundamentals of codecs and containers, practice encoding with FFmpeg, and then experiment with an adaptive streaming player such as hls.js or Shaka Player. Awesome Video offers guided learning journeys and a curated set of courses, articles, and tools that take you from beginner streaming concepts to advanced encoding pipelines.── INDEXawesome.videoA curated collection of awesome video resources, tools, and technologies for developers and content creatorsINDEXED1,9499 categories18 subcategories liveEXPLORE◈Community◇Encoding◆General▣Infrastructure▤Intro▥Media▶Players⟁Protocols◉StandardsSOURCEkrzemienski/awesome-video↗Open-source. PRs welcome.Indexed automatically from README.md.© 2026 awesome.video · content CC0, code MITAboutTermsPrivacyConductIssues ↗Sitemapbuilt with the awesome-list framework\n    \n      // BUG-018 (run19): routes without server-injected content (admin,\n      // noindex pages) used to show a blank black page until React mounted.\n      // Paint a minimal skeleton ONLY when #root is empty — injected SSR\n      // content (most public routes) already gives instant real content.\n      // React's createRoot().render() replaces this on mount.\n      (function () {\n        try {\n          var root = document.getElementById('root');\n          if (!root) return;\n          // Crawler-injected routes (#ssr-seo-content, never the hydrated Home\n          // tree): move the markup into the fixed #ssr-seo-hold overlay HERE,\n          // before the first paint, instead of in main.tsx after the bundle\n          // has executed. Re-inserting the nodes later re-registers the lead\n          // paragraph as a fresh Largest Contentful Paint candidate measured\n          // in the swapped web font (a few percent larger than the fallback\n          // paint), which dated the route's LCP to the bundle's execution\n          // instead of the document's first paint. The overlay stays\n          // semantic and interactive (real h1, links, no aria-hidden/inert)\n          // until main.tsx adopts it (data-preboot) right before React\n          // mounts underneath — so a bundle that never runs still leaves a\n          // usable page, exactly like the old in-#root fallback.\n          var ssr = root.querySelector('#ssr-seo-content');\n          if (ssr && root.getAttribute('data-home-ssr') !== 'true' && !document.getElementById('ssr-seo-hold')) {\n            var overlay = document.createElement('div');\n            overlay.id = 'ssr-seo-hold';\n            overlay.setAttribute('data-preboot', 'true');\n            // main.tsx judges readiness for THIS document's URL, not a later one.\n            overlay.setAttribute('data-pathname', location.pathname);\n            overlay.setAttribute(\n              'style',\n              'position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain'\n            );\n            while (root.firstChild) overlay.appendChild(root.firstChild);\n            document.body.appendChild(overlay);\n            return;\n          }\n          if (root.firstElementChild) return;\n          root.innerHTML =\n            '<div aria-hidden=\"true\" style=\"min-height:100vh;background:var(--bg);padding:40px 20px;max-width:960px;margin:0 auto\">' +\n            '<style nonce=\"bwQQwfiTHsqzHCIsHQIZhA==\">@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:var(--surface-2);animation:bsk 1.4s ease-in-out infinite}</style>' +\n            '<div class=\"bsk\" style=\"height:2rem;width:60%;max-width:420px;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:1rem;width:80%;max-width:640px;margin-bottom:2rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%\"></div>' +\n            '</div>';\n        } catch (e) {}\n      })();\n    \n    \n    \n      // The Replit dev banner is a development-only convenience. Inject it only\n      // on Replit/dev hosts so production (awesome.video) never requests it.\n      (function () {\n        try {\n          var isDev = location.hostname.endsWith('.replit.dev') ||\n                      location.hostname === 'localhost' ||\n                      location.hostname.endsWith('.repl.co');\n          if (!isDev) return;\n          var s = document.createElement('script');\n          s.type = 'text/javascript';\n          s.src = 'https://replit.com/public/js/replit-dev-banner.js';\n          document.body.appendChild(s);\n        } catch (e) {}\n      })();",
+    "href": null,
+    "focusVisible": false
+  }
+}

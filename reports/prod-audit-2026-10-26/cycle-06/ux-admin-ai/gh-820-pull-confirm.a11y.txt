@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Import from GitHub?"
+    - heading "Import from GitHub?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This pulls the resource list from krzemienski/awesome-video and updates the database to match. New resources are added and existing ones may be updated. Cancel and use Preview import to see how many before pulling."
+    - button "Cancel" [ref=e2]
+    - button "Start Import" [ref=e3]

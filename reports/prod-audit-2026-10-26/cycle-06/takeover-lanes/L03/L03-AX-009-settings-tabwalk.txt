@@ -1,0 +1,135 @@
+1440 1 A||Skip to main content|ring|||156x44
+1440 2 A||avAWESOME.VIDEOAWESOME.VIDEO home|ring|||147x28
+1440 3 BUTTON||Search 3,826 resourcesSearch 3,826 resources…⌘|ring|||245x44
+1440 4 A||Browse|ring|||46x24
+1440 5 A||Submit|ring|||44x24
+1440 6 A||About|ring|||37x24
+1440 7 A||Docs ↗|ring|||45x24
+1440 8 A||Admin|ring|||46x24
+1440 9 BUTTON||AAdminAdmin, account menu|ring|||85x44
+1440 10 A||Back|ring|||55x44
+1440 11 A||AppearanceSwitch design system, accent color, |ring|||374x102
+1440 12 A||AccountView your profile, submissions, favorit|ring|||374x102
+1440 13 A||SecurityChange your password from the Security|ring|||374x102
+1440 14 A||BookmarksReview the resources you've saved for|ring|||374x102
+1440 15 A||RecommendationsPersonalized resource suggestio|ring|||374x102
+1440 16 BUTTON|radio||ring|||16x16
+1440 17 BUTTON|radio||ring|||16x16
+1440 18 BUTTON|checkbox||ring|||16x16
+1440 19 BUTTON|checkbox||ring|||16x16
+1440 20 BUTTON|checkbox||ring|||16x16
+1440 21 BUTTON|checkbox||ring|||16x16
+1440 22 BUTTON|checkbox||ring|||16x16
+1440 23 BUTTON|checkbox||ring|||16x16
+1440 24 BUTTON|checkbox||ring|||16x16
+1440 25 BUTTON|checkbox||ring|||16x16
+1440 26 BUTTON|checkbox||ring|||16x16
+1440 27 BUTTON|checkbox||ring|||16x16
+1440 28 BUTTON|checkbox||ring|||16x16
+1440 29 BUTTON|checkbox||ring|||16x16
+1440 30 BUTTON|checkbox||ring|||16x16
+1440 31 BUTTON|checkbox||ring|||16x16
+1440 32 BUTTON|checkbox||ring|||16x16
+1440 33 BUTTON|checkbox||ring|||16x16
+1440 34 BUTTON|checkbox||ring|||16x16
+1440 35 BUTTON|checkbox||ring|||16x16
+1440 36 BUTTON|checkbox||ring|||16x16
+1440 37 BUTTON|checkbox||ring|||16x16
+1440 38 BUTTON|checkbox||ring|||16x16
+1440 39 BUTTON|checkbox||ring|||16x16
+1440 40 BUTTON|checkbox||ring|||16x16
+1440 41 BUTTON|radio||ring|||16x16
+1440 42 BUTTON||Reset preferences|ring|||179x44
+1440 43 BUTTON||Save learning preferences|ring|||199x44
+1440 44 INPUT|||ring|||1x1
+1440 45 INPUT|||ring|||1x1
+820 1 A||Skip to main content|ring|||156x44
+820 2 BUTTON||Toggle sidebar|ring|||44x44
+820 3 A||avAWESOME.VIDEOAWESOME.VIDEO home|ring|||147x44
+820 4 BUTTON||Search 3,826 resourcesSearch 3,826 resources…⌘|ring|||180x44
+820 5 BUTTON||AAdminAdmin, account menu|ring|||85x44
+820 6 A||Back|ring|||55x44
+820 7 A||AppearanceSwitch design system, accent color, |ring|||351x102
+820 8 A||AccountView your profile, submissions, favorit|ring|||351x102
+820 9 A||SecurityChange your password from the Security|ring|||351x102
+820 10 A||BookmarksReview the resources you've saved for|ring|||351x102
+820 11 A||RecommendationsPersonalized resource suggestio|ring|||351x102
+820 12 BUTTON|radio||ring|||16x16
+820 13 BUTTON|radio||ring|||16x16
+820 14 BUTTON|checkbox||ring|||16x16
+820 15 BUTTON|checkbox||ring|||16x16
+820 16 BUTTON|checkbox||ring|||16x16
+820 17 BUTTON|checkbox||ring|||16x16
+820 18 BUTTON|checkbox||ring|||16x16
+820 19 BUTTON|checkbox||ring|||16x16
+820 20 BUTTON|checkbox||ring|||16x16
+820 21 BUTTON|checkbox||ring|||16x16
+820 22 BUTTON|checkbox||ring|||16x16
+820 23 BUTTON|checkbox||ring|||16x16
+820 24 BUTTON|checkbox||ring|||16x16
+820 25 BUTTON|checkbox||ring|||16x16
+820 26 BUTTON|checkbox||ring|||16x16
+820 27 BUTTON|checkbox||ring|||16x16
+820 28 BUTTON|checkbox||ring|||16x16
+820 29 BUTTON|checkbox||ring|||16x16
+820 30 BUTTON|checkbox||ring|||16x16
+820 31 BUTTON|checkbox||ring|||16x16
+820 32 BUTTON|checkbox||ring|||16x16
+820 33 BUTTON|checkbox||ring|||16x16
+820 34 BUTTON|checkbox||ring|||16x16
+820 35 BUTTON|checkbox||ring|||16x16
+820 36 BUTTON|checkbox||ring|||16x16
+820 37 BUTTON|radio||ring|||16x16
+820 38 BUTTON||Reset preferences|ring|||179x44
+820 39 BUTTON||Save learning preferences|ring|||199x44
+820 40 INPUT|||ring|||1x1
+820 41 INPUT|||ring|||1x1
+820 42 INPUT|||ring|||16x16
+820 43 INPUT|||ring|||16x16
+820 44 INPUT|||ring|||16x16
+820 45 SELECT||WeeklyEvery 2 weeksMonthly|ring|||328x44
+390 1 A||Skip to main content|ring|||156x44
+390 2 BUTTON||Toggle sidebar|ring|||44x44
+390 3 A||avAWESOME.VIDEOAWESOME.VIDEO home|ring|||44x44
+390 4 BUTTON||Search 3,826 resourcesSearch 3,826 resources…⌘|ring|||44x44
+390 5 BUTTON||AAdminAdmin, account menu|ring|||44x44
+390 6 A||Back|ring|||55x44
+390 7 A||AppearanceSwitch design system, accent color, |ring|||304x102
+390 8 A||AccountView your profile, submissions, favorit|ring|||304x102
+390 9 A||SecurityChange your password from the Security|ring|||304x102
+390 10 A||BookmarksReview the resources you've saved for|ring|||304x102
+390 11 A||RecommendationsPersonalized resource suggestio|ring|||304x102
+390 12 BUTTON|radio||ring|||16x16
+390 13 BUTTON|radio||ring|||16x16
+390 14 BUTTON|checkbox||ring|||16x16
+390 15 BUTTON|checkbox||ring|||16x16
+390 16 BUTTON|checkbox||ring|||16x16
+390 17 BUTTON|checkbox||ring|||16x16
+390 18 BUTTON|checkbox||ring|||16x16
+390 19 BUTTON|checkbox||ring|||16x16
+390 20 BUTTON|checkbox||ring|||16x16
+390 21 BUTTON|checkbox||ring|||16x16
+390 22 BUTTON|checkbox||ring|||16x16
+390 23 BUTTON|checkbox||ring|||16x16
+390 24 BUTTON|checkbox||ring|||16x16
+390 25 BUTTON|checkbox||ring|||16x16
+390 26 BUTTON|checkbox||ring|||16x16
+390 27 BUTTON|checkbox||ring|||16x16
+390 28 BUTTON|checkbox||ring|||16x16
+390 29 BUTTON|checkbox||ring|||16x16
+390 30 BUTTON|checkbox||ring|||16x16
+390 31 BUTTON|checkbox||ring|||16x16
+390 32 BUTTON|checkbox||ring|||16x16
+390 33 BUTTON|checkbox||ring|||16x16
+390 34 BUTTON|checkbox||ring|||16x16
+390 35 BUTTON|checkbox||ring|||16x16
+390 36 BUTTON|checkbox||ring|||16x16
+390 37 BUTTON|radio||ring|||16x16
+390 38 BUTTON||Reset preferences|ring|||262x44
+390 39 BUTTON||Save learning preferences|ring|||262x44
+390 40 INPUT|||ring|||1x1
+390 41 INPUT|||ring|||1x1
+390 42 INPUT|||ring|||16x16
+390 43 INPUT|||ring|||16x16
+390 44 INPUT|||ring|||16x16
+390 45 SELECT||WeeklyEvery 2 weeksMonthly|ring|||262x44

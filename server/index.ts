@@ -2,19 +2,23 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
-import { serveStatic, log } from "./vite";
+import { serveStatic } from "./vite";
 import { handleSSR, prewarmSSRRenderer } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import { initializeDigestScheduler } from "./jobs/digestScheduler";
 import { initializeContactRetentionScheduler } from "./jobs/contactRetentionScheduler";
+import { initializeBackupScheduler } from "./jobs/backupScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import {
+  clientClass,
+  documentTemplate,
   endpointGroup,
+  recordDocumentRequest,
   recordEndpointLatency,
 } from "./ops/operationalTelemetry";
 import { markMigrationsNotRequired } from "./ops/bootState";
@@ -31,15 +35,19 @@ import {
   hasAdminBypass,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
-import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
+import { API_ERROR_CACHE_CONTROL, HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
+import { createLogger, logHttpRequest } from "./lib/logger";
+import { installProcessHandlers } from "./ops/processHandlers";
 import { publicApiCors } from "./middleware/publicApiCors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const logger = createLogger("startup");
+installProcessHandlers();
 
 /**
  * A development publishable key names its Frontend API host. Allow only that
@@ -109,8 +117,8 @@ const buildContentSecurityPolicy = (nonce: string): string =>
     // on its slower non-worker fallback. blob: workers only execute code
     // the page itself constructed, so this does not weaken script-src.
     `worker-src 'self' blob:`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    "font-src 'self' https://fonts.gstatic.com",
+    `style-src 'self' 'unsafe-inline'`,
+    "font-src 'self'",
     // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
     // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
     // so a fixed allowlist would break resource preview images in production.
@@ -145,6 +153,42 @@ app.use(operationalRequestContext);
 // Clerk Frontend API proxy (Task #307). Must be mounted before compression and
 // body parsers — it streams raw bytes to Clerk's FAPI in production.
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
+
+// Negative results never stick in a cache: every /api response with status
+// >= 400 is no-store, whichever handler (route, limiter, 404/405 fallback,
+// error handler) produced it. Patched at writeHead so it overrides a
+// Cache-Control set earlier with setHeader/res.set AND one passed in the
+// writeHead(status, headers) argument (object or flat [name, value, ...]
+// array). The caller's headers are copied, never mutated: a shared constant
+// reused for a 200 and a 404 must stay cacheable for the 200. See
+// server/http-cache-policy.ts.
+function withNoStoreCacheControl(headers: object): object {
+  if (Array.isArray(headers)) {
+    const copy = headers.slice();
+    for (let i = 0; i + 1 < copy.length; i += 2) {
+      if (String(copy[i]).toLowerCase() === "cache-control") copy[i + 1] = API_ERROR_CACHE_CONTROL;
+    }
+    return copy;
+  }
+  const copy: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(headers)) {
+    copy[name] = name.toLowerCase() === "cache-control" ? API_ERROR_CACHE_CONTROL : value;
+  }
+  return copy;
+}
+
+app.use("/api", (_req, res, next) => {
+  const writeHead = res.writeHead;
+  res.writeHead = function (this: Response, status: number, ...rest: any[]) {
+    if (status >= 400) {
+      res.setHeader("Cache-Control", API_ERROR_CACHE_CONTROL);
+      const at = rest.findIndex((arg) => arg !== null && typeof arg === "object");
+      if (at !== -1) rest[at] = withNoStoreCacheControl(rest[at]);
+    }
+    return (writeHead as any).call(this, status, ...rest);
+  } as typeof res.writeHead;
+  next();
+});
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
@@ -184,7 +228,9 @@ app.use((_req, res, next) => {
   const nonce = crypto.randomBytes(16).toString("base64");
   res.locals.cspNonce = nonce;
   res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  // strict-origin: same-origin subresources must not carry the page's path or
+  // query in their Referer (the edge WAF 403s a Referer containing <script>).
+  res.setHeader("Referrer-Policy", "strict-origin");
   res.setHeader(
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
@@ -496,17 +542,36 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       const group = endpointGroup(path);
       recordEndpointLatency(req.method, group, res.statusCode, duration);
-      // Bounded labels only: never emit raw paths, query strings, response
-      // bodies, user ids, cookies, or database details.
-      log(
-        JSON.stringify({
-          event: "ops.http_request",
+      // One line per API request: method, scrubbed path (opaque tokens and
+      // emails replaced, never the query string), status and duration.
+      logHttpRequest({
+        id: res.locals.requestId,
+        method: req.method,
+        path,
+        status: res.statusCode,
+        durationMs: duration,
+        group,
+        // Who did it, for mutating calls (admin actions included): the
+        // pseudonymous account id only.
+        userId: req.method !== "GET" && req.method !== "HEAD" ? (req as { dbUser?: { id?: string } }).dbUser?.id : undefined,
+      });
+    } else if (!path.startsWith("/assets/") && !path.startsWith("/@")) {
+      // B15: count page documents by template and client class (counts only).
+      // Static files (anything with an extension) are not page views.
+      if ((req.method === "GET" || req.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path)) {
+        recordDocumentRequest(documentTemplate(path), clientClass(req.get("user-agent")), res.statusCode);
+      }
+      // Page documents are logged only when they fail (404 / 5xx), so missing
+      // pages are visible in the logs without logging every page view.
+      if (res.statusCode >= 400) {
+        logHttpRequest({
+          id: res.locals.requestId,
           method: req.method,
-          group,
+          path,
           status: res.statusCode,
           durationMs: duration,
-        }),
-      );
+        });
+      }
     }
   });
 
@@ -521,7 +586,7 @@ void (async () => {
     try {
       await runMigrations();
     } catch (error) {
-      console.error('❌ Failed to run migrations, cannot start server');
+      logger.error('Migrations failed; the server cannot start', error);
       process.exit(1);
     }
   } else {
@@ -614,6 +679,20 @@ void (async () => {
         },
       }),
     );
+    // C19 H3-06: self-hosted webfonts. The woff2 filenames carry a content
+    // hash, so they cache like /assets; fonts.css and OFL.txt are not hashed
+    // and keep revalidating so a changed @font-face set reaches visitors.
+    app.use(
+      "/fonts",
+      express.static(path.resolve(import.meta.dirname, "public", "fonts"), {
+        setHeaders: (res, filePath) => {
+          res.setHeader(
+            "Cache-Control",
+            filePath.endsWith(".woff2") ? HASHED_ASSET_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL,
+          );
+        },
+      }),
+    );
     // NB-009 (run18): unknown FILE-LIKE paths (/.env, /backup.zip, dead hashed
     // /assets/*.js) used to fall through to the SPA fallback and answer 200 +
     // index.html (soft-404 that masks dead assets and "confirms" sensitive
@@ -651,8 +730,8 @@ void (async () => {
     try {
       await prewarmSSRRenderer();
     } catch (error) {
-      console.error(
-        "⚠️ Failed to prewarm the production Home SSR renderer; continuing with the existing SPA fallback",
+      logger.warn(
+        "Home SSR renderer prewarm failed; continuing with the SPA fallback",
         error,
       );
     }
@@ -674,28 +753,29 @@ void (async () => {
   }
 
   server.listen(listenOptions, () => {
-    log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
+    logger.info(`Serving on port ${port}`, { mode: isProduction ? 'production' : 'development' });
 
     // A second deployment sharing the production database sets
     // DISABLE_BACKGROUND_JOBS=1 so only the primary runs the schedulers and the
     // startup watchdog, which fails every pending/processing enrichment job.
     if (process.env.DISABLE_BACKGROUND_JOBS === '1') {
-      log('background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
+      logger.info('Background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
       return;
     }
 
     // Run background initialization AFTER server is listening
     // This ensures fast startup for production deployments
     runBackgroundInitialization().catch((error) => {
-      console.error('❌ Background initialization error (non-fatal):', error);
+      logger.error('Background initialization failed (non-fatal)', error);
     });
 
     // Initialize link health monitoring cron job
     initializeLinkHealthScheduler();
     initializeDigestScheduler();
     initializeContactRetentionScheduler();
+    initializeBackupScheduler();
   }).on('error', (err) => {
-    console.error(`❌ Server failed to start on port ${port}:`, err);
+    logger.error(`Server failed to start on port ${port}`, err);
     process.exit(1);
   });
 })();

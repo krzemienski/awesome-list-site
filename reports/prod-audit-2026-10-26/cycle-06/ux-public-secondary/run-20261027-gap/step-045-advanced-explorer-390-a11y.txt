@@ -1,0 +1,540 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem:
+                  - link "Advanced Search" [disabled]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - img [ref=e42]
+                  - heading "Advanced Features" [level=1] [ref=e44]
+                - paragraph [ref=e45]: Discover powerful tools for exploring, analyzing, and sharing awesome list data
+              - generic [ref=e46]:
+                - tablist [ref=e47]:
+                  - tab "Explorer" [selected] [ref=e48] [cursor=pointer]:
+                    - img [ref=e49]
+                    - text: Explorer
+                  - tab "Metrics" [ref=e52] [cursor=pointer]:
+                    - img [ref=e53]
+                    - text: Metrics
+                  - tab "Export" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - text: Export
+                  - tab "AI Recommendations" [ref=e59] [cursor=pointer]:
+                    - img [ref=e60]
+                    - generic [ref=e62]: AI Recommendations
+                - tabpanel "Explorer" [ref=e63]:
+                  - article [ref=e64]:
+                    - generic [ref=e65]:
+                      - generic [ref=e66]:
+                        - img [ref=e67]
+                        - text: Interactive Category Explorer
+                      - generic [ref=e70]: Advanced search and filtering capabilities with real-time category statistics and interactive exploration
+                    - generic [ref=e72]:
+                      - article [ref=e73]:
+                        - generic [ref=e74]:
+                          - generic [ref=e75]: "9"
+                          - generic [ref=e76]: Categories
+                      - article [ref=e77]:
+                        - generic [ref=e78]:
+                          - generic [ref=e79]: 3,825
+                          - generic [ref=e80]: Resources
+                      - article [ref=e81]:
+                        - generic [ref=e82]:
+                          - generic [ref=e83]: 1,623
+                          - generic [ref=e84]: Unique Tags
+                      - article [ref=e85]:
+                        - generic [ref=e86]:
+                          - generic [ref=e87]: "99"
+                          - generic [ref=e88]: Subcategories
+                  - generic [ref=e89]:
+                    - article [ref=e90]:
+                      - generic [ref=e91]:
+                        - generic [ref=e92]:
+                          - img [ref=e93]
+                          - text: Category Explorer
+                        - generic [ref=e95]: Discover and explore 9 categories with 3,825 total resources
+                      - generic [ref=e96]:
+                        - generic [ref=e97]:
+                          - text: Search categories and resources
+                          - generic [ref=e98]:
+                            - img [ref=e99]
+                            - textbox "Search categories and resources" [ref=e102]:
+                              - /placeholder: Search categories and resources...
+                        - generic [ref=e103]:
+                          - generic [ref=e104]:
+                            - img [ref=e105]
+                            - generic [ref=e107]: "Sort:"
+                            - combobox "Sort categories" [ref=e108] [cursor=pointer]:
+                              - generic: Name
+                              - img [ref=e109]
+                          - generic [ref=e111]:
+                            - checkbox "Show subcategories" [active] [ref=e112] [cursor=pointer]
+                            - generic [ref=e113] [cursor=pointer]: Show subcategories
+                        - generic [ref=e114]:
+                          - generic [ref=e115]:
+                            - img [ref=e116]
+                            - generic [ref=e119]: "Filter by tags:"
+                          - group "Filter by tags" [ref=e120]:
+                            - button "open-source" [ref=e121] [cursor=pointer]
+                            - button "video-streaming" [ref=e122] [cursor=pointer]
+                            - button "streaming" [ref=e123] [cursor=pointer]
+                            - button "ffmpeg" [ref=e124] [cursor=pointer]
+                            - button "video-processing" [ref=e125] [cursor=pointer]
+                            - button "live-streaming" [ref=e126] [cursor=pointer]
+                            - button "video-encoding" [ref=e127] [cursor=pointer]
+                            - button "hls" [ref=e128] [cursor=pointer]
+                            - button "video-player" [ref=e129] [cursor=pointer]
+                            - button "encoding" [ref=e130] [cursor=pointer]
+                            - button "video-technology" [ref=e131] [cursor=pointer]
+                            - button "drm" [ref=e132] [cursor=pointer]
+                            - button "standard" [ref=e133] [cursor=pointer]
+                            - button "webassembly" [ref=e134] [cursor=pointer]
+                            - button "webrtc" [ref=e135] [cursor=pointer]
+                            - button "android" [ref=e136] [cursor=pointer]
+                            - button "cross-platform" [ref=e137] [cursor=pointer]
+                            - button "video-editing" [ref=e138] [cursor=pointer]
+                            - button "sdk" [ref=e139] [cursor=pointer]
+                            - button "transcoding" [ref=e140] [cursor=pointer]
+                            - button "Show all 1617 tags" [ref=e141] [cursor=pointer]
+                    - generic [ref=e142]:
+                      - article [ref=e143]:
+                        - generic [ref=e146]:
+                          - link "Community & Events" [ref=e148] [cursor=pointer]:
+                            - /url: /category/community-events
+                            - generic [ref=e149]: Community & Events
+                          - generic [ref=e150]:
+                            - generic [ref=e151]: 129 resources
+                            - generic [ref=e152]: 2 subcategories
+                            - generic [ref=e153]: 194 tags
+                        - generic [ref=e154]:
+                          - generic [ref=e155]:
+                            - generic [ref=e156]:
+                              - link "AOSP and AAOS Meetup Archive (opens in new tab)" [ref=e157] [cursor=pointer]:
+                                - /url: https://aospandaaos.github.io/meetup.html
+                                - text: AOSP and AAOS Meetup Archive
+                                - img [ref=e158]
+                                - generic [ref=e162]: (opens in new tab)
+                              - paragraph [ref=e163]: A comprehensive archive of meetings focused on the Android Open Source Project (AOSP) and Android Automotive OS (AAOS). The archive includes slides and videos from various talks, providing valuable insights into Android development and related technologies.
+                            - generic [ref=e164]:
+                              - link "Apple Developer Forums - Media Technologies (opens in new tab)" [ref=e165] [cursor=pointer]:
+                                - /url: https://developer.apple.com/forums/topics/media-technologies/streaming
+                                - text: Apple Developer Forums - Media Technologies
+                                - img [ref=e166]
+                                - generic [ref=e170]: (opens in new tab)
+                              - paragraph [ref=e171]: Apple's Developer Forums offer a dedicated section for Media Technologies, including streaming. Developers can engage in discussions about HTTP Live Streaming (HLS), AVFoundation, and other Apple media technologies, making it a crucial resource for those developing on Apple platforms.
+                            - generic [ref=e172]:
+                              - link "Atlanta Tech Resources (opens in new tab)" [ref=e173] [cursor=pointer]:
+                                - /url: https://github.com/citizen00147/atlanta-tech-resources
+                                - text: Atlanta Tech Resources
+                                - img [ref=e174]
+                                - generic [ref=e178]: (opens in new tab)
+                              - paragraph [ref=e179]: A curated collection of groups, events, and opportunities for developers in the Atlanta, GA area. This repository serves as a comprehensive guide to active tech meetups, affordable conventions, and networking opportunities, making it easier for developers to connect and collaborate.
+                            - paragraph [ref=e180]: +126 more resources
+                          - 'button "Explore Category: Community & Events" [ref=e182] [cursor=pointer]': Explore Category
+                      - article [ref=e183]:
+                        - generic [ref=e186]:
+                          - link "Encoding & Codecs" [ref=e188] [cursor=pointer]:
+                            - /url: /category/encoding-codecs
+                            - generic [ref=e189]: Encoding & Codecs
+                          - generic [ref=e190]:
+                            - generic [ref=e191]: 579 resources
+                            - generic [ref=e192]: 16 subcategories
+                            - generic [ref=e193]: 286 tags
+                        - generic [ref=e194]:
+                          - generic [ref=e195]:
+                            - generic [ref=e196]:
+                              - link "Adobe Media Encoder (opens in new tab)" [ref=e197] [cursor=pointer]:
+                                - /url: https://www.adobe.com/products/media-encoder.html
+                                - text: Adobe Media Encoder
+                                - img [ref=e198]
+                                - generic [ref=e202]: (opens in new tab)
+                              - paragraph [ref=e203]: Adobe Media Encoder is a professional video encoding software that integrates seamlessly with Adobe's suite of creative tools. It supports a wide range of formats and offers features like batch processing, GPU acceleration, and preset templates, making it ideal for high-quality video encoding tasks.
+                            - generic [ref=e204]:
+                              - link "Alliance for Open Media (AOMedia) (opens in new tab)" [ref=e205] [cursor=pointer]:
+                                - /url: https://aomedia.org/
+                                - text: Alliance for Open Media (AOMedia)
+                                - img [ref=e206]
+                                - generic [ref=e210]: (opens in new tab)
+                              - paragraph [ref=e211]: An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image formats and tools.
+                            - generic [ref=e212]:
+                              - link "AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)" [ref=e213] [cursor=pointer]:
+                                - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                                - text: AMD Advanced Media Acceleration (AMA) SDK
+                                - img [ref=e214]
+                                - generic [ref=e218]: (opens in new tab)
+                              - paragraph [ref=e219]: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.
+                            - paragraph [ref=e220]: +576 more resources
+                          - 'button "Explore Category: Encoding & Codecs" [ref=e222] [cursor=pointer]': Explore Category
+                      - article [ref=e223]:
+                        - generic [ref=e226]:
+                          - link "General Tools" [ref=e228] [cursor=pointer]:
+                            - /url: /category/general-tools
+                            - generic [ref=e229]: General Tools
+                          - generic [ref=e230]:
+                            - generic [ref=e231]: 514 resources
+                            - generic [ref=e232]: 19 subcategories
+                            - generic [ref=e233]: 187 tags
+                        - generic [ref=e234]:
+                          - generic [ref=e235]:
+                            - generic [ref=e236]:
+                              - link "AutoVideo (opens in new tab)" [ref=e237] [cursor=pointer]:
+                                - /url: https://github.com/datamllab/autovideo
+                                - text: AutoVideo
+                                - img [ref=e238]
+                                - generic [ref=e242]: (opens in new tab)
+                              - paragraph [ref=e243]: AutoVideo is a Python system designed for automated video action recognition. It features a modular infrastructure, an extensive list of primitives for pipeline construction, data-driven tuners for pipeline optimization, and an easy-to-use graphical user interface. This tool is valuable for developers working on video analysis and understanding tasks.
+                            - generic [ref=e244]:
+                              - link "AviSynth (opens in new tab)" [ref=e245] [cursor=pointer]:
+                                - /url: https://github.com/AviSynth/AviSynthPlus
+                                - text: AviSynth
+                                - img [ref=e246]
+                                - generic [ref=e250]: (opens in new tab)
+                              - paragraph [ref=e251]: AviSynth is a powerful scripting-based tool for video post-production. It allows users to process videos through scripts without a GUI, enabling tasks like cutting, trimming, cropping, and applying various filters. AviSynth acts as a non-linear video editor controlled entirely by scripting, making it highly flexible for complex video processing workflows.
+                            - generic [ref=e252]:
+                              - link "AWS SPEKE Reference Server (opens in new tab)" [ref=e253] [cursor=pointer]:
+                                - /url: https://github.com/awslabs/speke-reference-server
+                                - text: AWS SPEKE Reference Server
+                                - img [ref=e254]
+                                - generic [ref=e258]: (opens in new tab)
+                              - paragraph [ref=e259]: The Secure Packager and Encoder Key Exchange (SPEKE) reference server by AWS provides a framework for communication between media services and DRM system key servers. It helps developers implement content encryption protection strategies effectively.
+                            - paragraph [ref=e260]: +511 more resources
+                          - 'button "Explore Category: General Tools" [ref=e262] [cursor=pointer]': Explore Category
+                      - article [ref=e263]:
+                        - generic [ref=e266]:
+                          - link "Infrastructure & Delivery" [ref=e268] [cursor=pointer]:
+                            - /url: /category/infrastructure-delivery
+                            - generic [ref=e269]: Infrastructure & Delivery
+                          - generic [ref=e270]:
+                            - generic [ref=e271]: 353 resources
+                            - generic [ref=e272]: 10 subcategories
+                            - generic [ref=e273]: 273 tags
+                        - generic [ref=e274]:
+                          - generic [ref=e275]:
+                            - generic [ref=e276]:
+                              - link "Amazon CloudFront Streaming Tutorials (opens in new tab)" [ref=e277] [cursor=pointer]:
+                                - /url: https://aws.amazon.com/cloudfront/streaming/
+                                - text: Amazon CloudFront Streaming Tutorials
+                                - img [ref=e278]
+                                - generic [ref=e282]: (opens in new tab)
+                              - paragraph [ref=e283]: Amazon CloudFront offers detailed tutorials and best practices for implementing video streaming workflows using their CDN services. These resources guide developers through setting up scalable, distributed architectures for ingesting, storing, processing, and delivering video content efficiently.
+                            - generic [ref=e284]:
+                              - link "Ant Media Server (opens in new tab)" [ref=e285] [cursor=pointer]:
+                                - /url: https://antmedia.io/
+                                - text: Ant Media Server
+                                - img [ref=e286]
+                                - generic [ref=e290]: (opens in new tab)
+                              - paragraph [ref=e291]: Ant Media Server is a highly scalable real-time video streaming platform that supports live and on-demand streaming with ultra-low latency. It offers compatibility with various cloud networks, including AWS, Azure, GCP, and Oracle Cloud, and provides SDKs for multiple platforms to facilitate broad audience reach.
+                            - generic [ref=e292]:
+                              - link "Apache Traffic Control (opens in new tab)" [ref=e293] [cursor=pointer]:
+                                - /url: https://trafficcontrol.apache.org/
+                                - text: Apache Traffic Control
+                                - img [ref=e294]
+                                - generic [ref=e298]: (opens in new tab)
+                              - paragraph [ref=e299]: An open source CDN control plane originally contributed by Comcast. Apache Traffic Control can create a CDN with edge cache servers (like Apache Traffic Server) and provides tooling to manage content delivery, making it useful for building an edge caching infrastructure for video.
+                            - paragraph [ref=e300]: +350 more resources
+                          - 'button "Explore Category: Infrastructure & Delivery" [ref=e302] [cursor=pointer]': Explore Category
+                      - article [ref=e303]:
+                        - generic [ref=e306]:
+                          - link "Intro & Learning" [ref=e308] [cursor=pointer]:
+                            - /url: /category/intro-learning
+                            - generic [ref=e309]: Intro & Learning
+                          - generic [ref=e310]:
+                            - generic [ref=e311]: 297 resources
+                            - generic [ref=e312]: 9 subcategories
+                            - generic [ref=e313]: 328 tags
+                        - generic [ref=e314]:
+                          - generic [ref=e315]:
+                            - generic [ref=e316]:
+                              - link "A Brief History of Video Coding (opens in new tab)" [ref=e317] [cursor=pointer]:
+                                - /url: https://docslib.org/doc/10606874/a-brief-history-of-video-coding
+                                - text: A Brief History of Video Coding
+                                - img [ref=e318]
+                                - generic [ref=e322]: (opens in new tab)
+                              - paragraph [ref=e323]: Authored by Marco Jacobs and Jonah Probell, this document provides a detailed account of the history of video coding. It discusses early forms of compression, the development of interlacing, and the progression of video coding standards. This resource is useful for those interested in the technical aspects and historical context of video coding.
+                            - generic [ref=e324]:
+                              - 'link "A Brief History of Video Compression Standards: 1929 to 2020 (opens in new tab)" [ref=e325] [cursor=pointer]':
+                                - /url: https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html
+                                - text: "A Brief History of Video Compression Standards: 1929 to 2020"
+                                - img [ref=e326]
+                                - generic [ref=e330]: (opens in new tab)
+                              - paragraph [ref=e331]: An article by Moment For Technology that provides a concise history of video compression standards, covering key developments from 1929 to 2020.
+                            - generic [ref=e332]:
+                              - link "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)" [ref=e333] [cursor=pointer]:
+                                - /url: https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+                                - text: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App
+                                - img [ref=e334]
+                                - generic [ref=e338]: (opens in new tab)
+                              - paragraph [ref=e339]: An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks.
+                            - paragraph [ref=e340]: +294 more resources
+                          - 'button "Explore Category: Intro & Learning" [ref=e342] [cursor=pointer]': Explore Category
+                      - article [ref=e343]:
+                        - generic [ref=e346]:
+                          - link "Media Tools" [ref=e348] [cursor=pointer]:
+                            - /url: /category/media-tools
+                            - generic [ref=e349]: Media Tools
+                          - generic [ref=e350]:
+                            - generic [ref=e351]: 704 resources
+                            - generic [ref=e352]: 16 subcategories
+                            - generic [ref=e353]: 374 tags
+                        - generic [ref=e354]:
+                          - generic [ref=e355]:
+                            - generic [ref=e356]:
+                              - link "3DLUT Creator (opens in new tab)" [ref=e357] [cursor=pointer]:
+                                - /url: https://3dlutcreator.com/
+                                - text: 3DLUT Creator
+                                - img [ref=e358]
+                                - generic [ref=e362]: (opens in new tab)
+                              - paragraph [ref=e363]: A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors.
+                            - generic [ref=e364]:
+                              - link "4K Media (opens in new tab)" [ref=e365] [cursor=pointer]:
+                                - /url: https://4kmedia.org/
+                                - text: 4K Media
+                                - img [ref=e366]
+                                - generic [ref=e370]: (opens in new tab)
+                              - paragraph [ref=e371]: Uncompressed 4K demos, samples, and trailers, to show off your new ultra-HD (2160p) HDR/HLG/Dolby Vision television or monitor.
+                            - generic [ref=e372]:
+                              - link "Ad Insertion Sample (opens in new tab)" [ref=e373] [cursor=pointer]:
+                                - /url: https://www.intel.com/content/www/us/en/developer/articles/technical/ad-insertion-sample-powered-by-open-visual-cloud.html
+                                - text: Ad Insertion Sample
+                                - img [ref=e374]
+                                - generic [ref=e378]: (opens in new tab)
+                              - paragraph [ref=e379]: A server-side ad insertion system featuring on-demand video transcoding and streaming, with ad insertion based on video content analysis, powered by Open Visual Cloud software stacks.
+                            - paragraph [ref=e380]: +701 more resources
+                          - 'button "Explore Category: Media Tools" [ref=e382] [cursor=pointer]': Explore Category
+                      - article [ref=e383]:
+                        - generic [ref=e386]:
+                          - link "Players & Clients" [ref=e388] [cursor=pointer]:
+                            - /url: /category/players-clients
+                            - generic [ref=e389]: Players & Clients
+                          - generic [ref=e390]:
+                            - generic [ref=e391]: 447 resources
+                            - generic [ref=e392]: 10 subcategories
+                            - generic [ref=e393]: 266 tags
+                        - generic [ref=e394]:
+                          - generic [ref=e395]:
+                            - generic [ref=e396]:
+                              - link "Advantech Video Solutions (opens in new tab)" [ref=e397] [cursor=pointer]:
+                                - /url: https://www.advantech.com/en-us/solutions/video-solution
+                                - text: Advantech Video Solutions
+                                - img [ref=e398]
+                                - generic [ref=e402]: (opens in new tab)
+                              - paragraph [ref=e403]: Advantech offers a range of industrial-grade video solutions, including high-quality, real-time video transmission systems with UHD resolutions and low latency. Their VEGA series supports various protocols, aiding in broadcasting, mobile, gaming, and medical applications, accelerating the deployment of next-generation media solutions.
+                            - generic [ref=e404]:
+                              - link "Agora Video SDK for Android (opens in new tab)" [ref=e405] [cursor=pointer]:
+                                - /url: https://docs.agora.io/en/interactive-live-streaming/get-started/compile-run-sample-project
+                                - text: Agora Video SDK for Android
+                                - img [ref=e406]
+                                - generic [ref=e410]: (opens in new tab)
+                              - paragraph [ref=e411]: Agora provides open-source sample projects demonstrating the implementation of basic and advanced Video SDK features for Android. These samples help developers integrate video calling and live streaming functionalities into their applications, leveraging Agora's global real-time communication network.
+                            - generic [ref=e412]:
+                              - link "Agora.io Live Streaming SDK (opens in new tab)" [ref=e413] [cursor=pointer]:
+                                - /url: https://www.agora.io/en/products/interactive-live-streaming/
+                                - text: Agora.io Live Streaming SDK
+                                - img [ref=e414]
+                                - generic [ref=e418]: (opens in new tab)
+                              - paragraph [ref=e419]: Agora.io provides a live streaming SDK that enables developers to build interactive live streaming applications on mobile platforms. It offers features like dual video streaming, co-hosting capabilities, and adaptive bitrate streaming up to 1080p at 30fps.
+                            - paragraph [ref=e420]: +444 more resources
+                          - 'button "Explore Category: Players & Clients" [ref=e422] [cursor=pointer]': Explore Category
+                      - article [ref=e423]:
+                        - generic [ref=e426]:
+                          - link "Protocols & Transport" [ref=e428] [cursor=pointer]:
+                            - /url: /category/protocols-transport
+                            - generic [ref=e429]: Protocols & Transport
+                          - generic [ref=e430]:
+                            - generic [ref=e431]: 467 resources
+                            - generic [ref=e432]: 9 subcategories
+                            - generic [ref=e433]: 184 tags
+                        - generic [ref=e434]:
+                          - generic [ref=e435]:
+                            - generic [ref=e436]:
+                              - 'link "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared (opens in new tab)" [ref=e437] [cursor=pointer]':
+                                - /url: https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls
+                                - text: "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+                                - img [ref=e438]
+                                - generic [ref=e442]: (opens in new tab)
+                              - paragraph [ref=e443]: A detailed comparison of RTMP, WebRTC, and HLS protocols, highlighting their differences in latency, scalability, quality, and reach. This resource assists developers in choosing the appropriate protocol based on their specific live video streaming requirements.
+                            - generic [ref=e444]:
+                              - link "Ad Creative Signaling in DASH and HLS (opens in new tab)" [ref=e445] [cursor=pointer]:
+                                - /url: https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/
+                                - text: Ad Creative Signaling in DASH and HLS
+                                - img [ref=e446]
+                                - generic [ref=e450]: (opens in new tab)
+                              - paragraph [ref=e451]: This project by the Streaming Video Technology Alliance defines a data scheme for signaling advertisement creative assets within DASH manifests and HLS playlists, facilitating better ad integration in streaming workflows.
+                            - generic [ref=e452]:
+                              - link "Adaptive Streaming (opens in new tab)" [ref=e453] [cursor=pointer]:
+                                - /url: https://github.com/moorthy-g/adaptive-streaming
+                                - text: Adaptive Streaming
+                                - img [ref=e454]
+                                - generic [ref=e458]: (opens in new tab)
+                              - paragraph [ref=e459]: A comprehensive overview and experimental project focusing on adaptive streaming technologies, specifically HLS and DASH. It covers content generation, playback across various browsers, and includes a Node.js module for creating multi-bitrate DASH and HLS content.
+                            - paragraph [ref=e460]: +464 more resources
+                          - 'button "Explore Category: Protocols & Transport" [ref=e462] [cursor=pointer]': Explore Category
+                      - article [ref=e463]:
+                        - generic [ref=e466]:
+                          - link "Standards & Industry" [ref=e468] [cursor=pointer]:
+                            - /url: /category/standards-industry
+                            - generic [ref=e469]: Standards & Industry
+                          - generic [ref=e470]:
+                            - generic [ref=e471]: 335 resources
+                            - generic [ref=e472]: 8 subcategories
+                            - generic [ref=e473]: 324 tags
+                        - generic [ref=e474]:
+                          - generic [ref=e475]:
+                            - generic [ref=e476]:
+                              - link "Academy Color Encoding System (ACES) (opens in new tab)" [ref=e477] [cursor=pointer]:
+                                - /url: https://acescentral.com/
+                                - text: Academy Color Encoding System (ACES)
+                                - img [ref=e478]
+                                - generic [ref=e482]: (opens in new tab)
+                              - paragraph [ref=e483]: A standardized color management and interchange system for motion pictures and television. ACES defines comprehensive workflows for color grading and consistent color reproduction across devices.
+                            - generic [ref=e484]:
+                              - link "Advanced Television Systems Committee (ATSC) (opens in new tab)" [ref=e485] [cursor=pointer]:
+                                - /url: https://www.atsc.org/
+                                - text: Advanced Television Systems Committee (ATSC)
+                                - img [ref=e486]
+                                - generic [ref=e490]: (opens in new tab)
+                              - paragraph [ref=e491]: ATSC is an international nonprofit organization that develops technical standards for digital terrestrial television and data broadcasting, including the ATSC 3.0 standard for next-generation TV.
+                            - generic [ref=e492]:
+                              - link "Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10 (opens in new tab)" [ref=e493] [cursor=pointer]:
+                                - /url: https://en.wikipedia.org/wiki/Advanced_Video_Coding
+                                - text: Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10
+                                - img [ref=e494]
+                                - generic [ref=e498]: (opens in new tab)
+                              - paragraph [ref=e499]: An in-depth overview of the H.264/MPEG-4 Part 10 standard, also known as Advanced Video Coding (AVC). This resource provides detailed information on the features, design, and applications of AVC, which is widely used for video compression in various media formats.
+                            - paragraph [ref=e500]: +332 more resources
+                          - 'button "Explore Category: Standards & Industry" [ref=e502] [cursor=pointer]': Explore Category
+              - article [ref=e503]:
+                - generic [ref=e504]:
+                  - heading "Explore More Features" [level=2] [ref=e505]
+                  - paragraph [ref=e506]: These advanced features help you discover, analyze, and share awesome list data more effectively
+                  - generic [ref=e507]:
+                    - link "Browse All Resources" [ref=e508] [cursor=pointer]:
+                      - /url: /categories
+                    - link "Explore Categories" [ref=e509] [cursor=pointer]:
+                      - /url: /category/community-events
+        - contentinfo [ref=e510]:
+          - generic [ref=e511]:
+            - generic [ref=e512]:
+              - paragraph [ref=e513]: ── INDEX
+              - link "awesome.video home" [ref=e514] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e515]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e517]:
+              - heading "INDEXED" [level=2] [ref=e518]
+              - paragraph [ref=e519]: 3,825
+              - paragraph [ref=e520]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e521]: live
+            - navigation "Explore categories" [ref=e523]:
+              - heading "EXPLORE" [level=2] [ref=e524]
+              - generic [ref=e525]:
+                - link "Community & Events" [ref=e526] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e527]: ◈
+                  - generic [ref=e528]: Community
+                - link "Encoding & Codecs" [ref=e529] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e530]: ◇
+                  - generic [ref=e531]: Encoding
+                - link "General Tools" [ref=e532] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e533]: ◆
+                  - generic [ref=e534]: General
+                - link "Infrastructure & Delivery" [ref=e535] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e536]: ▣
+                  - generic [ref=e537]: Infrastructure
+                - link "Intro & Learning" [ref=e538] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e539]: ▤
+                  - generic [ref=e540]: Intro
+                - link "Media Tools" [ref=e541] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e542]: ▥
+                  - generic [ref=e543]: Media
+                - link "Players & Clients" [ref=e544] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e545]: ▶
+                  - generic [ref=e546]: Players
+                - link "Protocols & Transport" [ref=e547] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e548]: ⟁
+                  - generic [ref=e549]: Protocols
+                - link "Standards & Industry" [ref=e550] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e551]: ◉
+                  - generic [ref=e552]: Standards
+            - generic [ref=e553]:
+              - heading "SOURCE" [level=2] [ref=e554]
+              - link "krzemienski/awesome-video" [ref=e555] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e556]
+                - generic [ref=e558]:
+                  - text: krzemienski
+                  - generic [ref=e559]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e560]: ↗
+              - paragraph [ref=e561]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e562] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e564] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e565]:
+            - generic [ref=e566]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e567]:
+              - link "About" [ref=e568] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e569] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e570] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e571] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e572] [cursor=pointer]
+              - link "Issues ↗" [ref=e573] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e574] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e575]: built with the awesome-list framework

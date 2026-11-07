@@ -23,6 +23,19 @@ export interface ValidationResult {
   };
 }
 
+/**
+ * The prose of one Markdown line: link targets, autolinks, bare URLs and
+ * code spans are addresses or literals, so wording rules skip them.
+ */
+function proseOf(line: string): string {
+  return line
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/\]\((?:[^()]|\([^()]*\))*\)/g, ']')
+    .replace(/^\s*\[[^\]]+\]:\s*\S+/, ' ')
+    .replace(/<[a-z][a-z0-9+.-]{0,31}:[^>\s]*>/gi, ' ')
+    .replace(/\b(?:[a-z][a-z0-9+.-]{0,31}:\/\/|www\.)[^\s)>\]]+/gi, ' ');
+}
+
 export class AwesomeLintValidator {
   private content: string;
   private lines: string[];
@@ -292,11 +305,13 @@ export class AwesomeLintValidator {
     };
 
     for (let i = 0; i < this.lines.length; i++) {
-      const line = this.lines[i];
-      
+      const prose = proseOf(this.lines[i]);
+
       for (const [wrong, correct] of Object.entries(incorrectTerms)) {
-        const regex = new RegExp(`\\b${wrong}\\b`, 'g');
-        if (regex.test(line)) {
+        // A term inside a host name or path (foo.github.io, @org/graphql)
+        // is an identifier, not prose.
+        const regex = new RegExp(`(?<![\\w./@])${wrong}(?![\\w/]|\\.\\w)`);
+        if (regex.test(prose)) {
           this.addWarning(i + 1, 'capitalization', `Use "${correct}" instead of "${wrong}"`);
         }
       }

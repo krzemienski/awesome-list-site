@@ -1,0 +1,11 @@
+{
+  "url": "http://127.0.0.1:5068/sign-in?redirect_url=%2Fadmin%23subcategories",
+  "title": "Sign In — Awesome Video",
+  "width": 820,
+  "height": 1180,
+  "touchPoints": 1,
+  "coarse": true,
+  "consent": "denied",
+  "umamiDisabled": "1",
+  "adminDialog": false
+}

@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/settings#notification-settings",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 69,
+  "active": "<section id=\"notification-settings\" aria-labelledby=\"notification-settings-title\" data-route-focus=\"\" tabindex=\"-1\"><article class=\"card text-card-foreground\" data-testid=\"card-notification-preferences\"><div class=\"flex flex-col space-y-1.5 p-[var(--profile-panel-padding)]\"><div class=\"text-2xl font-semibold leading-none tracking-tight flex items-center gap-2\" id=\"notification-settings-title\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"c",
+  "umami": "1",
+  "consent": "denied"
+}

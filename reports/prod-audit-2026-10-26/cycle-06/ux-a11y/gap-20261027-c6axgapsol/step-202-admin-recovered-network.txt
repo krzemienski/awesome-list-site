@@ -1,0 +1,10 @@
+[14106.1695] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.247] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.271] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.274] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.421] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.436] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.440] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.442] GET https://awesome.video/api/admin/stats (Fetch)
+[50845.567] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.591] GET https://awesome.video/api/admin/stats (Fetch) 200

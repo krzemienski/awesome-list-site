@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"recent":[],"storageKeys":["recent-searches"]}
+```

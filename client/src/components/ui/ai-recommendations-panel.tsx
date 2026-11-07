@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { REMOVING_FEEDBACK_LABELS, isRemovingFeedback } from "@/components/ui/recommendation-feedback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,12 +35,14 @@ import {
   hasMeaningfulLearningPreferences,
 } from "@shared/onboarding-values";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
+import { describeLoadError } from "@/lib/apiError";
 import {
   trackRecommendationRestored,
   trackRecommendationSignInClicked,
   trackRecommendationsRefreshed,
   trackRecommendationsViewed,
 } from "@/lib/analytics-recommendations";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface AIRecommendationsPanelProps {
   resources?: Resource[];
@@ -173,13 +176,7 @@ export default function AIRecommendationsPanel({
 
   const authoritativeExcludedIds = new Set(
     feedbackStates
-      .filter((state) =>
-        state.feedback === "hidden"
-        || (isFromCache && (
-          state.feedback === "not_for_me"
-          || state.feedback === "already_known"
-        )),
-      )
+      .filter((state) => isRemovingFeedback(state.feedback))
       .map((state) => state.resourceId),
   );
   // C6-V2-06: cached cards are only held back until hidden choices are known
@@ -195,7 +192,7 @@ export default function AIRecommendationsPanel({
       )
     : [];
   const hiddenStates = feedbackStates.filter(
-    (state) => state.feedback === "hidden" && state.resource,
+    (state) => isRemovingFeedback(state.feedback) && state.resource,
   );
 
   // One view per panel load: a fresh device cache reused without a request,
@@ -247,7 +244,7 @@ export default function AIRecommendationsPanel({
     feedback: RecommendationFeedbackValue | null,
   ) => {
     if (
-      feedback === "hidden"
+      isRemovingFeedback(feedback)
       && document.activeElement?.closest(`[data-testid^="recommendation-feedback-"]`)
     ) {
       const index = visibleRecommendations.findIndex((r) => r.resource.id === resourceId);
@@ -258,7 +255,7 @@ export default function AIRecommendationsPanel({
     }
     setLocallyHidden((current) => {
       const next = new Set(current);
-      if (feedback === "hidden") next.add(resourceId);
+      if (isRemovingFeedback(feedback)) next.add(resourceId);
       else next.delete(resourceId);
       return next;
     });
@@ -439,7 +436,7 @@ export default function AIRecommendationsPanel({
           <summary className="cursor-pointer font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="inline-flex items-center gap-2">
               <EyeOff className="h-4 w-4" />
-              Hidden recommendations ({hiddenStates.length})
+              Hidden and dismissed recommendations ({hiddenStates.length})
             </span>
           </summary>
           <ul className="mt-3 space-y-2">
@@ -450,6 +447,9 @@ export default function AIRecommendationsPanel({
               >
                 <span className="min-w-0 break-words text-sm font-medium">
                   {state.resource?.title}
+                  <Badge variant="secondary" className="ml-2 align-middle">
+                    {REMOVING_FEEDBACK_LABELS[state.feedback]}
+                  </Badge>
                 </span>
                 <Button
                   size="sm"
@@ -469,7 +469,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {feedbackStatesError && !canRenderRecommendations ? (
-        <Alert>
+        <Alert live="polite">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Saved feedback is temporarily unavailable</AlertTitle>
           <AlertDescription className="space-y-2">
@@ -477,14 +477,7 @@ export default function AIRecommendationsPanel({
               Saved cards are paused until hidden choices can be checked, so no
               dismissed resource is shown by mistake.
             </p>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchFeedbackStates(); }}
-            >
-              Try again
-            </Button>
+            <RetryButton label="Try again" onRetry={() => void refetchFeedbackStates()} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -499,7 +492,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {(isStale || (isError && hasUsefulResults)) && visibleRecommendations.length > 0 ? (
-        <Alert data-testid="stale-recommendations-state">
+        <Alert data-testid="stale-recommendations-state" live="polite">
           <RefreshCw className="h-4 w-4" />
           <AlertTitle>Showing your last useful recommendations</AlertTitle>
           <AlertDescription className="space-y-2">
@@ -511,15 +504,13 @@ export default function AIRecommendationsPanel({
                 ? ` Last updated ${new Date(lastUpdatedAt).toLocaleString()}.`
                 : ""}
             </p>
-            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
-              Try again
-            </Button>
+            <RetryButton label="Try again" onRetry={() => retry()} />
           </AlertDescription>
         </Alert>
       ) : null}
 
       {isPaused ? (
-        <Alert data-testid="offline-refresh-state" role="status">
+        <Alert data-testid="offline-refresh-state" live="polite">
           <WifiOff className="h-4 w-4" />
           <AlertTitle>You’re offline</AlertTitle>
           <AlertDescription>
@@ -560,10 +551,8 @@ export default function AIRecommendationsPanel({
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Recommendations couldn’t load</AlertTitle>
           <AlertDescription className="space-y-3">
-            <p>{error instanceof Error ? error.message : "An unexpected error occurred."}</p>
-            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
-              Try again
-            </Button>
+            <p>{describeLoadError(error)}</p>
+            <RetryButton label="Try again" onRetry={() => retry()} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -622,7 +611,7 @@ export default function AIRecommendationsPanel({
       {!isAuthenticated && visibleRecommendations.length > 0 ? guestFooterCard : null}
 
       {!isLoading && !isError && recommendations.length === 0 ? (
-        <Alert data-testid="no-recommendations">
+        <Alert data-testid="no-recommendations" live="polite">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No unseen recommendations right now</AlertTitle>
           <AlertDescription className="space-y-3">

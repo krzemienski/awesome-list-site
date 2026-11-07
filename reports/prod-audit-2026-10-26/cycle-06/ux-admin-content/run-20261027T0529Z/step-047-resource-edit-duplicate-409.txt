@@ -1,0 +1,92 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Resources" [ref=e36] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e44]
+                - status
+  - dialog "Edit Resource #190358"
+    - heading "Edit Resource #190358" [level=2, ref=e2]
+      - image
+      - StaticText "Edit Resource #190358"
+    - paragraph
+      - StaticText "Make changes to the resource below. Click save when done."
+    - generic
+      - LabelText [ref=e6] clickable [cursor:pointer]
+        - StaticText "Title *"
+      - textbox "Title *" [ref=e7]: [QA-audit-1026] c6 admin content resource
+        - StaticText "[QA-audit-1026] c6 admin content resource"
+      - LabelText [ref=e8] clickable [cursor:pointer]
+        - StaticText "URL *"
+      - textbox "URL *" [ref=e9]: https://github.com/Flipatic/flip-reel
+        - StaticText "https://github.com/Flipatic/flip-reel"
+      - paragraph
+        - StaticText "Another resource already uses this URL (id 190350: \"FlipReel\"). URLs must be unique."
+      - LabelText [ref=e10] clickable [cursor:pointer]
+        - StaticText "Description"
+      - textbox "Description" [ref=e11]: Temporary QA row for cycle-06 admin-content validation; delete by ID.
+        - StaticText "Temporary QA row for cycle-06 admin-content validation; delete by ID."
+      - LabelText [ref=e12] clickable [cursor:pointer]
+        - StaticText "Category"
+      - combobox "Category" [expanded=false, ref=e13]: Players & Clients
+        - generic [ref=e29] clickable [cursor:pointer, onclick]
+          - StaticText "Players & Clients"
+      - LabelText [ref=e14] clickable [cursor:pointer]
+        - StaticText "Status"
+      - combobox "Status" [expanded=false, ref=e15]: Rejected
+        - generic [ref=e30] clickable [cursor:pointer, onclick]
+          - StaticText "Rejected"
+      - LabelText [ref=e16] clickable [cursor:pointer]
+        - StaticText "Subcategory"
+      - combobox "Subcategory" [expanded=false, ref=e17]: Desktop Players
+        - generic [ref=e31] clickable [cursor:pointer, onclick]
+          - StaticText "Desktop Players"
+      - LabelText [ref=e18] clickable [cursor:pointer]
+        - StaticText "Sub-subcategory"
+      - combobox "Sub-subcategory" [expanded=false, disabled, ref=e19]: Select subcategory first
+        - StaticText "Select subcategory first"
+      - paragraph
+        - StaticText "Kind and featured: Changes save immediately."
+      - LabelText [ref=e20] clickable [cursor:pointer]
+        - StaticText "Kind override"
+      - combobox "Kind override" [expanded=false, ref=e32]: Automatic — Tools
+        - MenuListPopup
+          - option "Automatic — Tools" [selected, ref=e37]
+          - option "Tools" [ref=e38]
+          - option "Libraries" [ref=e39]
+          - option "Standards" [ref=e40]
+          - option "Events" [ref=e41]
+          - option "Protocols" [ref=e42]
+          - option "Other" [ref=e43]
+      - paragraph
+        - StaticText "Automatic: Tools (decided from category, link and title)"
+      - LabelText [ref=e21] clickable [cursor:pointer]
+        - StaticText "Curated placement"
+      - switch "Feature this resource" [checked=true, ref=e22]
+      - StaticText "Feature this resource"
+      - paragraph
+        - StaticText "Drives Curated cards and the Index rail."
+      - LabelText [ref=e23] clickable [cursor:pointer]
+        - StaticText "Format"
+      - combobox "Format" [expanded=false, ref=e24]: Player
+        - generic [ref=e33] clickable [cursor:pointer, onclick]
+          - StaticText "Player"
+      - LabelText [ref=e25] clickable [cursor:pointer]
+        - StaticText "Provider"
+      - combobox "Provider" [expanded=false, ref=e26]: Self-hosted
+        - generic [ref=e34] clickable [cursor:pointer, onclick]
+          - StaticText "Self-hosted"
+      - LabelText [ref=e27] clickable [cursor:pointer]
+        - StaticText "Skill level"
+      - combobox "Skill level" [expanded=false, ref=e28]: Intermediate
+        - generic [ref=e35] clickable [cursor:pointer, onclick]
+          - StaticText "Intermediate"
+    - button "Cancel" [ref=e3]
+    - button "Save Changes" [ref=e4]
+      - image
+      - StaticText "Save Changes"
+    - button "Close" [ref=e5]
+      - image
+      - StaticText "Close"

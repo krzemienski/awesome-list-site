@@ -98,10 +98,16 @@
   line-height: 1.7;
 }
 
+/* Inline links take their hit area from padding; a 28px line keeps padded
+   links on neighbouring lines from overlapping when the text wraps. */
+.legal-prose p:has(.legal-inline-link) {
+  line-height: 28px;
+}
+
 .legal-prose .legal-inline-link {
   display: inline;
-  min-height: 24px;
-  padding: 0;
+  padding-block: 4px;
+  padding-inline: 0;
   vertical-align: baseline;
   color: var(--accent-ink);
   font-size: inherit;

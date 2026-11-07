@@ -1,0 +1,14 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - main
+        - region "Bulk bookmark actions" [ref=e8]
+  - dialog "Create a collection"
+    - heading "Create a collection" [level=2, ref=e2]
+    - paragraph
+    - form
+      - LabelText [ref=e4] clickable [cursor:pointer]
+      - textbox "Name" [ref=e5]
+      - button "Cancel" [ref=e6]
+      - button "Create collection" [disabled, ref=e7]
+    - button "Close" [ref=e3]

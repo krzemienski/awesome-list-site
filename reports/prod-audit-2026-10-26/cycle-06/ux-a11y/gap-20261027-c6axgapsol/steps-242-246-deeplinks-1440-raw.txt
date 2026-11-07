@@ -1,0 +1,114 @@
+✓ Done
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/users
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Users" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-242-direct-users-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/github
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - button "Scroll tabs left" [ref=e18]
+  - tablist "Admin sections" [ref=e19] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e20]
+  - tabpanel "GitHub" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-243-direct-github-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/linkhealth
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - button "Scroll tabs left" [ref=e18]
+  - tablist "Admin sections" [ref=e19] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e20]
+  - tabpanel "Link Health" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-244-direct-linkhealth-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/audit
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - button "Scroll tabs left" [ref=e18]
+  - tablist "Admin sections" [ref=e19] focusable [tabindex]
+  - button "Scroll tabs right" [ref=e20]
+  - tabpanel "Audit" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-245-direct-audit-1440.png
+
+✓ Admin — Awesome Video
+  https://awesome.video/admin/research
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,826 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - button "Scroll tabs left" [ref=e18]
+  - tablist "Admin sections" [ref=e19] focusable [tabindex]
+  - tabpanel "Research" [ref=e17] focusable [tabindex]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-246-direct-research-1440.png

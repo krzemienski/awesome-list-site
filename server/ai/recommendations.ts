@@ -13,6 +13,9 @@ import {
   resolveFlowModel,
   StructuredOutputError,
 } from './anthropicConfig';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("recommendations");
 
 /** Schema for the AI recommendation call — enforced by the API's structured output. */
 const AIRecommendationSchema = z.object({
@@ -408,7 +411,7 @@ export async function generateAIRecommendations(
 ): Promise<AIRecommendationResult[]> {
   try {
     if (!isAnthropicConfigured()) {
-      console.warn('Anthropic not configured, falling back to rule-based recommendations');
+      logger.warn('Anthropic not configured, falling back to rule-based recommendations');
       return generateFallbackRecommendations(userProfile, availableResources, limit);
     }
 
@@ -514,11 +517,11 @@ Please provide ${Math.min(limit, 8)} personalized recommendations. For each reco
 
   } catch (error: unknown) {
     if (error instanceof StructuredOutputError) {
-      console.error(`AI recommendation structured output failed (${error.reason}): ${error.message}`);
+      logger.error(`AI recommendation structured output failed (${error.reason}): ${error.message}`);
     } else {
-      console.error('AI recommendation generation failed:', error);
+      logger.error('AI recommendation generation failed:', error);
     }
-    console.warn('Falling back to rule-based recommendations');
+    logger.warn('Falling back to rule-based recommendations');
     return generateFallbackRecommendations(userProfile, availableResources, limit);
   }
 }

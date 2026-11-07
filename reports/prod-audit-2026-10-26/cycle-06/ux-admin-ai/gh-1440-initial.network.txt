@@ -1,0 +1,6 @@
+[5406.310] GET https://img.clerk.com/static/github.svg (Image) 200
+[5406.453] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[5406.454] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10F8121CE8A3B44BB8A09987A8BB3CA0] GET https://awesome.video/admin/github (Document) 200
+[5406.1549] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[5406.1550] GET https://awesome.video/api/github/sync-status (Fetch) 200

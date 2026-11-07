@@ -1,0 +1,198 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e63]
+              - listitem [level=1]
+                - link "Settings" [ref=e64]
+              - listitem [level=1]
+                - link "Appearance" [disabled, ref=e65]
+          - link "Back" [ref=e9]
+            - image
+            - StaticText "Back"
+          - StaticText "── SETTINGS · THEME"
+          - heading "Theme Settings" [level=1, ref=e10]
+          - paragraph
+            - StaticText "Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads. "
+            - status
+              - StaticText "Active: Editorial · Crimson"
+          - status
+            - paragraph
+              - StaticText "Theme saved to your account."
+          - link "Explore the full design-system showcase →" [ref=e11]
+          - StaticText "The quick brown fox "
+          - emphasis
+            - StaticText "jumps"
+          - StaticText "Editorial"
+          - StaticText " · "
+          - StaticText "Crimson"
+          - region "Design system picker" [ref=e12]
+            - heading "Design System" [level=2, ref=e23]
+            - radiogroup "Design system"
+              - radio "Editorial Magazine · Fraunces Refined editorial — italic Fraunces drops, warm ink, generous leading." [checked=true, ref=e45]
+                - StaticText "Editorial"
+                - image
+                - code
+                  - StaticText "Magazine · Fraunces"
+                - paragraph
+                  - StaticText "Refined editorial — italic Fraunces drops, warm ink, generous leading."
+              - radio "Geist Modern · Geist Sans Vercel-clean — neutral, soft 8px radii, quiet hover glow." [checked=false, ref=e46]
+                - StaticText "Geist"
+                - code
+                  - StaticText "Modern · Geist Sans"
+                - paragraph
+                  - StaticText "Vercel-clean — neutral, soft 8px radii, quiet hover glow."
+          - region "Accent picker" [ref=e13]
+            - heading "Accent" [level=2, ref=e24]
+            - radiogroup "Accent"
+              - radio "Crimson #ff3d52" [checked=true, ref=e47]
+                - StaticText "Crimson"
+                - image
+                - code
+                  - StaticText "#ff3d52"
+              - radio "Magenta #ec4899" [checked=false, ref=e48]
+                - StaticText "Magenta"
+                - code
+                  - StaticText "#ec4899"
+              - radio "Orange #ff7a3d" [checked=false, ref=e49]
+                - StaticText "Orange"
+                - code
+                  - StaticText "#ff7a3d"
+              - radio "Amber #ffb84d" [checked=false, ref=e50]
+                - StaticText "Amber"
+                - code
+                  - StaticText "#ffb84d"
+              - radio "Emerald #34d08c" [checked=false, ref=e51]
+                - StaticText "Emerald"
+                - code
+                  - StaticText "#34d08c"
+              - radio "Matrix #00ff88" [checked=false, ref=e52]
+                - StaticText "Matrix"
+                - code
+                  - StaticText "#00ff88"
+              - radio "Cyan #5eddf2" [checked=false, ref=e53]
+                - StaticText "Cyan"
+                - code
+                  - StaticText "#5eddf2"
+              - radio "Violet #9d4edd" [checked=false, ref=e54]
+                - StaticText "Violet"
+                - code
+                  - StaticText "#9d4edd"
+              - radio "Lime #aaff00" [checked=false, ref=e55]
+                - StaticText "Lime"
+                - code
+                  - StaticText "#aaff00"
+              - radio "Rose #ff7a8a" [checked=false, ref=e56]
+                - StaticText "Rose"
+                - code
+                  - StaticText "#ff7a8a"
+            - paragraph
+              - StaticText "Switching systems keeps your accent unless you were on that system’s natural default — in which case the accent nudges to the new system’s natural default."
+          - region "Font override picker" [ref=e14]
+            - heading "Font" [level=2, ref=e25]
+            - paragraph
+              - StaticText "Override the system’s default font. “System default” falls back to the active design system’s bundled font."
+            - radiogroup "Font override"
+              - radio "System default The quick brown fox jumps over the lazy dog. 0123456789" [checked=true, ref=e57]
+                - StaticText "System default"
+                - image
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+              - radio "Inter The quick brown fox jumps over the lazy dog. 0123456789" [checked=false, ref=e58]
+                - StaticText "Inter"
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+              - radio "DM Sans The quick brown fox jumps over the lazy dog. 0123456789" [checked=false, ref=e59]
+                - StaticText "DM Sans"
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+              - radio "Source Sans 3 The quick brown fox jumps over the lazy dog. 0123456789" [checked=false, ref=e60]
+                - StaticText "Source Sans 3"
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+              - radio "IBM Plex Sans The quick brown fox jumps over the lazy dog. 0123456789" [checked=false, ref=e61]
+                - StaticText "IBM Plex Sans"
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+              - radio "JetBrains Mono The quick brown fox jumps over the lazy dog. 0123456789" [checked=false, ref=e62]
+                - StaticText "JetBrains Mono"
+                - paragraph
+                  - StaticText "The quick brown fox jumps over the lazy dog. 0123456789"
+          - region "Live preview" [ref=e15]
+            - heading "Live Preview" [level=2, ref=e26]
+            - StaticText "Editorial"
+            - StaticText " · "
+            - StaticText "Crimson"
+            - paragraph
+              - StaticText "Display-only specimens — the controls below are intentionally inactive."
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e16]
+            - StaticText "awesome.video"
+          - paragraph
+            - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+          - heading "INDEXED" [level=2, ref=e17]
+          - paragraph
+            - StaticText "3,825"
+          - paragraph
+            - StaticText "9 categories"
+            - LineBreak "\n"
+            - StaticText "99 subcategories"
+            - LineBreak "\n"
+            - StaticText "live"
+          - navigation "Explore categories" [ref=e18]
+            - heading "EXPLORE" [level=2, ref=e27]
+            - link "Community & Events" [ref=e28]
+            - link "Encoding & Codecs" [ref=e29]
+            - link "General Tools" [ref=e30]
+            - link "Infrastructure & Delivery" [ref=e31]
+            - link "Intro & Learning" [ref=e32]
+            - link "Media Tools" [ref=e33]
+            - link "Players & Clients" [ref=e34]
+            - link "Protocols & Transport" [ref=e35]
+            - link "Standards & Industry" [ref=e36]
+          - heading "SOURCE" [level=2, ref=e19]
+          - link "krzemienski/ awesome-video" [ref=e20]
+            - StaticText "krzemienski"
+            - StaticText "/"
+            - StaticText "awesome-video"
+          - paragraph
+            - StaticText "Open-source."
+            - link "PRs welcome" [ref=e37]
+            - StaticText "."
+            - LineBreak "\n"
+            - StaticText "Indexed automatically from README.md."
+          - button "Contact maintainers" [ref=e21]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e22]
+            - link "About" [ref=e38]
+            - link "Terms" [ref=e39]
+            - link "Privacy" [ref=e40]
+            - link "Code of Conduct" [ref=e41]
+              - StaticText "Conduct"
+            - button "Cookie settings" [ref=e42]
+            - link "Issues ↗" [ref=e43]
+            - link "Sitemap" [ref=e44]
+          - StaticText "built with the awesome-list framework"

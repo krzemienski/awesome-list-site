@@ -1,0 +1,5 @@
+[22400.880] GET https://awesome.video/api/admin/link-reports?status=open (Fetch) 200
+[22400.885] GET https://awesome.video/api/admin/link-reports?status=resolved (Fetch) 200
+[22400.886] GET https://awesome.video/api/admin/link-reports?status=dismissed (Fetch)
+[22400.887] GET https://awesome.video/api/admin/link-reports?status=dismissed (Fetch)
+[22400.888] GET https://awesome.video/api/admin/link-reports?status=dismissed (Fetch) 200

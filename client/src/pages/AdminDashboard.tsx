@@ -8,6 +8,7 @@ import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import AdminOverview from "@/components/admin/AdminOverview";
+import OfflinePageState from "@/components/layout/OfflinePageState";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import "@/components/admin/admin-canonical.css";
@@ -33,6 +34,7 @@ import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import { focusElement, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
 // one shared module so the SSR middleware accepts exactly the same
@@ -80,7 +82,8 @@ function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
 }
 
 export default function AdminDashboard() {
-  const { stats, isLoading, error: statsError, isFetching: statsFetching, refetch: refetchStats } = useAdmin();
+  const { stats, isLoading, isPaused: statsPaused, error: statsError, isFetching: statsFetching, refetch: refetchStats } = useAdmin();
+  const resourceCount = stats?.totalPublic ?? stats?.resources;
   // Only a first-load failure or an expired session replaces the dashboard;
   // a failed background poll keeps the last good stats on screen.
   const error =
@@ -107,6 +110,12 @@ export default function AdminDashboard() {
   // Digests have no parent tab, so each renders its own panel with no strip
   // tab selected.
   const visibleTab = ({ subsubcategories: "subcategories" } as Record<string, string>)[activeTab] ?? activeTab;
+  // Journeys and Digests open from the Settings menu with no strip tab
+  // selected, so the Settings trigger names the open section instead.
+  // Sections reached only through the Settings menu: the trigger names the
+  // open one, because no strip tab can (Sub-Subcats also keeps its parent
+  // Subcategories tab highlighted).
+  const settingsSection = ({ journeys: "Journeys", digests: "Digests", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -204,7 +213,7 @@ export default function AdminDashboard() {
       ),
     );
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
-    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
+    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: scrollBehavior() });
   };
 
   // Bumped on every New entry click so an already-mounted ResourceManager
@@ -279,9 +288,20 @@ export default function AdminDashboard() {
     );
   }
 
+  // An initial offline query pauses without isLoading or an error. Do not
+  // mount zero-valued stats or the overview's unstarted activity requests.
+  if (!stats && statsPaused) {
+    return (
+      <OfflinePageState
+        onRetry={() => { void refetchStats(); }}
+        testId="admin-dashboard-offline"
+      />
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center bg-background">
+      <div className="min-h-full flex items-center justify-center bg-background" role="status" aria-busy="true">
         <h1 className="sr-only">Admin Dashboard</h1>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
@@ -318,7 +338,15 @@ export default function AdminDashboard() {
             <AdminLoadError
               subject="the admin dashboard"
               error={error}
-              onRetry={() => { void refetchStats(); }}
+              onRetry={(event) => {
+                // The whole error branch is swapped for the loading branch while
+                // the retry runs, so look the new Retry up by test id: if it fails
+                // again focus returns to it, otherwise to the dashboard h1.
+                handoffFocusOnUnmount(event.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid="button-retry-admin-dashboard"]'),
+                );
+                void refetchStats();
+              }}
               retrying={statsFetching}
               className="text-left"
               testId="alert-admin-dashboard-error"
@@ -348,12 +376,21 @@ export default function AdminDashboard() {
         <h1 className="page-title">
           Operations <em>dashboard</em>
         </h1>
-        <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>
+        <p>Manage {resourceCount === undefined ? "resources" : `the ${resourceCount.toLocaleString()} resources`}, jobs, and contributors that keep the index alive.</p>
         </div>
         <div className="admin-dashboard__actions">
           <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost"><Settings className="h-4 w-4" /> Settings</Button>
+              <Button
+                variant="ghost"
+                className={settingsSection ? "admin-dashboard__settings-trigger--active" : undefined}
+                aria-current={settingsSection ? "page" : undefined}
+                aria-label={settingsSection ? `Settings, ${settingsSection} section open` : undefined}
+                data-testid="button-admin-settings"
+              >
+                <Settings className="h-4 w-4" /> Settings
+                {settingsSection ? <span className="admin-dashboard__settings-current" aria-hidden="true">· {settingsSection}</span> : null}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="admin-dashboard__settings-menu" align="start" sideOffset={6} collisionPadding={12}>
               <DropdownMenuItem asChild><WLink href="/settings/theme">Theme settings</WLink></DropdownMenuItem>
@@ -373,14 +410,18 @@ export default function AdminDashboard() {
                   Rejected resources
                 </DropdownMenuItem>
               ) : null}
-              <DropdownMenuItem data-testid="tab-subsubcategories" onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-journeys" onSelect={() => handleTabChange("journeys")}>Journeys</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-digests" onSelect={() => handleTabChange("digests")}>Digests</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-subsubcategories" aria-current={activeTab === "subsubcategories" ? "page" : undefined} onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats{activeTab === "subsubcategories" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-journeys" aria-current={activeTab === "journeys" ? "page" : undefined} onSelect={() => handleTabChange("journeys")}>Journeys{activeTab === "journeys" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-digests" aria-current={activeTab === "digests" ? "page" : undefined} onSelect={() => handleTabChange("digests")}>Digests{activeTab === "digests" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button className="btn primary" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
+          <Button className="btn primary" onClick={handleNewEntry} title="Add a new resource to the catalog" aria-label="New entry: add a resource" data-testid="button-admin-new-entry"><Plus className="h-4 w-4" /> New entry</Button>
         </div>
       </div>
+
+      <p className="sr-only" role="status" data-testid="text-admin-hidden-section-status">
+        {settingsSection ? `${settingsSection} section open` : ""}
+      </p>
 
       {/* NB-020 (run18): `activeTab` is always one of the TabsTrigger values
           (normalizeTab yields a valid id or the "approvals" default), so Radix's
@@ -409,7 +450,7 @@ export default function AdminDashboard() {
               <ChevronLeft aria-hidden="true" size={16} />
             </button>
           )}
-          <TabsList className="admin-dashboard__tabs">
+          <TabsList className="admin-dashboard__tabs" aria-label="Admin sections">
             {CANONICAL_TABS.map(([id, label, Icon]) => (
               <TabsTrigger
                 key={id}
@@ -518,7 +559,7 @@ export default function AdminDashboard() {
           <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
         </TabsContent>
 
-        <TabsContent value="digests" data-testid="content-digests">
+        <TabsContent value="digests" data-testid="content-digests" aria-label="Digests">
           <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
         </TabsContent>
 
@@ -529,7 +570,7 @@ export default function AdminDashboard() {
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
-        <TabsContent value="journeys" data-testid="content-journeys">
+        <TabsContent value="journeys" data-testid="content-journeys" aria-label="Journeys">
           <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
         </TabsContent>
 

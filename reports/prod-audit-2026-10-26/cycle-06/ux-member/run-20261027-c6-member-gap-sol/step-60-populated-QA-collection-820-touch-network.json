@@ -1,0 +1,1797 @@
+[
+  {
+    "id": "request-662",
+    "ts": 1793089387534,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-663",
+    "ts": 1793089387534,
+    "method": "GET",
+    "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-664",
+    "ts": 1793089387534,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-665",
+    "ts": 1793089387534,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-666",
+    "ts": 1793089387534,
+    "method": "GET",
+    "url": "https://i.replit.com/script.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-667",
+    "ts": 1793089387535,
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-668",
+    "ts": 1793089387535,
+    "method": "GET",
+    "url": "https://awesome.video/api/resources?tags=hls&limit=24&offset=0&facets=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-669",
+    "ts": 1793089387535,
+    "method": "GET",
+    "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-670",
+    "ts": 1793089387535,
+    "method": "GET",
+    "url": "https://awesome.video/site.webmanifest",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-671",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-672",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-673",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-674",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-675",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-676",
+    "ts": 1793089387627,
+    "method": "GET",
+    "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-677",
+    "ts": 1793089387628,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-678",
+    "ts": 1793089387628,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-679",
+    "ts": 1793089387667,
+    "method": "GET",
+    "url": "https://awesome.video/assets/TagLanding-D2ddChOK.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-680",
+    "ts": 1793089387667,
+    "method": "GET",
+    "url": "https://awesome.video/assets/ResourceCard-Cf3blW1O.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-681",
+    "ts": 1793089387667,
+    "method": "GET",
+    "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-682",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-683",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/BookmarkButton-C6vdIsM_.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-684",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/analytics-collections-CGdPjnSE.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-685",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-686",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-687",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-688",
+    "ts": 1793089387668,
+    "method": "GET",
+    "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-689",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-690",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/heart-BtyRCSqq.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-691",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/vendor-blurhash-C5fTp4Q_.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-692",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-693",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/square-pen-Bpo9RyJI.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-694",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/resource-card-D8VJPT5p.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-695",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/SearchEntryButton-HJEWL8cD.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-696",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/paginator-DtK58l0u.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-697",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/skeletons-DBXMVehA.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-698",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/not-found-B67YF6Tx.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-699",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/arrow-right-BQVqG_QJ.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-700",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/seo-content-templates-Hd-gY2WC.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-701",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/resourceFacets-Dre2v4hL.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-702",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/resourceFacets-core-DMw7vNpP.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-703",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-704",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/OfflinePageState-BBaOjQDO.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-705",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-706",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/validation-jfoUUw0X.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-707",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/arrow-left-DEdDATMn.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-708",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/assets/taxonomy-TdfWWadz.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-709",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-710",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-711",
+    "ts": 1793089387669,
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-712",
+    "ts": 1793089387670,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-713",
+    "ts": 1793089387670,
+    "method": "GET",
+    "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-714",
+    "ts": 1793089387670,
+    "method": "GET",
+    "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-715",
+    "ts": 1793089387670,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-716",
+    "ts": 1793089387817,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-717",
+    "ts": 1793089387818,
+    "method": "GET",
+    "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-718",
+    "ts": 1793089388023,
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-719",
+    "ts": 1793089388024,
+    "method": "GET",
+    "url": "https://awesome.video/api/user/preferences",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-720",
+    "ts": 1793089388024,
+    "method": "GET",
+    "url": "https://awesome.video/assets/ClerkRuntime-DL3FmpuL.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-721",
+    "ts": 1793089388024,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-DiZr6w4w.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-722",
+    "ts": 1793089388026,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "status": 307,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-723",
+    "ts": 1793089388191,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-724",
+    "ts": 1793089388227,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "status": 307,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-725",
+    "ts": 1793089388332,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-726",
+    "ts": 1793089388432,
+    "method": "GET",
+    "url": "blob:https://awesome.video/c16e2e4c-2b98-40bb-b59d-684f91b91681",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "id": "request-727",
+    "ts": 1793089388432,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-728",
+    "ts": 1793089388433,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-729",
+    "ts": 1793089388584,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-730",
+    "ts": 1793089388584,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-731",
+    "ts": 1793089388599,
+    "method": "GET",
+    "url": "https://opengraph.githubassets.com/bb34414feb68d1f3c0983ee2314f3b8e9017dc0474955b27ffb868b59ebc9656/frank-vpl/TV-Workers",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-732",
+    "ts": 1793089388652,
+    "method": "GET",
+    "url": "blob:https://awesome.video/ab45a138-1780-453b-b43a-a01ddaf5c9b2",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "id": "request-733",
+    "ts": 1793089388652,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-734",
+    "ts": 1793089388652,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-735",
+    "ts": 1793089388657,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-736",
+    "ts": 1793089388658,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-737",
+    "ts": 1793089402132,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-738",
+    "ts": 1793089408704,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-739",
+    "ts": 1793089429540,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/190342",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-740",
+    "ts": 1793089429748,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-741",
+    "ts": 1793089429861,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-742",
+    "ts": 1793089438002,
+    "method": "POST",
+    "url": "https://awesome.video/api/favorites/190342",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-743",
+    "ts": 1793089438195,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-744",
+    "ts": 1793089438291,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-745",
+    "ts": 1793089438291,
+    "method": "DELETE",
+    "url": "https://awesome.video/api/favorites/190342",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-746",
+    "ts": 1793089438457,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-747",
+    "ts": 1793089445086,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-748",
+    "ts": 1793089445261,
+    "method": "GET",
+    "url": "https://awesome.video/bookmarks",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "id": "request-749",
+    "ts": 1793089445369,
+    "method": "GET",
+    "url": "https://awesome.video/ds/design-system.css",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-750",
+    "ts": 1793089445369,
+    "method": "GET",
+    "url": "https://awesome.video/ds/design-system.js",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-751",
+    "ts": 1793089445369,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-752",
+    "ts": 1793089445369,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-753",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-754",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-755",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-756",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://i.replit.com/script.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-757",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://awesome.video/api/awesome-list/nav",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-758",
+    "ts": 1793089445370,
+    "method": "GET",
+    "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-759",
+    "ts": 1793089445372,
+    "method": "GET",
+    "url": "https://awesome.video/site.webmanifest",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-760",
+    "ts": 1793089445441,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-761",
+    "ts": 1793089445442,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-762",
+    "ts": 1793089445442,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-763",
+    "ts": 1793089445442,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-764",
+    "ts": 1793089445442,
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-765",
+    "ts": 1793089445442,
+    "method": "GET",
+    "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-766",
+    "ts": 1793089445444,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-767",
+    "ts": 1793089445449,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-768",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/BookmarksGate-BbBprieE.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-769",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/validation-jfoUUw0X.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-770",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-771",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/skeletons-DBXMVehA.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-772",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-773",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/resource-card-D8VJPT5p.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-774",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/ResourceCard-Cf3blW1O.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-775",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-776",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/BookmarkButton-C6vdIsM_.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-777",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/analytics-collections-CGdPjnSE.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-778",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-779",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-780",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-781",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-782",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-783",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/heart-BtyRCSqq.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-784",
+    "ts": 1793089445483,
+    "method": "GET",
+    "url": "https://awesome.video/assets/vendor-blurhash-C5fTp4Q_.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-785",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-786",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/square-pen-Bpo9RyJI.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-787",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/alert-dialog-C3lpWNAV.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-788",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-789",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-790",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-791",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/url-filter-state-hUMXr8Zj.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-792",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/trash-2-DiW00Btq.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-793",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/pencil-3PplsnOE.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-794",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/rotate-ccw-BlePNcvv.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-795",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/triangle-alert-_nVB0Z13.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-796",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/account-CPzh-fWY.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-797",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-798",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/api/config",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-799",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/api/auth/user",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-800",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/ClerkRuntime-DL3FmpuL.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-801",
+    "ts": 1793089445484,
+    "method": "GET",
+    "url": "https://awesome.video/assets/index-DiZr6w4w.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-802",
+    "ts": 1793089445486,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-803",
+    "ts": 1793089445486,
+    "method": "GET",
+    "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-804",
+    "ts": 1793089445486,
+    "method": "GET",
+    "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-805",
+    "ts": 1793089445486,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-806",
+    "ts": 1793089445500,
+    "method": "GET",
+    "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-807",
+    "ts": 1793089445500,
+    "method": "GET",
+    "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+    "status": 200,
+    "ok": true,
+    "referer": ""
+  },
+  {
+    "id": "request-808",
+    "ts": 1793089445502,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "status": 307,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-809",
+    "ts": 1793089445619,
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-810",
+    "ts": 1793089445619,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-811",
+    "ts": 1793089445619,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-812",
+    "ts": 1793089445619,
+    "method": "GET",
+    "url": "https://awesome.video/api/user/preferences",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-813",
+    "ts": 1793089445641,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-814",
+    "ts": 1793089445703,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "status": 307,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-815",
+    "ts": 1793089445803,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-816",
+    "ts": 1793089445907,
+    "method": "GET",
+    "url": "blob:https://awesome.video/3706513a-910b-4a37-a67a-2980bcbb820f",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "id": "request-817",
+    "ts": 1793089445907,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-818",
+    "ts": 1793089445907,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-819",
+    "ts": 1793089446076,
+    "method": "GET",
+    "url": "https://awesome.video/api/favorites",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-820",
+    "ts": 1793089446107,
+    "method": "GET",
+    "url": "blob:https://awesome.video/2e6a2919-10ac-45b3-811d-1e1badbbe6c1",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "id": "request-821",
+    "ts": 1793089446108,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-822",
+    "ts": 1793089446108,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-823",
+    "ts": 1793089446112,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-824",
+    "ts": 1793089446112,
+    "method": "GET",
+    "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-825",
+    "ts": 1793089453194,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/190342",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-826",
+    "ts": 1793089453396,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-827",
+    "ts": 1793089453398,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-828",
+    "ts": 1793089462927,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-829",
+    "ts": 1793089463194,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-830",
+    "ts": 1793089463195,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-831",
+    "ts": 1793089463676,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-832",
+    "ts": 1793089463934,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-833",
+    "ts": 1793089463934,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-834",
+    "ts": 1793089469817,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-835",
+    "ts": 1793089483145,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-836",
+    "ts": 1793089483400,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-837",
+    "ts": 1793089483400,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-838",
+    "ts": 1793089483775,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-839",
+    "ts": 1793089484034,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-840",
+    "ts": 1793089484034,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-841",
+    "ts": 1793089489825,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-842",
+    "ts": 1793089498143,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-843",
+    "ts": 1793089498409,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-844",
+    "ts": 1793089498409,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-845",
+    "ts": 1793089498735,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-846",
+    "ts": 1793089498926,
+    "method": "POST",
+    "url": "https://awesome.video/api/collections",
+    "status": 201,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-847",
+    "ts": 1793089499184,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-848",
+    "ts": 1793089499184,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-849",
+    "ts": 1793089499429,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-850",
+    "ts": 1793089499437,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-851",
+    "ts": 1793089499729,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-852",
+    "ts": 1793089505951,
+    "method": "GET",
+    "url": "https://awesome.video/api/notifications?limit=50",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-853",
+    "ts": 1793089516277,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-854",
+    "ts": 1793089516626,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-855",
+    "ts": 1793089516626,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-856",
+    "ts": 1793089517009,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-857",
+    "ts": 1793089517243,
+    "method": "POST",
+    "url": "https://awesome.video/api/bookmarks/bulk",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-858",
+    "ts": 1793089517567,
+    "method": "GET",
+    "url": "https://awesome.video/api/bookmarks",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-859",
+    "ts": 1793089517567,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections?includeArchived=true",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-860",
+    "ts": 1793089517992,
+    "method": "GET",
+    "url": "https://awesome.video/api/collections",
+    "status": 200,
+    "ok": true,
+    "referer": "https://awesome.video/"
+  },
+  {
+    "id": "request-861",
+    "ts": 1793089550818,
+    "method": "GET",
+    "url": "https://awesome.video/favicon.svg",
+    "status": 304,
+    "ok": false,
+    "referer": "https://awesome.video/"
+  }
+]

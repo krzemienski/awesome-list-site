@@ -1,0 +1,39 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Resources" [ref=e38] focusable [tabindex]
+    - navigation "Pagination" [ref=e39]
+- heading "Add New Resource" [level=2, ref=e2]
+- LabelText "Title *" [ref=e6] clickable [cursor:pointer]
+- textbox "Title *" [ref=e7]: [QA-audit-1026] c6 admin content resource
+- LabelText "URL *" [ref=e8] clickable [cursor:pointer]
+- textbox "URL *" [ref=e9]: https://example.com/qa-audit-1026-c6-admin-content
+- LabelText "Description" [ref=e10] clickable [cursor:pointer]
+- textbox "Description" [ref=e11]: Temporary QA row for cycle-06 admin-content validation; delete by ID.
+- LabelText "Category *" [ref=e12] clickable [cursor:pointer]
+- combobox "Category *" [expanded=false, required, ref=e13]: Players & Clients
+  - generic "Players & Clients" [ref=e30] clickable [cursor:pointer, onclick]
+- LabelText "Status" [ref=e14] clickable [cursor:pointer]
+- combobox "Status" [expanded=false, ref=e15]: Pending
+  - generic "Pending" [ref=e31] clickable [cursor:pointer, onclick]
+- LabelText "Subcategory" [ref=e16] clickable [cursor:pointer]
+- combobox "Subcategory" [expanded=false, ref=e17]: Desktop Players
+  - generic "Desktop Players" [ref=e32] clickable [cursor:pointer, onclick]
+- LabelText "Sub-subcategory" [ref=e18] clickable [cursor:pointer]
+- combobox "Sub-subcategory" [expanded=false, disabled, ref=e19]: Select subcategory first
+- LabelText "Kind override" [ref=e20] clickable [cursor:pointer]
+- combobox "Kind override" [expanded=false, ref=e21]: Tools
+  - generic "Tools" [ref=e33] clickable [cursor:pointer, onclick]
+- LabelText "Curated placement" [ref=e22] clickable [cursor:pointer]
+- LabelText "Feature this resource" [ref=e23] clickable [cursor:pointer]
+  - checkbox "Curated placement Feature this resource" [checked=true, ref=e34]
+- LabelText "Format" [ref=e24] clickable [cursor:pointer]
+- combobox "Format" [expanded=false, ref=e25]: Player
+  - generic "Player" [ref=e35] clickable [cursor:pointer, onclick]
+- LabelText "Provider" [ref=e26] clickable [cursor:pointer]
+- combobox "Provider" [expanded=false, ref=e27]: Self-hosted
+  - generic "Self-hosted" [ref=e36] clickable [cursor:pointer, onclick]
+- LabelText "Skill level" [ref=e28] clickable [cursor:pointer]
+- combobox "Skill level" [expanded=false, ref=e29]: Not yet classified
+  - generic "Not yet classified" [ref=e37] clickable [cursor:pointer, onclick]
+- button "Cancel" [ref=e3]
+- button "Create Resource" [ref=e4]
+- button "Close" [ref=e5]

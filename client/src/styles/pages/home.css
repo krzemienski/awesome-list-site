@@ -28,6 +28,20 @@
   line-height: 1.3;
 }
 
+/* Sits in the title's bottom gap: 1rem below the title, the title's own
+   2.25rem above the stat strip. */
+.home-index-search {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 36rem;
+  margin: -1.25rem 0 2.25rem;
+}
+
+.home-index-search .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .home-hero {
   margin-bottom: 2.5rem;
 }
@@ -159,7 +173,7 @@
 
 .home-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 2rem;
 }
 
@@ -189,7 +203,7 @@
 
 /*
  * The recent rows stand in for native buttons, whose font shorthand resets
- * OpenType features; other links inherit the body ss01/cv11/tnum settings,
+ * OpenType features; other links inherit the body ss01/cv11 settings,
  * as the design's category headings and subcategory rows do.
  */
 .home-recent-row,
@@ -269,6 +283,9 @@
 }
 
 .home-subcategory-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   margin-top: 0.25rem;
   color: var(--text-3);
   font-size: 0.75rem;
@@ -291,11 +308,23 @@
 }
 
 .home-index-rail {
-  position: sticky;
-  top: 5.25rem;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+}
+
+/* Pinned under the header, as the reference has it. With eight featured picks
+   the rail is ~1100px, taller than most laptop screens; a rail pinned by its
+   top would then hide its own end until the index beside it runs out. So the
+   pin offset is min(header offset, viewport - rail height - 1rem): a rail
+   that fits sits under the header, a taller one scrolls until its last link
+   reaches the bottom of the screen and stays there. The rail's measured
+   height arrives as --home-rail-h (RecentRail). No inner scroller. */
+@media (min-width: 1025px) {
+  .home-index-rail {
+    position: sticky;
+    top: min(5.25rem, calc(100svh - var(--home-rail-h, 0px) - 1rem - var(--app-bottom-inset, 0px)));
+  }
 }
 
 .home-rail-eyebrow {
@@ -506,8 +535,17 @@
 }
 
 .home-resource-card {
+  position: relative;
   min-width: 0;
   padding: 1.25rem;
+}
+
+/* The title link stretches over the whole card, as in the listing card; the
+   tag chips sit above it and reach the 44px touch floor. */
+.home-resource-title a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
 }
 
 .home-resource-card:hover {
@@ -560,6 +598,13 @@
   line-height: 1.3;
 }
 
+.home-resource-title a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .home-resource-description {
   display: -webkit-box;
   min-height: 0;
@@ -580,11 +625,37 @@
 }
 
 .home-resource-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.25rem 0.625rem;
   font-size: 0.65625rem;
   letter-spacing: 0.0375rem;
   border-radius: var(--radius-pill);
   text-decoration: none;
+}
+
+.home-resource-tag {
+  position: relative;
+  z-index: 1;
+}
+
+/* A pill is its own link inside a hoverable card, so it answers the pointer
+   (and keyboard focus) separately with the DS accent-chip paint. */
+@media (hover: hover) {
+  .home-resource-tag:hover {
+    color: var(--accent-ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+}
+
+.home-resource-tag:focus-visible {
+  color: var(--accent-ink);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .home-recent-table {
@@ -789,6 +860,12 @@
   margin-bottom: 2.25rem;
 }
 
+.home-skeleton-index-search {
+  max-width: 36rem;
+  height: 2.75rem;
+  margin: -1.25rem 0 2.25rem;
+}
+
 .home-skeleton-hero-title {
   width: min(100%, 36rem);
   height: 4.5rem;
@@ -924,9 +1001,18 @@
   .home-index-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .home-index-rail {
-    position: static;
+/* With the sidebar open the main column is ~300px narrower than the viewport,
+   so four stat cells at 768px break words mid-letter ("CATEGORIE S"). */
+@media (max-width: 1100px) {
+  .home-stat-strip,
+  .home-stat-strip[data-cells="3"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-stat-cell:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 

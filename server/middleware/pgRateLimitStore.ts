@@ -1,6 +1,9 @@
 import pkg from "pg";
 import type { Store, Options, IncrementResponse, ClientRateLimitInfo } from "express-rate-limit";
 import { MemoryStore } from "express-rate-limit";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("rate-limit");
 
 const { Pool } = pkg;
 
@@ -53,7 +56,7 @@ function getPool(): InstanceType<typeof Pool> {
       statement_timeout: QUERY_TIMEOUT_MS,
     });
     sharedPool.on("error", (err) => {
-      console.error("[rate-limit] pg pool error:", err.message);
+      logger.error("[rate-limit] pg pool error:", err.message);
     });
   }
   return sharedPool;
@@ -64,7 +67,7 @@ function openBreaker(reason: string): void {
   // Log at most once per breaker window to avoid flooding during an outage.
   if (Date.now() - lastBreakerLogAt > BREAKER_OPEN_MS) {
     lastBreakerLogAt = Date.now();
-    console.error(
+    logger.error(
       `[rate-limit] Postgres store unavailable (${reason}); ` +
         `falling back to per-instance in-memory limiting for ${BREAKER_OPEN_MS / 1000}s`,
     );
@@ -192,6 +195,6 @@ export class PgRateLimitStore implements Store {
     if (Math.random() >= GC_PROBABILITY) return;
     getPool()
       .query(`DELETE FROM rate_limit_hits WHERE reset_at < now() - interval '1 hour'`)
-      .catch((err) => console.error("[rate-limit] GC failed:", err.message));
+      .catch((err) => logger.error("[rate-limit] GC failed:", err.message));
   }
 }

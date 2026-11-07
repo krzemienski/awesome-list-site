@@ -6,8 +6,9 @@
 
 /*
  * MobileDrawer (layout.jsx) taxonomy: no L3 marker on category rows, and
- * canonical 36px .sub-item rows (38px rhythm). Rows keep 44px targets that
- * overhang by 3px; paint moves to an inset ::before as on desktop.
+ * canonical 36px .sub-item rows (38px rhythm). With a fine pointer rows keep
+ * 44px targets that overhang by 3px; a touch pointer gets real 44px rows.
+ * Paint moves to an inset ::before as on desktop.
  */
 .av-sidebar-drawer .av-sidebar-l3-indicator {
   display: none;
@@ -25,6 +26,14 @@
   background: transparent;
   margin-block: -3px;
   position: relative;
+}
+
+@media not all and (hover: hover) and (pointer: fine) {
+  .av-sidebar-drawer .av-sidebar-all-category,
+  .av-sidebar-drawer .av-sidebar-leaf,
+  .av-sidebar-drawer .av-sidebar-l2-row {
+    margin-block: 0;
+  }
 }
 
 .av-sidebar-drawer .av-sidebar-all-category::before,
@@ -47,6 +56,17 @@
   position: relative;
 }
 
+/* Keep visible content above adjacent padding overhangs, as on desktop. */
+.av-sidebar-drawer .av-sidebar-all-category > span,
+.av-sidebar-drawer .av-sidebar-leaf > span,
+.av-sidebar-drawer .av-sidebar-l2-link > span,
+.av-sidebar-drawer .av-sidebar-l2-toggle > *,
+.av-sidebar-drawer .av-sidebar-l3-all > span,
+.av-sidebar-drawer .av-sidebar-l3-row > span {
+  position: relative;
+  z-index: 1;
+}
+
 .av-sidebar-drawer .av-sidebar-all-category:hover,
 .av-sidebar-drawer .av-sidebar-leaf:hover,
 .av-sidebar-drawer .av-sidebar-leaf[data-active="true"] {
@@ -54,11 +74,33 @@
   border-color: transparent;
 }
 
-.av-sidebar-drawer .av-sidebar-all-category:hover::before,
-.av-sidebar-drawer .av-sidebar-leaf:hover::before,
-.av-sidebar-drawer .av-sidebar-l2-row:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-drawer .av-sidebar-all-category:hover::before,
+  .av-sidebar-drawer .av-sidebar-leaf:hover::before,
+  .av-sidebar-drawer .av-sidebar-l2-row:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+}
+
+/* The canonical .sub-item and .accordion-header hovers (design-system.css,
+   never edited) are not gated, and a touch browser keeps :hover on the last
+   tapped row. Without a hovering pointer those rows keep their resting paint. */
+@media not all and (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .sub-item:hover,
+  .av-sidebar-drawer .sub-item:hover {
+    border-color: transparent;
+    transform: none;
+  }
+  .av-sidebar-shell .sub-item:not([data-active="true"]):hover,
+  .av-sidebar-drawer .sub-item:not([data-active="true"]):hover {
+    background: transparent;
+    color: var(--text-2);
+  }
+  .av-sidebar-shell .accordion-header:not(.active):hover,
+  .av-sidebar-drawer .accordion-header:not(.active):hover {
+    background: transparent;
+  }
 }
 
 .av-sidebar-drawer .av-sidebar-leaf[data-active="true"]::before,
@@ -73,7 +115,14 @@
 
 /* Leaf .sub-item rows keep their 1px transparent hairline in the drawer. */
 .av-sidebar-drawer .av-sidebar-l2-link {
-  padding: 0 0 0 12px;
+  padding: 14px 0 14px 12px;
+}
+
+/* The hairline adds 2px to the leaf's block padding, so 14px + 16px line
+   + 14px rendered 46px. 13px keeps a one-line leaf at exactly 44px and a
+   wrapped label still grows the row. */
+.av-sidebar-drawer .av-sidebar-leaf {
+  padding-block: 13px;
 }
 
 
@@ -130,6 +179,13 @@
   .av-sidebar-shell {
     flex-basis: var(--shell-sidebar-w-tablet, 240px);
     width: var(--shell-sidebar-w-tablet, 240px);
+  }
+
+  /* The compact rail is a desktop-only mode (AppSidebar isRailCompact), so
+     collapsing here changed nothing visible yet saved a collapsed
+     preference that later opened 1440 as the 56px rail. */
+  .av-sidebar-shell .av-sidebar-collapse-toggle {
+    display: none;
   }
 
   /* F210: at 240px an ellipsis cut category names to ~10 characters

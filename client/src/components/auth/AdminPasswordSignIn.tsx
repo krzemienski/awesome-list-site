@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestedReturnPath } from "@/lib/returnUrl";
+import { setAdminAnalyticsSession } from "@/lib/analytics-suppression";
+import { authPageHeadings } from "@shared/seo-templates";
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Owner password sign-in, shown on /sign-in?admin. Posts to
@@ -14,19 +17,23 @@ export function AdminPasswordSignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/admin-login", {
+      const response = await apiFetch("/api/auth/admin-login", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
       });
       if (response.ok) {
+        // The owner is an admin: keep the next page out of analytics before
+        // its auth check answers.
+        setAdminAnalyticsSession(true);
         // Full reload so every cached signed-out query is discarded. Honor a
         // validated same-origin redirect_url (incl. #tab), else the dashboard.
         window.location.href = requestedReturnPath() ?? "/admin";
@@ -41,6 +48,9 @@ export function AdminPasswordSignIn() {
       setError("Couldn't reach the server. Check your connection and try again.");
     }
     setSubmitting(false);
+    // The submit button was disabled while the request ran, which dropped focus
+    // to <body>; put it back in the field the failed password was typed into.
+    passwordRef.current?.focus();
   };
 
   return (
@@ -49,11 +59,12 @@ export function AdminPasswordSignIn() {
       className="flex w-full max-w-sm flex-col gap-4 px-4"
       data-testid="form-admin-password"
     >
-      <h1 className="page-title text-xl">Admin sign-in</h1>
+      <h1 className="page-title text-xl">{authPageHeadings.adminSignIn}</h1>
       <div className="flex flex-col gap-2">
         <Label htmlFor="admin-password">Password</Label>
         <Input
           id="admin-password"
+          ref={passwordRef}
           type="password"
           autoComplete="current-password"
           required

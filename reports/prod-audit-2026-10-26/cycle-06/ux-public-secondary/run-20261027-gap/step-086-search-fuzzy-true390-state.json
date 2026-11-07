@@ -1,0 +1,787 @@
+{
+  "url": "https://awesome.video/search?q=FFmpeg",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "reduced": true,
+  "overflow": 0,
+  "focus": "<input class=\"input file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed min-h-11 pl-10\" placeholder=\"Search resources...\" aria-label=\"Search resources\" data-testid=\"input-search-page\" value=\"FFmpeg\">",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.875,
+        "height": 44,
+        "top": -100,
+        "right": 164.875,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 14,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 58,
+        "bottom": 49.5,
+        "left": 14
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 72,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 116,
+        "bottom": 49.5,
+        "left": 72
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 274,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 318,
+        "bottom": 49.5,
+        "left": 274
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 332,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 376,
+        "bottom": 49.5,
+        "left": 332
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 19,
+        "y": 103,
+        "width": 37.703125,
+        "height": 20,
+        "top": 103,
+        "right": 56.703125,
+        "bottom": 123,
+        "left": 19
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Search resources",
+      "href": null,
+      "role": "INPUT",
+      "rect": {
+        "x": 20,
+        "y": 194.171875,
+        "width": 310,
+        "height": 44,
+        "top": 194.171875,
+        "right": 330,
+        "bottom": 238.171875,
+        "left": 20
+      },
+      "class": "input file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed min-h-11 pl-10",
+      "disabled": false
+    },
+    {
+      "name": "Sort results",
+      "href": null,
+      "role": "combobox",
+      "rect": {
+        "x": 51.265625,
+        "y": 250.171875,
+        "width": 144,
+        "height": 44,
+        "top": 250.171875,
+        "right": 195.265625,
+        "bottom": 294.171875,
+        "left": 51.265625
+      },
+      "class": "select flex items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1 min-h-11 w-36",
+      "disabled": false
+    },
+    {
+      "name": "Filters",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 343.171875,
+        "width": 95.84375,
+        "height": 44,
+        "top": 343.171875,
+        "right": 115.84375,
+        "bottom": 387.171875,
+        "left": 20
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-w-[44px] min-h-11 gap-2",
+      "disabled": false
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 2549.578125,
+        "width": 191.421875,
+        "height": 44,
+        "top": 2549.578125,
+        "right": 211.421875,
+        "bottom": 2593.578125,
+        "left": 20
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2739.546875,
+        "width": 143,
+        "height": 44,
+        "top": 2739.546875,
+        "right": 330,
+        "bottom": 2783.546875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2768.359375,
+        "width": 143,
+        "height": 44,
+        "top": 2768.359375,
+        "right": 330,
+        "bottom": 2812.359375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2797.171875,
+        "width": 143,
+        "height": 44,
+        "top": 2797.171875,
+        "right": 330,
+        "bottom": 2841.171875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2825.984375,
+        "width": 143,
+        "height": 44,
+        "top": 2825.984375,
+        "right": 330,
+        "bottom": 2869.984375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2854.796875,
+        "width": 143,
+        "height": 44,
+        "top": 2854.796875,
+        "right": 330,
+        "bottom": 2898.796875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2883.609375,
+        "width": 143,
+        "height": 44,
+        "top": 2883.609375,
+        "right": 330,
+        "bottom": 2927.609375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2912.421875,
+        "width": 143,
+        "height": 44,
+        "top": 2912.421875,
+        "right": 330,
+        "bottom": 2956.421875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2941.234375,
+        "width": 143,
+        "height": 44,
+        "top": 2941.234375,
+        "right": 330,
+        "bottom": 2985.234375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2970.046875,
+        "width": 143,
+        "height": 44,
+        "top": 2970.046875,
+        "right": 330,
+        "bottom": 3014.046875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 3067.953125,
+        "width": 258.734375,
+        "height": 44,
+        "top": 3067.953125,
+        "right": 278.734375,
+        "bottom": 3111.953125,
+        "left": 20
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 93.71875,
+        "y": 3123.953125,
+        "width": 71.25,
+        "height": 24,
+        "top": 3123.953125,
+        "right": 164.96875,
+        "bottom": 3147.953125,
+        "left": 93.71875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 3178.34375,
+        "width": 310,
+        "height": 44,
+        "top": 3178.34375,
+        "right": 330,
+        "bottom": 3222.34375,
+        "left": 20
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 3299.34375,
+        "width": 44,
+        "height": 44,
+        "top": 3299.34375,
+        "right": 64,
+        "bottom": 3343.34375,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 78,
+        "y": 3299.34375,
+        "width": 44,
+        "height": 44,
+        "top": 3299.34375,
+        "right": 122,
+        "bottom": 3343.34375,
+        "left": 78
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 136,
+        "y": 3299.34375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3299.34375,
+        "right": 184.515625,
+        "bottom": 3343.34375,
+        "left": 136
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 198.515625,
+        "y": 3299.34375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3299.34375,
+        "right": 247.03125,
+        "bottom": 3343.34375,
+        "left": 198.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 3343.34375,
+        "width": 103.953125,
+        "height": 44,
+        "top": 3343.34375,
+        "right": 123.953125,
+        "bottom": 3387.34375,
+        "left": 20
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 137.953125,
+        "y": 3343.34375,
+        "width": 55.46875,
+        "height": 44,
+        "top": 3343.34375,
+        "right": 193.421875,
+        "bottom": 3387.34375,
+        "left": 137.953125
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 207.421875,
+        "y": 3343.34375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3343.34375,
+        "right": 255.9375,
+        "bottom": 3387.34375,
+        "left": 207.421875
+      },
+      "class": ""
+    }
+  ],
+  "network": [
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-mono-D0YFCcQg.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/Search-BcHY7gAh.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/skeletons-DBXMVehA.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/resource-card-D8VJPT5p.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/url-filter-state-hUMXr8Zj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tags-D5fI2uuo.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/ResourceCard-Cf3blW1O.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/BookmarkButton-C6vdIsM_.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/analytics-collections-CGdPjnSE.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/heart-BtyRCSqq.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/vendor-blurhash-C5fTp4Q_.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/square-pen-Bpo9RyJI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/paginator-DtK58l0u.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/SearchFilters-CLj0h4Wf.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/resourceFacets-core-DMw7vNpP.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sliders-horizontal-DttIcMM2.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/SearchFilters-BPMyc0i7.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/discovery-BiEoTuXK.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/resources?page=1&limit=24&facets=true&search=ffmepg",
+      "status": 200,
+      "type": "fetch"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+✓ Done
+== iPhone 12 /profile { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPhone 12 /bookmarks { "list": [ "BUTTON checkbox \"Select all visible bookmarks\" 20x20", "BUTTON checkbox \"Select 2025 NAB Show: CineCentral\" 20x20", "BUTTON checkbox \"Select Transcoding Performance Trial\" 20x20", "BUTTON checkbox \"Select 3DLUT Creator\" 20x20", "BUTTON checkbox \"Select AVPlayer\" 20x20", "BUTTON checkbox \"Select Able Player\" 20x20", "BUTTON checkbox \"Select About Frame Rates or Why 29.97?\" 20x20", "BUTTON checkbox \"Select AWS Media Services\" 20x20", "BUTTON checkbox \"Select A Comprehensive Guide To Develop \" 20x20", "BUTTON checkbox \"Select M3U8Parser\" 20x20", "BUTTON checkbox \"Select ABR Video Player\" 20x20", "BUTTON checkbox \"Select 3 Cases from a Video Expert: Enco\" 20x20", "BUTTON checkbox \"Select AMD Advanced Media Acceleration (\" 20x20", "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 14}
+✓ Done
+== iPhone 12 /contributions { "list": [ "A \"https://example.com/qa-audit-1026-c5-adm\" 258x32", "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 2}
+✓ Done
+== iPhone 12 /notifications { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPhone 12 /settings { "list": [ "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16" ], "ov": 0, "small": 35}
+✓ Done
+== iPhone 12 /submit { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPhone 12 /recommendations { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPhone 12 /journey/9 { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPhone 12 /journeys { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /profile { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /bookmarks { "list": [ "BUTTON checkbox \"Select all visible bookmarks\" 20x20", "BUTTON checkbox \"Select 2025 NAB Show: CineCentral\" 20x20", "BUTTON checkbox \"Select Transcoding Performance Trial\" 20x20", "BUTTON checkbox \"Select 3DLUT Creator\" 20x20", "BUTTON checkbox \"Select AVPlayer\" 20x20", "BUTTON checkbox \"Select Able Player\" 20x20", "BUTTON checkbox \"Select About Frame Rates or Why 29.97?\" 20x20", "BUTTON checkbox \"Select AWS Media Services\" 20x20", "BUTTON checkbox \"Select A Comprehensive Guide To Develop \" 20x20", "BUTTON checkbox \"Select M3U8Parser\" 20x20", "BUTTON checkbox \"Select ABR Video Player\" 20x20", "BUTTON checkbox \"Select 3 Cases from a Video Expert: Enco\" 20x20", "BUTTON checkbox \"Select AMD Advanced Media Acceleration (\" 20x20", "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 14}
+✓ Done
+== iPad Air /contributions { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /notifications { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /settings { "list": [ "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON radio \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16", "BUTTON checkbox \"\" 16x16" ], "ov": 0, "small": 35}
+✓ Done
+== iPad Air /submit { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /recommendations { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /journey/9 { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}
+✓ Done
+== iPad Air /journeys { "list": [ "A \"PRs welcome\" 73x24" ], "ov": 0, "small": 1}

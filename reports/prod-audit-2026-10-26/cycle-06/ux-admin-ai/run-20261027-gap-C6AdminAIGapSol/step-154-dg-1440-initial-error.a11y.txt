@@ -1,0 +1,139 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Digests" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings, Digests section open" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                  - generic [ref=e59]: · Digests
+                - 'button "New entry: add a resource" [ref=e60] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e61]: Digests section open
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - tablist "Admin sections" [ref=e64]:
+                  - tab "Overview" [ref=e65] [cursor=pointer]:
+                    - img [ref=e66]
+                    - text: Overview
+                  - tab "Approvals" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Approvals
+                  - tab "Edits" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e79] [cursor=pointer]:
+                    - img [ref=e80]
+                    - text: Researcher
+                  - tab "Export" [ref=e82] [cursor=pointer]:
+                    - img [ref=e83]
+                    - text: Export
+                  - tab "Database" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Database
+                  - tab "Resources" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Resources
+                  - tab "Categories" [ref=e93] [cursor=pointer]:
+                    - img [ref=e94]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Subcategories
+                  - tab "Users" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: Users
+                  - tab "GitHub" [ref=e103] [cursor=pointer]:
+                    - img [ref=e104]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Link Health
+                  - tab "Audit" [ref=e110] [cursor=pointer]:
+                    - img [ref=e111]
+                    - text: Audit
+                  - tab "Research" [ref=e112] [cursor=pointer]:
+                    - img [ref=e113]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e115] [cursor=pointer]:
+                  - img [ref=e116]
+              - tabpanel "Digests" [ref=e118]:
+                - article [ref=e119]:
+                  - generic [ref=e120]:
+                    - generic [ref=e121]:
+                      - img [ref=e122]
+                      - text: Digest delivery health
+                    - paragraph [ref=e124]: Aggregate transport and queue signals only. No message contents, user data, recipient identifiers, or secret tokens are shown.
+                    - generic [ref=e125]:
+                      - paragraph [ref=e126]: Refreshes every 30s
+                      - button "Refresh" [ref=e127] [cursor=pointer]:
+                        - img
+                        - text: Refresh
+                  - alert [ref=e129]:
+                    - img [ref=e130]
+                    - paragraph [ref=e132]: Couldn't load digest delivery health
+                    - generic [ref=e133]:
+                      - generic [ref=e134]: Could not reach the server. Please check your connection and try again.
+                      - button "Retry" [ref=e135] [cursor=pointer]:
+                        - img
+                        - text: Retry

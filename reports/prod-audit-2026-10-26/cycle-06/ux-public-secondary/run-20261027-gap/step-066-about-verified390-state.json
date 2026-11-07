@@ -1,0 +1,68 @@
+{
+  "url": "https://awesome.video/about",
+  "width": 390,
+  "height": 844,
+  "touch": true,
+  "buttons": [
+    {
+      "name": "What is Awesome Video?",
+      "expanded": "true",
+      "id": "about-faq-button-0",
+      "controls": "about-faq-panel-0"
+    },
+    {
+      "name": "Is Awesome Video free to use?",
+      "expanded": "false",
+      "id": "about-faq-button-1",
+      "controls": "about-faq-panel-1"
+    },
+    {
+      "name": "How are resources curated?",
+      "expanded": "false",
+      "id": "about-faq-button-2",
+      "controls": "about-faq-panel-2"
+    },
+    {
+      "name": "What topics does Awesome Video cover?",
+      "expanded": "false",
+      "id": "about-faq-button-3",
+      "controls": "about-faq-panel-3"
+    },
+    {
+      "name": "How do I suggest a new resource?",
+      "expanded": "false",
+      "id": "about-faq-button-4",
+      "controls": "about-faq-panel-4"
+    },
+    {
+      "name": "What are the best video codecs for developers?",
+      "expanded": "false",
+      "id": "about-faq-button-5",
+      "controls": "about-faq-panel-5"
+    },
+    {
+      "name": "What are the best free video encoding tools?",
+      "expanded": "false",
+      "id": "about-faq-button-6",
+      "controls": "about-faq-panel-6"
+    },
+    {
+      "name": "What streaming protocols should I use?",
+      "expanded": "false",
+      "id": "about-faq-button-7",
+      "controls": "about-faq-panel-7"
+    },
+    {
+      "name": "What are the best open-source video players for the web?",
+      "expanded": "false",
+      "id": "about-faq-button-8",
+      "controls": "about-faq-panel-8"
+    },
+    {
+      "name": "How do I get started with video development?",
+      "expanded": "false",
+      "id": "about-faq-button-9",
+      "controls": "about-faq-panel-9"
+    }
+  ]
+}

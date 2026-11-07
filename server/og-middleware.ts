@@ -1,19 +1,21 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
+import { corpusTotalCount, type CorpusCountNode } from "@shared/catalog-counts";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
-import { MAINTAINER } from "@shared/about-content";
+import { getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
 import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
+  siteHost,
 } from "@shared/site-identity";
 import { config } from "./config";
-import { homeHeading, advancedHeading } from "@shared/page-headings";
+import { homeHeading, advancedHeading, aboutHeading, submitHeading } from "@shared/page-headings";
 import { legalPolicies, type LegalPolicyPath } from "@shared/legal-policy-content";
 import { preferredContactDestination } from "@shared/contact-destination";
 import { configuredContactDestinations, configuredSourceRepository } from "./public-contact";
@@ -44,9 +46,15 @@ import {
   siteTagline,
   signInSeoDescription,
   signUpSeoDescription,
+  authPageHeadings,
+  designSystemSeoDescription,
   missingPageSeo,
   bookmarksPageSeo,
+  continueLearningPageSeo,
+  publicCollectionSeo,
   searchPageSeo,
+  staticPageHeads,
+  type StaticPageHeadPath,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -57,6 +65,7 @@ import { tagScopeIntro, taxonomyScopeIntro } from "@shared/seo-content-templates
 import {
   normalizeTagFilter,
   normalizeTagPathSegment,
+  parseTagFilterValues,
   TAG_LANDING_MIN_RESOURCES,
   tagDisplayName,
   tagLandingPath,
@@ -66,24 +75,32 @@ import {
   renderHomeContent,
   renderTaxonomyContent,
   renderResourceContent,
+  renderResourceBoot,
   renderJourneysContent,
   renderJourneyContent,
   renderStaticPageContent,
   renderSearchContent,
   renderCategoriesContent,
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
 } from "./seo-content";
 import { buildRelatedResources } from "./services/relatedResources";
+import { stripInternalResourceFields } from "./lib/publicResource";
 import { CollectionRepository } from "./repositories/CollectionRepository";
 import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 import { getPublicCacheValue } from "./cache/publicCache";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { loadHomeNav } from "./home-ssr-data";
+import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
+import { createLogger } from "./lib/logger";
+
+/** A corpus-tree node as this file reads it; the tree source itself is untyped. */
+type CorpusNode = CorpusCountNode & { name: string; slug: string };
+
+const logger = createLogger("og-middleware");
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -100,17 +117,19 @@ export interface RouteMeta {
   keywords?: string;
   /**
    * When true the page is excluded from search: buildMetaTags emits a static
-   * `noindex,nofollow` robots tag and OMITS the self-referencing canonical +
-   * og:url. Two cases use this:
+   * `noindex,nofollow` robots tag and omits og:url and, by default, the
+   * self-referencing canonical. Cases include:
    *   1. Soft-404s (unknown/non-existent route served as the SPA shell) — these
    *      ALSO get HTTP 404 from the middleware because `found` is false.
    *   2. Valid utility pages with no search value (e.g. /sign-in, /sign-up) —
    *      these stay HTTP 200 because `found` is true; only the index signal is
    *      suppressed. These may still opt in to prerendered body injection
-   *      (noindex governs indexing, not readability); soft-404s never receive
-   *      an injected body because `found` is false (`!notFound` guard).
+   *      (noindex governs indexing, not readability). Soft-404s get the
+   *      same "Page Not Found" body the client renders.
    */
   noindex?: boolean;
+  /** Emit a self-canonical independently of indexing, e.g. valid low-count tags. */
+  canonical?: boolean;
   /** Opt a valid noindex page into link crawling; soft-404s stay nofollow. */
   follow?: boolean;
   /**
@@ -234,7 +253,7 @@ async function resolveRouteWithSaturationRetry(
         throw error;
       }
       const delayMs = backoffsMs[attempt];
-      console.warn(
+      logger.warn(
         "[og-middleware] saturation failure for",
         urlPath,
         `— retry ${attempt + 1}/${backoffsMs.length} in ${delayMs}ms:`,
@@ -250,11 +269,13 @@ interface ResolvedRoute {
   meta: RouteMeta;
   /** false → unknown route / missing entity → soft-404 (HTTP 404 + noindex). */
   found: boolean;
+  /** true → the entity existed publicly and was removed → HTTP 410 instead of 404. */
+  gone?: boolean;
   /**
-   * Prerendered semantic body HTML for the SPA shell (Task #80). Present only
-   * for found, indexable public routes; injected into `<!--app-html-->` so
-   * non-JS crawlers see real content. Absent for soft-404s and auth/internal
-   * routes (those keep the empty shell).
+   * Prerendered semantic body HTML for the SPA shell (Task #80), injected into
+   * `<!--app-html-->` so non-JS crawlers see real content. Absent for
+   * soft-404s (the middleware adds the shared 404 body) and for routes that
+   * keep the empty shell.
    */
   bodyHtml?: string;
 }
@@ -297,6 +318,18 @@ function parsePage(url: string): number {
   return n != null && n > 1 ? n : 1;
 }
 
+// Same test as SignInPage: any ?admin switches /sign-in to the owner form.
+function isAdminSignIn(url: string): boolean {
+  return new URLSearchParams(url.split("?")[1] || "").has("admin");
+}
+
+// Active ?tags= / legacy ?tag= filters, parsed with the SAME rule as the
+// hydrated client (parseTagsParam -> parseTagFilterValues).
+function activeTagFilters(url: string): string[] {
+  const q = new URLSearchParams(url.split("?")[1] || "");
+  return parseTagFilterValues([...q.getAll("tags"), ...q.getAll("tag")]);
+}
+
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -309,20 +342,36 @@ async function resolveRoute(
     (/^\/(category|subcategory|sub-subcategory)\//.test(cleanPath) && url.includes("?")) ||
     // Shared collections are revocable. Never let the metadata cache keep a
     // just-unpublished or deleted collection reachable for another 60 seconds.
-    cleanPath.startsWith("/collection/")
+    cleanPath.startsWith("/collection/") ||
+    // Tag-filtered Home titles name arbitrary tags: unbounded key space.
+    (cleanPath === "/" && activeTagFilters(url).length > 0)
   ) {
     return resolveRouteUncached(url, signal);
   }
-  // Only ?page= differentiates cacheable routes; fold it into the key so page 2
-  // is not served page 1's cached body (BUG-001). All other params are ignored.
+  // Only ?page= (and /sign-in's ?admin) differentiate cacheable routes; fold
+  // them into the key so page 2 is not served page 1's cached body (BUG-001).
+  // All other params are ignored.
   const page = parsePage(url);
-  const key = page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
+  const key = cleanPath === "/sign-in" && isAdminSignIn(url)
+    ? "/sign-in?admin"
+    : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   return getPublicCacheValue({
     namespace: "route-meta",
     key,
     ttlMs: 60_000,
     load: () => resolveRouteUncached(url, signal),
   });
+}
+
+// A taxonomy node with nothing approved in it is a valid page (it shows an
+// empty state and links onward) but thin, so it is noindex, follow and left
+// out of the sitemap. The count comes from the tree, so approving a resource
+// into the node makes it indexable again. LOCKSTEP: client TaxonomyListing
+// SEOHead (listing totalAll === 0) and the sitemap's empty-node skip.
+function markEmptyTaxonomyNoindex(m: RouteMeta, approvedCount: number): void {
+  if (approvedCount > 0) return;
+  m.noindex = true;
+  m.follow = true;
 }
 
 // Soft-404 metadata: a known-shape page rendered for an unknown URL. Marked
@@ -479,36 +528,6 @@ async function getTreeCached(): Promise<any> {
   return storage.getAwesomeListFromDatabase();
 }
 
-/**
- * The Home document is rendered by the exact-tree SSR path after this
- * middleware has rewritten the shell.  Its metadata/body only need the small
- * navigation projection; resolving Home through the legacy full catalog tree
- * duplicated the largest public query before SSR started and made the document
- * TTFB pay for two independent catalog representations.  Keep the recursive
- * count here because HomeNavRepository stores direct counts at each level.
- */
-function homeNavCategoryCount(category: {
-  resourceCount?: number;
-  subcategories?: Array<{
-    resourceCount?: number;
-    subSubcategories?: Array<{ resourceCount?: number }>;
-  }>;
-}): number {
-  return (
-    (category.resourceCount ?? 0) +
-    (category.subcategories ?? []).reduce(
-      (total, subcategory) =>
-        total +
-        (subcategory.resourceCount ?? 0) +
-        (subcategory.subSubcategories ?? []).reduce(
-          (nestedTotal, nested) => nestedTotal + (nested.resourceCount ?? 0),
-          0,
-        ),
-      0,
-    )
-  );
-}
-
 function safeDecode(segment: string): string {
   try {
     return decodeURIComponent(segment);
@@ -630,18 +649,19 @@ function homeShellChrome(): string {
  // Home
  if (path === "/" || path === "") {
    const m = defaultMeta(path);
+   const activeTags = activeTagFilters(url);
    let categories: { name: string; slug: string; count: number }[] = [];
    try {
       const data = await loadHomeNav();
       const resourceCount = data.totalResources;
       const categoryCount = data.categories.length;
-     m.title = homeSeoTitle(resourceCount);
+     m.title = homeSeoTitle(resourceCount, activeTags);
      m.description = homeSeoDescription(resourceCount, categoryCount);
      m.image = ogImage("/");
       categories = data.categories.map((c) => ({
        name: c.name,
        slug: c.slug,
-        count: homeNavCategoryCount(c),
+        count: c.totalResourceCount,
      }));
     } catch (error) {
       rethrowBoundedDependencyFailure(error);
@@ -674,18 +694,19 @@ function homeShellChrome(): string {
       return { meta: notFoundMeta(path), found: false };
     }
     const m = defaultMeta(path);
-    const count = collection.resources.length;
-    m.title = clampSeoTitle(`${collection.name} — Shared collection — ${SITE_NAME}`);
+    m.title = clampSeoTitle(`${publicCollectionSeo.titleCore(collection.name)} — ${SITE_NAME}`);
     m.description = clampSeoDescription(
-      `A read-only collection of ${count} curated video development ${
-        count === 1 ? "resource" : "resources"
-      } shared on ${SITE_NAME}.`,
+      publicCollectionSeo.description(collection.resources.length),
     );
     m.noindex = true;
     m.follow = true;
     m.ogUrl = abs(path);
     m.image = ogImage(path);
-    return { meta: m, found: true };
+    const bodyHtml = renderStaticPageContent({
+      heading: collection.name,
+      description: m.description,
+    });
+    return { meta: m, found: true, bodyHtml };
   }
 
   // Static page routes (every fixed client route in App.tsx). These always
@@ -762,8 +783,8 @@ function homeShellChrome(): string {
       noindex: true,
     },
     "/continue-learning": {
-      title: `Continue Learning — ${SITE_NAME}`,
-      description: `Resume journeys, revisit resources, and see learning milestones on ${SITE_NAME}.`,
+      title: `${continueLearningPageSeo.title} — ${SITE_NAME}`,
+      description: continueLearningPageSeo.description,
       // Personalized, auth-gated progress summary — noindex like /profile.
       noindex: true,
     },
@@ -814,7 +835,7 @@ function homeShellChrome(): string {
       // (two-pass parity). Internal reference page — noindex keeps the
       // indexable set equal to the sitemap.
       title: `Design System — ${SITE_NAME}`,
-      description: `The ${SITE_NAME} design system — 5 systems × 10 accents, live tokens, type scale, and core components.`,
+      description: designSystemSeoDescription,
       noindex: true,
     },
     "/recommendations": {
@@ -851,7 +872,15 @@ function homeShellChrome(): string {
   // meta (noindex) instead of a soft-404. The section ids and aliases are the
   // ones AdminDashboard accepts; unknown sections still fall through to 404.
   const adminSection = path.match(/^\/admin\/([^/]+)$/)?.[1];
-  const staticKey = adminSection && normalizeAdminTab(adminSection) ? "/admin" : path;
+  // Clerk path routing owns everything under /sign-in/ and /sign-up/
+  // (sso-callback after Google, factor-one, verify-email-address, ...); the
+  // client renders the same auth page for all of them, so they share its meta.
+  const authFlow = path.match(/^\/(sign-in|sign-up)\/[^?#]+$/)?.[1];
+  const staticKey = adminSection && normalizeAdminTab(adminSection)
+    ? "/admin"
+    : authFlow
+      ? `/${authFlow}`
+      : path;
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
@@ -919,10 +948,10 @@ function homeShellChrome(): string {
         const data = await getTreeCached();
         aboutResourceCount = data?.resources?.length;
         aboutCategoryCount = data?.categories?.length;
-        categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
+        categories = (data?.categories ?? []).slice(0, 12).map((c: CorpusNode) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -979,7 +1008,11 @@ function homeShellChrome(): string {
         ];
       }
       bodyHtml = renderStaticPageContent({
-        heading: path === "/advanced" ? advancedHeading : m.title.split(" — ")[0],
+        heading: path === "/about"
+          ? aboutHeading
+          : path === "/submit"
+            ? submitHeading
+            : path === "/advanced" ? advancedHeading : m.title.split(" — ")[0],
         description: m.description,
         ...(path === "/submit"
           ? {
@@ -1047,10 +1080,22 @@ function homeShellChrome(): string {
             }
           : {}),
         ...(path === "/about"
-          ? { faqs: aboutFaqs, paragraphs: MAINTAINER.bio }
+          ? {
+              faqs: aboutFaqs,
+              about: {
+                catalogSummary: getAboutCatalogSummary(
+                  siteHost(aboutSite.url) || aboutSite.name,
+                  aboutResourceCount,
+                  aboutCategoryCount,
+                ),
+              },
+            }
           : {}),
         categories,
       });
+    } else if (Object.hasOwn(staticPageHeads, path)) {
+      const head = staticPageHeads[path as StaticPageHeadPath];
+      bodyHtml = renderStaticPageContent({ heading: head.heading, description: head.lead });
     } else if (path === "/sign-in" || path === "/sign-up") {
       // Noindex utility pages still get a minimal readable body so non-JS
       // crawlers (GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended) see real
@@ -1059,28 +1104,33 @@ function homeShellChrome(): string {
       // form itself is rendered client-side by the auth provider, so no static
       // <form> markup is emitted — password reset lives inside the sign-in
       // flow now, not on a separate token-bearing page.)
+      // Headings match what the client hydrates to: Clerk's localized title,
+      // or the owner password form that AuthPages shows for /sign-in?admin.
       const isSignIn = path === "/sign-in";
-      bodyHtml = renderStaticPageContent({
-        heading: isSignIn
-          ? "Sign in to Awesome Video"
-          : "Create an Awesome Video account",
-        description: m.description,
-        paragraphs: [
-          isSignIn
-            ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys. Forgot your password? Use the reset option on the sign-in form."
-            : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
-          "The interactive sign-in form requires JavaScript.",
-        ],
-        links: isSignIn
-          ? [
-              { path: "/sign-up", label: "Create an account" },
-              { path: "/submit", label: "Submit a resource" },
-            ]
-          : [
-              { path: "/sign-in", label: "Sign in" },
-              { path: "/submit", label: "Submit a resource" },
+      bodyHtml = isSignIn && isAdminSignIn(url)
+        ? renderStaticPageContent({
+            heading: authPageHeadings.adminSignIn,
+            paragraphs: ["The admin sign-in form requires JavaScript."],
+          })
+        : renderStaticPageContent({
+            heading: isSignIn ? authPageHeadings.signIn : authPageHeadings.signUp,
+            description: m.description,
+            paragraphs: [
+              isSignIn
+                ? "Sign in to access your bookmarks, submitted resources, and personalized learning journeys. Forgot your password? Use the reset option on the sign-in form."
+                : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
+              "The interactive sign-in form requires JavaScript.",
             ],
-      });
+            links: isSignIn
+              ? [
+                  { path: "/sign-up", label: "Create an account" },
+                  { path: "/submit", label: "Submit a resource" },
+                ]
+              : [
+                  { path: "/sign-in", label: "Sign in" },
+                  { path: "/submit", label: "Submit a resource" },
+                ],
+          });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
       // BUG-007 (audit 2): EXACT client parity — the hydrated Search page calls
@@ -1141,10 +1191,10 @@ function homeShellChrome(): string {
       let cats: { name: string; slug: string; count: number }[] = [];
       try {
         const data = await getTreeCached();
-        cats = (data?.categories ?? []).map((c: any) => ({
+        cats = (data?.categories ?? []).map((c: CorpusNode) => ({
           name: c.name,
           slug: c.slug,
-          count: countNodeResources(c),
+          count: corpusTotalCount(c),
         }));
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
@@ -1212,11 +1262,7 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "category", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): an out-of-range ?page is a real 404 — never a
-        // silent clamp serving page-1 duplicate content on infinite URLs.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           categorySeoDescription(found.name, slug, total),
@@ -1252,16 +1298,17 @@ function homeShellChrome(): string {
             level: "category",
             totalResources: flat.length,
             childNames: (found.node?.subcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
-              .map((child: any) => child.name),
+              .filter((child: CorpusNode) => corpusTotalCount(child) > 0)
+              .map((child: CorpusNode) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "subcategory",
-          children: (found.node?.subcategories ?? []).map((s: any) => ({
+          children: (found.node?.subcategories ?? []).map((s: CorpusNode) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,
@@ -1294,7 +1341,7 @@ function homeShellChrome(): string {
         tags: [slug],
         offset: (page - 1) * LISTING_PAGE_SIZE,
         limit: LISTING_PAGE_SIZE,
-        includeFacets: true,
+        facets: ["categories"],
       } as any) as Awaited<ReturnType<typeof storage.listResources>> & {
         facets?: {
           categories?: Array<{ value: string; count: number }>;
@@ -1311,6 +1358,7 @@ function homeShellChrome(): string {
       const name = tagDisplayNameBranded(slug);
       const canonicalPath = tagLandingPath(slug);
       const m = defaultMeta(canonicalPath);
+      m.canonical = true;
       m.title = `${pagedSeoTitleCore(tagTitleCoreDeduped(name), page)} — ${SITE_NAME}`;
       m.description = pagedSeoDescription(
         tagSeoDescription(name, result.total),
@@ -1414,8 +1462,7 @@ function homeShellChrome(): string {
       if (found) {
         const m = defaultMeta(path);
         const categoryName = found.crumbs[1]?.name ?? "Video Development";
-        const categorySlug = found.crumbs[1]?.path?.split("/").pop();
-        const titleCore = subcategorySeoTitleCore(found.name, categoryName, categorySlug);
+        const titleCore = subcategorySeoTitleCore(found.name);
         m.image = ogImage(found.path);
         m.type = "website"; // R5-052: listing/detail pages are not articles
         // BUG-007 (audit 2): mirror the hydrated client page exactly — same
@@ -1425,10 +1472,7 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "subcategory", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           subcategorySeoDescription(found.name, categoryName, total),
@@ -1463,16 +1507,17 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             childNames: (found.node?.subSubcategories ?? [])
-              .filter((child: any) => countNodeResources(child) > 0)
-              .map((child: any) => child.name),
+              .filter((child: CorpusNode) => corpusTotalCount(child) > 0)
+              .map((child: CorpusNode) => child.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           childKind: "sub-subcategory",
-          children: (found.node?.subSubcategories ?? []).map((s: any) => ({
+          children: (found.node?.subSubcategories ?? []).map((s: CorpusNode) => ({
             name: s.name,
             slug: s.slug,
-            count: countNodeResources(s),
+            count: corpusTotalCount(s),
           })),
           resources: pageResources.map((r: any) => ({
             id: r.id,
@@ -1518,10 +1563,7 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "sub-subcategory", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           subSubcategorySeoDescription(
@@ -1560,6 +1602,7 @@ function homeShellChrome(): string {
             totalResources: flat.length,
             parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
             formats: flat.map((resource: any) => resource.resourceFormat),
+            tagFiltered: activeTagFilters(url).length > 0,
           }),
           crumbs: found.crumbs,
           resources: pageResources.map((r: any) => ({
@@ -1590,9 +1633,13 @@ function homeShellChrome(): string {
     // slips past the middleware normalizer (which 301s it) soft-404s here.
     // Ids past int4 are 404s too, not a failed lookup that falls back to 200.
     const idNum = parseRouteId(raw);
+    let gone = false;
     if (idNum !== null) {
       try {
         const resource = await storage.getResource(idNum);
+        // B10: an archived resource was public and then removed, so it answers
+        // 410 Gone; rejected rows were never public and stay a plain 404.
+        gone = resource?.status === "archived";
         // Only approved resources are public/indexable (this mirrors the
         // sitemap, which lists approved resources only). A pending/rejected/
         // archived resource resolves to a soft-404 + noindex, no canonical.
@@ -1725,6 +1772,9 @@ function homeShellChrome(): string {
           // non-JS crawlers). Mirrors GET /api/resources/:id/related.
           let relatedLinks: { id: number; title: string; description?: string }[] =
             [];
+          // The same /related payload the page would otherwise fetch after
+          // boot; undefined when it could not be built (the client fetches).
+          let relatedBoot: unknown;
           try {
             const { resources: pool } = await storage.listResources({
               status: "approved",
@@ -1732,6 +1782,17 @@ function homeShellChrome(): string {
               limit: 60,
             });
             const related = buildRelatedResources(resource as any, pool, 5);
+            const sanitizeItems = (items: any[]) =>
+              items.map((item) => ({
+                ...item,
+                resource: stripInternalResourceFields(item.resource),
+              }));
+            relatedBoot = {
+              ...related,
+              similar: sanitizeItems(related.similar),
+              prerequisites: sanitizeItems(related.prerequisites),
+              nextSteps: sanitizeItems(related.nextSteps),
+            };
             const seen = new Set<number>();
             for (const bucket of [
               related.similar,
@@ -1772,6 +1833,9 @@ function homeShellChrome(): string {
               ] ?? "Not yet classified",
             tags: tags.map((tag) => tag.name),
             related: relatedLinks,
+          }) + renderResourceBoot({
+            resource: stripInternalResourceFields(resource as any),
+            related: relatedBoot,
           });
           return { meta: m, found: true, bodyHtml };
         }
@@ -1780,7 +1844,7 @@ function homeShellChrome(): string {
         return { meta: defaultMeta(path), found: true };
       }
     }
-    return { meta: notFoundMeta(path), found: false };
+    return { meta: notFoundMeta(path), found: false, gone };
   }
 
   // /journey/:id — found only if the journey exists.
@@ -1968,7 +2032,8 @@ export function buildMetaTags(m: RouteMeta): string {
   const robotsTag = m.noindex
     ? `\n    <meta name="robots" content="noindex, ${m.follow ? "follow" : "nofollow"}" data-react-helmet="true" />`
     : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />`;
-  const canonicalTag = m.noindex
+  const omitCanonical = !(m.canonical ?? !m.noindex);
+  const canonicalTag = omitCanonical
     ? ""
     : `\n    <link rel="canonical" href="${u}" data-react-helmet="true" />`;
   // R5-050: a noindex page may still carry an explicit og:url (the 404 head
@@ -2139,9 +2204,19 @@ export function ogInjectionMiddleware() {
         const tree = await getTreeCached();
         const level = taxonomyVariant[1].toLowerCase();
         const identity = safeDecode(taxonomyVariant[2]).toLowerCase();
-        const match = level === "category" ? findCategory(tree, identity)
-          : level === "subcategory" ? findSubcategory(tree, identity)
-          : findSubSubcategory(tree, identity);
+        const findAtLevel = (slug: string) =>
+          level === "category" ? findCategory(tree, slug)
+          : level === "subcategory" ? findSubcategory(tree, slug)
+          : findSubSubcategory(tree, slug);
+        // Old slugs were generated from names like "Standards & Industry"
+        // without collapsing separators ("standards--industry"); current
+        // slugs collapse them. Tidy only when the literal slug is unknown.
+        const tidied = identity.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+        const match = findAtLevel(identity)
+          ?? (tidied && tidied !== identity
+            ? findAtLevel(tidied) ?? findCategory(tree, tidied)
+              ?? findSubcategory(tree, tidied) ?? findSubSubcategory(tree, tidied)
+            : null);
         if (match && urlPath !== match.path) {
           const query = (req.originalUrl || req.url).split("?")[1];
           return res.redirect(301, match.path + (query ? `?${query}` : ""));
@@ -2201,7 +2276,7 @@ export function ogInjectionMiddleware() {
       } catch {
         // tree lookup failed — fall through to the resolver's fail-open path
       }
-      console.warn("[og-middleware] unresolvable nested category path:", urlPath);
+      logger.warn("[og-middleware] unresolvable nested category path:", urlPath);
     }
     // Slug tolerance for single-level /category/:slug where the slug actually
     // belongs to a subcategory or sub-subcategory — 301 to the canonical page
@@ -2419,13 +2494,14 @@ export function ogInjectionMiddleware() {
     // prefixes. An explicit ?page=1 duplicates the param-less canonical → 301
     // (other params preserved); anything the SHARED strict rule
     // (shared/page-param.ts parseUrlPageStrict — the exact verdict the
-    // hydrated client renders as its invalid/clamped-to-1 notice) doesn't
+    // hydrated client renders as the same 404 page) doesn't
     // accept as a canonical page spelling (0, -1, abc, 2.5, 1e3, 007 …) is a
-    // real 404, never a silent clamp onto page 1's content.
+    // 404 on /tag and a page-1 render with a notice on the taxonomy listings.
     // Out-of-range pages 404 inside the resolver, which knows totalPages.
     // /search keeps the client's clamp behaviour on purpose (noindex, lenient
     // parsePageNumber on both passes), and every other route ignores ?page.
     let forcedNotFound = false;
+    let pageParamStripped: string | null = null;
     if (/^\/(?:category|subcategory|sub-subcategory|tag)\/[^\/]+$/.test(urlPath)) {
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
       const params = new URLSearchParams(qs);
@@ -2437,18 +2513,30 @@ export function ogInjectionMiddleware() {
           return res.redirect(301, `${urlPath}${rest ? `?${rest}` : ""}`);
         }
         if (parseUrlPageStrict(rawPage).kind !== "page") {
-          forcedNotFound = true;
+          if (urlPath.startsWith("/tag/")) {
+            forcedNotFound = true;
+          } else {
+            // Taxonomy listings: not a canonical page spelling, so serve
+            // page 1 (canonical carries no ?page) like the client, which
+            // shows a page-adjusted notice. /tag keeps the strict 404.
+            params.delete("page");
+            const rest = params.toString();
+            pageParamStripped = `${urlPath}${rest ? `?${rest}` : ""}`;
+          }
         }
       }
     }
 
     let meta: RouteMeta;
     let notFound = false;
+    let gone = false;
     // Task 592 V20: set when route resolution hit a bounded dependency failure
     // on a browser navigation — the SPA shell is still served (with HTTP 503 +
     // Retry-After) so the client can render its own error card and Retry.
     let dependencyUnavailable = false;
     let bodyHtml: string | undefined;
+    // Route-chunk hints for pages main.tsx renders only once their chunk is in.
+    let headPreload: { href: string; tag: string }[] = [];
     if (forcedNotFound) {
       // Malformed ?page short-circuits the resolver entirely so the junk URL
       // never lands in the public route-meta cache (parsePage would collapse it onto the
@@ -2464,17 +2552,21 @@ export function ogInjectionMiddleware() {
         // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
         // render search results; resolveRoute keys its cache on path + page.
         const resolved = await resolveRouteWithSaturationRetry(
-          req.originalUrl || req.url,
+          pageParamStripped ?? (req.originalUrl || req.url),
           urlPath,
           routeResolutionAbort.signal,
         );
         meta = resolved.meta;
         notFound = !resolved.found;
+        gone = resolved.gone === true;
         bodyHtml = resolved.bodyHtml;
+        if (resolved.found && bodyHtml && /^\/resource\/\d+$/.test(urlPath)) {
+          headPreload = await routeChunkPreloadTags(RESOURCE_DETAIL_MANIFEST_KEY);
+        }
       } catch (e) {
         if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
-          console.warn(
+          logger.warn(
             "[og-middleware] bounded dependency failure for",
             urlPath,
             String((e as any)?.message ?? e),
@@ -2496,7 +2588,7 @@ export function ogInjectionMiddleware() {
           meta = defaultMeta(urlPath);
           notFound = false;
         } else {
-          console.warn("[og-middleware] meta lookup failed for", urlPath, e);
+          logger.warn("[og-middleware] meta lookup failed for", urlPath, e);
           // Fail open: never demote a real page to 404 on a transient lookup error.
           meta = defaultMeta(urlPath);
           notFound = false;
@@ -2505,6 +2597,14 @@ export function ogInjectionMiddleware() {
         req.off("aborted", abortRouteResolution);
         res.off("close", abortRouteResolution);
       }
+    }
+
+    if (notFound) {
+      bodyHtml = renderStaticPageContent({
+        heading: missingPageSeo.heading,
+        description: missingPageSeo.lead,
+        links: [{ path: "/categories", label: "Browse all categories" }],
+      });
     }
 
     // Wrap res.end / res.write to capture HTML and rewrite it.
@@ -2539,7 +2639,7 @@ export function ogInjectionMiddleware() {
       // (which already runs before the SPA fallback and owns the HTML rewrite)
       // rather than in the framework-managed server/vite.ts.
       if (notFound && checkHtml() && !res.headersSent) {
-        res.statusCode = 404;
+        res.statusCode = gone ? 410 : 404;
       }
       if (dependencyUnavailable && checkHtml() && !res.headersSent) {
         res.statusCode = 503;
@@ -2552,22 +2652,25 @@ export function ogInjectionMiddleware() {
           if (/<head[\s>]/i.test(html)) {
             html = rewriteHead(html, meta!);
           }
-          // Task #80: inject prerendered semantic content into the SPA shell for
-          // found routes so non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
+          // Task #80: inject prerendered semantic content into the SPA shell so
+          // non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
           // pre-render) see real headings, summaries, and internal links.
-          // Noindex utility routes (/sign-in, /sign-up) are included on purpose:
+          // Noindex routes (utility pages, soft-404s) are included on purpose:
           // noindex governs indexing, not readability, and bodyHtml is only ever
           // assigned to routes that deliberately opt in. main.tsx calls
           // createRoot().render() on boot, which REPLACES this content — we
           // never set __INITIAL_DATA__, so there is no hydration step (and no
           // mismatch). The function form of replace() avoids `$`
           // special-sequence interpretation in titles/descriptions.
-          if (
-            bodyHtml &&
-            !notFound &&
-            html.includes("<!--app-html-->")
-          ) {
+          if (bodyHtml && html.includes("<!--app-html-->")) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);
+            const hints = headPreload
+              .filter(({ href }) => !html.includes(`href="${href}"`))
+              .map(({ tag }) => tag)
+              .join("");
+            if (hints && html.includes("</head>")) {
+              html = html.replace("</head>", () => `${hints}</head>`);
+            }
           }
           // BUG-014: stamp the per-request CSP nonce onto every inline
           // <script>/<style> now that the head rewrite and SSR body injection
@@ -2592,7 +2695,7 @@ export function ogInjectionMiddleware() {
           res.setHeader("Cache-Control", "no-store");
           return (origEnd as any)(buf, ...args);
         } catch (e) {
-          console.warn("[og-middleware] rewrite failed", e);
+          logger.warn("[og-middleware] rewrite failed", e);
           // The security middleware has already issued a nonce-based CSP.
           // Even when metadata rewriting fails, return a body whose inline
           // boot scripts/styles carry that request's nonce rather than an

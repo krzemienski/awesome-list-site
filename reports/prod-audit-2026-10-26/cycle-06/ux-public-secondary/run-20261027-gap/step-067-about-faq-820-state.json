@@ -1,0 +1,119 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": true,
+  "expanded": [
+    {
+      "name": "What is Awesome Video?",
+      "expanded": "false"
+    },
+    {
+      "name": "Is Awesome Video free to use?",
+      "expanded": "false"
+    },
+    {
+      "name": "How are resources curated?",
+      "expanded": "false"
+    },
+    {
+      "name": "What topics does Awesome Video cover?",
+      "expanded": "false"
+    },
+    {
+      "name": "How do I suggest a new resource?",
+      "expanded": "false"
+    },
+    {
+      "name": "What are the best video codecs for developers?",
+      "expanded": "false"
+    },
+    {
+      "name": "What are the best free video encoding tools?",
+      "expanded": "false"
+    },
+    {
+      "name": "What streaming protocols should I use?",
+      "expanded": "false"
+    },
+    {
+      "name": "What are the best open-source video players for the web?",
+      "expanded": "false"
+    },
+    {
+      "name": "How do I get started with video development?",
+      "expanded": "false"
+    }
+  ],
+  "links": [
+    {
+      "text": "Home",
+      "href": "https://awesome.video/",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "Nick Krzemienski on GitHub",
+      "href": "https://github.com/krzemienski",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Profile → Security → Delete account & data",
+      "href": "https://awesome.video/profile?tab=security",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "open an issue on the project's GitHub repository",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Terms of Use",
+      "href": "https://awesome.video/terms",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "Privacy Policy",
+      "href": "https://awesome.video/privacy",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "awesome-video\n\nA curated list of awesome streaming video tools, frameworks, libraries, and learning resources. Every resource on this site is sourced from and kept in sync with this repository.\n\nThe source list\nCC0-1.0",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "awesome-list-site\n\nThe open-source platform that powers this site — it transforms any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.\n\nThe engine\nMIT",
+      "href": "https://github.com/krzemienski/awesome-list-site",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Nick Krzemienski\nMaintainer",
+      "href": "https://github.com/krzemienski",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "shadcn/ui\nComponents",
+      "href": "https://ui.shadcn.com/",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Tailwind CSS\nStyling",
+      "href": "https://tailwindcss.com/",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    }
+  ],
+  "focused": "<div role=\"menuitem\" class=\"relative flex cursor-default select-none items-center gap-2 px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0\" aria-label=\"Sign in\" tabindex=\"0\" data-orientation=\"vertical\" data-radix-collection-item=\"\" data-highlighted=\"\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-log-in mr-2 h-4 w-4\"><path d=\"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4\"></path><polyline points=\"10 17 15 12 10 7\"></polyline><line x1=\"15\" x2=\"3\" y1=\"12\" y2=\"12\"></line></svg>Sign in</div>"
+}

@@ -105,9 +105,11 @@
   border-color: transparent;
 }
 
-.av-sidebar-shell .av-sidebar-home-navigation > .sub-item:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-home-navigation > .sub-item:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
 }
 
 .av-sidebar-shell .av-sidebar-home-navigation > .sub-item[data-active="true"] {

@@ -1,0 +1,267 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,827 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,827 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - button "Scroll tabs left" [ref=e59] [cursor=pointer]:
+                  - img [ref=e60]
+                - tablist "Admin sections" [ref=e62]:
+                  - tab "Overview" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Overview
+                  - tab "Approvals" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Approvals
+                  - tab "Edits" [ref=e72] [cursor=pointer]:
+                    - img [ref=e73]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Researcher
+                  - tab "Export" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Export
+                  - tab "Database" [ref=e83] [cursor=pointer]:
+                    - img [ref=e84]
+                    - text: Database
+                  - tab "Resources" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Resources
+                  - tab "Categories" [ref=e91] [cursor=pointer]:
+                    - img [ref=e92]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e93] [cursor=pointer]:
+                    - img [ref=e94]
+                    - text: Subcategories
+                  - tab "Users" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Users
+                  - tab "GitHub" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Link Health
+                  - tab "Audit" [ref=e108] [cursor=pointer]:
+                    - img [ref=e109]
+                    - text: Audit
+                  - tab "Research" [ref=e110] [cursor=pointer]:
+                    - img [ref=e111]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e113] [cursor=pointer]:
+                  - img [ref=e114]
+              - tabpanel "Researcher" [ref=e116]:
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - generic [ref=e121]:
+                      - heading "Run a research task" [level=3] [ref=e122]
+                      - paragraph [ref=e123]: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                      - generic [ref=e124]:
+                        - region "Brief" [ref=e125]:
+                          - generic [ref=e126]:
+                            - generic [ref=e127]: "1"
+                            - heading "Brief" [level=4] [ref=e128]
+                            - generic [ref=e129]: Auto-generated at launch
+                          - radiogroup "Research brief" [ref=e131]:
+                            - generic [ref=e132] [cursor=pointer]:
+                              - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked] [ref=e133]:
+                                - img [ref=e135]
+                              - generic [ref=e137]:
+                                - generic [ref=e138]: Auto-generate at launch
+                                - generic [ref=e139]: A gap-aware brief built from the catalog and past runs.
+                            - generic [ref=e140] [cursor=pointer]:
+                              - radio "Write my own Describe what to search for, or start from a generated brief." [ref=e141]
+                              - generic [ref=e142]:
+                                - generic [ref=e143]: Write my own
+                                - generic [ref=e144]: Describe what to search for, or start from a generated brief.
+                        - region "Focus" [ref=e145]:
+                          - generic [ref=e146]:
+                            - generic [ref=e147]: "2"
+                            - heading "Focus" [level=4] [ref=e148]
+                            - generic [ref=e149]: All categories
+                          - combobox "Category focus" [ref=e151] [cursor=pointer]:
+                            - generic: All categories
+                            - img [ref=e152]
+                        - region "Limits" [ref=e154]:
+                          - generic [ref=e155]:
+                            - generic [ref=e156]: "3"
+                            - heading "Limits" [level=4] [ref=e157]
+                            - generic [ref=e158]: no target · $3.00 cap · 40 turns
+                          - generic [ref=e159]:
+                            - generic [ref=e160]:
+                              - generic [ref=e161]:
+                                - text: Stop after (discoveries)
+                                - spinbutton "Stop after (discoveries)" [ref=e162]
+                                - paragraph [ref=e163]: No target — runs until the budget or turns end.
+                              - generic [ref=e164]:
+                                - text: Budget cap (USD)
+                                - spinbutton "Budget cap (USD)" [ref=e165]: "3.00"
+                                - paragraph [ref=e166]: Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops.
+                              - generic [ref=e167]:
+                                - text: Max turns
+                                - spinbutton "Max turns" [ref=e168]: "40"
+                                - paragraph [ref=e169]: Positive whole number (blank = no cap).
+                            - paragraph [ref=e170]: Past runs cost $0.15–$41.78. Discoveries are deduplicated against the 3,827 catalog resources.
+                        - region "Endpoint & model" [ref=e171]:
+                          - generic [ref=e172]:
+                            - generic [ref=e173]: "4"
+                            - heading "Endpoint & model" [level=4] [ref=e174]
+                            - generic [ref=e175]: Server configuration
+                          - generic [ref=e176]:
+                            - button "Override endpoint or models (optional)" [expanded] [ref=e177] [cursor=pointer]:
+                              - text: Override endpoint or models (optional)
+                              - img
+                            - generic [ref=e178]:
+                              - generic [ref=e179]:
+                                - text: Orchestrator model
+                                - textbox "Orchestrator model" [active] [ref=e180]:
+                                  - /placeholder: Blank = ANTHROPIC_MODEL
+                                  - text: audit/offline-tablet
+                              - generic [ref=e181]:
+                                - text: Scout model
+                                - textbox "Scout model" [ref=e182]:
+                                  - /placeholder: Blank = haiku tier
+                              - generic [ref=e183]:
+                                - text: Base URL
+                                - textbox "Base URL" [ref=e184]:
+                                  - /placeholder: Blank = ANTHROPIC_BASE_URL
+                                - paragraph [ref=e185]: A custom endpoint needs its own token below.
+                              - generic [ref=e186]:
+                                - text: Auth token
+                                - textbox "Auth token" [ref=e187]:
+                                  - /placeholder: Required with a base URL
+                                - paragraph [ref=e188]: Encrypted at rest; only the last 4 characters are shown afterwards.
+                        - region "About to run on" [ref=e189]:
+                          - generic [ref=e190]:
+                            - generic [ref=e191]: "5"
+                            - heading "About to run on" [level=4] [ref=e192]
+                          - generic [ref=e193]:
+                            - alert [ref=e195]: Could not reach the server. Please check your connection and try again.
+                            - generic [ref=e196]:
+                              - button "Launch research run" [disabled]:
+                                - img
+                                - text: Launch research run
+                    - generic [ref=e197]:
+                      - generic [ref=e199]:
+                        - heading "Researcher jobs" [level=2] [ref=e200]
+                        - paragraph [ref=e201]: Latest 5 of 76 research runs
+                      - generic [ref=e202]:
+                        - region "Researcher jobs table, scrollable" [ref=e203]:
+                          - table [ref=e204]:
+                            - rowgroup [ref=e205]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e206]:
+                                - columnheader "Status" [ref=e207]
+                                - columnheader "Prompt" [ref=e208]
+                                - columnheader "Found" [ref=e209]
+                                - columnheader "Approved / Rejected" [ref=e210]
+                                - columnheader "Cost" [ref=e211]
+                                - columnheader "Turns" [ref=e212]
+                                - columnheader "Created" [ref=e213]
+                            - rowgroup [ref=e214]:
+                              - row [ref=e215]:
+                                - cell "completed" [ref=e216]:
+                                  - generic [ref=e217]: completed
+                                - cell [ref=e218]
+                                - cell "0" [ref=e219]
+                                - cell "0/0" [ref=e220]
+                                - cell "$0.7600" [ref=e221]
+                                - cell "28/600" [ref=e222]
+                                - cell "Oct 27, 2026" [ref=e223]
+                              - row [ref=e224]:
+                                - cell "completed" [ref=e225]:
+                                  - generic [ref=e226]: completed
+                                - cell [ref=e227]
+                                - cell "0" [ref=e228]
+                                - cell "0/0" [ref=e229]
+                                - cell "$1.2973" [ref=e230]
+                                - cell "93/600" [ref=e231]
+                                - cell "Oct 27, 2026" [ref=e232]
+                              - row [ref=e233]:
+                                - cell "completed" [ref=e234]:
+                                  - generic [ref=e235]: completed
+                                - cell [ref=e236]
+                                - cell "0" [ref=e237]
+                                - cell "0/0" [ref=e238]
+                                - cell "$0.5650" [ref=e239]
+                                - cell "13/600" [ref=e240]
+                                - cell "Oct 27, 2026" [ref=e241]
+                              - row [ref=e242]:
+                                - cell "completed" [ref=e243]:
+                                  - generic [ref=e244]: completed
+                                - cell [ref=e245]
+                                - cell "4" [ref=e246]
+                                - cell "1/0" [ref=e247]
+                                - cell "$5.4603" [ref=e248]
+                                - cell "155/200" [ref=e249]
+                                - cell "Oct 27, 2026" [ref=e250]
+                              - row [ref=e251]:
+                                - cell "failed" [ref=e252]:
+                                  - generic [ref=e253]: failed
+                                - cell [ref=e254]
+                                - cell "0" [ref=e255]
+                                - cell "0/0" [ref=e256]
+                                - cell "$0.0000" [ref=e257]
+                                - cell "1/200" [ref=e258]
+                                - cell "Oct 27, 2026" [ref=e259]
+                        - button "Show more" [ref=e261] [cursor=pointer]
+                  - group [ref=e262]:
+                    - generic "All pending discoveries & full job history" [ref=e263] [cursor=pointer]

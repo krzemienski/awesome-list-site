@@ -16,7 +16,9 @@ export const ChipButton = React.forwardRef<
       {...props}
       ref={ref}
       type={type}
-      className={cn("btn", !pressed && "ghost", className)}
+      // Below desktop (touch widths) a filter chip must keep a 44px target;
+      // desktop keeps the compact chip height.
+      className={cn("btn", !pressed && "ghost", "max-lg:min-h-11", className)}
     />
   );
 });

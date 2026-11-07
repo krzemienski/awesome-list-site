@@ -46,6 +46,8 @@
 import type { Express, Response, RequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
+import { buildValidationEnvelope } from "../../contracts/envelope";
+import { boundedIntStringSchema } from "../../contracts/inference";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
 import {
@@ -65,6 +67,8 @@ import {
   resourceTitleSchema,
   resourceDescriptionSchema,
   tagSchema,
+  isReservedTestHost,
+  RESERVED_TEST_HOST_MESSAGE,
 } from "@shared/validation";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import {
@@ -78,6 +82,7 @@ import {
 } from "@shared/resourceFacets";
 import { parseTagFilterValues } from "@shared/tagNormalize";
 import { RESOURCE_KIND_VALUES, resourceKindSchema } from "@shared/resourceKinds";
+import { RESOURCE_FACET_KINDS } from "@shared/resourceFacets";
 import { parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
 import { trackServerEvent } from "../../lib/mixpanelServer";
 import { CATALOG_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
@@ -94,6 +99,9 @@ import { listApprovedResourceTags } from "../../repositories/TagRepository";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("contributions");
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -135,6 +143,20 @@ export interface CatalogContributionsRoutesContext {
   resourceRepo: ResourceRepository;
   categoryRepo: CategoryRepository;
   auditRepo: AuditRepository;
+}
+
+/**
+ * One policy for a malformed resource id (not a positive int4 integer):
+ * 400 validation_failed in the canonical field-level envelope. A well-formed
+ * id with no row is a 404, answered by the handlers themselves.
+ */
+export function sendInvalidResourceId(res: Response, id: unknown) {
+  const parsed = z.object({ id: boundedIntStringSchema }).safeParse({ id });
+  return res.status(400).json(
+    parsed.success
+      ? { error: 'validation_failed', message: 'Invalid request parameters', fieldErrors: {}, errors: [] }
+      : buildValidationEnvelope(parsed.error, 'Invalid request parameters'),
+  );
 }
 
 export function registerCatalogContributionsRoutes(
@@ -296,15 +318,22 @@ export function registerCatalogContributionsRoutes(
         });
       }
 
+      // `facets=categories` counts only the category facet (the tag landing page
+      // renders nothing else); `true` counts every group.
       const rawFacets = firstQueryValue(req.query.facets);
-      if (rawFacets !== undefined && rawFacets !== 'true' && rawFacets !== 'false') {
+      const FACET_PARAM_VALUES = ['true', 'false', 'categories'];
+      if (rawFacets !== undefined && !FACET_PARAM_VALUES.includes(rawFacets)) {
         return res.status(400).json({
           error: 'invalid_facets',
-          message: 'facets must be true or false',
-          allowed: ['true', 'false'],
+          message: 'facets must be true, false or categories',
+          allowed: FACET_PARAM_VALUES,
         });
       }
-      const includeFacets = rawFacets === 'true';
+      const facets = rawFacets === 'true'
+        ? RESOURCE_FACET_KINDS
+        : rawFacets === 'categories'
+          ? (['categories'] as const)
+          : undefined;
 
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
@@ -318,6 +347,7 @@ export function registerCatalogContributionsRoutes(
       // of a phantom zero-count row named after the raw slug.
       const resolvedFilters: { category?: { requested: string; name: string }; subcategory?: { requested: string; name: string } } = {};
       let resolvedCategory: { id: number; name: string } | undefined;
+      let resolvedSubcategory: { id: number } | undefined;
       if (category && SLUG_SHAPE.test(category)) {
         const cat = await categoryRepo.getCategoryBySlug(category);
         if (cat) {
@@ -334,15 +364,22 @@ export function registerCatalogContributionsRoutes(
           ? await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id)
           : await categoryRepo.getSubcategoryBySlugGlobal(subcategory);
         if (sub) {
+          resolvedSubcategory = sub;
           resolvedFilters.subcategory = { requested: subcategory, name: sub.name };
           subcategory = sub.name;
         }
       }
 
-      // BUG-002: sub-subcategory filter. The audit's reproduction passes the
-      // display NAME (e.g. subSubcategory=AV1), matching the existing
-      // subcategory behaviour, so pass it straight through to listResources.
-      const subSubcategory = firstQueryValue(req.query.subSubcategory);
+      // BUG-002 / PS-25: sub-subcategory accepts the display NAME or a slug,
+      // like category and subcategory. Prefer the subcategory-scoped lookup
+      // when the parent resolved; otherwise resolve the slug globally.
+      let subSubcategory = firstQueryValue(req.query.subSubcategory);
+      if (subSubcategory && SLUG_SHAPE.test(subSubcategory)) {
+        const subSub = resolvedSubcategory
+          ? await categoryRepo.getSubSubcategoryBySlug(subSubcategory, resolvedSubcategory.id)
+          : await categoryRepo.getSubSubcategoryBySlugGlobal(subSubcategory);
+        if (subSub) subSubcategory = subSub.name;
+      }
       const rawGeneralScope = firstQueryValue(req.query.generalScope);
       if (rawGeneralScope !== undefined && rawGeneralScope !== 'category' && rawGeneralScope !== 'subcategory') {
         return res.status(400).json({
@@ -396,7 +433,7 @@ export function registerCatalogContributionsRoutes(
         resourceFormat: resourceFormat || undefined,
         skillLevel: skillLevel || undefined,
         generalScope: rawGeneralScope as "category" | "subcategory" | undefined,
-        includeFacets,
+        facets,
         sort,
         kind: kind || undefined,
       });
@@ -416,6 +453,10 @@ export function registerCatalogContributionsRoutes(
       // Full-set total as a header too, so paged consumers (and the kind
       // strip) can read it without parsing the body.
       res.set('X-Total-Count', String(result.total));
+      // Approved listings are the same for every caller; only the admin-only
+      // pending/rejected listings are session-dependent, and those keep the
+      // session default (private, no-store).
+      if (statusFilter === 'approved') res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json({
         ...result,
         resources: publicResources,
@@ -433,7 +474,7 @@ export function registerCatalogContributionsRoutes(
         ...(Object.keys(resolvedFilters).length ? { resolvedFilters } : {}),
       });
     } catch (error) {
-      console.error('Error fetching resources:', error);
+      logger.error('Error fetching resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resources');
     }
   }));
@@ -491,7 +532,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', knownScope ? CATALOG_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL);
       res.json(counts);
     } catch (error) {
-      console.error('Error counting resources by kind:', error);
+      logger.error('Error counting resources by kind:', error);
       sendOperationalFailure(res, error, 'Failed to count resources by kind');
     }
   }));
@@ -552,9 +593,12 @@ export function registerCatalogContributionsRoutes(
       // NB-021: honest pagination metadata — repeat with offset=nextOffset
       // until nextOffset is null to retrieve every promised match.
       const nextOffset = offset + resources.length < total ? offset + resources.length : null;
+      // Approved-only search: identical for every caller, so it takes the
+      // public catalog policy like the other catalog reads.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource), search });
     } catch (error) {
-      console.error('Error searching resources:', error);
+      logger.error('Error searching resources:', error);
       sendOperationalFailure(res, error, 'Failed to search resources');
     }
   }));
@@ -577,26 +621,29 @@ export function registerCatalogContributionsRoutes(
     if (!parsed.success) {
       return res.status(400).json({ message: 'Invalid payload' });
     }
-    const { path, referrer, ts } = parsed.data;
+    const { referrer, ts } = parsed.data;
+    // Query strings can carry search text or tokens, and older clients still
+    // send them: only the path is logged, for the page and the referrer.
+    const path = parsed.data.path.split(/[?#]/, 1)[0] || '/';
     let safeReferrer: string | null = null;
     if (referrer) {
       try {
         const u = new URL(referrer);
         if ((u.protocol === 'https:' || u.protocol === 'http:') && u.host === req.get('host')) {
-          safeReferrer = u.toString();
+          safeReferrer = `${u.origin}${u.pathname}`;
         }
       } catch {
         safeReferrer = null;
       }
     }
-    console.warn(
+    logger.warn(
       `[dead-link] path=${JSON.stringify(path)} referrer=${JSON.stringify(safeReferrer ?? '')} ts=${ts ?? new Date().toISOString()}`
     );
     res.status(204).end();
   });
 
   // GET /api/resources/check-url - Check if URL already exists (public)
-  app.get('/api/resources/check-url', asyncHandler(async (req, res) => {
+  app.get('/api/resources/check-url', resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // Run15 BUG-037: trim like the submit schema does — a pasted URL with a
       // trailing space must resolve to the same duplicate-check result.
@@ -624,7 +671,7 @@ export function registerCatalogContributionsRoutes(
       // contents to anonymous probes).
       res.json({ exists: !!existingResource });
     } catch (error) {
-      console.error('Error checking URL:', error);
+      logger.error('Error checking URL:', error);
       sendOperationalFailure(res, error, 'Failed to check URL');
     }
   }));
@@ -640,7 +687,7 @@ export function registerCatalogContributionsRoutes(
       // regex and overflow inside PG → 500. Bound-check before the DB.
       const id = parseBoundedInt(req.params.id);
       if (id === null) {
-        return res.status(404).json({ message: 'Resource not found' });
+        return sendInvalidResourceId(res, req.params.id);
       }
       const resource = await resourceRepo.getResource(id);
 
@@ -664,7 +711,7 @@ export function registerCatalogContributionsRoutes(
       // NEW-019: strip internal `searchTsv` from the public detail response.
       res.json(toPublicResource(resource));
     } catch (error) {
-      console.error('Error fetching resource:', error);
+      logger.error('Error fetching resource:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resource');
     }
   };
@@ -672,26 +719,25 @@ export function registerCatalogContributionsRoutes(
   app.get('/api/resource/:id(\\d+)', resourceReadLimiter, asyncHandler(getResourceByIdHandler));
 
   app.get('/api/resources/:id/related', resourceReadLimiter, asyncHandler(async (req, res) => {
-    const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
       // NB-008 (run23): bound-check (int4 overflow → 500 otherwise).
       const id = parseBoundedInt(req.params.id);
       if (id === null) {
-        return res.json(empty);
+        return sendInvalidResourceId(res, req.params.id);
       }
       const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 5, 1), 10);
       const resource = await resourceRepo.getResource(id);
       if (!resource) {
-        return res.json(empty);
+        return res.status(404).json({ message: 'Resource not found' });
       }
-      // NEW-006 companion: for a non-approved seed id, return the empty shape
-      // to non-admins — a populated `similar` list would confirm the hidden
-      // id exists and leak its category.
+      // NEW-006 companion: a non-approved seed id answers the same 404 as a
+      // missing id to non-admins — a populated `similar` list, or any other
+      // status code, would confirm the hidden id exists and leak its category.
       if (resource.status !== 'approved') {
         // Clerk migration: req.dbUser IS the resolved user row.
         const requester = req.dbUser;
         if (!requester || requester.role !== 'admin') {
-          return res.json(empty);
+          return res.status(404).json({ message: 'Resource not found' });
         }
       }
       // Pull a pool of approved resources in the same category to rank against.
@@ -714,7 +760,7 @@ export function registerCatalogContributionsRoutes(
         nextSteps: sanitizeItems(related.nextSteps),
       });
     } catch (error) {
-      console.error('Error fetching related resources:', error);
+      logger.error('Error fetching related resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch related resources');
     }
   }));
@@ -764,6 +810,18 @@ export function registerCatalogContributionsRoutes(
           message: 'Validation failed',
           fieldErrors,
           errors: submitValidation.error.issues
+        });
+      }
+
+      // Leftover QA probes (example.com etc.) silted up the live moderation
+      // queue; the live site refuses reserved test domains outright. Dev
+      // keeps accepting them so disposable QA submissions still work there.
+      if (process.env.NODE_ENV === 'production' && isReservedTestHost(submitValidation.data.url)) {
+        return res.status(400).json({
+          error: 'validation_failed',
+          message: RESERVED_TEST_HOST_MESSAGE,
+          fieldErrors: { url: RESERVED_TEST_HOST_MESSAGE },
+          errors: [],
         });
       }
 
@@ -857,6 +915,7 @@ export function registerCatalogContributionsRoutes(
           content_type: 'resource_submission',
           category: resourceData.category,
         });
+        logger.info('Resource submitted for review', { resourceId: resource.id, user: userId });
 
         res.status(201).json(resource);
       } catch (createError: any) {
@@ -869,7 +928,7 @@ export function registerCatalogContributionsRoutes(
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid resource data', errors: error.issues });
       }
-      console.error('Error creating resource:', error);
+      logger.error('Error creating resource:', error);
       sendOperationalFailure(res, error, 'Failed to create resource');
     }
   };
@@ -904,7 +963,7 @@ export function registerCatalogContributionsRoutes(
       
       res.json(result);
     } catch (error) {
-      console.error('Error fetching pending resources:', error);
+      logger.error('Error fetching pending resources:', error);
       res.status(500).json({ message: 'Failed to fetch pending resources' });
     }
   }));
@@ -934,9 +993,10 @@ export function registerCatalogContributionsRoutes(
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
+      logger.info('Resource approved', { resourceId: id, admin: userId });
       res.json(resource);
     } catch (error: any) {
-      console.error('Error approving resource:', error);
+      logger.error('Error approving resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -962,9 +1022,10 @@ export function registerCatalogContributionsRoutes(
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
+      logger.info('Resource rejected', { resourceId: id, admin: userId });
       res.json(resource);
     } catch (error: any) {
-      console.error('Error rejecting resource:', error);
+      logger.error('Error rejecting resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -1234,7 +1295,7 @@ export function registerCatalogContributionsRoutes(
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid edit data', errors: error.issues });
       }
-      console.error('Error creating edit suggestion:', error);
+      logger.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
     }
   }));
@@ -1262,7 +1323,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(enriched);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch categories');
     }
   }));
@@ -1286,7 +1347,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(payload);
     } catch (error) {
-      console.error('Error aggregating tags:', error);
+      logger.error('Error aggregating tags:', error);
       sendOperationalFailure(res, error, 'Failed to fetch tags');
     }
   }));
@@ -1329,7 +1390,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subcategories);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
+      logger.error('Error fetching subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch subcategories');
     }
   }));
@@ -1371,7 +1432,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subSubcategories);
     } catch (error) {
-      console.error('Error fetching sub-subcategories:', error);
+      logger.error('Error fetching sub-subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch sub-subcategories');
     }
   }));

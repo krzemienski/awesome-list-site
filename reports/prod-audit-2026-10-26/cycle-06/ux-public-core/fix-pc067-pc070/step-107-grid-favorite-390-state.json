@@ -1,0 +1,39 @@
+{
+  "state": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?sortBy=name-desc&kind=libraries",
+    "width": 390,
+    "height": 844,
+    "touch": 1,
+    "favorite": "false"
+  },
+  "order": [
+    {
+      "label": "View details for Xuggler",
+      "test": "link-view-details-1865"
+    },
+    {
+      "label": "Show 2 more tags",
+      "test": "button-more-tags-1865"
+    },
+    {
+      "label": "Open LinkXuggler (opens in new tab)",
+      "test": "button-visit-1865"
+    },
+    {
+      "label": "Suggest an edit: Xuggler",
+      "test": "button-suggest-edit-1865"
+    },
+    {
+      "label": "Favorite to your account — sign in required: Xuggler",
+      "test": "button-favorite"
+    },
+    {
+      "label": "Bookmark on this device — no sign-in required: Xuggler",
+      "test": "button-bookmark"
+    },
+    {
+      "label": "Xuggler",
+      "test": "link-resource-title-1865"
+    }
+  ]
+}

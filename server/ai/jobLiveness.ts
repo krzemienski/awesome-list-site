@@ -4,6 +4,9 @@ import os from "os";
 import path from "path";
 import { and, eq, isNull, type SQL } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("ai-jobs");
 
 /**
  * Cross-instance liveness for long-running AI jobs (enrichment + research).
@@ -164,7 +167,7 @@ export function startJobHeartbeat(opts: {
       .catch((err: unknown) => {
         if (!warned) {
           warned = true;
-          console.warn(`[${opts.label}] heartbeat failed (will retry):`, err instanceof Error ? err.message : err);
+          logger.warn(`[${opts.label}] heartbeat failed (will retry):`, err instanceof Error ? err.message : err);
         }
       })
       .finally(() => {

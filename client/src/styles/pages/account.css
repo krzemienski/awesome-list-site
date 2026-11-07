@@ -103,10 +103,12 @@
     box-shadow var(--motion-base) var(--motion-ease);
 }
 
-.account-page .account-list-item:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+  .account-page .account-list-item:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 .account-page .account-profile-metric {

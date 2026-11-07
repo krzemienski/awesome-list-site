@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?tags=UDP","title":"Awesome Video — 3826+ Curated Video & Streaming Resources","width":820,"height":1180,"touch":true,"scrollY":980,"bodyWidth":814,"online":true,"focus":{"tag":"INPUT","id":"","label":"Search tags","text":"","rect":{"x":297,"y":764,"width":286,"height":44,"top":764,"right":583,"bottom":808,"left":297}},"headings":[{"text":"Awesome Video Resources","id":""},{"text":"Hand-picked highlights","id":""},{"text":"Nine domains, one taxonomy","id":""},{"text":"Fresh from the index","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Home","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

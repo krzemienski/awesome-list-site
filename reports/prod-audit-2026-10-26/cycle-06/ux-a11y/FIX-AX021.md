@@ -1,0 +1,7 @@
+Fix C6-AX-021 in awesome-list-site. Work in an isolated /tmp clone from origin/main 520d6778369bc7ce495204cfcacc7e0533f941cc on branch fix/c6-ax021-admin-stats-offline. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-a11y/findings.md and sh-14 evidence. During initial admin stats load failure/offline, the dashboard must never present unmeasured resources/categories as numeric zero. Provide a truthful unavailable/error state and a focusable stats Retry distinct from a genuine empty dashboard; preserve normal loading and populated states, avoid indefinite Loading activity after settled failure, and recover correctly when online. Scope AdminDashboard/AdminStats and directly related initial-stats state only. No analytics/API changes.
+
+Run tsc --noEmit and npm run build with unpiped exits. Drive real local admin with authorized owner session at 1440, 820 touch and 390 touch: initial offline stats failure has no zero fallback and has focusable Retry; Retry while offline gives clear feedback; reconnect/Retry restores real counts and activity; genuine zero (if safely available) remains distinct. Save screenshots, accessibility snapshots and network/focus state under reports/prod-audit-2026-10-26/cycle-06/ux-a11y/fix-ax021/. No test files/mocks/validation harnesses.
+
+Commit conventional fix, push HEAD to fix/c6-ax021-admin-stats-offline, open non-draft PR to main and return PR/head SHA, files, checks, evidence and UNVERIFIED items. Never merge.

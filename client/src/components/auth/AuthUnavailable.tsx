@@ -80,7 +80,7 @@ export function ClerkUiFallback({ flow }: { flow: "sign-in" | "sign-up" }) {
 
   if (!failed) {
     return (
-      <p className="text-sm text-muted-foreground" role="status">
+      <p className="text-sm text-muted-foreground" role="status" aria-busy="true">
         Loading {flow}…
       </p>
     );

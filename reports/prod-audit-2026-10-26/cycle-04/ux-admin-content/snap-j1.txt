@@ -1,0 +1,75 @@
+uid=282_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#journeys"
+  uid=282_1 region "Notifications (F8)"
+    uid=282_2 list
+  uid=282_3 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=282_5 banner
+    uid=282_6 button "Toggle sidebar"
+    uid=282_7 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=282_10 button "Search 3,825 resources"
+    uid=282_11 button "Admin, account menu" expandable haspopup="menu"
+  uid=282_12 main
+    uid=282_13 navigation "Breadcrumb"
+      uid=282_14 link "Home" url="https://awesome.video/"
+      uid=282_16 "Admin"
+    uid=282_17 "Authorized admin area"
+    uid=282_18 "ADMIN CONSOLE · "
+    uid=282_19 "ADMIN USER"
+    uid=282_20 heading "Operations dashboard" level="1"
+    uid=282_21 "Manage the "
+    uid=282_22 "3,825"
+    uid=282_23 " resources, jobs, and contributors that keep the index alive."
+    uid=282_24 button "Settings, Journeys section open" expandable haspopup="menu"
+    uid=282_25 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=282_26 status atomic live="polite" relevant="additions text"
+      uid=282_27 "Journeys section open"
+    uid=282_28 button "Scroll tabs left"
+    uid=282_29 tablist "Admin sections" orientation="horizontal"
+      uid=282_30 tab "Overview" selectable
+      uid=282_31 tab "Approvals" selectable
+      uid=282_32 tab "Edits" selectable
+      uid=282_33 tab "Enrichment" selectable
+      uid=282_34 tab "Researcher" selectable
+      uid=282_35 tab "Export" selectable
+      uid=282_36 tab "Database" selectable
+      uid=282_37 tab "Resources" selectable
+      uid=282_38 tab "Categories" selectable
+      uid=282_39 tab "Subcategories" selectable
+      uid=282_40 tab "Users" selectable
+      uid=282_41 tab "GitHub" selectable
+      uid=282_42 tab "Link Health" selectable
+      uid=282_43 tab "Audit" selectable
+      uid=282_44 tab "Research" selectable
+    uid=282_45 button "Scroll tabs right"
+    uid=282_46 tabpanel "Journeys"
+      uid=282_47 "Learning Journeys"
+      uid=282_48 "Edit the steps shown on each learning journey. Changes go live immediately."
+      uid=282_49 "Video Streaming Fundamentals"
+      uid=282_50 "INTRO & LEARNING"
+      uid=282_51 "6"
+      uid=282_52 " STEPS"
+      uid=282_53 "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+      uid=282_54 button "Steps for Video Streaming Fundamentals"
+      uid=282_55 "Building Your First Streaming Platform"
+      uid=282_56 "INFRASTRUCTURE & DELIVERY"
+      uid=282_57 "6"
+      uid=282_58 " STEPS"
+      uid=282_59 "Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of managed versus self-hosted infrastructure."
+      uid=282_60 button "Steps for Building Your First Streaming Platform"
+      uid=282_61 "FFmpeg Mastery"
+      uid=282_62 "ENCODING & CODECS"
+      uid=282_63 "6"
+      uid=282_64 " STEPS"
+      uid=282_65 "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+      uid=282_66 button "Steps for FFmpeg Mastery"
+      uid=282_67 "Advanced Live Streaming Architecture"
+      uid=282_68 "PROTOCOLS & TRANSPORT"
+      uid=282_69 "6"
+      uid=282_70 " STEPS"
+      uid=282_71 "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+      uid=282_72 button "Steps for Advanced Live Streaming Architecture"
+      uid=282_73 "DRM & Content Protection"
+      uid=282_74 "GENERAL TOOLS"
+      uid=282_75 "6"
+      uid=282_76 " STEPS"
+      uid=282_77 "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach."
+      uid=282_78 button "Steps for DRM & Content Protection"

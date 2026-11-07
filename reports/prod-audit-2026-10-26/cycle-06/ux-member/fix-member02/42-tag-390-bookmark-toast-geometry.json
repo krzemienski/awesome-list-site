@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-10-27T08:32:14.658Z",
+  "bookmarks": "[{\"id\":1923,\"savedAt\":\"2026-10-27T08:32:14.502Z\"}]",
+  "toast": [
+    {
+      "text": "Saved on this device\nYour saved resource will move to your account when you sign in.\nSign in",
+      "bounds": {
+        "x": 16,
+        "y": 666,
+        "width": 358,
+        "height": 118,
+        "top": 666,
+        "right": 374,
+        "bottom": 784,
+        "left": 16
+      }
+    },
+    {
+      "text": "",
+      "bounds": {
+        "x": 174.5,
+        "y": 9401.09375,
+        "width": 1,
+        "height": 1,
+        "top": 9401.09375,
+        "right": 175.5,
+        "bottom": 9402.09375,
+        "left": 174.5
+      }
+    },
+    {
+      "text": "Notification Saved on this deviceYour saved resource will move to your account when you sign in.Sign in",
+      "bounds": {
+        "x": -1,
+        "y": 11734.296875,
+        "width": 1,
+        "height": 1,
+        "top": 11734.296875,
+        "right": 0,
+        "bottom": 11735.296875,
+        "left": -1
+      }
+    }
+  ],
+  "backToTop": []
+}

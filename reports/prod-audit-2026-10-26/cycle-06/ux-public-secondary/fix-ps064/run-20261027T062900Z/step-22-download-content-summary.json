@@ -1,0 +1,13 @@
+{
+  "jsonCount": 1858,
+  "jsonDeclared": 1858,
+  "jsonResourceKeys": [
+    "title",
+    "url"
+  ],
+  "csvHeader": "Title,URL",
+  "csvDataLines": 1858,
+  "method": "read original Chrome-downloaded files after UI export",
+  "jsonPath": "downloads/awesome-video.json",
+  "csvPath": "downloads/awesome-video.csv"
+}

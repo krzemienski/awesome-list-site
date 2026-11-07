@@ -1,0 +1,1 @@
+"{\"box\":[45,692,218,44],\"text\":[45,707,207,15],\"cs\":{\"mt\":\"-11px\",\"mb\":\"-9px\",\"pos\":\"static\",\"pad\":\"4px 11px 4px 0px\",\"minH\":\"44px\",\"fs\":\"11.5px\"},\"extentAtTextCenter\":[708,716,9],\"extentAtLeft\":[708,716,9],\"nextTop\":718,\"nextTid\":\"subsub-av1\",\"nextH\":44}"

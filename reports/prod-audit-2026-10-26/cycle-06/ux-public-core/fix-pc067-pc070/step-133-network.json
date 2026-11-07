@@ -1,0 +1,47 @@
+[
+  {
+    "seq": 4210,
+    "ts": 1793086014624,
+    "method": "GET",
+    "url": "http://127.0.0.1:5067/api/awesome-list/nav",
+    "resourceType": "fetch",
+    "status": 200,
+    "durationMs": 50
+  },
+  {
+    "seq": 4211,
+    "ts": 1793086014624,
+    "method": "GET",
+    "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=999",
+    "resourceType": "fetch",
+    "status": 304,
+    "durationMs": 124
+  },
+  {
+    "seq": 4346,
+    "ts": 1793086014793,
+    "method": "GET",
+    "url": "http://127.0.0.1:5067/api/config",
+    "resourceType": "fetch",
+    "status": 200,
+    "durationMs": 39
+  },
+  {
+    "seq": 4347,
+    "ts": 1793086014793,
+    "method": "GET",
+    "url": "http://127.0.0.1:5067/api/auth/user",
+    "resourceType": "fetch",
+    "status": 304,
+    "durationMs": 48
+  },
+  {
+    "seq": 4407,
+    "ts": 1793086014924,
+    "method": "GET",
+    "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=16",
+    "resourceType": "fetch",
+    "status": 304,
+    "durationMs": 24
+  }
+]

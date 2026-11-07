@@ -1,0 +1,158 @@
+✓ Done
+
+✓ All Categories — Awesome Video
+  https://awesome.video/categories
+
+- navigation "Breadcrumb" [ref=e1]
+  - link "Home" [ref=e4]
+  - link "All Categories" [ref=e5]
+- heading "All Categories" [level=1, ref=e2]
+- heading "All categories" [level=2, ref=e3]
+- link "Community & Events" [ref=e6]
+- link "Encoding & Codecs" [ref=e7]
+- link "General Tools" [ref=e8]
+- link "Infrastructure & Delivery" [ref=e9]
+- link "Intro & Learning" [ref=e10]
+- link "Media Tools" [ref=e11]
+- link "Players & Clients" [ref=e12]
+- link "Protocols & Transport" [ref=e13]
+- link "Standards & Industry" [ref=e14]
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-351-categories-firsttab-390.png
+
+✓ About — Awesome Video
+  https://awesome.video/about
+
+- heading "A field journal for video engineers" [level=1, ref=e1]
+- heading "About the maintainer" [level=2, ref=e15]
+- link "Nick Krzemienski on GitHub" [ref=e35]
+- heading "Open source at its core" [level=2, ref=e16]
+- heading "awesome-video" [level=3, ref=e17]
+  - link "awesome-video" [ref=e36]
+- heading "awesome-list-site" [level=3, ref=e18]
+  - link "awesome-list-site" [ref=e37]
+- heading "Features" [level=2, ref=e19]
+- heading "Technology Stack" [level=2, ref=e20]
+- heading "Accessibility First" [level=2, ref=e21]
+- heading "Credits" [level=2, ref=e22]
+- link "Nick Krzemienski" [ref=e38]
+- link "shadcn/ui" [ref=e39]
+- link "Tailwind CSS" [ref=e40]
+- heading "Frequently asked questions" [level=2, ref=e2]
+- heading "What is Awesome Video?" [level=3, ref=e3]
+- heading "Is Awesome Video free to use?" [level=3, ref=e4]
+- heading "How are resources curated?" [level=3, ref=e5]
+- heading "What topics does Awesome Video cover?" [level=3, ref=e6]
+- heading "How do I suggest a new resource?" [level=3, ref=e7]
+- heading "What are the best video codecs for developers?" [level=3, ref=e8]
+- heading "What are the best free video encoding tools?" [level=3, ref=e9]
+- heading "What streaming protocols should I use?" [level=3, ref=e10]
+- heading "What are the best open-source video players for the web?" [level=3, ref=e11]
+- heading "How do I get started with video development?" [level=3, ref=e12]
+- heading "Explore" [level=2, ref=e13]
+- link "Home — all categories" [ref=e23]
+- link "Learning journeys" [ref=e24]
+- link "About" [ref=e25]
+- heading "Top categories" [level=2, ref=e14]
+- link "Community & Events" [ref=e26]
+- link "Encoding & Codecs" [ref=e27]
+- link "General Tools" [ref=e28]
+- link "Infrastructure & Delivery" [ref=e29]
+- link "Intro & Learning" [ref=e30]
+- link "Media Tools" [ref=e31]
+- link "Players & Clients" [ref=e32]
+- link "Protocols & Transport" [ref=e33]
+- link "Standards & Industry" [ref=e34]
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-352-about-firsttab-390.png
+
+✓ Terms of Use — Awesome Video
+  https://awesome.video/terms
+
+- heading "Terms of Use" [level=1, ref=e1]
+- heading "1. What this site is" [level=2, ref=e3]
+- heading "2. Your account" [level=2, ref=e4]
+- heading "3. Submitted content" [level=2, ref=e5]
+- heading "4. Third-party links" [level=2, ref=e6]
+- heading "5. No warranty" [level=2, ref=e7]
+- heading "6. Changes" [level=2, ref=e8]
+- heading "7. Governing law" [level=2, ref=e9]
+- heading "8. Contact" [level=2, ref=e10]
+- link "open an issue on the project's GitHub repository" [ref=e17]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e11]
+- link "Learning journeys" [ref=e12]
+- link "About" [ref=e13]
+- link "Terms of Use" [ref=e14]
+- link "Privacy Policy" [ref=e15]
+- link "Code of Conduct" [ref=e16]
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-353-terms-firsttab-390.png
+
+✓ Privacy Policy — Awesome Video
+  https://awesome.video/privacy
+
+- heading "Privacy Policy" [level=1, ref=e1]
+- heading "1. What we collect" [level=2, ref=e3]
+- heading "2. Analytics" [level=2, ref=e4]
+- heading "3. Cookies" [level=2, ref=e5]
+- columnheader "Cookie" [ref=e19]
+- columnheader "Purpose" [ref=e20]
+- columnheader "Lifetime" [ref=e21]
+- cell "__session*" [ref=e22]
+- cell "Clerk authentication cookie. Clerk uses it to maintain and verify your signed-in session; the name may include an instance suffix." [ref=e23]
+- cell "Managed by Clerk according to the authentication session" [ref=e24]
+- cell "GAESA" [ref=e25]
+- cell "Infrastructure cookie set by our hosting edge (Google App Engine), not by this application. It supports request routing between the edge and our servers — we do not use it to track you, it carries no analytics, and we never read it. Because it comes from the hosting platform, it appears on your first visit regardless of your analytics consent choice. It applies site-wide (path \"/\"). You can block or delete it in your browser settings at any time — the site keeps working; the edge may simply set a fresh one on a later visit." [ref=e26]
+- cell "About 30 days from your last visit" [ref=e27]
+- cell "_ga*, ph_*, AMP_*, AMP_MKTG_*" [ref=e28]
+- cell "Cookies used by Google Analytics, PostHog, and Amplitude for analytics identifiers and session continuity. They are only set after you accept analytics; declining keeps these services from loading." [ref=e29]
+- cell "Set and managed by the relevant analytics provider" [ref=e30]
+- heading "4. Sharing" [level=2, ref=e6]
+- heading "5. Retention and deletion" [level=2, ref=e7]
+- link "Profile → Security → Delete account & data" [ref=e16]
+- link "open an issue on the project's GitHub repository" [ref=e17]
+- heading "6. Changes" [level=2, ref=e8]
+- heading "7. Contact" [level=2, ref=e9]
+- link "open an issue on the project's GitHub repository" [ref=e18]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e10]
+- link "Learning journeys" [ref=e11]
+- link "About" [ref=e12]
+- link "Terms of Use" [ref=e13]
+- link "Privacy Policy" [ref=e14]
+- link "Code of Conduct" [ref=e15]
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-354-privacy-firsttab-390.png
+
+✓ Code of Conduct — Awesome Video
+  https://awesome.video/code-of-conduct
+
+- heading "Code of Conduct" [level=1, ref=e1]
+- heading "1. Our pledge" [level=2, ref=e3]
+- heading "2. Expected behavior" [level=2, ref=e4]
+- heading "3. Unacceptable behavior" [level=2, ref=e5]
+- heading "4. Reporting and enforcement" [level=2, ref=e6]
+- link "open an issue on the project's GitHub repository" [ref=e15]
+- heading "5. Scope" [level=2, ref=e7]
+- heading "6. Changes" [level=2, ref=e8]
+- heading "Explore" [level=2, ref=e2]
+- link "Home — all categories" [ref=e9]
+- link "Learning journeys" [ref=e10]
+- link "About" [ref=e11]
+- link "Terms of Use" [ref=e12]
+- link "Privacy Policy" [ref=e13]
+- link "Code of Conduct" [ref=e14]
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-355-conduct-firsttab-390.png
+

@@ -26,8 +26,10 @@ import {
   Settings
 } from "lucide-react";
 import { AwesomeList } from "@/types/awesome-list";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { countVisibleSubcategories } from "@shared/catalog-counts";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { trackToolTabOpened } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import "@/styles/pages/discovery-tools.css";
 
@@ -54,6 +56,7 @@ export default function Advanced() {
       : "overview";
   });
   const handleTabChange = (next: string) => {
+    if (next !== tab) trackToolTabOpened("advanced", next);
     setTab(next);
     // audit2 BUG-036: ?sub= only means anything on the Metrics tab — reset
     // the inner selection and drop the param when the outer tab changes.
@@ -96,15 +99,27 @@ export default function Advanced() {
   const catalogUnavailable = queryUnavailableReason(catalogQuery);
   const resources = awesomeList?.resources ?? [];
   const categories = awesomeList?.categories ?? [];
+  // The stat cards quote the site-wide definitions, not a recount of the
+  // corpus: subcategories as the footer and Home count them (empty ones
+  // pruned) and tags as /api/tags folds them.
+  const navQuery = useQuery<AwesomeListNav>({ queryKey: ["awesome-list-nav"], queryFn: fetchAwesomeListNav, staleTime: 1000 * 60 * 60 });
+  const tagsQuery = useQuery<{ total: number }>({ queryKey: ["/api/tags"], staleTime: 1000 * 60 * 5 });
+  const statValue = (pending: boolean, value: number | undefined) =>
+    pending ? <Skeleton className="inline-block h-[1em] w-[2.5ch] align-middle" /> : value?.toLocaleString() ?? "—";
 
   if (isLoading && tab !== "recommendations") {
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
-        <div className="discovery-tools-state discovery-tools-state--loading" aria-busy="true">
-          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--title" />
-          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--lede" />
+        <div className="discovery-tools-masthead">
+          <div className="discovery-tools-title-row">
+            <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
+            <h1 className="page-title discovery-tools-page-title">{advancedHeading}</h1>
+          </div>
+          <p className="discovery-tools-page-lede">
+            Discover powerful tools for exploring, analyzing, and sharing awesome list data
+          </p>
         </div>
-        <div className="discovery-tools-loading-grid">
+        <div className="discovery-tools-loading-grid" aria-busy="true">
           {Array(4).fill(0).map((_, i) => (
             <Skeleton key={i} className="discovery-tools-skeleton discovery-tools-skeleton--panel" />
           ))}
@@ -230,7 +245,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--tertiary">
-                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? []).map((tag) => tag.toLowerCase())).size.toLocaleString()}
+                      {statValue(tagsQuery.isPending, tagsQuery.data?.total)}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Unique Tags</div>
                   </CardContent>
@@ -238,7 +253,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--quaternary">
-                      {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
+                      {statValue(navQuery.isPending, navQuery.data && countVisibleSubcategories(visibleNavCategories(navQuery.data.categories)))}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Subcategories</div>
                   </CardContent>
@@ -282,7 +297,7 @@ export default function Advanced() {
             <CardContent className="discovery-tools-panel-content">
               {/* BUG-026 (run13): format cards are now buttons that select the
                   matching format in the export panel below. */}
-              <div className="discovery-tools-format-grid">
+              <div className="discovery-tools-format-grid" role="group" aria-label="Export format">
                 {([
                   { format: "Markdown", value: "markdown", icon: FileText, desc: "GitHub-ready" },
                   { format: "JSON", value: "json", icon: Code, desc: "API-friendly" },
@@ -298,7 +313,7 @@ export default function Advanced() {
                       type="button"
                       onClick={() => setExportFormat(item.value)}
                       aria-pressed={exportFormat === item.value}
-                      aria-label={`Select ${item.format} export format`}
+                      aria-label={item.format}
                       className="discovery-tools-format-option"
                       data-testid={`button-format-${item.value}`}
                     >

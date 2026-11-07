@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -29,12 +29,20 @@ import {
 import type { Resource, Category, Subcategory, SubSubcategory } from "@shared/schema";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
-import { parsePageFromSearch } from "@/lib/page-param";
+import { useSearch } from "wouter";
+import {
+  parseResourceListQuery,
+  updateResourceListQuery,
+  type ResourceListQuery,
+  type ResourceSort,
+} from "@/lib/admin-resource-list-query";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -53,8 +61,10 @@ import {
 } from "@shared/resourceKinds";
 import { classifyResourceKind } from "@shared/resourceKindClassifier";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { ChipButton } from "@/components/ui/chip-button";
 import "@/styles/pages/admin-catalog-resources.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
   tools: "Tools",
@@ -115,6 +125,49 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
 const kindSelectValue = (resource: Pick<AdminResource, "kind" | "inferredKind">): ResourceKind | "" =>
   resource.kind && resource.kind !== resource.inferredKind ? resource.kind : "";
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
+
+type ResourceFormField = "title" | "url" | "description" | "category" | "rejectionReason";
+type ResourceFieldErrors = Partial<Record<ResourceFormField, string>>;
+
+/** The dialogs' validated fields in visual order. */
+const RESOURCE_FORM_FIELDS: readonly ResourceFormField[] = [
+  "title",
+  "url",
+  "description",
+  "category",
+  "rejectionReason",
+];
+
+const resourceFieldId = (mode: "edit" | "create", field: ResourceFormField) =>
+  field === "rejectionReason" ? "edit-rejection-reason" : `${mode}-${field}`;
+
+/**
+ * A failed submit left focus on the submit button, or on the dialog once a
+ * pending save disabled it. Land on the first invalid field after it renders
+ * its aria-describedby error, which screen readers then read with the field.
+ * Returns whether any field was invalid.
+ */
+const focusFirstInvalidField = (mode: "edit" | "create", errors: ResourceFieldErrors): boolean => {
+  const firstInvalid = RESOURCE_FORM_FIELDS.find((field) => errors[field]);
+  if (!firstInvalid) return false;
+  requestAnimationFrame(() => document.getElementById(resourceFieldId(mode, firstInvalid))?.focus());
+  return true;
+};
+
+/**
+ * A save that collides with another resource's URL is answered 409 with a
+ * plain message (no fieldErrors). The only unique field on the write is the
+ * URL, so the message belongs on that field. Null for any other error.
+ */
+const duplicateUrlMessage = (error: unknown): string | null => {
+  if (!(error instanceof ApiError) || error.status !== 409) return null;
+  try {
+    const message = (JSON.parse(error.body) as { message?: unknown }).message;
+    return typeof message === "string" && message ? message : null;
+  } catch {
+    return null;
+  }
+};
 
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
 interface BulkResourceResult {
@@ -187,25 +240,27 @@ const FILTER_STATUS_OPTIONS = [
   ...STATUS_OPTIONS,
   { value: "withdrawn", label: "Withdrawn", color: "bg-[var(--surface-3)] text-[var(--text)]" },
 ];
+const FILTER_STATUS_VALUES = FILTER_STATUS_OPTIONS.map((option) => option.value);
 
 export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Task 275: honor ?page= on load so the paginator's real hrefs
-  // (copy-link / cmd-click) actually land on the linked page.
-  const [page, setPage] = useState(() => parsePageFromSearch(window.location.search).page);
-  // Run16 BUG-035: page size + sort are now user-selectable.
-  const [limit, setLimit] = useState(25);
-  const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
-  const [search, setSearch] = useState("");
-  // A deep-linked non-default status (?status=rejected from the dashboard
-  // stat, or a reload) must be visible, so the filter panel starts open.
-  const [catalogToolsOpen, setCatalogToolsOpen] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get("status");
-    return (!!s && s !== "approved") || params.get("featured") === "true";
-  });
+  // AC-06: the URL is the only owner of the list state (search, category,
+  // status, sort, featured, page, size), so reload, share and the
+  // dashboard's ?status=rejected deep link all land on the same table. List
+  // changes use replaceState, so Back leaves the list instead of stepping
+  // through earlier filters or pages.
+  const searchString = useSearch();
+  const { search, category: categoryFilter, status: statusFilter, sort, featured: featuredOnly, page, limit } =
+    useMemo(() => parseResourceListQuery(searchString, FILTER_STATUS_VALUES), [searchString]);
+  const updateListQuery = (patch: Partial<ResourceListQuery>) =>
+    updateResourceListQuery(patch, FILTER_STATUS_VALUES);
+  // A deep-linked filter hidden inside the closed panel must be visible, so
+  // the panel starts open for anything but the default view.
+  const [catalogToolsOpen, setCatalogToolsOpen] = useState(
+    () => statusFilter !== "approved" || featuredOnly || !!categoryFilter || sort !== "newest",
+  );
   // Audit2 BUG-003: debounce the search text into the query key. Every
   // keystroke used to swap the queryKey immediately; the fresh key had no
   // cached data, `isLoading` went true, and the whole component fell into the
@@ -213,62 +268,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // to the first character, focus lost, one request per remount, and rapid
   // typing could hang the page). Debounce + keepPreviousData keep the form
   // mounted and send ONE request for the full string.
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(t);
   }, [search]);
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  // P1-04: seed the status filter from ?status= on first load so a deep-link
-  // (the dashboard's "N rejected" stat) and a plain reload/bookmark of
-  // /admin?tab=resources&status=rejected both land on the same filtered table.
-  const [statusFilter, setStatusFilter] = useState<string>(() => {
-    const s = new URLSearchParams(window.location.search).get("status");
-    // C10-V5A-03: "all" is an explicit choice (distinct from the default
-    // "approved"), so it survives reload/Back and reads as a real value.
-    return s && (s === "all" || FILTER_STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
-  });
-
-  // Home-page picks: "Featured only" narrows the table to metadata.featured
-  // rows and round-trips through ?featured=true like ?status=.
-  const [featuredOnly, setFeaturedOnly] = useState(
-    () => new URLSearchParams(window.location.search).get("featured") === "true",
-  );
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("featured");
-    const want = featuredOnly ? "true" : null;
-    if (current === want) return;
-    if (want) url.searchParams.set("featured", want);
-    else url.searchParams.delete("featured");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [featuredOnly]);
-
-  // Task 275: mirror the effective page into ?page= (replaceState, no history
-  // spam) so the paginator's hrefs stay honest and refresh keeps your place.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("page");
-    const want = page > 1 ? String(page) : null;
-    if (current === want) return;
-    if (want) url.searchParams.set("page", want);
-    else url.searchParams.delete("page");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [page]);
-
-  // P1-04: keep ?status= in sync with the active status filter (replaceState,
-  // no history spam) so the deep-linked/filtered view round-trips on reload,
-  // share, and bookmark — and clearing the filter removes the param instead of
-  // leaving a stale ?status=rejected behind.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("status");
-    const want = statusFilter || null;
-    if (current === want) return;
-    if (want) url.searchParams.set("status", want);
-    else url.searchParams.delete("status");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [statusFilter]);
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -284,7 +288,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<ResourceFieldErrors>({});
+  // Moving a resource into Rejected from the editor needs the same 10+
+  // character reason as the moderation queue; the contributor sees it.
+  const [rejectionReason, setRejectionReason] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   // Catalog controls use narrow PATCH endpoints. Keep failures next to the
   // control that initiated them so an error never closes/remounts the dialog.
@@ -335,18 +342,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const buildQueryKey = () => {
-    const params = new URLSearchParams();
-    params.set('page', page.toString());
-    params.set('limit', limit.toString());
-    if (search) params.set('search', search);
-    if (categoryFilter) params.set('category', categoryFilter);
-    if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
-    if (featuredOnly) params.set('featured', 'true');
-    return `/api/admin/resources?${params.toString()}`;
-  };
-
-  const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, refetch } = useQuery<ResourcesResponse>({
+  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -359,7 +355,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
       if (featuredOnly) params.set('featured', 'true');
-      const response = await fetch(`/api/admin/resources?${params.toString()}`, {
+      const response = await apiFetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resources');
@@ -376,6 +372,16 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     refetchOnWindowFocus: true
   });
 
+  // React Query v5 drops placeholderData as soon as the new key errors, so a
+  // failed page/filter/search change used to wipe the rows and print "0 of 0".
+  // Retain the last successful response instead; every count below then
+  // describes the rows that are actually on screen.
+  const lastLoadedRef = useRef<ResourcesResponse | null>(null);
+  useEffect(() => {
+    if (queryData) lastLoadedRef.current = queryData;
+  }, [queryData]);
+  const data = queryData ?? lastLoadedRef.current ?? undefined;
+
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
   // next one loads (or, offline, while its fetch is paused). The footer and
   // pager describe the rows actually shown, not the page that was requested.
@@ -383,7 +389,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const shownLimit = data?.limit ?? limit;
   // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
   // kept instead of dropping it to <body>.
-  const tableRegionRef = useRef<HTMLDivElement>(null);
+  const tableRegionRef = useRef<HTMLDivElement | null>(null);
+  const tableScrollCue = useHorizontalScrollCue();
+  const setTableScroller = tableScrollCue.ref;
+  const tableRegionCallbackRef = useCallback((el: HTMLDivElement | null) => {
+    tableRegionRef.current = el;
+    setTableScroller(el);
+  }, [setTableScroller]);
   // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
   // bar that opened its dialog) and a row delete removes its row, so the
   // dialog's return-focus target is gone. Land on the table instead.
@@ -395,11 +407,35 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     tableRegionRef.current?.focus();
   };
 
+  // AC-11: the paginator sits under up to 100 rows. Paging brings the panel's
+  // top back into view at once and, once the new rows replace the
+  // placeholder page, moves focus to the count heading (as on the public
+  // listings) so keyboard and screen-reader users land on the new results.
+  const shellRef = useRef<HTMLElement | null>(null);
+  const resultsHeadingRef = useRef<HTMLDivElement | null>(null);
+  const pendingResultsFocusRef = useRef(false);
+  const goToPage = (nextPage: number) => {
+    updateListQuery({ page: nextPage });
+    pendingResultsFocusRef.current = true;
+    shellRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+  };
+  useEffect(() => {
+    if (!pendingResultsFocusRef.current || !data || isPlaceholderData) return;
+    pendingResultsFocusRef.current = false;
+    resultsHeadingRef.current?.focus({ preventScroll: true });
+  }, [data, isPlaceholderData]);
+  // A page request that fails keeps the placeholder rows; the pending move
+  // must not survive to steal focus from a later refetch. Unmount drops it too.
+  useEffect(() => {
+    if (isError) pendingResultsFocusRef.current = false;
+  }, [isError]);
+  useEffect(() => () => { pendingResultsFocusRef.current = false; }, []);
+
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
   const totalPages = data?.totalPages || 1;
   useEffect(() => {
-    if (data && page > totalPages) setPage(totalPages);
+    if (data && page > totalPages) updateResourceListQuery({ page: totalPages }, FILTER_STATUS_VALUES);
   }, [data, page, totalPages]);
 
   // Run17 BUG-028: unfiltered grand total so the header never claims
@@ -407,7 +443,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const { data: grandTotalData } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', 'grand-total'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/resources?page=1&limit=1', {
+      const response = await apiFetch('/api/admin/resources?page=1&limit=1', {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resource total');
@@ -422,7 +458,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const { data: featuredCountData } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', 'featured-count'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/resources?page=1&limit=1&status=approved&featured=true', {
+      const response = await apiFetch('/api/admin/resources?page=1&limit=1&status=approved&featured=true', {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch featured count');
@@ -436,30 +472,38 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   // C3-V5A-02: a server 400 carries per-field messages; mark those fields
   // inline and keep the banner for anything that has no field in the dialog.
-  const showServerFormError = (error: Error, fallback: string) => {
+  const showServerFormError = (mode: "edit" | "create", error: Error, fallback: string) => {
+    const duplicateUrl = duplicateUrlMessage(error);
+    if (duplicateUrl) {
+      setFieldErrors({ url: duplicateUrl });
+      setFormError(null);
+      focusFirstInvalidField(mode, { url: duplicateUrl });
+      return;
+    }
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
       setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
       return;
     }
-    const inline: { title?: string; url?: string; description?: string } = {};
+    const inline: ResourceFieldErrors = {};
     const other: string[] = [];
     for (const [field, message] of Object.entries(serverFieldErrors)) {
-      if (field === "title" || field === "url" || field === "description") inline[field] = message;
+      if (field === "title" || field === "url" || field === "description" || field === "rejectionReason") inline[field] = message;
       else other.push(`${field}: ${message}`);
     }
     setFieldErrors(inline);
     setFormError(other.length > 0 ? other.join(" ") : "Please fix the highlighted fields.");
+    focusFirstInvalidField(mode, inline);
   };
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> }) => {
+    mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> & { rejectionReason?: string } }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
     },
-    onSuccess: () => {
+    onSuccess: (_result, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
@@ -467,15 +511,18 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setEditDialogOpen(false);
       setSelectedResource(null);
+      const savedTitle = variables.data.title || "The resource";
       toast({
-        title: "Resource Updated",
-        description: "The resource has been successfully updated.",
+        title: "Resource updated",
+        description: variables.data.rejectionReason
+          ? `"${savedTitle}" was rejected. The contributor will see your reason.`
+          : `Changes to "${savedTitle}" were saved.`,
       });
     },
     onError: (error: Error) => {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
-      showServerFormError(error, "Failed to update resource");
+      showServerFormError("edit", error, "Failed to update resource");
     }
   });
 
@@ -668,11 +715,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       const createdStatus = STATUS_OPTIONS.find((option) => option.value === createdResource?.status)?.value
         ?? editForm.status
         ?? "pending";
-      setSearch("");
       setDebouncedSearch("");
-      setCategoryFilter("");
-      setStatusFilter(createdStatus);
-      setPage(1);
+      updateListQuery({ search: "", category: "", status: createdStatus });
       setSelectedResourceIds([]);
       setCreateDialogOpen(false);
       resetEditForm();
@@ -685,7 +729,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
-      showServerFormError(error, "Failed to create resource");
+      showServerFormError("create", error, "Failed to create resource");
     }
   });
 
@@ -819,6 +863,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // returns there on close (Radix onCloseAutoFocus) instead of falling to
   // <body> — keyboard/AT users keep their place in the table row.
   const editTriggerRef = useRef<HTMLElement | null>(null);
+  // Same for the row delete confirmation and the create dialog: their opener
+  // is remembered so Cancel/Escape return focus to it instead of <body>.
+  const deleteTriggerRef = useRef<HTMLElement | null>(null);
+  const createTriggerRef = useRef<HTMLElement | null>(null);
 
   const openEditDialog = (resource: AdminResource) => {
     // Capture the triggering row button (falls back to null for the
@@ -828,6 +876,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     setSelectedResource(resource);
     // BUG-049: fresh dialog, fresh error state.
     setFieldErrors({});
+    setRejectionReason("");
     setFormError(null);
     setResourceActionErrors((previous) => {
       const next = { ...previous };
@@ -853,6 +902,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const openCreateDialog = () => {
+    const active = document.activeElement;
+    createTriggerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     resetEditForm();
     // Run16 BUG-031: new resources follow the approval workflow by default —
     // the admin can still explicitly pick "approved" in the dialog.
@@ -892,7 +943,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       url.searchParams.delete("resourceId");
       window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     };
-    fetch(`/api/resources/${rid}`, { credentials: "include" })
+    apiFetch(`/api/resources/${rid}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((resource: AdminResourceWire) => openEditDialog(normalizeAdminResource(resource)))
       .catch(() => {
@@ -907,6 +958,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   }, []);
 
   const openDeleteDialog = (resource: AdminResource) => {
+    const active = document.activeElement;
+    deleteTriggerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     setSelectedResource(resource);
     setDeleteDialogOpen(true);
   };
@@ -916,8 +969,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // inline next to each field instead of toast-only. Edit accepts legacy
   // http:// URLs (server PUT uses webUrlSchema); Create requires https
   // (server POST uses httpsUrlSchema).
+  const needsRejectionReason = Boolean(
+    selectedResource && editForm.status === "rejected" && selectedResource.status !== "rejected",
+  );
+
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string; category?: string } = {};
+    const errors: ResourceFieldErrors = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -935,12 +992,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     if (mode === 'create' && !editForm.category) {
       errors.category = "Category is required";
     }
+    if (mode === 'edit' && needsRejectionReason && rejectionReason.trim().length < 10) {
+      errors.rejectionReason = "Rejection reason is required (minimum 10 characters)";
+    }
     setFieldErrors(errors);
     setFormError(null);
-    return Object.keys(errors).length === 0;
+    return !focusFirstInvalidField(mode, errors);
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category') => {
+  const clearFieldError = (field: ResourceFormField) => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -954,7 +1014,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     delete (fields as Partial<typeof editForm>).featured;
     updateMutation.mutate({
       id: selectedResource.id,
-      data: fields as Partial<AdminResource>,
+      data: {
+        ...(fields as Partial<AdminResource>),
+        ...(needsRejectionReason ? { rejectionReason: rejectionReason.trim() } : {}),
+      },
     });
   };
 
@@ -1047,18 +1110,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     e.preventDefault();
     // Explicit submit skips the debounce window (Audit2 BUG-003).
     setDebouncedSearch(search);
-    setPage(1);
+    updateListQuery({});
     setSelectedResourceIds([]);
   };
 
   const clearFilters = () => {
-    setSearch("");
     setDebouncedSearch("");
-    setCategoryFilter("");
-    setStatusFilter("approved");
-    setFeaturedOnly(false);
-    setSort("newest");
-    setPage(1);
+    updateListQuery({ search: "", category: "", status: "approved", featured: false, sort: "newest" });
     setSelectedResourceIds([]);
   };
 
@@ -1107,11 +1165,42 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return data.resources.some(r => selectedResourceIds.includes(r.id)) && !isAllSelected;
   }, [data?.resources, selectedResourceIds, isAllSelected]);
 
+  // "approved" is the default status, not a filter the admin chose.
+  const hasActiveFilters = Boolean(search || categoryFilter || featuredOnly || statusFilter !== "approved");
+
+  // The empty state names exactly these filters, so "nothing found" explains
+  // which search/category/status/featured choices produced it.
+  const activeFilterSummary = [
+    search.trim() ? `"${search.trim()}"` : null,
+    categoryFilter || null,
+    statusFilter !== "approved"
+      ? FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter
+      : null,
+    featuredOnly ? "Featured only" : null,
+  ].filter(Boolean).join(" · ");
+
   // Audit2 BUG-003: only the true first load may show the skeleton. With
   // keepPreviousData above, later key changes (typing, paging, filters) keep
   // `data` populated, so this branch can never unmount the search input
   // mid-typing again.
-  if (isLoading && !data) {
+  // A first load paused offline has no data and no error either; say so
+  // instead of leaving a skeleton up with no explanation (RM-02).
+  if (!data && queryUnavailableReason({ isPending, isPaused, isError }) === "offline") {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <AdminLoadError
+            subject="resources"
+            error={resourcesError}
+            offline
+            testId="banner-resources-offline"
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if ((isLoading || isPaused) && !data) {
     return (
       <Card>
         <CardHeader>
@@ -1130,10 +1219,17 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   return (
     <div className={`admin-catalog-resources space-y-4${catalogToolsOpen ? " admin-catalog-resources--tools-open" : ""}`}>
-      <Card className="admin-catalog-resources__shell">
+      <Card ref={shellRef} className="admin-catalog-resources__shell">
         <CardHeader className="admin-catalog-resources__header">
           <div>
-            <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
+            <CardTitle
+              ref={resultsHeadingRef}
+              role="heading"
+              aria-level={2}
+              tabIndex={-1}
+              className="admin-catalog-resources__title flex items-center gap-2 outline-none"
+              data-testid="text-resources-heading"
+            >
               <Database className="h-5 w-5" />
               Resources ({data?.resources.length ?? 0} of {(data?.total ?? 0).toLocaleString()})
             </CardTitle>
@@ -1144,14 +1240,14 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   {` · ★ ${featuredCount.toLocaleString()} featured on the home page`}
                 </span>
               ) : null}
-              {(search || categoryFilter || featuredOnly || (statusFilter && statusFilter !== "approved")) ? " · Filters applied" : ""}
+              {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
           <div className="admin-catalog-resources__header-actions">
             <Input
               placeholder="Search…"
               value={search}
-              onChange={(event) => { setSearch(event.target.value); setPage(1); }}
+              onChange={(event) => updateListQuery({ search: event.target.value })}
               data-testid="input-search-resources-header"
             />
             <Button
@@ -1180,9 +1276,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             role="region"
             aria-label="Resource filters and tools"
             onSubmit={handleSearch}
-            className="admin-catalog-resources__filters flex flex-col sm:flex-row gap-3"
+            className="admin-catalog-resources__filters flex flex-col sm:flex-row sm:flex-wrap gap-3"
           >
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-w-52">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
                 placeholder="Search by title or URL..."
@@ -1190,7 +1286,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 /* R4-018: the query key includes `search`, so each keystroke
                    refetches live — reset to page 1 too, or a deep page index
                    survives into a smaller result set ("Page 101 of 11"). */
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => updateListQuery({ search: e.target.value })}
                 className="pl-10"
                 data-testid="input-search-resources"
               />
@@ -1199,8 +1295,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 value=""), but the API treats a literal status/category of "all"
                 as a real filter value and matches nothing. Map "all" back to ""
                 (= param omitted) so resetting a filter actually resets it. */}
-            <Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
-              <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
+            <Select value={categoryFilter} onValueChange={(v) => { updateListQuery({ category: v === "all" ? "" : v }); setSelectedResourceIds([]); }}>
+              <SelectTrigger className="w-full sm:w-48 shrink-0" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -1211,8 +1307,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); setSelectedResourceIds([]); }}>
-              <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
+            <Select value={statusFilter} onValueChange={(v) => { updateListQuery({ status: v }); setSelectedResourceIds([]); }}>
+              <SelectTrigger className="w-full sm:w-36 shrink-0" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -1223,8 +1319,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </SelectContent>
             </Select>
             {/* Run16 BUG-035: user-selectable sort order (server-side, whitelisted). */}
-            <Select value={sort} onValueChange={(v) => { setSort(v as typeof sort); setPage(1); }}>
-              <SelectTrigger className="w-full sm:w-40" aria-label="Sort resources" data-testid="select-sort">
+            <Select value={sort} onValueChange={(v) => updateListQuery({ sort: v as ResourceSort })}>
+              <SelectTrigger className="w-full sm:w-40 shrink-0" aria-label="Sort resources" data-testid="select-sort">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
@@ -1236,7 +1332,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </Select>
             <ChipButton
               aria-pressed={featuredOnly}
-              onClick={() => { setFeaturedOnly((on) => !on); setPage(1); setSelectedResourceIds([]); }}
+              onClick={() => { updateListQuery({ featured: !featuredOnly }); setSelectedResourceIds([]); }}
               data-testid="button-featured-only"
             >
               ★ Featured only
@@ -1244,20 +1340,30 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
               <Search className="h-4 w-4" />
             </Button>
-            {(search || categoryFilter || statusFilter || featuredOnly) && (
-              <Button type="button" variant="ghost" onClick={clearFilters} aria-label="Clear filters" data-testid="button-clear-filters">
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={(event) => {
+                  // The button hides once nothing is filtered; keep focus with the results.
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  clearFilters();
+                }}
+                aria-label="Clear filters"
+                data-testid="button-clear-filters"
+              >
                 <X className="h-4 w-4" />
               </Button>
             )}
           </form>
 
           {selectedResourceIds.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium text-[var(--text)]">
                   {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
                 </span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -1449,7 +1555,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      setPage(shownPage);
+                      updateListQuery({ page: shownPage });
                       tableRegionRef.current?.focus();
                     }}
                     data-testid="button-resources-offline-stay"
@@ -1471,46 +1577,45 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
+          <div className="relative">
+          {tableScrollCue.showCue && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid="gradient-scroll-cue-resources"
+            />
+          )}
           <div
-            ref={tableRegionRef}
-            tabIndex={-1}
-            className="admin-catalog-resources__table-scroll overflow-auto"
+            ref={tableRegionCallbackRef}
+            tabIndex={0}
+            role="region"
+            aria-label="Resources table, scrollable"
+            onKeyDown={tableScrollCue.onKeyDown}
+            className="admin-catalog-resources__table-scroll overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
           >
             <table className="table admin-catalog-resources__table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th className="admin-catalog-resources__id-cell admin-catalog-resources__id-head">
+                    <span>ID</span>
+                    <Checkbox
+                      checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleSelectAll}
+                      disabled={!data?.resources.length}
+                      aria-label="Select all resources on this page"
+                      className="admin-catalog-resources__row-select h-8 w-8"
+                      data-testid="checkbox-select-all-resources"
+                    />
+                  </th>
                   <th>Title</th>
                   <th>Category</th>
+                  <th>Status</th>
                   <th>Tags</th>
                   <th>Featured</th>
                   <th aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
-                {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
-                {!isLoading && !isError && (data?.resources.length || 0) === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
-                      {(search || categoryFilter || statusFilter)
-                        ? <>No resources match the current search or filters.{' '}
-                            {/* C5-V5A-02: this row unmounts once results return;
-                                hand focus to the table that shows them. */}
-                            <button
-                              type="button"
-                              className="text-primary underline"
-                              onClick={() => {
-                                clearFilters();
-                                tableRegionRef.current?.focus();
-                              }}
-                              data-testid="button-empty-clear-filters"
-                            >
-                              Clear filters
-                            </button></>
-                        : "No resources yet."}
-                    </td>
-                  </tr>
-                )}
                 {data?.resources.map((resource) => (
                   <tr
                     key={resource.id}
@@ -1534,16 +1639,37 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     <td className="admin-catalog-resources__category-cell">
                       {resource.category || "Uncategorized"}
                     </td>
+                    {/* Rows must show their own status: with status=all the
+                        table mixed approved/pending/rejected with no way to
+                        tell them apart. getStatusBadge already existed. */}
+                    <td>{getStatusBadge(resource.status ?? "unknown")}</td>
                     <td>
                       <div className="admin-catalog-resources__tags">
-                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
-                          const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
-                          return (
-                            <Badge key={index} variant="chip" title={label}>
-                              {label}
-                            </Badge>
+                        {(() => {
+                          const labels = (safeResourceMetadataTags(resource.metadata) || []).map((tag) =>
+                            typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag),
                           );
-                        })}
+                          return (
+                            <>
+                              {labels.slice(0, 2).map((label, index) => (
+                                <Badge key={index} variant="chip" title={label}>
+                                  {label}
+                                </Badge>
+                              ))}
+                              {/* Truncating silently hid real tags; the +N names
+                                  the rest for pointer and assistive-tech users. */}
+                              {labels.length > 2 && (
+                                <Badge
+                                  variant="chip"
+                                  title={labels.slice(2).join(", ")}
+                                  aria-label={`${labels.length - 2} more tags: ${labels.slice(2).join(", ")}`}
+                                >
+                                  +{labels.length - 2}
+                                </Badge>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </td>
                     <td>
@@ -1596,10 +1722,38 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </tbody>
             </table>
           </div>
-          {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
-          <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see category, tags, featured, and actions.
-          </p>
+          </div>
+          {/* Run16 BUG-080: explicit empty state instead of a blank table.
+              Rendered OUTSIDE the horizontally scrolling table: a colSpan cell
+              centred on a 1052px table was clipped to "No resources match th…"
+              on a phone, with Clear filters unreachable. */}
+          {!isLoading && !isError && !isPaused && (data?.resources.length || 0) === 0 && (
+            <div className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+              {hasActiveFilters ? (
+                <>
+                  No resources match {activeFilterSummary}.{' '}
+                  {/* C5-V5A-02: this message unmounts once results return;
+                      hand focus to the table that shows them. */}
+                  <button
+                    type="button"
+                    className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary underline"
+                    onClick={() => {
+                      clearFilters();
+                      tableRegionRef.current?.focus();
+                    }}
+                    data-testid="button-empty-clear-filters"
+                  >
+                    Clear filters
+                  </button>
+                </>
+              ) : "No resources yet."}
+            </div>
+          )}
+          {tableScrollCue.showCue && (
+            <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
+              Swipe the table sideways to see category, tags, featured, and actions.
+            </p>
+          )}
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
           <div className="admin-catalog-resources__pagination-summary flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
@@ -1611,7 +1765,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   ? "0 resources"
                   : `Showing ${(((shownPage - 1) * shownLimit) + 1).toLocaleString()} - ${Math.min(shownPage * shownLimit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
               </div>
-              <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
+              <Select value={String(limit)} onValueChange={(v) => updateListQuery({ limit: parseInt(v, 10) })}>
                 {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
                     at 375px and ellipsis-clipped "25 / page" to "25 /…". */}
                 <SelectTrigger className="w-28 h-8 shrink-0" aria-label="Rows per page" data-testid="select-page-size">
@@ -1641,7 +1795,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               else url.searchParams.delete("page");
               return url.pathname + url.search + url.hash;
             }}
-            onNavigate={(p) => setPage(p)}
+            onNavigate={goToPage}
             className="admin-catalog-resources__paginator pt-4"
           />
         </CardContent>
@@ -1766,7 +1920,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <Label htmlFor="edit-status">Status</Label>
                 <Select 
                   value={editForm.status} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
+                  onValueChange={(v) => { clearFieldError('rejectionReason'); setEditForm(f => ({ ...f, status: v })); }}
                 >
                   <SelectTrigger id="edit-status" data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
@@ -1779,6 +1933,26 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 </Select>
               </div>
             </div>
+            {needsRejectionReason && (
+              <div className="grid gap-2">
+                <Label htmlFor="edit-rejection-reason">Rejection reason * <span className="text-muted-foreground font-normal">(shown to the contributor)</span></Label>
+                <Textarea
+                  id="edit-rejection-reason"
+                  value={rejectionReason}
+                  onChange={(e) => { clearFieldError('rejectionReason'); setRejectionReason(e.target.value); }}
+                  rows={3}
+                  placeholder="Explain why this resource is being rejected (at least 10 characters)..."
+                  aria-invalid={!!fieldErrors.rejectionReason}
+                  aria-describedby={fieldErrors.rejectionReason ? "edit-rejection-reason-error" : undefined}
+                  data-testid="input-edit-rejection-reason"
+                />
+                {fieldErrors.rejectionReason && (
+                  <p id="edit-rejection-reason-error" className="text-sm text-destructive" data-testid="error-edit-rejection-reason">
+                    {fieldErrors.rejectionReason}
+                  </p>
+                )}
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>
@@ -1952,7 +2126,19 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         {/* NB-005 (run18) + F893: same svh cap and pinned footer as the edit dialog. */}
-        <DialogContent className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]">
+        <DialogContent
+          className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
+          onCloseAutoFocus={(event) => {
+            const trigger = createTriggerRef.current;
+            createTriggerRef.current = null;
+            event.preventDefault();
+            // Deep link (?create=1) has no in-page opener: use the Add button.
+            const target = trigger?.isConnected
+              ? trigger
+              : document.querySelector<HTMLElement>('[data-testid="button-add-resource"]');
+            if (!focusElement(target)) focusPageHeading();
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -2201,7 +2387,19 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]" onCloseAutoFocus={restoreFocusToTable}>
+        <AlertDialogContent
+          className="bg-[var(--bg-2)] border-[var(--border)]"
+          onCloseAutoFocus={(event) => {
+            const trigger = deleteTriggerRef.current;
+            deleteTriggerRef.current = null;
+            // A confirmed delete removes the row (and its button): land on the table.
+            if (focusTableOnCloseRef.current) return restoreFocusToTable(event);
+            if (trigger?.isConnected) {
+              event.preventDefault();
+              trigger.focus();
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>

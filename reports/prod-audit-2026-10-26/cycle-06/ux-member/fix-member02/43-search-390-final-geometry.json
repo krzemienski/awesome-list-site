@@ -1,0 +1,2658 @@
+{
+  "capturedAt": "2026-10-27T08:32:30.044Z",
+  "url": "http://127.0.0.1:5122/search?q=hls",
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "dpr": 1,
+    "touchPoints": 1,
+    "coarse": true,
+    "hover": false
+  },
+  "document": {
+    "clientWidth": 390,
+    "scrollWidth": 390
+  },
+  "cards": [
+    {
+      "id": "card-resource-777",
+      "bounds": {
+        "x": 20,
+        "y": 430.578125,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 844.96875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: hlsjs-p2p-engine",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 447.578125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 491.578125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: hlsjs-p2p-engine",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 447.578125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 491.578125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "hlsjs-p2p-engine",
+          "testId": "link-resource-title-777",
+          "href": "/resource/777",
+          "bounds": {
+            "x": 37,
+            "y": 505.578125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 549.578125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for hlsjs-p2p-engine",
+          "testId": "link-view-details-777",
+          "href": "/resource/777",
+          "bounds": {
+            "x": 37,
+            "y": 639.96875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 683.96875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": true
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-777",
+          "href": "https://cdnbye.github.io/hlsjs-p2p-engine/",
+          "bounds": {
+            "x": 37,
+            "y": 731.96875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 775.96875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: hlsjs-p2p-engine",
+          "testId": "button-suggest-edit-777",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 783.96875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 827.96875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1706",
+      "bounds": {
+        "x": 20,
+        "y": 860.96875,
+        "width": 310,
+        "height": 382.390625,
+        "right": 330,
+        "bottom": 1243.359375
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: hls.js Low-Latency Playlist Simulator",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 877.96875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 921.96875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: hls.js Low-Latency Playlist Simulator",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 877.96875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 921.96875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "hls.js Low-Latency Playlist Simulator",
+          "testId": "link-resource-title-1706",
+          "href": "/resource/1706",
+          "bounds": {
+            "x": 37,
+            "y": 935.96875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 979.96875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for hls.js Low-Latency Playlist Simulator",
+          "testId": "link-view-details-1706",
+          "href": "/resource/1706",
+          "bounds": {
+            "x": 37,
+            "y": 1070.359375,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 1114.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1706",
+          "href": "https://hls-js.netlify.app/demo/?src=LL-HLS_URL",
+          "bounds": {
+            "x": 37,
+            "y": 1130.359375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 1174.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: hls.js Low-Latency Playlist Simulator",
+          "testId": "button-suggest-edit-1706",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 1182.359375,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 1226.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-292",
+      "bounds": {
+        "x": 20,
+        "y": 1259.359375,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 1673.75
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: hls-dash-dl",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 1276.359375,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 1320.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: hls-dash-dl",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 1276.359375,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 1320.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "hls-dash-dl",
+          "testId": "link-resource-title-292",
+          "href": "/resource/292",
+          "bounds": {
+            "x": 37,
+            "y": 1334.359375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 1378.359375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for hls-dash-dl",
+          "testId": "link-view-details-292",
+          "href": "/resource/292",
+          "bounds": {
+            "x": 37,
+            "y": 1468.75,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 1512.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-292",
+          "href": "https://github.com/ssnangua/hls-dash-dl",
+          "bounds": {
+            "x": 37,
+            "y": 1560.75,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 1604.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: hls-dash-dl",
+          "testId": "button-suggest-edit-292",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 1612.75,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 1656.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-556",
+      "bounds": {
+        "x": 20,
+        "y": 1689.75,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 2104.140625
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: HTTP Live Streaming (HLS)",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 1706.75,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 1750.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: HTTP Live Streaming (HLS)",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 1706.75,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 1750.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "HTTP Live Streaming (HLS)",
+          "testId": "link-resource-title-556",
+          "href": "/resource/556",
+          "bounds": {
+            "x": 37,
+            "y": 1764.75,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 1808.75
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for HTTP Live Streaming (HLS)",
+          "testId": "link-view-details-556",
+          "href": "/resource/556",
+          "bounds": {
+            "x": 37,
+            "y": 1899.140625,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 1943.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-556",
+          "href": "https://en.wikipedia.org/wiki/HTTP_Live_Streaming",
+          "bounds": {
+            "x": 37,
+            "y": 1991.140625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 2035.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: HTTP Live Streaming (HLS)",
+          "testId": "button-suggest-edit-556",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 2043.140625,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 2087.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1102",
+      "bounds": {
+        "x": 20,
+        "y": 2120.140625,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 2534.53125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Guide to Mobile Video Streaming with HLS",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 2137.140625,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 2181.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Guide to Mobile Video Streaming with HLS",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 2137.140625,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 2181.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Guide to Mobile Video Streaming with HLS",
+          "testId": "link-resource-title-1102",
+          "href": "/resource/1102",
+          "bounds": {
+            "x": 37,
+            "y": 2195.140625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 2239.140625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Guide to Mobile Video Streaming with HLS",
+          "testId": "link-view-details-1102",
+          "href": "/resource/1102",
+          "bounds": {
+            "x": 37,
+            "y": 2329.53125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 2373.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1102",
+          "href": "https://mux.com/blog/mobile-hls-guide/",
+          "bounds": {
+            "x": 37,
+            "y": 2421.53125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 2465.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Guide to Mobile Video Streaming with HLS",
+          "testId": "button-suggest-edit-1102",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 2473.53125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 2517.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-45",
+      "bounds": {
+        "x": 20,
+        "y": 2550.53125,
+        "width": 310,
+        "height": 382.390625,
+        "right": 330,
+        "bottom": 2932.921875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: wasp-hls",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 2567.53125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 2611.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: wasp-hls",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 2567.53125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 2611.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "wasp-hls",
+          "testId": "link-resource-title-45",
+          "href": "/resource/45",
+          "bounds": {
+            "x": 37,
+            "y": 2625.53125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 2669.53125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for wasp-hls",
+          "testId": "link-view-details-45",
+          "href": "/resource/45",
+          "bounds": {
+            "x": 37,
+            "y": 2759.921875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 2803.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-45",
+          "href": "https://git.histb.com/peaBerberian/wasp-hls",
+          "bounds": {
+            "x": 37,
+            "y": 2819.921875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 2863.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: wasp-hls",
+          "testId": "button-suggest-edit-45",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 2871.921875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 2915.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1088",
+      "bounds": {
+        "x": 20,
+        "y": 2948.921875,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 3363.3125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: HLS | Bento4",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 2965.921875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 3009.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: HLS | Bento4",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 2965.921875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 3009.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "HLS | Bento4",
+          "testId": "link-resource-title-1088",
+          "href": "/resource/1088",
+          "bounds": {
+            "x": 37,
+            "y": 3023.921875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 3067.921875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for HLS | Bento4",
+          "testId": "link-view-details-1088",
+          "href": "/resource/1088",
+          "bounds": {
+            "x": 37,
+            "y": 3158.3125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 3202.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1088",
+          "href": "https://www.bento4.com/developers/hls/",
+          "bounds": {
+            "x": 37,
+            "y": 3250.3125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 3294.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: HLS | Bento4",
+          "testId": "button-suggest-edit-1088",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 3302.3125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 3346.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1551",
+      "bounds": {
+        "x": 20,
+        "y": 3379.3125,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 3793.703125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Apple HLS Tools",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 3396.3125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 3440.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Apple HLS Tools",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 3396.3125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 3440.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Apple HLS Tools",
+          "testId": "link-resource-title-1551",
+          "href": "/resource/1551",
+          "bounds": {
+            "x": 37,
+            "y": 3454.3125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 3498.3125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Apple HLS Tools",
+          "testId": "link-view-details-1551",
+          "href": "/resource/1551",
+          "bounds": {
+            "x": 37,
+            "y": 3588.703125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 3632.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1551",
+          "href": "https://developer.apple.com/documentation/http-live-streaming/using-apple-s-http-live-streaming-hls-tools",
+          "bounds": {
+            "x": 37,
+            "y": 3680.703125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 3724.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Apple HLS Tools",
+          "testId": "button-suggest-edit-1551",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 3732.703125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 3776.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1554",
+      "bounds": {
+        "x": 20,
+        "y": 3809.703125,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 4224.09375
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Mux HLS Streams",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 3826.703125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 3870.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Mux HLS Streams",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 3826.703125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 3870.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Mux HLS Streams",
+          "testId": "link-resource-title-1554",
+          "href": "/resource/1554",
+          "bounds": {
+            "x": 37,
+            "y": 3884.703125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 3928.703125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Mux HLS Streams",
+          "testId": "link-view-details-1554",
+          "href": "/resource/1554",
+          "bounds": {
+            "x": 37,
+            "y": 4019.09375,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 4063.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1554",
+          "href": "https://test-streams.mux.dev/",
+          "bounds": {
+            "x": 37,
+            "y": 4111.09375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 4155.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Mux HLS Streams",
+          "testId": "button-suggest-edit-1554",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 4163.09375,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 4207.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1010",
+      "bounds": {
+        "x": 20,
+        "y": 4240.09375,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 4654.484375
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: HLS and Fragmented MP4",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 4257.09375,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 4301.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: HLS and Fragmented MP4",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 4257.09375,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 4301.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "HLS and Fragmented MP4",
+          "testId": "link-resource-title-1010",
+          "href": "/resource/1010",
+          "bounds": {
+            "x": 37,
+            "y": 4315.09375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 4359.09375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for HLS and Fragmented MP4",
+          "testId": "link-view-details-1010",
+          "href": "/resource/1010",
+          "bounds": {
+            "x": 37,
+            "y": 4449.484375,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 4493.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1010",
+          "href": "https://hlsbook.net/hls-fragmented-mp4/",
+          "bounds": {
+            "x": 37,
+            "y": 4541.484375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 4585.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: HLS and Fragmented MP4",
+          "testId": "button-suggest-edit-1010",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 4593.484375,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 4637.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1245",
+      "bounds": {
+        "x": 20,
+        "y": 4670.484375,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 5084.875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: 515_hls_authoring_update",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 4687.484375,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 4731.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: 515_hls_authoring_update",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 4687.484375,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 4731.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "515_hls_authoring_update",
+          "testId": "link-resource-title-1245",
+          "href": "/resource/1245",
+          "bounds": {
+            "x": 37,
+            "y": 4745.484375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 4789.484375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for 515_hls_authoring_update",
+          "testId": "link-view-details-1245",
+          "href": "/resource/1245",
+          "bounds": {
+            "x": 37,
+            "y": 4879.875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 4923.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1245",
+          "href": "https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf",
+          "bounds": {
+            "x": 37,
+            "y": 4971.875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 5015.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: 515_hls_authoring_update",
+          "testId": "button-suggest-edit-1245",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 5023.875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 5067.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-465",
+      "bounds": {
+        "x": 20,
+        "y": 5100.875,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 5515.265625
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: HLS (HTTP Live Streaming)",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 5117.875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 5161.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: HLS (HTTP Live Streaming)",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 5117.875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 5161.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "HLS (HTTP Live Streaming)",
+          "testId": "link-resource-title-465",
+          "href": "/resource/465",
+          "bounds": {
+            "x": 37,
+            "y": 5175.875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 5219.875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for HLS (HTTP Live Streaming)",
+          "testId": "link-view-details-465",
+          "href": "/resource/465",
+          "bounds": {
+            "x": 37,
+            "y": 5310.265625,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 5354.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-465",
+          "href": "https://developer.apple.com/streaming/",
+          "bounds": {
+            "x": 37,
+            "y": 5402.265625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 5446.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: HLS (HTTP Live Streaming)",
+          "testId": "button-suggest-edit-465",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 5454.265625,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 5498.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1233",
+      "bounds": {
+        "x": 20,
+        "y": 5531.265625,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 5945.65625
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: 507_hls_authoring_for_airplay_2.",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 5548.265625,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 5592.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: 507_hls_authoring_for_airplay_2.",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 5548.265625,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 5592.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "507_hls_authoring_for_airplay_2.",
+          "testId": "link-resource-title-1233",
+          "href": "/resource/1233",
+          "bounds": {
+            "x": 37,
+            "y": 5606.265625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 5650.265625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for 507_hls_authoring_for_airplay_2.",
+          "testId": "link-view-details-1233",
+          "href": "/resource/1233",
+          "bounds": {
+            "x": 37,
+            "y": 5740.65625,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 5784.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1233",
+          "href": "https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf",
+          "bounds": {
+            "x": 37,
+            "y": 5832.65625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 5876.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: 507_hls_authoring_for_airplay_2.",
+          "testId": "button-suggest-edit-1233",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 5884.65625,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 5928.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1235",
+      "bounds": {
+        "x": 20,
+        "y": 5961.65625,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 6376.046875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 5978.65625,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 6022.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 5978.65625,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 6022.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",
+          "testId": "link-resource-title-1235",
+          "href": "/resource/1235",
+          "bounds": {
+            "x": 37,
+            "y": 6036.65625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 6080.65625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",
+          "testId": "link-view-details-1235",
+          "href": "/resource/1235",
+          "bounds": {
+            "x": 37,
+            "y": 6171.046875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 6215.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1235",
+          "href": "https://developer.apple.com/documentation/http_live_streaming/protocol_extension_for_low-latency_hls_preliminary_specification#3291001",
+          "bounds": {
+            "x": 37,
+            "y": 6263.046875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 6307.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",
+          "testId": "button-suggest-edit-1235",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 6315.046875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 6359.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1695",
+      "bounds": {
+        "x": 20,
+        "y": 6392.046875,
+        "width": 310,
+        "height": 382.390625,
+        "right": 330,
+        "bottom": 6774.4375
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: OpenPlayerJS",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 6409.046875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 6453.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: OpenPlayerJS",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 6409.046875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 6453.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "OpenPlayerJS",
+          "testId": "link-resource-title-1695",
+          "href": "/resource/1695",
+          "bounds": {
+            "x": 37,
+            "y": 6467.046875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 6511.046875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for OpenPlayerJS",
+          "testId": "link-view-details-1695",
+          "href": "/resource/1695",
+          "bounds": {
+            "x": 37,
+            "y": 6601.4375,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 6645.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1695",
+          "href": "https://openplayerjs.io/",
+          "bounds": {
+            "x": 37,
+            "y": 6661.4375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 6705.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: OpenPlayerJS",
+          "testId": "button-suggest-edit-1695",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 6713.4375,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 6757.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1919",
+      "bounds": {
+        "x": 20,
+        "y": 6790.4375,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 7204.828125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Peer5 HLS P2P",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 6807.4375,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 6851.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Peer5 HLS P2P",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 6807.4375,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 6851.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Peer5 HLS P2P",
+          "testId": "link-resource-title-1919",
+          "href": "/resource/1919",
+          "bounds": {
+            "x": 37,
+            "y": 6865.4375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 6909.4375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Peer5 HLS P2P",
+          "testId": "link-view-details-1919",
+          "href": "/resource/1919",
+          "bounds": {
+            "x": 37,
+            "y": 6999.828125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 7043.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1919",
+          "href": "https://docs.peer5.com/",
+          "bounds": {
+            "x": 37,
+            "y": 7091.828125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 7135.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Peer5 HLS P2P",
+          "testId": "button-suggest-edit-1919",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 7143.828125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 7187.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-291",
+      "bounds": {
+        "x": 20,
+        "y": 7220.828125,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 7635.21875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: MediaFlow Proxy",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 7237.828125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 7281.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: MediaFlow Proxy",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 7237.828125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 7281.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "MediaFlow Proxy",
+          "testId": "link-resource-title-291",
+          "href": "/resource/291",
+          "bounds": {
+            "x": 37,
+            "y": 7295.828125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 7339.828125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for MediaFlow Proxy",
+          "testId": "link-view-details-291",
+          "href": "/resource/291",
+          "bounds": {
+            "x": 37,
+            "y": 7430.21875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 7474.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-291",
+          "href": "https://github.com/mhdzumair/mediaflow-proxy",
+          "bounds": {
+            "x": 37,
+            "y": 7522.21875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 7566.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: MediaFlow Proxy",
+          "testId": "button-suggest-edit-291",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 7574.21875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 7618.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-894",
+      "bounds": {
+        "x": 20,
+        "y": 7651.21875,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 8065.609375
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: muxinc/hlstools",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 7668.21875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 7712.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: muxinc/hlstools",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 7668.21875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 7712.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "muxinc/hlstools",
+          "testId": "link-resource-title-894",
+          "href": "/resource/894",
+          "bounds": {
+            "x": 37,
+            "y": 7726.21875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 7770.21875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for muxinc/hlstools",
+          "testId": "link-view-details-894",
+          "href": "/resource/894",
+          "bounds": {
+            "x": 37,
+            "y": 7860.609375,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 7904.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-894",
+          "href": "https://github.com/muxinc/hlstools",
+          "bounds": {
+            "x": 37,
+            "y": 7952.609375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 7996.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: muxinc/hlstools",
+          "testId": "button-suggest-edit-894",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 8004.609375,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 8048.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1142",
+      "bounds": {
+        "x": 20,
+        "y": 8081.609375,
+        "width": 310,
+        "height": 382.390625,
+        "right": 330,
+        "bottom": 8464
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: Eyevinn/ott-multiview",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 8098.609375,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 8142.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: Eyevinn/ott-multiview",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 8098.609375,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 8142.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Eyevinn/ott-multiview",
+          "testId": "link-resource-title-1142",
+          "href": "/resource/1142",
+          "bounds": {
+            "x": 37,
+            "y": 8156.609375,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 8200.609375
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for Eyevinn/ott-multiview",
+          "testId": "link-view-details-1142",
+          "href": "/resource/1142",
+          "bounds": {
+            "x": 37,
+            "y": 8291,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 8335
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1142",
+          "href": "https://github.com/Eyevinn/ott-multiview",
+          "bounds": {
+            "x": 37,
+            "y": 8351,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 8395
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: Eyevinn/ott-multiview",
+          "testId": "button-suggest-edit-1142",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 8403,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 8447
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-49",
+      "bounds": {
+        "x": 20,
+        "y": 8480,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 8894.390625
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: P2P CDN SDK for JavaScript",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 8497,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 8541
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: P2P CDN SDK for JavaScript",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 8497,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 8541
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "P2P CDN SDK for JavaScript",
+          "testId": "link-resource-title-49",
+          "href": "/resource/49",
+          "bounds": {
+            "x": 37,
+            "y": 8555,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 8599
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for P2P CDN SDK for JavaScript",
+          "testId": "link-view-details-49",
+          "href": "/resource/49",
+          "bounds": {
+            "x": 37,
+            "y": 8689.390625,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 8733.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-49",
+          "href": "https://github.com/vadootvpeer/p2p-cdn-sdk-javascript",
+          "bounds": {
+            "x": 37,
+            "y": 8781.390625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 8825.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: P2P CDN SDK for JavaScript",
+          "testId": "button-suggest-edit-49",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 8833.390625,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 8877.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-260",
+      "bounds": {
+        "x": 20,
+        "y": 8910.390625,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 9324.78125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: videojs/videojs-contrib-hls",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 8927.390625,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 8971.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: videojs/videojs-contrib-hls",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 8927.390625,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 8971.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "videojs/videojs-contrib-hls",
+          "testId": "link-resource-title-260",
+          "href": "/resource/260",
+          "bounds": {
+            "x": 37,
+            "y": 8985.390625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 9029.390625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for videojs/videojs-contrib-hls",
+          "testId": "link-view-details-260",
+          "href": "/resource/260",
+          "bounds": {
+            "x": 37,
+            "y": 9119.78125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 9163.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-260",
+          "href": "https://github.com/videojs/videojs-contrib-hls",
+          "bounds": {
+            "x": 37,
+            "y": 9211.78125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 9255.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: videojs/videojs-contrib-hls",
+          "testId": "button-suggest-edit-260",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 9263.78125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 9307.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-464",
+      "bounds": {
+        "x": 20,
+        "y": 9340.78125,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 9755.171875
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: moorthy-g/adaptive-streaming",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 9357.78125,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 9401.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: moorthy-g/adaptive-streaming",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 9357.78125,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 9401.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "moorthy-g/adaptive-streaming",
+          "testId": "link-resource-title-464",
+          "href": "/resource/464",
+          "bounds": {
+            "x": 37,
+            "y": 9415.78125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 9459.78125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for moorthy-g/adaptive-streaming",
+          "testId": "link-view-details-464",
+          "href": "/resource/464",
+          "bounds": {
+            "x": 37,
+            "y": 9550.171875,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 9594.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-464",
+          "href": "https://github.com/moorthy-g/adaptive-streaming",
+          "bounds": {
+            "x": 37,
+            "y": 9642.171875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 9686.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: moorthy-g/adaptive-streaming",
+          "testId": "button-suggest-edit-464",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 9694.171875,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 9738.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-186",
+      "bounds": {
+        "x": 20,
+        "y": 9771.171875,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 10185.5625
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: python-ffmpeg-video-streaming",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 9788.171875,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 9832.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: python-ffmpeg-video-streaming",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 9788.171875,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 9832.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "python-ffmpeg-video-streaming",
+          "testId": "link-resource-title-186",
+          "href": "/resource/186",
+          "bounds": {
+            "x": 37,
+            "y": 9846.171875,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 9890.171875
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for python-ffmpeg-video-streaming",
+          "testId": "link-view-details-186",
+          "href": "/resource/186",
+          "bounds": {
+            "x": 37,
+            "y": 9980.5625,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 10024.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-186",
+          "href": "https://github.com/quasarstream/python-ffmpeg-video-streaming",
+          "bounds": {
+            "x": 37,
+            "y": 10072.5625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 10116.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: python-ffmpeg-video-streaming",
+          "testId": "button-suggest-edit-186",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 10124.5625,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 10168.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-resource-1232",
+      "bounds": {
+        "x": 20,
+        "y": 10201.5625,
+        "width": 310,
+        "height": 414.390625,
+        "right": 330,
+        "bottom": 10615.953125
+      },
+      "actions": [
+        {
+          "name": "Favorite to your account — sign in required: 510_validating_http_live_streams.",
+          "testId": "button-favorite",
+          "href": null,
+          "bounds": {
+            "x": 221,
+            "y": 10218.5625,
+            "width": 44,
+            "height": 44,
+            "right": 265,
+            "bottom": 10262.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Bookmark on this device — no sign-in required: 510_validating_http_live_streams.",
+          "testId": "button-bookmark",
+          "href": null,
+          "bounds": {
+            "x": 269,
+            "y": 10218.5625,
+            "width": 44,
+            "height": 44,
+            "right": 313,
+            "bottom": 10262.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "510_validating_http_live_streams.",
+          "testId": "link-resource-title-1232",
+          "href": "/resource/1232",
+          "bounds": {
+            "x": 37,
+            "y": 10276.5625,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 10320.5625
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "View details for 510_validating_http_live_streams.",
+          "testId": "link-view-details-1232",
+          "href": "/resource/1232",
+          "bounds": {
+            "x": 37,
+            "y": 10410.953125,
+            "width": 121.203125,
+            "height": 44,
+            "right": 158.203125,
+            "bottom": 10454.953125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Open Link",
+          "testId": "button-visit-1232",
+          "href": "https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf",
+          "bounds": {
+            "x": 37,
+            "y": 10502.953125,
+            "width": 276,
+            "height": 44,
+            "right": 313,
+            "bottom": 10546.953125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        },
+        {
+          "name": "Suggest an edit: 510_validating_http_live_streams.",
+          "testId": "button-suggest-edit-1232",
+          "href": null,
+          "bounds": {
+            "x": 37,
+            "y": 10554.953125,
+            "width": 44,
+            "height": 44,
+            "right": 81,
+            "bottom": 10598.953125
+          },
+          "opacity": "1",
+          "hitOwned": null,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    }
+  ]
+}

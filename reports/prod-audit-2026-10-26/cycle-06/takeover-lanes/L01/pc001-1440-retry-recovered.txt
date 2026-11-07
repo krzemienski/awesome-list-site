@@ -1,0 +1,8 @@
+  - heading "All Categories" [level=1, ref=e29]
+    - heading "Community & Events" [level=2, ref=e51]
+    - heading "Encoding & Codecs" [level=2, ref=e52]
+    - heading "General Tools" [level=2, ref=e53]
+    - heading "Infrastructure & Delivery" [level=2, ref=e54]
+    - heading "Intro & Learning" [level=2, ref=e55]
+[83130.649] GET https://awesome.video/api/awesome-list/nav (Fetch)
+[83130.650] GET https://awesome.video/api/awesome-list/nav (Fetch) 200

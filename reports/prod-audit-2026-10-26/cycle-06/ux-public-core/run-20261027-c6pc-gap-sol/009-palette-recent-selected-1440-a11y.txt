@@ -1,0 +1,16 @@
+uid=220_0 RootWebArea "Search — Awesome Video" url="https://awesome.video/search"
+  uid=227_0 dialog "Search Resources" description="Search resources, categories, and pages in the awesome video collection."
+    uid=227_1 heading "Search Resources" level="2"
+    uid=227_2 "Search resources, categories, and pages in the awesome video collection."
+    uid=227_3 generic
+      uid=227_4 combobox "Search resources, categories, and pages" autocomplete="list" expandable expanded haspopup="listbox" value="ffmpeg"
+      uid=227_5 button "esc Close search"
+      uid=227_6 listbox "Suggestions" focusable focused orientation="vertical"
+        uid=232_0 status atomic live="polite" relevant="additions text"
+      uid=227_8 contentinfo
+        uid=227_9 "↑↓"
+        uid=227_10 " navigate"
+        uid=227_11 "↵"
+        uid=227_12 " open"
+        uid=227_13 "esc"
+        uid=227_14 " close"

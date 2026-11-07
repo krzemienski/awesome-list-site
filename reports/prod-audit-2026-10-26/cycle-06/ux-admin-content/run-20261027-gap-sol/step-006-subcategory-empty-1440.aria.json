@@ -1,0 +1,15 @@
+{
+  "active": "create-name",
+  "invalid": [
+    {
+      "describedby": "create-name-error",
+      "id": "create-name",
+      "role": null
+    },
+    {
+      "describedby": "create-slug-error",
+      "id": "create-slug",
+      "role": null
+    }
+  ]
+}

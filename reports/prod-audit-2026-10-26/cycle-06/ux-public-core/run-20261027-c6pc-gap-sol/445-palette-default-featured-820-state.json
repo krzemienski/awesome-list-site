@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/resource/186450","title":"Shaka Packager — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":814,"online":true,"focus":{"tag":"H1","id":"","label":null,"text":"Shaka Packager","rect":{"x":40,"y":223.59375,"width":714,"height":36.0625,"top":223.59375,"right":754,"bottom":259.65625,"left":40}},"headings":[{"text":"Shaka Packager","id":""},{"text":"DESCRIPTION","id":""},{"text":"Keep exploring","id":"resource-onward-heading"},{"text":"Related Resources","id":"related-resources-heading"},{"text":"Resource details","id":""},{"text":"Canonical URL","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Shaka Packager","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/sign-in?redirect_url=%2Fcategory%2Fencoding-codecs%3Fkind%3Dlibraries","title":"Sign In — Awesome Video","width":1440,"height":900,"scrollX":0,"scrollY":0,"bodyWidth":1440,"online":true,"focus":{"tag":"BUTTON","id":"radix-:r0:","label":null,"text":"Sign inSign in, account menu"},"headings":[{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":[],"pressed":[{"text":"Sign in","label":null}],"status":["Loading sign-in…"],"analyticsDisabled":"1"}
+```

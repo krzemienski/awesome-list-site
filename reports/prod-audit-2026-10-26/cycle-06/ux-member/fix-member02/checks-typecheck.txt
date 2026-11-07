@@ -1,0 +1,6 @@
+Command: npx tsc --noEmit
+Working directory: /tmp/c6-member02-sol.2ofXGB
+Executed: 2026-10-27
+Exit status: 0
+Output: (none)
+Source: actual unpiped command result (19.34 seconds); no test suite was run.

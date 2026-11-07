@@ -30,6 +30,9 @@ import {
 import { db } from "../db";
 import { eq, and, desc, asc, inArray, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, WORKER_ID } from "../ai/jobLiveness";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("enrichment");
 
 type DbOrTx = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -135,7 +138,7 @@ export class EnrichmentRepository {
           .returning({ id: enrichmentJobs.id });
         if (reclaimed) {
           await closeOutEnrichmentQueue(tx, orphan.id, 'Not processed: the job was orphaned by a server restart');
-          console.log(`🧹 Enrichment admission reclaimed orphaned job #${orphan.id} (worker gone)`);
+          logger.info(`🧹 Enrichment admission reclaimed orphaned job #${orphan.id} (worker gone)`);
           continue;
         }
         // No match: either it finished meanwhile (fine) or its worker just

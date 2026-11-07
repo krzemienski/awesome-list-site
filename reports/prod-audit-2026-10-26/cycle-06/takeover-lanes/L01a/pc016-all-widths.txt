@@ -1,0 +1,12 @@
+== 820 1180 bottom
+"{\"vw\":1440,\"sy\":4550,\"btn\":[1378,775,44,44],\"overBanner\":false,\"coversFooterLinks\":[],\"focus\":\"BODY:\\n    \\n    \\n      <di\"}"
+after
+"{\"vw\":1440,\"sy\":0,\"btn\":null,\"overBanner\":\"nobanner\",\"coversFooterLinks\":[],\"focus\":\"H1:Players & Clients\"}"
+== 390 844 bottom
+"{\"vw\":1440,\"sy\":4550,\"btn\":[1378,775,44,44],\"overBanner\":false,\"coversFooterLinks\":[],\"focus\":\"BODY:\\n    \\n    \\n      <di\"}"
+after
+"{\"vw\":1440,\"sy\":0,\"btn\":null,\"overBanner\":\"nobanner\",\"coversFooterLinks\":[],\"focus\":\"H1:Players & Clients\"}"
+== 1440 900 bottom
+"{\"vw\":1440,\"sy\":4550,\"btn\":[1378,775,44,44],\"overBanner\":false,\"coversFooterLinks\":[],\"focus\":\"BODY:\\n    \\n    \\n      <di\"}"
+after
+"{\"vw\":1440,\"sy\":0,\"btn\":null,\"overBanner\":\"nobanner\",\"coversFooterLinks\":[],\"focus\":\"H1:Players & Clients\"}"

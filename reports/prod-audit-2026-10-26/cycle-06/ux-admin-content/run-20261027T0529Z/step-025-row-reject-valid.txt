@@ -1,0 +1,5 @@
+- heading "Reject Resource?" [level=2, ref=e1]
+- LabelText "Rejection Reason *" [ref=e2] clickable [cursor:pointer]
+- textbox "Rejection Reason *" [ref=e3]: QA dialog-only rejection reason; cancelling.
+- button "Cancel" [ref=e4]
+- button "Reject" [ref=e5]

@@ -1,0 +1,21 @@
+=== 390x844
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+/journeys -> https://awesome.video/journeys dialogs=0 bodyLock="/null"
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+/advanced -> https://awesome.video/advanced dialogs=0 bodyLock="/null"
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+/settings/theme -> https://awesome.video/settings/theme dialogs=0 bodyLock="/null"
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+/?context=account -> https://awesome.video/?context=account dialogs=0 bodyLock="/null"

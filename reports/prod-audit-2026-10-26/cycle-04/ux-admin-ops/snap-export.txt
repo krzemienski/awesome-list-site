@@ -1,0 +1,91 @@
+uid=164_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin/export"
+  uid=166_0 region "Notifications (F8)"
+    uid=166_1 list
+  uid=166_2 link "Skip to main content" url="https://awesome.video/admin/export#main"
+  uid=166_4 banner
+    uid=166_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=166_8 button "Search 3,825 resources"
+    uid=166_9 navigation "Primary"
+      uid=166_10 link "Browse" url="https://awesome.video/categories"
+      uid=166_12 link "Submit" url="https://awesome.video/submit"
+      uid=166_14 link "About" url="https://awesome.video/about"
+      uid=166_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=166_18 link "Admin" url="https://awesome.video/admin"
+    uid=166_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=166_21 main
+    uid=166_22 navigation "Breadcrumb"
+      uid=166_23 link "Home" url="https://awesome.video/"
+      uid=166_25 link "Admin" url="https://awesome.video/admin"
+      uid=166_27 "Export"
+    uid=166_28 "Authorized admin area"
+    uid=166_29 "ADMIN CONSOLE · "
+    uid=166_30 "ADMIN USER"
+    uid=166_31 heading "Operations dashboard" level="1"
+    uid=166_32 "Manage the "
+    uid=166_33 "3,825"
+    uid=166_34 " resources, jobs, and contributors that keep the index alive."
+    uid=166_35 button "Settings" expandable haspopup="menu"
+    uid=166_36 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=166_37 status atomic live="polite" relevant="additions text"
+    uid=166_38 tablist "Admin sections" orientation="horizontal"
+      uid=166_39 tab "Overview" selectable
+      uid=166_40 tab "Approvals" selectable
+      uid=166_41 tab "Edits" selectable
+      uid=166_42 tab "Enrichment" selectable
+      uid=166_43 tab "Researcher" selectable
+      uid=166_44 tab "Export" selectable selected
+      uid=166_45 tab "Database" selectable
+      uid=166_46 tab "Resources" selectable
+      uid=166_47 tab "Categories" selectable
+      uid=166_48 tab "Subcategories" selectable
+      uid=166_49 tab "Users" selectable
+      uid=166_50 tab "GitHub" selectable
+      uid=166_51 tab "Link Health" selectable
+      uid=166_52 tab "Audit" selectable
+      uid=166_53 tab "Research" selectable
+    uid=166_54 button "Scroll tabs right"
+    uid=166_55 tabpanel "Export"
+      uid=166_56 DisclosureTriangle "Validation controls" expandable
+      uid=166_57 region "Export link check"
+        uid=166_58 heading "Link check #8 COMPLETED" level="2"
+        uid=166_59 "Checks the stored URL of every approved resource — the same URLs the exports write."
+        uid=166_60 status atomic live="polite" relevant="additions text"
+          uid=166_61 "Scan #8 completed Aug 4, 2026, 08:18 PM. At scan time: 3,809 healthy, 12 broken, 0 redirects, 0 timeouts, 2 suspect of 3,823."
+        uid=166_62 "These are the counts saved when the scan finished. Link Health shows the same scan's problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed."
+        uid=166_63 link "Open Link Health for problem links" url="https://awesome.video/admin/linkhealth"
+      uid=166_65 heading "JSON Snapshot" level="3"
+      uid=166_66 "Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state. For a restorable copy, use Full database backup below."
+      uid=166_67 button "Download"
+      uid=166_68 heading "CSV (resources)" level="3"
+      uid=166_69 "Flat resource table for spreadsheet workflows."
+      uid=166_70 button "Download"
+      uid=166_71 heading "README.md" level="3"
+      uid=166_72 "Awesome-list flavored Markdown for the GitHub repo."
+      uid=166_73 button "Generate"
+      uid=166_74 heading "OPML (categories)" level="3"
+      uid=166_75 "Hierarchical export for feed readers."
+      uid=166_76 button "Download"
+      uid=166_77 DisclosureTriangle "Export history & validation results" expandable
+      uid=166_78 heading "Full database backup" level="2"
+      uid=166_79 "Restorable copy of the whole database, kept in private storage."
+      uid=166_80 button "Create backup" focusable focused
+      uid=166_81 "Covers:"
+      uid=166_82 " every table and row in the application database, with its primary keys, foreign-key relationships, unique and check constraints, indexes, sequence positions, extensions and the migration journal. That includes user accounts and their Clerk sign-in links, favorites, bookmarks and collections, journeys and progress, submissions and suggested edits, the audit log, AI enrichment and research jobs and their discoveries, notification preferences, API keys and sessions."
+      uid=166_83 "Not covered:"
+      uid=166_84 " Clerk sign-in credentials (passwords, social logins, MFA), which Clerk holds outside this database, and the hosting platform's own "
+      uid=166_85 "_system"
+      uid=166_86 " schema."
+      uid=166_87 "Storage:"
+      uid=166_88 " this project's private App Storage ("
+      uid=166_89 "production"
+      uid=166_90 " backups only). Backups contain personal data, so they are never downloaded to the browser."
+      uid=166_91 "Restore:"
+      uid=166_92 " into a new, empty database with "
+      uid=166_93 "npm run db:backup -- restore <backup id>"
+      uid=166_94 " "
+      uid=166_95 "(runbook: "
+      uid=166_96 "docs/DATABASE-BACKUP.md"
+      uid=166_97 "). The restore checks the archive's SHA-256, then compares every table's row count, every sequence and the schema with the backup's record."
+      uid=166_98 "No "
+      uid=166_99 "production"
+      uid=166_100 " backups yet."

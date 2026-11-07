@@ -1,0 +1,301 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,825 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,825 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+        - button "Sign in, account menu" [ref=e24] [cursor=pointer]:
+          - img [ref=e26]
+          - generic [ref=e29]: Sign in
+          - generic [ref=e30]: Sign in, account menu
+      - generic [ref=e32]:
+        - main [ref=e33]:
+          - generic [ref=e34]:
+            - navigation "Breadcrumb" [ref=e35]:
+              - list [ref=e36]:
+                - listitem [ref=e37]:
+                  - link "Home" [ref=e38] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e39]:
+                  - img [ref=e40]
+                - listitem:
+                  - link "Advanced Search" [disabled]
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - img [ref=e45]
+                  - heading "Advanced Features" [level=1] [ref=e47]
+                - paragraph [ref=e48]: Discover powerful tools for exploring, analyzing, and sharing awesome list data
+              - generic [ref=e49]:
+                - tablist [ref=e50]:
+                  - tab "Explorer" [ref=e51] [cursor=pointer]:
+                    - img [ref=e52]
+                    - text: Explorer
+                  - tab "Metrics" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - text: Metrics
+                  - tab "Export" [selected] [ref=e58] [cursor=pointer]:
+                    - img [ref=e59]
+                    - text: Export
+                  - tab "AI Recommendations" [ref=e62] [cursor=pointer]:
+                    - img [ref=e63]
+                    - generic [ref=e65]: AI Recommendations
+                - tabpanel "Export" [ref=e66]:
+                  - article [ref=e67]:
+                    - generic [ref=e68]:
+                      - generic [ref=e69]:
+                        - img [ref=e70]
+                        - text: Multi-Format Export System
+                      - generic [ref=e73]: Export your curated lists in multiple formats including Markdown, JSON, CSV, YAML, HTML, and PDF with advanced filtering options
+                    - generic [ref=e75]:
+                      - button "Select Markdown export format" [ref=e76] [cursor=pointer]:
+                        - article [ref=e77]:
+                          - generic [ref=e78]:
+                            - img [ref=e79]
+                            - generic [ref=e82]: Markdown
+                            - generic [ref=e83]: GitHub-ready
+                      - button "Select JSON export format" [ref=e84] [cursor=pointer]:
+                        - article [ref=e85]:
+                          - generic [ref=e86]:
+                            - img [ref=e87]
+                            - generic [ref=e90]: JSON
+                            - generic [ref=e91]: API-friendly
+                      - button "Select CSV export format" [ref=e92] [cursor=pointer]:
+                        - article [ref=e93]:
+                          - generic [ref=e94]:
+                            - img [ref=e95]
+                            - generic [ref=e99]: CSV
+                            - generic [ref=e100]: Spreadsheet
+                      - button "Select PDF export format" [pressed] [ref=e101] [cursor=pointer]:
+                        - article [ref=e102]:
+                          - generic [ref=e103]:
+                            - img [ref=e104]
+                            - generic [ref=e107]: PDF
+                            - generic [ref=e108]: Professional
+                      - button "Select HTML export format" [ref=e109] [cursor=pointer]:
+                        - article [ref=e110]:
+                          - generic [ref=e111]:
+                            - img [ref=e112]
+                            - generic [ref=e114]: HTML
+                            - generic [ref=e115]: Web-ready
+                      - button "Select YAML export format" [ref=e116] [cursor=pointer]:
+                        - article [ref=e117]:
+                          - generic [ref=e118]:
+                            - img [ref=e119]
+                            - generic [ref=e122]: YAML
+                            - generic [ref=e123]: Config files
+                  - article [ref=e124]:
+                    - generic [ref=e125]:
+                      - generic [ref=e126]:
+                        - img [ref=e127]
+                        - text: Export Tools
+                      - generic [ref=e130]: Export your awesome list data in various formats for sharing and analysis
+                    - generic [ref=e131]:
+                      - generic [ref=e132]:
+                        - text: Export Format
+                        - combobox "Export Format" [ref=e133] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img
+                              - generic:
+                                - generic: PDF
+                                - generic: Professional PDF document for sharing
+                          - img [ref=e134]
+                      - generic [ref=e136]:
+                        - text: Content Options
+                        - generic [ref=e137]:
+                          - generic [ref=e138]:
+                            - checkbox "Include descriptions" [checked] [ref=e139] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e140] [cursor=pointer]: Include descriptions
+                          - generic [ref=e141]:
+                            - checkbox "Include tags" [checked] [ref=e142] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e143] [cursor=pointer]: Include tags
+                          - generic [ref=e144]:
+                            - checkbox "Include categories" [checked] [ref=e145] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e146] [cursor=pointer]: Include categories
+                          - generic [ref=e147]:
+                            - checkbox "Group by category" [checked] [ref=e148] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e149] [cursor=pointer]: Group by category
+                      - generic [ref=e150]:
+                        - generic [ref=e151]:
+                          - generic [ref=e152]:
+                            - img [ref=e153]
+                            - text: Category Filter
+                          - generic [ref=e155]:
+                            - button "Select All" [ref=e156] [cursor=pointer]
+                            - button "Clear All" [ref=e157] [cursor=pointer]
+                        - generic [ref=e158]:
+                          - generic [ref=e159]:
+                            - checkbox "Community & Events (129)" [checked] [ref=e160] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e161] [cursor=pointer]: Community & Events (129)
+                          - generic [ref=e162]:
+                            - checkbox "Encoding & Codecs (579)" [ref=e163] [cursor=pointer]
+                            - generic [ref=e164] [cursor=pointer]: Encoding & Codecs (579)
+                          - generic [ref=e165]:
+                            - checkbox "General Tools (514)" [ref=e166] [cursor=pointer]
+                            - generic [ref=e167] [cursor=pointer]: General Tools (514)
+                          - generic [ref=e168]:
+                            - checkbox "Infrastructure & Delivery (353)" [ref=e169] [cursor=pointer]
+                            - generic [ref=e170] [cursor=pointer]: Infrastructure & Delivery (353)
+                          - generic [ref=e171]:
+                            - checkbox "Intro & Learning (297)" [ref=e172] [cursor=pointer]
+                            - generic [ref=e173] [cursor=pointer]: Intro & Learning (297)
+                          - generic [ref=e174]:
+                            - checkbox "Media Tools (704)" [ref=e175] [cursor=pointer]
+                            - generic [ref=e176] [cursor=pointer]: Media Tools (704)
+                          - generic [ref=e177]:
+                            - checkbox "Players & Clients (447)" [ref=e178] [cursor=pointer]
+                            - generic [ref=e179] [cursor=pointer]: Players & Clients (447)
+                          - generic [ref=e180]:
+                            - checkbox "Protocols & Transport (467)" [ref=e181] [cursor=pointer]
+                            - generic [ref=e182] [cursor=pointer]: Protocols & Transport (467)
+                          - generic [ref=e183]:
+                            - checkbox "Standards & Industry (335)" [ref=e184] [cursor=pointer]
+                            - generic [ref=e185] [cursor=pointer]: Standards & Industry (335)
+                      - generic [ref=e186]:
+                        - generic [ref=e187]:
+                          - img [ref=e188]
+                          - generic [ref=e191]: Export Summary
+                        - generic [ref=e192]:
+                          - generic [ref=e193]:
+                            - text: "Format:"
+                            - generic [ref=e194]: PDF
+                          - generic [ref=e195]: "Resources: 129"
+                          - generic [ref=e196]: "Categories: 1"
+                      - button "Exporting..." [disabled] [active] [ref=e197]: Exporting...
+              - article [ref=e199]:
+                - generic [ref=e200]:
+                  - heading "Explore More Features" [level=2] [ref=e201]
+                  - paragraph [ref=e202]: These advanced features help you discover, analyze, and share awesome list data more effectively
+                  - generic [ref=e203]:
+                    - link "Browse All Resources" [ref=e204] [cursor=pointer]:
+                      - /url: /categories
+                    - link "Explore Categories" [ref=e205] [cursor=pointer]:
+                      - /url: /category/community-events
+        - contentinfo [ref=e206]:
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - paragraph [ref=e209]: ── INDEX
+              - link "awesome.video home" [ref=e210] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e211]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e213]:
+              - heading "INDEXED" [level=2] [ref=e214]
+              - paragraph [ref=e215]: 3,825
+              - paragraph [ref=e216]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e217]: live
+            - navigation "Explore categories" [ref=e219]:
+              - heading "EXPLORE" [level=2] [ref=e220]
+              - generic [ref=e221]:
+                - link "Community & Events" [ref=e222] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e223]: ◈
+                  - generic [ref=e224]: Community
+                - link "Encoding & Codecs" [ref=e225] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e226]: ◇
+                  - generic [ref=e227]: Encoding
+                - link "General Tools" [ref=e228] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e229]: ◆
+                  - generic [ref=e230]: General
+                - link "Infrastructure & Delivery" [ref=e231] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e232]: ▣
+                  - generic [ref=e233]: Infrastructure
+                - link "Intro & Learning" [ref=e234] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e235]: ▤
+                  - generic [ref=e236]: Intro
+                - link "Media Tools" [ref=e237] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e238]: ▥
+                  - generic [ref=e239]: Media
+                - link "Players & Clients" [ref=e240] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e241]: ▶
+                  - generic [ref=e242]: Players
+                - link "Protocols & Transport" [ref=e243] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e244]: ⟁
+                  - generic [ref=e245]: Protocols
+                - link "Standards & Industry" [ref=e246] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e247]: ◉
+                  - generic [ref=e248]: Standards
+            - generic [ref=e249]:
+              - heading "SOURCE" [level=2] [ref=e250]
+              - link "krzemienski/awesome-video" [ref=e251] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e252]
+                - generic [ref=e254]:
+                  - text: krzemienski
+                  - generic [ref=e255]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e256]: ↗
+              - paragraph [ref=e257]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e258] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e260] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e261]:
+            - generic [ref=e262]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e263]:
+              - link "About" [ref=e264] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e265] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e266] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e267] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e268] [cursor=pointer]
+              - link "Issues ↗" [ref=e269] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e270] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e271]: built with the awesome-list framework
+    - button "Back to top" [ref=e272] [cursor=pointer]:
+      - img

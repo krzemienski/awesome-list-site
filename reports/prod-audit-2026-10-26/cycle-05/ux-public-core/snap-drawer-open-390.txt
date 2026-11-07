@@ -1,0 +1,941 @@
+uid=324_0 RootWebArea "Android – Mobile & Web Players — Awesome Video" url="https://awesome.video/sub-subcategory/android"
+  uid=327_0 ignored
+    uid=327_1 generic
+      uid=324_3 ignored
+        uid=324_4 ignored
+      uid=324_6 ignored
+        uid=327_2 ignored
+          uid=327_3 ignored
+          uid=327_4 ignored
+        uid=327_5 ignored
+          uid=327_6 ignored
+      uid=324_7 ignored
+        uid=327_7 ignored
+          uid=327_8 ignored
+        uid=327_9 ignored
+          uid=327_10 ignored
+        uid=327_11 ignored
+          uid=324_8 ignored
+          uid=324_9 ignored
+      uid=324_10 ignored
+        uid=327_12 ignored
+          uid=327_13 ignored
+          uid=327_14 ignored
+        uid=327_15 ignored
+          uid=327_16 ignored
+        uid=327_17 ignored
+          uid=327_18 ignored
+          uid=327_19 ignored
+            uid=327_20 ignored
+            uid=327_21 ignored
+        uid=327_22 ignored
+          uid=327_23 ignored
+      uid=324_11 ignored
+        uid=327_24 ignored
+          uid=327_25 ignored
+            uid=327_26 ignored
+            uid=327_27 ignored
+            uid=327_28 ignored
+        uid=327_29 ignored
+          uid=327_30 ignored
+        uid=327_31 ignored
+          uid=327_32 ignored
+          uid=327_33 ignored
+      uid=324_14 ignored
+        uid=324_15 ignored
+      uid=324_16 ignored
+        uid=324_17 ignored
+      uid=324_18 ignored
+        uid=324_19 ignored
+      uid=324_23 ignored
+        uid=327_34 ignored
+      uid=324_30 ignored
+        uid=327_35 ignored
+          uid=327_36 ignored
+          uid=327_37 ignored
+          uid=327_38 ignored
+          uid=327_39 ignored
+          uid=327_40 ignored
+          uid=327_41 ignored
+          uid=327_42 ignored
+          uid=327_43 ignored
+          uid=327_44 ignored
+        uid=327_45 ignored
+          uid=327_46 ignored
+      uid=327_47 ignored
+      uid=327_48 ignored
+      uid=327_49 ignored
+        uid=327_50 ignored
+        uid=327_51 ignored
+        uid=327_52 ignored
+        uid=327_53 ignored
+        uid=327_54 ignored
+        uid=327_55 ignored
+        uid=327_56 ignored
+      uid=324_32 ignored
+        uid=327_57 ignored
+          uid=327_58 ignored
+          uid=327_59 ignored
+          uid=327_60 ignored
+      uid=324_33 ignored
+        uid=327_61 ignored
+          uid=327_62 ignored
+            uid=327_63 ignored
+          uid=327_64 ignored
+            uid=324_34 ignored
+      uid=324_35 ignored
+        uid=327_65 ignored
+          uid=327_66 ignored
+          uid=327_67 ignored
+          uid=327_68 ignored
+        uid=327_69 ignored
+          uid=324_36 ignored
+        uid=327_70 ignored
+          uid=324_37 ignored
+      uid=324_38 ignored
+        uid=324_39 ignored
+      uid=324_43 ignored
+        uid=327_71 ignored
+          uid=327_72 ignored
+            uid=327_73 ignored
+          uid=327_74 ignored
+            uid=324_44 ignored
+      uid=324_45 ignored
+        uid=327_75 ignored
+          uid=327_76 ignored
+          uid=327_77 ignored
+          uid=327_78 ignored
+        uid=327_79 ignored
+          uid=324_46 ignored
+        uid=327_80 ignored
+          uid=324_47 ignored
+      uid=324_48 ignored
+        uid=324_49 ignored
+      uid=324_53 ignored
+        uid=327_81 ignored
+          uid=327_82 ignored
+            uid=327_83 ignored
+          uid=327_84 ignored
+            uid=324_54 ignored
+      uid=324_55 ignored
+        uid=327_85 ignored
+          uid=327_86 ignored
+          uid=327_87 ignored
+          uid=327_88 ignored
+        uid=327_89 ignored
+          uid=324_56 ignored
+        uid=327_90 ignored
+          uid=324_57 ignored
+      uid=324_58 ignored
+        uid=324_59 ignored
+      uid=324_63 ignored
+        uid=327_91 ignored
+          uid=327_92 ignored
+            uid=327_93 ignored
+          uid=327_94 ignored
+            uid=324_64 ignored
+      uid=324_65 ignored
+        uid=327_95 ignored
+          uid=327_96 ignored
+          uid=327_97 ignored
+          uid=327_98 ignored
+        uid=327_99 ignored
+          uid=324_66 ignored
+        uid=327_100 ignored
+          uid=324_67 ignored
+      uid=324_68 ignored
+        uid=324_69 ignored
+      uid=324_73 ignored
+        uid=327_101 ignored
+          uid=327_102 ignored
+            uid=327_103 ignored
+          uid=327_104 ignored
+            uid=324_74 ignored
+      uid=324_75 ignored
+        uid=327_105 ignored
+          uid=327_106 ignored
+          uid=327_107 ignored
+          uid=327_108 ignored
+        uid=327_109 ignored
+          uid=324_76 ignored
+        uid=327_110 ignored
+          uid=324_77 ignored
+      uid=324_78 ignored
+        uid=324_79 ignored
+      uid=324_83 ignored
+        uid=327_111 ignored
+          uid=327_112 ignored
+            uid=327_113 ignored
+          uid=327_114 ignored
+            uid=324_84 ignored
+      uid=324_85 ignored
+        uid=327_115 ignored
+          uid=327_116 ignored
+          uid=327_117 ignored
+          uid=327_118 ignored
+        uid=327_119 ignored
+          uid=324_86 ignored
+        uid=327_120 ignored
+          uid=324_87 ignored
+      uid=324_88 ignored
+        uid=324_89 ignored
+      uid=324_93 ignored
+        uid=327_121 ignored
+          uid=327_122 ignored
+            uid=327_123 ignored
+          uid=327_124 ignored
+            uid=324_94 ignored
+      uid=324_95 ignored
+        uid=327_125 ignored
+      uid=324_96 ignored
+        uid=327_126 ignored
+          uid=327_127 ignored
+          uid=327_128 ignored
+          uid=327_129 ignored
+        uid=327_130 ignored
+          uid=324_97 ignored
+        uid=327_131 ignored
+          uid=324_98 ignored
+      uid=324_99 ignored
+        uid=324_100 ignored
+      uid=324_104 ignored
+        uid=327_132 ignored
+          uid=324_105 ignored
+          uid=324_106 ignored
+      uid=324_107 ignored
+        uid=327_133 ignored
+          uid=324_108 ignored
+          uid=324_109 ignored
+      uid=324_110 ignored
+        uid=327_134 ignored
+          uid=324_111 ignored
+          uid=324_112 ignored
+      uid=324_113 ignored
+        uid=327_135 ignored
+          uid=327_136 ignored
+            uid=327_137 ignored
+          uid=327_138 ignored
+            uid=324_114 ignored
+      uid=324_115 ignored
+        uid=327_139 ignored
+          uid=327_140 ignored
+          uid=327_141 ignored
+          uid=327_142 ignored
+        uid=327_143 ignored
+          uid=324_116 ignored
+        uid=327_144 ignored
+          uid=324_117 ignored
+      uid=324_118 ignored
+        uid=324_119 ignored
+      uid=324_123 ignored
+        uid=327_145 ignored
+          uid=327_146 ignored
+            uid=327_147 ignored
+          uid=327_148 ignored
+            uid=324_124 ignored
+      uid=324_125 ignored
+        uid=327_149 ignored
+      uid=324_126 ignored
+        uid=327_150 ignored
+          uid=327_151 ignored
+          uid=327_152 ignored
+          uid=327_153 ignored
+        uid=327_154 ignored
+          uid=324_127 ignored
+        uid=327_155 ignored
+          uid=324_128 ignored
+      uid=324_129 ignored
+        uid=324_130 ignored
+      uid=324_134 ignored
+        uid=327_156 ignored
+          uid=324_135 ignored
+          uid=324_136 ignored
+      uid=324_137 ignored
+        uid=327_157 ignored
+          uid=324_138 ignored
+          uid=324_139 ignored
+      uid=324_140 ignored
+        uid=327_158 ignored
+          uid=324_141 ignored
+          uid=324_142 ignored
+      uid=324_143 ignored
+        uid=327_159 ignored
+          uid=327_160 ignored
+            uid=327_161 ignored
+          uid=327_162 ignored
+            uid=324_144 ignored
+      uid=324_145 ignored
+        uid=327_163 ignored
+          uid=327_164 ignored
+          uid=327_165 ignored
+          uid=327_166 ignored
+        uid=327_167 ignored
+          uid=324_146 ignored
+        uid=327_168 ignored
+          uid=324_147 ignored
+      uid=324_148 ignored
+        uid=324_149 ignored
+      uid=324_153 ignored
+        uid=327_169 ignored
+          uid=327_170 ignored
+            uid=327_171 ignored
+          uid=327_172 ignored
+            uid=324_154 ignored
+      uid=324_155 ignored
+        uid=327_173 ignored
+          uid=327_174 ignored
+          uid=327_175 ignored
+          uid=327_176 ignored
+        uid=327_177 ignored
+          uid=324_156 ignored
+        uid=327_178 ignored
+          uid=324_157 ignored
+      uid=324_158 ignored
+        uid=324_159 ignored
+      uid=324_163 ignored
+        uid=327_179 ignored
+          uid=327_180 ignored
+            uid=327_181 ignored
+          uid=327_182 ignored
+            uid=324_164 ignored
+      uid=324_165 ignored
+        uid=327_183 ignored
+      uid=324_166 ignored
+        uid=327_184 ignored
+          uid=327_185 ignored
+          uid=327_186 ignored
+          uid=327_187 ignored
+        uid=327_188 ignored
+          uid=324_167 ignored
+        uid=327_189 ignored
+          uid=324_168 ignored
+      uid=324_169 ignored
+        uid=324_170 ignored
+      uid=324_174 ignored
+        uid=327_190 ignored
+          uid=324_175 ignored
+          uid=324_176 ignored
+      uid=324_177 ignored
+        uid=327_191 ignored
+          uid=324_178 ignored
+          uid=324_179 ignored
+      uid=324_180 ignored
+        uid=327_192 ignored
+          uid=324_181 ignored
+          uid=324_182 ignored
+      uid=324_183 ignored
+        uid=327_193 ignored
+          uid=327_194 ignored
+            uid=327_195 ignored
+          uid=327_196 ignored
+            uid=324_184 ignored
+      uid=324_185 ignored
+        uid=327_197 ignored
+      uid=324_186 ignored
+        uid=327_198 ignored
+          uid=327_199 ignored
+          uid=327_200 ignored
+          uid=327_201 ignored
+        uid=327_202 ignored
+          uid=324_187 ignored
+        uid=327_203 ignored
+          uid=324_188 ignored
+      uid=324_189 ignored
+        uid=324_190 ignored
+      uid=324_194 ignored
+        uid=327_204 ignored
+          uid=324_195 ignored
+          uid=324_196 ignored
+      uid=324_197 ignored
+        uid=327_205 ignored
+          uid=324_198 ignored
+          uid=324_199 ignored
+      uid=324_200 ignored
+        uid=327_206 ignored
+          uid=324_201 ignored
+          uid=324_202 ignored
+      uid=324_203 ignored
+        uid=327_207 ignored
+          uid=327_208 ignored
+            uid=327_209 ignored
+          uid=327_210 ignored
+            uid=324_204 ignored
+      uid=324_205 ignored
+        uid=327_211 ignored
+          uid=327_212 ignored
+          uid=327_213 ignored
+          uid=327_214 ignored
+        uid=327_215 ignored
+          uid=324_206 ignored
+        uid=327_216 ignored
+          uid=324_207 ignored
+      uid=324_208 ignored
+        uid=324_209 ignored
+      uid=324_212 ignored
+        uid=327_217 ignored
+          uid=327_218 ignored
+            uid=327_219 ignored
+          uid=327_220 ignored
+            uid=324_213 ignored
+      uid=324_214 ignored
+        uid=327_221 ignored
+          uid=327_222 ignored
+          uid=327_223 ignored
+          uid=327_224 ignored
+        uid=327_225 ignored
+          uid=324_215 ignored
+        uid=327_226 ignored
+          uid=324_216 ignored
+      uid=324_217 ignored
+        uid=324_218 ignored
+      uid=324_222 ignored
+        uid=327_227 ignored
+          uid=327_228 ignored
+            uid=327_229 ignored
+          uid=327_230 ignored
+            uid=324_223 ignored
+      uid=324_224 ignored
+        uid=327_231 ignored
+          uid=327_232 ignored
+          uid=327_233 ignored
+          uid=327_234 ignored
+        uid=327_235 ignored
+          uid=324_225 ignored
+        uid=327_236 ignored
+          uid=324_226 ignored
+      uid=324_227 ignored
+        uid=324_228 ignored
+      uid=324_232 ignored
+        uid=327_237 ignored
+          uid=327_238 ignored
+            uid=327_239 ignored
+          uid=327_240 ignored
+            uid=324_233 ignored
+      uid=324_234 ignored
+        uid=327_241 ignored
+          uid=327_242 ignored
+          uid=327_243 ignored
+          uid=327_244 ignored
+        uid=327_245 ignored
+          uid=324_235 ignored
+        uid=327_246 ignored
+          uid=324_236 ignored
+      uid=324_237 ignored
+        uid=324_238 ignored
+      uid=324_242 ignored
+        uid=327_247 ignored
+          uid=327_248 ignored
+            uid=327_249 ignored
+          uid=327_250 ignored
+            uid=324_243 ignored
+      uid=324_244 ignored
+        uid=327_251 ignored
+          uid=327_252 ignored
+          uid=327_253 ignored
+          uid=327_254 ignored
+        uid=327_255 ignored
+          uid=324_245 ignored
+        uid=327_256 ignored
+          uid=324_246 ignored
+      uid=324_247 ignored
+        uid=324_248 ignored
+      uid=324_252 ignored
+        uid=327_257 ignored
+          uid=327_258 ignored
+            uid=327_259 ignored
+          uid=327_260 ignored
+            uid=324_253 ignored
+      uid=324_254 ignored
+        uid=327_261 ignored
+      uid=324_255 ignored
+        uid=327_262 ignored
+          uid=327_263 ignored
+          uid=327_264 ignored
+          uid=327_265 ignored
+        uid=327_266 ignored
+          uid=324_256 ignored
+        uid=327_267 ignored
+          uid=324_257 ignored
+      uid=324_258 ignored
+        uid=324_259 ignored
+      uid=324_263 ignored
+        uid=327_268 ignored
+          uid=324_264 ignored
+          uid=324_265 ignored
+      uid=324_266 ignored
+        uid=327_269 ignored
+          uid=324_267 ignored
+          uid=324_268 ignored
+      uid=324_269 ignored
+        uid=327_270 ignored
+          uid=324_270 ignored
+          uid=324_271 ignored
+      uid=324_272 ignored
+        uid=327_271 ignored
+          uid=327_272 ignored
+            uid=327_273 ignored
+          uid=327_274 ignored
+            uid=324_273 ignored
+      uid=324_274 ignored
+        uid=327_275 ignored
+          uid=327_276 ignored
+          uid=327_277 ignored
+          uid=327_278 ignored
+        uid=327_279 ignored
+          uid=324_275 ignored
+        uid=327_280 ignored
+          uid=324_276 ignored
+      uid=324_277 ignored
+        uid=324_278 ignored
+      uid=324_283 ignored
+        uid=327_281 ignored
+        uid=327_282 ignored
+      uid=324_284 ignored
+        uid=327_283 ignored
+          uid=324_285 ignored
+        uid=327_284 ignored
+          uid=324_286 ignored
+      uid=324_287 ignored
+        uid=327_285 ignored
+          uid=324_288 ignored
+        uid=327_286 ignored
+          uid=324_289 ignored
+      uid=324_290 ignored
+        uid=327_287 ignored
+          uid=324_291 ignored
+          uid=324_292 ignored
+        uid=327_288 ignored
+          uid=327_289 ignored
+      uid=324_295 ignored
+        uid=324_296 ignored
+      uid=324_309 ignored
+        uid=327_290 ignored
+          uid=327_291 ignored
+        uid=327_292 ignored
+          uid=327_293 ignored
+      uid=324_310 ignored
+        uid=327_294 ignored
+          uid=327_295 ignored
+        uid=327_296 ignored
+          uid=327_297 ignored
+      uid=324_311 ignored
+        uid=327_298 ignored
+          uid=327_299 ignored
+        uid=327_300 ignored
+          uid=327_301 ignored
+      uid=324_312 ignored
+        uid=327_302 ignored
+          uid=327_303 ignored
+        uid=327_304 ignored
+          uid=327_305 ignored
+      uid=324_313 ignored
+        uid=327_306 ignored
+          uid=327_307 ignored
+        uid=327_308 ignored
+          uid=327_309 ignored
+      uid=324_314 ignored
+        uid=327_310 ignored
+          uid=327_311 ignored
+        uid=327_312 ignored
+          uid=327_313 ignored
+      uid=324_315 ignored
+        uid=327_314 ignored
+          uid=327_315 ignored
+        uid=327_316 ignored
+          uid=327_317 ignored
+      uid=324_316 ignored
+        uid=327_318 ignored
+          uid=327_319 ignored
+        uid=327_320 ignored
+          uid=327_321 ignored
+      uid=324_317 ignored
+        uid=327_322 ignored
+          uid=327_323 ignored
+        uid=327_324 ignored
+          uid=327_325 ignored
+      uid=324_319 ignored
+        uid=327_326 ignored
+          uid=327_327 ignored
+        uid=327_328 ignored
+          uid=324_320 ignored
+          uid=327_329 ignored
+            uid=324_321 ignored
+            uid=327_330 ignored
+            uid=324_322 ignored
+        uid=327_331 ignored
+          uid=327_332 ignored
+      uid=324_324 ignored
+        uid=324_325 ignored
+      uid=324_331 ignored
+        uid=327_333 ignored
+          uid=327_334 ignored
+          uid=327_335 ignored
+        uid=327_336 ignored
+      uid=324_338 ignored
+        uid=324_339 ignored
+      uid=324_340 ignored
+        uid=324_341 ignored
+      uid=324_342 ignored
+        uid=324_343 ignored
+      uid=324_344 ignored
+        uid=324_345 ignored
+      uid=324_346 ignored
+        uid=327_337 ignored
+      uid=324_347 ignored
+        uid=324_348 ignored
+      uid=324_349 ignored
+        uid=324_350 ignored
+      uid=327_338 dialog "Sidebar" description="Displays the sidebar navigation." modal
+        uid=327_339 heading "Sidebar" level="2"
+          uid=327_340 "Sidebar"
+        uid=327_341 paragraph
+          uid=327_342 "Displays the sidebar navigation."
+        uid=327_343 navigation "Sidebar"
+          uid=327_344 ignored
+            uid=327_345 link "AWESOME.VIDEO home, 3,825 resources" focusable focused url="https://awesome.video/"
+              uid=327_346 ignored
+                uid=327_347 "AWESOME.VIDEO"
+                uid=327_348 ignored
+                  uid=327_349 "home,"
+                uid=327_350 ignored
+                  uid=327_351 "3,825 resources"
+          uid=327_352 form
+            uid=327_353 generic
+              uid=327_354 searchbox "Search resources"
+                uid=327_355 ignored
+                uid=327_356 ignored
+                  uid=327_357 generic
+          uid=327_358 navigation "Primary"
+            uid=327_359 link "Home" url="https://awesome.video/"
+              uid=327_360 ignored
+                uid=327_361 image
+                uid=327_362 ignored
+                  uid=327_363 "Home"
+            uid=327_364 link "Submit" url="https://awesome.video/submit"
+              uid=327_365 ignored
+                uid=327_366 image
+                uid=327_367 ignored
+                  uid=327_368 "Submit"
+            uid=327_369 link "About" url="https://awesome.video/about"
+              uid=327_370 ignored
+                uid=327_371 image
+                uid=327_372 ignored
+                  uid=327_373 "About"
+          uid=327_374 ignored
+            uid=327_375 generic
+              uid=327_376 "CATEGORIES"
+          uid=327_377 ignored
+            uid=327_378 ignored
+              uid=327_379 button "Community & Events 129 resources" description="Community & Events" expandable
+                uid=327_380 ignored
+                  uid=327_381 generic
+                    uid=327_382 "Community & Events"
+                uid=327_383 ignored
+                  uid=327_384 generic "129 resources" description="129 resources"
+                    uid=327_385 "129"
+                  uid=327_386 ignored
+                    uid=327_387 image
+            uid=327_388 ignored
+              uid=327_389 button "Encoding & Codecs 579 resources" description="Encoding & Codecs" expandable expanded
+                uid=327_390 ignored
+                  uid=327_391 generic
+                    uid=327_392 "Encoding & Codecs"
+                uid=327_393 ignored
+                  uid=327_394 generic "579 resources" description="579 resources"
+                    uid=327_395 "579"
+                  uid=327_396 ignored
+                    uid=327_397 image
+              uid=327_398 generic
+                uid=327_399 ignored
+                  uid=327_400 ignored
+                    uid=327_401 link "All in Encoding & Codecs →" url="https://awesome.video/category/encoding-codecs"
+                      uid=327_402 ignored
+                        uid=327_403 "All in "
+                        uid=327_404 "Encoding & Codecs"
+                        uid=327_405 " →"
+                    uid=327_406 link "Benchmarking & Performance Tools for Codecs 18 resources" description="Benchmarking & Performance Tools for Codecs" url="https://awesome.video/subcategory/benchmarking-performance-tools-for-codecs"
+                      uid=327_407 generic
+                        uid=327_408 "Benchmarking & Performance Tools for Codecs"
+                      uid=327_409 generic "18 resources" description="18 resources"
+                        uid=327_410 "18"
+                    uid=327_411 link "Cloud-Based Encoding Solutions 18 resources" description="Cloud-Based Encoding Solutions" url="https://awesome.video/subcategory/cloud-based-encoding-solutions"
+                      uid=327_412 generic
+                        uid=327_413 "Cloud-Based Encoding Solutions"
+                      uid=327_414 generic "18 resources" description="18 resources"
+                        uid=327_415 "18"
+                    uid=327_416 ignored
+                      uid=327_417 generic
+                        uid=327_418 link "Codecs 68 resources" description="Codecs" url="https://awesome.video/subcategory/codecs"
+                          uid=327_419 ignored
+                            uid=327_420 "Codecs"
+                          uid=327_421 generic "68 resources" description="68 resources"
+                            uid=327_422 "68"
+                        uid=327_423 button "Expand 3 nested groups in Codecs" description="3 nested groups" expandable
+                          uid=327_424 image
+                    uid=327_425 link "Comparative Analysis of Codecs 19 resources" description="Comparative Analysis of Codecs" url="https://awesome.video/subcategory/comparative-analysis-of-codecs"
+                      uid=327_426 generic
+                        uid=327_427 "Comparative Analysis of Codecs"
+                      uid=327_428 generic "19 resources" description="19 resources"
+                        uid=327_429 "19"
+                    uid=327_430 ignored
+                      uid=327_431 generic
+                        uid=327_432 link "Containerization & Packaging Tools 35 resources" description="Containerization & Packaging Tools" url="https://awesome.video/subcategory/containerization-packaging-tools"
+                          uid=327_433 ignored
+                            uid=327_434 "Containerization & Packaging Tools"
+                          uid=327_435 generic "35 resources" description="35 resources"
+                            uid=327_436 "35"
+                        uid=327_437 button "Expand 1 nested group in Containerization & Packaging Tools" description="1 nested group" expandable
+                          uid=327_438 image
+                    uid=327_439 ignored
+                      uid=327_440 generic
+                        uid=327_441 link "Encoding Tools 136 resources" description="Encoding Tools" url="https://awesome.video/subcategory/encoding-tools"
+                          uid=327_442 ignored
+                            uid=327_443 "Encoding Tools"
+                          uid=327_444 generic "136 resources" description="136 resources"
+                            uid=327_445 "136"
+                        uid=327_446 button "Expand 1 nested group in Encoding Tools" description="1 nested group" expandable
+                          uid=327_447 image
+                    uid=327_448 link "FFmpeg-Based Tools 18 resources" description="FFmpeg-Based Tools" url="https://awesome.video/subcategory/ffmpeg-based-tools"
+                      uid=327_449 generic
+                        uid=327_450 "FFmpeg-Based Tools"
+                      uid=327_451 generic "18 resources" description="18 resources"
+                        uid=327_452 "18"
+                    uid=327_453 link "Hardware Accelerated Transcoding 25 resources" description="Hardware Accelerated Transcoding" url="https://awesome.video/subcategory/hardware-accelerated-transcoding"
+                      uid=327_454 generic
+                        uid=327_455 "Hardware Accelerated Transcoding"
+                      uid=327_456 generic "25 resources" description="25 resources"
+                        uid=327_457 "25"
+                    uid=327_458 link "Hardware Codecs & Acceleration 24 resources" description="Hardware Codecs & Acceleration" url="https://awesome.video/subcategory/hardware-codecs-acceleration"
+                      uid=327_459 generic
+                        uid=327_460 "Hardware Codecs & Acceleration"
+                      uid=327_461 generic "24 resources" description="24 resources"
+                        uid=327_462 "24"
+                    uid=327_463 link "Multi-format Packaging Tools 13 resources" description="Multi-format Packaging Tools" url="https://awesome.video/subcategory/multi-format-packaging-tools"
+                      uid=327_464 generic
+                        uid=327_465 "Multi-format Packaging Tools"
+                      uid=327_466 generic "13 resources" description="13 resources"
+                        uid=327_467 "13"
+                    uid=327_468 link "Next-Generation Codecs AV1 VVC 19 resources" description="Next-Generation Codecs AV1 VVC" url="https://awesome.video/subcategory/next-generation-codecs-av1-vvc"
+                      uid=327_469 generic
+                        uid=327_470 "Next-Generation Codecs AV1 VVC"
+                      uid=327_471 generic "19 resources" description="19 resources"
+                        uid=327_472 "19"
+                    uid=327_473 link "Open Source Encoder Projects 28 resources" description="Open Source Encoder Projects" url="https://awesome.video/subcategory/open-source-encoder-projects"
+                      uid=327_474 generic
+                        uid=327_475 "Open Source Encoder Projects"
+                      uid=327_476 generic "28 resources" description="28 resources"
+                        uid=327_477 "28"
+                    uid=327_478 link "Real-Time Encoding Solutions 16 resources" description="Real-Time Encoding Solutions" url="https://awesome.video/subcategory/real-time-encoding-solutions"
+                      uid=327_479 generic
+                        uid=327_480 "Real-Time Encoding Solutions"
+                      uid=327_481 generic "16 resources" description="16 resources"
+                        uid=327_482 "16"
+                    uid=327_483 link "Scripting & Automation Tools 17 resources" description="Scripting & Automation Tools" url="https://awesome.video/subcategory/scripting-automation-tools"
+                      uid=327_484 generic
+                        uid=327_485 "Scripting & Automation Tools"
+                      uid=327_486 generic "17 resources" description="17 resources"
+                        uid=327_487 "17"
+                    uid=327_488 link "Software Codecs 18 resources" description="Software Codecs" url="https://awesome.video/subcategory/software-codecs"
+                      uid=327_489 generic
+                        uid=327_490 "Software Codecs"
+                      uid=327_491 generic "18 resources" description="18 resources"
+                        uid=327_492 "18"
+                    uid=327_493 link "Software Transcoding Tools 15 resources" description="Software Transcoding Tools" url="https://awesome.video/subcategory/software-transcoding-tools"
+                      uid=327_494 generic
+                        uid=327_495 "Software Transcoding Tools"
+                      uid=327_496 generic "15 resources" description="15 resources"
+                        uid=327_497 "15"
+                    uid=327_498 link "Uncategorized 92 resources" description="Uncategorized" url="https://awesome.video/category/encoding-codecs?filter=general"
+                      uid=327_499 generic
+                        uid=327_500 "Uncategorized"
+                      uid=327_501 generic "92 resources" description="92 resources"
+                        uid=327_502 "92"
+            uid=327_503 ignored
+              uid=327_504 button "General Tools 514 resources" description="General Tools" expandable
+                uid=327_505 ignored
+                  uid=327_506 generic
+                    uid=327_507 "General Tools"
+                uid=327_508 ignored
+                  uid=327_509 generic "514 resources" description="514 resources"
+                    uid=327_510 "514"
+                  uid=327_511 ignored
+                    uid=327_512 image
+            uid=327_513 ignored
+              uid=327_514 button "Infrastructure & Delivery 353 resources" description="Infrastructure & Delivery" expandable
+                uid=327_515 ignored
+                  uid=327_516 generic
+                    uid=327_517 "Infrastructure & Delivery"
+                uid=327_518 ignored
+                  uid=327_519 generic "353 resources" description="353 resources"
+                    uid=327_520 "353"
+                  uid=327_521 ignored
+                    uid=327_522 image
+            uid=327_523 ignored
+              uid=327_524 button "Intro & Learning 297 resources" description="Intro & Learning" expandable
+                uid=327_525 ignored
+                  uid=327_526 generic
+                    uid=327_527 "Intro & Learning"
+                uid=327_528 ignored
+                  uid=327_529 generic "297 resources" description="297 resources"
+                    uid=327_530 "297"
+                  uid=327_531 ignored
+                    uid=327_532 image
+            uid=327_533 ignored
+              uid=327_534 button "Media Tools 704 resources" description="Media Tools" expandable
+                uid=327_535 ignored
+                  uid=327_536 generic
+                    uid=327_537 "Media Tools"
+                uid=327_538 ignored
+                  uid=327_539 generic "704 resources" description="704 resources"
+                    uid=327_540 "704"
+                  uid=327_541 ignored
+                    uid=327_542 image
+            uid=327_543 ignored
+              uid=327_544 button "Players & Clients 447 resources" description="Players & Clients" expandable expanded
+                uid=327_545 ignored
+                  uid=327_546 generic
+                    uid=327_547 "Players & Clients"
+                uid=327_548 ignored
+                  uid=327_549 generic "447 resources" description="447 resources"
+                    uid=327_550 "447"
+                  uid=327_551 ignored
+                    uid=327_552 image
+              uid=327_553 generic
+                uid=327_554 ignored
+                  uid=327_555 ignored
+                    uid=327_556 link "All in Players & Clients →" url="https://awesome.video/category/players-clients"
+                      uid=327_557 ignored
+                        uid=327_558 "All in "
+                        uid=327_559 "Players & Clients"
+                        uid=327_560 " →"
+                    uid=327_561 link "Browser Extensions 20 resources" description="Browser Extensions" url="https://awesome.video/subcategory/browser-extensions"
+                      uid=327_562 generic
+                        uid=327_563 "Browser Extensions"
+                      uid=327_564 generic "20 resources" description="20 resources"
+                        uid=327_565 "20"
+                    uid=327_566 link "Desktop Players 19 resources" description="Desktop Players" url="https://awesome.video/subcategory/desktop-players"
+                      uid=327_567 generic
+                        uid=327_568 "Desktop Players"
+                      uid=327_569 generic "19 resources" description="19 resources"
+                        uid=327_570 "19"
+                    uid=327_571 link "Embedded Players 29 resources" description="Embedded Players" url="https://awesome.video/subcategory/embedded-players"
+                      uid=327_572 generic
+                        uid=327_573 "Embedded Players"
+                      uid=327_574 generic "29 resources" description="29 resources"
+                        uid=327_575 "29"
+                    uid=327_576 link "Frameworks & UI Components 26 resources" description="Frameworks & UI Components" url="https://awesome.video/subcategory/frameworks-ui-components"
+                      uid=327_577 generic
+                        uid=327_578 "Frameworks & UI Components"
+                      uid=327_579 generic "26 resources" description="26 resources"
+                        uid=327_580 "26"
+                    uid=327_581 ignored
+                      uid=327_582 generic
+                        uid=327_583 link "Hardware Players 46 resources" description="Hardware Players" url="https://awesome.video/subcategory/hardware-players"
+                          uid=327_584 ignored
+                            uid=327_585 "Hardware Players"
+                          uid=327_586 generic "46 resources" description="46 resources"
+                            uid=327_587 "46"
+                        uid=327_588 button "Expand 1 nested group in Hardware Players" description="1 nested group" expandable
+                          uid=327_589 image
+                    uid=327_590 ignored
+                      uid=327_591 generic
+                        uid=327_592 link "Mobile & Web Players 83 resources" description="Mobile & Web Players" url="https://awesome.video/subcategory/mobile-web-players"
+                          uid=327_593 ignored
+                            uid=327_594 "Mobile & Web Players"
+                          uid=327_595 generic "83 resources" description="83 resources"
+                            uid=327_596 "83"
+                        uid=327_597 button "Collapse 3 nested groups in Mobile & Web Players" description="3 nested groups" expandable expanded
+                          uid=327_598 image
+                      uid=327_599 generic
+                        uid=327_600 ignored
+                          uid=327_601 ignored
+                            uid=327_602 link "All in Mobile & Web Players" url="https://awesome.video/subcategory/mobile-web-players"
+                              uid=327_603 ignored
+                                uid=327_604 "All in "
+                                uid=327_605 "Mobile & Web Players"
+                            uid=327_606 link "Android 20" url="https://awesome.video/sub-subcategory/android"
+                              uid=327_607 generic
+                                uid=327_608 "Android"
+                              uid=327_609 ignored
+                                uid=327_610 "20"
+                            uid=327_611 link "Web Players 23" url="https://awesome.video/sub-subcategory/web-players"
+                              uid=327_612 generic
+                                uid=327_613 "Web Players"
+                              uid=327_614 ignored
+                                uid=327_615 "23"
+                            uid=327_616 link "iOS/tvOS 29" url="https://awesome.video/sub-subcategory/ios-tvos"
+                              uid=327_617 generic
+                                uid=327_618 "iOS/tvOS"
+                              uid=327_619 ignored
+                                uid=327_620 "29"
+                            uid=327_621 link "Uncategorized 11" url="https://awesome.video/subcategory/mobile-web-players?filter=general"
+                              uid=327_622 generic description="Uncategorized in Mobile & Web Players"
+                                uid=327_623 "Uncategorized"
+                              uid=327_624 ignored
+                                uid=327_625 "11"
+                    uid=327_626 link "Mobile Players 16 resources" description="Mobile Players" url="https://awesome.video/subcategory/mobile-players"
+                      uid=327_627 generic
+                        uid=327_628 "Mobile Players"
+                      uid=327_629 generic "16 resources" description="16 resources"
+                        uid=327_630 "16"
+                    uid=327_631 link "Set-top Box Players 25 resources" description="Set-top Box Players" url="https://awesome.video/subcategory/set-top-box-players"
+                      uid=327_632 generic
+                        uid=327_633 "Set-top Box Players"
+                      uid=327_634 generic "25 resources" description="25 resources"
+                        uid=327_635 "25"
+                    uid=327_636 ignored
+                      uid=327_637 generic
+                        uid=327_638 link "Smart TV Players 39 resources" description="Smart TV Players" url="https://awesome.video/subcategory/smart-tv-players"
+                          uid=327_639 ignored
+                            uid=327_640 "Smart TV Players"
+                          uid=327_641 generic "39 resources" description="39 resources"
+                            uid=327_642 "39"
+                        uid=327_643 button "Expand 2 nested groups in Smart TV Players" description="2 nested groups" expandable
+                          uid=327_644 image
+                    uid=327_645 link "Web Players 27 resources" description="Web Players" url="https://awesome.video/subcategory/web-players"
+                      uid=327_646 generic
+                        uid=327_647 "Web Players"
+                      uid=327_648 generic "27 resources" description="27 resources"
+                        uid=327_649 "27"
+                    uid=327_650 link "Uncategorized 117 resources" description="Uncategorized" url="https://awesome.video/category/players-clients?filter=general"
+                      uid=327_651 generic
+                        uid=327_652 "Uncategorized"
+                      uid=327_653 generic "117 resources" description="117 resources"
+                        uid=327_654 "117"
+            uid=327_655 ignored
+              uid=327_656 button "Protocols & Transport 467 resources" description="Protocols & Transport" expandable
+                uid=327_657 ignored
+                  uid=327_658 generic
+                    uid=327_659 "Protocols & Transport"
+                uid=327_660 ignored
+                  uid=327_661 generic "467 resources" description="467 resources"
+                    uid=327_662 "467"
+                  uid=327_663 ignored
+                    uid=327_664 image
+            uid=327_665 ignored
+              uid=327_666 button "Standards & Industry 335 resources" description="Standards & Industry" expandable
+                uid=327_667 ignored
+                  uid=327_668 generic
+                    uid=327_669 "Standards & Industry"
+                uid=327_670 ignored
+                  uid=327_671 generic "335 resources" description="335 resources"
+                    uid=327_672 "335"
+                  uid=327_673 ignored
+                    uid=327_674 image
+          uid=327_675 ignored
+            uid=327_676 ignored
+              uid=327_677 ignored
+                uid=327_678 "3,825 indexed"
+                uid=327_679 " · live"
+              uid=327_680 ignored
+                uid=327_681 link "Docs ↗" url="https://github.com/krzemienski/awesome-video/tree/master/docs"
+                  uid=327_682 "Docs ↗"
+                uid=327_683 link "Source: krzemienski/awesome-video" description="Source: krzemienski/awesome-video" url="https://github.com/krzemienski/awesome-video"
+              uid=327_684 group
+                uid=327_685 ignored
+                  uid=327_686 DisclosureTriangle "More navigation" description="More navigation" expandable
+                    uid=327_687 generic
+                uid=327_688 generic
+        uid=327_689 button "Close sidebar"
+          uid=327_690 ignored
+            uid=327_691 "Close"

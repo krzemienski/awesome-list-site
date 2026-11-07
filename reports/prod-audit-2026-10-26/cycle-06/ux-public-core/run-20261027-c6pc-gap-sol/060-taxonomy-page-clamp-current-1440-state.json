@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/category/encoding-codecs?page=25","title":"Video Encoding & Codecs: AV1… — Page 25 — Awesome Video","width":1440,"height":900,"scrollX":0,"scrollY":904,"bodyWidth":1434,"online":true,"focus":{"tag":"A","id":"","label":"awesome.video home","text":"awesome.video"},"headings":[{"text":"Encoding & Codecs","id":""},{"text":"About this collection","id":"taxonomy-scope-heading"},{"text":"Subcategories","id":"taxonomy-children-heading"},{"text":"Resources (579)","id":"taxonomy-results-heading"},{"text":"transcode2H265","id":""},{"text":"Video Transcoding","id":""},{"text":"Vireo","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":[],"pressed":[{"text":"All in Encoding & Codecs →","label":null},{"text":"Encoding & Codecs","label":null},{"text":"25","label":"Page 25, current page"}],"status":[""],"analyticsDisabled":"1"}
+```

@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
 import { PRODUCT_PROFILES } from "@/lib/design-system";
+import { designSystemSeoDescription, staticPageHeads } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
 
 /**
@@ -175,7 +176,7 @@ export default function DesignSystemShowcase() {
     <div className="system-showcase space-y-12">
       <SEOHead
         title="Design System"
-        description="The Awesome Video design system — 2 systems × 10 accents, live tokens, type scale, and core components."
+        description={designSystemSeoDescription}
         noindex
       />
 
@@ -191,12 +192,10 @@ export default function DesignSystemShowcase() {
         </Link>
         <div className="flex items-center gap-3">
           <Shapes className="h-6 w-6 text-[var(--accent-ink)]" />
-          <h1 className="page-title text-3xl" data-testid="text-ds-title">Design System</h1>
+          <h1 className="page-title text-3xl" data-testid="text-ds-title">{staticPageHeads["/design-system"].heading}</h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2 max-w-3xl">
-          The living anatomy of the runtime design system: two visual languages × ten accents
-          sharing one component contract. Every value below is read live from the active
-          stylesheet — switch a system or accent and watch the whole catalog re-derive.{" "}
+          {staticPageHeads["/design-system"].lead}{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-ds-active">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
@@ -442,10 +441,10 @@ export default function DesignSystemShowcase() {
             <div className="grid sm:grid-cols-2 gap-3">
               <Input placeholder="Search resources…" />
               <Textarea placeholder="Multi-line input…" className="min-h-[44px] h-[44px]" />
-              <label className="flex items-center gap-2 text-sm text-[color:var(--text-2)]">
+              <label className="flex min-h-11 items-center gap-2 text-sm text-[color:var(--text-2)]">
                 <Switch checked aria-label="Example switch" /> Switch
               </label>
-              <label className="flex items-center gap-2 text-sm text-[color:var(--text-2)]">
+              <label className="flex min-h-11 items-center gap-2 text-sm text-[color:var(--text-2)]">
                 <Checkbox checked aria-label="Example checkbox" /> Checkbox
               </label>
             </div>

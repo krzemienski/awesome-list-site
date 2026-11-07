@@ -1,0 +1,33 @@
+188271 rejected 'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT' https://example.invalid/zz-qa 2026-07-16
+188272 rejected 'ZZ QA TEST tags probe 11tags' https://example.invalid/zz-qa-tags-tags 2026-07-16
+188274 rejected 'ZZ QA TEST 7f3d9' https://example.invalid/zz-qa-test-7f3d9 2026-07-16
+188469 rejected 'QA url scheme probe' javascript:alert(1) 2026-07-17
+188470 rejected 'QA url scheme probe' ftp://x 2026-07-17
+188479 rejected 'QA VERIFY — do not approve' https://qaverify 2026-07-17
+188536 rejected 'QA5 url probe 3' https://exаmple.com/qa5-idn 2026-07-20
+188537 rejected 'QA5 url probe 4' https://xn--exmple-7nf.com/qa5-idn2 2026-07-20
+190172 rejected '[AUDIT-TEST] cf audit submission 260929' https://example.com/cf-audit-260929 2026-09-30
+190173 rejected '[AUDIT-TEST] fixer6 1' https://example.com/cf-audit-260929-fixer6-1 2026-09-30
+190175 rejected '[AUDIT-TEST] c4 f890' https://example.com/cf-audit-c4-f890 2026-09-30
+190177 rejected '[AUDIT-TEST] VX A 1790763258' https://example.com/audit-test-vx-1-1790763258 2026-09-30
+190187 rejected '[AUDIT-TEST] VX C mobile 1790763258' https://example.com/audit-test-vx-3-1790763258 2026-09-30
+190197 rejected '[AUDIT-TEST] C2-VX A 1790772064' https://example.com/audit-test-c2-vx-a-1790772064 2026-09-30
+190201 rejected '[AUDIT-TEST] C2-VX C mobile 1790772064' https://example.com/audit-test-c2-vx-c-1790772064 2026-09-30
+190205 rejected '[AUDIT-TEST] C2-VX reject-target A' https://example.com/audit-test-c2-vx-1-1790876861 2026-10-01
+190208 rejected '[AUDIT-TEST] C3-VX reject-target A' https://example.com/audit-test-c3-vx-1-1790943340 2026-10-02
+190214 rejected '[AUDIT-TEST] C3-VX mobile reject-target C' https://example.com/audit-test-c3-vx-3-1790943340 2026-10-02
+190217 rejected '[AUDIT-TEST] C4-VX reject-target A' https://example.com/audit-test-c4-vx-1-1790952847 2026-10-02
+190220 rejected '[AUDIT-TEST] C4-VX mobile reject-target C' https://example.com/audit-test-c4-vx-3-1790952847 2026-10-02
+190224 rejected '[AUDIT-TEST] C5-VX reject-target A' https://example.com/audit-test-c5-vx-a-1790971782 2026-10-02
+190230 rejected '[AUDIT-TEST] C5-VX mobile reject-target C' https://example.com/audit-test-c5-vx-c-1790971782 2026-10-02
+190236 rejected '[AUDIT-TEST] C6-VX reject-target A' https://example.com/audit-test-c6-vx-a-1790987663 2026-10-03
+190238 rejected '[AUDIT-TEST] C6-VX mobile reject-target C' https://example.com/audit-test-c6-vx-c-1790987663 2026-10-03
+190247 rejected '[AUDIT-TEST] C7-VX reject-target A' https://example.com/audit-test-c7-vx-a-1791000612 2026-10-03
+190250 rejected '[AUDIT-TEST] C7-VX mobile reject-target D' https://example.com/audit-test-c7-vx-d-1791000612 2026-10-03
+190260 rejected '[AUDIT-TEST] C8-VX reject-target A' https://example.com/audit-test-c8-vx-a-1791015303 2026-10-03
+190263 rejected '[AUDIT-TEST] C8-VX mobile reject-target D' https://example.com/audit-test-c8-vx-d-1791015303 2026-10-03
+190268 rejected '[AUDIT-TEST] C9-VX reject-target A' https://example.com/audit-test-c9-vx-a-1791022300 2026-10-03
+190273 rejected '[AUDIT-TEST] C9-VX mobile reject-target D' https://example.com/audit-test-c9-vx-d-1791022300 2026-10-03
+190280 rejected '[AUDIT-TEST] C10-VX withdraw-target B (390 title last)' https://example.com/audit-test-c10-vx-2-1791037274 2026-10-03
+190282 rejected '[AUDIT-TEST] C10-VX reject-target D' https://example.com/audit-test-c10-vx-4-1791037274 2026-10-03
+matched 32 of 32

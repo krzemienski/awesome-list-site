@@ -52,6 +52,7 @@ const Toast = React.forwardRef<
   return (
     <ToastPrimitives.Root
       ref={ref}
+      type={variant === "destructive" ? "foreground" : "background"}
       className={cn(toastVariants({ variant }), className)}
       {...props}
     />
@@ -121,7 +122,7 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName;
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
-type ToastActionElement = React.ReactElement<typeof ToastAction>;
+type ToastActionElement = React.ReactElement<React.ComponentProps<typeof ToastAction>>;
 
 export {
   type ToastProps,

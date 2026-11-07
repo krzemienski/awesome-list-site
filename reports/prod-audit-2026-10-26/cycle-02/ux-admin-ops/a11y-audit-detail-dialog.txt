@@ -1,0 +1,16 @@
+  - dialog "Audit entry #27424"
+    - heading "Audit entry #27424" [level=2, ref=e1]
+      - StaticText "Audit entry #27424"
+    - paragraph
+      - StaticText "sub subcategory updated · system · Oct 26, 2026, 01:10 PM"
+    - generic
+      - StaticText "Performed by: a•••@example.com"
+    - StaticText "Notes"
+    - paragraph
+      - StaticText "Updated sub-subcategory: [QA-audit-1026] c2 subsub"
+    - StaticText "Changes"
+    - generic "{ \"after\": { \"id\": 3773, \"name\": \"[QA-audit-1026] c2 subsub renamed\", \"slug\": \"qa-audit-1026-c2-subsub\", \"updatedAt\": \"2026-10-26T17:10:50.409Z\", \"subcategoryId\": 2334 }, \"before\": { \"id\": 3773, \"name\": \"[QA-audit-1026] c2 subsub\", \"slug\": \"qa-audit-1026-c2-subsub\", \"updatedAt\": \"2026-10-26T17:09:06.676Z\", \"subcategoryId\": 2334 } }" [ref=e3] focusable [tabindex]
+      - LayoutTable
+        - StaticText "{\n  \"after\": {\n    \"id\": 3773,\n    \"name\": \"[QA-audit-1026] c2 subsub renamed\",\n    \"slug\": \"qa-audit-1026-c2-subsub\",\n    \"updatedAt\": \"2026-10-26T17:10:50.409Z\",\n    \"subcategoryId\": 2334\n  },\n  \"before\": {\n    \"id\": 3773,\n    \"name\": \"[QA-audit-1026] c2 subsub\",\n    \"slug\": \"qa-audit-1026-c2-subsub\",\n    \"updatedAt\": \"2026-10-26T17:09:06.676Z\",\n    \"subcategoryId\": 2334\n  }\n}"
+    - button "Close" [ref=e2]
+"{\"activeTag\":\"DIV\",\"role\":null,\"ariaLabel\":null,\"radixViewport\":true,\"tabIndex\":0}"

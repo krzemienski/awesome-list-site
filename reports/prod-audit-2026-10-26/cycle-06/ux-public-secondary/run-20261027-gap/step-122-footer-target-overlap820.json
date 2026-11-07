@@ -1,0 +1,18 @@
+{
+  "before": {
+    "rect": {
+      "x": 288.65625,
+      "y": 723.140625,
+      "width": 216.671875,
+      "height": 44,
+      "top": 723.140625,
+      "right": 505.328125,
+      "bottom": 767.140625,
+      "left": 288.65625
+    },
+    "x": 396.9921875,
+    "y": 765.140625,
+    "hit": "General Tools"
+  },
+  "after": "https://awesome.video/category/general-tools"
+}

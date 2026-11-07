@@ -1,0 +1,54 @@
+{
+  "url": "http://127.0.0.1:5064/search?q=video&sort=name-asc",
+  "width": 1440,
+  "activeId": "",
+  "query": "video",
+  "sort": "Name A–Z",
+  "tagSearch": "ffmpeg",
+  "missing": [],
+  "duplicateIds": [],
+  "issues": [
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "1608",
+            "url": "http://127.0.0.1:5064/search?q=ffmpeg",
+            "lineNumber": 149,
+            "columnNumber": 109
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "1608",
+            "url": "http://127.0.0.1:5064/search?q=ffmpeg",
+            "lineNumber": 160,
+            "columnNumber": 103
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "41",
+            "url": "http://127.0.0.1:5064/src/lib/clerk-bridge.tsx",
+            "lineNumber": 84,
+            "columnNumber": 26
+          }
+        }
+      }
+    }
+  ]
+}

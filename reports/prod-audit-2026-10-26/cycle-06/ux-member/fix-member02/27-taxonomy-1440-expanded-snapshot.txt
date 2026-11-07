@@ -1,0 +1,1309 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport#main"]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 1,949 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 1,949 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 1,949 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer] [href="http://127.0.0.1:5122/categories"]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer] [href="http://127.0.0.1:5122/submit"]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer] [href="http://127.0.0.1:5122/about"]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer] [href="http://127.0.0.1:5122/design-system"]:
+            - /url: /design-system
+        - button "Sign in, account menu" [ref=e24] [cursor=pointer]:
+          - img [ref=e26]
+          - generic [ref=e29]: Sign in
+          - generic [ref=e30]: Sign in, account menu
+      - generic [ref=e31]:
+        - navigation "Sidebar" [ref=e33]:
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - link "Home" [ref=e38] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+                - /url: /
+                - generic [ref=e39]:
+                  - img [ref=e40]
+                  - generic [ref=e43]: Home
+              - generic [ref=e44]:
+                - generic [ref=e45]: CATEGORIES · 9
+                - button "Collapse sidebar" [ref=e46] [cursor=pointer]:
+                  - img [ref=e47]
+            - generic [ref=e49]:
+              - button "Community & Events 91 resources" [ref=e51] [cursor=pointer]:
+                - generic [ref=e52]:
+                  - generic [ref=e53]: ◈
+                  - generic "Community & Events" [ref=e54]
+                - generic [ref=e55]:
+                  - generic [ref=e56]: L3
+                  - generic "91 resources" [ref=e57]: "91"
+                  - img [ref=e59]
+              - button "Encoding & Codecs 372 resources" [ref=e62] [cursor=pointer]:
+                - generic [ref=e63]:
+                  - generic [ref=e64]: ◇
+                  - generic "Encoding & Codecs" [ref=e65]
+                - generic [ref=e66]:
+                  - generic [ref=e67]: L3
+                  - generic "372 resources" [ref=e68]: "372"
+                  - img [ref=e70]
+              - button "General Tools 95 resources" [ref=e73] [cursor=pointer]:
+                - generic [ref=e74]:
+                  - generic [ref=e75]: ◆
+                  - generic "General Tools" [ref=e76]
+                - generic [ref=e77]:
+                  - generic "95 resources" [ref=e78]: "95"
+                  - img [ref=e80]
+              - button "Infrastructure & Delivery 183 resources" [ref=e83] [cursor=pointer]:
+                - generic [ref=e84]:
+                  - generic [ref=e85]: ▣
+                  - generic "Infrastructure & Delivery" [ref=e86]
+                - generic [ref=e87]:
+                  - generic [ref=e88]: L3
+                  - generic "183 resources" [ref=e89]: "183"
+                  - img [ref=e91]
+              - button "Intro & Learning 227 resources" [ref=e94] [cursor=pointer]:
+                - generic [ref=e95]:
+                  - generic [ref=e96]: ▤
+                  - generic "Intro & Learning" [ref=e97]
+                - generic [ref=e98]:
+                  - generic "227 resources" [ref=e99]: "227"
+                  - img [ref=e101]
+              - button "Media Tools 304 resources" [ref=e104] [cursor=pointer]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]: ▥
+                  - generic "Media Tools" [ref=e107]
+                - generic [ref=e108]:
+                  - generic [ref=e109]: L3
+                  - generic "304 resources" [ref=e110]: "304"
+                  - img [ref=e112]
+              - button "Players & Clients 263 resources" [ref=e115] [cursor=pointer]:
+                - generic [ref=e116]:
+                  - generic [ref=e117]: ▶
+                  - generic "Players & Clients" [ref=e118]
+                - generic [ref=e119]:
+                  - generic [ref=e120]: L3
+                  - generic "263 resources" [ref=e121]: "263"
+                  - img [ref=e123]
+              - generic [ref=e125]:
+                - button "Protocols & Transport 242 resources" [expanded] [ref=e126] [cursor=pointer]:
+                  - generic [ref=e127]:
+                    - generic [ref=e128]: ⟁
+                    - generic "Protocols & Transport" [ref=e129]
+                  - generic [ref=e130]:
+                    - generic [ref=e131]: L3
+                    - generic "242 resources" [ref=e132]: "242"
+                    - img [ref=e134]
+                - generic [ref=e138]:
+                  - link "All in Protocols & Transport →" [ref=e139] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport"]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e140]: All in Protocols & Transport →
+                  - generic [ref=e142]:
+                    - link "Adaptive Streaming 139 resources" [ref=e143] [cursor=pointer] [href="http://127.0.0.1:5122/subcategory/adaptive-streaming"]:
+                      - /url: /subcategory/adaptive-streaming
+                      - generic [ref=e144]: Adaptive Streaming
+                      - generic "139 resources" [ref=e145]: "139"
+                    - button "Expand 2 nested groups in Adaptive Streaming" [ref=e146] [cursor=pointer]:
+                      - generic [ref=e147]: "+2"
+                      - img [ref=e148]
+                  - generic [ref=e151]:
+                    - link "Transport Protocols 9 resources" [ref=e152] [cursor=pointer] [href="http://127.0.0.1:5122/subcategory/transport-protocols"]:
+                      - /url: /subcategory/transport-protocols
+                      - generic [ref=e153]: Transport Protocols
+                      - generic "9 resources" [ref=e154]: "9"
+                    - button "Expand 1 nested group in Transport Protocols" [ref=e155] [cursor=pointer]:
+                      - generic [ref=e156]: "+1"
+                      - img [ref=e157]
+                  - link "Uncategorized 94 resources" [ref=e159] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport?filter=general"]:
+                    - /url: /category/protocols-transport?filter=general
+                    - generic "Uncategorized" [ref=e160]
+                    - generic "94 resources" [ref=e161]: "94"
+              - button "Standards & Industry 172 resources" [ref=e163] [cursor=pointer]:
+                - generic [ref=e164]:
+                  - generic [ref=e165]: ◉
+                  - generic "Standards & Industry" [ref=e166]
+                - generic [ref=e167]:
+                  - generic [ref=e168]: L3
+                  - generic "172 resources" [ref=e169]: "172"
+                  - img [ref=e171]
+            - generic [ref=e174]:
+              - generic [ref=e176]: 1,949 indexed · live
+              - 'link "Source: krzemienski/awesome-video" [ref=e178] [cursor=pointer]':
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e179]
+              - group [ref=e181]:
+                - generic "More navigation" [ref=e182] [cursor=pointer]:
+                  - img [ref=e183]
+        - generic [ref=e187]:
+          - main [ref=e188]:
+            - generic [ref=e189]:
+              - navigation "Breadcrumb" [ref=e190]:
+                - list [ref=e191]:
+                  - listitem [ref=e192]:
+                    - link "Home" [ref=e193] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+                      - /url: /
+                  - listitem [ref=e194]:
+                    - img [ref=e195]
+                  - listitem:
+                    - link "Protocols & Transport" [disabled]
+              - generic [ref=e197]:
+                - link "Browse" [ref=e198] [cursor=pointer] [href="http://127.0.0.1:5122/categories"]:
+                  - /url: /categories
+                  - img
+                  - text: Browse
+                - generic [ref=e199]:
+                  - generic [ref=e200]:
+                    - generic [ref=e201]: ⟁
+                    - text: CATEGORY · PROTOCOLS & TRANSPORT
+                  - heading "Protocols & Transport" [level=1] [ref=e202]
+                  - region "About this collection" [ref=e203]:
+                    - heading "About this collection" [level=2] [ref=e204]
+                    - paragraph [ref=e205]: Protocols & Transport brings together 242 curated resources from across the video technology landscape. Notable topics include Adaptive Streaming and Transport Protocols.
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: 242 resources
+                    - generic [ref=e208]: 2 subcategories
+                    - button "Filters & view" [ref=e209] [cursor=pointer]:
+                      - generic [ref=e210]: Filters & view
+                - region "Subcategories" [ref=e211]:
+                  - heading "Subcategories" [level=2] [ref=e212]
+                  - generic [ref=e213]:
+                    - link "Adaptive Streaming 139" [ref=e214] [cursor=pointer] [href="http://127.0.0.1:5122/subcategory/adaptive-streaming"]:
+                      - /url: /subcategory/adaptive-streaming
+                      - generic [ref=e215]: Adaptive Streaming
+                      - generic [ref=e216]: "139"
+                    - link "Transport Protocols 9" [ref=e217] [cursor=pointer] [href="http://127.0.0.1:5122/subcategory/transport-protocols"]:
+                      - /url: /subcategory/transport-protocols
+                      - generic [ref=e218]: Transport Protocols
+                      - generic [ref=e219]: "9"
+                    - button "Uncategorized 94" [ref=e220] [cursor=pointer]:
+                      - generic [ref=e221]: Uncategorized
+                      - generic [ref=e222]: "94"
+                - generic "Resources (242)" [ref=e225]:
+                  - heading "Resources (242)" [level=2] [ref=e227]
+                  - generic [ref=e228]:
+                    - article [ref=e229] [cursor=pointer]:
+                      - generic [ref=e230]:
+                        - generic [ref=e231]:
+                          - generic [ref=e232]: ⟁
+                          - generic:
+                            - 'link "View details for 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"':
+                              - /url: /resource/282
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - generic:
+                              - 'link "Open Link 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared (opens in new tab)"':
+                                - /url: https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls
+                                - img
+                                - generic: Open Link
+                                - generic: "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared (opens in new tab)"
+                              - 'button "Suggest an edit: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"':
+                                - img
+                          - generic [ref=e234]:
+                            - 'button "Favorite to your account — sign in required: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e235]':
+                              - generic [ref=e236]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e237]':
+                              - generic [ref=e238]:
+                                - img
+                        - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e240]':
+                          - 'link "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e241]':
+                            - /url: /resource/282
+                        - paragraph [ref=e242]: A detailed comparison of RTMP, WebRTC, and HLS protocols, highlighting their differences in latency, scalability, quality, and reach. This resource assists developers in choosing the appropriate protocol based on their specific live video streaming requirements.
+                      - generic [ref=e244]:
+                        - generic [ref=e245]: Protocols & Transport
+                        - link "Filter by tag RTMP" [ref=e246] [href="http://127.0.0.1:5122/tag/rtmp"]:
+                          - /url: /tag/rtmp
+                          - generic [ref=e247]: "#RTMP"
+                        - link "Filter by tag WebRTC" [ref=e248] [href="http://127.0.0.1:5122/tag/webrtc"]:
+                          - /url: /tag/webrtc
+                          - generic [ref=e249]: "#WebRTC"
+                        - link "Filter by tag HLS" [ref=e250] [href="http://127.0.0.1:5122/tag/hls"]:
+                          - /url: /tag/hls
+                          - generic [ref=e251]: "#HLS"
+                    - article [ref=e252] [cursor=pointer]:
+                      - generic [ref=e253]:
+                        - generic [ref=e254]:
+                          - generic [ref=e255]: ⟁
+                          - generic [ref=e256]:
+                            - link "View details for Ad Creative Signaling in DASH and HLS" [ref=e257] [href="http://127.0.0.1:5122/resource/812"]:
+                              - /url: /resource/812
+                              - generic [ref=e258]:
+                                - img [ref=e259]
+                                - generic [ref=e261]: View Details
+                            - button "Show fewer tags" [expanded] [active] [ref=e262]: Show fewer
+                            - generic [ref=e263]:
+                              - link "Open Link Ad Creative Signaling in DASH and HLS (opens in new tab)" [ref=e264] [href="https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/"]:
+                                - /url: https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/
+                                - img
+                                - generic [ref=e265]: Open Link
+                                - generic [ref=e266]: Ad Creative Signaling in DASH and HLS (opens in new tab)
+                              - 'button "Suggest an edit: Ad Creative Signaling in DASH and HLS" [ref=e267]':
+                                - img
+                          - generic [ref=e269]:
+                            - 'button "Favorite to your account — sign in required: Ad Creative Signaling in DASH and HLS" [ref=e270]':
+                              - generic [ref=e271]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Ad Creative Signaling in DASH and HLS" [ref=e272]':
+                              - generic [ref=e273]:
+                                - img
+                        - heading "Ad Creative Signaling in DASH and HLS" [level=2] [ref=e275]:
+                          - link "Ad Creative Signaling in DASH and HLS" [ref=e276] [href="http://127.0.0.1:5122/resource/812"]:
+                            - /url: /resource/812
+                        - paragraph [ref=e277]: This project by the Streaming Video Technology Alliance defines a data scheme for signaling advertisement creative assets within DASH manifests and HLS playlists, facilitating better ad integration in streaming workflows.
+                      - generic [ref=e279]:
+                        - generic [ref=e280]: Protocols & Transport
+                        - link "Filter by tag advertising" [ref=e281] [href="http://127.0.0.1:5122/tag/advertising"]:
+                          - /url: /tag/advertising
+                          - generic [ref=e282]: "#advertising"
+                        - link "Filter by tag DASH" [ref=e283] [href="http://127.0.0.1:5122/tag/dash"]:
+                          - /url: /tag/dash
+                          - generic [ref=e284]: "#DASH"
+                        - link "Filter by tag HLS" [ref=e285] [href="http://127.0.0.1:5122/tag/hls"]:
+                          - /url: /tag/hls
+                          - generic [ref=e286]: "#HLS"
+                        - link "Filter by tag streaming" [ref=e287] [href="http://127.0.0.1:5122/tag/streaming"]:
+                          - /url: /tag/streaming
+                          - generic [ref=e288]: "#streaming"
+                        - link "Filter by tag metadata" [ref=e289] [href="http://127.0.0.1:5122/tag/metadata"]:
+                          - /url: /tag/metadata
+                          - generic [ref=e290]: "#metadata"
+                    - article [ref=e291] [cursor=pointer]:
+                      - generic [ref=e292]:
+                        - generic [ref=e293]:
+                          - generic [ref=e294]: ⟁
+                          - generic:
+                            - link "View details for Adaptive Streaming with MPEG-DASH and HLS using AWS":
+                              - /url: /resource/655
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Adaptive Streaming with MPEG-DASH and HLS using AWS (opens in new tab)":
+                                - /url: https://gist.github.com/PaulRosset/7bf10bf53895b1a53630bc947c8b1834
+                                - img
+                                - generic: Open Link
+                                - generic: Adaptive Streaming with MPEG-DASH and HLS using AWS (opens in new tab)
+                              - 'button "Suggest an edit: Adaptive Streaming with MPEG-DASH and HLS using AWS"':
+                                - img
+                          - generic [ref=e296]:
+                            - 'button "Favorite to your account — sign in required: Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e297]':
+                              - generic [ref=e298]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e299]':
+                              - generic [ref=e300]:
+                                - img
+                        - heading "Adaptive Streaming with MPEG-DASH and HLS using AWS" [level=2] [ref=e302]:
+                          - link "Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e303] [href="http://127.0.0.1:5122/resource/655"]:
+                            - /url: /resource/655
+                        - paragraph [ref=e304]: A comprehensive guide detailing the process of setting up adaptive streaming using MPEG-DASH and HLS with AWS services. It covers S3 bucket configuration, Elastic Transcoder usage, and integration with Video.js for playback.
+                      - generic [ref=e306]:
+                        - generic [ref=e307]: Protocols & Transport
+                        - link "Filter by tag adaptive streaming" [ref=e308] [href="http://127.0.0.1:5122/tag/adaptive-streaming"]:
+                          - /url: /tag/adaptive-streaming
+                          - generic [ref=e309]: "#adaptive streaming"
+                        - link "Filter by tag MPEG-DASH" [ref=e310] [href="http://127.0.0.1:5122/tag/mpeg-dash"]:
+                          - /url: /tag/mpeg-dash
+                          - generic [ref=e311]: "#MPEG-DASH"
+                        - link "Filter by tag HLS" [ref=e312] [href="http://127.0.0.1:5122/tag/hls"]:
+                          - /url: /tag/hls
+                          - generic [ref=e313]: "#HLS"
+                    - article [ref=e314] [cursor=pointer]:
+                      - generic [ref=e315]:
+                        - generic [ref=e316]:
+                          - generic [ref=e317]: ⟁
+                          - generic:
+                            - link "View details for aiortc (Python WebRTC)":
+                              - /url: /resource/1920
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 3 more tags": +3 more
+                            - generic:
+                              - link "Open Link aiortc (Python WebRTC) (opens in new tab)":
+                                - /url: https://github.com/aiortc/aiortc
+                                - img
+                                - generic: Open Link
+                                - generic: aiortc (Python WebRTC) (opens in new tab)
+                              - 'button "Suggest an edit: aiortc (Python WebRTC)"':
+                                - img
+                          - generic [ref=e319]:
+                            - 'button "Favorite to your account — sign in required: aiortc (Python WebRTC)" [ref=e320]':
+                              - generic [ref=e321]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: aiortc (Python WebRTC)" [ref=e322]':
+                              - generic [ref=e323]:
+                                - img
+                        - heading "aiortc (Python WebRTC)" [level=2] [ref=e325]:
+                          - link "aiortc (Python WebRTC)" [ref=e326] [href="http://127.0.0.1:5122/resource/1920"]:
+                            - /url: /resource/1920
+                        - paragraph [ref=e327]: A Python library for Web Real-Time Communication that implements WebRTC and ORTC, enabling real-time audio/video and data streaming in Python applications.
+                      - generic [ref=e329]:
+                        - generic [ref=e330]: Protocols & Transport
+                        - generic [ref=e331]: Protocols
+                        - link "Filter by tag WebRTC" [ref=e332] [href="http://127.0.0.1:5122/tag/webrtc"]:
+                          - /url: /tag/webrtc
+                          - generic [ref=e333]: "#WebRTC"
+                        - link "Filter by tag real-time" [ref=e334] [href="http://127.0.0.1:5122/tag/real-time"]:
+                          - /url: /tag/real-time
+                          - generic [ref=e335]: "#real-time"
+                        - link "Filter by tag streaming" [ref=e336] [href="http://127.0.0.1:5122/tag/streaming"]:
+                          - /url: /tag/streaming
+                          - generic [ref=e337]: "#streaming"
+                    - article [ref=e338] [cursor=pointer]:
+                      - generic [ref=e339]:
+                        - generic [ref=e340]:
+                          - generic [ref=e341]: ⟁
+                          - generic:
+                            - link "View details for AOMediaCodec/av1-rtp-spec":
+                              - /url: /resource/1364
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link AOMediaCodec/av1-rtp-spec (opens in new tab)":
+                                - /url: https://github.com/AOMediaCodec/av1-rtp-spec
+                                - img
+                                - generic: Open Link
+                                - generic: AOMediaCodec/av1-rtp-spec (opens in new tab)
+                              - 'button "Suggest an edit: AOMediaCodec/av1-rtp-spec"':
+                                - img
+                          - generic [ref=e343]:
+                            - 'button "Favorite to your account — sign in required: AOMediaCodec/av1-rtp-spec" [ref=e344]':
+                              - generic [ref=e345]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: AOMediaCodec/av1-rtp-spec" [ref=e346]':
+                              - generic [ref=e347]:
+                                - img
+                        - heading "AOMediaCodec/av1-rtp-spec" [level=2] [ref=e349]:
+                          - link "AOMediaCodec/av1-rtp-spec" [ref=e350] [href="http://127.0.0.1:5122/resource/1364"]:
+                            - /url: /resource/1364
+                        - paragraph [ref=e351]: "Current draft (HTML): https://aomediacodec.github.io/av1-rtp-spec/ - AOMediaCodec/av1-rtp-spec"
+                      - generic [ref=e353]:
+                        - generic [ref=e354]: Protocols & Transport
+                        - generic [ref=e355]: Standards
+                        - link "Filter by tag RTP" [ref=e356] [href="http://127.0.0.1:5122/tag/rtp"]:
+                          - /url: /tag/rtp
+                          - generic [ref=e357]: "#RTP"
+                        - link "Filter by tag AV1" [ref=e358] [href="http://127.0.0.1:5122/tag/av1"]:
+                          - /url: /tag/av1
+                          - generic [ref=e359]: "#AV1"
+                        - link "Filter by tag transport" [ref=e360] [href="http://127.0.0.1:5122/tag/transport"]:
+                          - /url: /tag/transport
+                          - generic [ref=e361]: "#transport"
+                    - article [ref=e362] [cursor=pointer]:
+                      - generic [ref=e363]:
+                        - generic [ref=e364]:
+                          - generic [ref=e365]: ⟁
+                          - generic:
+                            - link "View details for Awesome DASH":
+                              - /url: /resource/650
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Awesome DASH (opens in new tab)":
+                                - /url: https://github.com/yuan-jinghao/awesome-dash
+                                - img
+                                - generic: Open Link
+                                - generic: Awesome DASH (opens in new tab)
+                              - 'button "Suggest an edit: Awesome DASH"':
+                                - img
+                          - generic [ref=e367]:
+                            - 'button "Favorite to your account — sign in required: Awesome DASH" [ref=e368]':
+                              - generic [ref=e369]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Awesome DASH" [ref=e370]':
+                              - generic [ref=e371]:
+                                - img
+                        - heading "Awesome DASH" [level=2] [ref=e373]:
+                          - link "Awesome DASH" [ref=e374] [href="http://127.0.0.1:5122/resource/650"]:
+                            - /url: /resource/650
+                        - paragraph [ref=e375]: A curated list of resources, tools, and information related to MPEG-DASH. This repository serves as a comprehensive guide for developers interested in DASH technology, offering insights into its implementation, best practices, and related research.
+                      - generic [ref=e377]:
+                        - generic [ref=e378]: Protocols & Transport
+                        - link "Filter by tag DASH" [ref=e379] [href="http://127.0.0.1:5122/tag/dash"]:
+                          - /url: /tag/dash
+                          - generic [ref=e380]: "#DASH"
+                        - link "Filter by tag video streaming" [ref=e381] [href="http://127.0.0.1:5122/tag/video-streaming"]:
+                          - /url: /tag/video-streaming
+                          - generic [ref=e382]: "#video streaming"
+                        - link "Filter by tag resources" [ref=e383] [href="http://127.0.0.1:5122/tag/resource"]:
+                          - /url: /tag/resource
+                          - generic [ref=e384]: "#resources"
+                    - article [ref=e385] [cursor=pointer]:
+                      - generic [ref=e386]:
+                        - generic [ref=e387]:
+                          - generic [ref=e388]: ⟁
+                          - generic:
+                            - link "View details for Bitmovin Player":
+                              - /url: /resource/493
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Bitmovin Player (opens in new tab)":
+                                - /url: https://github.com/bitmovin/bitmovin-player-web-samples
+                                - img
+                                - generic: Open Link
+                                - generic: Bitmovin Player (opens in new tab)
+                              - 'button "Suggest an edit: Bitmovin Player"':
+                                - img
+                          - generic [ref=e390]:
+                            - 'button "Favorite to your account — sign in required: Bitmovin Player" [ref=e391]':
+                              - generic [ref=e392]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Bitmovin Player" [ref=e393]':
+                              - generic [ref=e394]:
+                                - img
+                        - heading "Bitmovin Player" [level=2] [ref=e396]:
+                          - link "Bitmovin Player" [ref=e397] [href="http://127.0.0.1:5122/resource/493"]:
+                            - /url: /resource/493
+                        - paragraph [ref=e398]: A comprehensive adaptive streaming player supporting HLS and MPEG-DASH, offering features like low latency, DRM integration, and customizable UI. It is designed for high-quality video playback across various devices and platforms.
+                      - generic [ref=e400]:
+                        - generic [ref=e401]: Protocols & Transport
+                        - link "Filter by tag adaptive streaming" [ref=e402] [href="http://127.0.0.1:5122/tag/adaptive-streaming"]:
+                          - /url: /tag/adaptive-streaming
+                          - generic [ref=e403]: "#adaptive streaming"
+                        - link "Filter by tag HLS" [ref=e404] [href="http://127.0.0.1:5122/tag/hls"]:
+                          - /url: /tag/hls
+                          - generic [ref=e405]: "#HLS"
+                        - link "Filter by tag MPEG-DASH" [ref=e406] [href="http://127.0.0.1:5122/tag/mpeg-dash"]:
+                          - /url: /tag/mpeg-dash
+                          - generic [ref=e407]: "#MPEG-DASH"
+                    - article [ref=e408] [cursor=pointer]:
+                      - generic [ref=e409]:
+                        - generic [ref=e410]:
+                          - generic [ref=e411]: ⟁
+                          - generic:
+                            - 'link "View details for BlendVision: Top 6 Live Streaming Protocols Comparison"':
+                              - /url: /resource/279
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - 'link "Open Link BlendVision: Top 6 Live Streaming Protocols Comparison (opens in new tab)"':
+                                - /url: https://blendvision.com/en/blog/live-streaming-protocols-comparison
+                                - img
+                                - generic: Open Link
+                                - generic: "BlendVision: Top 6 Live Streaming Protocols Comparison (opens in new tab)"
+                              - 'button "Suggest an edit: BlendVision: Top 6 Live Streaming Protocols Comparison"':
+                                - img
+                          - generic [ref=e413]:
+                            - 'button "Favorite to your account — sign in required: BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e414]':
+                              - generic [ref=e415]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e416]':
+                              - generic [ref=e417]:
+                                - img
+                        - 'heading "BlendVision: Top 6 Live Streaming Protocols Comparison" [level=2] [ref=e419]':
+                          - 'link "BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e420]':
+                            - /url: /resource/279
+                        - paragraph [ref=e421]: "A comprehensive comparison of six common live streaming protocols: RTP, SRT, RTMP, RIST, ZiXi, and WebRTC. The article explores their technical characteristics, application scenarios, and differences, aiding developers in selecting the most suitable protocol for their live streaming services."
+                      - generic [ref=e423]:
+                        - generic [ref=e424]: Protocols & Transport
+                        - link "Filter by tag RTP" [ref=e425] [href="http://127.0.0.1:5122/tag/rtp"]:
+                          - /url: /tag/rtp
+                          - generic [ref=e426]: "#RTP"
+                        - link "Filter by tag SRT" [ref=e427] [href="http://127.0.0.1:5122/tag/srt"]:
+                          - /url: /tag/srt
+                          - generic [ref=e428]: "#SRT"
+                        - link "Filter by tag RTMP" [ref=e429] [href="http://127.0.0.1:5122/tag/rtmp"]:
+                          - /url: /tag/rtmp
+                          - generic [ref=e430]: "#RTMP"
+                    - article [ref=e431] [cursor=pointer]:
+                      - generic [ref=e432]:
+                        - generic [ref=e433]:
+                          - generic [ref=e434]: ⟁
+                          - generic:
+                            - link "View details for Comcast/gots":
+                              - /url: /resource/1208
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Comcast/gots (opens in new tab)":
+                                - /url: https://github.com/Comcast/gots
+                                - img
+                                - generic: Open Link
+                                - generic: Comcast/gots (opens in new tab)
+                              - 'button "Suggest an edit: Comcast/gots"':
+                                - img
+                          - generic [ref=e436]:
+                            - 'button "Favorite to your account — sign in required: Comcast/gots" [ref=e437]':
+                              - generic [ref=e438]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Comcast/gots" [ref=e439]':
+                              - generic [ref=e440]:
+                                - img
+                        - heading "Comcast/gots" [level=2] [ref=e442]:
+                          - link "Comcast/gots" [ref=e443] [href="http://127.0.0.1:5122/resource/1208"]:
+                            - /url: /resource/1208
+                        - paragraph [ref=e444]: MPEG Transport Stream handling in Go.
+                      - generic [ref=e446]:
+                        - generic [ref=e447]: Protocols & Transport
+                        - generic [ref=e448]: Protocols
+                        - link "Filter by tag transport" [ref=e449] [href="http://127.0.0.1:5122/tag/transport"]:
+                          - /url: /tag/transport
+                          - generic [ref=e450]: "#transport"
+                        - link "Filter by tag mpeg" [ref=e451] [href="http://127.0.0.1:5122/tag/mpeg"]:
+                          - /url: /tag/mpeg
+                          - generic [ref=e452]: "#mpeg"
+                        - link "Filter by tag go" [ref=e453] [href="http://127.0.0.1:5122/tag/go"]:
+                          - /url: /tag/go
+                          - generic [ref=e454]: "#go"
+                    - article [ref=e455] [cursor=pointer]:
+                      - generic [ref=e456]:
+                        - generic [ref=e457]:
+                          - generic [ref=e458]: ⟁
+                          - generic:
+                            - link "View details for Comcast/scte35-js":
+                              - /url: /resource/1178
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Comcast/scte35-js (opens in new tab)":
+                                - /url: https://github.com/Comcast/scte35-js
+                                - img
+                                - generic: Open Link
+                                - generic: Comcast/scte35-js (opens in new tab)
+                              - 'button "Suggest an edit: Comcast/scte35-js"':
+                                - img
+                          - generic [ref=e460]:
+                            - 'button "Favorite to your account — sign in required: Comcast/scte35-js" [ref=e461]':
+                              - generic [ref=e462]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Comcast/scte35-js" [ref=e463]':
+                              - generic [ref=e464]:
+                                - img
+                        - heading "Comcast/scte35-js" [level=2] [ref=e466]:
+                          - link "Comcast/scte35-js" [ref=e467] [href="http://127.0.0.1:5122/resource/1178"]:
+                            - /url: /resource/1178
+                        - paragraph [ref=e468]: A SCTE 35 Parser for JavaScript.
+                      - generic [ref=e470]:
+                        - generic [ref=e471]: Protocols & Transport
+                        - generic [ref=e472]: Protocols
+                        - link "Filter by tag scte35" [ref=e473] [href="http://127.0.0.1:5122/tag/scte35"]:
+                          - /url: /tag/scte35
+                          - generic [ref=e474]: "#scte35"
+                        - link "Filter by tag javascript" [ref=e475] [href="http://127.0.0.1:5122/tag/javascript"]:
+                          - /url: /tag/javascript
+                          - generic [ref=e476]: "#javascript"
+                        - link "Filter by tag parsing" [ref=e477] [href="http://127.0.0.1:5122/tag/parsing"]:
+                          - /url: /tag/parsing
+                          - generic [ref=e478]: "#parsing"
+                    - article [ref=e479] [cursor=pointer]:
+                      - generic [ref=e480]:
+                        - generic [ref=e481]:
+                          - generic [ref=e482]: ⟁
+                          - generic:
+                            - 'link "View details for Comparing Video Transport Technologies: Which One is Best for Your Needs?"':
+                              - /url: /resource/360
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - 'link "Open Link Comparing Video Transport Technologies: Which One is Best for Your Needs? (opens in new tab)"':
+                                - /url: https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs/
+                                - img
+                                - generic: Open Link
+                                - generic: "Comparing Video Transport Technologies: Which One is Best for Your Needs? (opens in new tab)"
+                              - 'button "Suggest an edit: Comparing Video Transport Technologies: Which One is Best for Your Needs?"':
+                                - img
+                          - generic [ref=e484]:
+                            - 'button "Favorite to your account — sign in required: Comparing Video Transport Technologies: Which One is Best for Your Needs?" [ref=e485]':
+                              - generic [ref=e486]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Comparing Video Transport Technologies: Which One is Best for Your Needs?" [ref=e487]':
+                              - generic [ref=e488]:
+                                - img
+                        - 'heading "Comparing Video Transport Technologies: Which One is Best for Your Needs?" [level=2] [ref=e490]':
+                          - 'link "Comparing Video Transport Technologies: Which One is Best for Your Needs?" [ref=e491]':
+                            - /url: /resource/360
+                        - paragraph [ref=e492]: This article from Medialooks offers a comprehensive comparison of various video transport technologies, including RTMP, HLS, DASH, SRT, and WebRTC. It explains the pros and cons of each protocol, highlights popular products that use them, and provides guidance on selecting the best technology based on specific use cases.
+                      - generic [ref=e494]:
+                        - generic [ref=e495]: Protocols & Transport
+                        - link "Filter by tag Video Transport" [ref=e496] [href="http://127.0.0.1:5122/tag/video-transport"]:
+                          - /url: /tag/video-transport
+                          - generic [ref=e497]: "#Video Transport"
+                        - link "Filter by tag Protocol Comparison" [ref=e498] [href="http://127.0.0.1:5122/tag/protocol-comparison"]:
+                          - /url: /tag/protocol-comparison
+                          - generic [ref=e499]: "#Protocol Comparison"
+                        - link "Filter by tag RTMP" [ref=e500] [href="http://127.0.0.1:5122/tag/rtmp"]:
+                          - /url: /tag/rtmp
+                          - generic [ref=e501]: "#RTMP"
+                    - article [ref=e502] [cursor=pointer]:
+                      - generic [ref=e503]:
+                        - generic [ref=e504]:
+                          - generic [ref=e505]: ⟁
+                          - generic:
+                            - link "View details for Comparison of Streaming Media Software":
+                              - /url: /resource/188
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Comparison of Streaming Media Software (opens in new tab)":
+                                - /url: https://en.wikipedia.org/wiki/Comparison_of_streaming_media_software
+                                - img
+                                - generic: Open Link
+                                - generic: Comparison of Streaming Media Software (opens in new tab)
+                              - 'button "Suggest an edit: Comparison of Streaming Media Software"':
+                                - img
+                          - generic [ref=e507]:
+                            - 'button "Favorite to your account — sign in required: Comparison of Streaming Media Software" [ref=e508]':
+                              - generic [ref=e509]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Comparison of Streaming Media Software" [ref=e510]':
+                              - generic [ref=e511]:
+                                - img
+                        - heading "Comparison of Streaming Media Software" [level=2] [ref=e513]:
+                          - link "Comparison of Streaming Media Software" [ref=e514] [href="http://127.0.0.1:5122/resource/188"]:
+                            - /url: /resource/188
+                        - paragraph [ref=e515]: This resource provides a comprehensive comparison of various streaming media software, detailing the protocols they support, including HTTP, MPEG DASH, WebRTC, RTSP, and more. It's a valuable reference for developers seeking to understand the capabilities and protocol support of different streaming solutions.
+                      - generic [ref=e517]:
+                        - generic [ref=e518]: Protocols & Transport
+                        - generic [ref=e519]: Tools & SDKs
+                        - link "Filter by tag streaming media" [ref=e520] [href="http://127.0.0.1:5122/tag/streaming-media"]:
+                          - /url: /tag/streaming-media
+                          - generic [ref=e521]: "#streaming media"
+                        - link "Filter by tag protocol comparison" [ref=e522] [href="http://127.0.0.1:5122/tag/protocol-comparison"]:
+                          - /url: /tag/protocol-comparison
+                          - generic [ref=e523]: "#protocol comparison"
+                        - link "Filter by tag software" [ref=e524] [href="http://127.0.0.1:5122/tag/software"]:
+                          - /url: /tag/software
+                          - generic [ref=e525]: "#software"
+                    - article [ref=e526] [cursor=pointer]:
+                      - generic [ref=e527]:
+                        - generic [ref=e528]:
+                          - generic [ref=e529]: ⟁
+                          - generic:
+                            - link "View details for Comparison of Streaming Protocols":
+                              - /url: /resource/440
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Comparison of Streaming Protocols (opens in new tab)":
+                                - /url: https://gist.github.com/travelhawk/89c17064afcedc9b919d985da37f72fd
+                                - img
+                                - generic: Open Link
+                                - generic: Comparison of Streaming Protocols (opens in new tab)
+                              - 'button "Suggest an edit: Comparison of Streaming Protocols"':
+                                - img
+                          - generic [ref=e531]:
+                            - 'button "Favorite to your account — sign in required: Comparison of Streaming Protocols" [ref=e532]':
+                              - generic [ref=e533]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Comparison of Streaming Protocols" [ref=e534]':
+                              - generic [ref=e535]:
+                                - img
+                        - heading "Comparison of Streaming Protocols" [level=2] [ref=e537]:
+                          - link "Comparison of Streaming Protocols" [ref=e538] [href="http://127.0.0.1:5122/resource/440"]:
+                            - /url: /resource/440
+                        - paragraph [ref=e539]: A comprehensive GitHub Gist that provides a detailed comparison of various streaming protocols, including RTMP, WebRTC, SRT, and others. It outlines the supported codecs, latency, pros, and cons of each protocol, serving as a valuable resource for developers seeking to understand the differences and applications of these protocols.
+                      - generic [ref=e541]:
+                        - generic [ref=e542]: Protocols & Transport
+                        - link "Filter by tag streaming protocols" [ref=e543] [href="http://127.0.0.1:5122/tag/streaming-protocol"]:
+                          - /url: /tag/streaming-protocol
+                          - generic [ref=e544]: "#streaming protocols"
+                        - link "Filter by tag RTMP" [ref=e545] [href="http://127.0.0.1:5122/tag/rtmp"]:
+                          - /url: /tag/rtmp
+                          - generic [ref=e546]: "#RTMP"
+                        - link "Filter by tag WebRTC" [ref=e547] [href="http://127.0.0.1:5122/tag/webrtc"]:
+                          - /url: /tag/webrtc
+                          - generic [ref=e548]: "#WebRTC"
+                    - article [ref=e549] [cursor=pointer]:
+                      - generic [ref=e550]:
+                        - generic [ref=e551]:
+                          - generic [ref=e552]: ⟁
+                          - generic:
+                            - link "View details for coturn":
+                              - /url: /resource/1922
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 3 more tags": +3 more
+                            - generic:
+                              - link "Open Link coturn (opens in new tab)":
+                                - /url: https://github.com/coturn/coturn
+                                - img
+                                - generic: Open Link
+                                - generic: coturn (opens in new tab)
+                              - 'button "Suggest an edit: coturn"':
+                                - img
+                          - generic [ref=e554]:
+                            - 'button "Favorite to your account — sign in required: coturn" [ref=e555]':
+                              - generic [ref=e556]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: coturn" [ref=e557]':
+                              - generic [ref=e558]:
+                                - img
+                        - heading "coturn" [level=2] [ref=e560]:
+                          - link "coturn" [ref=e561] [href="http://127.0.0.1:5122/resource/1922"]:
+                            - /url: /resource/1922
+                        - paragraph [ref=e562]: An open source implementation of TURN and STUN servers, used to facilitate NAT traversal for peer-to-peer video (and audio) communication in WebRTC and other protocols.
+                      - generic [ref=e564]:
+                        - generic [ref=e565]: Protocols & Transport
+                        - generic [ref=e566]: Protocols
+                        - link "Filter by tag WebRTC" [ref=e567] [href="http://127.0.0.1:5122/tag/webrtc"]:
+                          - /url: /tag/webrtc
+                          - generic [ref=e568]: "#WebRTC"
+                        - link "Filter by tag NAT" [ref=e569] [href="http://127.0.0.1:5122/tag/nat"]:
+                          - /url: /tag/nat
+                          - generic [ref=e570]: "#NAT"
+                        - link "Filter by tag network" [ref=e571] [href="http://127.0.0.1:5122/tag/network"]:
+                          - /url: /tag/network
+                          - generic [ref=e572]: "#network"
+                    - article [ref=e573] [cursor=pointer]:
+                      - generic [ref=e574]:
+                        - generic [ref=e575]:
+                          - generic [ref=e576]: ⟁
+                          - generic:
+                            - link "View details for DVBlast":
+                              - /url: /resource/1801
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link DVBlast (opens in new tab)":
+                                - /url: https://www.videolan.org/projects/dvblast.html
+                                - img
+                                - generic: Open Link
+                                - generic: DVBlast (opens in new tab)
+                              - 'button "Suggest an edit: DVBlast"':
+                                - img
+                          - generic [ref=e578]:
+                            - 'button "Favorite to your account — sign in required: DVBlast" [ref=e579]':
+                              - generic [ref=e580]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: DVBlast" [ref=e581]':
+                              - generic [ref=e582]:
+                                - img
+                        - heading "DVBlast" [level=2] [ref=e584]:
+                          - link "DVBlast" [ref=e585] [href="http://127.0.0.1:5122/resource/1801"]:
+                            - /url: /resource/1801
+                        - paragraph [ref=e586]: A simple and powerful MPEG-2/TS demux and streaming application. DVBlast can stream digital TV (DVB) channels over a network, often used for IPTV or SAT-IP solutions.
+                      - generic [ref=e588]:
+                        - generic [ref=e589]: Protocols & Transport
+                        - link "Filter by tag streaming" [ref=e590] [href="http://127.0.0.1:5122/tag/streaming"]:
+                          - /url: /tag/streaming
+                          - generic [ref=e591]: "#streaming"
+                        - link "Filter by tag DVB" [ref=e592] [href="http://127.0.0.1:5122/tag/dvb"]:
+                          - /url: /tag/dvb
+                          - generic [ref=e593]: "#DVB"
+                        - link "Filter by tag IPTV" [ref=e594] [href="http://127.0.0.1:5122/tag/iptv"]:
+                          - /url: /tag/iptv
+                          - generic [ref=e595]: "#IPTV"
+                    - article [ref=e596] [cursor=pointer]:
+                      - generic [ref=e597]:
+                        - generic [ref=e598]:
+                          - generic [ref=e599]: ⟁
+                          - generic:
+                            - link "View details for Eyevinn SRT to RTMP":
+                              - /url: /resource/112
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Eyevinn SRT to RTMP (opens in new tab)":
+                                - /url: https://github.com/Eyevinn/srt-rtmp
+                                - img
+                                - generic: Open Link
+                                - generic: Eyevinn SRT to RTMP (opens in new tab)
+                              - 'button "Suggest an edit: Eyevinn SRT to RTMP"':
+                                - img
+                          - generic [ref=e601]:
+                            - 'button "Favorite to your account — sign in required: Eyevinn SRT to RTMP" [ref=e602]':
+                              - generic [ref=e603]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Eyevinn SRT to RTMP" [ref=e604]':
+                              - generic [ref=e605]:
+                                - img
+                        - heading "Eyevinn SRT to RTMP" [level=2] [ref=e607]:
+                          - link "Eyevinn SRT to RTMP" [ref=e608] [href="http://127.0.0.1:5122/resource/112"]:
+                            - /url: /resource/112
+                        - paragraph [ref=e609]: This project by Eyevinn Technology provides a tool to ingest MPEG-TS streams over SRT and output them as RTMP streams. It's particularly useful for streaming SRT content to platforms like Twitch or YouTube Live, facilitating integration between different streaming protocols.
+                      - generic [ref=e611]:
+                        - generic [ref=e612]: Protocols & Transport
+                        - link "Filter by tag SRT" [ref=e613] [href="http://127.0.0.1:5122/tag/srt"]:
+                          - /url: /tag/srt
+                          - generic [ref=e614]: "#SRT"
+                        - link "Filter by tag RTMP" [ref=e615] [href="http://127.0.0.1:5122/tag/rtmp"]:
+                          - /url: /tag/rtmp
+                          - generic [ref=e616]: "#RTMP"
+                        - link "Filter by tag video streaming" [ref=e617] [href="http://127.0.0.1:5122/tag/video-streaming"]:
+                          - /url: /tag/video-streaming
+                          - generic [ref=e618]: "#video streaming"
+                    - article [ref=e619] [cursor=pointer]:
+                      - generic [ref=e620]:
+                        - generic [ref=e621]:
+                          - generic [ref=e622]: ⟁
+                          - generic:
+                            - link "View details for go-astits":
+                              - /url: /resource/1598
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link go-astits (opens in new tab)":
+                                - /url: https://github.com/asticode/go-astits
+                                - img
+                                - generic: Open Link
+                                - generic: go-astits (opens in new tab)
+                              - 'button "Suggest an edit: go-astits"':
+                                - img
+                          - generic [ref=e624]:
+                            - 'button "Favorite to your account — sign in required: go-astits" [ref=e625]':
+                              - generic [ref=e626]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: go-astits" [ref=e627]':
+                              - generic [ref=e628]:
+                                - img
+                        - heading "go-astits" [level=2] [ref=e630]:
+                          - link "go-astits" [ref=e631] [href="http://127.0.0.1:5122/resource/1598"]:
+                            - /url: /resource/1598
+                        - paragraph [ref=e632]: A Golang library for parsing and demuxing MPEG Transport Stream (.ts) files natively, enabling inspection and processing of TS files.
+                      - generic [ref=e634]:
+                        - generic [ref=e635]: Protocols & Transport
+                        - link "Filter by tag golang" [ref=e636] [href="http://127.0.0.1:5122/tag/golang"]:
+                          - /url: /tag/golang
+                          - generic [ref=e637]: "#golang"
+                        - link "Filter by tag transport-stream" [ref=e638] [href="http://127.0.0.1:5122/tag/transport-stream"]:
+                          - /url: /tag/transport-stream
+                          - generic [ref=e639]: "#transport-stream"
+                        - link "Filter by tag demuxing" [ref=e640] [href="http://127.0.0.1:5122/tag/demuxing"]:
+                          - /url: /tag/demuxing
+                          - generic [ref=e641]: "#demuxing"
+                    - article [ref=e642] [cursor=pointer]:
+                      - generic [ref=e643]:
+                        - generic [ref=e644]:
+                          - generic [ref=e645]: ⟁
+                          - generic:
+                            - link "View details for gortsplib":
+                              - /url: /resource/1602
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 4 more tags": +4 more
+                            - generic:
+                              - link "Open Link gortsplib (opens in new tab)":
+                                - /url: https://github.com/aler9/gortsplib
+                                - img
+                                - generic: Open Link
+                                - generic: gortsplib (opens in new tab)
+                              - 'button "Suggest an edit: gortsplib"':
+                                - img
+                          - generic [ref=e647]:
+                            - 'button "Favorite to your account — sign in required: gortsplib" [ref=e648]':
+                              - generic [ref=e649]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: gortsplib" [ref=e650]':
+                              - generic [ref=e651]:
+                                - img
+                        - heading "gortsplib" [level=2] [ref=e653]:
+                          - link "gortsplib" [ref=e654] [href="http://127.0.0.1:5122/resource/1602"]:
+                            - /url: /resource/1602
+                        - paragraph [ref=e655]: A pure Go RTSP server and client library that supports handling RTSP streams without external dependencies, ideal for building streaming servers or proxies.
+                      - generic [ref=e657]:
+                        - generic [ref=e658]: Protocols & Transport
+                        - generic [ref=e659]: Libraries
+                        - link "Filter by tag rtsp" [ref=e660] [href="http://127.0.0.1:5122/tag/rtsp"]:
+                          - /url: /tag/rtsp
+                          - generic [ref=e661]: "#rtsp"
+                        - link "Filter by tag streaming" [ref=e662] [href="http://127.0.0.1:5122/tag/streaming"]:
+                          - /url: /tag/streaming
+                          - generic [ref=e663]: "#streaming"
+                        - link "Filter by tag server" [ref=e664] [href="http://127.0.0.1:5122/tag/server"]:
+                          - /url: /tag/server
+                          - generic [ref=e665]: "#server"
+                    - article [ref=e666] [cursor=pointer]:
+                      - generic [ref=e667]:
+                        - generic [ref=e668]:
+                          - generic [ref=e669]: ⟁
+                          - generic:
+                            - link "View details for GoSRT":
+                              - /url: /resource/114
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link GoSRT (opens in new tab)":
+                                - /url: https://github.com/eyevinn/gosrt
+                                - img
+                                - generic: Open Link
+                                - generic: GoSRT (opens in new tab)
+                              - 'button "Suggest an edit: GoSRT"':
+                                - img
+                          - generic [ref=e671]:
+                            - 'button "Favorite to your account — sign in required: GoSRT" [ref=e672]':
+                              - generic [ref=e673]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: GoSRT" [ref=e674]':
+                              - generic [ref=e675]:
+                                - img
+                        - heading "GoSRT" [level=2] [ref=e677]:
+                          - link "GoSRT" [ref=e678] [href="http://127.0.0.1:5122/resource/114"]:
+                            - /url: /resource/114
+                        - paragraph [ref=e679]: GoSRT is a pure Go implementation of the SRT protocol with minimal dependencies. Designed with live video/audio streaming in mind, it supports features like handshake, message mode, timestamp-based packet delivery, and encryption, making it suitable for developers working with Go.
+                      - generic [ref=e681]:
+                        - generic [ref=e682]: Protocols & Transport
+                        - link "Filter by tag SRT" [ref=e683] [href="http://127.0.0.1:5122/tag/srt"]:
+                          - /url: /tag/srt
+                          - generic [ref=e684]: "#SRT"
+                        - link "Filter by tag Go" [ref=e685] [href="http://127.0.0.1:5122/tag/go"]:
+                          - /url: /tag/go
+                          - generic [ref=e686]: "#Go"
+                        - link "Filter by tag video streaming" [ref=e687] [href="http://127.0.0.1:5122/tag/video-streaming"]:
+                          - /url: /tag/video-streaming
+                          - generic [ref=e688]: "#video streaming"
+                    - article [ref=e689] [cursor=pointer]:
+                      - generic [ref=e690]:
+                        - generic [ref=e691]:
+                          - generic [ref=e692]: ⟁
+                          - generic:
+                            - link "View details for Haivision SRT Gateway":
+                              - /url: /resource/152
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Haivision SRT Gateway (opens in new tab)":
+                                - /url: https://www.haivision.com/products/srt-secure-reliable-transport/
+                                - img
+                                - generic: Open Link
+                                - generic: Haivision SRT Gateway (opens in new tab)
+                              - 'button "Suggest an edit: Haivision SRT Gateway"':
+                                - img
+                          - generic [ref=e694]:
+                            - 'button "Favorite to your account — sign in required: Haivision SRT Gateway" [ref=e695]':
+                              - generic [ref=e696]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Haivision SRT Gateway" [ref=e697]':
+                              - generic [ref=e698]:
+                                - img
+                        - heading "Haivision SRT Gateway" [level=2] [ref=e700]:
+                          - link "Haivision SRT Gateway" [ref=e701] [href="http://127.0.0.1:5122/resource/152"]:
+                            - /url: /resource/152
+                        - paragraph [ref=e702]: A cloud-based service by Haivision that acts as a video router, protocol converter, and stream duplicator. The SRT Gateway facilitates secure and reliable video transport across different networks and protocols, enhancing the flexibility of video streaming workflows.
+                      - generic [ref=e704]:
+                        - generic [ref=e705]: Protocols & Transport
+                        - link "Filter by tag SRT Gateway" [ref=e706] [href="http://127.0.0.1:5122/tag/srt-gateway"]:
+                          - /url: /tag/srt-gateway
+                          - generic [ref=e707]: "#SRT Gateway"
+                        - link "Filter by tag video transport" [ref=e708] [href="http://127.0.0.1:5122/tag/video-transport"]:
+                          - /url: /tag/video-transport
+                          - generic [ref=e709]: "#video transport"
+                        - link "Filter by tag protocol conversion" [ref=e710] [href="http://127.0.0.1:5122/tag/protocol-conversion"]:
+                          - /url: /tag/protocol-conversion
+                          - generic [ref=e711]: "#protocol conversion"
+                    - article [ref=e712] [cursor=pointer]:
+                      - generic [ref=e713]:
+                        - generic [ref=e714]:
+                          - generic [ref=e715]: ⟁
+                          - generic:
+                            - link "View details for Haivision SRT Protocol Technical Overview":
+                              - /url: /resource/731
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Haivision SRT Protocol Technical Overview (opens in new tab)":
+                                - /url: https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview/
+                                - img
+                                - generic: Open Link
+                                - generic: Haivision SRT Protocol Technical Overview (opens in new tab)
+                              - 'button "Suggest an edit: Haivision SRT Protocol Technical Overview"':
+                                - img
+                          - generic [ref=e717]:
+                            - 'button "Favorite to your account — sign in required: Haivision SRT Protocol Technical Overview" [ref=e718]':
+                              - generic [ref=e719]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Haivision SRT Protocol Technical Overview" [ref=e720]':
+                              - generic [ref=e721]:
+                                - img
+                        - heading "Haivision SRT Protocol Technical Overview" [level=2] [ref=e723]:
+                          - link "Haivision SRT Protocol Technical Overview" [ref=e724] [href="http://127.0.0.1:5122/resource/731"]:
+                            - /url: /resource/731
+                        - paragraph [ref=e725]: This comprehensive technical overview provides in-depth information about the SRT protocol, including its architecture, features, and implementation details. It serves as a valuable resource for developers looking to understand and implement SRT in their video streaming applications.
+                      - generic [ref=e727]:
+                        - generic [ref=e728]: Protocols & Transport
+                        - generic [ref=e729]: Protocols
+                        - link "Filter by tag SRT" [ref=e730] [href="http://127.0.0.1:5122/tag/srt"]:
+                          - /url: /tag/srt
+                          - generic [ref=e731]: "#SRT"
+                        - link "Filter by tag technical overview" [ref=e732] [href="http://127.0.0.1:5122/tag/technical-overview"]:
+                          - /url: /tag/technical-overview
+                          - generic [ref=e733]: "#technical overview"
+                        - link "Filter by tag video streaming" [ref=e734] [href="http://127.0.0.1:5122/tag/video-streaming"]:
+                          - /url: /tag/video-streaming
+                          - generic [ref=e735]: "#video streaming"
+                    - article [ref=e736] [cursor=pointer]:
+                      - generic [ref=e737]:
+                        - generic [ref=e738]:
+                          - generic [ref=e739]: ⟁
+                          - generic:
+                            - link "View details for Haivision SRT Solutions":
+                              - /url: /resource/503
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Haivision SRT Solutions (opens in new tab)":
+                                - /url: https://www.haivision.com/products/srt-solutions/
+                                - img
+                                - generic: Open Link
+                                - generic: Haivision SRT Solutions (opens in new tab)
+                              - 'button "Suggest an edit: Haivision SRT Solutions"':
+                                - img
+                          - generic [ref=e741]:
+                            - 'button "Favorite to your account — sign in required: Haivision SRT Solutions" [ref=e742]':
+                              - generic [ref=e743]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Haivision SRT Solutions" [ref=e744]':
+                              - generic [ref=e745]:
+                                - img
+                        - heading "Haivision SRT Solutions" [level=2] [ref=e747]:
+                          - link "Haivision SRT Solutions" [ref=e748] [href="http://127.0.0.1:5122/resource/503"]:
+                            - /url: /resource/503
+                        - paragraph [ref=e749]: A suite of products by Haivision leveraging the SRT protocol, including encoders, decoders, gateways, and mobile transmitters. These solutions provide secure, high-quality, and low-latency video streaming over IP networks, suitable for broadcasters, enterprises, and government agencies.
+                      - generic [ref=e751]:
+                        - generic [ref=e752]: Protocols & Transport
+                        - link "Filter by tag SRT" [ref=e753] [href="http://127.0.0.1:5122/tag/srt"]:
+                          - /url: /tag/srt
+                          - generic [ref=e754]: "#SRT"
+                        - link "Filter by tag video streaming" [ref=e755] [href="http://127.0.0.1:5122/tag/video-streaming"]:
+                          - /url: /tag/video-streaming
+                          - generic [ref=e756]: "#video streaming"
+                        - link "Filter by tag Haivision" [ref=e757] [href="http://127.0.0.1:5122/tag/haivision"]:
+                          - /url: /tag/haivision
+                          - generic [ref=e758]: "#Haivision"
+                    - article [ref=e759] [cursor=pointer]:
+                      - generic [ref=e760]:
+                        - generic [ref=e761]:
+                          - generic [ref=e762]: ⟁
+                          - generic:
+                            - link "View details for Helix Universal Server":
+                              - /url: /resource/111
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link Helix Universal Server (opens in new tab)":
+                                - /url: https://www.realnetworks.com/products/helix-universal-server
+                                - img
+                                - generic: Open Link
+                                - generic: Helix Universal Server (opens in new tab)
+                              - 'button "Suggest an edit: Helix Universal Server"':
+                                - img
+                          - generic [ref=e764]:
+                            - 'button "Favorite to your account — sign in required: Helix Universal Server" [ref=e765]':
+                              - generic [ref=e766]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Helix Universal Server" [ref=e767]':
+                              - generic [ref=e768]:
+                                - img
+                        - heading "Helix Universal Server" [level=2] [ref=e770]:
+                          - link "Helix Universal Server" [ref=e771] [href="http://127.0.0.1:5122/resource/111"]:
+                            - /url: /resource/111
+                        - paragraph [ref=e772]: Helix Universal Server is a media server that supports multiple streaming protocols, including HLS, RTSP, and RTMP. It is designed for scalable and reliable media delivery across various platforms and devices.
+                      - generic [ref=e774]:
+                        - generic [ref=e775]: Protocols & Transport
+                        - link "Filter by tag media server" [ref=e776] [href="http://127.0.0.1:5122/tag/media-server"]:
+                          - /url: /tag/media-server
+                          - generic [ref=e777]: "#media server"
+                        - link "Filter by tag HLS" [ref=e778] [href="http://127.0.0.1:5122/tag/hls"]:
+                          - /url: /tag/hls
+                          - generic [ref=e779]: "#HLS"
+                        - link "Filter by tag RTSP" [ref=e780] [href="http://127.0.0.1:5122/tag/rtsp"]:
+                          - /url: /tag/rtsp
+                          - generic [ref=e781]: "#RTSP"
+                    - article [ref=e782] [cursor=pointer]:
+                      - generic [ref=e783]:
+                        - generic [ref=e784]:
+                          - generic [ref=e785]: ⟁
+                          - generic:
+                            - link "View details for HESP (High Efficiency Streaming Protocol) Whitepaper":
+                              - /url: /resource/1714
+                              - generic:
+                                - img
+                                - generic: View Details
+                            - button "Show 2 more tags": +2 more
+                            - generic:
+                              - link "Open Link HESP (High Efficiency Streaming Protocol) Whitepaper (opens in new tab)":
+                                - /url: https://download2.diva-cdn.com/files/High%20Efficiency%20Streaming%20Protocol%20(HESP)%20Whitepaper%20v2.0.pdf
+                                - img
+                                - generic: Open Link
+                                - generic: HESP (High Efficiency Streaming Protocol) Whitepaper (opens in new tab)
+                              - 'button "Suggest an edit: HESP (High Efficiency Streaming Protocol) Whitepaper"':
+                                - img
+                          - generic [ref=e787]:
+                            - 'button "Favorite to your account — sign in required: HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e788]':
+                              - generic [ref=e789]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e790]':
+                              - generic [ref=e791]:
+                                - img
+                        - heading "HESP (High Efficiency Streaming Protocol) Whitepaper" [level=2] [ref=e793]:
+                          - link "HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e794] [href="http://127.0.0.1:5122/resource/1714"]:
+                            - /url: /resource/1714
+                        - paragraph [ref=e795]: A whitepaper on the High Efficiency Streaming Protocol (HESP), an emerging approach to ultra low latency streaming. It describes how HESP achieves sub-second latencies with design differences from HLS/DASH, though it requires specialized server and player support.
+                      - generic [ref=e797]:
+                        - generic [ref=e798]: Protocols & Transport
+                        - generic [ref=e799]: Protocols
+                        - link "Filter by tag streaming protocol" [ref=e800] [href="http://127.0.0.1:5122/tag/streaming-protocol"]:
+                          - /url: /tag/streaming-protocol
+                          - generic [ref=e801]: "#streaming protocol"
+                        - link "Filter by tag low latency" [ref=e802] [href="http://127.0.0.1:5122/tag/low-latency"]:
+                          - /url: /tag/low-latency
+                          - generic [ref=e803]: "#low latency"
+                        - link "Filter by tag transport" [ref=e804] [href="http://127.0.0.1:5122/tag/transport"]:
+                          - /url: /tag/transport
+                          - generic [ref=e805]: "#transport"
+                  - navigation "Pagination" [ref=e807]:
+                    - generic [ref=e808]:
+                      - generic:
+                        - img
+                        - text: Previous
+                      - link "Page 1, current page" [ref=e809] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport"]:
+                        - /url: /category/protocols-transport
+                        - text: "1"
+                      - link "Go to page 2" [ref=e810] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport?page=2"]:
+                        - /url: /category/protocols-transport?page=2
+                        - text: "2"
+                      - generic [ref=e811]: …
+                      - link "Go to page 11" [ref=e812] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport?page=11"]:
+                        - /url: /category/protocols-transport?page=11
+                        - text: "11"
+                      - link "Next" [ref=e813] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport?page=2"]:
+                        - /url: /category/protocols-transport?page=2
+                        - text: Next
+                        - img
+                    - generic [ref=e814]:
+                      - generic [ref=e815]: Page 1 of 11
+                      - generic [ref=e816]:
+                        - generic [ref=e817] [cursor=pointer]: Go to page
+                        - textbox "Page number, 1 to 11" [ref=e818]: "1"
+                        - generic [ref=e819]: / 11
+                    - status [ref=e820]
+          - contentinfo [ref=e821]:
+            - generic [ref=e822]:
+              - generic [ref=e823]:
+                - paragraph [ref=e824]: ── INDEX
+                - link "awesome.video home" [ref=e825] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e826]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - generic [ref=e828]:
+                - heading "INDEXED" [level=2] [ref=e829]
+                - paragraph [ref=e830]: 1,949
+                - paragraph [ref=e831]:
+                  - text: 9 categories
+                  - text: 18 subcategories
+                  - generic [ref=e832]: live
+              - navigation "Explore categories" [ref=e834]:
+                - heading "EXPLORE" [level=2] [ref=e835]
+                - generic [ref=e836]:
+                  - link "Community & Events" [ref=e837] [cursor=pointer] [href="http://127.0.0.1:5122/category/community-events"]:
+                    - /url: /category/community-events
+                    - generic [ref=e838]: ◈
+                    - generic [ref=e839]: Community
+                  - link "Encoding & Codecs" [ref=e840] [cursor=pointer] [href="http://127.0.0.1:5122/category/encoding-codecs"]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e841]: ◇
+                    - generic [ref=e842]: Encoding
+                  - link "General Tools" [ref=e843] [cursor=pointer] [href="http://127.0.0.1:5122/category/general-tools"]:
+                    - /url: /category/general-tools
+                    - generic [ref=e844]: ◆
+                    - generic [ref=e845]: General
+                  - link "Infrastructure & Delivery" [ref=e846] [cursor=pointer] [href="http://127.0.0.1:5122/category/infrastructure-delivery"]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e847]: ▣
+                    - generic [ref=e848]: Infrastructure
+                  - link "Intro & Learning" [ref=e849] [cursor=pointer] [href="http://127.0.0.1:5122/category/intro-learning"]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e850]: ▤
+                    - generic [ref=e851]: Intro
+                  - link "Media Tools" [ref=e852] [cursor=pointer] [href="http://127.0.0.1:5122/category/media-tools"]:
+                    - /url: /category/media-tools
+                    - generic [ref=e853]: ▥
+                    - generic [ref=e854]: Media
+                  - link "Players & Clients" [ref=e855] [cursor=pointer] [href="http://127.0.0.1:5122/category/players-clients"]:
+                    - /url: /category/players-clients
+                    - generic [ref=e856]: ▶
+                    - generic [ref=e857]: Players
+                  - link "Protocols & Transport" [ref=e858] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport"]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e859]: ⟁
+                    - generic [ref=e860]: Protocols
+                  - link "Standards & Industry" [ref=e861] [cursor=pointer] [href="http://127.0.0.1:5122/category/standards-industry"]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e862]: ◉
+                    - generic [ref=e863]: Standards
+              - generic [ref=e864]:
+                - heading "SOURCE" [level=2] [ref=e865]
+                - link "krzemienski/awesome-video" [ref=e866] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video"]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e867]
+                  - generic [ref=e869]:
+                    - text: krzemienski
+                    - generic [ref=e870]:
+                      - text: /
+                      - text: awesome-video
+                  - generic [ref=e871]: ↗
+                - paragraph [ref=e872]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e873] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md"]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+            - generic [ref=e874]:
+              - generic [ref=e875]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e876]:
+                - link "About" [ref=e877] [cursor=pointer] [href="http://127.0.0.1:5122/about"]:
+                  - /url: /about
+                - link "Terms" [ref=e878] [cursor=pointer] [href="http://127.0.0.1:5122/terms"]:
+                  - /url: /terms
+                - link "Privacy" [ref=e879] [cursor=pointer] [href="http://127.0.0.1:5122/privacy"]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e880] [cursor=pointer] [href="http://127.0.0.1:5122/code-of-conduct"]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - link "Issues ↗" [ref=e881] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/issues"]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e882] [cursor=pointer] [href="http://127.0.0.1:5122/sitemap.xml"]:
+                  - /url: /sitemap.xml
+              - generic [ref=e883]: built with the awesome-list framework

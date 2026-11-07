@@ -1,0 +1,8 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subcategories"
+  uid=274_0 alertdialog "Delete Subcategory" description="Are you sure you want to delete "[QA-audit-1026] c4 subcategory"?"
+    uid=274_1 heading "Delete Subcategory" level="2"
+    uid=274_2 "Are you sure you want to delete ""
+    uid=274_3 "[QA-audit-1026] c4 subcategory"
+    uid=274_4 ""?"
+    uid=274_5 button "Cancel" focusable focused
+    uid=274_6 button "Delete"

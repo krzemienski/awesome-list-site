@@ -1,0 +1,985 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - 'region "Research run #77" [ref=e121]':
+                      - generic [ref=e122]:
+                        - generic [ref=e123]:
+                          - 'heading "Research run #77" [level=3] [ref=e124]'
+                          - paragraph [ref=e125]: All categories · running for 15:55
+                        - generic [ref=e126]:
+                          - generic [ref=e127]:
+                            - img [ref=e128]
+                            - text: Running
+                          - button "Cancel run" [ref=e130] [cursor=pointer]:
+                            - img
+                            - text: Cancel run
+                      - paragraph [ref=e131]
+                      - generic [ref=e132]:
+                        - list "Run phases" [ref=e133]:
+                          - listitem [ref=e134]:
+                            - img [ref=e136]
+                            - generic [ref=e138]:
+                              - text: Planning
+                              - generic [ref=e139]: 03:38:14 AM
+                            - generic [ref=e140]: (done)
+                          - listitem [ref=e141]:
+                            - generic [ref=e144]:
+                              - text: Scouting
+                              - generic [ref=e145]: 03:38:32 AM
+                            - generic [ref=e146]: (current)
+                          - listitem [ref=e147]:
+                            - img [ref=e149]
+                            - generic [ref=e151]:
+                              - text: Verifying
+                              - generic [ref=e152]: 03:50:44 AM
+                            - generic [ref=e153]: (done)
+                          - listitem [ref=e154]:
+                            - img [ref=e156]
+                            - generic [ref=e158]:
+                              - text: Saving
+                              - generic [ref=e159]: 03:53:39 AM
+                            - generic [ref=e160]: (done)
+                          - listitem [ref=e161]:
+                            - generic [ref=e163]: Done
+                            - generic [ref=e165]: (not reached)
+                        - generic [ref=e166]:
+                          - heading "Scouts 5 started · 2 searching" [level=4] [ref=e167]:
+                            - img [ref=e168]
+                            - text: Scouts
+                            - generic [ref=e171]: 5 started · 2 searching
+                          - list "Scouts" [ref=e172]:
+                            - listitem [ref=e173]:
+                              - generic [ref=e174]:
+                                - generic [ref=e175]: Scout 1
+                                - generic [ref=e176]: Reported
+                              - paragraph [ref=e177]: List taxonomy subcategories
+                              - paragraph [ref=e178]: 15 searches · 28 candidates · 755s
+                            - listitem [ref=e179]:
+                              - generic [ref=e180]:
+                                - generic [ref=e181]: Scout 2
+                                - generic [ref=e182]: Reported
+                              - paragraph [ref=e183]: Scout podcast webinar gap
+                              - paragraph [ref=e184]: 5 searches · 6 candidates · 25s
+                            - listitem [ref=e185]:
+                              - generic [ref=e186]:
+                                - generic [ref=e187]: Scout 3
+                                - generic [ref=e188]: Reported
+                              - paragraph [ref=e189]: Scout audio subtitle tools
+                              - paragraph [ref=e190]: 4 searches · 8 candidates · 28s
+                            - listitem [ref=e191]:
+                              - generic [ref=e192]:
+                                - generic [ref=e193]: Scout 4
+                                - generic [ref=e194]: Searching
+                              - paragraph [ref=e195]: Scout packaging and origin tools
+                            - listitem [ref=e197]:
+                              - generic [ref=e198]:
+                                - generic [ref=e199]: Scout 5
+                                - generic [ref=e200]: Searching
+                              - paragraph [ref=e201]: Scout forums standards hardware
+                      - generic [ref=e203]:
+                        - generic [ref=e204]:
+                          - term [ref=e205]: Discoveries
+                          - definition [ref=e206]: 8 of 25 saved
+                          - progressbar "Discoveries saved against the target" [ref=e207]
+                        - generic [ref=e209]:
+                          - term [ref=e210]: Turns
+                          - definition [ref=e211]: counted at the end · cap 600
+                        - generic [ref=e212]:
+                          - term [ref=e213]: Spend
+                          - definition [ref=e214]: reported at the end · cap $8.00
+                      - region "Discoveries so far" [ref=e215]:
+                        - heading "Discoveries so far" [level=4] [ref=e216]
+                        - list "Discoveries from this run" [ref=e217]:
+                          - listitem [ref=e218]:
+                            - generic [ref=e219]:
+                              - generic [ref=e220]:
+                                - generic [ref=e221]: EBU TECH 3392 ADM Renderer
+                                - generic [ref=e222]:
+                                  - img [ref=e223]
+                                  - text: Pending
+                                - generic [ref=e226]:
+                                  - img [ref=e227]
+                                  - text: Link OK
+                              - link "https://tech.ebu.ch/publications/tech3392" [ref=e230] [cursor=pointer]:
+                                - /url: https://tech.ebu.ch/publications/tech3392
+                                - generic [ref=e231]: https://tech.ebu.ch/publications/tech3392
+                                - img [ref=e232]
+                              - paragraph [ref=e236]: EBU technical specification of the Audio Definition Model renderer used to audition and quality-check next-generation ADM productions to a target loudspeaker layout.
+                              - generic [ref=e237]:
+                                - generic [ref=e238]: Standards & Industry
+                                - generic [ref=e239]: Specs & Standards
+                                - generic [ref=e240]: 85% confidence
+                            - generic [ref=e241]:
+                              - 'button "Approve discovery: EBU TECH 3392 ADM Renderer" [ref=e242] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: EBU TECH 3392 ADM Renderer" [ref=e243] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e244]:
+                            - generic [ref=e245]:
+                              - generic [ref=e246]:
+                                - generic [ref=e247]: webrtcHacks
+                                - generic [ref=e248]:
+                                  - img [ref=e249]
+                                  - text: Pending
+                                - generic [ref=e252]:
+                                  - img [ref=e253]
+                                  - text: Link OK
+                              - link "https://webrtchacks.com/" [ref=e256] [cursor=pointer]:
+                                - /url: https://webrtchacks.com/
+                                - generic [ref=e257]: https://webrtchacks.com/
+                                - img [ref=e258]
+                              - paragraph [ref=e262]: Independent technical site on WebRTC internals, media pipelines, congestion control, and real-time video transport, including talk and article deep dives.
+                              - generic [ref=e263]:
+                                - generic [ref=e264]: Intro & Learning
+                                - generic [ref=e265]: Community Blogs & Forums
+                                - generic [ref=e266]: 86% confidence
+                            - generic [ref=e267]:
+                              - 'button "Approve discovery: webrtcHacks" [ref=e268] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: webrtcHacks" [ref=e269] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e270]:
+                            - generic [ref=e271]:
+                              - generic [ref=e272]:
+                                - generic [ref=e273]: The Video Insiders
+                                - generic [ref=e274]:
+                                  - img [ref=e275]
+                                  - text: Pending
+                                - generic [ref=e278]:
+                                  - img [ref=e279]
+                                  - text: Link check failed
+                              - link "https://www.streamingmediablog.com/the-video-insiders/" [ref=e283] [cursor=pointer]:
+                                - /url: https://www.streamingmediablog.com/the-video-insiders/
+                                - generic [ref=e284]: https://www.streamingmediablog.com/the-video-insiders/
+                                - img [ref=e285]
+                              - paragraph [ref=e289]: Podcast hosted by streaming practitioners covering codecs, players, protocols, and video delivery operations.
+                              - generic [ref=e290]:
+                                - generic [ref=e291]: Community & Events
+                                - generic [ref=e292]: Events & Conferences
+                                - generic [ref=e293]: 78% confidence
+                            - generic [ref=e294]:
+                              - 'button "Approve discovery: The Video Insiders" [ref=e295] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: The Video Insiders" [ref=e296] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e297]:
+                            - generic [ref=e298]:
+                              - generic [ref=e299]:
+                                - generic [ref=e300]: FOMS Workshop
+                                - generic [ref=e301]:
+                                  - img [ref=e302]
+                                  - text: Pending
+                                - generic [ref=e305]:
+                                  - img [ref=e306]
+                                  - text: Link OK
+                              - link "https://www.foms-workshop.org/" [ref=e309] [cursor=pointer]:
+                                - /url: https://www.foms-workshop.org/
+                                - generic [ref=e310]: https://www.foms-workshop.org/
+                                - img [ref=e311]
+                              - paragraph [ref=e315]: Foundations of Open Media Software workshop site with engineer sessions on open codecs, players, and media software.
+                              - generic [ref=e316]:
+                                - generic [ref=e317]: Community & Events
+                                - generic [ref=e318]: Events & Conferences
+                                - generic [ref=e319]: 88% confidence
+                            - generic [ref=e320]:
+                              - 'button "Approve discovery: FOMS Workshop" [ref=e321] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: FOMS Workshop" [ref=e322] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e323]:
+                            - generic [ref=e324]:
+                              - generic [ref=e325]:
+                                - generic [ref=e326]: MPEG-H Audio (Fraunhofer IIS)
+                                - generic [ref=e327]:
+                                  - img [ref=e328]
+                                  - text: Pending
+                                - generic [ref=e331]:
+                                  - img [ref=e332]
+                                  - text: Link OK
+                              - link "https://www.iis.fraunhofer.de/en/ff/amm/broadcast-streaming/mpegh.html" [ref=e335] [cursor=pointer]:
+                                - /url: https://www.iis.fraunhofer.de/en/ff/amm/broadcast-streaming/mpegh.html
+                                - generic [ref=e336]: https://www.iis.fraunhofer.de/en/ff/amm/broadcast-streaming/mpegh.html
+                                - img [ref=e337]
+                              - paragraph [ref=e341]: Technical overview from the primary developer of MPEG-H 3D Audio covering object-based next-generation audio for broadcast and streaming, including personalization and loudness.
+                              - generic [ref=e342]:
+                                - generic [ref=e343]: Media Tools
+                                - generic [ref=e344]: Audio & Subtitles
+                                - generic [ref=e345]: 84% confidence
+                            - generic [ref=e346]:
+                              - 'button "Approve discovery: MPEG-H Audio (Fraunhofer IIS)" [ref=e347] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: MPEG-H Audio (Fraunhofer IIS)" [ref=e348] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e349]:
+                            - generic [ref=e350]:
+                              - generic [ref=e351]:
+                                - generic [ref=e352]: Subtitle Edit (official site)
+                                - generic [ref=e353]:
+                                  - img [ref=e354]
+                                  - text: Pending
+                                - generic [ref=e357]:
+                                  - img [ref=e358]
+                                  - text: Link OK
+                              - link "https://www.nikse.dk/subtitleedit" [ref=e361] [cursor=pointer]:
+                                - /url: https://www.nikse.dk/subtitleedit
+                                - generic [ref=e362]: https://www.nikse.dk/subtitleedit
+                                - img [ref=e363]
+                              - paragraph [ref=e367]: Official homepage of Subtitle Edit, the open-source editor for creating, converting, timing, and spell-checking captions across a large set of subtitle formats.
+                              - generic [ref=e368]:
+                                - generic [ref=e369]: Media Tools
+                                - generic [ref=e370]: Subtitle & Caption Tools
+                                - generic [ref=e371]: 86% confidence
+                            - generic [ref=e372]:
+                              - 'button "Approve discovery: Subtitle Edit (official site)" [ref=e373] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: Subtitle Edit (official site)" [ref=e374] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e375]:
+                            - generic [ref=e376]:
+                              - generic [ref=e377]:
+                                - generic [ref=e378]: Opus Codec
+                                - generic [ref=e379]:
+                                  - img [ref=e380]
+                                  - text: Pending
+                                - generic [ref=e383]:
+                                  - img [ref=e384]
+                                  - text: Link OK
+                              - link "https://opus-codec.org/" [ref=e387] [cursor=pointer]:
+                                - /url: https://opus-codec.org/
+                                - generic [ref=e388]: https://opus-codec.org/
+                                - img [ref=e389]
+                              - paragraph [ref=e393]: Official site for the IETF Opus audio codec used in WebRTC and streaming, with the specification, encoder guidance, and reference implementation links.
+                              - generic [ref=e394]:
+                                - generic [ref=e395]: Encoding & Codecs
+                                - generic [ref=e396]: Codecs
+                                - generic [ref=e397]: 90% confidence
+                            - generic [ref=e398]:
+                              - 'button "Approve discovery: Opus Codec" [ref=e399] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: Opus Codec" [ref=e400] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                          - listitem [ref=e401]:
+                            - generic [ref=e402]:
+                              - generic [ref=e403]:
+                                - generic [ref=e404]: libebur128
+                                - generic [ref=e405]:
+                                  - img [ref=e406]
+                                  - text: Pending
+                                - generic [ref=e409]:
+                                  - img [ref=e410]
+                                  - text: Link check failed
+                              - link "https://libebur128.github.io/" [ref=e414] [cursor=pointer]:
+                                - /url: https://libebur128.github.io/
+                                - generic [ref=e415]: https://libebur128.github.io/
+                                - img [ref=e416]
+                              - paragraph [ref=e420]: Official site for libebur128, a C library implementing EBU R128 and ITU-R BS.1770 loudness and true-peak measurement used by meters and FFmpeg's loudness filters.
+                              - generic [ref=e421]:
+                                - generic [ref=e422]: Media Tools
+                                - generic [ref=e423]: Audio & Subtitles
+                                - generic [ref=e424]: 92% confidence
+                            - generic [ref=e425]:
+                              - 'button "Approve discovery: libebur128" [ref=e426] [cursor=pointer]':
+                                - img
+                                - text: Approve
+                              - 'button "Reject discovery: libebur128" [ref=e427] [cursor=pointer]':
+                                - img
+                                - text: Reject
+                      - 'button "Run details: raw event log and agent graph" [ref=e429] [cursor=pointer]':
+                        - text: "Run details: raw event log and agent graph"
+                        - img
+                    - generic [ref=e430]:
+                      - generic [ref=e432]:
+                        - heading "Researcher jobs" [level=2] [ref=e433]
+                        - paragraph [ref=e434]: Latest 60 of 77 research runs
+                      - generic [ref=e435]:
+                        - region "Researcher jobs table, scrollable" [ref=e436]:
+                          - table [ref=e437]:
+                            - rowgroup [ref=e438]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e439]:
+                                - columnheader "Status" [ref=e440]
+                                - columnheader "Prompt" [ref=e441]
+                                - columnheader "Found" [ref=e442]
+                                - columnheader "Approved / Rejected" [ref=e443]
+                                - columnheader "Cost" [ref=e444]
+                                - columnheader "Turns" [ref=e445]
+                                - columnheader "Created" [ref=e446]
+                            - rowgroup [ref=e447]:
+                              - row [ref=e448]:
+                                - cell "processing" [ref=e449]:
+                                  - generic [ref=e450]: processing
+                                - cell [ref=e451]
+                                - cell "8" [ref=e452]
+                                - cell "0/0" [ref=e453]
+                                - cell "$0.0000" [ref=e454]
+                                - cell "0/600" [ref=e455]
+                                - cell "Oct 27, 2026" [ref=e456]
+                              - row [ref=e457]:
+                                - cell "completed" [ref=e458]:
+                                  - generic [ref=e459]: completed
+                                - cell [ref=e460]
+                                - cell "0" [ref=e461]
+                                - cell "0/0" [ref=e462]
+                                - cell "$0.7600" [ref=e463]
+                                - cell "28/600" [ref=e464]
+                                - cell "Oct 27, 2026" [ref=e465]
+                              - row [ref=e466]:
+                                - cell "completed" [ref=e467]:
+                                  - generic [ref=e468]: completed
+                                - cell [ref=e469]
+                                - cell "0" [ref=e470]
+                                - cell "0/0" [ref=e471]
+                                - cell "$1.2973" [ref=e472]
+                                - cell "93/600" [ref=e473]
+                                - cell "Oct 27, 2026" [ref=e474]
+                              - row [ref=e475]:
+                                - cell "completed" [ref=e476]:
+                                  - generic [ref=e477]: completed
+                                - cell [ref=e478]
+                                - cell "0" [ref=e479]
+                                - cell "0/0" [ref=e480]
+                                - cell "$0.5650" [ref=e481]
+                                - cell "13/600" [ref=e482]
+                                - cell "Oct 27, 2026" [ref=e483]
+                              - row [ref=e484]:
+                                - cell "completed" [ref=e485]:
+                                  - generic [ref=e486]: completed
+                                - cell [ref=e487]
+                                - cell "4" [ref=e488]
+                                - cell "1/0" [ref=e489]
+                                - cell "$5.4603" [ref=e490]
+                                - cell "155/200" [ref=e491]
+                                - cell "Oct 27, 2026" [ref=e492]
+                              - row [ref=e493]:
+                                - cell "failed" [ref=e494]:
+                                  - generic [ref=e495]: failed
+                                - cell [ref=e496]
+                                - cell "0" [ref=e497]
+                                - cell "0/0" [ref=e498]
+                                - cell "$0.0000" [ref=e499]
+                                - cell "1/200" [ref=e500]
+                                - cell "Oct 27, 2026" [ref=e501]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e502]':
+                                - cell "completed" [ref=e503]:
+                                  - generic [ref=e504]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e505]'
+                                - cell "9" [ref=e506]
+                                - cell "0/0" [ref=e507]
+                                - cell "$3.3100" [ref=e508]
+                                - cell "41/200" [ref=e509]
+                                - cell "Oct 27, 2026" [ref=e510]
+                              - row [ref=e511]:
+                                - cell "completed" [ref=e512]:
+                                  - generic [ref=e513]: completed
+                                - 'cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e514]'
+                                - cell "0" [ref=e515]
+                                - cell "0/0" [ref=e516]
+                                - cell "$1.1166" [ref=e517]
+                                - cell "18/80" [ref=e518]
+                                - cell "Oct 27, 2026" [ref=e519]
+                              - row [ref=e520]:
+                                - cell "completed" [ref=e521]:
+                                  - generic [ref=e522]: completed
+                                - cell [ref=e523]
+                                - cell "0" [ref=e524]
+                                - cell "0/0" [ref=e525]
+                                - cell "$0.4199" [ref=e526]
+                                - cell "10/80" [ref=e527]
+                                - cell "Oct 27, 2026" [ref=e528]
+                              - 'row "stopped at budget [QA-audit-1026] smoke: find 1 new open-source video tool 0 0/0 $0.3062 3/10 Oct 26, 2026" [ref=e529]':
+                                - cell "stopped at budget" [ref=e530]:
+                                  - generic [ref=e531]: stopped at budget
+                                - 'cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e532]'
+                                - cell "0" [ref=e533]
+                                - cell "0/0" [ref=e534]
+                                - cell "$0.3062" [ref=e535]
+                                - cell "3/10" [ref=e536]
+                                - cell "Oct 26, 2026" [ref=e537]
+                              - 'row "completed QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification. 0 0/0 $0.1508 1/8 Oct 26, 2026" [ref=e538]':
+                                - cell "completed" [ref=e539]:
+                                  - generic [ref=e540]: completed
+                                - 'cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e541]'
+                                - cell "0" [ref=e542]
+                                - cell "0/0" [ref=e543]
+                                - cell "$0.1508" [ref=e544]
+                                - cell "1/8" [ref=e545]
+                                - cell "Oct 26, 2026" [ref=e546]
+                              - row [ref=e547]:
+                                - cell "cancelled" [ref=e548]:
+                                  - generic [ref=e549]: cancelled
+                                - cell [ref=e550]
+                                - cell "0" [ref=e551]
+                                - cell "0/0" [ref=e552]
+                                - cell "$0.2753 lower bound" [ref=e553]:
+                                  - text: $0.2753
+                                  - generic [ref=e554]: lower bound
+                                - cell "3/40" [ref=e555]
+                                - cell "Oct 26, 2026" [ref=e556]
+                              - row [ref=e557]:
+                                - cell "stopped at budget" [ref=e558]:
+                                  - generic [ref=e559]: stopped at budget
+                                - cell [ref=e560]
+                                - cell "0" [ref=e561]
+                                - cell "0/0" [ref=e562]
+                                - cell "$0.3213" [ref=e563]
+                                - cell "3/40" [ref=e564]
+                                - cell "Oct 26, 2026" [ref=e565]
+                              - row [ref=e566]:
+                                - cell "completed" [ref=e567]:
+                                  - generic [ref=e568]: completed
+                                - cell [ref=e569]
+                                - cell "2" [ref=e570]
+                                - cell "1/1" [ref=e571]
+                                - cell "$1.3245" [ref=e572]
+                                - cell "9/40" [ref=e573]
+                                - cell "Oct 26, 2026" [ref=e574]
+                              - row [ref=e575]:
+                                - cell "completed" [ref=e576]:
+                                  - generic [ref=e577]: completed
+                                - cell [ref=e578]
+                                - cell "173" [ref=e579]
+                                - cell "173/0" [ref=e580]
+                                - cell "$40.5425" [ref=e581]
+                                - cell "625/∞" [ref=e582]
+                                - cell "Jul 30, 2026" [ref=e583]
+                              - row [ref=e584]:
+                                - cell "completed" [ref=e585]:
+                                  - generic [ref=e586]: completed
+                                - cell [ref=e587]
+                                - cell "179" [ref=e588]
+                                - cell "179/0" [ref=e589]
+                                - cell "$41.7846" [ref=e590]
+                                - cell "639/∞" [ref=e591]
+                                - cell "Jul 30, 2026" [ref=e592]
+                              - row [ref=e593]:
+                                - cell "completed" [ref=e594]:
+                                  - generic [ref=e595]: completed
+                                - cell [ref=e596]
+                                - cell "113" [ref=e597]
+                                - cell "113/0" [ref=e598]
+                                - cell "$28.2090" [ref=e599]
+                                - cell "475/∞" [ref=e600]
+                                - cell "Jul 29, 2026" [ref=e601]
+                              - row [ref=e602]:
+                                - cell "cancelled" [ref=e603]:
+                                  - generic [ref=e604]: cancelled
+                                - cell [ref=e605]
+                                - cell "0" [ref=e606]
+                                - cell "0/0" [ref=e607]
+                                - cell "$0.0000" [ref=e608]
+                                - cell "0/∞" [ref=e609]
+                                - cell "Jul 29, 2026" [ref=e610]
+                              - row [ref=e611]:
+                                - cell "cancelled" [ref=e612]:
+                                  - generic [ref=e613]: cancelled
+                                - cell [ref=e614]
+                                - cell "0" [ref=e615]
+                                - cell "0/0" [ref=e616]
+                                - cell "$0.0000" [ref=e617]
+                                - cell "0/∞" [ref=e618]
+                                - cell "Jul 29, 2026" [ref=e619]
+                              - row [ref=e620]:
+                                - cell "cancelled" [ref=e621]:
+                                  - generic [ref=e622]: cancelled
+                                - cell [ref=e623]
+                                - cell "0" [ref=e624]
+                                - cell "0/0" [ref=e625]
+                                - cell "$0.0000" [ref=e626]
+                                - cell "0/∞" [ref=e627]
+                                - cell "Jul 29, 2026" [ref=e628]
+                              - row [ref=e629]:
+                                - cell "cancelled" [ref=e630]:
+                                  - generic [ref=e631]: cancelled
+                                - cell [ref=e632]
+                                - cell "0" [ref=e633]
+                                - cell "0/0" [ref=e634]
+                                - cell "$0.0000" [ref=e635]
+                                - cell "0/∞" [ref=e636]
+                                - cell "Jul 29, 2026" [ref=e637]
+                              - row [ref=e638]:
+                                - cell "cancelled" [ref=e639]:
+                                  - generic [ref=e640]: cancelled
+                                - cell [ref=e641]
+                                - cell "30" [ref=e642]
+                                - cell "30/0" [ref=e643]
+                                - cell "$0.0000" [ref=e644]
+                                - cell "0/∞" [ref=e645]
+                                - cell "Jul 29, 2026" [ref=e646]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 135 135/0 $0.0000 0/∞ Jul 29, 2026" [ref=e647]:
+                                - cell "cancelled" [ref=e648]:
+                                  - generic [ref=e649]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e650]
+                                - cell "135" [ref=e651]
+                                - cell "135/0" [ref=e652]
+                                - cell "$0.0000" [ref=e653]
+                                - cell "0/∞" [ref=e654]
+                                - cell "Jul 29, 2026" [ref=e655]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 304 304/0 $0.0000 0/∞ Jul 29, 2026" [ref=e656]:
+                                - cell "completed" [ref=e657]:
+                                  - generic [ref=e658]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e659]
+                                - cell "304" [ref=e660]
+                                - cell "304/0" [ref=e661]
+                                - cell "$0.0000" [ref=e662]
+                                - cell "0/∞" [ref=e663]
+                                - cell "Jul 29, 2026" [ref=e664]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 152 151/1 $55.0971 419/∞ Jul 29, 2026" [ref=e665]:
+                                - cell "completed" [ref=e666]:
+                                  - generic [ref=e667]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e668]
+                                - cell "152" [ref=e669]
+                                - cell "151/1" [ref=e670]
+                                - cell "$55.0971" [ref=e671]
+                                - cell "419/∞" [ref=e672]
+                                - cell "Jul 29, 2026" [ref=e673]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 125 125/0 $39.7923 370/∞ Jul 26, 2026" [ref=e674]:
+                                - cell "completed" [ref=e675]:
+                                  - generic [ref=e676]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e677]
+                                - cell "125" [ref=e678]
+                                - cell "125/0" [ref=e679]
+                                - cell "$39.7923" [ref=e680]
+                                - cell "370/∞" [ref=e681]
+                                - cell "Jul 26, 2026" [ref=e682]
+                              - row "failed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 40 40/0 $0.0000 0/∞ Jul 25, 2026" [ref=e683]:
+                                - cell "failed" [ref=e684]:
+                                  - generic [ref=e685]: failed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e686]
+                                - cell "40" [ref=e687]
+                                - cell "40/0" [ref=e688]
+                                - cell "$0.0000" [ref=e689]
+                                - cell "0/∞" [ref=e690]
+                                - cell "Jul 25, 2026" [ref=e691]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 233 233/0 $75.2327 569/∞ Jul 25, 2026" [ref=e692]:
+                                - cell "completed" [ref=e693]:
+                                  - generic [ref=e694]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e695]
+                                - cell "233" [ref=e696]
+                                - cell "233/0" [ref=e697]
+                                - cell "$75.2327" [ref=e698]
+                                - cell "569/∞" [ref=e699]
+                                - cell "Jul 25, 2026" [ref=e700]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 12 12/0 $0.0000 0/∞ Jul 24, 2026" [ref=e701]:
+                                - cell "cancelled" [ref=e702]:
+                                  - generic [ref=e703]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e704]
+                                - cell "12" [ref=e705]
+                                - cell "12/0" [ref=e706]
+                                - cell "$0.0000" [ref=e707]
+                                - cell "0/∞" [ref=e708]
+                                - cell "Jul 24, 2026" [ref=e709]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.0000 0/∞ Jul 24, 2026" [ref=e710]:
+                                - cell "cancelled" [ref=e711]:
+                                  - generic [ref=e712]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e713]
+                                - cell "0" [ref=e714]
+                                - cell "0/0" [ref=e715]
+                                - cell "$0.0000" [ref=e716]
+                                - cell "0/∞" [ref=e717]
+                                - cell "Jul 24, 2026" [ref=e718]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.1864 4/∞ Jul 24, 2026" [ref=e719]:
+                                - cell "cancelled" [ref=e720]:
+                                  - generic [ref=e721]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e722]
+                                - cell "0" [ref=e723]
+                                - cell "0/0" [ref=e724]
+                                - cell "$0.1864" [ref=e725]
+                                - cell "4/∞" [ref=e726]
+                                - cell "Jul 24, 2026" [ref=e727]
+                              - row "failed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.0000 0/∞ Jul 24, 2026" [ref=e728]:
+                                - cell "failed" [ref=e729]:
+                                  - generic [ref=e730]: failed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e731]
+                                - cell "0" [ref=e732]
+                                - cell "0/0" [ref=e733]
+                                - cell "$0.0000" [ref=e734]
+                                - cell "0/∞" [ref=e735]
+                                - cell "Jul 24, 2026" [ref=e736]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 2 2/0 $2.1662 31/∞ Jul 24, 2026" [ref=e737]:
+                                - cell "completed" [ref=e738]:
+                                  - generic [ref=e739]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e740]
+                                - cell "2" [ref=e741]
+                                - cell "2/0" [ref=e742]
+                                - cell "$2.1662" [ref=e743]
+                                - cell "31/∞" [ref=e744]
+                                - cell "Jul 24, 2026" [ref=e745]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.0000 0/∞ Jul 24, 2026" [ref=e746]:
+                                - cell "cancelled" [ref=e747]:
+                                  - generic [ref=e748]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e749]
+                                - cell "0" [ref=e750]
+                                - cell "0/0" [ref=e751]
+                                - cell "$0.0000" [ref=e752]
+                                - cell "0/∞" [ref=e753]
+                                - cell "Jul 24, 2026" [ref=e754]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 48 48/0 $18.8061 172/100 Jul 24, 2026" [ref=e755]:
+                                - cell "completed" [ref=e756]:
+                                  - generic [ref=e757]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e758]
+                                - cell "48" [ref=e759]
+                                - cell "48/0" [ref=e760]
+                                - cell "$18.8061" [ref=e761]
+                                - cell "172/100" [ref=e762]
+                                - cell "Jul 24, 2026" [ref=e763]
+                              - row "cancelled __qa6 verify valid job still starts 0 0/0 $0.0000 0/5 Jul 21, 2026" [ref=e764]:
+                                - cell "cancelled" [ref=e765]:
+                                  - generic [ref=e766]: cancelled
+                                - cell "__qa6 verify valid job still starts" [ref=e767]
+                                - cell "0" [ref=e768]
+                                - cell "0/0" [ref=e769]
+                                - cell "$0.0000" [ref=e770]
+                                - cell "0/5" [ref=e771]
+                                - cell "Jul 21, 2026" [ref=e772]
+                              - row [ref=e773]:
+                                - cell "cancelled" [ref=e774]:
+                                  - generic [ref=e775]: cancelled
+                                - cell [ref=e776]
+                                - cell "0" [ref=e777]
+                                - cell "0/0" [ref=e778]
+                                - cell "$0.0000" [ref=e779]
+                                - cell "0/5" [ref=e780]
+                                - cell "Jul 20, 2026" [ref=e781]
+                              - row "cancelled ‮‮‮‮‮‮‮‮‮‮ 0 0/0 $0.0000 0/5 Jul 20, 2026" [ref=e782]:
+                                - cell "cancelled" [ref=e783]:
+                                  - generic [ref=e784]: cancelled
+                                - cell "‮‮‮‮‮‮‮‮‮‮" [ref=e785]
+                                - cell "0" [ref=e786]
+                                - cell "0/0" [ref=e787]
+                                - cell "$0.0000" [ref=e788]
+                                - cell "0/5" [ref=e789]
+                                - cell "Jul 20, 2026" [ref=e790]
+                              - row "cancelled qa5 probe prompt 0 0/0 $0.0000 1/5 Jul 20, 2026" [ref=e791]:
+                                - cell "cancelled" [ref=e792]:
+                                  - generic [ref=e793]: cancelled
+                                - cell "qa5 probe prompt" [ref=e794]
+                                - cell "0" [ref=e795]
+                                - cell "0/0" [ref=e796]
+                                - cell "$0.0000" [ref=e797]
+                                - cell "1/5" [ref=e798]
+                                - cell "Jul 20, 2026" [ref=e799]
+                              - row "cancelled qa5 probe prompt 0 0/0 $0.0000 1/5 Jul 20, 2026" [ref=e800]:
+                                - cell "cancelled" [ref=e801]:
+                                  - generic [ref=e802]: cancelled
+                                - cell "qa5 probe prompt" [ref=e803]
+                                - cell "0" [ref=e804]
+                                - cell "0/0" [ref=e805]
+                                - cell "$0.0000" [ref=e806]
+                                - cell "1/5" [ref=e807]
+                                - cell "Jul 20, 2026" [ref=e808]
+                              - row "cancelled qa5 probe prompt 0 0/0 $0.0000 0/5 Jul 20, 2026" [ref=e809]:
+                                - cell "cancelled" [ref=e810]:
+                                  - generic [ref=e811]: cancelled
+                                - cell "qa5 probe prompt" [ref=e812]
+                                - cell "0" [ref=e813]
+                                - cell "0/0" [ref=e814]
+                                - cell "$0.0000" [ref=e815]
+                                - cell "0/5" [ref=e816]
+                                - cell "Jul 20, 2026" [ref=e817]
+                              - row "failed Find new video encoding tools released in 2026 0 0/0 $0.0000 0/30 Jul 20, 2026" [ref=e818]:
+                                - cell "failed" [ref=e819]:
+                                  - generic [ref=e820]: failed
+                                - cell "Find new video encoding tools released in 2026" [ref=e821]
+                                - cell "0" [ref=e822]
+                                - cell "0/0" [ref=e823]
+                                - cell "$0.0000" [ref=e824]
+                                - cell "0/30" [ref=e825]
+                                - cell "Jul 20, 2026" [ref=e826]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.7896 7/100 Jul 18, 2026" [ref=e827]:
+                                - cell "cancelled" [ref=e828]:
+                                  - generic [ref=e829]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e830]
+                                - cell "0" [ref=e831]
+                                - cell "0/0" [ref=e832]
+                                - cell "$0.7896" [ref=e833]
+                                - cell "7/100" [ref=e834]
+                                - cell "Jul 18, 2026" [ref=e835]
+                              - row "failed QA validation probe — intercepted, no real job 0 0/0 $0.0000 0/30 Jul 17, 2026" [ref=e836]:
+                                - cell "failed" [ref=e837]:
+                                  - generic [ref=e838]: failed
+                                - cell "QA validation probe — intercepted, no real job" [ref=e839]
+                                - cell "0" [ref=e840]
+                                - cell "0/0" [ref=e841]
+                                - cell "$0.0000" [ref=e842]
+                                - cell "0/30" [ref=e843]
+                                - cell "Jul 17, 2026" [ref=e844]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 73 73/0 $0.0000 0/300000 Jul 16, 2026" [ref=e845]:
+                                - cell "cancelled" [ref=e846]:
+                                  - generic [ref=e847]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e848]
+                                - cell "73" [ref=e849]
+                                - cell "73/0" [ref=e850]
+                                - cell "$0.0000" [ref=e851]
+                                - cell "0/300000" [ref=e852]
+                                - cell "Jul 16, 2026" [ref=e853]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.7301 6/300000 Jul 16, 2026" [ref=e854]:
+                                - cell "cancelled" [ref=e855]:
+                                  - generic [ref=e856]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e857]
+                                - cell "0" [ref=e858]
+                                - cell "0/0" [ref=e859]
+                                - cell "$0.7301" [ref=e860]
+                                - cell "6/300000" [ref=e861]
+                                - cell "Jul 16, 2026" [ref=e862]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $0.5066 6/300000 Jul 16, 2026" [ref=e863]:
+                                - cell "cancelled" [ref=e864]:
+                                  - generic [ref=e865]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e866]
+                                - cell "0" [ref=e867]
+                                - cell "0/0" [ref=e868]
+                                - cell "$0.5066" [ref=e869]
+                                - cell "6/300000" [ref=e870]
+                                - cell "Jul 16, 2026" [ref=e871]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 35 34/1 $12.3801 122/300000 Jul 16, 2026" [ref=e872]:
+                                - cell "completed" [ref=e873]:
+                                  - generic [ref=e874]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e875]
+                                - cell "35" [ref=e876]
+                                - cell "34/1" [ref=e877]
+                                - cell "$12.3801" [ref=e878]
+                                - cell "122/300000" [ref=e879]
+                                - cell "Jul 16, 2026" [ref=e880]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 55 55/0 $19.6131 200/300000 Jul 16, 2026" [ref=e881]:
+                                - cell "completed" [ref=e882]:
+                                  - generic [ref=e883]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e884]
+                                - cell "55" [ref=e885]
+                                - cell "55/0" [ref=e886]
+                                - cell "$19.6131" [ref=e887]
+                                - cell "200/300000" [ref=e888]
+                                - cell "Jul 16, 2026" [ref=e889]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 27 27/0 $12.2021 113/301000 Jul 16, 2026" [ref=e890]:
+                                - cell "completed" [ref=e891]:
+                                  - generic [ref=e892]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e893]
+                                - cell "27" [ref=e894]
+                                - cell "27/0" [ref=e895]
+                                - cell "$12.2021" [ref=e896]
+                                - cell "113/301000" [ref=e897]
+                                - cell "Jul 16, 2026" [ref=e898]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $12.1921 84/96 Jul 16, 2026" [ref=e899]:
+                                - cell "completed" [ref=e900]:
+                                  - generic [ref=e901]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e902]
+                                - cell "0" [ref=e903]
+                                - cell "0/0" [ref=e904]
+                                - cell "$12.1921" [ref=e905]
+                                - cell "84/96" [ref=e906]
+                                - cell "Jul 16, 2026" [ref=e907]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 53 53/0 $14.9872 169/96 Jul 16, 2026" [ref=e908]:
+                                - cell "completed" [ref=e909]:
+                                  - generic [ref=e910]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e911]
+                                - cell "53" [ref=e912]
+                                - cell "53/0" [ref=e913]
+                                - cell "$14.9872" [ref=e914]
+                                - cell "169/96" [ref=e915]
+                                - cell "Jul 16, 2026" [ref=e916]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 46 46/0 $12.8107 144/96 Jul 16, 2026" [ref=e917]:
+                                - cell "completed" [ref=e918]:
+                                  - generic [ref=e919]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e920]
+                                - cell "46" [ref=e921]
+                                - cell "46/0" [ref=e922]
+                                - cell "$12.8107" [ref=e923]
+                                - cell "144/96" [ref=e924]
+                                - cell "Jul 16, 2026" [ref=e925]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $6.8268 62/30000 Jul 15, 2026" [ref=e926]:
+                                - cell "completed" [ref=e927]:
+                                  - generic [ref=e928]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e929]
+                                - cell "0" [ref=e930]
+                                - cell "0/0" [ref=e931]
+                                - cell "$6.8268" [ref=e932]
+                                - cell "62/30000" [ref=e933]
+                                - cell "Jul 15, 2026" [ref=e934]
+                              - row "cancelled Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $1.1718 7/3000 Jul 15, 2026" [ref=e935]:
+                                - cell "cancelled" [ref=e936]:
+                                  - generic [ref=e937]: cancelled
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e938]
+                                - cell "0" [ref=e939]
+                                - cell "0/0" [ref=e940]
+                                - cell "$1.1718" [ref=e941]
+                                - cell "7/3000" [ref=e942]
+                                - cell "Jul 15, 2026" [ref=e943]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 86 86/0 $25.2709 262/3000 Jul 15, 2026" [ref=e944]:
+                                - cell "completed" [ref=e945]:
+                                  - generic [ref=e946]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e947]
+                                - cell "86" [ref=e948]
+                                - cell "86/0" [ref=e949]
+                                - cell "$25.2709" [ref=e950]
+                                - cell "262/3000" [ref=e951]
+                                - cell "Jul 15, 2026" [ref=e952]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $11.0902 57/3000 Jul 15, 2026" [ref=e953]:
+                                - cell "completed" [ref=e954]:
+                                  - generic [ref=e955]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e956]
+                                - cell "0" [ref=e957]
+                                - cell "0/0" [ref=e958]
+                                - cell "$11.0902" [ref=e959]
+                                - cell "57/3000" [ref=e960]
+                                - cell "Jul 15, 2026" [ref=e961]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $2.9412 37/30000 Jul 10, 2026" [ref=e962]:
+                                - cell "completed" [ref=e963]:
+                                  - generic [ref=e964]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e965]
+                                - cell "0" [ref=e966]
+                                - cell "0/0" [ref=e967]
+                                - cell "$2.9412" [ref=e968]
+                                - cell "37/30000" [ref=e969]
+                                - cell "Jul 10, 2026" [ref=e970]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $4.6991 8/30000 Jul 10, 2026" [ref=e971]:
+                                - cell "completed" [ref=e972]:
+                                  - generic [ref=e973]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e974]
+                                - cell "0" [ref=e975]
+                                - cell "0/0" [ref=e976]
+                                - cell "$4.6991" [ref=e977]
+                                - cell "8/30000" [ref=e978]
+                                - cell "Jul 10, 2026" [ref=e979]
+                              - row "completed Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms. 0 0/0 $3.7595 63/30000 Jul 10, 2026" [ref=e980]:
+                                - cell "completed" [ref=e981]:
+                                  - generic [ref=e982]: completed
+                                - cell "Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms." [ref=e983]
+                                - cell "0" [ref=e984]
+                                - cell "0/0" [ref=e985]
+                                - cell "$3.7595" [ref=e986]
+                                - cell "63/30000" [ref=e987]
+                                - cell "Jul 10, 2026" [ref=e988]
+                        - button "Load more (60 of 77) in the Researcher jobs table" [active] [ref=e990] [cursor=pointer]: Load more (60 of 77)
+                  - group [ref=e991]:
+                    - generic "All pending discoveries & full job history" [ref=e992] [cursor=pointer]
+    - button "Back to top" [ref=e993] [cursor=pointer]:
+      - img

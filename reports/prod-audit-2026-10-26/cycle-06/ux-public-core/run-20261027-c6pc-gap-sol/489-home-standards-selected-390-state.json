@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?layout=index&kind=standards","title":"Awesome Video — 3826+ Curated Video & Streaming Resources","width":390,"height":844,"touch":true,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BUTTON","id":"","label":"Standards, 278 resources","text":"Standards 278","rect":{"x":20,"y":188.59375,"width":134.734375,"height":44,"top":188.59375,"right":154.734375,"bottom":232.59375,"left":20}},"headings":[{"text":"~/awesome.videoAwesome Video Resources","id":""},{"text":"Hand-picked highlights","id":"home-index-featured-title"},{"text":"Categories","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Standards 278","label":"Standards, 278 resources","current":null}],"status":[],"analyticsDisabled":"1"}
+```

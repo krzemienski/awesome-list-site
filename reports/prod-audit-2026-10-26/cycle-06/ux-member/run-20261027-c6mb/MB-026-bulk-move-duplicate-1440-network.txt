@@ -1,0 +1,2 @@
+[7155.2277] POST https://awesome.video/api/bookmarks/bulk (Fetch) 200
+[7155.2282] POST https://awesome.video/api/bookmarks/bulk (Fetch) 200

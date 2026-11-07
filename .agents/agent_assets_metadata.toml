@@ -407,3 +407,59 @@ mtime_ms = 1789685998382
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4b70d1af-6b61-47f2-ab19-4ca6622fd5bb/e298f4db-fcdd-4950-bae6-1b21c6b7fda9"
 storage_version_token = "1789686055617363"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "2IOaDRHTDeRPlL4CrJ7d_"
+uri = "file://.local/outputs/daily-visitors.chart.html"
+type = "text"
+title = "Visitors peaked on Oct 16, then settled near 400 a day"
+description = "Daily visitors to awesome.video, last 7 days"
+logical_id = "fa483750-0819-4a8a-9de7-1358ebebaa49"
+content_hash = "sha256:bddcc0cca07a107d57fb35341922e971a6029144e4530be2350a2302e61486d7"
+size = 3471
+mtime_ms = 1792574370592
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/fa483750-0819-4a8a-9de7-1358ebebaa49/fcb05836-ac53-473e-a044-037e9938b538"
+storage_version_token = "1792574371250565"
+content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "IXCtR8EHbhDcmdsPYT1uD"
+uri = "file://.local/outputs/visitor-mix.chart.html"
+type = "text"
+title = "Three in four visitors look automated"
+description = "Visitor mix for the last 7 days"
+logical_id = "2f248e14-8f53-4d15-8edd-622019bd5216"
+content_hash = "sha256:f1981846a62f54a65da4fe2227dbe7eb74b31985054a3c7d2391cf48b524630a"
+size = 2674
+mtime_ms = 1792775894248
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/2f248e14-8f53-4d15-8edd-622019bd5216/c43794c2-6b3e-476b-a199-b1c495db102e"
+storage_version_token = "1792775895073093"
+content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "5TlxNnw4Q_3lBE0v2f18h"
+uri = "file://.local/outputs/google-resource-landing.chart.html"
+type = "text"
+title = "Most Google visitors read one resource page and leave"
+description = "What Google visitors did after landing on a resource page, Oct 23–24"
+logical_id = "f0c6f967-e5d1-484d-86dd-acf31de15c51"
+content_hash = "sha256:81436008937acb59f817bdd2d410a1a45398e537a45e91c5187ed30dde0eabdc"
+size = 3131
+mtime_ms = 1792885950978
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/f0c6f967-e5d1-484d-86dd-acf31de15c51/95986b8d-734d-4b62-a588-7b403b6f70cd"
+storage_version_token = "1792885951474543"
+content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "djWInXyNoGstoszLWL0IV"
+uri = "file://docs/prompts/awesome-video-improvement-waves.md"
+type = "text"
+title = "Prompt: analytics, researcher and full-audit waves"
+description = "Self-contained prompt covering tasks 706–709, their dependencies and execution order, for running in another environment."
+logical_id = "4b868d37-7f69-4bfb-aebf-3acc2dea7161"
+content_hash = "sha256:b55943ff67280b240f09f65bb0a8bd7cf79f15067c9a036dba5e291d1293b642"
+size = 22127
+mtime_ms = 1792886945662
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4b868d37-7f69-4bfb-aebf-3acc2dea7161/aa71be2d-cf40-47d7-b24a-d0eda0c47a0e"
+storage_version_token = "1792886954071140"
+content_type = "text/markdown"

@@ -1,0 +1,217 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Filters & view" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Filters & view
+      - region "Subcategories" [ref=e24]:
+        - heading "Subcategories" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - link "Codecs 27" [ref=e27] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e28]: Codecs
+            - generic [ref=e29]: "27"
+          - link "Encoding Tools 225" [ref=e30] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e31]: Encoding Tools
+            - generic [ref=e32]: "225"
+          - button "Uncategorized 120" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: Uncategorized
+            - generic [ref=e35]: "120"
+      - generic "Resources (372)" [ref=e38]:
+        - heading "Resources (372)" [active] [level=2] [ref=e40]
+        - status [ref=e41]:
+          - text: Page 999 is not available; showing page 16 instead.
+          - button "Dismiss" [ref=e42] [cursor=pointer]
+        - generic [ref=e43]:
+          - article [ref=e44]:
+            - generic [ref=e45]:
+              - heading "realeyes-media/alpine-bento-ffmpeg" [level=2] [ref=e46]:
+                - link "realeyes-media/alpine-bento-ffmpeg" [ref=e47] [cursor=pointer]:
+                  - /url: /resource/1028
+              - link "Open in new tab" [ref=e48] [cursor=pointer]:
+                - /url: https://github.com/realeyes-media/alpine-bento-ffmpeg
+                - img
+            - 'button "Favorite to your account — sign in required: realeyes-media/alpine-bento-ffmpeg" [ref=e50] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: realeyes-media/alpine-bento-ffmpeg" [ref=e52] [cursor=pointer]':
+              - img
+          - article [ref=e54]:
+            - generic [ref=e55]:
+              - heading "sambios/ffmpeg_transcoder" [level=2] [ref=e56]:
+                - link "sambios/ffmpeg_transcoder" [ref=e57] [cursor=pointer]:
+                  - /url: /resource/1434
+              - link "Open in new tab" [ref=e58] [cursor=pointer]:
+                - /url: https://github.com/sambios/ffmpeg_transcoder
+                - img
+            - 'button "Favorite to your account — sign in required: sambios/ffmpeg_transcoder" [ref=e60] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: sambios/ffmpeg_transcoder" [ref=e62] [cursor=pointer]':
+              - img
+          - article [ref=e64]:
+            - generic [ref=e65]:
+              - heading "serverlesspub/ffmpeg-aws-lambda-layer" [level=2] [ref=e66]:
+                - link "serverlesspub/ffmpeg-aws-lambda-layer" [ref=e67] [cursor=pointer]:
+                  - /url: /resource/1442
+              - link "Open in new tab" [ref=e68] [cursor=pointer]:
+                - /url: https://github.com/serverlesspub/ffmpeg-aws-lambda-layer
+                - img
+            - 'button "Favorite to your account — sign in required: serverlesspub/ffmpeg-aws-lambda-layer" [ref=e70] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: serverlesspub/ffmpeg-aws-lambda-layer" [ref=e72] [cursor=pointer]':
+              - img
+          - article [ref=e74]:
+            - generic [ref=e75]:
+              - heading "slhck/ffmpeg-bitrate-stats" [level=2] [ref=e76]:
+                - link "slhck/ffmpeg-bitrate-stats" [ref=e77] [cursor=pointer]:
+                  - /url: /resource/976
+              - link "Open in new tab" [ref=e78] [cursor=pointer]:
+                - /url: https://github.com/slhck/ffmpeg-bitrate-stats
+                - img
+            - 'button "Favorite to your account — sign in required: slhck/ffmpeg-bitrate-stats" [ref=e80] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: slhck/ffmpeg-bitrate-stats" [ref=e82] [cursor=pointer]':
+              - img
+          - article [ref=e84]:
+            - generic [ref=e85]:
+              - heading "slhck/ffmpeg-debug-qp" [level=2] [ref=e86]:
+                - link "slhck/ffmpeg-debug-qp" [ref=e87] [cursor=pointer]:
+                  - /url: /resource/977
+              - link "Open in new tab" [ref=e88] [cursor=pointer]:
+                - /url: https://github.com/slhck/ffmpeg-debug-qp
+                - img
+            - 'button "Favorite to your account — sign in required: slhck/ffmpeg-debug-qp" [ref=e90] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: slhck/ffmpeg-debug-qp" [ref=e92] [cursor=pointer]':
+              - img
+          - article [ref=e94]:
+            - generic [ref=e95]:
+              - heading "SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder" [level=2] [ref=e96]:
+                - link "SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder" [ref=e97] [cursor=pointer]:
+                  - /url: /resource/1448
+              - link "Open in new tab" [ref=e98] [cursor=pointer]:
+                - /url: https://github.com/SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+                - img
+            - 'button "Favorite to your account — sign in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder" [ref=e100] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder" [ref=e102] [cursor=pointer]':
+              - img
+          - article [ref=e104]:
+            - generic [ref=e105]:
+              - 'heading "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [level=2] [ref=e106]':
+                - 'link "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e107] [cursor=pointer]':
+                  - /url: /resource/1373
+              - link "Open in new tab" [ref=e108] [cursor=pointer]:
+                - /url: https://gist.github.com/SeanMollet/0eed16e80630ab67532890a9d42132af
+                - img
+            - 'button "Favorite to your account — sign in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e110] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e112] [cursor=pointer]':
+              - img
+          - article [ref=e114]:
+            - generic [ref=e115]:
+              - heading "transitive-bullshit/awesome-ffmpeg" [level=2] [ref=e116]:
+                - link "transitive-bullshit/awesome-ffmpeg" [ref=e117] [cursor=pointer]:
+                  - /url: /resource/831
+              - link "Open in new tab" [ref=e118] [cursor=pointer]:
+                - /url: https://github.com/transitive-bullshit/awesome-ffmpeg
+                - img
+            - 'button "Favorite to your account — sign in required: transitive-bullshit/awesome-ffmpeg" [ref=e120] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: transitive-bullshit/awesome-ffmpeg" [ref=e122] [cursor=pointer]':
+              - img
+          - article [ref=e124]:
+            - generic [ref=e125]:
+              - heading "Use of Look-Up Tables (LUTs) in FFmpeg" [level=2] [ref=e126]:
+                - link "Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e127] [cursor=pointer]:
+                  - /url: /resource/1286
+              - link "Open in new tab" [ref=e128] [cursor=pointer]:
+                - /url: https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_Use_of_LUTs_FFmpeg.pdf
+                - img
+            - 'button "Favorite to your account — sign in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e130] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e132] [cursor=pointer]':
+              - img
+          - article [ref=e134]:
+            - generic [ref=e135]:
+              - heading "VCDP/FFmpeg-patch" [level=2] [ref=e136]:
+                - link "VCDP/FFmpeg-patch" [ref=e137] [cursor=pointer]:
+                  - /url: /resource/1375
+              - link "Open in new tab" [ref=e138] [cursor=pointer]:
+                - /url: https://github.com/VCDP/FFmpeg-patch
+                - img
+            - 'button "Favorite to your account — sign in required: VCDP/FFmpeg-patch" [ref=e140] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: VCDP/FFmpeg-patch" [ref=e142] [cursor=pointer]':
+              - img
+          - article [ref=e144]:
+            - generic [ref=e145]:
+              - heading "x264 FFmpeg Options Guide - Linux Encoding" [level=2] [ref=e146]:
+                - link "x264 FFmpeg Options Guide - Linux Encoding" [ref=e147] [cursor=pointer]:
+                  - /url: /resource/1201
+              - link "Open in new tab" [ref=e148] [cursor=pointer]:
+                - /url: https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+                - img
+            - 'button "Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e150] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e152] [cursor=pointer]':
+              - img
+          - article [ref=e154]:
+            - generic [ref=e155]:
+              - heading "Xabe.FFmpeg" [level=2] [ref=e156]:
+                - link "Xabe.FFmpeg" [ref=e157] [cursor=pointer]:
+                  - /url: /resource/1781
+              - link "Open in new tab" [ref=e158] [cursor=pointer]:
+                - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                - img
+            - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e160] [cursor=pointer]':
+              - img
+            - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e162] [cursor=pointer]':
+              - img
+        - navigation "Pagination" [ref=e165]:
+          - generic [ref=e166]:
+            - link "Previous" [ref=e167] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=15&view=compact
+              - img
+              - text: Previous
+            - link "Go to page 1" [ref=e168] [cursor=pointer]:
+              - /url: /category/encoding-codecs?view=compact
+              - text: "1"
+            - generic [ref=e169]: …
+            - link "Go to page 15" [ref=e170] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=15&view=compact
+              - text: "15"
+            - link "Page 16, current page" [ref=e171] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=16&view=compact
+              - text: "16"
+            - text: Next
+            - img
+          - generic [ref=e172]:
+            - generic [ref=e173]: Page 16 of 16
+            - generic [ref=e174]:
+              - generic [ref=e175] [cursor=pointer]: Go to page
+              - textbox "Page number, 1 to 16" [ref=e176]: "16"
+              - generic [ref=e177]: / 16
+          - status [ref=e178]

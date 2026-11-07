@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/search","title":"Search — Awesome Video","width":1440,"height":900,"scrollX":0,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"BUTTON","id":"","label":null,"text":"Search 3,825 resourcesSearch 3,825 resources…⌘K"},"headings":[{"text":"Search","id":""},{"text":"Enter a query or choose filters","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":[],"pressed":[{"text":"Search","label":null}],"status":["Part of the link you followed was ignored: the “q” parameter contained unsafe content and was removed.Dismiss"],"analyticsDisabled":"1"}
+```

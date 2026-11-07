@@ -1,0 +1,740 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab [selected]:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=3]: Run a research task
+                                - paragraph: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                                - generic:
+                                  - region:
+                                    - generic:
+                                      - generic: "1"
+                                      - heading [level=4]: Brief
+                                      - generic: Auto-generated at launch
+                                    - generic:
+                                      - radiogroup:
+                                        - generic:
+                                          - radio [checked]:
+                                            - generic:
+                                              - img
+                                          - generic:
+                                            - generic: Auto-generate at launch
+                                            - generic: A gap-aware brief built from the catalog and past runs.
+                                        - generic:
+                                          - radio
+                                          - generic:
+                                            - generic: Write my own
+                                            - generic: Describe what to search for, or start from a generated brief.
+                                  - region:
+                                    - generic:
+                                      - generic: "2"
+                                      - heading [level=4]: Focus
+                                      - generic: All categories
+                                    - generic:
+                                      - combobox:
+                                        - generic: All categories
+                                        - img
+                                  - region:
+                                    - generic:
+                                      - generic: "3"
+                                      - heading [level=4]: Limits
+                                      - generic: no target · $3.00 cap · 40 turns
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - text: Stop after (discoveries)
+                                          - spinbutton
+                                          - paragraph: No target — runs until the budget or turns end.
+                                        - generic:
+                                          - text: Budget cap (USD)
+                                          - spinbutton: "3.00"
+                                          - paragraph: Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops.
+                                        - generic:
+                                          - text: Max turns
+                                          - spinbutton: "40"
+                                          - paragraph: Positive whole number (blank = no cap).
+                                      - paragraph: Past runs cost $0.15–$75.23. Discoveries are deduplicated against the 3,826 catalog resources.
+                                  - region:
+                                    - generic:
+                                      - generic: "4"
+                                      - heading [level=4]: Endpoint & model
+                                      - generic: Server configuration
+                                    - generic:
+                                      - button [expanded]:
+                                        - text: Override endpoint or models (optional)
+                                        - img
+                                      - generic:
+                                        - generic:
+                                          - text: Orchestrator model
+                                          - textbox:
+                                            - /placeholder: Blank = ANTHROPIC_MODEL
+                                        - generic:
+                                          - text: Scout model
+                                          - textbox:
+                                            - /placeholder: Blank = haiku tier
+                                        - generic:
+                                          - text: Base URL
+                                          - textbox:
+                                            - /placeholder: Blank = ANTHROPIC_BASE_URL
+                                          - paragraph: A custom endpoint needs its own token below.
+                                        - generic:
+                                          - text: Auth token
+                                          - textbox:
+                                            - /placeholder: Required with a base URL
+                                          - paragraph: Encrypted at rest; only the last 4 characters are shown afterwards.
+                                  - region:
+                                    - generic:
+                                      - generic: "5"
+                                      - heading [level=4]: About to run on
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - term: Endpoint
+                                              - definition:
+                                                - text: router.hack.ski
+                                                - generic: · ANTHROPIC_BASE_URL
+                                            - generic:
+                                              - term: Credential
+                                              - definition: router via ANTHROPIC_BASE_URL
+                                            - generic:
+                                              - term: Orchestrator model
+                                              - definition:
+                                                - text: cc/claude-opus-5
+                                                - generic: · ANTHROPIC_MODEL
+                                            - generic:
+                                              - term: Scout model
+                                              - definition:
+                                                - text: cc/claude-haiku-4-5-20251001
+                                                - generic: · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL
+                                      - generic:
+                                        - button:
+                                          - img
+                                          - text: Launch research run
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Researcher jobs
+                                - paragraph: Latest 5 of 76 research runs
+                            - generic:
+                              - region:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: Status
+                                      - columnheader: Prompt
+                                      - columnheader: Found
+                                      - columnheader: Approved / Rejected
+                                      - columnheader: Cost
+                                      - columnheader: Turns
+                                      - columnheader: Created
+                                  - rowgroup:
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: "Five-pass sustained catalog audit. Work for at least 30 minutes and complete at least 495 substantive orchestrator turns before finalizing. For EACH of the 99 real subcategories, perform FIVE SEPARATE ORCHESTRATOR TURNS, one subcategory at a time with no batching: (1) retrieve its existing resources and assess topic coverage, (2) compare its coverage gaps with sibling subcategories, (3) check_duplicate for one plausible official candidate, (4) check_duplicate for a second distinct plausible official candidate, and (5) record a concise coverage/duplicate ledger conclusion for that subcategory. Continue through every real subcategory, including Uncategorized; do not substitute only top-level categories. Use scouts for independent coverage assessment throughout. WebSearch is optional and capped at 10 calls; zero searches is fine and search failure must not stop the five-pass audit. Save up to 25 discoveries only for actually verified official URLs; zero saves is acceptable. Do not finalize before all 99 subcategories have five separate turns (495 total) and at least 30 minutes of genuine work. Never invent URLs/metadata and never idle-wait."
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.7600
+                                      - cell: 28/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: Sustained catalog coverage and duplicate-audit run requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. This run is NOT dependent on web-search success or saving discoveries. Use get_coverage_gaps, check_duplicate and scouts throughout to evaluate every catalog category and subcategory for missing video-engineering topics, stale overlaps and duplicate candidates; maintain a detailed candidate and coverage ledger. Search is optional and capped at 20 WebSearch calls total. If search returns no results or becomes exhausted, continue the substantive catalog coverage, taxonomy comparison and duplicate analysis without stopping. Save up to 25 discoveries only when an official URL is actually verified; zero saves is acceptable. Do not finalize before 30 minutes and 450 substantive turns covering all categories. Never invent URLs/metadata and never idle-wait to pad runtime.
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $1.2973
+                                      - cell: 93/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: Sustained production research requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. Find up to 25 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Evaluate at least 150 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Use scouts throughout for direct-source retrieval, URL verification, taxonomy comparison and candidate evaluation. Keep a written candidate ledger. Use at most 40 WebSearch calls in the entire run so the shared search budget cannot end the work; after that continue substantive direct official-source retrieval and evaluation with remaining tools. Do not finalize before 30 minutes, 450 substantive turns and 150 evaluated candidates. Never invent URLs/metadata and never idle-wait to pad runtime.
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.5650
+                                      - cell: 13/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting."
+                                      - cell: "4"
+                                      - cell: 1/0
+                                      - cell: $5.4603
+                                      - cell: 155/200
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: failed
+                                      - cell: "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting."
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.0000
+                                      - cell: 1/200
+                                      - cell: Oct 27, 2026
+                              - generic:
+                                - button: Show more
+                        - group:
+                          - generic: All pending discoveries & full job history
+                          - generic:
+                            - tablist:
+                              - tab [selected]:
+                                - img
+                                - text: Review Discoveries
+                                - generic: "12"
+                              - tab:
+                                - img
+                                - text: Job History
+                            - tabpanel:
+                              - article:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic:
+                                        - img
+                                        - text: Pending Discoveries
+                                        - generic: "12"
+                                      - generic: Review and approve or reject AI-discovered resources
+                                    - button:
+                                      - img
+                                      - text: Approve All (12)
+                                - generic:
+                                  - region:
+                                    - generic:
+                                      - table:
+                                        - rowgroup:
+                                          - row:
+                                            - columnheader: Title
+                                            - columnheader: Status
+                                            - columnheader: Category
+                                            - columnheader: Confidence
+                                            - columnheader: Job
+                                            - columnheader: Actions
+                                        - rowgroup:
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Neural Video Compression with Feature Modulation (DCVC-FM)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://arxiv.org/abs/2402.08545
+                                                  - generic: https://arxiv.org/abs/2402.08545
+                                                  - img
+                                                - paragraph: arXiv paper for DCVC-FM, a Microsoft Research neural video codec that modulates temporal features to improve compression efficiency in the DCVC family.
+                                                - paragraph: "\"Primary arXiv abstract page for DCVC-FM, distinct from the already-cataloged microsoft/DCVC code repo, the DCVC-RT arXiv preprint, and the DCVC-DC CVPR PDF saved earlier this run. Fills the thin next-gen/neural codec gap with a citable 2024 paper. Not a listicle and not the same URL as the code. Score: base 50 +15 primary paper +10 2024 +15 thin gap +10 technical depth = 100, reduced to 78 because the search index could not re-open the abstract body this session.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Next-Generation Codecs AV1 VVC
+                                            - cell: 78%
+                                            - cell: "#73"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Neural Video Compression with Diverse Contexts (CVPR 2024)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link check failed
+                                                - link:
+                                                  - /url: https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf
+                                                  - generic: https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf
+                                                  - img
+                                                - paragraph: Official CVPR 2024 paper on DCVC-DC, a neural video codec that conditions entropy coding on diverse spatial and temporal contexts to improve compression over earlier DCVC models.
+                                                - paragraph: "\"Primary open-access CVPR paper for the DCVC-DC diverse-contexts model. Catalog already has the microsoft/DCVC code repo and the later DCVC-RT arXiv preprint, but not this 2024 paper. Distinct archival source for engineers comparing neural codec generations. Not a listicle. Confidence: primary source +15, 2024 date +10, fills thin next-gen codec gap +15, technically deep +10, base 50 = 100 capped by not independently re-fetching the PDF body this run, so 80.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Next-Generation Codecs AV1 VVC
+                                            - cell: 80%
+                                            - cell: "#73"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Towards Practical Real-Time Neural Video Compression (CVPR 2025)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf
+                                                  - generic: https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf
+                                                  - img
+                                                - paragraph: CVPR 2025 paper on DCVC-RT, a practical real-time neural video codec with integerized models and implicit temporal modeling that encodes and decodes 1080p above 100 fps.
+                                                - paragraph: "\"Primary CVPR open-access paper for the real-time DCVC-RT neural codec. The catalog already has the project page dcvccodec.github.io but not this paper PDF, so it is a distinct archival source. Directly fills the thin real-time encoding subcategory with a 2025 peer-reviewed result rather than a blog.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Real-Time Encoding Solutions
+                                            - cell: 82%
+                                            - cell: "#73"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: WebRTC Encoded Transform (Insertable Streams)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://www.w3.org/TR/webrtc-encoded-transform/
+                                                  - generic: https://www.w3.org/TR/webrtc-encoded-transform/
+                                                  - img
+                                                - paragraph: W3C specification for accessing and transforming encoded audio and video frames on RTCPeerConnection, the basis of WebRTC insertable streams and frame-level E2EE.
+                                                - paragraph: "\"Current W3C Candidate Recommendation (dated 15 October 2026 in the scout report) for a real-time video primitive. w3.org is somewhat saturated but this specific TR is a distinct official spec not already catalogued. Score: 50+15 primary +10 recent +10 specs gap +10 depth −15 w3 saturation = 80.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Standards & Industry
+                                                - generic: Specs & Standards
+                                            - cell: 80%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: NVIDIA Video Codec SDK
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://developer.nvidia.com/video-codec-sdk
+                                                  - generic: https://developer.nvidia.com/video-codec-sdk
+                                                  - img
+                                                - paragraph: Official NVIDIA developer hub for the Video Codec SDK, covering NVENC hardware encode and NVDEC hardware decode APIs on NVIDIA GPUs.
+                                                - paragraph: "\"Primary vendor documentation for the dominant hardware encoder API. Not a marketing page; it is the SDK entry point video engineers use for NVENC/NVDEC. Domain is not saturated. Score: 50+15 primary +10 maintained +10 hardware-codec depth +5 gap adjacency −8 vendor portal = 82.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Hardware Codecs & Acceleration
+                                            - cell: 82%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: MSU Video Codecs Comparison 2025
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://www.compression.ru/video/codec_comparison/2025/
+                                                  - generic: https://www.compression.ru/video/codec_comparison/2025/
+                                                  - img
+                                                - paragraph: MSU Graphics & Media Lab’s 2025 independent codec comparison covering AV1, VVC, HEVC and other encoders with objective and subjective results.
+                                                - paragraph: "\"Canonical annual independent codec benchmark on compression.ru, a non-saturated domain. 2025 edition is current. Score: 50+15 primary +10 recent +15 thin benchmark gap +10 depth −18 report page not a tool = 82.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Benchmarking & Performance Tools for Codecs
+                                            - cell: 82%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: JPEG XS software (official)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                - link:
+                                                  - /url: https://jpeg.org/jpegxs/software.html
+                                                  - generic: https://jpeg.org/jpegxs/software.html
+                                                  - img
+                                                - paragraph: Official JPEG committee page listing JPEG XS reference software and open-source implementations of the low-latency mezzanine codec.
+                                                - paragraph: "\"Standards-body index, not a github mirror, durable, and points engineers at the canonical JPEG XS software set. Distinct from the OpenJXS repo. Score: 50+15 primary +10 maintained +15 specs gap +5 index rather than deep code −15 not itself the software = 80.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Standards & Industry
+                                                - generic: Video Codec Specifications
+                                            - cell: 80%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OpenJXS
+                                                  - generic:
+                                                    - img
+                                                    - text: Link check failed
+                                                - link:
+                                                  - /url: https://github.com/InterDigitalInc/OpenJXS
+                                                  - generic: https://github.com/InterDigitalInc/OpenJXS
+                                                  - img
+                                                - paragraph: Open-source JPEG XS (ISO/IEC 21122) encoder and decoder for lightweight, low-latency mezzanine video compression.
+                                                - paragraph: "\"Primary open implementation of the JPEG XS mezzanine codec, which the taxonomy barely covers. Actively maintained InterDigital project. Score: 50+15 primary +10 maintained +15 gap +10 depth −15 github = 85.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Software Codecs
+                                            - cell: 85%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: JPEG AI reference software
+                                                  - generic:
+                                                    - img
+                                                    - text: Link check failed
+                                                - link:
+                                                  - /url: https://github.com/InterDigitalInc/JPEGAI
+                                                  - generic: https://github.com/InterDigitalInc/JPEGAI
+                                                  - img
+                                                - paragraph: InterDigital implementation of the JPEG AI learned image coding verification model and reference software used in the JPEG AI standardization process.
+                                                - paragraph: "\"Official JPEG AI reference software from a core contributor. Standards-track learned codec missing from the list. Score: 50+15 primary +10 maintained +15 gap +10 depth −15 github = 85.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Next-Generation Codecs AV1 VVC
+                                            - cell: 85%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: MPEG Enhanced Compression Model (ECM)
+                                                  - generic:
+                                                    - img
+                                                    - text: Link check failed
+                                                - link:
+                                                  - /url: https://github.com/MPEGGroup/ECM
+                                                  - generic: https://github.com/MPEGGroup/ECM
+                                                  - img
+                                                - paragraph: Official MPEG reference software for the Enhanced Compression Model, the exploration codec used to study compression beyond VVC/H.266.
+                                                - paragraph: "\"Canonical MPEG reference software, actively used in standardization, not present in the catalog. Distinct from VVenC/VTM. Score: 50+15 primary +10 maintained +15 gap +10 depth −12 github saturation of a standards repo = 88.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Next-Generation Codecs AV1 VVC
+                                            - cell: 88%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: FovVideoVDP
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                  - generic:
+                                                    - img
+                                                    - text: "89"
+                                                - link:
+                                                  - /url: https://github.com/gfxdisp/FovVideoVDP
+                                                  - generic: https://github.com/gfxdisp/FovVideoVDP
+                                                  - img
+                                                - paragraph: Cambridge Rainbow Group’s foveated visible-difference predictor for video and images, with Python and Matlab implementations used as a perceptual quality metric beyond VMAF.
+                                                - paragraph: "\"Official research implementation of a widely cited perceptual video metric. ColorVideoVDP is already listed but FovVideoVDP is a distinct predecessor metric and repo. Score: 50+15 primary +10 maintained +15 thin metrics gap +10 depth −15 github domain = 85.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Media Tools
+                                                - generic: VMAF PSNR SSIM Tools
+                                            - cell: 85%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: CompressAI
+                                                  - generic:
+                                                    - img
+                                                    - text: Link OK
+                                                  - generic:
+                                                    - img
+                                                    - text: 1,652
+                                                - link:
+                                                  - /url: https://github.com/InterDigitalInc/CompressAI
+                                                  - generic: https://github.com/InterDigitalInc/CompressAI
+                                                  - img
+                                                - paragraph: InterDigital’s PyTorch library and evaluation platform for end-to-end learned image and video compression, with reference models, training code, and codec benchmarks.
+                                                - paragraph: "\"Primary official repo from InterDigital, actively maintained, and fills the thin neural/learned-compression gap. Distinct from CompressAI-Vision which is already catalogued. Not a listicle. Score: 50+15 primary +10 maintained +15 gap +10 depth −15 github saturation but exceptional canonical library = 85.\""
+                                            - cell:
+                                              - generic:
+                                                - img
+                                                - text: Pending
+                                            - cell:
+                                              - generic:
+                                                - generic: Encoding & Codecs
+                                                - generic: Next-Generation Codecs AV1 VVC
+                                            - cell: 85%
+                                            - cell: "#71"
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                  - text: Approve
+                                                - button:
+                                                  - img
+                                                  - text: Reject
+      - button:
+        - img
+  - dialog "Reject Discovery" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Reject Discovery" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Mark this discovered resource as rejected. Optionally include a reason for the audit trail.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: Reason (optional)
+        - textbox "Reason (optional)" [active] [ref=e8]:
+          - /placeholder: Why is this resource being rejected?
+          - text: Read-only local reason draft; never submitted
+      - generic [ref=e9]:
+        - button "Cancel" [ref=e10] [cursor=pointer]
+        - button "Reject" [ref=e11] [cursor=pointer]
+    - button "Close" [ref=e12] [cursor=pointer]:
+      - img [ref=e13]
+      - generic [ref=e16]: Close

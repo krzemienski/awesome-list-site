@@ -1,0 +1,261 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e35]
+              - listitem [level=1]
+                - link "Admin" [ref=e36]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e37]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [selected, ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Researcher" [ref=e17] focusable [tabindex]
+            - generic
+              - generic
+                - region "Research run #64" [ref=e38]
+                  - heading "Research run #64" [level=3, ref=e41]
+                    - StaticText "Research run #64"
+                  - paragraph
+                    - StaticText "All categories · ran for 3:24"
+                  - image
+                  - StaticText "COMPLETED"
+                  - paragraph
+                  - list "Run phases"
+                    - listitem [level=1]
+                      - StaticText "Planning"
+                      - StaticText "12:12:24 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Scouting"
+                      - StaticText "12:12:56 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Verifying"
+                      - StaticText "12:15:30 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Saving"
+                      - StaticText "12:15:39 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Done"
+                      - StaticText "12:15:48 AM"
+                      - StaticText "(current)"
+                  - heading "Scouts 2 started" [level=4, ref=e42]
+                    - StaticText "Scouts"
+                    - StaticText "2 started"
+                  - list "Scouts"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "1"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Scout multi-format packaging engineering blogs"
+                      - paragraph
+                        - StaticText "4 searches · 10 candidates · 81s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "2"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Scout RTMP/RTSP server engineering blogs"
+                      - paragraph
+                        - StaticText "8 searches · 9 candidates · 138s"
+                  - DescriptionList
+                    - term "Discoveries"
+                    - definition
+                      - StaticText "2 of 2 saved"
+                    - progressbar "Discoveries saved against the target": 100
+                    - term "Turns"
+                    - definition
+                      - StaticText "9 of 40"
+                    - progressbar "Turns used against the cap": 22.5
+                    - term "Spend"
+                    - definition
+                      - StaticText "$1.3245 of $3.00"
+                    - progressbar "Spend against the budget cap": 44.150001525878906
+                  - note
+                    - image
+                    - paragraph
+                      - StaticText "Run finished with 2 saved discoveries. Review them below."
+                  - region "Review discoveries" [ref=e43]
+                    - heading "Review discoveries" [level=4, ref=e45]
+                    - list "Discoveries from this run"
+                      - listitem [level=1]
+                        - StaticText "The Hidden Flaws of SRS: What You Need to Know (SRS Engineering Blog)"
+                        - image
+                        - StaticText "REJECTED"
+                        - image
+                        - StaticText "LINK CHECK FAILED"
+                        - link "https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af" [ref=e84]
+                          - StaticText "https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af"
+                        - paragraph
+                          - StaticText "Candid engineering post from the SRS (Simple Realtime Server) team analyzing the architectural limitations and performance trade-offs of their own RTMP/HLS/WebRTC/SRT media server, including single-process threading constraints and clustering caveats."
+                        - StaticText "INFRASTRUCTURE & DELIVERY"
+                        - StaticText "RTMPRTSPHTTP PROTOCOL SERVERS"
+                        - StaticText "86"
+                        - StaticText "% CONFIDENCE"
+                      - listitem [level=1]
+                        - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+                        - image
+                        - StaticText "APPROVED"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://mediamtx.net/" [ref=e85]
+                          - StaticText "https://mediamtx.net/"
+                        - paragraph
+                          - StaticText "Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API."
+                        - StaticText "INFRASTRUCTURE & DELIVERY"
+                        - StaticText "RTMPRTSPHTTP PROTOCOL SERVERS"
+                        - StaticText "92"
+                        - StaticText "% CONFIDENCE"
+                    - button "Done — go to job history" [ref=e46]
+                      - image
+                      - StaticText "Done — go to job history"
+                    - button "Start another run" [ref=e47]
+                      - image
+                      - StaticText "Start another run"
+                  - button "Run details: raw event log and agent graph" [expanded=false, ref=e48]
+                    - StaticText "Run details: raw event log and agent graph"
+                    - image
+              - generic
+                - sectionheader
+                  - heading "Researcher jobs" [level=2, ref=e44]
+                  - paragraph
+                    - StaticText "Latest 5 of 69 research runs"
+                - region "Researcher jobs table, scrollable" [ref=e39] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "STATUS" [ref=e86]
+                        - columnheader "PROMPT" [ref=e87]
+                        - columnheader "FOUND" [ref=e88]
+                        - columnheader "APPROVED / REJECTED" [ref=e89]
+                        - columnheader "COST" [ref=e90]
+                        - columnheader "TURNS" [ref=e91]
+                        - columnheader "CREATED" [ref=e92]
+                    - row
+                      - cell "COMPLETED" [ref=e49]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e50]
+                      - cell "0" [ref=e51]
+                      - cell "0/0" [ref=e52]
+                        - StaticText "0/0"
+                      - cell "$0.4199" [ref=e53]
+                      - cell "10/80" [ref=e54]
+                        - StaticText "10/80"
+                      - cell "Oct 27, 2026" [ref=e55]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e56]
+                      - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e57]
+                      - cell "0" [ref=e58]
+                      - cell "0/0" [ref=e59]
+                        - StaticText "0/0"
+                      - cell "$0.3062" [ref=e60]
+                      - cell "3/10" [ref=e61]
+                        - StaticText "3/10"
+                      - cell "Oct 26, 2026" [ref=e62]
+                    - row
+                      - cell "COMPLETED" [ref=e63]
+                      - cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e64]
+                      - cell "0" [ref=e65]
+                      - cell "0/0" [ref=e66]
+                        - StaticText "0/0"
+                      - cell "$0.1508" [ref=e67]
+                      - cell "1/8" [ref=e68]
+                        - StaticText "1/8"
+                      - cell "Oct 26, 2026" [ref=e69]
+                    - row
+                      - cell "CANCELLED" [ref=e70]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Community finds. Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e71]
+                      - cell "0" [ref=e72]
+                      - cell "0/0" [ref=e73]
+                        - StaticText "0/0"
+                      - cell "$0.2753 lower bound" [ref=e74]
+                        - StaticText "$0.2753"
+                        - StaticText "lower bound"
+                      - cell "3/40" [ref=e75]
+                        - StaticText "3/40"
+                      - cell "Oct 26, 2026" [ref=e76]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e77]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Curated-list mining. Bias this run toward mining other curated lists: awesome-* repos, roundups, \"top N tools\" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one's official site or repo. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e78]
+                      - cell "0" [ref=e79]
+                      - cell "0/0" [ref=e80]
+                        - StaticText "0/0"
+                      - cell "$0.3213" [ref=e81]
+                      - cell "3/40" [ref=e82]
+                        - StaticText "3/40"
+                      - cell "Oct 26, 2026" [ref=e83]
+                - button "Show more" [ref=e40]
+              - group
+                - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]

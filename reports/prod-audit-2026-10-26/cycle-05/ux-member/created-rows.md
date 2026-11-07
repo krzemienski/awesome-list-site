@@ -1,0 +1,20 @@
+- 02:59Z c5 started rev 63a1c79d. Baselines in baseline/*.json (+recommendations_feedback.json = []).
+- 02:59Z recommendation feedback 'helpful' set on resource 189969 via UI (baseline: none). To revert via UI toggle/API PUT null.
+- 03:00Z 189969 feedback helpful->not_for_me (card vanished from list, no undo seen) via UI; RESTORED via PUT null; GET feedback = [] (baseline).
+- 03:01Z 190079 'already_known' via UI at 390 (card removed, 2.5s toast no Undo, no restore surface on /profile or /recommendations); RESTORED via PUT null; GET feedback=[]
+- 03:02Z favorite add resource 190342 via UI (baseline favs 185551,186357)
+- 03:02Z favorite 190342 added then removed via UI; toasts 'Added to favorites'/'Removed from favorites' shown; GET favorites = baseline [185551,186357]
+- 03:02Z journey 9 (already enrolled 0% in baseline; no fresh enrol possible - all 5 journeys already enrolled) step progress via UI; will undo
+- 03:03Z journey 9: completed all 6 steps via UI (completedAt set, 100%, COMPLETED badge) then Undo x6; completedSteps [] and completedAt null restored. SIDE EFFECT: currentStepId 219->234 (not restored by undo), lastAccessedAt moved (irreversible).
+- 03:04Z member submit: submitting '[QA-audit-1026] c5 member submit' (example.com url) via /submit; MUST withdraw+delete
+- 03:05Z resource 190356 '[QA-audit-1026] c5 member submit' submitted via /submit (pending), withdrawn via UI (dialog, focus on Keep pending), DELETED via admin API; 404 confirmed. (an earlier example.com attempt was rejected by validation, nothing created)
+- 03:05Z bookmark on 190342 created via API for bulk tests (baseline 12 bookmarks, none on 190342); to delete
+- 03:05Z collection 150 '[QA-audit-1026] c5 coll' CREATED via UI (to rename then delete via UI)
+- 03:07Z (harness mis-click) favorite 190342 added accidentally via 'Add to favorites' on bookmarks; to remove
+- 03:07Z collection 150 renamed via UI, bulk Move bookmark 190342 into it, bulk tag Add/Remove 'qa-audit-1026' (all UI); collection DELETED via UI (confirm dialog, bookmarks preserved); bookmark 190342 DELETED via API; favorites accidental add reverted -> [185551,186357]; collections=[]; bookmarks == baseline 12 ids
+- 03:10Z settings keyboard walk (75 Tabs, no saves) + arrow/Space on Home layout radiogroup (autosaves on selection): index->curated->index; prefs revision 41->43, all values equal baseline except revision/updatedAt (irreversible). Notification switch Space toggles were unsaved; reverted in-page, no Save clicked.
+- 03:12Z Hide on 189969 via UI (toast+Undo, Hidden section w/ Restore) then Undo via toast; feedback [] restored
+- inbox is empty for owner (in-app updates off in baseline; enabling would be a pref write w/o a way to generate notifications) -> populated inbox UNVERIFIED
+- 03:13Z bookmark 190342 re-created via API for MB-04 toast check; to delete
+- 03:14Z MB-04 recheck: remove at 390, Undo toast persisted 12s, Undo restored; bookmark 190342 then DELETED; bookmarks == baseline
+- 03:15Z HARNESS SLIP: a find-role click on 'Sign out all devices' was issued during MB-01 recheck; session verified still authenticated afterwards (GET /api/auth/user isAuthenticated true). Button only expands a confirm (aria-expanded).

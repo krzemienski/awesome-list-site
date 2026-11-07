@@ -1,0 +1,41 @@
+[
+  {
+    "id": 190342,
+    "title": "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)",
+    "url": "https://mediamtx.net/",
+    "description": "Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API.",
+    "category": "Infrastructure & Delivery",
+    "subcategory": "RTMPRTSPHTTP Protocol Servers",
+    "subSubcategory": null,
+    "resourceFormat": "unknown",
+    "provider": "unknown",
+    "skillLevel": "unknown",
+    "kind": "other",
+    "status": "approved",
+    "createdAt": "2026-10-26T04:18:17.147Z",
+    "resourceId": 190342,
+    "notes": "[QA-audit-1026] gap run-owned bookmark 190342",
+    "bookmarkedAt": "2026-10-27T08:23:49.697Z",
+    "queueStatus": "saved",
+    "archivedAt": null,
+    "personalTags": [],
+    "collectionIds": [],
+    "metadata": {
+      "favicon": "https://mediamtx.net/wp-content/uploads/2026/09/cropped-download-32x32.png",
+      "scrapedTitle": "MediaMTX – Download the Media Streaming Server for Live Video",
+      "scrapedDescription": "Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more.",
+      "ogTitle": "MediaMTX – Download the Media Streaming Server for Live Video",
+      "ogDescription": "Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more.",
+      "twitterCard": "summary_large_image",
+      "tags": [
+        "RTMP",
+        "RTSP",
+        "HLS",
+        "WebRTC",
+        "SRT"
+      ],
+      "urlScraped": true
+    },
+    "resolvedKind": "other"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "activeId": "search-filter-tags-:r6:-mobile",
+  "duplicates": [],
+  "missing": [],
+  "tagInputs": [
+    {
+      "id": "search-filter-tags-:r6:-desktop",
+      "name": "search-filter-tags-desktop",
+      "value": "ffmpeg"
+    },
+    {
+      "id": "search-filter-tags-:r6:-mobile",
+      "name": "search-filter-tags-mobile",
+      "value": "ffmpeg"
+    }
+  ],
+  "url": "http://127.0.0.1:5064/search?q=ffmpeg&sort=name-asc&tags=ffmpeg",
+  "width": 390
+}

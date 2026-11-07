@@ -1,0 +1,70 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e5]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Learning Preferences" [disabled, ref=e43]
+          - article
+            - heading "Your learning profile is ready" [level=1, ref=e21]
+            - link "See personalized recommendations" [ref=e22]
+            - link "Browse the catalog" [ref=e23]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e14]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e15]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e16]
+            - heading "EXPLORE" [level=2, ref=e24]
+            - link "Community & Events" [ref=e25]
+            - link "Encoding & Codecs" [ref=e26]
+            - link "General Tools" [ref=e27]
+            - link "Infrastructure & Delivery" [ref=e28]
+            - link "Intro & Learning" [ref=e29]
+            - link "Media Tools" [ref=e30]
+            - link "Players & Clients" [ref=e31]
+            - link "Protocols & Transport" [ref=e32]
+            - link "Standards & Industry" [ref=e33]
+          - heading "SOURCE" [level=2, ref=e17]
+          - link "krzemienski/ awesome-video" [ref=e18]
+          - paragraph
+            - link "PRs welcome" [ref=e34]
+          - button "Contact maintainers" [ref=e19]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e20]
+            - link "About" [ref=e35]
+            - link "Terms" [ref=e36]
+            - link "Privacy" [ref=e37]
+            - link "Code of Conduct" [ref=e38]
+            - button "Cookie settings" [ref=e39]
+            - link "Issues ↗" [ref=e40]
+            - link "Sitemap" [ref=e41]

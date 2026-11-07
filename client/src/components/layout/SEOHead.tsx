@@ -25,12 +25,12 @@ interface SEOHeadProps {
   resourceCount?: number;
   type?: "website" | "article";
   /**
-   * When true, emit a noindex/nofollow robots directive and omit the canonical
-   * link so this state matches the server's soft-404 contract (og-middleware
-   * marks missing resources noindex with no canonical). Used by error/not-found
-   * branches so client hydration never re-asserts indexability on a dead URL.
+   * Exclude the page from indexing. Canonical links are omitted by default so
+   * error/not-found branches match the server's soft-404 contract.
    */
   noindex?: boolean;
+  /** Emit a self-canonical independently of indexing, e.g. valid low-count tags. */
+  canonical?: boolean;
   /** Keep links crawlable on an intentionally unindexed public page. */
   follow?: boolean;
   /**
@@ -40,6 +40,12 @@ interface SEOHeadProps {
    * server.
    */
   ogUrl?: string;
+  /**
+   * Marks a head rendered while the page's data is still loading. It follows
+   * the loading-fallback rules (never replaces the server head on first paint)
+   * even when the title already names the page.
+   */
+  loading?: boolean;
 }
 
 // R5-022: on the very first client render the SSR head (stamped
@@ -85,14 +91,17 @@ export default function SEOHead({
   resourceCount,
   type = "website",
   noindex = false,
+  canonical = !noindex,
   follow = false,
-  ogUrl
+  ogUrl,
+  loading = false,
 }: SEOHeadProps) {
   const committed = useCommitted();
   // R5-022: identify transient loading fallbacks — the "Loading …" titles the
   // pages mount while their data fetch is in flight, and the prop-less
   // <SEOHead /> Home renders while the tree loads.
   const isLoadingFallback =
+    loading ||
     (!!title && /^Loading /.test(title)) ||
     (!title && !description && !awesomeList && !category);
   if (isLoadingFallback && !firstRealHeadCommitted) {
@@ -171,14 +180,14 @@ export default function SEOHead({
   if (!committed) return null;
 
   return (
-    <Helmet>
+    <Helmet defer={false}>
       {/* Basic Meta Tags */}
       <title>{pageTitle}</title>
       <meta name="description" content={pageDescription} />
       <meta name="keywords" content={generateKeywords(awesomeList, category)} />
       <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : `${SITE_NAME} contributors`} />
       <meta name="robots" content={noindex ? `noindex, ${follow ? "follow" : "nofollow"}` : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
-      {!noindex && <link rel="canonical" href={currentUrl} />}
+      {canonical && <link rel="canonical" href={currentUrl} />}
 
       {/* Open Graph Meta Tags */}
       <meta property="og:type" content={type} />

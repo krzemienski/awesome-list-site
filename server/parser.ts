@@ -2,6 +2,7 @@ import { remark } from 'remark';
 import { visit } from 'unist-util-visit';
 import type { Node } from 'unist';
 import fetch, { Response } from 'node-fetch';
+import { createLogger } from './lib/logger';
 
 interface Resource {
   id: string;
@@ -25,10 +26,9 @@ interface AwesomeListData {
   categories: never[]; // Empty array - categories are built from resources by storage layer
 }
 
+const parserLogger = createLogger("list-parser");
 function log(message: string, level: 'info' | 'warn' | 'error' = 'info') {
-  const timestamp = new Date().toISOString();
-  const prefix = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
-  console.log(`${timestamp} - ${prefix} ${message}`);
+  parserLogger[level](message);
 }
 
 function logParsingStats(data: AwesomeListData, parseTime: number) {

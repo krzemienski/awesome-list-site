@@ -1,4 +1,5 @@
-import { getAnalyticsConsent } from "./analytics";
+import { getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
+import { isAnalyticsSuppressed } from "./analytics-suppression";
 import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
 let initialized = false;
@@ -22,9 +23,10 @@ const products: AmplitudeProductSlots = {
 let teardownPromise: Promise<void> = Promise.resolve();
 let lifecycleVersion = 0;
 
-// Custom events accepted while the consented setup is still loading. Never
-// filled pre-consent (ampTrack drops unless init is under way) and cleared on
-// every revoke, mirroring the Mixpanel/PostHog wrappers.
+// Custom events accepted before setup finishes: init under way, or consent
+// already granted and the post-paint init not started yet. Never filled
+// pre-consent, after Decline or while suppressed, and cleared on every revoke,
+// mirroring the Mixpanel/PostHog wrappers.
 const MAX_PENDING_EVENTS = 100;
 let pendingEvents: { name: string; props: Record<string, unknown> }[] = [];
 
@@ -121,7 +123,7 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
 }
 
 export function initAmplitude(): void {
-  if (getAnalyticsConsent() !== "granted") return;
+  if (!vendorSdksAllowed()) return;
   disabled = false;
   if (initialized) {
     amplitudeClient?.setOptOut(false);
@@ -144,7 +146,9 @@ export function initAmplitude(): void {
       // Post-consent plugin/transport config, kept out of the entry bundle.
       import("./analytics-sdk-options"),
     ]);
-    const isBlocked = () => disabled || getAnalyticsConsent() !== "granted";
+    // Replay and Guides & Surveys uploads also stop on QA paths and once any
+    // tab marks the device as an admin session.
+    const isBlocked = () => disabled || getAnalyticsConsent() !== "granted" || isAnalyticsSuppressed();
     amplitudeClient = amplitude;
     sdkOptions = options;
     await teardownPromise;
@@ -193,18 +197,18 @@ export function initAmplitude(): void {
 // so the three product tools see identical event shapes.
 export function ampTrack(name: string, props: Record<string, unknown> = {}): void {
   if (disabled || getAnalyticsConsent() !== "granted") return;
-  if (!initialized || !amplitudeClient) {
-    // Buffer only while a consented init is under way; otherwise drop.
-    if (initStarted && pendingEvents.length < MAX_PENDING_EVENTS) {
-      pendingEvents.push({ name, props });
-    }
-    return;
-  }
+  // Page context is read now, so a buffered event keeps the page it fired on.
   const merged: Record<string, unknown> = {
     platform: "web",
     page_path: window.location.pathname,
     ...props,
   };
+  if (!initialized || !amplitudeClient) {
+    if (vendorSdksAllowed() && pendingEvents.length < MAX_PENDING_EVENTS) {
+      pendingEvents.push({ name, props: merged });
+    }
+    return;
+  }
   try {
     amplitudeClient.track(name, merged);
   } catch {

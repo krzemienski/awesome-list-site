@@ -133,9 +133,9 @@ export default function AdminStats({
     queryFn: getAllUsers,
     staleTime: 30_000,
   });
+  // Shared with Top categories (AdminOverview): one key, one Retry for both.
   const categories = useQuery<CategorySummary[]>({
-    queryKey: ["/api/categories", "overview-stat"],
-    queryFn: () => apiRequest("/api/categories"),
+    queryKey: ["/api/categories"],
     staleTime: 60_000,
   });
   const subcategories = useQuery<CategorySummary[]>({
@@ -163,7 +163,7 @@ export default function AdminStats({
   const subcategoryCount = subcategories.data?.length;
   const pendingUnavailable = pending.isError;
   const value = (number: number | undefined) => (
-    number === undefined ? 0 : number.toLocaleString()
+    number === undefined ? "—" : number.toLocaleString()
   );
   const subcategoryValue = subcategories.isError ? "Error" : value(subcategoryCount);
   const activeUserValue = users.isError && activeUsers === undefined ? "Error" : value(activeUsers);
@@ -194,10 +194,10 @@ export default function AdminStats({
         value={value(stats?.totalPublic ?? stats?.resources)}
         sub={
           <>
-            {categories.isError
-              ? "category data unavailable"
-              : categoryCount === undefined
-                ? "across — categories"
+            {categories.isPending && categories.fetchStatus === "fetching"
+              ? "across — categories"
+              : categories.isError || categoryCount === undefined
+                ? "category data unavailable"
                 : `across ${categoryCount} categories`}
           </>
         }
@@ -215,8 +215,8 @@ export default function AdminStats({
         loading={subcategoriesLoading}
         onNavigate={onNavigate ? () => onNavigate("subcategories") : undefined}
         navigateLabel="Subcategories — open the subcategories tab"
-        titleTestId="stat-title-journeys"
-        testId="stat-card-journeys"
+        titleTestId="stat-title-subcategories"
+        testId="stat-card-subcategories"
       />
       <Stat
         label="Active users"

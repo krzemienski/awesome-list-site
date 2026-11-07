@@ -5,9 +5,11 @@ import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
+import { isRealCategory } from "@shared/catalog-counts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { requestClerk } from "@/lib/clerk-bridge";
+import { docsUrl, shellRepo } from "@/lib/docs-url";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -21,6 +23,8 @@ interface AppHeaderProps {
   logoutError?: string | null;
   categories?: AwesomeListNavNode[];
   siteName?: string;
+  repoUrl?: string;
+  repoBranch?: string;
 }
 
 /**
@@ -37,14 +41,7 @@ function shellBrand(siteName?: string): string {
 }
 
 // Catalog pages reached from Browse (bare /tag redirects to /categories).
-const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
-
-// Same recursive sum as Home's navTotalCount; never fetch the full corpus.
-function totalCount(node: AwesomeListNavNode): number {
-  return node.resourceCount
-    + (node.subcategories ?? []).reduce((n, child) => n + totalCount(child), 0)
-    + (node.subSubcategories ?? []).reduce((n, child) => n + totalCount(child), 0);
-}
+export const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
 
 function SearchIcon() {
   return <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -52,7 +49,7 @@ function SearchIcon() {
   </svg>;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName, repoUrl, repoBranch }: AppHeaderProps) {
   const [location, navigate] = useLocation();
   const guestSavedCount = useGuestBookmarkIds().size;
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
@@ -63,23 +60,25 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   });
   const unreadCount = notificationState?.unreadCount ?? 0;
   const count = categories
-    .filter(c => !["Table of contents", "Contributing", "License", "External Links", "Anti-features"].includes(c.name) && !c.name.startsWith("List of"))
-    .reduce((sum, node) => sum + totalCount(node), 0);
+    .filter(c => isRealCategory(c.name))
+    .reduce((sum, node) => sum + node.totalResourceCount, 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const brand = shellBrand(siteName);
+  const repo = shellRepo(repoUrl, repoBranch);
+  const docsHref = docsUrl(repo.repoUrl, repo.repoBranch);
   const signIn = () => {
     const here = window.location.pathname + window.location.search;
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
     navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
   };
-  const isCurrent = (href: string) =>
-    location === href ||
-    (href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix))));
+  const isSectionMatch = (href: string) =>
+    href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix)));
+  const isCurrent = (href: string) => location === href || isSectionMatch(href);
   const navLink = (href: string, label: string) => (
     <Link
       href={href}
       className={`nav-link${isCurrent(href) ? " active" : ""}`}
-      aria-current={isCurrent(href) ? "page" : undefined}
+      aria-current={location === href ? "page" : isSectionMatch(href) ? "true" : undefined}
     >
       {label}
     </Link>
@@ -109,7 +108,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         {navLink("/categories", "Browse")}
         {navLink("/submit", "Submit")}
         {navLink("/about", "About")}
-        <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
+        {docsHref && <a className="nav-link" href={docsHref} target="_blank" rel="noopener noreferrer">Docs ↗</a>}
         {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`} aria-current={location.startsWith("/admin") ? "page" : undefined}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
       </nav>
       {/* Backlog X-03: Clerk loads on demand — warm it when the visitor

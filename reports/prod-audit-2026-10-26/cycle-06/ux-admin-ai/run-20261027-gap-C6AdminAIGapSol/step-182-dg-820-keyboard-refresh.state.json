@@ -1,0 +1,2307 @@
+{
+  "url": "https://awesome.video/admin/digests",
+  "environment": {
+    "width": 820,
+    "height": 1180,
+    "dpr": 1.25,
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 820,
+    "online": true,
+    "touch": 0,
+    "coarse": false,
+    "reduce": true,
+    "focus": {
+      "tag": "BUTTON",
+      "name": "Refresh"
+    },
+    "blockedWrites": []
+  },
+  "console": {
+    "entries": [],
+    "nextSeq": 85,
+    "dropped": 0
+  },
+  "errors": {
+    "entries": [
+      {
+        "seq": 1,
+        "ts": 1793086517249,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/config?model=audit%2Foffline-preview: net::ERR_INTERNET_DISCONNECTED",
+        "location": "https://awesome.video/api/researcher/config?model=audit%2Foffline-preview"
+      },
+      {
+        "seq": 2,
+        "ts": 1793086645011,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/config"
+      },
+      {
+        "seq": 3,
+        "ts": 1793086645619,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/config"
+      },
+      {
+        "seq": 4,
+        "ts": 1793086694951,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/config?model=audit%2Foffline-tablet: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/config?model=audit%2Foffline-tablet"
+      },
+      {
+        "seq": 5,
+        "ts": 1793086742685,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs"
+      },
+      {
+        "seq": 6,
+        "ts": 1793086753460,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs/34: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs/34"
+      },
+      {
+        "seq": 7,
+        "ts": 1793086758478,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs/34: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs/34"
+      },
+      {
+        "seq": 8,
+        "ts": 1793086760785,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs"
+      },
+      {
+        "seq": 9,
+        "ts": 1793086769012,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs/34: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs/34"
+      },
+      {
+        "seq": 10,
+        "ts": 1793086770618,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs"
+      },
+      {
+        "seq": 11,
+        "ts": 1793086779505,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/enrichment/jobs/34: net::ERR_FAILED",
+        "location": "https://awesome.video/api/enrichment/jobs/34"
+      },
+      {
+        "seq": 12,
+        "ts": 1793086781618,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=4: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=4"
+      },
+      {
+        "seq": 13,
+        "ts": 1793086815385,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77"
+      },
+      {
+        "seq": 14,
+        "ts": 1793086820855,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77"
+      },
+      {
+        "seq": 15,
+        "ts": 1793086824388,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=4: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=4"
+      },
+      {
+        "seq": 16,
+        "ts": 1793086831359,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77"
+      },
+      {
+        "seq": 17,
+        "ts": 1793086832670,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=4: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=4"
+      },
+      {
+        "seq": 18,
+        "ts": 1793086839103,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77"
+      },
+      {
+        "seq": 19,
+        "ts": 1793086840595,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/admin/digests/health: net::ERR_FAILED",
+        "location": "https://awesome.video/api/admin/digests/health"
+      },
+      {
+        "seq": 20,
+        "ts": 1793086847536,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/admin/digests/health: net::ERR_FAILED",
+        "location": "https://awesome.video/api/admin/digests/health"
+      },
+      {
+        "seq": 21,
+        "ts": 1793086855980,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/admin/digests/health: net::ERR_FAILED",
+        "location": "https://awesome.video/api/admin/digests/health"
+      },
+      {
+        "seq": 22,
+        "ts": 1793086873560,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 23,
+        "ts": 1793086873569,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 24,
+        "ts": 1793086875035,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 25,
+        "ts": 1793086875036,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-history: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-history"
+      },
+      {
+        "seq": 26,
+        "ts": 1793086875036,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-status: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-status"
+      },
+      {
+        "seq": 27,
+        "ts": 1793086886502,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 28,
+        "ts": 1793086886509,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 29,
+        "ts": 1793086887096,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 30,
+        "ts": 1793086887096,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-history: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-history"
+      },
+      {
+        "seq": 31,
+        "ts": 1793086887096,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-status: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-status"
+      },
+      {
+        "seq": 32,
+        "ts": 1793086901459,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 33,
+        "ts": 1793086901464,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 34,
+        "ts": 1793086902063,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/config: net::ERR_FAILED",
+        "location": "https://awesome.video/api/config"
+      },
+      {
+        "seq": 35,
+        "ts": 1793086902063,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-history: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-history"
+      },
+      {
+        "seq": 36,
+        "ts": 1793086902063,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/github/sync-status: net::ERR_FAILED",
+        "location": "https://awesome.video/api/github/sync-status"
+      },
+      {
+        "seq": 37,
+        "ts": 1793086913929,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72"
+      },
+      {
+        "seq": 38,
+        "ts": 1793086913929,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 39,
+        "ts": 1793086913929,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 40,
+        "ts": 1793086913929,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 41,
+        "ts": 1793086922313,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72"
+      },
+      {
+        "seq": 42,
+        "ts": 1793086928472,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72"
+      },
+      {
+        "seq": 43,
+        "ts": 1793086935571,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 44,
+        "ts": 1793086935571,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 45,
+        "ts": 1793086935571,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 46,
+        "ts": 1793086937747,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 47,
+        "ts": 1793086938741,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 48,
+        "ts": 1793086939749,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 49,
+        "ts": 1793086939926,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 50,
+        "ts": 1793086941749,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 51,
+        "ts": 1793086941932,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 52,
+        "ts": 1793086943945,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 53,
+        "ts": 1793086944756,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 54,
+        "ts": 1793086945874,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 55,
+        "ts": 1793086945957,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 56,
+        "ts": 1793086947707,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 57,
+        "ts": 1793086947707,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 58,
+        "ts": 1793086947707,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 59,
+        "ts": 1793086949889,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 60,
+        "ts": 1793086950895,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 61,
+        "ts": 1793086951900,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 62,
+        "ts": 1793086953906,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 63,
+        "ts": 1793086953907,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 64,
+        "ts": 1793086955909,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 65,
+        "ts": 1793086956912,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 66,
+        "ts": 1793086957815,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 67,
+        "ts": 1793086958009,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 68,
+        "ts": 1793086959023,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 69,
+        "ts": 1793086959023,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 70,
+        "ts": 1793086959023,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries"
+      },
+      {
+        "seq": 71,
+        "ts": 1793086961197,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 72,
+        "ts": 1793086962195,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 73,
+        "ts": 1793086963206,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 74,
+        "ts": 1793086965219,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=72: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=72"
+      },
+      {
+        "seq": 75,
+        "ts": 1793086965219,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 76,
+        "ts": 1793086965472,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/72/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/72/events"
+      },
+      {
+        "seq": 77,
+        "ts": 1793086966598,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=20: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=20"
+      },
+      {
+        "seq": 78,
+        "ts": 1793086974924,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=20: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=20"
+      },
+      {
+        "seq": 79,
+        "ts": 1793086981631,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=20: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=20"
+      },
+      {
+        "seq": 80,
+        "ts": 1793086993907,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=40: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=40"
+      },
+      {
+        "seq": 81,
+        "ts": 1793087011950,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=40: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=40"
+      },
+      {
+        "seq": 82,
+        "ts": 1793087013454,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs?limit=40: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs?limit=40"
+      },
+      {
+        "seq": 83,
+        "ts": 1793087042906,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77"
+      },
+      {
+        "seq": 84,
+        "ts": 1793087042906,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/jobs/77/events: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/jobs/77/events"
+      },
+      {
+        "seq": 85,
+        "ts": 1793087042906,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/api/researcher/discoveries?jobId=77: net::ERR_FAILED",
+        "location": "https://awesome.video/api/researcher/discoveries?jobId=77"
+      }
+    ],
+    "nextSeq": 85,
+    "dropped": 0
+  },
+  "requests": [
+    {
+      "id": "request-3895",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3896",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3897",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3898",
+      "method": "GET",
+      "url": "https://awesome.video/favicon.svg",
+      "status": 304,
+      "durationMs": 78,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3899",
+      "method": "GET",
+      "url": "https://awesome.video/favicon.svg",
+      "status": 304,
+      "durationMs": 159,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3900",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminGuard-CLY_hacH.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3901",
+      "method": "GET",
+      "url": "https://awesome.video/assets/returnUrl-CocRmWOY.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3902",
+      "method": "GET",
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3903",
+      "method": "GET",
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "durationMs": 7,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3904",
+      "method": "GET",
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "durationMs": 147,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3905",
+      "method": "GET",
+      "url": "https://awesome.video/assets/ClerkRuntime-DL3FmpuL.js",
+      "status": 200,
+      "durationMs": 1,
+      "referer": ""
+    },
+    {
+      "id": "request-3906",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-DiZr6w4w.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3907",
+      "method": "GET",
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3908",
+      "method": "GET",
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3909",
+      "method": "GET",
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3910",
+      "method": "GET",
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3911",
+      "method": "GET",
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3912",
+      "method": "GET",
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3913",
+      "method": "GET",
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3914",
+      "method": "GET",
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3915",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "status": 307,
+      "durationMs": 105,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3916",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js",
+      "status": 200,
+      "durationMs": 3,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3917",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminDashboard-BYsZ3R6W.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3918",
+      "method": "GET",
+      "url": "https://awesome.video/assets/tabs-D1zzd93y.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3919",
+      "method": "GET",
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "durationMs": 1,
+      "referer": ""
+    },
+    {
+      "id": "request-3920",
+      "method": "GET",
+      "url": "https://awesome.video/assets/alert-DSm2PGKH.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3921",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-alert-Cw300bgL.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3922",
+      "method": "GET",
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3923",
+      "method": "GET",
+      "url": "https://awesome.video/assets/alert-dialog-C3lpWNAV.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3924",
+      "method": "GET",
+      "url": "https://awesome.video/assets/scroll-area-DWyq4DAA.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3925",
+      "method": "GET",
+      "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3926",
+      "method": "GET",
+      "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3927",
+      "method": "GET",
+      "url": "https://awesome.video/assets/clock-D0R3nDH2.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3928",
+      "method": "GET",
+      "url": "https://awesome.video/assets/filter-BaEjNb1k.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3929",
+      "method": "GET",
+      "url": "https://awesome.video/assets/file-text-BYi6ry2B.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3930",
+      "method": "GET",
+      "url": "https://awesome.video/assets/paginator-DtK58l0u.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3931",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-check-CrhNlsuh.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3932",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-x-Dk_ZeYtT.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3933",
+      "method": "GET",
+      "url": "https://awesome.video/assets/triangle-alert-_nVB0Z13.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3934",
+      "method": "GET",
+      "url": "https://awesome.video/assets/trash-2-DiW00Btq.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3935",
+      "method": "GET",
+      "url": "https://awesome.video/assets/thumbs-up-BogcikQA.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3936",
+      "method": "GET",
+      "url": "https://awesome.video/assets/eye-B85TU6fU.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3937",
+      "method": "GET",
+      "url": "https://awesome.video/assets/validation-jfoUUw0X.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3938",
+      "method": "GET",
+      "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3939",
+      "method": "GET",
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3940",
+      "method": "GET",
+      "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3941",
+      "method": "GET",
+      "url": "https://awesome.video/assets/folder-tree-CwppIlrT.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3942",
+      "method": "GET",
+      "url": "https://awesome.video/assets/calendar-N6dm227u.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3943",
+      "method": "GET",
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3944",
+      "method": "GET",
+      "url": "https://awesome.video/assets/progress-DGcD0s24.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3945",
+      "method": "GET",
+      "url": "https://awesome.video/assets/navigation-icons-0MmHvaVv.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3946",
+      "method": "GET",
+      "url": "https://awesome.video/assets/users-CEk8-QMW.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3947",
+      "method": "GET",
+      "url": "https://awesome.video/assets/play-BcyaWd9k.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3948",
+      "method": "GET",
+      "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3949",
+      "method": "GET",
+      "url": "https://awesome.video/assets/link-2-Ddd5AyNu.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3950",
+      "method": "GET",
+      "url": "https://awesome.video/assets/trending-up-DWWVMpda.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3951",
+      "method": "GET",
+      "url": "https://awesome.video/assets/switch-Dn5unf1k.js",
+      "status": 200,
+      "durationMs": 1,
+      "referer": ""
+    },
+    {
+      "id": "request-3952",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceFacets-Dre2v4hL.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3953",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceFacets-core-DMw7vNpP.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3954",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceKinds-DC5JVwQ4.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3955",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceKinds-core-Dz8cDD7Y.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3956",
+      "method": "GET",
+      "url": "https://awesome.video/assets/chip-button-Cj4pYKU5.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3957",
+      "method": "GET",
+      "url": "https://awesome.video/assets/pencil-3PplsnOE.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3958",
+      "method": "GET",
+      "url": "https://awesome.video/assets/history-OsSh_2vj.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3959",
+      "method": "GET",
+      "url": "https://awesome.video/assets/not-found-B67YF6Tx.js",
+      "status": 200,
+      "durationMs": 1,
+      "referer": ""
+    },
+    {
+      "id": "request-3960",
+      "method": "GET",
+      "url": "https://awesome.video/assets/arrow-right-BQVqG_QJ.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3961",
+      "method": "GET",
+      "url": "https://awesome.video/assets/radio-group-DWWfvnXv.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3962",
+      "method": "GET",
+      "url": "https://awesome.video/assets/useDebounce-COVvrRCZ.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3963",
+      "method": "GET",
+      "url": "https://awesome.video/assets/vendor-animation-Cn-AYYf2.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3964",
+      "method": "GET",
+      "url": "https://awesome.video/assets/set-active-BoWHzfmv.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3965",
+      "method": "GET",
+      "url": "https://awesome.video/assets/clock-3-D0meeCeb.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": ""
+    },
+    {
+      "id": "request-3966",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminDashboard-DEpm6FZS.css",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3967",
+      "method": "GET",
+      "url": "https://awesome.video/api/notifications?limit=50",
+      "status": 200,
+      "durationMs": 127,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3968",
+      "method": "GET",
+      "url": "https://awesome.video/api/user/preferences",
+      "status": 200,
+      "durationMs": 154,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3969",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/stats",
+      "status": 200,
+      "durationMs": 440,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3970",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+      "status": 307,
+      "durationMs": 98,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3971",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js",
+      "status": 200,
+      "durationMs": 2,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3972",
+      "method": "GET",
+      "url": "blob:https://awesome.video/a5a8e6d5-4386-417e-bb35-c9e647acfff8",
+      "status": 200,
+      "durationMs": 4
+    },
+    {
+      "id": "request-3973",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+      "status": 200,
+      "durationMs": 175,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3974",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+      "status": 200,
+      "durationMs": 166,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3975",
+      "method": "GET",
+      "url": "blob:https://awesome.video/cb71237e-77fa-4e6c-bbd9-4feffe563065",
+      "status": 200,
+      "durationMs": 5
+    },
+    {
+      "id": "request-3976",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3977",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3978",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3979",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 0,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3980",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/config",
+      "status": 200,
+      "durationMs": 131,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3981",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs/73",
+      "status": 200,
+      "durationMs": 231,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3982",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs/73/events",
+      "status": 200,
+      "durationMs": 446,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3983",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/discoveries?jobId=73",
+      "status": 200,
+      "durationMs": 431,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3984",
+      "method": "GET",
+      "url": "https://awesome.video/api/health/ai",
+      "status": 200,
+      "durationMs": 274,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3985",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 439,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3986",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/discoveries",
+      "status": 200,
+      "durationMs": 497,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3987",
+      "method": "GET",
+      "url": "https://awesome.video/api/awesome-list",
+      "status": 304,
+      "durationMs": 721,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3988",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 254,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3989",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 208,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3990",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 249,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3991",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/discoveries",
+      "status": 200,
+      "durationMs": 166,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3992",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 255,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3993",
+      "method": "GET",
+      "url": "https://awesome.video/api/researcher/jobs?limit=20",
+      "status": 200,
+      "durationMs": 217,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3994",
+      "method": "GET",
+      "url": "https://awesome.video/api/version",
+      "status": 200,
+      "durationMs": 90
+    },
+    {
+      "id": "request-3995",
+      "method": "GET",
+      "url": "https://awesome.video/admin/digests",
+      "status": 200,
+      "durationMs": 125
+    },
+    {
+      "id": "request-3996",
+      "method": "GET",
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 304,
+      "durationMs": 78,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3997",
+      "method": "GET",
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 304,
+      "durationMs": 79,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3998",
+      "method": "GET",
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "durationMs": 360,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-3999",
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 200,
+      "durationMs": 77,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4000",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "durationMs": 8,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4001",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "durationMs": 9,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4002",
+      "method": "GET",
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "durationMs": 10,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4003",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "durationMs": 10,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4004",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "durationMs": 9,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4005",
+      "method": "GET",
+      "url": "https://i.replit.com/script.js",
+      "status": 200,
+      "durationMs": 77,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4006",
+      "method": "GET",
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 304,
+      "durationMs": 132,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4007",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminGuard-CLY_hacH.js",
+      "status": 200,
+      "durationMs": 5,
+      "referer": ""
+    },
+    {
+      "id": "request-4008",
+      "method": "GET",
+      "url": "https://awesome.video/assets/returnUrl-CocRmWOY.js",
+      "status": 200,
+      "durationMs": 7,
+      "referer": ""
+    },
+    {
+      "id": "request-4009",
+      "method": "GET",
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "durationMs": 1,
+      "referer": ""
+    },
+    {
+      "id": "request-4010",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "durationMs": 7,
+      "referer": "https://fonts.googleapis.com/"
+    },
+    {
+      "id": "request-4011",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "durationMs": 24,
+      "referer": "https://fonts.googleapis.com/"
+    },
+    {
+      "id": "request-4012",
+      "method": "GET",
+      "url": "https://awesome.video/api/config",
+      "status": 304,
+      "durationMs": 201,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4013",
+      "method": "GET",
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "durationMs": 201,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4014",
+      "method": "GET",
+      "url": "https://awesome.video/assets/ClerkRuntime-DL3FmpuL.js",
+      "status": 200,
+      "durationMs": 26,
+      "referer": ""
+    },
+    {
+      "id": "request-4015",
+      "method": "GET",
+      "url": "https://awesome.video/assets/index-DiZr6w4w.js",
+      "status": 200,
+      "durationMs": 27,
+      "referer": ""
+    },
+    {
+      "id": "request-4016",
+      "method": "GET",
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "durationMs": 66,
+      "referer": ""
+    },
+    {
+      "id": "request-4017",
+      "method": "GET",
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "durationMs": 66,
+      "referer": ""
+    },
+    {
+      "id": "request-4018",
+      "method": "GET",
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "durationMs": 67,
+      "referer": ""
+    },
+    {
+      "id": "request-4019",
+      "method": "GET",
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "durationMs": 76,
+      "referer": ""
+    },
+    {
+      "id": "request-4020",
+      "method": "GET",
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "durationMs": 76,
+      "referer": ""
+    },
+    {
+      "id": "request-4021",
+      "method": "GET",
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "durationMs": 77,
+      "referer": ""
+    },
+    {
+      "id": "request-4022",
+      "method": "GET",
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "durationMs": 109,
+      "referer": ""
+    },
+    {
+      "id": "request-4023",
+      "method": "GET",
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "durationMs": 18,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4024",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "status": 307,
+      "durationMs": 267,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4025",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminDashboard-BYsZ3R6W.js",
+      "status": 200,
+      "durationMs": 27,
+      "referer": ""
+    },
+    {
+      "id": "request-4026",
+      "method": "GET",
+      "url": "https://awesome.video/assets/tabs-D1zzd93y.js",
+      "status": 200,
+      "durationMs": 24,
+      "referer": ""
+    },
+    {
+      "id": "request-4027",
+      "method": "GET",
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "durationMs": 35,
+      "referer": ""
+    },
+    {
+      "id": "request-4028",
+      "method": "GET",
+      "url": "https://awesome.video/assets/alert-DSm2PGKH.js",
+      "status": 200,
+      "durationMs": 39,
+      "referer": ""
+    },
+    {
+      "id": "request-4029",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-alert-Cw300bgL.js",
+      "status": 200,
+      "durationMs": 47,
+      "referer": ""
+    },
+    {
+      "id": "request-4030",
+      "method": "GET",
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "durationMs": 46,
+      "referer": ""
+    },
+    {
+      "id": "request-4031",
+      "method": "GET",
+      "url": "https://awesome.video/assets/alert-dialog-C3lpWNAV.js",
+      "status": 200,
+      "durationMs": 126,
+      "referer": ""
+    },
+    {
+      "id": "request-4032",
+      "method": "GET",
+      "url": "https://awesome.video/assets/scroll-area-DWyq4DAA.js",
+      "status": 200,
+      "durationMs": 146,
+      "referer": ""
+    },
+    {
+      "id": "request-4033",
+      "method": "GET",
+      "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+      "status": 200,
+      "durationMs": 146,
+      "referer": ""
+    },
+    {
+      "id": "request-4034",
+      "method": "GET",
+      "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+      "status": 200,
+      "durationMs": 153,
+      "referer": ""
+    },
+    {
+      "id": "request-4035",
+      "method": "GET",
+      "url": "https://awesome.video/assets/clock-D0R3nDH2.js",
+      "status": 200,
+      "durationMs": 164,
+      "referer": ""
+    },
+    {
+      "id": "request-4036",
+      "method": "GET",
+      "url": "https://awesome.video/assets/filter-BaEjNb1k.js",
+      "status": 200,
+      "durationMs": 164,
+      "referer": ""
+    },
+    {
+      "id": "request-4037",
+      "method": "GET",
+      "url": "https://awesome.video/assets/file-text-BYi6ry2B.js",
+      "status": 200,
+      "durationMs": 167,
+      "referer": ""
+    },
+    {
+      "id": "request-4038",
+      "method": "GET",
+      "url": "https://awesome.video/assets/paginator-DtK58l0u.js",
+      "status": 200,
+      "durationMs": 178,
+      "referer": ""
+    },
+    {
+      "id": "request-4039",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-check-CrhNlsuh.js",
+      "status": 200,
+      "durationMs": 178,
+      "referer": ""
+    },
+    {
+      "id": "request-4040",
+      "method": "GET",
+      "url": "https://awesome.video/assets/circle-x-Dk_ZeYtT.js",
+      "status": 200,
+      "durationMs": 179,
+      "referer": ""
+    },
+    {
+      "id": "request-4041",
+      "method": "GET",
+      "url": "https://awesome.video/assets/triangle-alert-_nVB0Z13.js",
+      "status": 200,
+      "durationMs": 181,
+      "referer": ""
+    },
+    {
+      "id": "request-4042",
+      "method": "GET",
+      "url": "https://awesome.video/assets/trash-2-DiW00Btq.js",
+      "status": 200,
+      "durationMs": 183,
+      "referer": ""
+    },
+    {
+      "id": "request-4043",
+      "method": "GET",
+      "url": "https://awesome.video/assets/thumbs-up-BogcikQA.js",
+      "status": 200,
+      "durationMs": 183,
+      "referer": ""
+    },
+    {
+      "id": "request-4044",
+      "method": "GET",
+      "url": "https://awesome.video/assets/eye-B85TU6fU.js",
+      "status": 200,
+      "durationMs": 187,
+      "referer": ""
+    },
+    {
+      "id": "request-4045",
+      "method": "GET",
+      "url": "https://awesome.video/assets/validation-jfoUUw0X.js",
+      "status": 200,
+      "durationMs": 188,
+      "referer": ""
+    },
+    {
+      "id": "request-4046",
+      "method": "GET",
+      "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+      "status": 200,
+      "durationMs": 188,
+      "referer": ""
+    },
+    {
+      "id": "request-4047",
+      "method": "GET",
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "durationMs": 196,
+      "referer": ""
+    },
+    {
+      "id": "request-4048",
+      "method": "GET",
+      "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+      "status": 200,
+      "durationMs": 196,
+      "referer": ""
+    },
+    {
+      "id": "request-4049",
+      "method": "GET",
+      "url": "https://awesome.video/assets/folder-tree-CwppIlrT.js",
+      "status": 200,
+      "durationMs": 197,
+      "referer": ""
+    },
+    {
+      "id": "request-4050",
+      "method": "GET",
+      "url": "https://awesome.video/assets/calendar-N6dm227u.js",
+      "status": 200,
+      "durationMs": 199,
+      "referer": ""
+    },
+    {
+      "id": "request-4051",
+      "method": "GET",
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "durationMs": 200,
+      "referer": ""
+    },
+    {
+      "id": "request-4052",
+      "method": "GET",
+      "url": "https://awesome.video/assets/progress-DGcD0s24.js",
+      "status": 200,
+      "durationMs": 202,
+      "referer": ""
+    },
+    {
+      "id": "request-4053",
+      "method": "GET",
+      "url": "https://awesome.video/assets/navigation-icons-0MmHvaVv.js",
+      "status": 200,
+      "durationMs": 232,
+      "referer": ""
+    },
+    {
+      "id": "request-4054",
+      "method": "GET",
+      "url": "https://awesome.video/assets/users-CEk8-QMW.js",
+      "status": 200,
+      "durationMs": 232,
+      "referer": ""
+    },
+    {
+      "id": "request-4055",
+      "method": "GET",
+      "url": "https://awesome.video/assets/play-BcyaWd9k.js",
+      "status": 200,
+      "durationMs": 233,
+      "referer": ""
+    },
+    {
+      "id": "request-4056",
+      "method": "GET",
+      "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+      "status": 200,
+      "durationMs": 234,
+      "referer": ""
+    },
+    {
+      "id": "request-4057",
+      "method": "GET",
+      "url": "https://awesome.video/assets/link-2-Ddd5AyNu.js",
+      "status": 200,
+      "durationMs": 236,
+      "referer": ""
+    },
+    {
+      "id": "request-4058",
+      "method": "GET",
+      "url": "https://awesome.video/assets/trending-up-DWWVMpda.js",
+      "status": 200,
+      "durationMs": 237,
+      "referer": ""
+    },
+    {
+      "id": "request-4059",
+      "method": "GET",
+      "url": "https://awesome.video/assets/switch-Dn5unf1k.js",
+      "status": 200,
+      "durationMs": 235,
+      "referer": ""
+    },
+    {
+      "id": "request-4060",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceFacets-Dre2v4hL.js",
+      "status": 200,
+      "durationMs": 236,
+      "referer": ""
+    },
+    {
+      "id": "request-4061",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceFacets-core-DMw7vNpP.js",
+      "status": 200,
+      "durationMs": 238,
+      "referer": ""
+    },
+    {
+      "id": "request-4062",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceKinds-DC5JVwQ4.js",
+      "status": 200,
+      "durationMs": 240,
+      "referer": ""
+    },
+    {
+      "id": "request-4063",
+      "method": "GET",
+      "url": "https://awesome.video/assets/resourceKinds-core-Dz8cDD7Y.js",
+      "status": 200,
+      "durationMs": 243,
+      "referer": ""
+    },
+    {
+      "id": "request-4064",
+      "method": "GET",
+      "url": "https://awesome.video/assets/chip-button-Cj4pYKU5.js",
+      "status": 200,
+      "durationMs": 241,
+      "referer": ""
+    },
+    {
+      "id": "request-4065",
+      "method": "GET",
+      "url": "https://awesome.video/assets/pencil-3PplsnOE.js",
+      "status": 200,
+      "durationMs": 245,
+      "referer": ""
+    },
+    {
+      "id": "request-4066",
+      "method": "GET",
+      "url": "https://awesome.video/assets/history-OsSh_2vj.js",
+      "status": 200,
+      "durationMs": 249,
+      "referer": ""
+    },
+    {
+      "id": "request-4067",
+      "method": "GET",
+      "url": "https://awesome.video/assets/not-found-B67YF6Tx.js",
+      "status": 200,
+      "durationMs": 250,
+      "referer": ""
+    },
+    {
+      "id": "request-4068",
+      "method": "GET",
+      "url": "https://awesome.video/assets/arrow-right-BQVqG_QJ.js",
+      "status": 200,
+      "durationMs": 251,
+      "referer": ""
+    },
+    {
+      "id": "request-4069",
+      "method": "GET",
+      "url": "https://awesome.video/assets/radio-group-DWWfvnXv.js",
+      "status": 200,
+      "durationMs": 254,
+      "referer": ""
+    },
+    {
+      "id": "request-4070",
+      "method": "GET",
+      "url": "https://awesome.video/assets/useDebounce-COVvrRCZ.js",
+      "status": 200,
+      "durationMs": 254,
+      "referer": ""
+    },
+    {
+      "id": "request-4071",
+      "method": "GET",
+      "url": "https://awesome.video/assets/vendor-animation-Cn-AYYf2.js",
+      "status": 200,
+      "durationMs": 270,
+      "referer": ""
+    },
+    {
+      "id": "request-4072",
+      "method": "GET",
+      "url": "https://awesome.video/assets/set-active-BoWHzfmv.js",
+      "status": 200,
+      "durationMs": 259,
+      "referer": ""
+    },
+    {
+      "id": "request-4073",
+      "method": "GET",
+      "url": "https://awesome.video/assets/clock-3-D0meeCeb.js",
+      "status": 200,
+      "durationMs": 260,
+      "referer": ""
+    },
+    {
+      "id": "request-4074",
+      "method": "GET",
+      "url": "https://awesome.video/assets/AdminDashboard-DEpm6FZS.css",
+      "status": 200,
+      "durationMs": 26,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4075",
+      "method": "GET",
+      "url": "https://awesome.video/api/notifications?limit=50",
+      "status": 200,
+      "durationMs": 159,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4076",
+      "method": "GET",
+      "url": "https://awesome.video/api/user/preferences",
+      "status": 200,
+      "durationMs": 169,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4077",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js",
+      "status": 200,
+      "durationMs": 27,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4078",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+      "status": 307,
+      "durationMs": 212,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4079",
+      "method": "GET",
+      "url": "https://awesome.video/favicon.svg",
+      "status": 304,
+      "durationMs": 180,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4080",
+      "method": "GET",
+      "url": "https://awesome.video/favicon.svg",
+      "status": 304,
+      "durationMs": 251,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4081",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/stats",
+      "status": 200,
+      "durationMs": 421,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4082",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js",
+      "status": 200,
+      "durationMs": 12,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4083",
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "durationMs": 148,
+      "referer": "https://fonts.googleapis.com/"
+    },
+    {
+      "id": "request-4084",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/digests/health",
+      "status": 200,
+      "durationMs": 238,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4085",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/digests/health",
+      "status": 200,
+      "durationMs": 391,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4086",
+      "method": "GET",
+      "url": "blob:https://awesome.video/095880ad-96f1-42a5-b492-c759d4d7873e",
+      "status": 200,
+      "durationMs": 315
+    },
+    {
+      "id": "request-4087",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+      "status": 200,
+      "durationMs": 665,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4088",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0",
+      "status": 200,
+      "durationMs": 663,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4089",
+      "method": "GET",
+      "url": "blob:https://awesome.video/f59e054e-71bd-445f-8b1a-10473e4cc605",
+      "status": 200,
+      "durationMs": 62
+    },
+    {
+      "id": "request-4090",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 38,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4091",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 47,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4092",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 83,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4093",
+      "method": "GET",
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js",
+      "status": 200,
+      "durationMs": 79,
+      "referer": "https://awesome.video/"
+    },
+    {
+      "id": "request-4094",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/digests/health",
+      "status": 200,
+      "durationMs": 244,
+      "referer": "https://awesome.video/"
+    }
+  ]
+}

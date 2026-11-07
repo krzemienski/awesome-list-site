@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/","scrollY":0,"focus":"H1","focusText":"~/awesome.videoAwesome Video Resources","h1":[{"text":"~/awesome.videoAwesome Video Resources","tab":-1,"visible":{"x":280,"y":253.59375,"width":474,"height":31.96875,"top":253.59375,"right":754,"bottom":285.5625,"left":280}}]}
+```

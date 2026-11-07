@@ -1,0 +1,165 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "GitHub" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - button "Scroll tabs left" [ref=e59] [cursor=pointer]:
+                  - img [ref=e60]
+                - tablist "Admin sections" [ref=e62]:
+                  - tab "Overview" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Overview
+                  - tab "Approvals" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Approvals
+                  - tab "Edits" [ref=e72] [cursor=pointer]:
+                    - img [ref=e73]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Researcher
+                  - tab "Export" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Export
+                  - tab "Database" [ref=e83] [cursor=pointer]:
+                    - img [ref=e84]
+                    - text: Database
+                  - tab "Resources" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Resources
+                  - tab "Categories" [ref=e91] [cursor=pointer]:
+                    - img [ref=e92]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e93] [cursor=pointer]:
+                    - img [ref=e94]
+                    - text: Subcategories
+                  - tab "Users" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                    - text: Users
+                  - tab "GitHub" [selected] [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Link Health
+                  - tab "Audit" [ref=e108] [cursor=pointer]:
+                    - img [ref=e109]
+                    - text: Audit
+                  - tab "Research" [ref=e110] [cursor=pointer]:
+                    - img [ref=e111]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e113] [cursor=pointer]:
+                  - img [ref=e114]
+              - tabpanel "GitHub" [ref=e116]:
+                - generic [ref=e117]:
+                  - article [ref=e118]:
+                    - generic [ref=e119]:
+                      - generic [ref=e120]:
+                        - img [ref=e122]
+                        - generic [ref=e124]:
+                          - generic [ref=e125]: Repository not configured
+                          - paragraph [ref=e126]: branch unavailable · not synced yet · 0 sync jobs
+                        - generic [ref=e128]:
+                          - button "Preview import" [disabled]
+                          - button "Pull" [disabled]
+                          - button "Sync now" [disabled]
+                      - alert [ref=e129]:
+                        - img [ref=e130]
+                        - paragraph [ref=e132]: Couldn't load the repository settings
+                        - generic [ref=e133]:
+                          - generic [ref=e134]: Could not reach the server. Please check your connection and try again. Pull and export stay disabled until they load.
+                          - button "Retry" [ref=e135] [cursor=pointer]:
+                            - img
+                            - text: Retry
+                      - generic [ref=e136]:
+                        - text: Target Repository
+                        - generic [ref=e137]:
+                          - textbox "Target Repository" [ref=e138]:
+                            - /placeholder: owner/repository
+                          - button "No configured repository available" [disabled]:
+                            - img
+                        - paragraph [ref=e139]: "Format: owner/repository"
+                  - article [ref=e140]:
+                    - generic [ref=e143]:
+                      - img [ref=e144]
+                      - text: Sync Status
+                    - alert [ref=e147]:
+                      - img [ref=e148]
+                      - paragraph [ref=e150]: Couldn't load the sync queue
+                      - generic [ref=e151]:
+                        - generic [ref=e152]: Could not reach the server. Please check your connection and try again.
+                        - button "Retry" [ref=e153] [cursor=pointer]:
+                          - img
+                          - text: Retry
+                  - generic [ref=e154]:
+                    - generic [ref=e156]:
+                      - heading "Sync jobs" [level=2] [ref=e157]
+                      - paragraph [ref=e158]: The sync history could not be loaded.
+                    - alert [ref=e160]:
+                      - img [ref=e161]
+                      - paragraph [ref=e163]: Couldn't load sync history
+                      - generic [ref=e164]:
+                        - generic [ref=e165]: Could not reach the server. Please check your connection and try again.
+                        - button "Retry" [ref=e166] [cursor=pointer]:
+                          - img
+                          - text: Retry
+                  - button "Less" [expanded] [active] [ref=e168] [cursor=pointer]

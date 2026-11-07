@@ -1,0 +1,72 @@
+{
+  "console": {
+    "entries": [],
+    "nextSeq": 3,
+    "dropped": 0
+  },
+  "errors": {
+    "entries": [
+      {
+        "seq": 1,
+        "ts": 1793086747703,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/favicon.svg: net::ERR_INTERNET_DISCONNECTED",
+        "location": "https://awesome.video/favicon.svg"
+      },
+      {
+        "seq": 2,
+        "ts": 1793086747762,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/favicon.svg: net::ERR_INTERNET_DISCONNECTED",
+        "location": "https://awesome.video/favicon.svg"
+      },
+      {
+        "seq": 3,
+        "ts": 1793086747793,
+        "type": "requestfailed",
+        "level": "error",
+        "text": "GET https://awesome.video/favicon.svg: net::ERR_INTERNET_DISCONNECTED",
+        "location": "https://awesome.video/favicon.svg"
+      }
+    ],
+    "nextSeq": 3,
+    "dropped": 0
+  },
+  "version": {
+    "revision": "520d6778369bc7ce495204cfcacc7e0533f941cc"
+  },
+  "cleanup": [
+    {
+      "type": "category",
+      "id": 1202,
+      "absent": true,
+      "total": 9
+    },
+    {
+      "type": "subcategory",
+      "id": 2340,
+      "absent": true,
+      "total": 99
+    },
+    {
+      "type": "subsubcategory",
+      "id": 3777,
+      "absent": true,
+      "total": 32
+    },
+    {
+      "type": "resource",
+      "id": 190360,
+      "status": 404
+    },
+    {
+      "type": "step",
+      "id": 262,
+      "absent": true,
+      "rows": 13,
+      "maxStep": 6
+    }
+  ]
+}

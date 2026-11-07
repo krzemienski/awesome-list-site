@@ -1,0 +1,1136 @@
+{
+  "url": "https://awesome.video/settings/theme",
+  "viewport": [
+    1440,
+    900
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "focus": "<button type=\"button\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\" data-testid=\"system-option-editorial\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">Editorial</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check theme-option__check\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><code class=\"theme-option__tag\">Magazine · Fraunces</code><p class=\"text-xs text-[color:var(--text-2)]\">Refined editorial — italic Fraunces drops, warm ink, generous leading.</p></button>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 24,
+        "y": 15.5,
+        "width": 147.203125,
+        "height": 28,
+        "top": 15.5,
+        "right": 171.203125,
+        "bottom": 43.5,
+        "left": 24
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,826 resources\nSearch 3,826 resources…\n⌘K",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 823.296875,
+        "y": 7.5,
+        "width": 244.9375,
+        "height": 44,
+        "top": 7.5,
+        "right": 1068.234375,
+        "bottom": 51.5,
+        "left": 823.296875
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Browse",
+      "href": "/categories",
+      "role": "A",
+      "rect": {
+        "x": 1082.234375,
+        "y": 17.5,
+        "width": 46.375,
+        "height": 24,
+        "top": 17.5,
+        "right": 1128.609375,
+        "bottom": 41.5,
+        "left": 1082.234375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "Submit",
+      "href": "/submit",
+      "role": "A",
+      "rect": {
+        "x": 1146.609375,
+        "y": 17.5,
+        "width": 43.515625,
+        "height": 24,
+        "top": 17.5,
+        "right": 1190.125,
+        "bottom": 41.5,
+        "left": 1146.609375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 1208.125,
+        "y": 17.5,
+        "width": 37.359375,
+        "height": 24,
+        "top": 17.5,
+        "right": 1245.484375,
+        "bottom": 41.5,
+        "left": 1208.125
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "Docs ↗",
+      "href": "/design-system",
+      "role": "A",
+      "rect": {
+        "x": 1263.484375,
+        "y": 17.5,
+        "width": 45.21875,
+        "height": 24,
+        "top": 17.5,
+        "right": 1308.703125,
+        "bottom": 41.5,
+        "left": 1263.484375
+      },
+      "class": "nav-link"
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 1322.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 1410,
+        "bottom": 51.5,
+        "left": 1322.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 180,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 219.234375,
+        "bottom": 127,
+        "left": 180
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Settings",
+      "href": "/settings",
+      "role": "A",
+      "rect": {
+        "x": 253.234375,
+        "y": 107,
+        "width": 53.953125,
+        "height": 20,
+        "top": 107,
+        "right": 307.1875,
+        "bottom": 127,
+        "left": 253.234375
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Back",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 181,
+        "y": 108,
+        "width": 54.703125,
+        "height": 44,
+        "top": 108,
+        "right": 235.703125,
+        "bottom": 152,
+        "left": 181
+      },
+      "class": "inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
+    },
+    {
+      "name": "Explore the full design-system showcase →",
+      "href": "/design-system",
+      "role": "A",
+      "rect": {
+        "x": 181,
+        "y": 353.984375,
+        "width": 287.984375,
+        "height": 44,
+        "top": 353.984375,
+        "right": 468.984375,
+        "bottom": 397.984375,
+        "left": 181
+      },
+      "class": "inline-flex items-center gap-1.5 text-sm text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4 hover:decoration-[color:var(--text)] mt-2 min-h-[44px]"
+    },
+    {
+      "name": "Editorial\nMagazine · Fraunces\n\nRefined editorial — italic Fraunces drops, warm ink, generous leading.",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 477.9375,
+        "width": 530,
+        "height": 115.59375,
+        "top": 477.9375,
+        "right": 711,
+        "bottom": 593.53125,
+        "left": 181
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Geist\nModern · Geist Sans\n\nVercel-clean — neutral, soft 8px radii, quiet hover glow.",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 723,
+        "y": 478.9375,
+        "width": 530,
+        "height": 115.59375,
+        "top": 478.9375,
+        "right": 1253,
+        "bottom": 594.53125,
+        "left": 723
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Crimson\n#ff3d52",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 675.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 675.484375,
+        "right": 385.796875,
+        "bottom": 805.484375,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Magenta\n#ec4899",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 397.796875,
+        "y": 675.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 675.484375,
+        "right": 602.59375,
+        "bottom": 805.484375,
+        "left": 397.796875
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Orange\n#ff7a3d",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 614.59375,
+        "y": 675.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 675.484375,
+        "right": 819.390625,
+        "bottom": 805.484375,
+        "left": 614.59375
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Amber\n#ffb84d",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 831.390625,
+        "y": 675.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 675.484375,
+        "right": 1036.1875,
+        "bottom": 805.484375,
+        "left": 831.390625
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Emerald\n#34d08c",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 1048.1875,
+        "y": 675.484375,
+        "width": 204.8125,
+        "height": 130,
+        "top": 675.484375,
+        "right": 1253,
+        "bottom": 805.484375,
+        "left": 1048.1875
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Matrix\n#00ff88",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 817.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 817.484375,
+        "right": 385.796875,
+        "bottom": 947.484375,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Cyan\n#5eddf2",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 397.796875,
+        "y": 817.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 817.484375,
+        "right": 602.59375,
+        "bottom": 947.484375,
+        "left": 397.796875
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Violet\n#9d4edd",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 614.59375,
+        "y": 817.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 817.484375,
+        "right": 819.390625,
+        "bottom": 947.484375,
+        "left": 614.59375
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Lime\n#aaff00",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 831.390625,
+        "y": 817.484375,
+        "width": 204.796875,
+        "height": 130,
+        "top": 817.484375,
+        "right": 1036.1875,
+        "bottom": 947.484375,
+        "left": 831.390625
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Rose\n#ff7a8a",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 1048.1875,
+        "y": 817.484375,
+        "width": 204.8125,
+        "height": 130,
+        "top": 817.484375,
+        "right": 1253,
+        "bottom": 947.484375,
+        "left": 1048.1875
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "System default\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1084.4375,
+        "width": 349.328125,
+        "height": 106,
+        "top": 1084.4375,
+        "right": 530.328125,
+        "bottom": 1190.4375,
+        "left": 181
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Inter\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 542.328125,
+        "y": 1084.4375,
+        "width": 349.328125,
+        "height": 106,
+        "top": 1084.4375,
+        "right": 891.65625,
+        "bottom": 1190.4375,
+        "left": 542.328125
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "DM Sans\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 903.65625,
+        "y": 1084.4375,
+        "width": 349.34375,
+        "height": 106,
+        "top": 1084.4375,
+        "right": 1253,
+        "bottom": 1190.4375,
+        "left": 903.65625
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Source Sans 3\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1202.4375,
+        "width": 349.328125,
+        "height": 106,
+        "top": 1202.4375,
+        "right": 530.328125,
+        "bottom": 1308.4375,
+        "left": 181
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "IBM Plex Sans\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 542.328125,
+        "y": 1202.4375,
+        "width": 349.328125,
+        "height": 106,
+        "top": 1202.4375,
+        "right": 891.65625,
+        "bottom": 1308.4375,
+        "left": 542.328125
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "JetBrains Mono\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 903.65625,
+        "y": 1202.4375,
+        "width": 349.34375,
+        "height": 106,
+        "top": 1202.4375,
+        "right": 1253,
+        "bottom": 1308.4375,
+        "left": 903.65625
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Primary action",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 206,
+        "y": 1654.390625,
+        "width": 155.390625,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 361.390625,
+        "bottom": 1698.390625,
+        "left": 206
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Secondary",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 369.390625,
+        "y": 1654.390625,
+        "width": 101.34375,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 470.734375,
+        "bottom": 1698.390625,
+        "left": 369.390625
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Outline",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 478.734375,
+        "y": 1654.390625,
+        "width": 78.234375,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 556.96875,
+        "bottom": 1698.390625,
+        "left": 478.734375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Ghost",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 564.96875,
+        "y": 1654.390625,
+        "width": 70.828125,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 635.796875,
+        "bottom": 1698.390625,
+        "left": 564.96875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Destructive",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 643.796875,
+        "y": 1654.390625,
+        "width": 105.359375,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 749.15625,
+        "bottom": 1698.390625,
+        "left": 643.796875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 danger min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Icon button",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 757.15625,
+        "y": 1654.390625,
+        "width": 44,
+        "height": 44,
+        "top": 1654.390625,
+        "right": 801.15625,
+        "bottom": 1698.390625,
+        "left": 757.15625
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]",
+      "disabled": false
+    },
+    {
+      "name": "Search resources…",
+      "href": null,
+      "role": "INPUT",
+      "rect": {
+        "x": 206,
+        "y": 1823.578125,
+        "width": 505,
+        "height": 44,
+        "top": 1823.578125,
+        "right": 711,
+        "bottom": 1867.578125,
+        "left": 206
+      },
+      "class": "input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed",
+      "disabled": false
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 97,
+        "y": 2233.578125,
+        "width": 278.640625,
+        "height": 42,
+        "top": 2233.578125,
+        "right": 375.640625,
+        "bottom": 2275.578125,
+        "left": 97
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2223.984375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2223.984375,
+        "right": 1050.734375,
+        "bottom": 2267.984375,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2252.796875,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2252.796875,
+        "right": 1050.734375,
+        "bottom": 2296.796875,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2281.609375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2281.609375,
+        "right": 1050.734375,
+        "bottom": 2325.609375,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2310.421875,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2310.421875,
+        "right": 1050.734375,
+        "bottom": 2354.421875,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2339.234375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2339.234375,
+        "right": 1050.734375,
+        "bottom": 2383.234375,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2368.046875,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2368.046875,
+        "right": 1050.734375,
+        "bottom": 2412.046875,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2396.859375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2396.859375,
+        "right": 1050.734375,
+        "bottom": 2440.859375,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2425.671875,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2425.671875,
+        "right": 1050.734375,
+        "bottom": 2469.671875,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 812.46875,
+        "y": 2454.484375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2454.484375,
+        "right": 1050.734375,
+        "bottom": 2498.484375,
+        "left": 812.46875
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 1098.734375,
+        "y": 2235.578125,
+        "width": 238.265625,
+        "height": 60.375,
+        "top": 2235.578125,
+        "right": 1337,
+        "bottom": 2295.953125,
+        "left": 1098.734375
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 1177.09375,
+        "y": 2307.953125,
+        "width": 73,
+        "height": 24,
+        "top": 2307.953125,
+        "right": 1250.09375,
+        "bottom": 2331.953125,
+        "left": 1177.09375
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 1098.734375,
+        "y": 2362.34375,
+        "width": 238.265625,
+        "height": 44,
+        "top": 2362.34375,
+        "right": 1337,
+        "bottom": 2406.34375,
+        "left": 1098.734375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 512.140625,
+        "y": 2535.890625,
+        "width": 34.65625,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 546.796875,
+        "bottom": 2579.890625,
+        "left": 512.140625
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 560.796875,
+        "y": 2535.890625,
+        "width": 34.65625,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 595.453125,
+        "bottom": 2579.890625,
+        "left": 560.796875
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 609.453125,
+        "y": 2535.890625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 657.96875,
+        "bottom": 2579.890625,
+        "left": 609.453125
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 671.96875,
+        "y": 2535.890625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 720.484375,
+        "bottom": 2579.890625,
+        "left": 671.96875
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 734.484375,
+        "y": 2535.890625,
+        "width": 103.953125,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 838.4375,
+        "bottom": 2579.890625,
+        "left": 734.484375
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 852.4375,
+        "y": 2535.890625,
+        "width": 55.46875,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 907.90625,
+        "bottom": 2579.890625,
+        "left": 852.4375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 921.90625,
+        "y": 2535.890625,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2535.890625,
+        "right": 970.421875,
+        "bottom": 2579.890625,
+        "left": 921.90625
+      },
+      "class": ""
+    }
+  ],
+  "network": [
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/ThemeSettings-DeWCwgsC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/arrow-left-DEdDATMn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/ThemeSettings-C1J8hyMQ.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/account-CPzh-fWY.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    }
+  ]
+}

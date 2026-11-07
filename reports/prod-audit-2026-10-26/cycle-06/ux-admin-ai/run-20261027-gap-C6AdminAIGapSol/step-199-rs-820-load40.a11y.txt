@@ -1,0 +1,321 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Researcher" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - 'region "Research run #77" [ref=e117]':
+                      - generic [ref=e119]:
+                        - 'heading "Research run #77" [level=3] [ref=e120]'
+                        - paragraph [ref=e121]: All categories
+                      - paragraph [ref=e122]
+                    - generic [ref=e123]:
+                      - generic [ref=e125]:
+                        - heading "Researcher jobs" [level=2] [ref=e126]
+                        - paragraph [ref=e127]: Latest 20 of 77 research runs
+                      - generic [ref=e128]:
+                        - region "Researcher jobs table, scrollable" [ref=e129]:
+                          - table [ref=e130]:
+                            - rowgroup [ref=e131]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e132]:
+                                - columnheader "Status" [ref=e133]
+                                - columnheader "Prompt" [ref=e134]
+                                - columnheader "Found" [ref=e135]
+                                - columnheader "Approved / Rejected" [ref=e136]
+                                - columnheader "Cost" [ref=e137]
+                                - columnheader "Turns" [ref=e138]
+                                - columnheader "Created" [ref=e139]
+                            - rowgroup [ref=e140]:
+                              - row [ref=e141]:
+                                - cell "processing" [ref=e142]:
+                                  - generic [ref=e143]: processing
+                                - cell [ref=e144]
+                                - cell "8" [ref=e145]
+                                - cell "0/0" [ref=e146]
+                                - cell "$0.0000" [ref=e147]
+                                - cell "0/600" [ref=e148]
+                                - cell "Oct 27, 2026" [ref=e149]
+                              - row [ref=e150]:
+                                - cell "completed" [ref=e151]:
+                                  - generic [ref=e152]: completed
+                                - cell [ref=e153]
+                                - cell "0" [ref=e154]
+                                - cell "0/0" [ref=e155]
+                                - cell "$0.7600" [ref=e156]
+                                - cell "28/600" [ref=e157]
+                                - cell "Oct 27, 2026" [ref=e158]
+                              - row [ref=e159]:
+                                - cell "completed" [ref=e160]:
+                                  - generic [ref=e161]: completed
+                                - cell [ref=e162]
+                                - cell "0" [ref=e163]
+                                - cell "0/0" [ref=e164]
+                                - cell "$1.2973" [ref=e165]
+                                - cell "93/600" [ref=e166]
+                                - cell "Oct 27, 2026" [ref=e167]
+                              - row [ref=e168]:
+                                - cell "completed" [ref=e169]:
+                                  - generic [ref=e170]: completed
+                                - cell [ref=e171]
+                                - cell "0" [ref=e172]
+                                - cell "0/0" [ref=e173]
+                                - cell "$0.5650" [ref=e174]
+                                - cell "13/600" [ref=e175]
+                                - cell "Oct 27, 2026" [ref=e176]
+                              - row [ref=e177]:
+                                - cell "completed" [ref=e178]:
+                                  - generic [ref=e179]: completed
+                                - cell [ref=e180]
+                                - cell "4" [ref=e181]
+                                - cell "1/0" [ref=e182]
+                                - cell "$5.4603" [ref=e183]
+                                - cell "155/200" [ref=e184]
+                                - cell "Oct 27, 2026" [ref=e185]
+                              - row [ref=e186]:
+                                - cell "failed" [ref=e187]:
+                                  - generic [ref=e188]: failed
+                                - cell [ref=e189]
+                                - cell "0" [ref=e190]
+                                - cell "0/0" [ref=e191]
+                                - cell "$0.0000" [ref=e192]
+                                - cell "1/200" [ref=e193]
+                                - cell "Oct 27, 2026" [ref=e194]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e195]':
+                                - cell "completed" [ref=e196]:
+                                  - generic [ref=e197]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e198]'
+                                - cell "9" [ref=e199]
+                                - cell "0/0" [ref=e200]
+                                - cell "$3.3100" [ref=e201]
+                                - cell "41/200" [ref=e202]
+                                - cell "Oct 27, 2026" [ref=e203]
+                              - row [ref=e204]:
+                                - cell "completed" [ref=e205]:
+                                  - generic [ref=e206]: completed
+                                - 'cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e207]'
+                                - cell "0" [ref=e208]
+                                - cell "0/0" [ref=e209]
+                                - cell "$1.1166" [ref=e210]
+                                - cell "18/80" [ref=e211]
+                                - cell "Oct 27, 2026" [ref=e212]
+                              - row [ref=e213]:
+                                - cell "completed" [ref=e214]:
+                                  - generic [ref=e215]: completed
+                                - cell [ref=e216]
+                                - cell "0" [ref=e217]
+                                - cell "0/0" [ref=e218]
+                                - cell "$0.4199" [ref=e219]
+                                - cell "10/80" [ref=e220]
+                                - cell "Oct 27, 2026" [ref=e221]
+                              - 'row "stopped at budget [QA-audit-1026] smoke: find 1 new open-source video tool 0 0/0 $0.3062 3/10 Oct 26, 2026" [ref=e222]':
+                                - cell "stopped at budget" [ref=e223]:
+                                  - generic [ref=e224]: stopped at budget
+                                - 'cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e225]'
+                                - cell "0" [ref=e226]
+                                - cell "0/0" [ref=e227]
+                                - cell "$0.3062" [ref=e228]
+                                - cell "3/10" [ref=e229]
+                                - cell "Oct 26, 2026" [ref=e230]
+                              - 'row "completed QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification. 0 0/0 $0.1508 1/8 Oct 26, 2026" [ref=e231]':
+                                - cell "completed" [ref=e232]:
+                                  - generic [ref=e233]: completed
+                                - 'cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e234]'
+                                - cell "0" [ref=e235]
+                                - cell "0/0" [ref=e236]
+                                - cell "$0.1508" [ref=e237]
+                                - cell "1/8" [ref=e238]
+                                - cell "Oct 26, 2026" [ref=e239]
+                              - row [ref=e240]:
+                                - cell "cancelled" [ref=e241]:
+                                  - generic [ref=e242]: cancelled
+                                - cell [ref=e243]
+                                - cell "0" [ref=e244]
+                                - cell "0/0" [ref=e245]
+                                - cell "$0.2753 lower bound" [ref=e246]:
+                                  - text: $0.2753
+                                  - generic [ref=e247]: lower bound
+                                - cell "3/40" [ref=e248]
+                                - cell "Oct 26, 2026" [ref=e249]
+                              - row [ref=e250]:
+                                - cell "stopped at budget" [ref=e251]:
+                                  - generic [ref=e252]: stopped at budget
+                                - cell [ref=e253]
+                                - cell "0" [ref=e254]
+                                - cell "0/0" [ref=e255]
+                                - cell "$0.3213" [ref=e256]
+                                - cell "3/40" [ref=e257]
+                                - cell "Oct 26, 2026" [ref=e258]
+                              - row [ref=e259]:
+                                - cell "completed" [ref=e260]:
+                                  - generic [ref=e261]: completed
+                                - cell [ref=e262]
+                                - cell "2" [ref=e263]
+                                - cell "1/1" [ref=e264]
+                                - cell "$1.3245" [ref=e265]
+                                - cell "9/40" [ref=e266]
+                                - cell "Oct 26, 2026" [ref=e267]
+                              - row [ref=e268]:
+                                - cell "completed" [ref=e269]:
+                                  - generic [ref=e270]: completed
+                                - cell [ref=e271]
+                                - cell "173" [ref=e272]
+                                - cell "173/0" [ref=e273]
+                                - cell "$40.5425" [ref=e274]
+                                - cell "625/∞" [ref=e275]
+                                - cell "Jul 30, 2026" [ref=e276]
+                              - row [ref=e277]:
+                                - cell "completed" [ref=e278]:
+                                  - generic [ref=e279]: completed
+                                - cell [ref=e280]
+                                - cell "179" [ref=e281]
+                                - cell "179/0" [ref=e282]
+                                - cell "$41.7846" [ref=e283]
+                                - cell "639/∞" [ref=e284]
+                                - cell "Jul 30, 2026" [ref=e285]
+                              - row [ref=e286]:
+                                - cell "completed" [ref=e287]:
+                                  - generic [ref=e288]: completed
+                                - cell [ref=e289]
+                                - cell "113" [ref=e290]
+                                - cell "113/0" [ref=e291]
+                                - cell "$28.2090" [ref=e292]
+                                - cell "475/∞" [ref=e293]
+                                - cell "Jul 29, 2026" [ref=e294]
+                              - row [ref=e295]:
+                                - cell "cancelled" [ref=e296]:
+                                  - generic [ref=e297]: cancelled
+                                - cell [ref=e298]
+                                - cell "0" [ref=e299]
+                                - cell "0/0" [ref=e300]
+                                - cell "$0.0000" [ref=e301]
+                                - cell "0/∞" [ref=e302]
+                                - cell "Jul 29, 2026" [ref=e303]
+                              - row [ref=e304]:
+                                - cell "cancelled" [ref=e305]:
+                                  - generic [ref=e306]: cancelled
+                                - cell [ref=e307]
+                                - cell "0" [ref=e308]
+                                - cell "0/0" [ref=e309]
+                                - cell "$0.0000" [ref=e310]
+                                - cell "0/∞" [ref=e311]
+                                - cell "Jul 29, 2026" [ref=e312]
+                              - row [ref=e313]:
+                                - cell "cancelled" [ref=e314]:
+                                  - generic [ref=e315]: cancelled
+                                - cell [ref=e316]
+                                - cell "0" [ref=e317]
+                                - cell "0/0" [ref=e318]
+                                - cell "$0.0000" [ref=e319]
+                                - cell "0/∞" [ref=e320]
+                                - cell "Jul 29, 2026" [ref=e321]
+                        - button "Load more (20 of 77) in the Researcher jobs table" [active] [ref=e323] [cursor=pointer]: Load more (20 of 77)
+                  - group [ref=e324]:
+                    - generic "All pending discoveries & full job history" [ref=e325] [cursor=pointer]
+    - button "Back to top" [ref=e326] [cursor=pointer]:
+      - img

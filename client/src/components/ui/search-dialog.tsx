@@ -1,6 +1,8 @@
-import { lazy, Suspense, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
+import { useCommandState } from "cmdk";
+import { focusPaletteOpener } from "@/lib/search-dialog-loader";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, WifiOff, X } from "lucide-react";
 import { useLocation } from "wouter";
@@ -20,6 +22,10 @@ const ContactPaletteItem =
 interface SearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  /** Text typed into the loading fallback before this chunk arrived. */
+  initialQuery?: string;
+  /** Element that opened the palette, captured before any fallback took focus. */
+  opener?: HTMLElement | null;
 }
 
 interface DbSearchResource {
@@ -43,6 +49,16 @@ const PAGES = [
   { label: "Submit a resource", detail: "Suggest something useful", href: "/submit", icon: Plus },
   { label: "About", detail: "Learn about this collection", href: "/about", icon: Info },
 ] as const;
+
+// A pasted paragraph must not blow the empty-state heading out of the palette:
+// echo a bounded prefix and let the browser break whatever is left.
+const SEARCH_PLACEHOLDER = "Search resources…";
+const ECHO_QUERY_MAX = 80;
+const WRAP_ANYWHERE: CSSProperties = { overflowWrap: "anywhere", minWidth: 0, maxWidth: "100%" };
+
+function echoQuery(query: string): string {
+  return query.length > ECHO_QUERY_MAX ? `${query.slice(0, ECHO_QUERY_MAX).trimEnd()}…` : query;
+}
 
 // R2-L10: recent searches persisted in localStorage (max 5, most recent first).
 const RECENT_SEARCHES_KEY = "recent-searches";
@@ -73,18 +89,46 @@ function saveRecentSearch(query: string): string[] {
   return next;
 }
 
-export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
-  const [query, setQuery] = useState("");
+/**
+ * Rendered inside <Command> so the empty palette's suggestion count is cmdk's
+ * own count of mounted rows. Rows that decide their own visibility (the lazy
+ * contact row) are then counted exactly when they render.
+ */
+function PaletteFooter({ showResults, shownResults, totalMatches }: { showResults: boolean; shownResults: number; totalMatches: number }) {
+  const rowCount = useCommandState((state) => state.filtered.count);
+  const showCount = showResults ? shownResults > 0 : rowCount > 0;
+  return (
+    <footer className="search-palette-footer">
+      <span><kbd className="kbd">↑↓</kbd> navigate</span>
+      <span><kbd className="kbd">↵</kbd> open</span>
+      <span><kbd className="kbd">esc</kbd> close</span>
+      <span className="search-palette-footer-spacer" aria-hidden="true" />
+      {showCount ? (
+        <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
+          {showResults ? (
+            <>
+              {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
+              {totalMatches > shownResults ? ` — showing top ${shownResults}` : ""}
+            </>
+          ) : (
+            <>{rowCount} suggestion{rowCount === 1 ? "" : "s"}</>
+          )}
+        </span>
+      ) : null}
+    </footer>
+  );
+}
+
+export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }: SearchDialogProps) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [recentSearches, setRecentSearches] = useState<string[]>(readRecentSearches);
-  const [selectedValue, setSelectedValue] = useState("");
-  const selectionInteracted = useRef(false);
   const debouncedQuery = useDebounce(query, 300);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   // The palette is mounted by MainLayout only after its trigger opens it, so
   // activeElement here is the real opener (header button or shortcut target).
   const openerRef = useRef<HTMLElement | null>(
-    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+    opener ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null),
   );
 
   // Normalize exactly like the /search page + server matcher so the palette
@@ -129,12 +173,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const results = allMatches.slice(0, 15);
   const defaultCategories = (categoriesQuery.data ?? []).slice(0, 5);
   const featuredResources = (featuredQuery.data?.featured ?? []).slice(0, 4);
-  // C7-V2-05: count every row the empty palette lists (jump targets, pages, recent searches).
-  const defaultSuggestionCount =
-    defaultCategories.length + featuredResources.length + PAGES.length + recentSearches.length;
-  const firstCategoryValue = defaultCategories[0]
-    ? `category-${defaultCategories[0].name}`
-    : undefined;
+  // Until the first categories land, rows that would sit below them stay
+  // unselectable, so cmdk's automatic highlight waits for the real first row
+  // instead of parking on a page row that the categories then push down.
+  const catalogPending = !showResults && categoriesQuery.isLoading && defaultCategories.length === 0;
   const isPending =
     showResults && results.length === 0 && (resourceQuery.isFetching || queryTrimmed !== trimmed);
   // Offline, the resource search is paused rather than failed; it is not a
@@ -166,22 +208,8 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setQuery("");
-      setSelectedValue("");
-      selectionInteracted.current = false;
-    }
+    if (!isOpen) setQuery("");
   }, [isOpen]);
-
-  // Cached featured items can register before the live categories. Keep the
-  // untouched initial selection in displayed order, without overriding a
-  // person's keyboard/pointer choice or their recent-search shortcuts.
-  useEffect(() => {
-    if (isOpen && !query && recentSearches.length === 0 &&
-        !selectionInteracted.current && firstCategoryValue) {
-      setSelectedValue(firstCategoryValue);
-    }
-  }, [isOpen, query, recentSearches.length, firstCategoryValue]);
 
   const openResource = (resource: DbSearchResource) => {
     trackResourceClick(resource.title, resource.url, resource.category || "", "search_palette");
@@ -215,14 +243,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   };
 
   const restoreOpenerFocus = (event: Event) => {
-    const opener = openerRef.current && openerRef.current !== document.body
-      ? openerRef.current
-      : Array.from(document.querySelectorAll<HTMLElement>('button.header-search-trigger, button[aria-label="Search resources"], button[aria-label="Search"]'))
-          .find((element) => element.getClientRects().length > 0);
-    if (opener?.isConnected) {
-      event.preventDefault();
-      opener.focus();
-    }
+    if (focusPaletteOpener(openerRef.current)) event.preventDefault();
   };
 
   const renderPages = () => (
@@ -234,6 +255,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
             key={page.href}
             value={`page-${page.label}`}
             onSelect={() => openPage(page.href)}
+            disabled={catalogPending}
             className="search-palette-row"
           >
             <span className="search-palette-kind"><Icon aria-hidden="true" />page</span>
@@ -245,7 +267,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </CommandItem>
         );
       })}
-      {ContactPaletteItem ? (
+      {ContactPaletteItem && !catalogPending ? (
         <Suspense fallback={null}><ContactPaletteItem closePalette={() => setIsOpen(false)} /></Suspense>
       ) : null}
     </CommandGroup>
@@ -286,7 +308,13 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           <CommandItem
             key={`recent-${recent}`}
             value={`recent-${recent}`}
-            onSelect={() => setQuery(recent)}
+            onSelect={() =>
+              // A recent entry identical to what is already typed would be a
+              // no-op; treat it as submitting that search instead.
+              recent.toLocaleLowerCase() === queryTrimmed.toLocaleLowerCase()
+                ? commitToSearchPage(recent)
+                : setQuery(recent)}
+            disabled={catalogPending}
             className="search-palette-row"
             data-testid={`recent-search-${index}`}
           >
@@ -321,6 +349,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           key={`jump-featured-${resource.id}`}
           value={`featured-${resource.id}`}
           onSelect={() => openResource(resource)}
+          disabled={catalogPending}
           className="search-palette-row search-palette-default-jump"
         >
           <span className="search-palette-kind">item</span>
@@ -330,7 +359,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               <span className="sr-only">Featured: </span>
               {resource.title}
             </span>
-            {resource.description ? <small>{resource.description.slice(0, 60)}</small> : null}
+            {resource.description ? <small>{resource.description}</small> : null}
           </span>
           <span className="search-palette-arrow" aria-hidden="true">→</span>
         </CommandItem>
@@ -354,7 +383,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           }}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            inputRef.current?.focus();
+            const input = inputRef.current;
+            if (!input) return;
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
           }}
           onCloseAutoFocus={restoreOpenerFocus}
         >
@@ -366,20 +398,23 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           <Command
             className="search-palette-command"
             shouldFilter={false}
-            value={selectedValue}
-            onValueChange={setSelectedValue}
-            onKeyDownCapture={() => { selectionInteracted.current = true; }}
-            onPointerMove={() => { selectionInteracted.current = true; }}
           >
             <CommandInput
               ref={inputRef}
               aria-label="Search resources, categories, and pages"
-              placeholder="Find resources, categories, or pages…"
+              placeholder={SEARCH_PLACEHOLDER}
               trailing={
-                <DialogPrimitive.Close className="search-palette-close" onKeyDown={keepNativeEnter}>
-                  <kbd className="kbd">esc</kbd>
-                  <span className="sr-only">Close search</span>
-                </DialogPrimitive.Close>
+                <>
+                  {!query && (
+                    <span className="search-palette-placeholder" aria-hidden="true">
+                      {SEARCH_PLACEHOLDER}
+                    </span>
+                  )}
+                  <DialogPrimitive.Close className="search-palette-close" onKeyDown={keepNativeEnter}>
+                    <kbd className="kbd">esc</kbd>
+                    <span className="sr-only">Close search</span>
+                  </DialogPrimitive.Close>
+                </>
               }
               value={query}
               onValueChange={setQuery}
@@ -420,7 +455,18 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                     ) : (
                       <>
                         <span>Search failed. Please try again.</span>
-                        <button type="button" onKeyDown={keepNativeEnter} onClick={() => void resourceQuery.refetch()}>Try again</button>
+                        <button
+                          type="button"
+                          onKeyDown={keepNativeEnter}
+                          onClick={() => {
+                            // This button unmounts while the refetch runs; keep
+                            // the keyboard in the search input, where results land.
+                            inputRef.current?.focus();
+                            void resourceQuery.refetch();
+                          }}
+                        >
+                          Try again
+                        </button>
                       </>
                     )}
                   </div>
@@ -454,7 +500,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                           data-testid="search-view-all"
                         >
                           <span className="search-palette-kind"><Search aria-hidden="true" />all</span>
-                          <span className="search-palette-copy"><span>View all results for “{queryTrimmed}”</span></span>
+                          <span className="search-palette-copy"><span style={WRAP_ANYWHERE}>View all results for “{echoQuery(queryTrimmed)}”</span></span>
                           <span className="search-palette-arrow" aria-hidden="true">→</span>
                         </CommandItem>
                       </CommandGroup>
@@ -486,11 +532,31 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                         <span>Resource results will load when your connection is back.</span>
                       </div>
                     ) : !hasNonResourceMatches && results.length === 0 && (
-                      <div className="search-palette-status" data-testid="search-no-results">
-                        <Search aria-hidden="true" />
-                        <strong>No results for “{queryTrimmed}”</strong>
-                        <span>Try different keywords or check the spelling.</span>
-                      </div>
+                      <>
+                        <div className="search-palette-status" data-testid="search-no-results">
+                          <Search aria-hidden="true" />
+                          <strong style={WRAP_ANYWHERE} title={queryTrimmed}>No results for “{echoQuery(queryTrimmed)}”</strong>
+                          <span>Try different keywords, or start from one of these.</span>
+                        </div>
+                        {/* First row, so cmdk's automatic highlight (and Enter)
+                            lands on the full search rather than on whichever
+                            Jump-to row happens to be first. */}
+                        <CommandGroup className="search-palette-group">
+                          <CommandItem
+                            value={`view-all-${queryTrimmed}`}
+                            onSelect={() => commitToSearchPage(queryTrimmed)}
+                            className="search-palette-row search-palette-view-all"
+                            data-testid="search-view-all"
+                          >
+                            <span className="search-palette-kind"><Search aria-hidden="true" />all</span>
+                            <span className="search-palette-copy"><span style={WRAP_ANYWHERE}>Open full search for “{echoQuery(queryTrimmed)}”</span></span>
+                            <span className="search-palette-arrow" aria-hidden="true">→</span>
+                          </CommandItem>
+                        </CommandGroup>
+                        {/* A dead end closed the palette with nowhere to go;
+                            offer the same jump targets as the empty palette. */}
+                        {renderDefaultJumps()}
+                      </>
                     )}
                     {categoriesQuery.isError && (
                       <div className="search-palette-inline-error" role="status">
@@ -516,27 +582,8 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                 </>
               )}
             </CommandList>
+            <PaletteFooter showResults={showResults} shownResults={results.length} totalMatches={totalMatches} />
           </Command>
-
-          <footer className="search-palette-footer">
-            <span><kbd className="kbd">↑↓</kbd> navigate</span>
-            <span><kbd className="kbd">↵</kbd> open</span>
-            <span><kbd className="kbd">esc</kbd> close</span>
-            <span className="search-palette-footer-spacer" aria-hidden="true" />
-            {(showResults && results.length > 0) || (!showResults && defaultSuggestionCount > 0) ? (
-              <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
-                {showResults ? (
-                  <>
-                    {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
-                    {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
-                  </>
-                ) : (
-                  <>{defaultSuggestionCount} result{defaultSuggestionCount === 1 ? "" : "s"}</>
-                )}
-              </span>
-            ) : null}
-          </footer>
-
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

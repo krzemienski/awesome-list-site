@@ -1,0 +1,162 @@
+[
+  {
+    "file": "step-159-gh-390-full-errors.a11y.txt",
+    "text": "                      - alert [ref=e125]:\n                        - paragraph [ref=e128]: Couldn't load the repository settings\n                          - generic [ref=e130]: Could not reach the server. Please check your connection and try again. Pull and export stay disabled until they load.\n                          - button \"Retry\" [ref=e131] [cursor=pointer]:\n                            - text: Retry\n                          - button \"No configured repository available\" [disabled]:\n                    - alert [ref=e143]:\n                      - paragraph [ref=e146]: Couldn't load the sync queue\n                        - generic [ref=e148]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e149] [cursor=pointer]:\n                          - text: Retry\n                    - alert [ref=e156]:\n                      - paragraph [ref=e159]: Couldn't load sync history\n                        - generic [ref=e161]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e162] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-145-rw-1440-detail-error.a11y.txt",
+    "text": "    - alert [ref=e6]:\n      - paragraph [ref=e9]: Couldn't load research details\n        - generic [ref=e11]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e12] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-147-rw-820-detail-error.a11y.txt",
+    "text": "    - alert [ref=e6]:\n      - paragraph [ref=e9]: Couldn't load research details\n        - generic [ref=e11]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e12] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-139-en-820-list-error.a11y.txt",
+    "text": "                - link \"Enrichment\" [disabled]\n                          - button \"Run job\" [disabled]:\n                        - alert [ref=e146]:\n                          - paragraph [ref=e149]: Couldn't load enrichment jobs\n                            - generic [ref=e151]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e152] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-164-rs-820-discovery-events-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e184]:\n                          - paragraph [ref=e187]: Couldn't load this run's discoveries\n                            - generic [ref=e189]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e190] [cursor=pointer]:\n                              - text: Retry\n                              - alert [ref=e206]:\n                                - paragraph [ref=e209]: Couldn't load agent events\n                                  - generic [ref=e211]: Could not reach the server. Please check your connection and try again.\n                                  - button \"Retry\" [ref=e212] [cursor=pointer]:\n                                    - text: Retry"
+  },
+  {
+    "file": "step-189-rs-1440-live-stale-visible.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - text: Live updates failed; showing the last good data and retrying."
+  },
+  {
+    "file": "step-169-rs-1440-load-more-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e209]:\n                          - paragraph [ref=e212]: Couldn't load research jobs\n                            - generic [ref=e214]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e215] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-162-rs-1440-detail-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e128]:\n                          - paragraph [ref=e131]: \"Couldn't load run #72\"\n                            - generic [ref=e133]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e134] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-154-dg-1440-initial-error.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                  - alert [ref=e129]:\n                    - paragraph [ref=e132]: Couldn't load digest delivery health\n                      - generic [ref=e134]: Could not reach the server. Please check your connection and try again.\n                      - button \"Retry\" [ref=e135] [cursor=pointer]:\n                        - text: Retry"
+  },
+  {
+    "file": "step-149-rw-390-detail-error.a11y.txt",
+    "text": "    - alert [ref=e6]:\n      - paragraph [ref=e9]: Couldn't load research details\n        - generic [ref=e11]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e12] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-161-rs-820-detail-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e124]:\n                          - paragraph [ref=e127]: \"Couldn't load run #72\"\n                            - generic [ref=e129]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e130] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-195-dg-1440-stale-exact.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                      - paragraph [ref=e126]: Last good update 03:53:50 AM · refreshes every 30s\n                    - alert [ref=e130]:\n                      - paragraph [ref=e131]: Couldn't refresh health data. Showing the last successful snapshot from 03:53:50 AM; it may be out of date."
+  },
+  {
+    "file": "step-167-rs-820-jobs-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                              - button \"Launch research run\" [disabled]:\n                              - paragraph [ref=e199]: Job history failed to load, so an active run can't be ruled out. Retry the jobs table below first.\n                        - alert [ref=e217]:\n                          - paragraph [ref=e220]: Couldn't load research jobs\n                            - generic [ref=e222]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e223] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-165-rs-390-discovery-events-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e183]:\n                          - paragraph [ref=e186]: Couldn't load this run's discoveries\n                            - generic [ref=e188]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e189] [cursor=pointer]:\n                              - text: Retry\n                              - alert [ref=e205]:\n                                - paragraph [ref=e208]: Couldn't load agent events\n                                  - generic [ref=e210]: Could not reach the server. Please check your connection and try again.\n                                  - button \"Retry\" [ref=e211] [cursor=pointer]:\n                                    - text: Retry"
+  },
+  {
+    "file": "step-163-rs-1440-discovery-events-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e188]:\n                          - paragraph [ref=e191]: Couldn't load this run's discoveries\n                            - generic [ref=e193]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e194] [cursor=pointer]:\n                              - text: Retry\n                              - alert [ref=e210]:\n                                - paragraph [ref=e213]: Couldn't load agent events\n                                  - generic [ref=e215]: Could not reach the server. Please check your connection and try again.\n                                  - button \"Retry\" [ref=e216] [cursor=pointer]:\n                                    - text: Retry"
+  },
+  {
+    "file": "step-125-rs-390-config-failure-exact.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                            - alert [ref=e191]: Could not reach the server. Please check your connection and try again.\n                              - button \"Launch research run\" [disabled]:"
+  },
+  {
+    "file": "step-156-gh-1440-full-errors.a11y.txt",
+    "text": "                      - alert [ref=e133]:\n                        - paragraph [ref=e136]: Couldn't load the repository settings\n                          - generic [ref=e138]: Could not reach the server. Please check your connection and try again. Pull and export stay disabled until they load.\n                          - button \"Retry\" [ref=e139] [cursor=pointer]:\n                            - text: Retry\n                          - button \"No configured repository available\" [disabled]:\n                    - alert [ref=e151]:\n                      - paragraph [ref=e154]: Couldn't load the sync queue\n                        - generic [ref=e156]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e157] [cursor=pointer]:\n                          - text: Retry\n                    - alert [ref=e164]:\n                      - paragraph [ref=e167]: Couldn't load sync history\n                        - generic [ref=e169]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e170] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-155-gh-1440-load-errors.a11y.txt",
+    "text": "                - link \"GitHub\" [disabled]\n                          - button \"Preview import\" [disabled]\n                          - button \"Pull\" [disabled]\n                          - button \"Sync now\" [disabled]\n                      - alert [ref=e133]:\n                        - paragraph [ref=e136]: Couldn't load the repository settings\n                          - generic [ref=e138]: Could not reach the server. Please check your connection and try again. Pull and export stay disabled until they load.\n                          - button \"Retry\" [ref=e139] [cursor=pointer]:\n                            - text: Retry\n                    - alert [ref=e146]:\n                      - paragraph [ref=e149]: Couldn't load sync history\n                        - generic [ref=e151]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e152] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-193-dg-390-stale-exact.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                      - paragraph [ref=e118]: Last good update 03:53:50 AM · refreshes every 30s\n                    - alert [ref=e122]:\n                      - paragraph [ref=e123]: Couldn't refresh health data. Showing the last successful snapshot from 03:53:50 AM; it may be out of date."
+  },
+  {
+    "file": "step-132-rs-1440-config-failure.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                            - alert [ref=e199]: Could not reach the server. Please check your connection and try again.\n                              - button \"Launch research run\" [disabled]:"
+  },
+  {
+    "file": "step-152-dg-820-initial-error.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                  - alert [ref=e125]:\n                    - paragraph [ref=e128]: Couldn't load digest delivery health\n                      - generic [ref=e130]: Could not reach the server. Please check your connection and try again.\n                      - button \"Retry\" [ref=e131] [cursor=pointer]:\n                        - text: Retry"
+  },
+  {
+    "file": "step-140-en-390-detail-error.a11y.txt",
+    "text": "    - alert [ref=e7]:\n      - paragraph [ref=e10]: Couldn't load this job's details\n        - generic [ref=e12]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e13] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-131-rs-820-config-failure.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                            - alert [ref=e195]: Could not reach the server. Please check your connection and try again.\n                              - button \"Launch research run\" [disabled]:"
+  },
+  {
+    "file": "step-187-rs-390-live-stale-visible.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - text: Live updates failed; showing the last good data and retrying."
+  },
+  {
+    "file": "step-158-gh-820-full-errors.a11y.txt",
+    "text": "                      - alert [ref=e129]:\n                        - paragraph [ref=e132]: Couldn't load the repository settings\n                          - generic [ref=e134]: Could not reach the server. Please check your connection and try again. Pull and export stay disabled until they load.\n                          - button \"Retry\" [ref=e135] [cursor=pointer]:\n                            - text: Retry\n                          - button \"No configured repository available\" [disabled]:\n                    - alert [ref=e147]:\n                      - paragraph [ref=e150]: Couldn't load the sync queue\n                        - generic [ref=e152]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e153] [cursor=pointer]:\n                          - text: Retry\n                    - alert [ref=e160]:\n                      - paragraph [ref=e163]: Couldn't load sync history\n                        - generic [ref=e165]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e166] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-170-rs-820-load-more-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e205]:\n                          - paragraph [ref=e208]: Couldn't load research jobs\n                            - generic [ref=e210]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e211] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-168-rs-1440-jobs-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                              - button \"Launch research run\" [disabled]:\n                              - paragraph [ref=e203]: Job history failed to load, so an active run can't be ruled out. Retry the jobs table below first.\n                        - alert [ref=e221]:\n                          - paragraph [ref=e224]: Couldn't load research jobs\n                            - generic [ref=e226]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e227] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-136-en-820-detail-error.a11y.txt",
+    "text": "    - alert [ref=e7]:\n      - paragraph [ref=e10]: Couldn't load this job's details\n        - generic [ref=e12]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e13] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-188-rs-820-live-stale-visible.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - text: Live updates failed; showing the last good data and retrying."
+  },
+  {
+    "file": "step-150-dg-390-initial-error.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                  - alert [ref=e121]:\n                    - paragraph [ref=e124]: Couldn't load digest delivery health\n                      - generic [ref=e126]: Could not reach the server. Please check your connection and try again.\n                      - button \"Retry\" [ref=e127] [cursor=pointer]:\n                        - text: Retry"
+  },
+  {
+    "file": "step-134-en-1440-jobs-error.a11y.txt",
+    "text": "                - link \"Enrichment\" [disabled]\n                          - button \"Run job\" [disabled]:\n                        - alert [ref=e150]:\n                          - paragraph [ref=e153]: Couldn't load enrichment jobs\n                            - generic [ref=e155]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e156] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-171-rs-390-load-more-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]"
+  },
+  {
+    "file": "step-148-rw-390-list-error.a11y.txt",
+    "text": "                - link \"Research\" [disabled]\n                    - alert [ref=e114]:\n                      - paragraph [ref=e117]: Couldn't load research notes\n                        - generic [ref=e119]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e120] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-166-rs-390-jobs-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                              - button \"Launch research run\" [disabled]:\n                              - paragraph [ref=e198]: Job history failed to load, so an active run can't be ruled out. Retry the jobs table below first.\n                        - alert [ref=e216]:\n                          - paragraph [ref=e219]: Couldn't load research jobs\n                            - generic [ref=e221]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e222] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-144-rw-1440-list-error.a11y.txt",
+    "text": "                - link \"Research\" [disabled]\n                    - alert [ref=e122]:\n                      - paragraph [ref=e125]: Couldn't load research notes\n                        - generic [ref=e127]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e128] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-141-en-390-list-error.a11y.txt",
+    "text": "                - link \"Enrichment\" [disabled]\n                          - button \"Run job\" [disabled]:\n                        - alert [ref=e145]:\n                          - paragraph [ref=e148]: Couldn't load enrichment jobs\n                            - generic [ref=e150]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e151] [cursor=pointer]:\n                              - text: Retry"
+  },
+  {
+    "file": "step-194-dg-820-stale-exact.a11y.txt",
+    "text": "                - link \"Digests\" [disabled]\n                      - paragraph [ref=e121]: Last good update 03:53:50 AM · refreshes every 30s\n                    - alert [ref=e125]:\n                      - paragraph [ref=e126]: Couldn't refresh health data. Showing the last successful snapshot from 03:53:50 AM; it may be out of date."
+  },
+  {
+    "file": "step-146-rw-820-list-error.a11y.txt",
+    "text": "                - link \"Research\" [disabled]\n                    - alert [ref=e118]:\n                      - paragraph [ref=e121]: Couldn't load research notes\n                        - generic [ref=e123]: Could not reach the server. Please check your connection and try again.\n                        - button \"Retry\" [ref=e124] [cursor=pointer]:\n                          - text: Retry"
+  },
+  {
+    "file": "step-142-en-1440-detail-error.a11y.txt",
+    "text": "    - alert [ref=e7]:\n      - paragraph [ref=e10]: Couldn't load this job's details\n        - generic [ref=e12]: Could not reach the server. Please check your connection and try again.\n        - button \"Retry\" [ref=e13] [cursor=pointer]:\n          - text: Retry"
+  },
+  {
+    "file": "step-160-rs-390-detail-error.a11y.txt",
+    "text": "                - link \"Researcher\" [disabled]\n                        - alert [ref=e123]:\n                          - paragraph [ref=e126]: \"Couldn't load run #72\"\n                            - generic [ref=e128]: Could not reach the server. Please check your connection and try again.\n                            - button \"Retry\" [ref=e129] [cursor=pointer]:\n                              - text: Retry"
+  }
+]

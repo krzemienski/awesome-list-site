@@ -1,0 +1,1104 @@
+{
+  "url": "https://awesome.video/settings/theme",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "reduced": true,
+  "overflow": 0,
+  "focused": "<body>\n    <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.\n         (A prior \"noscript\" match in this file was only a comment.) -->\n    <noscript>\n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);\">\n        <p style=\"font-size:20px;font-weight:700;margin:0 0 12px;\">Awesome Video</p>\n        <p style=\"margin:0 0 8px;\">This app requires JavaScript to browse thousands of curated video development resources.</p>\n        <p style=\"margin:0;\">Please enable JavaScript, or view the source list at\n          <a href=\"https://github.com/krzemienski/awesome-video\" style=\"color:var(--accent);\">github.com/krzemienski/awesome-video</a>.</p>\n      </div>\n    </noscript>\n    <div id=\"home-layout-boot-skeleton\" aria-hidden=\"true\">\n      <div style=\"max-width:960px;margin:0 auto\">\n        <div style=\"height:2rem;width:55%;background:var(--surface-2);margin-bottom:1rem\"></div>\n        <div style=\"height:1rem;width:80%;background:var(--surface-2);margin-bottom:2rem\"></div>\n        <div style=\"height:12rem;background:var(--surface-2);margin-bottom:1rem\"></div>\n      </div>\n    </div>\n    <div id=\"root\"><div role=\"region\" aria-label=\"Notifications (F8)\" tabindex=\"-1\" style=\"pointer-events: none;\"><ol tabindex=\"-1\" class=\"system-toast-viewport fixed bottom-[var(--app-bottom-inset,0px)] top-auto z-[100] flex max-h-screen w-full flex-col p-4 sm:bottom-[var(--app-bottom-inset,0px)] sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]\"></ol></div><div class=\"group/sidebar-wrapper flex w-full has-[[data-variant=inset]]:bg-sidebar overflow-x-clip flex-col flex-1 min-h-[auto] [--header-height:56px] min-[768px]:[--header-height:60px]\" style=\"--sidebar-width: var(--shell-sidebar-w, 280px); --sidebar-width-tablet: var(--shell-sidebar-w-tablet, 240px); --sidebar-width-icon: var(--shell-rail-w, 56px);\"><a href=\"#main\" class=\"skip-link\">Skip to main content</a><div class=\"page app-shell-page\" data-product-profile=\"learning-workspace\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\"><div class=\"grain\" aria-hidden=\"true\"></div><header class=\"app-canonical-header\"><span class=\"header-menu-control\"><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn\" data-ds-variant=\"ghost\" data-sidebar=\"trigger\" data-testid=\"mobile-drawer-trigger\" aria-label=\"Toggle sidebar\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-panel-left\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"></rect><path d=\"M9 3v18\"></path></svg><span class=\"sr-only\">Toggle sidebar</span></button><svg class=\"header-menu-icon\" aria-hidden=\"true\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M2 4 H14 M2 8 H14 M2 12 H14\"></path></svg></span><a data-testid=\"header-brand\" href=\"/\" class=\"header-brand\"><span class=\"header-logo\" aria-hidden=\"true\" data-testid=\"brand-mark\">av</span><span class=\"header-wordmark\" aria-hidden=\"true\">AWESOME.VIDEO</span><span class=\"sr-only\">AWESOME.VIDEO home</span></a><div class=\"header-spacer\"></div><button type=\"button\" class=\"header-search-trigger\"><svg aria-hidden=\"true\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"7\" cy=\"7\" r=\"5\"></circle><path d=\"M11 11 L14 14\"></path></svg><span class=\"sr-only\">Search 3,825 resources</span><span class=\"header-search-label\" aria-hidden=\"true\">Search <span>3,825 resources…</span></span><span class=\"kbd hide-mobile\" aria-hidden=\"true\">⌘K</span></button><nav class=\"header-nav hide-tablet\" aria-label=\"Primary\"><a href=\"/categories\" class=\"nav-link\">Browse</a><a href=\"/submit\" class=\"nav-link\">Submit</a><a href=\"/about\" class=\"nav-link\">About</a><a class=\"nav-link\" href=\"/design-system\" target=\"_blank\" rel=\"noopener noreferrer\">Docs ↗</a></nav><button type=\"button\" class=\"user-pill\" id=\"radix-:r0:\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\"><span class=\"header-avatar\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-log-in\" aria-hidden=\"true\"><path d=\"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4\"></path><polyline points=\"10 17 15 12 10 7\"></polyline><line x1=\"15\" x2=\"3\" y1=\"12\" y2=\"12\"></line></svg></span><span class=\"header-account-name hide-mobile\" aria-hidden=\"true\">Sign in</span><span class=\"sr-only\">Sign in, account menu</span></button></header><div class=\"app-shell-row\" data-browse-sidebar=\"false\"><div class=\"app-shell-column\"><main id=\"main\" data-product-profile=\"learning-workspace\" tabindex=\"-1\" class=\"app-shell-main focus:outline-none\"><div class=\"page-content-wrap\" data-admin=\"false\"><nav aria-label=\"Breadcrumb\" class=\"sr-only\" data-testid=\"page-breadcrumb\"><ol class=\"flex items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5 min-w-0 flex-nowrap overflow-hidden\"><li class=\"inline-flex items-center gap-1.5\"><a class=\"transition-colors hover:text-foreground\" href=\"/\" title=\"Home\" tabindex=\"-1\" data-testid=\"link-breadcrumb-home\">Home</a></li><li role=\"presentation\" aria-hidden=\"true\" class=\"[&amp;&gt;svg]:w-3.5 [&amp;&gt;svg]:h-3.5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right\"><path d=\"m9 18 6-6-6-6\"></path></svg></li><li class=\"inline-flex items-center gap-1.5\"><a class=\"transition-colors hover:text-foreground\" href=\"/settings\" title=\"Settings\" tabindex=\"-1\" data-testid=\"link-breadcrumb-hidden-settings\">Settings</a></li><li role=\"presentation\" aria-hidden=\"true\" class=\"[&amp;&gt;svg]:w-3.5 [&amp;&gt;svg]:h-3.5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right\"><path d=\"m9 18 6-6-6-6\"></path></svg></li><li class=\"inline-flex items-center gap-1.5 min-w-0\"><span role=\"link\" aria-disabled=\"true\" aria-current=\"page\" class=\"font-normal text-foreground block truncate\" title=\"Appearance\" data-testid=\"breadcrumb-mobile-current\">Appearance</span></li></ol></nav><div class=\"account-theme max-w-5xl space-y-10\"><div><a data-testid=\"link-back-home\" href=\"/\" class=\"inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-left h-4 w-4\"><path d=\"m12 19-7-7 7-7\"></path><path d=\"M19 12H5\"></path></svg>Back</a><div class=\"eyebrow theme-page__eyebrow\">── Settings · Theme</div><h1 class=\"page-title theme-page__title\">Theme Settings</h1><p class=\"theme-page__lede\">Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads. <span role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" class=\"theme-page__status\" data-testid=\"text-active-preset\">Active: Editorial · Crimson</span></p><div role=\"status\" aria-live=\"polite\" class=\"mt-3 flex flex-wrap items-center gap-3 text-sm text-[color:var(--text-2)]\" data-testid=\"text-account-sync\"><p>Theme choices are saved on this device.</p></div><a data-testid=\"link-design-system-showcase\" href=\"/design-system\" class=\"inline-flex items-center gap-1.5 text-sm text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4 hover:decoration-[color:var(--text)] mt-2 min-h-[44px]\">Explore the full design-system showcase →</a></div><div class=\"theme-sticky-preview no-print sticky top-[var(--header-height)] z-20 -mx-4 border-b border-[color:var(--border)] px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden\" data-testid=\"theme-sticky-preview\"><div class=\"flex items-center gap-3\"><span class=\"min-w-0 flex-1 font-sans\"><span class=\"block truncate text-sm font-bold tracking-tight\">The quick brown fox <em>jumps</em></span><span class=\"block truncate text-[11px] text-[color:var(--text-3)]\">Editorial · Crimson</span></span></div></div><section aria-label=\"Design system picker\" data-testid=\"system-picker\" class=\"no-print\"><div class=\"flex items-center gap-2 mb-4\"><h2 class=\"display-h theme-section__title\">Design System</h2></div><div role=\"radiogroup\" aria-label=\"Design system\" class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><button type=\"button\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\" data-testid=\"system-option-editorial\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">Editorial</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check theme-option__check\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><code class=\"theme-option__tag\">Magazine · Fraunces</code><p class=\"text-xs text-[color:var(--text-2)]\">Refined editorial — italic Fraunces drops, warm ink, generous leading.</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"system-option-geist\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">Geist</span></div><code class=\"theme-option__tag\">Modern · Geist Sans</code><p class=\"text-xs text-[color:var(--text-2)]\">Vercel-clean — neutral, soft 8px radii, quiet hover glow.</p></button></div></section><section aria-label=\"Accent picker\" data-testid=\"accent-picker\" class=\"no-print\"><div class=\"flex items-center gap-2 mb-4\"><h2 class=\"display-h theme-section__title\">Accent</h2></div><div role=\"radiogroup\" aria-label=\"Accent\" class=\"grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3\"><button type=\"button\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\" data-testid=\"accent-option-crimson\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Crimson</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check theme-option__check\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(255, 61, 82);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(184, 77, 255);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#ff3d52</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-magenta\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Magenta</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(236, 72, 153);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(244, 114, 182);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#ec4899</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-orange\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Orange</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(255, 122, 61);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(255, 184, 77);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#ff7a3d</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-amber\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Amber</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(255, 184, 77);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(255, 216, 107);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#ffb84d</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-emerald\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Emerald</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(52, 208, 140);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(94, 230, 184);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#34d08c</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-matrix\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Matrix</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(0, 255, 136);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(57, 255, 20);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#00ff88</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-cyan\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Cyan</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(94, 221, 242);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(125, 211, 252);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#5eddf2</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-violet\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Violet</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(157, 78, 221);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(199, 125, 255);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#9d4edd</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-lime\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Lime</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(170, 255, 0);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(0, 255, 136);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#aaff00</code></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"accent-option-rose\" class=\"btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-2\"><span class=\"font-semibold text-sm\">Rose</span></div><div class=\"flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2\"><div aria-hidden=\"true\" style=\"flex: 2 1 0%; background: rgb(255, 122, 138);\"></div><div aria-hidden=\"true\" style=\"flex: 1 1 0%; background: rgb(255, 179, 193);\"></div></div><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider\">#ff7a8a</code></button></div><p class=\"mt-4 text-xs text-[color:var(--text-2)]\">Switching systems keeps your accent unless you were on that system’s natural default — in which case the accent nudges to the new system’s natural default.</p></section><section aria-label=\"Font override picker\" data-testid=\"font-picker\" class=\"no-print\"><div class=\"flex items-center gap-2 mb-2\"><h2 class=\"display-h theme-section__title\">Font</h2></div><p class=\"text-xs text-[color:var(--text-2)] mb-4\">Override the system’s default font. “System default” falls back to the active design system’s bundled font.</p><div role=\"radiogroup\" aria-label=\"Font override\" class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3\"><button type=\"button\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\" data-testid=\"font-option-system\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">System default</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check theme-option__check\"><path d=\"M20 6 9 17l-5-5\"></path></svg></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: Inter, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"font-option-inter\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">Inter</span></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: Inter, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"font-option-dm-sans\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">DM Sans</span></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: &quot;DM Sans&quot;, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"font-option-source-sans\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">Source Sans 3</span></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: &quot;Source Sans 3&quot;, &quot;Source Sans Pro&quot;, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"font-option-ibm-plex\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">IBM Plex Sans</span></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: &quot;IBM Plex Sans&quot;, system-ui, sans-serif;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\" data-testid=\"font-option-jetbrains\" class=\"btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]\"><div class=\"flex items-center justify-between mb-1\"><span class=\"font-semibold text-sm\">JetBrains Mono</span></div><p class=\"text-sm text-[color:var(--text-2)]\" style=\"font-family: &quot;JetBrains Mono&quot;, ui-monospace, monospace;\">The quick brown fox jumps over the lazy dog. 0123456789</p></button></div></section><section aria-label=\"Live preview\" data-testid=\"theme-preview\" class=\"no-print\"><div class=\"flex items-center gap-2 mb-4\"><h2 class=\"display-h theme-section__title\">Live Preview</h2><span class=\"ml-2 text-xs text-[color:var(--text-3)]\">Editorial · Crimson</span></div><p class=\"text-xs text-[color:var(--text-2)] -mt-2 mb-4\" data-testid=\"preview-display-only-note\">Display-only specimens — the controls below are intentionally inactive.</p><article class=\"card text-card-foreground p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]\" data-testid=\"preview-card\" inert=\"\"><div class=\"space-y-2\"><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase\">Typography</code><p class=\"font-display text-3xl font-bold tracking-tight\">The quick brown fox <em class=\"serif-italic\">jumps</em> over</p><h3 class=\"font-sans text-lg font-semibold\">Section heading</h3><p class=\"text-sm text-[color:var(--text-2)] max-w-2xl\">Body copy renders in the system’s primary sans face. Accent color drives links, focus rings, and emphasized words — try a different accent above to see this paragraph re-tint instantly.</p><code class=\"block font-mono text-xs text-[color:var(--text-3)]\">0123456789 · const x = await fetch('/api/resources');</code></div><div class=\"space-y-2\"><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase\">Buttons</code><div class=\"flex flex-wrap gap-2\"><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"default\" data-testid=\"preview-btn-default\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-sparkles h-4 w-4 mr-1.5\"><path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"></path><path d=\"M20 3v4\"></path><path d=\"M22 5h-4\"></path><path d=\"M4 17v2\"></path><path d=\"M5 18H3\"></path></svg>Primary action</button><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"secondary\" data-testid=\"preview-btn-secondary\">Secondary</button><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"outline\" data-testid=\"preview-btn-outline\">Outline</button><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"ghost\" data-testid=\"preview-btn-ghost\">Ghost</button><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 danger min-h-[max(44px,var(--profile-control-height))] min-w-[44px]\" data-ds-variant=\"destructive\" data-testid=\"preview-btn-destructive\">Destructive</button><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]\" data-ds-variant=\"outline\" aria-label=\"Icon button\" data-testid=\"preview-btn-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-zap h-4 w-4\"><path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"></path></svg></button></div></div><div class=\"space-y-2\"><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase\">Badges</code><div class=\"flex flex-wrap gap-2\"><div class=\"chip focus:outline-none\">Default</div><div class=\"chip focus:outline-none\">Secondary</div><div class=\"chip focus:outline-none\">Outline</div><div class=\"chip focus:outline-none bad\">Destructive</div><div class=\"chip focus:outline-none accent\">Accent</div></div></div><div class=\"space-y-2\"><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase\">Form &amp; Surface</code><div class=\"grid sm:grid-cols-2 gap-3\"><input class=\"input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed\" placeholder=\"Search resources…\" data-testid=\"preview-input\"><div class=\"flex items-center gap-2 rounded-[var(--radius)] border border-[color:var(--border)] bg-[var(--bg)] px-3 py-2 text-xs\"><span class=\"text-[color:var(--text-3)]\">Try</span><kbd class=\"kbd font-mono\">⌘K</kbd><span class=\"text-[color:var(--text-3)]\">to open command palette</span></div></div></div><div class=\"space-y-2\"><code class=\"block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase\">Active Tokens</code><div class=\"grid grid-cols-3 gap-2 text-xs\"><div class=\"rounded-[var(--radius-sm)] border border-[color:var(--border)] p-2\" data-testid=\"preview-token-bg\"><div class=\"h-8 w-full rounded-[var(--radius-sm)] mb-1.5 border border-[color:var(--border)]\" style=\"background: var(--bg);\"></div><div class=\"font-mono text-xs text-[color:var(--text-3)]\">bg</div><div class=\"font-mono text-xs text-[color:var(--text-2)]\">--bg</div></div><div class=\"rounded-[var(--radius-sm)] border border-[color:var(--border)] p-2\" data-testid=\"preview-token-surface\"><div class=\"h-8 w-full rounded-[var(--radius-sm)] mb-1.5 border border-[color:var(--border)]\" style=\"background: var(--surface);\"></div><div class=\"font-mono text-xs text-[color:var(--text-3)]\">surface</div><div class=\"font-mono text-xs text-[color:var(--text-2)]\">--surface</div></div><div class=\"rounded-[var(--radius-sm)] border border-[color:var(--border)] p-2\" data-testid=\"preview-token-border\"><div class=\"h-8 w-full rounded-[var(--radius-sm)] mb-1.5 border border-[color:var(--border)]\" style=\"background: var(--border);\"></div><div class=\"font-mono text-xs text-[color:var(--text-3)]\">border</div><div class=\"font-mono text-xs text-[color:var(--text-2)]\">--border</div></div></div></div></article></section></div></div></main><footer class=\"app-footer\" data-testid=\"site-footer\"><div class=\"app-footer-grid\"><div class=\"app-footer-identity\"><p class=\"eyebrow app-footer-eyebrow\">── INDEX</p><a data-testid=\"footer-home\" aria-label=\"awesome.video home\" href=\"/\" class=\"display-h app-footer-name\">awesome.video</a><p class=\"app-footer-tagline\">A curated collection of awesome video resources, tools, and technologies for developers and content creators</p><div class=\"shimmer-line app-footer-shimmer\" aria-hidden=\"true\"></div></div><div><h2 class=\"app-footer-heading\">INDEXED</h2><p class=\"display-h app-footer-total\">3,825</p><p class=\"app-footer-stats\">9 categories<br>99 subcategories<br><span class=\"app-footer-live\"><span class=\"live-dot\" aria-hidden=\"true\"></span> live</span></p></div><nav aria-label=\"Explore categories\"><h2 class=\"app-footer-heading\">EXPLORE</h2><div class=\"app-footer-explore\"><a aria-label=\"Community &amp; Events\" href=\"/category/community-events\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◈</span><span aria-hidden=\"true\">Community</span></a><a aria-label=\"Encoding &amp; Codecs\" href=\"/category/encoding-codecs\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◇</span><span aria-hidden=\"true\">Encoding</span></a><a aria-label=\"General Tools\" href=\"/category/general-tools\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◆</span><span aria-hidden=\"true\">General</span></a><a aria-label=\"Infrastructure &amp; Delivery\" href=\"/category/infrastructure-delivery\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▣</span><span aria-hidden=\"true\">Infrastructure</span></a><a aria-label=\"Intro &amp; Learning\" href=\"/category/intro-learning\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▤</span><span aria-hidden=\"true\">Intro</span></a><a aria-label=\"Media Tools\" href=\"/category/media-tools\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▥</span><span aria-hidden=\"true\">Media</span></a><a aria-label=\"Players &amp; Clients\" href=\"/category/players-clients\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▶</span><span aria-hidden=\"true\">Players</span></a><a aria-label=\"Protocols &amp; Transport\" href=\"/category/protocols-transport\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">⟁</span><span aria-hidden=\"true\">Protocols</span></a><a aria-label=\"Standards &amp; Industry\" href=\"/category/standards-industry\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◉</span><span aria-hidden=\"true\">Standards</span></a></div></nav><div><h2 class=\"app-footer-heading\">SOURCE</h2><a class=\"app-footer-repo\" href=\"https://github.com/krzemienski/awesome-video\" target=\"_blank\" rel=\"noopener noreferrer\" data-testid=\"footer-github\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z\"></path></svg><span class=\"app-footer-repo-label\">krzemienski<span>/<wbr>awesome-video</span></span><span class=\"app-footer-repo-arrow\" aria-hidden=\"true\">↗</span></a><p class=\"app-footer-note\">Open-source. <a href=\"https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md\" target=\"_blank\" rel=\"noopener noreferrer\">PRs welcome</a>.<br>Indexed automatically from <span class=\"app-footer-mono\">README.md</span>.</p><div class=\"app-footer-contact\"><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs\" data-ds-variant=\"ghost\" data-testid=\"contact-open-form\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-mail\" aria-hidden=\"true\"><rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"></rect><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\"></path></svg>Contact maintainers</button></div></div></div><div class=\"app-footer-meta\"><span data-testid=\"footer-copyright\">© 2026 awesome.video · content CC0, code MIT</span><nav class=\"app-footer-meta-links\" aria-label=\"Site policies\"><a data-testid=\"footer-about\" href=\"/about\">About</a><a data-testid=\"footer-terms\" href=\"/terms\">Terms</a><a data-testid=\"footer-privacy\" href=\"/privacy\">Privacy</a><a data-testid=\"footer-code-of-conduct\" aria-label=\"Code of Conduct\" href=\"/code-of-conduct\">Conduct</a><button type=\"button\" data-testid=\"footer-cookie-settings\" class=\"btn ghost footer-cookie-settings\">Cookie settings</button><a href=\"https://github.com/krzemienski/awesome-video/issues\" target=\"_blank\" rel=\"noopener noreferrer\">Issues ↗</a><a href=\"/sitemap.xml\">Sitemap</a></nav><span>built with the awesome-list framework</span></div></footer></div></div></div></div></div>\n    <script nonce=\"\">\n      // BUG-018 (run19): routes without server-injected content (admin,\n      // noindex pages) used to show a blank black page until React mounted.\n      // Paint a minimal skeleton ONLY when #root is empty — injected SSR\n      // content (most public routes) already gives instant real content.\n      // React's createRoot().render() replaces this on mount.\n      (function () {\n        try {\n          var root = document.getElementById('root');\n          if (!root) return;\n          // Crawler-injected routes (#ssr-seo-content, never the hydrated Home\n          // tree): move the markup into the fixed #ssr-seo-hold overlay HERE,\n          // before the first paint, instead of in main.tsx after the bundle\n          // has executed. Re-inserting the nodes later re-registers the lead\n          // paragraph as a fresh Largest Contentful Paint candidate measured\n          // in the swapped web font (a few percent larger than the fallback\n          // paint), which dated the route's LCP to the bundle's execution\n          // instead of the document's first paint. The overlay stays\n          // semantic and interactive (real h1, links, no aria-hidden/inert)\n          // until main.tsx adopts it (data-preboot) right before React\n          // mounts underneath — so a bundle that never runs still leaves a\n          // usable page, exactly like the old in-#root fallback.\n          var ssr = root.querySelector('#ssr-seo-content');\n          if (ssr && root.getAttribute('data-home-ssr') !== 'true' && !document.getElementById('ssr-seo-hold')) {\n            var overlay = document.createElement('div');\n            overlay.id = 'ssr-seo-hold';\n            overlay.setAttribute('data-preboot', 'true');\n            // main.tsx judges readiness for THIS document's URL, not a later one.\n            overlay.setAttribute('data-pathname', location.pathname);\n            overlay.setAttribute(\n              'style',\n              'position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain'\n            );\n            while (root.firstChild) overlay.appendChild(root.firstChild);\n            document.body.appendChild(overlay);\n            return;\n          }\n          if (root.firstElementChild) return;\n          root.innerHTML =\n            '<div aria-hidden=\"true\" style=\"min-height:100vh;background:var(--bg);padding:40px 20px;max-width:960px;margin:0 auto\">' +\n            '<style nonce=\"dzM3CjN/fuvh857pGeylvA==\">@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:var(--surface-2);animation:bsk 1.4s ease-in-out infinite}</style>' +\n            '<div class=\"bsk\" style=\"height:2rem;width:60%;max-width:420px;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:1rem;width:80%;max-width:640px;margin-bottom:2rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%\"></div>' +\n            '</div>';\n        } catch (e) {}\n      })();\n    </script>\n    <script nonce=\"\">\n      // The Replit dev banner is a development-only convenience. Inject it only\n      // on Replit/dev hosts so production (awesome.video) never requests it.\n      (function () {\n        try {\n          var isDev = location.hostname.endsWith('.replit.dev') ||\n                      location.hostname === 'localhost' ||\n                      location.hostname.endsWith('.repl.co');\n          if (!isDev) return;\n          var s = document.createElement('script');\n          s.type = 'text/javascript';\n          s.src = 'https://replit.com/public/js/replit-dev-banner.js';\n          document.body.appendChild(s);\n        } catch (e) {}\n      })();\n    </script>\n    <script nonce=\"\" type=\"module\">(function(){var started=false;var start=function(){if(started)return;started=true;var s=document.createElement(\"script\");s.type=\"module\";s.crossOrigin=\"anonymous\";s.src=\"/assets/index-0OZjaKaA.js\";document.head.appendChild(s);};if(document.visibilityState===\"hidden\"||typeof requestAnimationFrame!==\"function\"){start();return;}requestAnimationFrame(function(){requestAnimationFrame(function(){setTimeout(start,0);});});setTimeout(start,1000);})();</script>\n<script src=\"https://i.replit.com/script.js\" async=\"\" data-website-id=\"71ccccc7-37f7-4f07-a880-5973ae4aa911\"></script>\n\n</body>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 14,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 58,
+        "bottom": 49.5,
+        "left": 14
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 72,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 116,
+        "bottom": 49.5,
+        "left": 72
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 274,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 318,
+        "bottom": 49.5,
+        "left": 274
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 332,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 376,
+        "bottom": 49.5,
+        "left": 332
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 19,
+        "y": 103,
+        "width": 39.234375,
+        "height": 20,
+        "top": 103,
+        "right": 58.234375,
+        "bottom": 123,
+        "left": 19
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Settings",
+      "href": "/settings",
+      "role": "A",
+      "rect": {
+        "x": 84.234375,
+        "y": 103,
+        "width": 53.953125,
+        "height": 20,
+        "top": 103,
+        "right": 138.1875,
+        "bottom": 123,
+        "left": 84.234375
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Back",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 104,
+        "width": 54.703125,
+        "height": 44,
+        "top": 104,
+        "right": 74.703125,
+        "bottom": 148,
+        "left": 20
+      },
+      "class": "inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
+    },
+    {
+      "name": "Explore the full design-system showcase →",
+      "href": "/design-system",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 384.78125,
+        "width": 287.984375,
+        "height": 44,
+        "top": 384.78125,
+        "right": 307.984375,
+        "bottom": 428.78125,
+        "left": 20
+      },
+      "class": "inline-flex items-center gap-1.5 text-sm text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4 hover:decoration-[color:var(--text)] mt-2 min-h-[44px]"
+    },
+    {
+      "name": "Editorial\nMagazine · Fraunces\n\nRefined editorial — italic Fraunces drops, warm ink, generous leading.",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 604.328125,
+        "width": 310,
+        "height": 131.59375,
+        "top": 604.328125,
+        "right": 330,
+        "bottom": 735.921875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Geist\nModern · Geist Sans\n\nVercel-clean — neutral, soft 8px radii, quiet hover glow.",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 747.921875,
+        "width": 310,
+        "height": 131.59375,
+        "top": 747.921875,
+        "right": 330,
+        "bottom": 879.515625,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Crimson\n#ff3d52",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 960.46875,
+        "width": 149,
+        "height": 130,
+        "top": 960.46875,
+        "right": 169,
+        "bottom": 1090.46875,
+        "left": 20
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Magenta\n#ec4899",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 960.46875,
+        "width": 149,
+        "height": 130,
+        "top": 960.46875,
+        "right": 330,
+        "bottom": 1090.46875,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Orange\n#ff7a3d",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1102.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1102.46875,
+        "right": 169,
+        "bottom": 1232.46875,
+        "left": 20
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Amber\n#ffb84d",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1102.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1102.46875,
+        "right": 330,
+        "bottom": 1232.46875,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Emerald\n#34d08c",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1244.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1244.46875,
+        "right": 169,
+        "bottom": 1374.46875,
+        "left": 20
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Matrix\n#00ff88",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1244.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1244.46875,
+        "right": 330,
+        "bottom": 1374.46875,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Cyan\n#5eddf2",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1386.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1386.46875,
+        "right": 169,
+        "bottom": 1516.46875,
+        "left": 20
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Violet\n#9d4edd",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1386.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1386.46875,
+        "right": 330,
+        "bottom": 1516.46875,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Lime\n#aaff00",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1528.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1528.46875,
+        "right": 169,
+        "bottom": 1658.46875,
+        "left": 20
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Rose\n#ff7a8a",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 181,
+        "y": 1528.46875,
+        "width": 149,
+        "height": 130,
+        "top": 1528.46875,
+        "right": 330,
+        "bottom": 1658.46875,
+        "left": 181
+      },
+      "class": "btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "System default\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1843.421875,
+        "width": 310,
+        "height": 106,
+        "top": 1843.421875,
+        "right": 330,
+        "bottom": 1949.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Inter\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 1961.421875,
+        "width": 310,
+        "height": 106,
+        "top": 1961.421875,
+        "right": 330,
+        "bottom": 2067.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "DM Sans\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 2079.421875,
+        "width": 310,
+        "height": 106,
+        "top": 2079.421875,
+        "right": 330,
+        "bottom": 2185.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Source Sans 3\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 2197.421875,
+        "width": 310,
+        "height": 106,
+        "top": 2197.421875,
+        "right": 330,
+        "bottom": 2303.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "IBM Plex Sans\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 2315.421875,
+        "width": 310,
+        "height": 106,
+        "top": 2315.421875,
+        "right": 330,
+        "bottom": 2421.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "JetBrains Mono\n\nThe quick brown fox jumps over the lazy dog. 0123456789",
+      "href": null,
+      "role": "radio",
+      "rect": {
+        "x": 20,
+        "y": 2433.421875,
+        "width": 310,
+        "height": 106,
+        "top": 2433.421875,
+        "right": 330,
+        "bottom": 2539.421875,
+        "left": 20
+      },
+      "class": "btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+      "disabled": false
+    },
+    {
+      "name": "Primary action",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 3013.375,
+        "width": 155.390625,
+        "height": 44,
+        "top": 3013.375,
+        "right": 200.390625,
+        "bottom": 3057.375,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 primary min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Secondary",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 3065.375,
+        "width": 101.34375,
+        "height": 44,
+        "top": 3065.375,
+        "right": 146.34375,
+        "bottom": 3109.375,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Outline",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 154.34375,
+        "y": 3065.375,
+        "width": 78.234375,
+        "height": 44,
+        "top": 3065.375,
+        "right": 232.578125,
+        "bottom": 3109.375,
+        "left": 154.34375
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Ghost",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 3117.375,
+        "width": 70.828125,
+        "height": 44,
+        "top": 3117.375,
+        "right": 115.828125,
+        "bottom": 3161.375,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Destructive",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 123.828125,
+        "y": 3117.375,
+        "width": 105.359375,
+        "height": 44,
+        "top": 3117.375,
+        "right": 229.1875,
+        "bottom": 3161.375,
+        "left": 123.828125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 danger min-h-[max(44px,var(--profile-control-height))] min-w-[44px]",
+      "disabled": false
+    },
+    {
+      "name": "Icon button",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 237.1875,
+        "y": 3117.375,
+        "width": 44,
+        "height": 44,
+        "top": 3117.375,
+        "right": 281.1875,
+        "bottom": 3161.375,
+        "left": 237.1875
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]",
+      "disabled": false
+    },
+    {
+      "name": "Search resources…",
+      "href": null,
+      "role": "INPUT",
+      "rect": {
+        "x": 45,
+        "y": 3360.9375,
+        "width": 260,
+        "height": 44,
+        "top": 3360.9375,
+        "right": 305,
+        "bottom": 3404.9375,
+        "left": 45
+      },
+      "class": "input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed",
+      "disabled": false
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 3802.9375,
+        "width": 195.046875,
+        "height": 44,
+        "top": 3802.9375,
+        "right": 215.046875,
+        "bottom": 3846.9375,
+        "left": 20
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 3993.40625,
+        "width": 143,
+        "height": 44,
+        "top": 3993.40625,
+        "right": 330,
+        "bottom": 4037.40625,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4022.21875,
+        "width": 143,
+        "height": 44,
+        "top": 4022.21875,
+        "right": 330,
+        "bottom": 4066.21875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4051.03125,
+        "width": 143,
+        "height": 44,
+        "top": 4051.03125,
+        "right": 330,
+        "bottom": 4095.03125,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4079.84375,
+        "width": 143,
+        "height": 44,
+        "top": 4079.84375,
+        "right": 330,
+        "bottom": 4123.84375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4108.65625,
+        "width": 143,
+        "height": 44,
+        "top": 4108.65625,
+        "right": 330,
+        "bottom": 4152.65625,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4137.46875,
+        "width": 143,
+        "height": 44,
+        "top": 4137.46875,
+        "right": 330,
+        "bottom": 4181.46875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4166.28125,
+        "width": 143,
+        "height": 44,
+        "top": 4166.28125,
+        "right": 330,
+        "bottom": 4210.28125,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4195.09375,
+        "width": 143,
+        "height": 44,
+        "top": 4195.09375,
+        "right": 330,
+        "bottom": 4239.09375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 4223.90625,
+        "width": 143,
+        "height": 44,
+        "top": 4223.90625,
+        "right": 330,
+        "bottom": 4267.90625,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 4322.3125,
+        "width": 258.734375,
+        "height": 44,
+        "top": 4322.3125,
+        "right": 278.734375,
+        "bottom": 4366.3125,
+        "left": 20
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 98.359375,
+        "y": 4378.3125,
+        "width": 73,
+        "height": 24,
+        "top": 4378.3125,
+        "right": 171.359375,
+        "bottom": 4402.3125,
+        "left": 98.359375
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 4432.703125,
+        "width": 310,
+        "height": 44,
+        "top": 4432.703125,
+        "right": 330,
+        "bottom": 4476.703125,
+        "left": 20
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 4553.703125,
+        "width": 44,
+        "height": 44,
+        "top": 4553.703125,
+        "right": 64,
+        "bottom": 4597.703125,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 78,
+        "y": 4553.703125,
+        "width": 44,
+        "height": 44,
+        "top": 4553.703125,
+        "right": 122,
+        "bottom": 4597.703125,
+        "left": 78
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 136,
+        "y": 4553.703125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4553.703125,
+        "right": 184.515625,
+        "bottom": 4597.703125,
+        "left": 136
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 198.515625,
+        "y": 4553.703125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4553.703125,
+        "right": 247.03125,
+        "bottom": 4597.703125,
+        "left": 198.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 4597.703125,
+        "width": 103.953125,
+        "height": 44,
+        "top": 4597.703125,
+        "right": 123.953125,
+        "bottom": 4641.703125,
+        "left": 20
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 137.953125,
+        "y": 4597.703125,
+        "width": 55.46875,
+        "height": 44,
+        "top": 4597.703125,
+        "right": 193.421875,
+        "bottom": 4641.703125,
+        "left": 137.953125
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 207.421875,
+        "y": 4597.703125,
+        "width": 48.515625,
+        "height": 44,
+        "top": 4597.703125,
+        "right": 255.9375,
+        "bottom": 4641.703125,
+        "left": 207.421875
+      },
+      "class": ""
+    }
+  ],
+  "resources": [
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-mono-D0YFCcQg.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/ThemeSettings-DeWCwgsC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/arrow-left-DEdDATMn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/ThemeSettings-C1J8hyMQ.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/account-CPzh-fWY.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    }
+  ]
+}

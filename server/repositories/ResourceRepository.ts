@@ -38,7 +38,7 @@ import {
 } from "@shared/schema";
 import { db, runInTransaction } from "../db";
 import { eq, and, sql, asc, desc, like, inArray, isNull, getTableColumns } from "drizzle-orm";
-import { tokenizeSearchQuery } from "@shared/searchNormalize";
+import { isLiteralSearchToken, tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
 import { transitionResourceInTransaction, withResourcePublication } from "./resourcePublication";
@@ -48,6 +48,7 @@ import {
   resourceFormatSchema,
   resourceProviderSchema,
   resourceSkillLevelSchema,
+  type ResourceFacetKind,
   type ResourceFormat,
   type ResourceProvider,
   type ResourceSearchFacets,
@@ -62,6 +63,10 @@ import {
   type ResourceKind,
   type ResourceKindCounts,
 } from "../lib/resourceKinds";
+import { compareTitles, titleOrderAsc, titleOrderDesc } from "../lib/titleOrder";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("resources");
 
 /**
  * Options for listing resources with filtering and pagination
@@ -82,7 +87,8 @@ export interface ListResourceOptions {
   skillLevel?: ResourceSkillLevel;
   /** Limit results to resources attached directly to this taxonomy level. */
   generalScope?: "category" | "subcategory";
-  includeFacets?: boolean;
+  /** Facet groups to count (disjunctive: each ignores its own filter). Omit for none; each kind costs one UNION branch. */
+  facets?: readonly ResourceFacetKind[];
   /** C9-V5A-06: admin lists must show exact full-text matches only, never fuzzy near-misses. */
   exactSearchOnly?: boolean;
   /** Admin list: a search also matches any resource whose URL contains the raw text. */
@@ -145,6 +151,21 @@ type FuzzyMatch = {
   titleLengthDelta: number;
   editDirectionPriority: number;
 };
+
+/**
+ * Whole-word, case-insensitive pattern for a literal search token. Every regex
+ * metacharacter is escaped and the pattern is bound as a parameter, so a query
+ * only ever matches its own text. The token must start a word ("mpv.net" does
+ * not match ".net"). A token ending in a letter or digit must also end a word;
+ * one ending in "+" or "#" may be followed by digits ("C++11") but not letters,
+ * so "c++" does not match "C++foo".
+ */
+function literalWordPattern(token: string): string {
+  const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const edge = "[^[:alnum:]_]";
+  const end = /[\p{L}\p{N}]$/u.test(token) ? `(${edge}|$)` : "([^[:alpha:]]|$)";
+  return `(^|${edge})${escaped}${end}`;
+}
 
 function compactSearchText(value: string): string {
   return value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
@@ -248,7 +269,16 @@ function fuzzyMatchForCandidate(
         }
         for (const variant of variants) {
           const lengthDelta = Math.abs(needle.length - variant.length);
-          if (lengthDelta > maxDistance || !sharesBigram(needleBigrams, variant)) continue;
+          // A swapped pair of letters ("hsl" for "hls") can share no bigram
+          // with the intended short word, so whole-word spans (never title
+          // prefixes) one edit away bypass the prefilter.
+          const isTransposition =
+            variant === span &&
+            needle.length <= 4 &&
+            lengthDelta === 0 &&
+            variant !== needle &&
+            boundedDamerauLevenshtein(needle, variant, 1) === 1;
+          if (lengthDelta > maxDistance || !(isTransposition || sharesBigram(needleBigrams, variant))) continue;
           const distance = boundedDamerauLevenshtein(needle, variant, maxDistance);
           const normalizedDistance = distance / Math.max(needle.length, variant.length);
           if (distance > maxDistance || normalizedDistance > 0.4) continue;
@@ -263,7 +293,7 @@ function fuzzyMatchForCandidate(
             titleLengthDelta: Math.abs(needle.length - compactSearchText(candidate.title).length),
             editDirectionPriority: isSubsequence(variant, needle)
               ? 0
-              : isSubsequence(needle, variant)
+              : isTransposition || isSubsequence(needle, variant)
                 ? 1
                 : 2,
           };
@@ -314,12 +344,11 @@ function scoreFuzzyCandidates(
     .filter((match): match is FuzzyMatch => Boolean(match));
 
   return matches.sort((left, right) => {
-    const titleOrder = left.title.localeCompare(right.title, undefined, { sensitivity: "base" });
     switch (sort) {
       case "name-asc":
-        return titleOrder || left.id - right.id;
+        return compareTitles(left, right);
       case "name-desc":
-        return -titleOrder || right.id - left.id;
+        return compareTitles(right, left);
       case "oldest":
         return (left.createdAt?.getTime() ?? 0) - (right.createdAt?.getTime() ?? 0) || left.id - right.id;
       case "newest":
@@ -333,17 +362,23 @@ function scoreFuzzyCandidates(
           left.normalizedDistance - right.normalizedDistance ||
           left.lengthDelta - right.lengthDelta ||
           left.titleLengthDelta - right.titleLengthDelta ||
-          titleOrder ||
-          left.id - right.id
+          compareTitles(left, right)
         );
     }
   });
 }
 
+/** How many top-ranked fuzzy matches the did-you-mean suggestion considers. */
+const SUGGESTION_POOL_SIZE = 50;
+
 function bestSearchSuggestion(query: string, titles: string[]): string | undefined {
   const needle = query.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
   if (!needle) return undefined;
-  let best: { display: string; score: number; lengthDelta: number } | undefined;
+  // Ties on edit score prefer one real word over a stitched phrase, then
+  // letters over digit fragments, then closer length: "hsl" ties "HLS" with
+  // "2 SL", and "hevcc" ties "HEVC" with "HEVC H"; the single word is the
+  // useful search in each case.
+  let best: { display: string; score: number; lengthDelta: number; parts: number; digits: number } | undefined;
   for (const title of titles) {
     const words = title.match(/[\p{L}\p{N}]+/gu) ?? [];
     const candidates: string[][] = [];
@@ -357,8 +392,16 @@ function bestSearchSuggestion(query: string, titles: string[]): string | undefin
       const distance = damerauLevenshtein(needle, normalized);
       const score = distance / Math.max(needle.length, normalized.length);
       const lengthDelta = Math.abs(needle.length - normalized.length);
-      if (!best || score < best.score || (score === best.score && lengthDelta < best.lengthDelta)) {
-        best = { display: parts.join(" "), score, lengthDelta };
+      const digits = /\d/.test(normalized) ? 1 : 0;
+      const better =
+        !best ||
+        score < best.score ||
+        (score === best.score &&
+          (parts.length < best.parts ||
+            (parts.length === best.parts &&
+              (digits < best.digits || (digits === best.digits && lengthDelta < best.lengthDelta)))));
+      if (better) {
+        best = { display: parts.join(" "), score, lengthDelta, parts: parts.length, digits };
       }
     }
   }
@@ -416,7 +459,7 @@ export class ResourceRepository {
       sort,
       kind,
       featuredOnly = false,
-      includeFacets = false,
+      facets: facetKinds = [],
       exactSearchOnly = false,
       matchUrlSubstring = false,
     } = options;
@@ -432,7 +475,9 @@ export class ResourceRepository {
     // C3-V2-03: Postgres indexes dotted names ("hls.js", "video.js") as one
     // host-style lexeme, so the punctuation-stripped prefix alone ("hlsjs:*")
     // missed most of them. A dotted token matches either form.
+    const literalTokens = searchTokens.filter(isLiteralSearchToken);
     const tsQuery = searchTokens
+      .filter((token) => !isLiteralSearchToken(token))
       .map((token) => {
         const lower = token.toLowerCase();
         const stripped = lower.replace(/[^\p{L}\p{N}_]+/gu, "");
@@ -454,9 +499,11 @@ export class ResourceRepository {
       })
       .filter(Boolean)
       .join(" & ");
-    const tsSearchCondition = tsQuery
-      ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
-      : undefined;
+    const searchDocument = sql`(coalesce(${resources.title}, '') || ' ' || coalesce(${resources.description}, '') || ' ' || coalesce(${resources.url}, ''))`;
+    const textSearchCondition = and(
+      tsQuery ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})` : undefined,
+      ...literalTokens.map((token) => sql`${searchDocument} ~* ${literalWordPattern(token)}`),
+    );
     // Full-text tokens drop URL punctuation, so a pasted URL or path only ever
     // matched its host. The admin list also matches the literal URL text.
     const rawSearch = (search ?? "").trim();
@@ -468,9 +515,9 @@ export class ResourceRepository {
     const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+\//i.test(rawSearch);
     const strictSearchCondition = urlSearchCondition && looksLikeUrl
       ? urlSearchCondition
-      : tsSearchCondition && urlSearchCondition
-        ? sql`(${tsSearchCondition} OR ${urlSearchCondition})`
-        : tsSearchCondition ?? urlSearchCondition;
+      : textSearchCondition && urlSearchCondition
+        ? sql`(${textSearchCondition} OR ${urlSearchCondition})`
+        : textSearchCondition ?? urlSearchCondition;
     const safeMetadataTags = sql`CASE
       WHEN jsonb_typeof(${resources.metadata}->'tags') = 'array'
       THEN ${resources.metadata}->'tags'
@@ -552,14 +599,14 @@ export class ResourceRepository {
       countQuery = countQuery.where(and(...conditions));
     }
 
-    // R3-H08: server-side sort. Title sorts are case-insensitive; id is a
-    // deterministic tiebreaker (createdAt is identical for bulk-seeded rows).
+    // R3-H08: server-side sort. id is a deterministic tiebreaker (createdAt
+    // is identical for bulk-seeded rows).
     const orderBy = (() => {
       switch (sort) {
         case "name-asc":
-          return [asc(sql`lower(${resources.title})`), asc(resources.id)];
+          return titleOrderAsc;
         case "name-desc":
-          return [desc(sql`lower(${resources.title})`), desc(resources.id)];
+          return titleOrderDesc;
         case "oldest":
           return [asc(resources.createdAt), asc(resources.id)];
         case "newest":
@@ -570,14 +617,16 @@ export class ResourceRepository {
           // relevance — exact title match first, then built-in full-text rank.
           // This prevents a prefix match (for example,
           // "ffmpeg-wasm") from outranking a direct "FFmpeg" lookup.
-          if (tsSearchCondition) {
+          if (textSearchCondition) {
             const q = normalizedSearch.toLowerCase();
             return [
               asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
-              desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`),
+              ...(literalTokens.length > 0
+                ? [desc(sql`${and(...literalTokens.map((token) => sql`coalesce(${resources.title}, '') ~* ${literalWordPattern(token)}`))}`)]
+                : []),
+              ...(tsQuery ? [desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`)] : []),
               asc(sql`length(${resources.title})`),
-              asc(sql`lower(${resources.title})`),
-              asc(resources.id),
+              ...titleOrderAsc,
             ];
           }
           return [desc(resources.createdAt), desc(resources.id)];
@@ -587,45 +636,31 @@ export class ResourceRepository {
     const getFacetPromise = (
       facetSearchCondition: ReturnType<typeof sql> | undefined,
     ): Promise<ResourceSearchFacets | undefined> => {
-      if (!includeFacets) return Promise.resolve(undefined);
+      if (facetKinds.length === 0) return Promise.resolve(undefined);
       const whereSql = (omit?: Parameters<typeof buildConditions>[0]) => {
         const facetConditions = buildConditions(omit, facetSearchCondition);
         return facetConditions.length > 0 ? and(...facetConditions)! : sql`true`;
       };
-      return db.execute(sql`
-          SELECT facet, value, count
-          FROM (
-            SELECT 'category'::text AS facet, ${resources.category} AS value, count(*)::int AS count
+      const has = (kind: ResourceFacetKind) => facetKinds.includes(kind);
+      const plainBranch = (
+        facet: string,
+        valueSql: ReturnType<typeof sql>,
+        omit: NonNullable<Parameters<typeof buildConditions>[0]>,
+        notNull?: ReturnType<typeof sql>,
+      ) => sql`
+            SELECT ${sql.raw(`'${facet}'`)}::text AS facet, ${valueSql} AS value, count(*)::int AS count
             FROM ${resources}
-            WHERE ${whereSql("category")}
-            GROUP BY ${resources.category}
-            UNION ALL
-            SELECT 'subcategory', coalesce(${resources.subcategory}, ''), count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("subcategory")} AND ${resources.subcategory} IS NOT NULL
-            GROUP BY ${resources.subcategory}
-            UNION ALL
-            SELECT 'subSubcategory', coalesce(${resources.subSubcategory}, ''), count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("subSubcategory")} AND ${resources.subSubcategory} IS NOT NULL
-            GROUP BY ${resources.subSubcategory}
-            UNION ALL
-            SELECT 'provider', ${resources.provider}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("provider")}
-            GROUP BY ${resources.provider}
-            UNION ALL
-            SELECT 'resourceFormat', ${resources.resourceFormat}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("resourceFormat")}
-            GROUP BY ${resources.resourceFormat}
-            UNION ALL
-            SELECT 'skillLevel', ${resources.skillLevel}, count(*)::int
-            FROM ${resources}
-            WHERE ${whereSql("skillLevel")}
-            GROUP BY ${resources.skillLevel}
-            UNION ALL
-            SELECT 'tag', ${canonicalTagSql}, count(DISTINCT ${resources.id})::int
+            WHERE ${whereSql(omit)}${notNull ? sql` AND ${notNull}` : sql``}
+            GROUP BY ${valueSql}`;
+      const branches = [
+        has("categories") && plainBranch("category", sql`${resources.category}`, "category"),
+        has("subcategories") && plainBranch("subcategory", sql`coalesce(${resources.subcategory}, '')`, "subcategory", sql`${resources.subcategory} IS NOT NULL`),
+        has("subSubcategories") && plainBranch("subSubcategory", sql`coalesce(${resources.subSubcategory}, '')`, "subSubcategory", sql`${resources.subSubcategory} IS NOT NULL`),
+        has("providers") && plainBranch("provider", sql`${resources.provider}`, "provider"),
+        has("formats") && plainBranch("resourceFormat", sql`${resources.resourceFormat}`, "resourceFormat"),
+        has("skillLevels") && plainBranch("skillLevel", sql`${resources.skillLevel}`, "skillLevel"),
+        has("tags") && sql`
+            SELECT 'tag'::text AS facet, ${canonicalTagSql} AS value, count(DISTINCT ${resources.id})::int AS count
             FROM ${resources}
             CROSS JOIN LATERAL (${resourceTagSource}) AS resource_tag(value)
             WHERE ${whereSql("tags")} AND trim(resource_tag.value) <> ''
@@ -633,8 +668,11 @@ export class ResourceRepository {
             -- Drizzle assigns fresh parameter positions to repeated SQL
             -- fragments, so PostgreSQL does not consider the two rendered CASE
             -- expressions structurally identical (42803).
-            GROUP BY 2
-          ) facet_counts
+            GROUP BY 2`,
+      ].filter((branch): branch is ReturnType<typeof sql> => branch !== false);
+      return db.execute(sql`
+          SELECT facet, value, count
+          FROM (${sql.join(branches, sql` UNION ALL `)}) facet_counts
           WHERE value <> ''
           ORDER BY facet, count DESC, lower(value), value
         `).then((result) => {
@@ -697,7 +735,9 @@ export class ResourceRepository {
         };
       }
 
-      if (exactSearchOnly) {
+      // The fuzzy scorer compares letters and digits only, so it would read
+      // "c++" as "c" and offer near-misses for the very word the query ruled out.
+      if (exactSearchOnly || literalTokens.length > 0) {
         return {
           resources: [],
           total: 0,
@@ -781,11 +821,15 @@ export class ResourceRepository {
         .map((id) => rowsById.get(id))
         .filter((resource): resource is Resource => Boolean(resource));
       const searchMetadata: ResourceSearchMetadata = { mode: "fuzzy" };
-      if (resourceList[0]?.title) {
-        searchMetadata.suggestion = bestSearchSuggestion(
-          normalizedSearch,
-          resourceList.map((resource) => resource.title),
-        );
+      // Suggest from the best-ranked matches, not just this page: a small
+      // `limit` or a later page would otherwise hide the intended term
+      // (sweep NEW-004: hsl suggested "dev Slack" with limit=3).
+      const suggestionTitles = filteredMatches
+        .slice(0, SUGGESTION_POOL_SIZE)
+        .map((match) => match.title)
+        .filter(Boolean);
+      if (suggestionTitles.length > 0) {
+        searchMetadata.suggestion = bestSearchSuggestion(normalizedSearch, suggestionTitles);
       }
       return {
         resources: resourceList,
@@ -915,7 +959,7 @@ export class ResourceRepository {
       const code = error?.code ?? cause?.code;
       const constraint = String(error?.constraint ?? cause?.constraint ?? '');
       if (code !== '23505' || constraint !== 'resources_pkey') throw error;
-      console.warn(
+      logger.warn(
         'resources_id_seq drift detected (23505 on resources_pkey); resyncing sequence and retrying insert',
       );
       await db.execute(
@@ -1063,13 +1107,19 @@ export class ResourceRepository {
   async updateResource(
     id: number,
     resource: Partial<InsertResource>,
-    audit: { performedBy?: string; notes?: string } | false = {},
+    audit: { performedBy?: string; notes?: string; rejectionReason?: string } | false = {},
+    options: { mergeMetadata?: Record<string, unknown> } = {},
   ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
     return withResourcePublication(tx => transitionResourceInTransaction(
       tx, id, resource, audit ? audit.performedBy : undefined,
-      { audit: audit !== false, notes: audit ? audit.notes : undefined },
+      {
+        audit: audit !== false,
+        notes: audit ? audit.notes : undefined,
+        rejectionReason: audit ? audit.rejectionReason : undefined,
+        mergeMetadata: options.mergeMetadata,
+      },
     ));
   }
 

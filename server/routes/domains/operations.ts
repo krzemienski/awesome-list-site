@@ -34,6 +34,11 @@ import { getOperationalTelemetrySnapshot } from "../../ops/operationalTelemetry"
 import { getPublicCacheSnapshot } from "../../cache/publicCache";
 import type { UserRepository } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+import { CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
+import { sendInvalidResourceId } from "./catalog-contributions";
+
+const logger = createLogger("ops");
 
 /**
  * Dependencies the operational handlers need from the composing module. These
@@ -88,7 +93,7 @@ export function registerOperationsRoutes(
         status: readiness.ready ? "ready" : "degraded",
         readiness: getReadinessSnapshot(),
         databasePool: {
-          max: 3,
+          max: (pool as unknown as { options: { max: number } }).options.max,
           total: pool.totalCount,
           idle: pool.idleCount,
           active: Math.max(0, pool.totalCount - pool.idleCount),
@@ -147,7 +152,7 @@ export function registerOperationsRoutes(
         config,
       });
     } catch (error) {
-      console.error('Error checking AI health:', error);
+      logger.error('Error checking AI health:', error);
       res.status(500).json({ status: 'error', error: 'Failed to check AI service health' });
     }
   }));
@@ -177,14 +182,17 @@ export function registerOperationsRoutes(
     });
   }
 
-  // Run16 BUG-091: one "not found" body per semantic — /api/resources/abc used
-  // to fall to the generic catch-all ('Not found') while /api/resources/0 said
-  // 'Resource not found'. A non-numeric id is still a resource lookup. Non-GET
+  // Run16 BUG-091: /api/resources/abc used to fall to the generic catch-all
+  // while /api/resources/0 answered differently. A non-numeric id is still a
+  // resource lookup, so it takes the one malformed-id policy below. Non-GET
   // methods on the detail path get 405 like the collections above.
   app.all('/api/resources/:id', (req, res, next) => {
     if (req.method === 'OPTIONS') return next();
+    // H4-02: digit ids were answered by the detail route (400 for 0 or past
+    // int4, 404 for a missing row); everything else (-1, 1.5, abc) is the same
+    // malformed-id 400, not a 404 for a row that was never looked up.
     if (req.method === 'GET' || req.method === 'HEAD') {
-      return res.status(404).json({ message: 'Resource not found' });
+      return sendInvalidResourceId(res, req.params.id);
     }
     res.set('Allow', 'GET');
     return res.status(405).json({ message: `Method ${req.method} not allowed. Allowed: GET` });
@@ -196,6 +204,8 @@ export function registerOperationsRoutes(
   // /api/openapi.json and a CSP-safe (no external scripts) human-readable
   // index at /api/docs.
   app.get('/api/openapi.json', (_req, res) => {
+    // The spec is generated from code and identical for every caller.
+    res.set('Cache-Control', CATALOG_CACHE_CONTROL);
     res.json(getSwaggerSpec());
   });
   app.get('/api/docs', (_req, res) => {
@@ -275,6 +285,8 @@ ${rows.join('\n')}
   // 405 + Allow header (canonical {message} envelope) instead of a misleading
   // 404 — DELETE /api/resources/1 and PUT /api/search used to claim the
   // route didn't exist at all.
+  // A route that lists more verbs than any real endpoint is an app.all() fallback.
+  const ALL_VERBS_THRESHOLD = 10;
   app.use('/api', (req, res) => {
     const fullPath = ((req.baseUrl || '') + (req.path || '')).replace(/\/+$/, '') || '/';
     const allowed = new Set<string>();
@@ -297,16 +309,26 @@ ${rows.join('\n')}
         (h: any) => h?.handle === isAuthenticated || h?.handle === isAdmin,
       );
       if (!hasAuthGuard) allMatchesRequireAuth = false;
-      for (const m of Object.keys(route.methods || {})) {
-        if (m === '_all') continue;
-        allowed.add(m.toUpperCase());
-      }
+      // app.all() fallbacks register every HTTP verb on their route; they say
+      // nothing about what the path really serves.
+      const verbs = Object.keys(route.methods || {}).filter((m) => m !== '_all');
+      if (verbs.length > ALL_VERBS_THRESHOLD) continue;
+      for (const m of verbs) allowed.add(m.toUpperCase());
+    }
+    // clerkUserContext resolves req.dbUser per request; there is no
+    // Passport-style req.isAuthenticated() under Clerk.
+    const isAuthed = Boolean((req as any).dbUser);
+    const verbMapHidden = sawMatch && allMatchesRequireAuth && !isAuthed;
+    if (req.method === 'OPTIONS' && allowed.size > 0 && !verbMapHidden) {
+      // H4-07: the core API is same-origin, so OPTIONS on an existing route is
+      // plain introspection — 204 + Allow, deliberately no Access-Control-*
+      // (only /api/public/* and the spec open CORS, in publicApiCors).
+      if (allowed.has('GET')) allowed.add('HEAD');
+      allowed.add('OPTIONS');
+      return res.status(204).set('Allow', Array.from(allowed).sort().join(', ')).end();
     }
     if (allowed.size > 0 && !allowed.has(req.method)) {
-      // clerkUserContext resolves req.dbUser per request; there is no
-      // Passport-style req.isAuthenticated() under Clerk.
-      const isAuthed = Boolean((req as any).dbUser);
-      if (sawMatch && allMatchesRequireAuth && !isAuthed) {
+      if (verbMapHidden) {
         // Uniform envelope with the real handlers' anonymous answer.
         return res.status(401).json({ message: 'Unauthorized' });
       }

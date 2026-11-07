@@ -1,0 +1,180 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list [ref=e4] clickable [onclick]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e93]
+              - listitem [level=1]
+                - link "Learning Journeys" [ref=e94]
+              - listitem [level=1]
+                - link "Advanced Live Streaming Architecture" [disabled, ref=e95]
+          - button "Back to Journeys" [ref=e15]
+            - image
+            - StaticText "Back to Journeys"
+          - article
+            - image
+            - StaticText "Advanced"
+            - image
+            - StaticText "COMPLETED"
+            - heading "Advanced Live Streaming Architecture" [level=1, ref=e24]
+            - StaticText "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+            - image
+            - StaticText "20-25 HOURS"
+            - StaticText "PROTOCOLS & TRANSPORT"
+            - StaticText "6"
+            - StaticText " "
+            - StaticText "STEPS"
+            - heading "Your Progress" [level=2, ref=e25]
+            - StaticText "100"
+            - StaticText "%"
+            - progressbar "Advanced Live Streaming Architecture progress: 100%": 100
+            - paragraph
+          - heading "Learning Path" [level=2, ref=e16]
+          - article
+            - image
+            - heading "Live Streaming Fundamentals" [level=3, ref=e26]
+            - paragraph
+              - StaticText "Review the live-streaming pipeline end-to-end: contribution, transcoding, packaging, distribution and playback timing budgets."
+            - link "Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT" [ref=e27]
+              - StaticText "Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT"
+            - link "Open Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT on its source site (new tab)" [ref=e28]
+            - paragraph
+            - link "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e29]
+              - StaticText "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+            - link "Open 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared on its source site (new tab)" [ref=e30]
+            - paragraph
+            - link "Streaming Learning Center's Beginner's Guide to Live Streaming" [ref=e31]
+            - link "Open Streaming Learning Center's Beginner's Guide to Live Streaming on its source site (new tab)" [ref=e32]
+            - paragraph
+            - button "Completed — Undo: Live Streaming Fundamentals" [ref=e33]
+          - article
+            - image
+            - heading "Low-Latency Protocols" [level=3, ref=e34]
+            - paragraph
+            - link "Low Latency Live Streaming" [ref=e35]
+            - link "Open Low Latency Live Streaming on its source site (new tab)" [ref=e36]
+            - paragraph
+            - link "BlendVision: Top 6 Live Streaming Protocols Comparison" [ref=e37]
+              - StaticText "BlendVision: Top 6 Live Streaming Protocols Comparison"
+            - link "Open BlendVision: Top 6 Live Streaming Protocols Comparison on its source site (new tab)" [ref=e38]
+            - paragraph
+              - StaticText "A comprehensive comparison of six common live streaming protocols: RTP, SRT, RTMP, RIST, ZiXi, and WebRTC. The article explores their technical characteristics, application scenarios, and differences, aiding developers in selecting the most suitable protocol for their live streaming services."
+            - link "CMAF for Low Latency Streaming – Bitmovin" [ref=e39]
+            - link "Open CMAF for Low Latency Streaming – Bitmovin on its source site (new tab)" [ref=e40]
+            - paragraph
+            - button "Completed — Undo: Low-Latency Protocols" [ref=e41]
+          - article
+            - image
+            - heading "Scalable Distribution Patterns" [level=3, ref=e42]
+            - paragraph
+            - link "cdnselector — Multi-CDN Switching/Failover Server" [ref=e43]
+            - link "Open cdnselector — Multi-CDN Switching/Failover Server on its source site (new tab)" [ref=e44]
+            - paragraph
+            - link "Unified Streaming — Origin Shield Cache Recommendations" [ref=e45]
+            - link "Open Unified Streaming — Origin Shield Cache Recommendations on its source site (new tab)" [ref=e46]
+            - paragraph
+            - link "Content Steering: A Standard for Multi-CDN Streaming" [ref=e47]
+              - StaticText "Content Steering: A Standard for Multi-CDN Streaming"
+            - link "Open Content Steering: A Standard for Multi-CDN Streaming on its source site (new tab)" [ref=e48]
+            - paragraph
+            - button "Completed — Undo: Scalable Distribution Patterns" [ref=e49]
+          - article
+            - image
+            - heading "Monitoring & Analytics" [level=3, ref=e50]
+            - paragraph
+            - link "Standardizing Multimedia QoE Telemetry from Telecommunications Networks for Open Analytics" [ref=e51]
+            - link "Open Standardizing Multimedia QoE Telemetry from Telecommunications Networks for Open Analytics on its source site (new tab)" [ref=e52]
+            - paragraph
+            - link "OpenQoE — Open-Source Video QoE Analytics" [ref=e53]
+            - link "Open OpenQoE — Open-Source Video QoE Analytics on its source site (new tab)" [ref=e54]
+            - paragraph
+              - StaticText "Apache-2.0 three-tier QoE stack: JS beaconing SDK (HTML5/Video.js/HLS.js/dash.js/Shaka) → Cloudflare Worker ingest → Prometheus/Grafana dashboards tracking startup time, rebuffer, errors, engagement."
+            - link "Improving Video Observability with CMCD and CloudFront" [ref=e55]
+            - link "Open Improving Video Observability with CMCD and CloudFront on its source site (new tab)" [ref=e56]
+            - paragraph
+            - button "Completed — Undo: Monitoring & Analytics" [ref=e57]
+          - article
+            - image
+            - heading "Edge Computing Integration" [level=3, ref=e58]
+            - paragraph
+            - link "Coffee: Cost-Effective Edge Caching for 360° Live Video" [ref=e59]
+              - StaticText "Coffee: Cost-Effective Edge Caching for 360° Live Video"
+            - link "Open Coffee: Cost-Effective Edge Caching for 360° Live Video on its source site (new tab)" [ref=e60]
+            - paragraph
+            - link "Akamai EdgeWorkers — Manifest and Playlist Personalization" [ref=e61]
+            - link "Open Akamai EdgeWorkers — Manifest and Playlist Personalization on its source site (new tab)" [ref=e62]
+            - paragraph
+            - link "SVTA — Enhancing and Standardizing Server-Guided Ad Insertion" [ref=e63]
+            - link "Open SVTA — Enhancing and Standardizing Server-Guided Ad Insertion on its source site (new tab)" [ref=e64]
+            - paragraph
+              - StaticText "Streaming Video Technology Alliance document on SGAI: how HLS Interstitials-based ad insertion works and where standardization gaps remain versus classic SSAI."
+            - button "Completed — Undo: Edge Computing Integration" [ref=e65]
+          - article
+            - heading "Production Best Practices" [level=3, ref=e66]
+            - link "Error Handling Best Practices for HTTP Live Streaming (WWDC17)" [ref=e67]
+            - link "Open Error Handling Best Practices for HTTP Live Streaming (WWDC17) on its source site (new tab)" [ref=e68]
+            - link "Apple Technical Note TN2224 - HLS Best Practices" [ref=e69]
+            - link "Open Apple Technical Note TN2224 - HLS Best Practices on its source site (new tab)" [ref=e70]
+            - link "AWS CloudFront Live failover" [ref=e71]
+            - link "Open AWS CloudFront Live failover on its source site (new tab)" [ref=e72]
+            - button "Completed — Undo: Production Best Practices" [ref=e73]
+          - article
+            - heading "Congratulations!" [level=3, ref=e74]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e17]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e18]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e19]
+            - heading "EXPLORE" [level=2, ref=e75]
+            - link "Community & Events" [ref=e76]
+            - link "Encoding & Codecs" [ref=e77]
+            - link "General Tools" [ref=e78]
+            - link "Infrastructure & Delivery" [ref=e79]
+            - link "Intro & Learning" [ref=e80]
+            - link "Media Tools" [ref=e81]
+            - link "Players & Clients" [ref=e82]
+            - link "Protocols & Transport" [ref=e83]
+            - link "Standards & Industry" [ref=e84]
+          - heading "SOURCE" [level=2, ref=e20]
+          - link "krzemienski/ awesome-video" [ref=e21]
+          - paragraph
+            - link "PRs welcome" [ref=e85]
+          - button "Contact maintainers" [ref=e22]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e23]
+            - link "About" [ref=e86]
+            - link "Terms" [ref=e87]
+            - link "Privacy" [ref=e88]
+            - link "Code of Conduct" [ref=e89]
+            - button "Cookie settings" [ref=e90]
+            - link "Issues ↗" [ref=e91]
+            - link "Sitemap" [ref=e92]

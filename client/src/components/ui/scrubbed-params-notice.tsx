@@ -42,7 +42,7 @@ export default function ScrubbedParamsNotice() {
       </span>
       <button
         type="button"
-        className="inline-flex min-h-8 items-center gap-1 underline underline-offset-2"
+        className="inline-flex min-h-8 max-lg:min-h-11 items-center gap-1 underline underline-offset-2"
         onClick={(e) => {
           handoffFocusOnUnmount(e.currentTarget);
           setDismissed(true);

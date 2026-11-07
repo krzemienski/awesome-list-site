@@ -4,9 +4,9 @@ description: How an app-level bottom bar reserves space in the shell column, and
 ---
 
 An app-level bottom bar (cookie/consent bar, install prompt, playback bar) reserves its
-space **declaratively**: the app root is a flex column and the bar is a row of it —
-in flow at the top on narrow viewports, `position: sticky; bottom: 0` above the
-breakpoint. Never pad or restyle an element the bar does not own to make room for it.
+space **declaratively**: the app root is a flex column and the bar is its last row,
+`position: sticky; bottom: 0` at every width, so it is last on screen as it is last in
+focus order. Never pad or restyle an element the bar does not own to make room for it.
 
 **Why:** imperative reservation (inline `padding-bottom` on `body` / the footer's
 container, inline `display` on the root) is invisible from the padded element's side, so
@@ -21,6 +21,9 @@ bar before the framework commits a size change.
   paint, before any scrolling, so a check that scrolls to the document bottom first will
   pass while the bug is on screen. In-flow spacers for viewport-fixed UI must subtract
   the bar inset too.
+- Never add the inset as padding on an in-flow container. Flow already ends it at the
+  bar's top edge, so the padding reserves the bar twice and leaves a bar-tall gap (the
+  admin canvas had this at ≥640px until PR #54).
 - Only viewport-**fixed** UI and the global `scroll-margin-bottom` rule need the measured
   height. Publish it as ONE generic shell variable from the bar's own `ResizeObserver`
   (a `resize` listener alone measures before the re-render commits), so no consumer

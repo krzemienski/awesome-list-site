@@ -1,0 +1,126 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [ref=e43]
+              - listitem [level=1]
+                - link "Overview" [disabled, ref=e44]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [selected, ref=e24]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e25]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e26]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e27]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e28]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e29]
+                - StaticText "Export"
+              - tab "Database" [ref=e30]
+                - StaticText "Database"
+              - tab "Resources" [ref=e31]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e32]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e33]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e34]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e35]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e36]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e37]
+                - StaticText "Audit"
+              - tab "Research" [ref=e38]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Overview" [ref=e17] focusable [tabindex]
+            - button "RESOURCES 3,825 across — categories" [ref=e20]
+              - StaticText "RESOURCES"
+              - StaticText "3,825"
+              - StaticText "across — categories"
+            - button "SUBCATEGORIES —" [ref=e21]
+              - StaticText "SUBCATEGORIES"
+              - StaticText "—"
+            - button "ACTIVE USERS —" [ref=e22]
+              - StaticText "ACTIVE USERS"
+              - StaticText "—"
+            - button "PENDING APPROVALS —" [ref=e23]
+              - StaticText "PENDING APPROVALS"
+              - StaticText "—"
+            - generic
+              - heading "Recent activity" [level=2, ref=e39]
+              - paragraph
+                - StaticText "Latest 6 events"
+              - paragraph
+                - StaticText "Loading activity…"
+            - generic
+              - heading "System health" [level=2, ref=e40]
+              - paragraph
+                - StaticText "Checking current readiness"
+              - image "Database: unknown"
+              - StaticText "Database"
+              - StaticText "checking…"
+              - image "GitHub sync: unknown"
+              - StaticText "GitHub sync"
+              - StaticText "checking…"
+              - image "Link checker: unknown"
+              - StaticText "Link checker"
+              - StaticText "checking…"
+              - image "Enrichment queue: unknown"
+              - StaticText "Enrichment queue"
+              - StaticText "checking…"
+              - image "Researcher API: unknown"
+              - StaticText "Researcher API"
+              - StaticText "checking…"
+            - generic
+              - heading "Top categories" [level=2, ref=e41]
+              - paragraph
+                - StaticText "By resource count"
+              - paragraph
+                - StaticText "Loading categories…"

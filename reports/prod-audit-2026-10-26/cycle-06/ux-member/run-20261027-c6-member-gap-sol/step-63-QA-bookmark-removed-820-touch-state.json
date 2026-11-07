@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 226,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 group relative text-primary hover:text-primary/90\" data-ds-variant=\"ghost\" aria-disabled=\"false\" aria-busy=\"false\" aria-label=\"Remove bookmark: 2025 NAB Show: CineCentral\" title=\"Remove bookmark\" aria-pressed=\"true\" data-testid=\"button-bookmark\"><div class=\"flex items-center gap-1.5\"><svg xmlns=\"http://www.",
+  "umami": "1",
+  "consent": "denied"
+}

@@ -46,7 +46,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
 import { writeFilterParams } from "@/lib/url-filter-state";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
   trackContributionExternalLinkOpened,
   trackContributionFilterChanged,
@@ -302,7 +304,7 @@ function ContributionCard({
               onClick={() => trackContributionExternalLinkOpened(item.submission!.url)}
               target="_blank"
               rel="noopener noreferrer"
-              className="account-accent inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
+              className="account-accent inline-flex min-h-8 max-lg:min-h-11 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
               title={item.submission.url}
             >
               <span className="truncate">{item.submission.url}</span>
@@ -366,7 +368,7 @@ function ContributionCard({
         )}
 
         {item.status === "superseded" && (
-          <Alert>
+          <Alert live="off">
             <RefreshCw className="h-4 w-4" />
             <AlertTitle>This suggestion is no longer current</AlertTitle>
             <AlertDescription>
@@ -510,19 +512,22 @@ export default function Contributions() {
             : "Your edit suggestion remains in your history as Withdrawn.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, item) => {
+      const conflict = error instanceof ApiError && error.status === 409;
+      // A 409 refetch can drop the row (and its Withdraw button) from the
+      // filtered list, so the dialog's close needs the same handoff as success.
+      if (conflict) withdrawnRef.current = { kind: item.kind, id: item.id };
       setWithdrawTarget(null);
       void queryClient.invalidateQueries({
         queryKey: ["/api/user/contributions"],
       });
-      const conflict = error instanceof ApiError && error.status === 409;
       toast({
         title: conflict
           ? "This contribution has already changed"
           : "Couldn't withdraw contribution",
         description: conflict
           ? "Its latest moderation state is now shown in your timeline."
-          : error.message || "Please try again.",
+          : humanizeApiError(error, "Please try again."),
         variant: conflict ? "default" : "destructive",
       });
     },
@@ -576,7 +581,7 @@ export default function Contributions() {
     setState((current) => ({ ...current, page }));
     writeFilterParams({ page: page > 1 ? String(page) : null }, "push");
     setPageNotice(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   };
 
   const makePageHref = (page: number) => {
@@ -796,7 +801,7 @@ export default function Contributions() {
         </Card>
 
         {pageNotice && (
-          <Alert className="mb-4" data-testid="notice-contribution-page-adjusted">
+          <Alert live="polite" className="mb-4" data-testid="notice-contribution-page-adjusted">
             <RefreshCw className="h-4 w-4" />
             <AlertTitle>Page adjusted</AlertTitle>
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
@@ -804,7 +809,7 @@ export default function Contributions() {
               <button
                 type="button"
                 onClick={() => setPageNotice(null)}
-                className="min-h-8 underline underline-offset-4"
+                className="min-h-8 max-lg:min-h-11 underline underline-offset-4"
               >
                 Dismiss
               </button>

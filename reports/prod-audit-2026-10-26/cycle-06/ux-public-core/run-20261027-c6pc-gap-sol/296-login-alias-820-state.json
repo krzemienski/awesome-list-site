@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/sign-in?redirect_url=%2Ftag%2Fhls%3Fpage%3D2","title":"Sign In — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":820,"online":true,"focus":{"tag":"BODY","id":"","label":null,"text":"\n    \n    \n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--bord","rect":{"x":0,"y":0,"width":820,"height":1180,"top":0,"right":820,"bottom":1180,"left":0}},"headings":[{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Sign in","label":null,"current":"page"}],"status":["Loading sign-in…"],"analyticsDisabled":"1"}
+```

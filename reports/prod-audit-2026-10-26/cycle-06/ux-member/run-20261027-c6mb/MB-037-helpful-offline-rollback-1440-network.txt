@@ -1,0 +1,9 @@
+[6370.326] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.332] POST https://awesome.video/api/recommendations?limit=10 (Fetch) 200
+[6370.405] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.407] POST https://awesome.video/api/recommendations?limit=10 (Fetch) 200
+[6370.419] POST https://awesome.video/api/recommendations?limit=10 (Fetch) 200
+[6370.421] PUT https://awesome.video/api/recommendations/189969/feedback (Fetch) 200
+[6370.422] GET https://awesome.video/api/recommendations/feedback (Fetch) 200
+[6370.423] PUT https://awesome.video/api/recommendations/189969/feedback (Fetch) 200
+[6370.424] GET https://awesome.video/api/recommendations/feedback (Fetch) 200

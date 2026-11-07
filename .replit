@@ -92,12 +92,15 @@ timeoutMs = 90000
 
 [userenv.shared]
 VITE_SITE_URL = "https://awesome.video"
+VITE_SITE_TITLE = "Awesome Video"
+VITE_SITE_DESCRIPTION = "A curated list of awesome video tools, libraries, and resources"
+VITE_DEFAULT_THEME = "dark"
 ANTHROPIC_BASE_URL = "https://router.hack.ski"
 ANTHROPIC_DEFAULT_FABLE_MODEL = "cc/claude-fable-5"
 ANTHROPIC_DEFAULT_HAIKU_MODEL = "cc/claude-haiku-4-5-20251001"
 ANTHROPIC_DEFAULT_OPUS_MODEL = "cc/claude-opus-5"
 ANTHROPIC_DEFAULT_SONNET_MODEL = "cc/claude-sonnet-5"
-ANTHROPIC_MODEL = "cc/claude-opus-5"
+ANTHROPIC_MODEL = "cc/claude-sonnet-5"
 CONTACT_ISSUES_URL = "https://github.com/krzemienski/awesome-video/issues"
 CONTACT_ENABLED = "true"
 VITE_CONTACT_VARIANT = "b"
@@ -109,4 +112,7 @@ VITE_POSTHOG_KEY = "phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8"
 [userenv.development]
 
 [userenv.production]
+QA_CLEANUP_USER_IDS = "user_3Ll7BiTtwPUMFSN96bgs6ClDXYI,user_3Lk0O4nWTo2VnwbqvnFWyoCDyPo"
 REPLIT_PUBLISH_IMAGE_TRIM = "1"
+LINK_HEALTH_INTERVAL_HOURS = "24"
+LINK_HEALTH_REMEDIATION = "apply"

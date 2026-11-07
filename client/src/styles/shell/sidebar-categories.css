@@ -38,9 +38,11 @@
   }
 }
 
-.av-sidebar-shell .accordion-header:hover,
-.av-sidebar-drawer .accordion-header:hover {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .accordion-header:hover,
+  .av-sidebar-drawer .accordion-header:hover {
+    background: var(--surface);
+  }
 }
 
 /* The owning .accordion-item clips overflow and the header fills it edge to
@@ -142,13 +144,14 @@
   overflow-wrap: anywhere;
 }
 
+/* Category names wrap instead of ellipsising so "Infrastructure & Delivery"
+   stays fully readable in the 280px rail (the title tooltip was the only
+   way to read it). */
 .av-sidebar-shell .av-sidebar-category-label > span:nth-child(2),
 .av-sidebar-drawer .av-sidebar-category-label > span:nth-child(2) {
   flex: 1 1 auto;
-  overflow: hidden;
-  overflow-wrap: normal;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /*
@@ -409,12 +412,14 @@
   transition: all 140ms ease;
 }
 
-.av-sidebar-shell .sub-item:hover,
-.av-sidebar-drawer .sub-item:hover {
-  background: var(--surface);
-  border-color: var(--border);
-  color: var(--text);
-  transform: translateX(2px);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .sub-item:hover,
+  .av-sidebar-drawer .sub-item:hover {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+    transform: translateX(2px);
+  }
 }
 
 .av-sidebar-shell .sub-item[data-active="true"],

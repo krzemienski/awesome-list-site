@@ -1,0 +1,5 @@
+Fix C6-AO-025 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-ao025-users-offline-search. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-admin-ops/findings.md and users evidence. Offline Users search currently leaves previous rows visible under a new query with no stale label/error/Retry. Make query transitions truthful: prior rows may remain only with an explicit stale/offline indicator and focusable Retry; failure must be distinguishable from genuine no matches, and reconnect/Retry must resolve the current query. Preserve pagination, search debounce, export and user row behavior. Scope UsersTab only.
+
+Run tsc --noEmit and npm run build unpiped. Use authorized local admin proof only if already available, otherwise mark it BLOCKED for post-deploy production verification at 1440, 820 touch and 390 touch. Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks and UNVERIFIED evidence. No test files/mocks/validation harnesses. Never merge.

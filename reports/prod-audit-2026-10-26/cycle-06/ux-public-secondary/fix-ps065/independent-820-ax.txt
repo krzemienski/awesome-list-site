@@ -1,0 +1,112 @@
+- contentinfo
+  - StaticText "── INDEX"
+  - link "awesome.video home" [ref=e10]
+    - StaticText "awesome.video"
+  - paragraph
+    - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+  - heading "INDEXED" [level=2, ref=e11]
+  - paragraph
+    - StaticText "1,949"
+  - paragraph
+    - StaticText "9 categories"
+    - LineBreak "\n"
+    - StaticText "18 subcategories"
+    - LineBreak "\n"
+    - StaticText "live"
+  - navigation "Explore categories" [ref=e12]
+    - heading "EXPLORE" [level=2, ref=e40]
+    - link "Community & Events" [ref=e41]
+    - link "Encoding & Codecs" [ref=e42]
+    - link "General Tools" [ref=e43]
+    - link "Infrastructure & Delivery" [ref=e44]
+    - link "Intro & Learning" [ref=e45]
+    - link "Media Tools" [ref=e46]
+    - link "Players & Clients" [ref=e47]
+    - link "Protocols & Transport" [ref=e48]
+    - link "Standards & Industry" [ref=e49]
+  - heading "SOURCE" [level=2, ref=e13]
+  - link "krzemienski/ awesome-video" [ref=e14]
+    - StaticText "krzemienski"
+    - StaticText "/"
+    - StaticText "awesome-video"
+  - paragraph
+    - StaticText "Open-source."
+    - link "PRs welcome" [ref=e50]
+    - StaticText "."
+    - LineBreak "\n"
+    - StaticText "Indexed automatically from README.md."
+  - StaticText "© "
+  - StaticText "2026"
+  - StaticText " "
+  - StaticText "awesome.video"
+  - StaticText " · content CC0, code MIT"
+  - navigation "Site policies" [ref=e15]
+    - link "About" [ref=e51]
+    - link "Terms" [ref=e52]
+    - link "Privacy" [ref=e53]
+    - link "Code of Conduct" [ref=e54]
+      - StaticText "Conduct"
+    - link "Issues ↗" [ref=e55]
+    - link "Sitemap" [ref=e56]
+  - StaticText "built with the awesome-list framework"
+- StaticText "── INDEX"
+- link "awesome.video home" [ref=e10]
+  - StaticText "awesome.video"
+- paragraph
+  - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+- heading "INDEXED" [level=2, ref=e11]
+- paragraph
+  - StaticText "1,949"
+- paragraph
+  - StaticText "9 categories"
+  - LineBreak "\n"
+  - StaticText "18 subcategories"
+  - LineBreak "\n"
+  - StaticText "live"
+- navigation "Explore categories" [ref=e12]
+  - heading "EXPLORE" [level=2, ref=e40]
+  - link "Community & Events" [ref=e41]
+  - link "Encoding & Codecs" [ref=e42]
+  - link "General Tools" [ref=e43]
+  - link "Infrastructure & Delivery" [ref=e44]
+  - link "Intro & Learning" [ref=e45]
+  - link "Media Tools" [ref=e46]
+  - link "Players & Clients" [ref=e47]
+  - link "Protocols & Transport" [ref=e48]
+  - link "Standards & Industry" [ref=e49]
+- heading "SOURCE" [level=2, ref=e13]
+- link "krzemienski/ awesome-video" [ref=e14]
+  - StaticText "krzemienski"
+  - StaticText "/"
+  - StaticText "awesome-video"
+- paragraph
+  - StaticText "Open-source."
+  - link "PRs welcome" [ref=e50]
+  - StaticText "."
+  - LineBreak "\n"
+  - StaticText "Indexed automatically from README.md."
+- StaticText "© "
+- StaticText "2026"
+- StaticText "awesome.video"
+- StaticText " · content CC0, code MIT"
+- navigation "Site policies" [ref=e15]
+  - link "About" [ref=e51]
+  - link "Terms" [ref=e52]
+  - link "Privacy" [ref=e53]
+  - link "Code of Conduct" [ref=e54]
+    - StaticText "Conduct"
+  - link "Issues ↗" [ref=e55]
+  - link "Sitemap" [ref=e56]
+- StaticText "built with the awesome-list framework"
+- link "Community & Events" [ref=e41]
+- link "Encoding & Codecs" [ref=e42]
+- link "General Tools" [ref=e43]
+- link "Infrastructure & Delivery" [ref=e44]
+- link "Intro & Learning" [ref=e45]
+- link "Media Tools" [ref=e46]
+- link "Players & Clients" [ref=e47]
+- link "Protocols & Transport" [ref=e48]
+- link "Standards & Industry" [ref=e49]
+- StaticText "krzemienski"
+- StaticText "/"
+- StaticText "awesome-video"

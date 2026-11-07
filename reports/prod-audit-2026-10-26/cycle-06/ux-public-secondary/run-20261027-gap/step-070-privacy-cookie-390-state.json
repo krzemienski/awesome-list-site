@@ -1,0 +1,38 @@
+{
+  "url": "https://awesome.video/privacy",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "links": [
+    {
+      "text": "Home",
+      "href": "https://awesome.video/",
+      "tag": "A"
+    },
+    {
+      "text": "Open cookie settings",
+      "tag": "BUTTON"
+    },
+    {
+      "text": "Profile → Security → Delete account & data",
+      "href": "https://awesome.video/profile?tab=security",
+      "tag": "A"
+    },
+    {
+      "text": "open an issue on the project's GitHub repository",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "tag": "A"
+    },
+    {
+      "text": "open an issue on the project's GitHub repository",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "tag": "A"
+    }
+  ],
+  "afterEscape": {
+    "active": "<button type=\"button\" class=\"legal-inline-link inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]\" data-testid=\"button-privacy-cookie-settings\">Open cookie settings</button>",
+    "consent": "denied"
+  }
+}

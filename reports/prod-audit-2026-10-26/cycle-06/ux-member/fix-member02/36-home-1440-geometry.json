@@ -1,0 +1,243 @@
+{
+  "capturedAt": "2026-10-27T08:30:25.903Z",
+  "url": "http://127.0.0.1:5122/?layout=curated",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "touchPoints": 0,
+    "coarse": false,
+    "hover": true
+  },
+  "document": {
+    "clientWidth": 1434,
+    "scrollWidth": 1434
+  },
+  "cards": [
+    {
+      "id": "card-home-resource-1923",
+      "bounds": {
+        "x": 320,
+        "y": 645.28125,
+        "width": 340.65625,
+        "height": 254.8125,
+        "right": 660.65625,
+        "bottom": 900.09375
+      },
+      "actions": [
+        {
+          "name": "Nimble Streamer",
+          "testId": "link-home-resource-1923",
+          "href": "/resource/1923",
+          "bounds": {
+            "x": 341,
+            "y": 716.28125,
+            "width": 126.484375,
+            "height": 20,
+            "right": 467.484375,
+            "bottom": 736.28125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#live streaming",
+          "href": "/?tags=live+streaming",
+          "bounds": {
+            "x": 341,
+            "y": 819.5,
+            "width": 125.515625,
+            "height": 26.796875,
+            "right": 466.515625,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#server",
+          "href": "/?tags=server",
+          "bounds": {
+            "x": 472.515625,
+            "y": 819.5,
+            "width": 70.3125,
+            "height": 26.796875,
+            "right": 542.828125,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#transmuxing",
+          "href": "/?tags=transmuxing",
+          "bounds": {
+            "x": 341,
+            "y": 852.296875,
+            "width": 104.8125,
+            "height": 26.796875,
+            "right": 445.8125,
+            "bottom": 879.09375
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-home-resource-812",
+      "bounds": {
+        "x": 676.65625,
+        "y": 645.28125,
+        "width": 340.671875,
+        "height": 254.8125,
+        "right": 1017.328125,
+        "bottom": 900.09375
+      },
+      "actions": [
+        {
+          "name": "Ad Creative Signaling in DASH and HLS",
+          "testId": "link-home-resource-812",
+          "href": "/resource/812",
+          "bounds": {
+            "x": 697.65625,
+            "y": 716.28125,
+            "width": 293.953125,
+            "height": 20,
+            "right": 991.609375,
+            "bottom": 736.28125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#advertising",
+          "href": "/?tags=advertising",
+          "bounds": {
+            "x": 697.65625,
+            "y": 819.5,
+            "width": 104.8125,
+            "height": 26.796875,
+            "right": 802.46875,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#DASH",
+          "href": "/?tags=DASH",
+          "bounds": {
+            "x": 808.46875,
+            "y": 819.5,
+            "width": 56.515625,
+            "height": 26.796875,
+            "right": 864.984375,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#HLS",
+          "href": "/?tags=HLS",
+          "bounds": {
+            "x": 870.984375,
+            "y": 819.5,
+            "width": 49.609375,
+            "height": 26.796875,
+            "right": 920.59375,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    },
+    {
+      "id": "card-home-resource-777",
+      "bounds": {
+        "x": 1033.328125,
+        "y": 645.28125,
+        "width": 340.65625,
+        "height": 254.8125,
+        "right": 1373.984375,
+        "bottom": 900.09375
+      },
+      "actions": [
+        {
+          "name": "hlsjs-p2p-engine",
+          "testId": "link-home-resource-777",
+          "href": "/resource/777",
+          "bounds": {
+            "x": 1054.328125,
+            "y": 716.28125,
+            "width": 130.09375,
+            "height": 20,
+            "right": 1184.421875,
+            "bottom": 736.28125
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#P2P streaming",
+          "href": "/?tags=P2P+streaming",
+          "bounds": {
+            "x": 1054.328125,
+            "y": 819.5,
+            "width": 118.609375,
+            "height": 26.796875,
+            "right": 1172.9375,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#WebRTC",
+          "href": "/?tags=WebRTC",
+          "bounds": {
+            "x": 1178.9375,
+            "y": 819.5,
+            "width": 70.3125,
+            "height": 26.796875,
+            "right": 1249.25,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        },
+        {
+          "name": "#HLS",
+          "href": "/?tags=HLS",
+          "bounds": {
+            "x": 1255.25,
+            "y": 819.5,
+            "width": 49.609375,
+            "height": 26.796875,
+            "right": 1304.859375,
+            "bottom": 846.296875
+          },
+          "opacity": "1",
+          "hitOwned": true,
+          "focusVisible": false
+        }
+      ],
+      "intersections": []
+    }
+  ]
+}

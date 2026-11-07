@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"selects":[{"label":"Limit Encoding & Codecs by subcategory","value":"all","options":[{"value":"all","text":"All subcategories"},{"value":"__general__","text":"Uncategorized (92)"},{"value":"Benchmarking & Performance Tools for Codecs","text":"Benchmarking & Performance Tools for Codecs (18)"},{"value":"Cloud-Based Encoding Solutions","text":"Cloud-Based Encoding Solutions (18)"},{"value":"Codecs","text":"Codecs (68)"},{"value":"Codecs › AV1","text":"Codecs › AV1 (22)"}]},{"label":"Limit by resource kind","value":"","options":[{"value":"","text":"All resource kinds"},{"value":"tools","text":"Tools"},{"value":"libraries","text":"Libraries"},{"value":"standards","text":"Standards"},{"value":"events","text":"Events"},{"value":"protocols","text":"Protocols"}]}],"radios":[{"label":"Grid view","text":""},{"label":"List view","text":""},{"label":"Compact view","text":""}]}
+```

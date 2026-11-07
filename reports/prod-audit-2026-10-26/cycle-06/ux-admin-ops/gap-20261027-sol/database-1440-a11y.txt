@@ -1,0 +1,196 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,827 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,827 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,827 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e41]: Authorized admin area
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - generic [ref=e48]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e49]:
+                  - text: Operations
+                  - emphasis [ref=e50]: dashboard
+                - paragraph [ref=e51]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e52]:
+                - button "Settings" [ref=e53] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e54] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e55]
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - button "Scroll tabs left" [ref=e58] [cursor=pointer]:
+                  - img [ref=e59]
+                - tablist "Admin sections" [ref=e61]:
+                  - tab "Overview" [ref=e62] [cursor=pointer]:
+                    - img [ref=e63]
+                    - text: Overview
+                  - tab "Approvals" [ref=e68] [cursor=pointer]:
+                    - img [ref=e69]
+                    - text: Approvals
+                  - tab "Edits" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Researcher
+                  - tab "Export" [ref=e79] [cursor=pointer]:
+                    - img [ref=e80]
+                    - text: Export
+                  - tab "Database" [selected] [ref=e82] [cursor=pointer]:
+                    - img [ref=e83]
+                    - text: Database
+                  - tab "Resources" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Resources
+                  - tab "Categories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Subcategories
+                  - tab "Users" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Users
+                  - tab "GitHub" [ref=e100] [cursor=pointer]:
+                    - img [ref=e101]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e104] [cursor=pointer]:
+                    - img [ref=e105]
+                    - text: Link Health
+                  - tab "Audit" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Audit
+                  - tab "Research" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Research
+              - tabpanel "Database" [ref=e112]:
+                - generic [ref=e113]:
+                  - generic [ref=e114]:
+                    - article [ref=e115]:
+                      - generic [ref=e116]: Tables
+                      - generic [ref=e117]: "41"
+                    - article [ref=e118]:
+                      - generic [ref=e119]: Rows
+                      - generic [ref=e120]: 74,560
+                    - article [ref=e121]:
+                      - generic [ref=e122]: Disk
+                      - generic [ref=e123]: 66 MB
+                    - article [ref=e124]:
+                      - generic [ref=e125]: Migrations
+                      - generic [ref=e126]: "34"
+                      - generic [ref=e127]: 0 pending
+                  - group [ref=e128]:
+                    - generic "Database seeding" [ref=e129] [cursor=pointer]
+                    - generic [ref=e130]:
+                      - generic [ref=e131]:
+                        - img [ref=e132]
+                        - generic [ref=e136]:
+                          - heading "Database Management" [level=2] [ref=e137]
+                          - paragraph [ref=e138]: Seed the database with video resources from the awesome-video JSON source
+                      - generic [ref=e139]:
+                        - note [ref=e140]:
+                          - img [ref=e141]
+                          - generic [ref=e143]: Database Seeding
+                          - generic [ref=e144]: This operation will populate the PostgreSQL database with all categories, subcategories, sub-subcategories, and resources from the awesome-video JSON source. Resources already in the database will be skipped.
+                        - generic [ref=e145]:
+                          - generic [ref=e146]:
+                            - button "Seed Database" [ref=e147] [cursor=pointer]:
+                              - img
+                              - text: Seed Database
+                            - paragraph [ref=e148]: Add new resources without removing existing data
+                          - generic [ref=e149]:
+                            - button "Clear & Re-seed" [active] [ref=e150] [cursor=pointer]:
+                              - img
+                              - text: Clear & Re-seed
+                            - paragraph [ref=e151]: Replace the catalog from the source; rolls back entirely on any failure
+                  - generic [ref=e152]:
+                    - generic [ref=e154]:
+                      - heading "Key tables" [level=2] [ref=e155]
+                      - paragraph [ref=e156]: 6 key tables of 41 in the primary PostgreSQL database
+                    - region "Key tables, scrollable" [ref=e159]:
+                      - table [ref=e160]:
+                        - rowgroup [ref=e161]:
+                          - row "Name Rows Size Newest row" [ref=e162]:
+                            - columnheader "Name" [ref=e163]
+                            - columnheader "Rows" [ref=e164]
+                            - columnheader "Size" [ref=e165]
+                            - columnheader "Newest row" [ref=e166]
+                        - rowgroup [ref=e167]:
+                          - row "resources 4,019 28 MB 6m ago" [ref=e168]:
+                            - cell "resources" [ref=e169]
+                            - cell "4,019" [ref=e170]
+                            - cell "28 MB" [ref=e171]
+                            - cell "6m ago" [ref=e172]
+                          - row "categories 10 96 KB 15m ago" [ref=e173]:
+                            - cell "categories" [ref=e174]
+                            - cell "10" [ref=e175]
+                            - cell "96 KB" [ref=e176]
+                            - cell "15m ago" [ref=e177]
+                          - row "subcategories 100 88 KB 14m ago" [ref=e178]:
+                            - cell "subcategories" [ref=e179]
+                            - cell "100" [ref=e180]
+                            - cell "88 KB" [ref=e181]
+                            - cell "14m ago" [ref=e182]
+                          - row "users 133 128 KB 34m ago" [ref=e183]:
+                            - cell "users" [ref=e184]
+                            - cell "133" [ref=e185]
+                            - cell "128 KB" [ref=e186]
+                            - cell "34m ago" [ref=e187]
+                          - row "resource_audit_log 16,898 4.4 MB 6m ago" [ref=e188]:
+                            - cell "resource_audit_log" [ref=e189]
+                            - cell "16,898" [ref=e190]
+                            - cell "4.4 MB" [ref=e191]
+                            - cell "6m ago" [ref=e192]
+                          - row "enrichment_jobs 33 160 KB 27h ago" [ref=e193]:
+                            - cell "enrichment_jobs" [ref=e194]
+                            - cell "33" [ref=e195]
+                            - cell "160 KB" [ref=e196]
+                            - cell "27h ago" [ref=e197]

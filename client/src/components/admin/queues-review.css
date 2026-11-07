@@ -49,7 +49,8 @@
 }
 
 .queue-review-actions .btn:disabled,
-.queue-review-actions button:disabled {
+.queue-review-actions button:disabled,
+.queue-review-actions button[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -143,6 +144,20 @@
 .queue-review-col-submitter { inline-size: 11rem; }
 .queue-review-col-when { inline-size: 6.5rem; }
 .queue-review-col-actions { inline-size: 16.5rem; }
+.queue-review-col-outcome { inline-size: 12rem; }
+
+/* The resolved-edits history sits under the pending queue in the same panel. */
+.queue-review-recent-heading {
+  border-block-start: var(--hairline-w) solid var(--border);
+  min-height: 0;
+}
+
+.queue-review-recent-heading h3 {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
 
 .queue-review-shell .admin-table-wrap .table .queue-review-select-cell {
   padding-inline-end: 0.25rem;
@@ -154,11 +169,23 @@
   position: relative;
 }
 
-/* 44px hit area around the 16px box without changing its drawn size. */
-.queue-review-select-cell [role="checkbox"]::after {
-  content: "";
-  inset: -14px;
-  position: absolute;
+/* Below 1024px the Checkbox primitive centres its own 44px hit area; from
+   1024px up this widens the 16px box to 44px without changing its drawn size. */
+@media (min-width: 64rem) {
+  .queue-review-select-cell [role="checkbox"]::after {
+    content: "";
+    inset: -14px;
+    position: absolute;
+  }
+}
+
+/* The header cell sits flush under the panel heading. On touch the checkbox's
+   44px hit area reaches 14px past the 16px box, so the cell needs that much
+   room or the heading covers the top of the target. */
+@media (max-width: 63.99rem) {
+  .queue-review-shell .admin-table-wrap .table th.queue-review-select-cell {
+    padding-block: 1rem;
+  }
 }
 
 /* Accent is reserved for the selection itself; an idle box is neutral ink. */
@@ -175,11 +202,11 @@
   min-inline-size: 0;
 }
 
+/* Titles wrap instead of ellipsizing: the title is the only way to tell which
+   resource a row targets, and the tooltip is unreachable on touch. */
 .queue-review-item-title > span {
   min-inline-size: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .queue-review-item-title > span > a {
@@ -189,6 +216,16 @@
 
 .queue-review-item-title > span > a:hover {
   text-decoration: underline;
+}
+
+/* Touch: the title link is the row's only way to the resource, so it gets a
+   44px target. */
+@media (max-width: 64rem) {
+  .queue-review-item-title > a {
+    align-items: center;
+    display: flex;
+    min-height: 2.75rem;
+  }
 }
 
 /* 44px hit area without growing the row: the negative margins cancel the
@@ -244,6 +281,37 @@
   color: var(--text-3);
   font-size: 12px;
   margin-block-start: 0.125rem;
+}
+
+.queue-review-reason {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.queue-review-reason[data-expanded="true"] {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.queue-review-reason-toggle {
+  color: var(--accent);
+  font-size: 12px;
+  min-height: 24px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .queue-review-reason-toggle {
+    min-height: 44px;
+  }
 }
 
 .queue-review-ai {

@@ -25,7 +25,9 @@ import { enrichmentService } from "../../ai/enrichmentService";
 import {
   parseAgentConfigFromRequest,
   stripJobAuthSecret,
+  validateBaseUrl,
 } from "../../ai/agentRuntime";
+import { researchPreflightMessage, resolveResearchRunConfig } from "../../ai/researchRunConfig";
 import type { EnrichmentRepository } from "../../repositories";
 import type { CategoryRepository } from "../../repositories";
 import type { ResourceRepository } from "../../repositories";
@@ -34,10 +36,15 @@ import {
   BIDI_CONTROL_RE,
   BIDI_CONTROL_MESSAGE,
   SINGLE_LINE_CONTROL_RE,
+  insecureHttpRefusal,
   visibleLength,
 } from "@shared/validation";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { isUniqueViolation } from "../../errors/pgErrors";
+import { createLogger } from "../../lib/logger";
+import { resourceAuditLog } from "@shared/schema";
+
+const logger = createLogger("ai-jobs");
 
 /**
  * Dependencies the AI job handlers need from the composing module. These mirror
@@ -68,7 +75,7 @@ export function registerAiJobsRoutes(
   // POST /api/enrichment/start - Start batch enrichment job
   app.post('/api/enrichment/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
-      const { filter = 'unenriched', batchSize = 10 } = req.body;
+      const { filter = 'unenriched', batchSize = 10, allowInsecureHttp } = req.body;
       const userId = req.dbUser?.id;
 
       // Run15 BUG-019 companion: the client guard alone is bypassable —
@@ -86,6 +93,10 @@ export function registerAiJobsRoutes(
         agentConfig = await parseAgentConfigFromRequest(req.body);
       } catch (cfgErr: any) {
         return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
+      }
+      const insecureHttp = insecureHttpRefusal(agentConfig.baseUrl, allowInsecureHttp === true);
+      if (insecureHttp) {
+        return res.status(400).json({ success: false, code: 'insecure_http_unconfirmed', message: insecureHttp });
       }
 
       const jobId = await enrichmentService.queueBatchEnrichment({
@@ -109,7 +120,7 @@ export function registerAiJobsRoutes(
       if (error?.code === 'ENRICHMENT_JOB_ACTIVE') {
         return res.status(409).json({ success: false, message: error.message });
       }
-      console.error('Error starting enrichment job:', error);
+      logger.error('Error starting enrichment job:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to start enrichment job',
@@ -138,7 +149,7 @@ export function registerAiJobsRoutes(
         jobs: jobs.map(stripJobAuthSecret)
       });
     } catch (error: any) {
-      console.error('Error listing enrichment jobs:', error);
+      logger.error('Error listing enrichment jobs:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to list enrichment jobs',
@@ -173,7 +184,7 @@ export function registerAiJobsRoutes(
         job: stripJobAuthSecret(job)
       });
     } catch (error: any) {
-      console.error('Error getting job status:', error);
+      logger.error('Error getting job status:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to get job status',
@@ -219,7 +230,7 @@ export function registerAiJobsRoutes(
         message: `Enrichment job ${jobId} cancelled successfully`
       });
     } catch (error: any) {
-      console.error('Error cancelling job:', error);
+      logger.error('Error cancelling job:', error);
       if (error?.name === 'JobNotFoundError' || error?.name === 'JobConflictError') {
         return res.status(error.name === 'JobNotFoundError' ? 404 : 409).json({ success: false, message: error.message });
       }
@@ -307,7 +318,7 @@ export function registerAiJobsRoutes(
         errors,
       };
 
-      console.log('[backfill-suggestions] report:', JSON.stringify(report));
+      logger.info('[backfill-suggestions] report:', JSON.stringify(report));
 
       res.json({
         success: true,
@@ -315,7 +326,7 @@ export function registerAiJobsRoutes(
         report,
       });
     } catch (error: any) {
-      console.error('Error backfilling enrichment suggestions:', error);
+      logger.error('Error backfilling enrichment suggestions:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to backfill enrichment suggestions',
@@ -388,9 +399,18 @@ export function registerAiJobsRoutes(
         }
         turns = n;
       }
+      const { minDurationMinutes } = req.body ?? {};
+      let minDurationMs: number | null = null;
+      if (minDurationMinutes !== undefined && minDurationMinutes !== null && String(minDurationMinutes).trim() !== '') {
+        const n = Number(minDurationMinutes);
+        if (typeof minDurationMinutes !== 'number' || !Number.isInteger(n) || n < 1 || n > 240) {
+          return res.status(400).json({ success: false, message: 'minDurationMinutes must be a whole number from 1 to 240, or omitted for no minimum' });
+        }
+        minDurationMs = n * 60_000;
+      }
       // Stop-after-N target: omitted/blank => no target. Bounded to the
       // per-run discovery ceiling (1000) so a typo can't demand a month-long run.
-      const { targetDiscoveries, scoutModel } = req.body ?? {};
+      const { targetDiscoveries, scoutModel, allowInsecureHttp } = req.body ?? {};
       let target: number | null = null;
       if (targetDiscoveries !== undefined && targetDiscoveries !== null && String(targetDiscoveries).trim() !== '') {
         const n = Number(targetDiscoveries);
@@ -415,12 +435,32 @@ export function registerAiJobsRoutes(
         return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
       }
 
+      // Strict resolution for the researcher: no fallback endpoint or model,
+      // and a plain-http override needs the explicit allowInsecureHttp flag.
+      const resolvedConfig = resolveResearchRunConfig({
+        model: agentConfig.model,
+        scoutModel: scout,
+        baseUrl: agentConfig.baseUrl,
+        hasAuthToken: !!agentConfig.authTokenEncrypted,
+        authTokenLast4: agentConfig.authTokenLast4,
+        allowInsecureHttp: allowInsecureHttp === true,
+      });
+      if (!resolvedConfig.preflight.ok) {
+        return res.status(400).json({
+          success: false,
+          code: resolvedConfig.preflight.issues[0].code,
+          message: researchPreflightMessage(resolvedConfig),
+          config: resolvedConfig,
+        });
+      }
+
       const userId = req.dbUser?.id;
       const jobId = await researchService.startResearchJob({
         prompt: effectivePrompt,
         categoryFocus: categoryFocus || undefined,
         maxBudgetUsd: budget,
         maxTurns: turns,
+        minDurationMs,
         startedBy: userId,
         model: agentConfig.model,
         scoutModel: scout,
@@ -428,13 +468,71 @@ export function registerAiJobsRoutes(
         baseUrl: agentConfig.baseUrl,
         authTokenEncrypted: agentConfig.authTokenEncrypted,
         authTokenLast4: agentConfig.authTokenLast4,
+        resolvedConfig,
       });
 
-      res.json({ success: true, jobId, message: 'Research job started' });
+      // Research runs spend money and create public resources, so the launch
+      // belongs in the same admin audit trail as other privileged actions.
+      // resourceId/originalResourceId stay null: the run is not a resource.
+      await db.insert(resourceAuditLog).values({
+        action: 'research_started',
+        performedBy: userId ?? null,
+        changes: {
+          jobId,
+          model: agentConfig.model ?? resolvedConfig.orchestrator.model,
+          scoutModel: scout ?? resolvedConfig.scout.model,
+          categoryFocus: categoryFocus || null,
+          maxBudgetUsd: budget,
+          maxTurns: turns,
+          minDurationMs,
+          targetDiscoveries: target,
+          endpoint: resolvedConfig.endpoint.host,
+        },
+        notes: `Started research run #${jobId} (${agentConfig.model ?? resolvedConfig.orchestrator.model})`,
+      });
+
+      res.json({ success: true, jobId, message: 'Research job started', config: resolvedConfig });
     } catch (error: any) {
-      console.error('Error starting research job:', error);
+      // One active run at a time, on any instance: a conflict, not a failure.
+      // (researchService is imported lazily, so match the error by name.)
+      if (error instanceof Error && error.name === 'ResearchJobActiveError') {
+        return res.status(409).json({ success: false, code: 'RESEARCH_JOB_ACTIVE', message: error.message });
+      }
+      logger.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
     }
+  }));
+
+  // Resolved run configuration BEFORE launch (endpoint host, credential
+  // source, orchestrator + scout model, override flags, preflight). Query
+  // params preview overrides exactly as POST /api/researcher/start would
+  // apply them; the token itself is never sent, only hasAuthToken=1.
+  app.get('/api/researcher/config', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const q = req.query as Record<string, unknown>;
+    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 500) : null);
+    let baseUrl = str(q.baseUrl);
+    let baseUrlError: string | null = null;
+    if (baseUrl) {
+      try {
+        baseUrl = await validateBaseUrl(baseUrl);
+      } catch (e) {
+        baseUrlError = e instanceof Error ? e.message : 'Invalid base URL';
+        baseUrl = null;
+      }
+    }
+    const config = resolveResearchRunConfig({
+      model: str(q.model),
+      scoutModel: str(q.scoutModel),
+      baseUrl,
+      hasAuthToken: q.hasAuthToken === '1',
+      authTokenLast4: null,
+      allowInsecureHttp: q.allowInsecureHttp === '1',
+    });
+    if (baseUrlError) {
+      config.preflight.issues.unshift({ code: 'invalid_base_url', message: baseUrlError });
+      config.preflight.ok = false;
+    }
+    res.json({ success: true, config });
   }));
 
   // WS1 (July 30, 2026): preview the auto-generated research brief so the
@@ -445,7 +543,7 @@ export function registerAiJobsRoutes(
       const { brief, angle } = await researchService.generateBrief();
       res.json({ success: true, brief, angle });
     } catch (error: any) {
-      console.error('Error generating research brief:', error);
+      logger.error('Error generating research brief:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to generate research brief' });
     }
   }));
@@ -461,11 +559,15 @@ export function registerAiJobsRoutes(
       const limit = Number.isFinite(rawLimit)
         ? Math.min(Math.max(rawLimit, 1), 200)
         : 20;
-      const [jobs, total] = await Promise.all([
+      const [jobs, total, cheapestSavingRun] = await Promise.all([
         researchService.listJobs(limit),
         researchService.countJobs(),
+        researchService.cheapestSavingRun().catch((error: unknown) => {
+          logger.error('Error computing cheapest saving run:', error);
+          return null;
+        }),
       ]);
-      res.json({ jobs: jobs.map(stripJobAuthSecret), total });
+      res.json({ jobs: jobs.map(stripJobAuthSecret), total, cheapestSavingRun });
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to list research jobs', error: error.message });
     }

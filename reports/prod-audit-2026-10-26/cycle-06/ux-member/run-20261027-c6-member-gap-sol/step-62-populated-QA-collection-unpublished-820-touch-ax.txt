@@ -1,0 +1,270 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list:
+        - listitem [ref=e4]:
+          - generic [ref=e6]: Read-only sharing enabled
+          - button "Dismiss notification":
+            - img
+    - generic [ref=e8]:
+      - link "Skip to main content" [ref=e9] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e10]:
+        - banner [ref=e11]:
+          - generic [ref=e12]:
+            - button "Toggle sidebar" [ref=e13] [cursor=pointer]:
+              - generic [ref=e14]: Toggle sidebar
+            - img
+          - link "AWESOME.VIDEO home" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e16]: av
+            - generic [ref=e17]: AWESOME.VIDEO
+            - generic [ref=e18]: AWESOME.VIDEO home
+          - button "Search 3,826 resources" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+            - generic [ref=e23]: Search 3,826 resources
+            - generic [ref=e24]: Search
+            - generic [ref=e25]: ⌘K
+          - button "Admin, account menu" [ref=e26] [cursor=pointer]:
+            - generic [ref=e28]: A
+            - generic [ref=e29]: Admin
+            - generic [ref=e30]: Admin, account menu
+        - generic [ref=e32]:
+          - main [ref=e33]:
+            - generic [ref=e34]:
+              - navigation "Breadcrumb" [ref=e35]:
+                - list [ref=e36]:
+                  - listitem [ref=e37]:
+                    - link "Home" [ref=e38] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e39]:
+                    - img [ref=e40]
+                  - listitem:
+                    - link "Bookmarks" [disabled]
+              - generic [ref=e42]:
+                - generic [ref=e43]:
+                  - generic [ref=e44]: // Learning library
+                  - generic [ref=e45]:
+                    - generic [ref=e46]:
+                      - generic [ref=e47]:
+                        - img [ref=e48]
+                        - heading "Saved, then finished." [level=1] [ref=e50]:
+                          - text: Saved, then
+                          - emphasis [ref=e51]: finished.
+                      - paragraph [ref=e52]: Turn bookmarks into a queue you can actually work through.
+                    - button "New collection" [ref=e53] [cursor=pointer]:
+                      - img
+                      - text: New collection
+                - region "Library summary" [ref=e54]:
+                  - button "13 Active" [ref=e55] [cursor=pointer]:
+                    - generic [ref=e56]: "13"
+                    - text: Active
+                  - button "12 Saved" [ref=e57] [cursor=pointer]:
+                    - generic [ref=e58]: "12"
+                    - text: Saved
+                  - button "1 Watch next" [ref=e59] [cursor=pointer]:
+                    - generic [ref=e60]: "1"
+                    - text: Watch next
+                  - button "0 In progress" [ref=e61] [cursor=pointer]:
+                    - generic [ref=e62]: "0"
+                    - text: In progress
+                  - button "0 Done" [ref=e63] [cursor=pointer]:
+                    - generic [ref=e64]: "0"
+                    - text: Done
+                  - button "0 Archived" [ref=e65] [cursor=pointer]:
+                    - generic [ref=e66]: "0"
+                    - text: Archived
+                - generic [ref=e68]:
+                  - generic [ref=e69]:
+                    - generic [ref=e70] [cursor=pointer]: Collection
+                    - combobox "Collection" [ref=e71] [cursor=pointer]:
+                      - generic: "[QA-audit-1026] gap Move (1)"
+                      - img [ref=e72]
+                  - region "Selected collection controls" [ref=e74]:
+                    - generic [ref=e75]:
+                      - generic [ref=e76]:
+                        - generic [ref=e77]:
+                          - img [ref=e78]
+                          - heading "[QA-audit-1026] gap Move" [level=2] [ref=e80]
+                        - paragraph [ref=e81]: 1 saved resource
+                      - generic [ref=e82]:
+                        - button "Rename" [ref=e83] [cursor=pointer]:
+                          - img
+                          - text: Rename
+                        - button "Archive" [ref=e84] [cursor=pointer]:
+                          - img
+                          - text: Archive
+                        - button "Publish link" [ref=e85] [cursor=pointer]:
+                          - img
+                          - text: Publish link
+                        - button "Delete" [ref=e86] [cursor=pointer]:
+                          - img
+                          - text: Delete
+                  - region "Library filters" [ref=e87]:
+                    - generic [ref=e88]:
+                      - generic [ref=e89] [cursor=pointer]: Queue status
+                      - combobox "Queue status" [ref=e90] [cursor=pointer]:
+                        - generic: All statuses
+                        - img [ref=e91]
+                    - generic [ref=e93]:
+                      - generic [ref=e94] [cursor=pointer]: Visibility
+                      - combobox "Visibility" [ref=e95] [cursor=pointer]:
+                        - generic: Active bookmarks
+                        - img [ref=e96]
+                    - generic [ref=e98]:
+                      - generic [ref=e99] [cursor=pointer]: Sort
+                      - combobox "Sort" [ref=e100] [cursor=pointer]:
+                        - generic: Newest saved
+                        - img [ref=e101]
+                  - region "Bulk bookmark actions" [ref=e103]:
+                    - generic [ref=e104]:
+                      - generic [ref=e105] [cursor=pointer]:
+                        - checkbox "Select all visible bookmarks" [ref=e106]
+                        - text: Select all shown
+                      - paragraph [ref=e107]: 0 bookmarks selected
+                  - article [ref=e109]:
+                    - generic [ref=e110]:
+                      - generic [ref=e111] [cursor=pointer]:
+                        - checkbox "Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e112]
+                        - generic [ref=e113]: Select MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)
+                      - combobox "Queue status for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e114] [cursor=pointer]:
+                        - generic: Watch next
+                        - img [ref=e115]
+                      - 'button "Note: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e117] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e118] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e119] [cursor=pointer]:
+                      - generic [ref=e120]:
+                        - generic [ref=e121]:
+                          - generic [ref=e122]: ▣
+                          - generic [ref=e124]:
+                            - 'button "Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e125]':
+                              - generic [ref=e126]:
+                                - img
+                            - 'button "Remove bookmark: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [pressed] [ref=e127]':
+                              - generic [ref=e128]:
+                                - img
+                            - 'button "View or edit bookmark notes: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e129]':
+                              - img
+                        - heading "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [level=2] [ref=e131]:
+                          - link "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e132]:
+                            - /url: /resource/190342
+                        - paragraph [ref=e133]: Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API.
+                        - paragraph [ref=e134]:
+                          - img [ref=e135]
+                          - generic [ref=e138]: "[QA-audit-1026] updated QA note"
+                      - generic [ref=e139]:
+                        - generic [ref=e140]:
+                          - generic [ref=e141]: "Page Title: MediaMTX – Download the Media Streaming Server for Live Video"
+                          - generic [ref=e142]: "Page Description: Download MediaMTX and build powerful live media streaming workflows with RTSP, RTMP, HLS, WebRTC, SRT, recording, and more."
+                        - generic [ref=e143]:
+                          - link "View details for MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e144]:
+                            - /url: /resource/190342
+                            - generic [ref=e145]:
+                              - img [ref=e146]
+                              - generic [ref=e148]: View Details
+                          - generic [ref=e149]: Infrastructure & Delivery
+                        - generic [ref=e150]:
+                          - link "Open Link MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)" [ref=e151]:
+                            - /url: https://mediamtx.net/
+                            - img
+                            - generic [ref=e152]: Open Link
+                            - generic [ref=e153]: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs) (opens in new tab)
+                          - 'button "Suggest an edit: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)" [ref=e154]':
+                            - img
+          - contentinfo [ref=e155]:
+            - generic [ref=e156]:
+              - generic [ref=e157]:
+                - paragraph [ref=e158]: ── INDEX
+                - link "awesome.video home" [ref=e159] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e160]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - generic [ref=e162]:
+                - heading "INDEXED" [level=2] [ref=e163]
+                - paragraph [ref=e164]: 3,826
+                - paragraph [ref=e165]:
+                  - text: 9 categories
+                  - text: 99 subcategories
+                  - generic [ref=e166]: live
+              - navigation "Explore categories" [ref=e168]:
+                - heading "EXPLORE" [level=2] [ref=e169]
+                - generic [ref=e170]:
+                  - link "Community & Events" [ref=e171] [cursor=pointer]:
+                    - /url: /category/community-events
+                    - generic [ref=e172]: ◈
+                    - generic [ref=e173]: Community
+                  - link "Encoding & Codecs" [ref=e174] [cursor=pointer]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e175]: ◇
+                    - generic [ref=e176]: Encoding
+                  - link "General Tools" [ref=e177] [cursor=pointer]:
+                    - /url: /category/general-tools
+                    - generic [ref=e178]: ◆
+                    - generic [ref=e179]: General
+                  - link "Infrastructure & Delivery" [ref=e180] [cursor=pointer]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e181]: ▣
+                    - generic [ref=e182]: Infrastructure
+                  - link "Intro & Learning" [ref=e183] [cursor=pointer]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e184]: ▤
+                    - generic [ref=e185]: Intro
+                  - link "Media Tools" [ref=e186] [cursor=pointer]:
+                    - /url: /category/media-tools
+                    - generic [ref=e187]: ▥
+                    - generic [ref=e188]: Media
+                  - link "Players & Clients" [ref=e189] [cursor=pointer]:
+                    - /url: /category/players-clients
+                    - generic [ref=e190]: ▶
+                    - generic [ref=e191]: Players
+                  - link "Protocols & Transport" [ref=e192] [cursor=pointer]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e193]: ⟁
+                    - generic [ref=e194]: Protocols
+                  - link "Standards & Industry" [ref=e195] [cursor=pointer]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e196]: ◉
+                    - generic [ref=e197]: Standards
+              - generic [ref=e198]:
+                - heading "SOURCE" [level=2] [ref=e199]
+                - link "krzemienski/awesome-video" [ref=e200] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e201]
+                  - generic [ref=e203]:
+                    - text: krzemienski
+                    - generic [ref=e204]:
+                      - text: /
+                      - text: awesome-video
+                  - generic [ref=e205]: ↗
+                - paragraph [ref=e206]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e207] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+                - button "Contact maintainers" [ref=e209] [cursor=pointer]:
+                  - img
+                  - text: Contact maintainers
+            - generic [ref=e210]:
+              - generic [ref=e211]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e212]:
+                - link "About" [ref=e213] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e214] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e215] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e216] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - button "Cookie settings" [ref=e217] [cursor=pointer]
+                - link "Issues ↗" [ref=e218] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e219] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e220]: built with the awesome-list framework
+  - status [ref=e221]: Notification Read-only sharing enabled

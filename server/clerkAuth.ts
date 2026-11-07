@@ -18,14 +18,17 @@
  *    error propagation when the DB lookup itself failed (so an outage is not
  *    misreported as "signed out").
  */
-import type { Request, RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { db } from "./db";
-import { deletedUserTombstones, users, type User } from "@shared/schema";
+import { deletedUserTombstones, users, type AuthMethod, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("auth");
 
 export interface ClerkSessionIdentity {
   /** Legacy bridge id — equals users.id for migrated users. */
@@ -46,6 +49,8 @@ declare global {
       dbUser?: User;
       /** Clerk session identity (set whenever a valid Clerk session exists). */
       clerkIdentity?: ClerkSessionIdentity;
+      /** How clerkUserContext authenticated `dbUser` (set with it). */
+      authMethod?: AuthMethod;
     }
   }
 }
@@ -111,13 +116,13 @@ export async function ensureDbUser(
     )
     .limit(1);
   if (tombstone) {
-    console.warn(
+    logger.warn(
       `[clerkAuth] refusing JIT provisioning for deleted account ${identity.bridgeUserId}`,
     );
     return undefined;
   }
 
-  await db
+  const inserted = await db
     .insert(users)
     .values({
       id: identity.bridgeUserId,
@@ -127,7 +132,8 @@ export async function ensureDbUser(
       profileImageUrl: identity.imageUrl ?? null,
       role: "user",
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: users.id });
 
   const [created] = await db
     .select()
@@ -135,11 +141,15 @@ export async function ensureDbUser(
     .where(eq(users.id, identity.bridgeUserId))
     .limit(1);
   if (created) {
-    // Row genuinely created by this request (or a concurrent twin) — this is
-    // the Clerk-era "sign_up_completed" moment. Consent-gated internally.
-    trackServerEvent(req, "sign_up_completed", created.id, {
-      sign_up_method: "clerk",
-    });
+    // Only the request whose insert won is the Clerk-era "sign_up_completed"
+    // moment; a new session fires several API calls at once and the others
+    // just re-select the row. Consent-gated internally.
+    if (inserted.length > 0) {
+      trackServerEvent(req, "sign_up_completed", created.id, {
+        sign_up_method: "clerk",
+      });
+      logger.info("New account provisioned from Clerk sign-up", { user: created.id });
+    }
     return created;
   }
 
@@ -147,7 +157,7 @@ export async function ensureDbUser(
   // certainly the UNIQUE(email) constraint colliding with an existing row
   // under a different id. Deliberately fail closed (no email-based binding);
   // the visitor stays effectively signed out of app data until reconciled.
-  console.error(
+  logger.error(
     `[clerkAuth] JIT provisioning conflict for bridge id ${identity.bridgeUserId}: ` +
       `an existing account owns this session's email. Refusing to auto-bind; ` +
       `manual reconciliation required.`,
@@ -165,7 +175,7 @@ function skipUserContext(req: Request): boolean {
 }
 
 /** Constant-time string comparison (hash first so lengths never leak). */
-function secretsMatch(candidate: string, expected: string): boolean {
+export function secretsMatch(candidate: string, expected: string): boolean {
   const a = createHash("sha256").update(candidate).digest();
   const b = createHash("sha256").update(expected).digest();
   return timingSafeEqual(a, b);
@@ -227,13 +237,32 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
  */
 export const ADMIN_SESSION_COOKIE = "av_admin_session";
 export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+/** How far past now + TTL a cookie's expiry may be (clock skew between instances). */
+const ADMIN_SESSION_FUTURE_TOLERANCE_MS = 60_000;
 export const adminCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/",
 };
+/**
+ * Script-readable twin of the HttpOnly owner cookie. It carries no secret: it
+ * only tells the client a session may exist so useAuth asks /api/auth/user.
+ * Set on admin-login, cleared wherever the session cookie is cleared.
+ */
+export const ADMIN_HINT_COOKIE = "av_admin_hint";
+const adminHintCookieOptions = { ...adminCookieOptions, httpOnly: false };
 const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 8;
+
+export function setAdminSessionCookies(res: Response, token: string): void {
+  res.cookie(ADMIN_SESSION_COOKIE, token, { ...adminCookieOptions, maxAge: ADMIN_SESSION_TTL_MS });
+  res.cookie(ADMIN_HINT_COOKIE, "1", { ...adminHintCookieOptions, maxAge: ADMIN_SESSION_TTL_MS });
+}
+
+export function clearAdminSessionCookies(res: Response): void {
+  res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+  res.clearCookie(ADMIN_HINT_COOKIE, adminHintCookieOptions);
+}
 
 function adminLoginPassword(): string | null {
   const password = process.env.OWNER_PASSWORD;
@@ -257,10 +286,26 @@ function adminSessionSignature(expiresAt: number, password: string): string {
 }
 
 /** Returns a fresh cookie value, or null when password login is disabled. */
-export function issueAdminSessionToken(now = Date.now()): string | null {
+export async function issueAdminSessionToken(): Promise<string | null> {
   const password = adminLoginPassword();
   if (!password) return null;
-  const expiresAt = now + ADMIN_SESSION_TTL_MS;
+  const now = Date.now();
+  const admin = await resolveBypassAdmin();
+  const revokedAt = admin?.sessionsRevokedAt?.getTime() ?? 0;
+  // Revocation kills cookies issued at or before sessionsRevokedAt (a database
+  // clock time), so a sign-in right after a sign-out is dated just after it.
+  // The bump never exceeds the future-dated tolerance, so the cookie always
+  // validates. A cutoff further ahead came from a skewed clock and would
+  // refuse every sign-in until wall time caught up, so it is pulled back.
+  let issuedAt = Math.max(now, revokedAt + 1);
+  if (admin && issuedAt > now + ADMIN_SESSION_FUTURE_TOLERANCE_MS) {
+    issuedAt = now;
+    await db
+      .update(users)
+      .set({ sessionsRevokedAt: new Date(now - 1) })
+      .where(eq(users.id, admin.id));
+  }
+  const expiresAt = issuedAt + ADMIN_SESSION_TTL_MS;
   return `${expiresAt}.${adminSessionSignature(expiresAt, password)}`;
 }
 
@@ -285,7 +330,7 @@ export function hasValidAdminSessionCookie(req: Request): boolean {
   const expiresAt = Number(raw.slice(0, dot));
   const now = Date.now();
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) return false;
-  if (expiresAt > now + ADMIN_SESSION_TTL_MS + 60_000) return false;
+  if (expiresAt > now + ADMIN_SESSION_TTL_MS + ADMIN_SESSION_FUTURE_TOLERANCE_MS) return false;
   return secretsMatch(raw.slice(dot + 1), adminSessionSignature(expiresAt, password));
 }
 
@@ -304,14 +349,19 @@ function isRevokedAdminSession(req: Request, admin: User): boolean {
 }
 
 /**
- * "Sign out all devices" for the owner: every owner cookie issued until now
- * stops working. Returns false when the request is not an owner session.
+ * Ends the owner session on the server: every owner cookie issued until now
+ * stops working, including copies of the request's own cookie. The cookie
+ * carries no per-device id, so sign-out and "sign out all devices" both end
+ * every owner session. Returns false when the request is not an owner session.
  */
 export async function revokeAdminSessions(req: Request): Promise<boolean> {
   if (adminSessionIssuedAt(req) === null || !req.dbUser) return false;
+  // Database clock, and never moved backwards: a sign-out that lands after a
+  // later one must not revive the sessions that one ended. The column holds
+  // UTC wall time (how Drizzle writes a Date to a timestamp without zone).
   await db
     .update(users)
-    .set({ sessionsRevokedAt: new Date() })
+    .set({ sessionsRevokedAt: sql`greatest(${users.sessionsRevokedAt}, now() at time zone 'utc')` })
     .where(eq(users.id, req.dbUser.id));
   return true;
 }
@@ -348,23 +398,24 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
     try {
       const auditAdmin = await resolveBypassAdmin();
       if (auditAdmin && !viaAuditKey && isRevokedAdminSession(req, auditAdmin)) {
-        // Signed out everywhere after this cookie was issued: anonymous, and
+        // The owner signed out after this cookie was issued: anonymous, and
         // drop the dead cookie so later requests take the normal path.
-        res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+        clearAdminSessionCookies(res);
       } else if (auditAdmin) {
         req.dbUser = auditAdmin;
+        req.authMethod = viaAuditKey ? "audit_key" : "owner_password";
         req.clerkIdentity = undefined; // no Clerk session backs this request
         if (viaAuditKey) {
-          console.log(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
+          logger.info(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
         }
       } else {
         // Valid credential but no seeded admin row: treat as anonymous.
-        console.warn(
+        logger.warn(
           "[clerkAuth] admin bypass valid but admin@example.com row missing — request stays anonymous",
         );
       }
     } catch (error) {
-      console.error("[clerkAuth] audit-key bypass lookup failed:", error);
+      logger.error("[clerkAuth] audit-key bypass lookup failed:", error);
       res.locals.clerkUserLookupError = error;
     }
     return next();
@@ -376,8 +427,9 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   req.clerkIdentity = identity;
   try {
     req.dbUser = await ensureDbUser(req, identity);
+    req.authMethod = "clerk";
   } catch (error) {
-    console.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
+    logger.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
     res.locals.clerkUserLookupError = error;
   }
   next();

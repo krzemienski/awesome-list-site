@@ -1,0 +1,9 @@
+✓ Done
+== /category/encoding-codecs
+"{\"url\":\"/category/encoding-codecs\",\"h1\":\"Encoding & Codecs\",\"bc\":[\"Home>/\"],\"back\":[\"Browse>/categories\"],\"tiles\":[\"/subcategory/benchmarking-performance-tools-for-codecs\",\"/subcategory/cloud-based-encoding-solutions\",\"/subcategory/codecs\",\"/subcategory/comparative-analysis-of-codecs\",\"/subcategory/containerization-packaging-tools\"],\"cnt\":\"826 resources\"}"
+✓ Done
+== /subcategory/codecs
+"{\"url\":\"/subcategory/codecs\",\"h1\":\"Codecs\",\"bc\":[\"Home>/\",\"Encoding & Codecs>/category/encoding-codecs\"],\"back\":[],\"tiles\":[\"/category/encoding-codecs\",\"/sub-subcategory/av1\",\"/sub-subcategory/hevc\",\"/sub-subcategory/vp9\",\"/subcategory/codecs\"],\"cnt\":\"826 resources\"}"
+✓ Done
+== /sub-subcategory/av1
+"{\"url\":\"/sub-subcategory/av1\",\"h1\":\"AV1\",\"bc\":[\"Home>/\",\"Encoding & Codecs>/category/encoding-codecs\",\"Codecs>/subcategory/codecs\"],\"back\":[],\"tiles\":[\"/category/encoding-codecs\",\"/subcategory/codecs\",\"/sub-subcategory/vp9\",\"/sub-subcategory/hevc\",\"/subcategory/codecs\"],\"cnt\":\"826 resources\"}"

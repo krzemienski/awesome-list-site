@@ -1,0 +1,35 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Subcategories" [ref=e15] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e16]
+                - status
+  - listbox [ref=e2]
+    - generic
+      - option "Community & Events" [ref=e3]
+        - StaticText "Community & Events"
+      - option "Encoding & Codecs" [ref=e4]
+        - StaticText "Encoding & Codecs"
+      - option "General Tools" [ref=e5]
+        - StaticText "General Tools"
+      - option "Infrastructure & Delivery" [ref=e6]
+        - StaticText "Infrastructure & Delivery"
+      - option "Intro & Learning" [ref=e7]
+        - StaticText "Intro & Learning"
+      - option "Media Tools" [ref=e8]
+        - StaticText "Media Tools"
+      - option "Players & Clients" [ref=e9]
+        - StaticText "Players & Clients"
+      - option "Protocols & Transport" [ref=e10]
+        - StaticText "Protocols & Transport"
+      - option "Standards & Industry" [selected, ref=e11]
+        - StaticText "Standards & Industry"
+      - option "[QA-audit-1026] c6 category renamed" [ref=e12]
+        - StaticText "[QA-audit-1026] c6 category renamed"
+      - option "[QA-audit-1026] c6 race create winner" [ref=e13]
+        - StaticText "[QA-audit-1026] c6 race create winner"
+      - option "[QA-audit-1026] c6 race create2 winner" [ref=e14]
+        - StaticText "[QA-audit-1026] c6 race create2 winner"

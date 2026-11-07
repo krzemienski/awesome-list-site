@@ -1,0 +1,5 @@
+[5406.1716] GET https://awesome.video/api/researcher/jobs/71 (Fetch) 200
+[5406.1857] GET https://awesome.video/api/researcher/jobs/71 (Fetch) 200
+[5406.1858] GET https://awesome.video/api/researcher/jobs/71/events (Fetch) 200
+[5406.2311] GET https://awesome.video/api/researcher/jobs/71 (Fetch) 200
+[5406.2312] GET https://awesome.video/api/researcher/jobs/71/events (Fetch) 200

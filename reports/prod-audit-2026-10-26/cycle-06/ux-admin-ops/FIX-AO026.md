@@ -1,0 +1,5 @@
+Fix C6-AO-026 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-ao026-chart-reduced-motion. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-admin-ops/findings.md and chart evidence. Link Health Recharts lines/dots currently animate under prefers-reduced-motion: reduce. Reuse the app's reduced-motion hook/pattern and set isAnimationActive appropriately on every animated series/dots, including initial expansion and data updates; normal motion remains unchanged. Scope LinkHealthTrendChart only.
+
+Run tsc --noEmit and npm run build unpiped. Use authorized local admin proof only if already available, otherwise mark it BLOCKED for post-deploy production verification at 1440, 820 touch and 390 touch with reduced-motion DOM measurements. Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks and UNVERIFIED evidence. No test files/mocks/validation harnesses. Never merge.

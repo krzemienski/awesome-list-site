@@ -1,12 +1,12 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import "@/styles/pages/discovery.css";
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
-import { normalizeTag } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,16 +19,22 @@ import type { Resource as DbResource } from "@shared/schema";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { Paginator } from "@/components/ui/paginator";
 import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
+import { offeredFacets, orList } from "@/components/search/facet-options";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
 import { searchPageSeo } from "@shared/seo-templates";
+import { fetchAwesomeListNav, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
-const readState = (search: string): State => {
-  return readSearchState(search);
-};
+// parseTagsParam keeps the visitor's spelling of each tag, so an unknown tag
+// shows as typed instead of as its singular slug.
+const readState = (search: string): State => ({
+  ...readSearchState(search),
+  tags: parseTagsParam(new URLSearchParams(search)),
+});
 const facetState = (s: State) => [s.category, s.subcategory, s.subSubcategory, s.provider, s.format, s.skillLevel].some(Boolean) || s.tags.length > 0;
 const searchFilterSignature = (s: State) => JSON.stringify([
   s.category,
@@ -52,6 +58,14 @@ export default function Search() {
   const lastTrackedSearchIntentRef = useRef("");
   const resultsRef = useRef<HTMLElement>(null);
   const pendingResultsFocusRef = useRef(false);
+  const resultsFocusTimerRef = useRef<number>();
+  // The mobile Filters sheet owns focus while open and returns it to its trigger on close.
+  const sheetOpenRef = useRef(false);
+  const onFiltersSheetChange = useCallback((open: boolean) => {
+    sheetOpenRef.current = open;
+    pendingResultsFocusRef.current = false;
+    window.clearTimeout(resultsFocusTimerRef.current);
+  }, []);
   const pendingAnalyticsRef = useRef<{
     signature: string;
     type: string;
@@ -138,6 +152,9 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [input, state.q]);
   const clearFilters = (includeSort = false) => {
+    // A sort the page doesn't offer is part of what made the request invalid,
+    // so it goes with the filters; a supported one stays.
+    const resetSort = includeSort || !Object.hasOwn(sortLabels, state.sort);
     const next = {
       ...state,
       q: input,
@@ -148,7 +165,7 @@ export default function Search() {
       provider: "",
       format: "",
       skillLevel: "",
-      sort: includeSort ? "relevance" : state.sort,
+      sort: resetSort ? "relevance" : state.sort,
       page: 1,
     };
     setState(next);
@@ -169,18 +186,20 @@ export default function Search() {
       provider: null,
       format: null,
       skillLevel: null,
-      sort: includeSort ? null : state.sort === "relevance" ? null : state.sort,
+      sort: resetSort || state.sort === "relevance" ? null : state.sort,
       page: null,
     }, "push");
   };
   const clearInvalidRequest = () => {
-    const next = readState("");
+    // Keep a valid query; drop every other parameter used to construct the
+    // failed request, including unsupported values and unknown query keys.
+    const queryLength = normalizeSearchQuery(input).length;
+    const kept = queryLength > 0 && queryLength <= SEARCH_QUERY_MAX_LENGTH ? new URLSearchParams({ q: input }).toString() : "";
+    const next = readState(kept);
     setState(next);
-    setInput("");
+    setInput(next.q);
     setPageNotice(null);
-    // Remove every parameter used to construct the failed request, including
-    // unsupported values and any unrelated unknown query keys.
-    window.history.replaceState(null, "", "/search");
+    window.history.replaceState(null, "", `/search${kept ? `?${kept}` : ""}`);
     // C6-SWEEP-05: "Clear invalid filters" unmounts with the error card.
     inputRef.current?.focus();
   };
@@ -194,6 +213,13 @@ export default function Search() {
   const queryUrl = useMemo(() => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`, [state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
+  // A zero-result search used to offer only "Clear"; name a few real
+  // destinations instead. Shares the sidebar's cached nav tree.
+  const { data: nav } = useQuery<AwesomeListNav>({ queryKey: ["awesome-list-nav"], queryFn: fetchAwesomeListNav, staleTime: 1000 * 60 * 60 });
+  const suggestedCategories = useMemo(
+    () => visibleNavCategories(nav?.categories).filter(category => category.slug).sort((a, b) => b.totalResourceCount - a.totalResourceCount).slice(0, 6),
+    [nav],
+  );
   const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string }; resolvedFilters?: ResolvedFilters }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
   const data = query.data; const results = data?.resources ?? []; const total = data?.total ?? 0; const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE)); const safePage = Math.min(state.page, totalPages);
   useEffect(() => {
@@ -224,9 +250,10 @@ export default function Search() {
   useEffect(() => {
     if (!pendingResultsFocusRef.current || query.isLoading || !data) return;
     pendingResultsFocusRef.current = false;
-    const timer = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
-    return () => window.clearTimeout(timer);
+    if (sheetOpenRef.current) return;
+    resultsFocusTimerRef.current = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
   }, [data, query.isLoading]);
+  useEffect(() => () => window.clearTimeout(resultsFocusTimerRef.current), []);
   const lastFacets = useRef<ResourceSearchFacets>();
   if (data?.facets) lastFacets.current = data.facets;
   // A link can name the category/subcategory by slug (?category=encoding-codecs,
@@ -238,13 +265,21 @@ export default function Search() {
   const resolvedNames = useRef<{ category: Map<string, string>; subcategory: Map<string, string> }>({ category: new Map(), subcategory: new Map() });
   if (data?.resolvedFilters?.category) resolvedNames.current.category.set(data.resolvedFilters.category.requested, data.resolvedFilters.category.name);
   if (data?.resolvedFilters?.subcategory) resolvedNames.current.subcategory.set(data.resolvedFilters.subcategory.requested, data.resolvedFilters.subcategory.name);
+  // A rejected request (400) echoes nothing, so the nav tree already cached for
+  // the sidebar names a slug there; the chip then matches the valid state.
+  const navCategory = nav?.categories.find(c => c.slug === state.category);
+  const navSubcategory = (navCategory ? [navCategory] : nav?.categories ?? []).flatMap(c => c.subcategories ?? []).find(s => s.slug === state.subcategory);
+  const navSubSubcategory = (navSubcategory ? [navSubcategory] : navCategory?.subcategories ?? nav?.categories.flatMap(c => c.subcategories ?? []) ?? []).flatMap(s => s.subSubcategories ?? []).find(s => s.slug === state.subSubcategory);
   const filterState = {
     ...state,
-    category: resolvedNames.current.category.get(state.category) ?? state.category,
-    subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? state.subcategory,
+    category: resolvedNames.current.category.get(state.category) ?? navCategory?.name ?? state.category,
+    subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? navSubcategory?.name ?? state.subcategory,
+    subSubcategory: navSubSubcategory?.name ?? state.subSubcategory,
   };
+  const facets = data?.facets ?? lastFacets.current;
+  const facetNames = offeredFacets(facets, filterState);
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
-  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
   // A search started offline is paused, not failed: isLoading and isError are
@@ -265,19 +300,19 @@ export default function Search() {
   };
   return <div className="discovery-page space-y-6">
     <SEOHead title={`${searchPageSeo.titleCore(normalized)} — Awesome Video`} description={searchPageSeo.description} noindex />
-    <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent-ink)]" /><div><h1 className="page-title discovery-title">Search</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative min-w-0 flex-1"><SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input ref={inputRef} value={input} onChange={e => { pristine.current = false; setInput(e.target.value); }} onMouseDown={() => { pristine.current = false; }} onKeyDown={e => { if (e.key === "/" && pristine.current && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); window.dispatchEvent(new Event("awesome:open-search-palette")); } if (e.key === "Escape" && input) { e.preventDefault(); setInput(""); } pristine.current = false; }} placeholder="Search resources..." className="min-h-11 pl-10" aria-label="Search resources" data-testid="input-search-page" /></div>
-        <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Sort</span><Select value={state.sort} onValueChange={v => update("sort", v)}><SelectTrigger className="min-h-11 w-36" aria-label="Sort results" data-testid="select-search-sort"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(sortLabels).map(([v, text]) => <SelectItem key={v} value={v}>{text}</SelectItem>)}</SelectContent></Select></div></div>
+    <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent-ink)]" /><div><h1 className="page-title discovery-title">{searchPageSeo.heading}</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative min-w-0 flex-1"><SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input id="search-resources" name="search-resources" ref={inputRef} value={input} onChange={e => { pristine.current = false; setInput(e.target.value); }} onMouseDown={() => { pristine.current = false; }} onKeyDown={e => { if (e.key === "/" && pristine.current && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); window.dispatchEvent(new Event("awesome:open-search-palette")); } if (e.key === "Escape" && input) { e.preventDefault(); setInput(""); } pristine.current = false; }} placeholder="Search resources..." className="min-h-11 pl-10" aria-label="Search resources" data-testid="input-search-page" /></div>
+        <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Sort</span><Select name="search-sort-results" value={state.sort in sortLabels ? state.sort : ""} onValueChange={v => update("sort", v)}><SelectTrigger id="search-sort-results" className="min-h-11 w-36" aria-label="Sort results" data-testid="select-search-sort"><SelectValue placeholder="Invalid sort" /></SelectTrigger><SelectContent>{Object.entries(sortLabels).map(([v, text]) => <SelectItem key={v} value={v}>{text}</SelectItem>)}</SelectContent></Select></div></div>
     </header>
     <ActiveFilters state={filterState} onChange={update} onClear={() => clearFilters()} />
-    {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => { setPageNotice(null); /* C6-SWEEP-04: the notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
-      {!shouldShowResults ? <StatePanel tone="empty" label={normalized ? "Query too short" : "No query"} title={normalized ? "Keep typing to search" : "Enter a query or choose filters"} inline testId="text-search-prompt" actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</StatePanel>
+    {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 max-lg:min-h-11 underline" onClick={() => { setPageNotice(null); /* C6-SWEEP-04: the notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
+    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={facets} onChange={update} onClear={() => clearFilters()} onSheetOpenChange={onFiltersSheetChange} otherControls={["search", "sort"]} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
+      {!shouldShowResults ? <StatePanel tone="empty" label={normalized ? "Query too short" : "No query"} title={normalized ? "Keep typing to search" : "Enter a query or choose filters"} inline testId="text-search-prompt" actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : facetNames.length > 0 ? `Narrow the catalog by ${orList(facetNames)}.` : "Type a word to search the catalog."}</StatePanel>
        : queryTooLong ? <StatePanel tone="empty" label="Query too long" title="Shorten your search" inline testId="search-query-too-long" actions={<Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button>}><span role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</span></StatePanel>
        : offline ? <StatePanel tone="error" label="Offline" title="You’re offline" inline testId="search-results-offline" actions={<RetryButton onRetry={retrySearch} handoffFocus={false} testId="button-retry-offline-search" />}>Search couldn’t reach the catalog because your device has no connection. Results will load on their own when you reconnect.{stillOffline && <p className="system-state-note" data-testid="text-search-still-offline">Still offline — reconnect and try again.</p>}</StatePanel>
-       : query.isLoading || (!data && !query.isError) ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
+       : query.isLoading || (!data && !query.isError) ? <><p className="sr-only" role="status">Loading search results…</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></>
        : query.isError ? <StatePanel tone="error" label={invalid ? "Invalid filters" : "Error · unavailable"} title={invalid ? "These filters can’t be applied" : "Search failed"} inline testId="search-results-error" actions={invalid ? <Button variant="outline" onClick={clearInvalidRequest} data-testid="button-clear-invalid-filters">Clear invalid filters</Button> : <RetryButton onRetry={retrySearch} handoffFocus={false} testId="button-retry-search" />}>{invalid ? query.error.message : connectionFailed ? "Search couldn't reach the catalog. Check your connection and try again." : "Something went wrong while searching. Please try again."}</StatePanel>
-        : results.length === 0 ? <StatePanel tone="empty" label="No results" title={normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"} inline testId="text-no-results" actions={<>{hasActiveFilters && <Button variant="outline" onClick={() => clearFilters()} data-testid="button-clear-search-filters">Clear filters</Button>}{normalized && <Button variant="ghost" onClick={clearSearch} data-testid="button-clear-search-query">Clear search</Button>}<Button asChild variant="secondary"><Link href="/categories" data-testid="link-empty-browse-categories">Browse categories</Link></Button><Button asChild variant="secondary"><Link href="/advanced" data-testid="link-empty-advanced-discovery">Advanced discovery</Link></Button></>}>Try broadening your filters or search terms.</StatePanel>
+        : results.length === 0 ? <StatePanel tone="empty" label="No results" title={normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"} inline testId="text-no-results" actions={<>{hasActiveFilters && <Button variant="outline" onClick={() => clearFilters()} data-testid="button-clear-search-filters">Clear filters</Button>}{normalized && <Button variant="ghost" onClick={clearSearch} data-testid="button-clear-search-query">Clear search</Button>}<Button asChild variant="secondary"><Link href="/categories" data-testid="link-empty-browse-categories">Browse categories</Link></Button><Button asChild variant="secondary"><Link href="/advanced" data-testid="link-empty-advanced-discovery">Advanced discovery</Link></Button></>}>Try broadening your filters or search terms.{suggestedCategories.length > 0 && <nav aria-label="Popular categories" className="mt-3" data-testid="search-empty-categories"><p className="text-xs text-muted-foreground">Or start from a popular category:</p><ul className="mt-2 flex flex-wrap justify-center gap-2">{suggestedCategories.map(category => <li key={category.slug}><Link href={`/category/${category.slug}`} className="chip inline-flex min-h-11 items-center gap-2 hover:border-[var(--accent)]">{category.name}<span className="mono text-muted-foreground">{category.totalResourceCount}</span></Link></li>)}</ul></nav>}</StatePanel>
        : <>{data?.search?.mode === "fuzzy" && data.search.suggestion && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm" role="status" data-testid="notice-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setInput(data.search!.suggestion!); update("q", data.search!.suggestion!); inputRef.current?.focus(); /* C6-V2-01: the notice unmounts with this button */ }}>{data.search.suggestion}</Button><span>?</span></div>}<p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{queryReady ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-grid">{results.map(r => <ResourceCard key={r.id} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
     </section></div>
   </div>;

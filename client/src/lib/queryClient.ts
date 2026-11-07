@@ -1,7 +1,9 @@
 import { QueryClient, QueryCache, MutationCache, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
 import { humanizeStatusBody } from "./apiError";
+import { isCancelledRequestError } from "./analytics-suppression";
 import { isClerkRequested, whenClerkLoaded } from "./clerk-bridge";
+import { apiFetch } from "./api-fetch";
 
 // NB-028 (run18): errors must carry the HTTP status as a real property —
 // retry predicates checking `'status' in error` silently failed against the
@@ -25,6 +27,25 @@ export class ApiError extends Error {
   }
 }
 
+function hasValidationFailedBody(body: string): boolean {
+  try {
+    return JSON.parse(body)?.error === "validation_failed";
+  } catch {
+    return false;
+  }
+}
+
+// The resource no longer exists for this caller: 404/410, or a 400
+// validation_failed for a malformed legacy id (/api/resources/:id).
+export function isGoneError(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  return (
+    error.status === 404
+    || error.status === 410
+    || (error.status === 400 && hasValidationFailedBody(error.body))
+  );
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -42,7 +63,7 @@ export async function apiRequest(
   options?: RequestInit,
 ): Promise<any> {
   const isRead = !options?.method || ['GET', 'HEAD'].includes(options.method.toUpperCase());
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     ...(isRead && !options?.cache ? { cache: catalogRequestCache() } : {}),
     ...options,
     headers: {
@@ -55,9 +76,11 @@ export async function apiRequest(
   await throwIfResNotOk(res);
   // All admin catalog callers (including edits, bulk operations and undo/redo)
   // pass this boundary. Invalidate the whole catalog graph after a successful
-  // write, not just whichever manager happens to be mounted.
+  // write, not just whichever manager happens to be mounted. Approving a
+  // research discovery publishes a resource, so it is a catalog write too.
   if (options?.method && !['GET', 'HEAD'].includes(options.method.toUpperCase()) &&
-      /^\/api\/admin\/(?:resources|resource-edits|categories|subcategories|sub-subcategories)(?:\/|$)/.test(url)) {
+      (/^\/api\/admin\/(?:resources|resource-edits|categories|subcategories|sub-subcategories)(?:\/|$)/.test(url) ||
+        /^\/api\/researcher\/discoveries\/(?:\d+\/approve|approve-all)$/.test(url))) {
     void invalidateCatalogQueries();
   }
   const contentType = res.headers.get("content-type");
@@ -98,7 +121,7 @@ const getQueryFn: <T>(options: {
     const startTime = performance.now();
     
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         credentials: "include",
         cache: catalogRequestCache(),
       });
@@ -124,7 +147,7 @@ const getQueryFn: <T>(options: {
       // BUG-038 (run24): a 401 is an expected signed-out/expired-session
       // outcome, not an application error — don't report it to analytics.
       const is401 = error instanceof ApiError && error.status === 401;
-      if (!is401) {
+      if (!is401 && !isCancelledRequestError(error)) {
         trackError('api_error', `${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
 
@@ -197,7 +220,7 @@ export async function renewSessionToken(): Promise<boolean> {
 async function sessionStillValid(): Promise<boolean> {
   try {
     if (!(await renewSessionToken())) return false;
-    const res = await fetch("/api/auth/user", {
+    const res = await apiFetch("/api/auth/user", {
       credentials: "include",
       cache: "no-store",
       signal: AbortSignal.timeout(SESSION_RECHECK_TIMEOUT_MS),
@@ -296,6 +319,12 @@ export const queryClient = new QueryClient({
     mutations: {
       // Mutations stay non-retried: they are not guaranteed idempotent.
       retry: false,
+      // The default "online" mode pauses a write while the browser is offline
+      // and replays it on reconnect, with no error and no message, so a dialog
+      // just sat there with disabled buttons (C22-MB-075). Send it now so it
+      // fails with the friendly "Could not reach the server" copy instead.
+      // A mutation with its own "Waiting for connection" UI opts back in.
+      networkMode: "always",
     },
   },
 });

@@ -12,30 +12,39 @@
  * Analytics consent
  * -------------------------------------------------------------------------- */
 
+/* The last row of the #root column, pinned to the viewport bottom at every
+   width: last on screen as it is last in the DOM, so focus order matches what
+   is seen (WCAG 2.4.3). */
 .system-consent-banner {
-  position: relative;
-  order: -1;
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
   border-style: solid;
-  border-width: 0 0 var(--border-w);
+  border-width: var(--border-w) 0 0;
   border-color: var(--border);
-  background: color-mix(in srgb, var(--bg-2) 94%, transparent);
+  /* The accent wash is a background layer, not a ::before: Chrome reported
+     the absolutely positioned pseudo as jumping from a stale position to the
+     banner on every content reflow under the sticky banner — up to 0.1 of
+     layout shift per page load for every visitor still seeing the banner. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      transparent 38%,
+      color-mix(in srgb, var(--accent-2) 5%, transparent)
+    ),
+    var(--bg-2);
   box-shadow: var(--shadow-lg);
   color: var(--text);
   isolation: isolate;
 }
 
-.system-consent-banner::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--accent) 8%, transparent),
-    transparent 38%,
-    color-mix(in srgb, var(--accent-2) 5%, transparent)
-  );
-  content: "";
-  pointer-events: none;
+/* The shell's scroll-margin-bottom (index.css) keeps content clear of this
+   bar. Applied to the bar's own controls it can never be satisfied, so every
+   focus move into the bar scrolled the page by the bar's height. */
+.system-consent-banner,
+.system-consent-banner * {
+  scroll-margin-bottom: 0;
 }
 
 .system-consent-banner__inner {
@@ -49,8 +58,19 @@
   line-height: 1.45;
 }
 
+/* Underlined so the link differs from the copy by more than colour (WCAG
+   1.4.1); it stays inline so the copy keeps even leading. Vertical padding
+   on an inline box grows its hit area to the 24px inline-link floor without
+   changing the line height (sweep NEW-010: it was 17px). */
 .system-consent-banner__privacy-link {
+  /* 4px padding alone left the box at 23px on the smaller mobile text;
+     a fixed 24px min-height doesn't depend on the font size. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
   transition: color var(--motion-fast) var(--motion-ease);
 }
@@ -68,14 +88,6 @@
 }
 
 @media (min-width: 640px) {
-  .system-consent-banner {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
-    order: 0;
-    border-width: var(--border-w) 0 0;
-  }
-
   .system-consent-banner__inner {
     padding-inline: var(--page-pad-x);
   }
@@ -87,14 +99,16 @@
   }
 }
 
-.system-consent-banner--compact .system-consent-banner__copy {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Short windows and native zoom keep the same disclosure, with tighter
+   spacing rather than hidden text or smaller action targets. */
+@media (max-height: 499px) {
+  .system-consent-banner__inner {
+    padding-block: 0.5rem;
+  }
 
-.system-consent-banner--compact .system-consent-banner__action {
-  min-height: 36px;
+  .system-consent-banner__copy {
+    font-size: 0.75rem;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -105,7 +119,13 @@
   box-sizing: border-box;
   gap: 0.75rem;
   pointer-events: none;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Toasts stack above the fixed back-to-top button (index.css lane), which
+   sits in the same bottom-right corner. Doubled class: the viewport's `p-4`
+   utility would otherwise win. */
+.system-toast-viewport.system-toast-viewport {
+  padding-bottom: max(var(--back-to-top-lane), env(safe-area-inset-bottom));
 }
 
 /*

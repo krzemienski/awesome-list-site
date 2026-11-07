@@ -1,0 +1,3 @@
+- heading "Delete Category" [level=2, ref=e1]
+- button "Cancel" [ref=e2]
+- button "Delete" [ref=e3]

@@ -1,0 +1,8 @@
+- generic
+  - menu "Settings"
+    - menuitem "Theme settings" [ref=e1]
+    - menuitem "Pending approvals" [ref=e2]
+    - menuitem "Rejected resources" [ref=e3]
+    - menuitem "Sub-Subcats" [ref=e4]
+    - menuitem "Journeys" [ref=e5]
+    - menuitem "Digests" [ref=e6]

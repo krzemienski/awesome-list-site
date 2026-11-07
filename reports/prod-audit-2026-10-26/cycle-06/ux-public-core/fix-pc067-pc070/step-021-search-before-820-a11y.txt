@@ -1,0 +1,400 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Close filters" [expanded] [active] [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Close filters
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - img [ref=e26]
+          - textbox "Search in Encoding & Codecs" [ref=e29]:
+            - /placeholder: Search in Encoding & Codecs...
+            - text: ffmpeg
+        - combobox "Limit Encoding & Codecs by subcategory" [ref=e30] [cursor=pointer]:
+          - option "All subcategories" [selected]
+          - option "Uncategorized (120)"
+          - option "Codecs (27)"
+          - option "Codecs › AV1 (5)"
+          - option "Codecs › HEVC (10)"
+          - option "Codecs › VP9 (1)"
+          - option "Encoding Tools (225)"
+          - option "Encoding Tools › FFMPEG (65)"
+        - combobox "Limit by resource kind" [ref=e31] [cursor=pointer]:
+          - option "All resource kinds" [selected]
+          - option "Tools"
+          - option "Libraries"
+          - option "Standards"
+          - option "Events"
+          - option "Protocols"
+          - option "Other"
+        - combobox "Sort resources" [ref=e33] [cursor=pointer]:
+          - generic: Name Z-A
+          - img [ref=e34]
+        - generic "View mode" [ref=e36]:
+          - generic [ref=e37]: View
+          - radiogroup [ref=e38]:
+            - radio "Grid view" [ref=e39] [cursor=pointer]:
+              - img
+            - radio "List view" [ref=e40] [cursor=pointer]:
+              - img
+            - radio "Compact view" [checked] [ref=e41] [cursor=pointer]:
+              - img
+      - region "Subcategories" [ref=e42]:
+        - heading "Subcategories" [level=2] [ref=e43]
+        - generic [ref=e44]:
+          - link "Codecs 27" [ref=e45] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e46]: Codecs
+            - generic [ref=e47]: "27"
+          - link "Encoding Tools 225" [ref=e48] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e49]: Encoding Tools
+            - generic [ref=e50]: "225"
+          - button "Uncategorized 120" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: Uncategorized
+            - generic [ref=e53]: "120"
+      - generic [ref=e54]:
+        - button "Filters" [ref=e57] [cursor=pointer]:
+          - img
+          - text: Filters
+        - generic "Resources (142)" [ref=e59]:
+          - heading "Resources (142)" [level=2] [ref=e61]
+          - generic [ref=e62]:
+            - article [ref=e63]:
+              - generic [ref=e64]:
+                - heading "zolinux/MediaArchiver" [level=2] [ref=e65]:
+                  - link "zolinux/MediaArchiver" [ref=e66] [cursor=pointer]:
+                    - /url: /resource/1431
+                - link "Open in new tab" [ref=e67] [cursor=pointer]:
+                  - /url: https://github.com/zolinux/MediaArchiver
+                  - img
+              - 'button "Favorite to your account — sign in required: zolinux/MediaArchiver" [ref=e69] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: zolinux/MediaArchiver" [ref=e71] [cursor=pointer]':
+                - img
+            - article [ref=e73]:
+              - generic [ref=e74]:
+                - heading "Xuggler" [level=2] [ref=e75]:
+                  - link "Xuggler" [ref=e76] [cursor=pointer]:
+                    - /url: /resource/1865
+                - link "Open in new tab" [ref=e77] [cursor=pointer]:
+                  - /url: https://github.com/artclarke/xuggle-xuggler
+                  - img
+              - 'button "Favorite to your account — sign in required: Xuggler" [ref=e79] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Xuggler" [ref=e81] [cursor=pointer]':
+                - img
+            - article [ref=e83]:
+              - generic [ref=e84]:
+                - heading "XMedia Recode" [level=2] [ref=e85]:
+                  - link "XMedia Recode" [ref=e86] [cursor=pointer]:
+                    - /url: /resource/1775
+                - link "Open in new tab" [ref=e87] [cursor=pointer]:
+                  - /url: https://www.xmedia-recode.de/en/
+                  - img
+              - 'button "Favorite to your account — sign in required: XMedia Recode" [ref=e89] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: XMedia Recode" [ref=e91] [cursor=pointer]':
+                - img
+            - article [ref=e93]:
+              - generic [ref=e94]:
+                - heading "Xabe.FFmpeg" [level=2] [ref=e95]:
+                  - link "Xabe.FFmpeg" [ref=e96] [cursor=pointer]:
+                    - /url: /resource/1781
+                - link "Open in new tab" [ref=e97] [cursor=pointer]:
+                  - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                  - img
+              - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e99] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e101] [cursor=pointer]':
+                - img
+            - article [ref=e103]:
+              - generic [ref=e104]:
+                - heading "x264 FFmpeg Options Guide - Linux Encoding" [level=2] [ref=e105]:
+                  - link "x264 FFmpeg Options Guide - Linux Encoding" [ref=e106] [cursor=pointer]:
+                    - /url: /resource/1201
+                - link "Open in new tab" [ref=e107] [cursor=pointer]:
+                  - /url: https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+                  - img
+              - 'button "Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e109] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e111] [cursor=pointer]':
+                - img
+            - article [ref=e113]:
+              - generic [ref=e114]:
+                - heading "WritingMinds/ffmpeg-android-java" [level=2] [ref=e115]:
+                  - link "WritingMinds/ffmpeg-android-java" [ref=e116] [cursor=pointer]:
+                    - /url: /resource/859
+                - link "Open in new tab" [ref=e117] [cursor=pointer]:
+                  - /url: https://github.com/WritingMinds/ffmpeg-android-java
+                  - img
+              - 'button "Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java" [ref=e119] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java" [ref=e121] [cursor=pointer]':
+                - img
+            - article [ref=e123]:
+              - generic [ref=e124]:
+                - heading "WinFF" [level=2] [ref=e125]:
+                  - link "WinFF" [ref=e126] [cursor=pointer]:
+                    - /url: /resource/1799
+                - link "Open in new tab" [ref=e127] [cursor=pointer]:
+                  - /url: https://winff.org/
+                  - img
+              - 'button "Favorite to your account — sign in required: WinFF" [ref=e129] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: WinFF" [ref=e131] [cursor=pointer]':
+                - img
+            - article [ref=e133]:
+              - generic [ref=e134]:
+                - heading "Vrecord" [level=2] [ref=e135]:
+                  - link "Vrecord" [ref=e136] [cursor=pointer]:
+                    - /url: /resource/1817
+                - link "Open in new tab" [ref=e137] [cursor=pointer]:
+                  - /url: https://github.com/amiaopensource/vrecord
+                  - img
+              - 'button "Favorite to your account — sign in required: Vrecord" [ref=e139] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Vrecord" [ref=e141] [cursor=pointer]':
+                - img
+            - article [ref=e143]:
+              - generic [ref=e144]:
+                - heading "VLC Live Transcoding Guide" [level=2] [ref=e145]:
+                  - link "VLC Live Transcoding Guide" [ref=e146] [cursor=pointer]:
+                    - /url: /resource/708
+                - link "Open in new tab" [ref=e147] [cursor=pointer]:
+                  - /url: https://gist.github.com/teocci/a7eae1b60ec018b64bdd13bb7a3499e0
+                  - img
+              - 'button "Favorite to your account — sign in required: VLC Live Transcoding Guide" [ref=e149] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: VLC Live Transcoding Guide" [ref=e151] [cursor=pointer]':
+                - img
+            - article [ref=e153]:
+              - generic [ref=e154]:
+                - heading "Vilsol/Transcoder" [level=2] [ref=e155]:
+                  - link "Vilsol/Transcoder" [ref=e156] [cursor=pointer]:
+                    - /url: /resource/1464
+                - link "Open in new tab" [ref=e157] [cursor=pointer]:
+                  - /url: https://github.com/Vilsol/Transcoder
+                  - img
+              - 'button "Favorite to your account — sign in required: Vilsol/Transcoder" [ref=e159] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Vilsol/Transcoder" [ref=e161] [cursor=pointer]':
+                - img
+            - article [ref=e163]:
+              - generic [ref=e164]:
+                - heading "videomorph-dev/videomorph" [level=2] [ref=e165]:
+                  - link "videomorph-dev/videomorph" [ref=e166] [cursor=pointer]:
+                    - /url: /resource/1326
+                - link "Open in new tab" [ref=e167] [cursor=pointer]:
+                  - /url: https://github.com/videomorph-dev/videomorph
+                  - img
+              - 'button "Favorite to your account — sign in required: videomorph-dev/videomorph" [ref=e169] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: videomorph-dev/videomorph" [ref=e171] [cursor=pointer]':
+                - img
+            - article [ref=e173]:
+              - generic [ref=e174]:
+                - heading "videojs-record ffmpeg.wasm Plugin" [level=2] [ref=e175]:
+                  - link "videojs-record ffmpeg.wasm Plugin" [ref=e176] [cursor=pointer]:
+                    - /url: /resource/560
+                - link "Open in new tab" [ref=e177] [cursor=pointer]:
+                  - /url: https://github.com/collab-project/videojs-record/blob/master/docs/plugins/ffmpeg.wasm.md
+                  - img
+              - 'button "Favorite to your account — sign in required: videojs-record ffmpeg.wasm Plugin" [ref=e179] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: videojs-record ffmpeg.wasm Plugin" [ref=e181] [cursor=pointer]':
+                - img
+            - article [ref=e183]:
+              - generic [ref=e184]:
+                - heading "Video Transcoding Scripts" [level=2] [ref=e185]:
+                  - link "Video Transcoding Scripts" [ref=e186] [cursor=pointer]:
+                    - /url: /resource/706
+                - link "Open in new tab" [ref=e187] [cursor=pointer]:
+                  - /url: https://github.com/lisamelton/video-transcoding-scripts
+                  - img
+              - 'button "Favorite to your account — sign in required: Video Transcoding Scripts" [ref=e189] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Video Transcoding Scripts" [ref=e191] [cursor=pointer]':
+                - img
+            - article [ref=e193]:
+              - generic [ref=e194]:
+                - heading "VidCutter" [level=2] [ref=e195]:
+                  - link "VidCutter" [ref=e196] [cursor=pointer]:
+                    - /url: /resource/1834
+                - link "Open in new tab" [ref=e197] [cursor=pointer]:
+                  - /url: https://github.com/ozmartian/vidcutter
+                  - img
+              - 'button "Favorite to your account — sign in required: VidCutter" [ref=e199] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: VidCutter" [ref=e201] [cursor=pointer]':
+                - img
+            - article [ref=e203]:
+              - generic [ref=e204]:
+                - heading "vid.stab" [level=2] [ref=e205]:
+                  - link "vid.stab" [ref=e206] [cursor=pointer]:
+                    - /url: /resource/1892
+                - link "Open in new tab" [ref=e207] [cursor=pointer]:
+                  - /url: https://github.com/georgmartius/vid.stab
+                  - img
+              - 'button "Favorite to your account — sign in required: vid.stab" [ref=e209] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: vid.stab" [ref=e211] [cursor=pointer]':
+                - img
+            - article [ref=e213]:
+              - generic [ref=e214]:
+                - heading "VCT - Video Converter & Transcoder" [level=2] [ref=e215]:
+                  - link "VCT - Video Converter & Transcoder" [ref=e216] [cursor=pointer]:
+                    - /url: /resource/728
+                - link "Open in new tab" [ref=e217] [cursor=pointer]:
+                  - /url: https://sourceforge.net/projects/videoconvertertranscoder/
+                  - img
+              - 'button "Favorite to your account — sign in required: VCT - Video Converter & Transcoder" [ref=e219] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: VCT - Video Converter & Transcoder" [ref=e221] [cursor=pointer]':
+                - img
+            - article [ref=e223]:
+              - generic [ref=e224]:
+                - heading "VCT (Video Converter & Transcoder)" [level=2] [ref=e225]:
+                  - link "VCT (Video Converter & Transcoder)" [ref=e226] [cursor=pointer]:
+                    - /url: /resource/572
+                - link "Open in new tab" [ref=e227] [cursor=pointer]:
+                  - /url: https://github.com/zbabac/VCT
+                  - img
+              - 'button "Favorite to your account — sign in required: VCT (Video Converter & Transcoder)" [ref=e229] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: VCT (Video Converter & Transcoder)" [ref=e231] [cursor=pointer]':
+                - img
+            - article [ref=e233]:
+              - generic [ref=e234]:
+                - heading "VCDP/FFmpeg-patch" [level=2] [ref=e235]:
+                  - link "VCDP/FFmpeg-patch" [ref=e236] [cursor=pointer]:
+                    - /url: /resource/1375
+                - link "Open in new tab" [ref=e237] [cursor=pointer]:
+                  - /url: https://github.com/VCDP/FFmpeg-patch
+                  - img
+              - 'button "Favorite to your account — sign in required: VCDP/FFmpeg-patch" [ref=e239] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: VCDP/FFmpeg-patch" [ref=e241] [cursor=pointer]':
+                - img
+            - article [ref=e243]:
+              - generic [ref=e244]:
+                - heading "Use of Look-Up Tables (LUTs) in FFmpeg" [level=2] [ref=e245]:
+                  - link "Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e246] [cursor=pointer]:
+                    - /url: /resource/1286
+                - link "Open in new tab" [ref=e247] [cursor=pointer]:
+                  - /url: https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_Use_of_LUTs_FFmpeg.pdf
+                  - img
+              - 'button "Favorite to your account — sign in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e249] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e251] [cursor=pointer]':
+                - img
+            - article [ref=e253]:
+              - generic [ref=e254]:
+                - heading "unosquare/ffmediaelement" [level=2] [ref=e255]:
+                  - link "unosquare/ffmediaelement" [ref=e256] [cursor=pointer]:
+                    - /url: /resource/867
+                - link "Open in new tab" [ref=e257] [cursor=pointer]:
+                  - /url: https://github.com/unosquare/ffmediaelement
+                  - img
+              - 'button "Favorite to your account — sign in required: unosquare/ffmediaelement" [ref=e259] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: unosquare/ffmediaelement" [ref=e261] [cursor=pointer]':
+                - img
+            - article [ref=e263]:
+              - generic [ref=e264]:
+                - heading "transitive-bullshit/awesome-ffmpeg" [level=2] [ref=e265]:
+                  - link "transitive-bullshit/awesome-ffmpeg" [ref=e266] [cursor=pointer]:
+                    - /url: /resource/831
+                - link "Open in new tab" [ref=e267] [cursor=pointer]:
+                  - /url: https://github.com/transitive-bullshit/awesome-ffmpeg
+                  - img
+              - 'button "Favorite to your account — sign in required: transitive-bullshit/awesome-ffmpeg" [ref=e269] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: transitive-bullshit/awesome-ffmpeg" [ref=e271] [cursor=pointer]':
+                - img
+            - article [ref=e273]:
+              - generic [ref=e274]:
+                - 'heading "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [level=2] [ref=e275]':
+                  - 'link "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e276] [cursor=pointer]':
+                    - /url: /resource/1373
+                - link "Open in new tab" [ref=e277] [cursor=pointer]:
+                  - /url: https://gist.github.com/SeanMollet/0eed16e80630ab67532890a9d42132af
+                  - img
+              - 'button "Favorite to your account — sign in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e279] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e281] [cursor=pointer]':
+                - img
+            - article [ref=e283]:
+              - generic [ref=e284]:
+                - heading "tanersener/mobile-ffmpeg" [level=2] [ref=e285]:
+                  - link "tanersener/mobile-ffmpeg" [ref=e286] [cursor=pointer]:
+                    - /url: /resource/1099
+                - link "Open in new tab" [ref=e287] [cursor=pointer]:
+                  - /url: https://github.com/tanersener/mobile-ffmpeg
+                  - img
+              - 'button "Favorite to your account — sign in required: tanersener/mobile-ffmpeg" [ref=e289] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: tanersener/mobile-ffmpeg" [ref=e291] [cursor=pointer]':
+                - img
+            - article [ref=e293]:
+              - generic [ref=e294]:
+                - 'heading "sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [level=2] [ref=e295]':
+                  - 'link "sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e296] [cursor=pointer]':
+                    - /url: /resource/1492
+                - link "Open in new tab" [ref=e297] [cursor=pointer]:
+                  - /url: https://github.com/sunhailin-Leo/AutoConfigShellScript
+                  - img
+              - 'button "Favorite to your account — sign in required: sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e299] [cursor=pointer]':
+                - img
+              - 'button "Bookmark on this device — no sign-in required: sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e301] [cursor=pointer]':
+                - img
+          - navigation "Pagination" [ref=e304]:
+            - generic [ref=e305]:
+              - img
+              - text: Previous
+              - link "Page 1, current page" [ref=e306] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact
+                - text: "1"
+              - link "Go to page 2" [ref=e307] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=2
+                - text: "2"
+              - link "Go to page 3" [ref=e308] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=3
+                - text: "3"
+              - link "Go to page 4" [ref=e309] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=4
+                - text: "4"
+              - link "Go to page 5" [ref=e310] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=5
+                - text: "5"
+              - link "Go to page 6" [ref=e311] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=6
+                - text: "6"
+              - link "Next" [ref=e312] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&view=compact&page=2
+                - text: Next
+                - img
+            - generic [ref=e314]: Page 1 of 6
+            - status [ref=e315]

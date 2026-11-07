@@ -1,0 +1,564 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - main
+        - navigation "Breadcrumb" [ref=e8]
+          - list
+            - listitem [level=1]
+              - link "Home" [ref=e32]
+            - listitem [level=1]
+              - link "Admin" [disabled, ref=e33]
+        - StaticText "Authorized admin area"
+        - StaticText "ADMIN CONSOLE · "
+        - StaticText "ADMIN USER"
+        - heading "Operations dashboard" [level=1, ref=e9]
+          - StaticText "Operations "
+          - emphasis
+            - StaticText "dashboard"
+        - paragraph
+          - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+        - button "Settings" [expanded=false, ref=e10]
+          - image
+          - StaticText "Settings"
+        - button "New entry: add a resource" [ref=e11]
+          - image
+          - StaticText "New entry"
+        - status
+        - generic
+          - tablist "Admin sections" [ref=e13] focusable [tabindex]
+            - tab "Overview" [ref=e16]
+              - StaticText "Overview"
+            - tab "Approvals" [selected, ref=e17]
+              - StaticText "Approvals"
+            - tab "Edits" [ref=e18]
+              - StaticText "Edits"
+            - tab "Enrichment" [ref=e19]
+              - StaticText "Enrichment"
+            - tab "Researcher" [ref=e20]
+              - StaticText "Researcher"
+            - tab "Export" [ref=e21]
+              - StaticText "Export"
+            - tab "Database" [ref=e22]
+              - StaticText "Database"
+            - tab "Resources" [ref=e23]
+              - StaticText "Resources"
+            - tab "Categories" [ref=e24]
+              - StaticText "Categories"
+            - tab "Subcategories" [ref=e25]
+              - StaticText "Subcategories"
+            - tab "Users" [ref=e26]
+              - StaticText "Users"
+            - tab "GitHub" [ref=e27]
+              - StaticText "GitHub"
+            - tab "Link Health" [ref=e28]
+              - StaticText "Link Health"
+            - tab "Audit" [ref=e29]
+              - StaticText "Audit"
+            - tab "Research" [ref=e30]
+              - StaticText "Research"
+          - button "Scroll tabs right" [ref=e14]
+        - tabpanel "Approvals" [ref=e12] focusable [tabindex]
+          - region "Pending approvals" [ref=e15]
+            - heading "Pending approvals" [level=2, ref=e31]
+            - paragraph
+              - StaticText "16 submissions awaiting review"
+            - toolbar "Pending approval actions"
+              - button "Bulk reject" [disabled, ref=e34]
+              - button "Approve all" [ref=e35]
+            - region "Pending approvals table, scrollable" [ref=e36] focusable [tabindex]
+              - table
+                - rowgroup
+                  - row
+                    - columnheader "Select all pending resources" [ref=e133]
+                      - checkbox "Select all pending resources" [checked=false, ref=e219]
+                    - columnheader "TITLE" [ref=e134]
+                    - columnheader "CATEGORY" [ref=e135]
+                    - columnheader "SUBMITTED BY" [ref=e136]
+                    - columnheader "WHEN" [ref=e137]
+                    - columnheader "ACTIONS" [ref=e138]
+                      - StaticText "ACTIONS"
+                - row
+                  - cell "Select FlipReel" [ref=e37]
+                    - checkbox "Select FlipReel" [checked=false, ref=e139]
+                  - cell "FlipReel Open FlipReel in a new tab Free open-source Lit web component carousel of vertical short-form videos for news sites. Shadow DOM embed, any JSON feed of MP4s, article deep-links, optional Google Ad Manager ad adapter. Maintained by Flipatic / Autentika." [ref=e38]
+                    - StaticText "FlipReel"
+                    - link "Open FlipReel in a new tab" [ref=e140]
+                      - image
+                    - paragraph
+                      - StaticText "Free open-source Lit web component carousel of vertical short-form videos for news sites. Shadow DOM embed, any JSON feed of MP4s, article deep-links, optional Google Ad Manager ad adapter. Maintained by Flipatic / Autentika."
+                  - cell "Players & Clients" [ref=e39]
+                    - StaticText "Players & Clients"
+                  - cell "misiek.fraczek@gmail.com" [ref=e40]
+                    - StaticText "misiek.fraczek@gmail.com"
+                  - cell "19h ago" [ref=e41]
+                    - time
+                      - StaticText "19h ago"
+                  - cell "Review details for FlipReel Approve FlipReel Reject FlipReel" [ref=e42]
+                    - button "Review details for FlipReel" [ref=e141]
+                      - StaticText "Review"
+                    - button "Approve FlipReel" [ref=e142]
+                      - StaticText "Approve"
+                    - button "Reject FlipReel" [ref=e143]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select TranscriptWorks" [ref=e43]
+                    - checkbox "Select TranscriptWorks" [checked=false, ref=e144]
+                  - cell "TranscriptWorks Open TranscriptWorks in a new tab Free web tools for subtitles and transcripts, no account needed. 59 subtitle tools run in the browser without uploading files: convert SRT, VTT, ASS, SBV, SUB, SMI, TTML, SCC and STL, shift or sync timing, change frame rate, fix encoding, merge two languages, OCR for SUP and IDX, extract subtitles from MKV and burn them into video. It also transcribes audio, video and YouTube, TikTok or Instagram links into text or SRT/VTT in about 100 languages. SUBTITLES CAPTIONS TRANSCRIPTION SRT VTT SUBTITLE-CONVERTER FREE WEB" [ref=e44]
+                    - StaticText "TranscriptWorks"
+                    - link "Open TranscriptWorks in a new tab" [ref=e145]
+                      - image
+                    - paragraph
+                      - StaticText "Free web tools for subtitles and transcripts, no account needed. 59 subtitle tools run in the browser without uploading files: convert SRT, VTT, ASS, SBV, SUB, SMI, TTML, SCC and STL, shift or sync timing, change frame rate, fix encoding, merge two languages, OCR for SUP and IDX, extract subtitles from MKV and burn them into video. It also transcribes audio, video and YouTube, TikTok or Instagram links into text or SRT/VTT in about 100 languages."
+                    - StaticText "SUBTITLES"
+                    - StaticText "CAPTIONS"
+                    - StaticText "TRANSCRIPTION"
+                    - StaticText "SRT"
+                    - StaticText "VTT"
+                    - StaticText "SUBTITLE-CONVERTER"
+                    - StaticText "FREE"
+                    - StaticText "WEB"
+                  - cell "Media Tools Subtitle & Caption Tools" [ref=e45]
+                    - StaticText "Media Tools"
+                    - StaticText "Subtitle & Caption Tools"
+                  - cell "jivwewonder@gmail.com" [ref=e46]
+                    - StaticText "jivwewonder@gmail.com"
+                  - cell "2d ago" [ref=e47]
+                    - time
+                      - StaticText "2d ago"
+                  - cell "Review details for TranscriptWorks Approve TranscriptWorks Reject TranscriptWorks" [ref=e48]
+                    - button "Review details for TranscriptWorks" [ref=e146]
+                      - StaticText "Review"
+                    - button "Approve TranscriptWorks" [ref=e147]
+                      - StaticText "Approve"
+                    - button "Reject TranscriptWorks" [ref=e148]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select InstantClone" [ref=e49]
+                    - checkbox "Select InstantClone" [checked=false, ref=e149]
+                  - cell "InstantClone Open InstantClone in a new tab Free, open source (GPL-3.0) local RTMP delay proxy for OBS on Windows and Linux that lets streamers add, change or cut the stream delay live without restarting the stream, with a scheduled \"cut after this airs\". It also multistreams to Twitch, YouTube, Kick and custom RTMP (including a vertical 9:16 feed and per-destination audio tracks for VOD-safe music), passes Twitch Enhanced Broadcasting through, keeps every destination live on a reconnect screen if OBS crashes, and adds an OBS dock, overlays, global hotkeys, MIDI control and Twitch, Discord and smart-light integrations. RTMP OBS STREAM-DELAY LIVE-STREAMING TWITCH RUST OPEN-SOURCE INTEGRATIONS ANTI STREAM-SNIPE" [ref=e50]
+                    - StaticText "InstantClone"
+                    - link "Open InstantClone in a new tab" [ref=e150]
+                      - image
+                    - paragraph
+                      - StaticText "Free, open source (GPL-3.0) local RTMP delay proxy for OBS on Windows and Linux that lets streamers add, change or cut the stream delay live without restarting the stream, with a scheduled \"cut after this airs\". It also multistreams to Twitch, YouTube, Kick and custom RTMP (including a vertical 9:16 feed and per-destination audio tracks for VOD-safe music), passes Twitch Enhanced Broadcasting through, keeps every destination live on a reconnect screen if OBS crashes, and adds an OBS dock, overlays, global hotkeys, MIDI control and Twitch, Discord and smart-light integrations."
+                    - StaticText "RTMP"
+                    - StaticText "OBS"
+                    - StaticText "STREAM-DELAY"
+                    - StaticText "LIVE-STREAMING"
+                    - StaticText "TWITCH"
+                    - StaticText "RUST"
+                    - StaticText "OPEN-SOURCE"
+                    - StaticText "INTEGRATIONS"
+                    - StaticText "ANTI STREAM-SNIPE"
+                  - cell "Protocols & Transport Transport Protocols" [ref=e51]
+                    - StaticText "Protocols & Transport"
+                    - StaticText "Transport Protocols"
+                  - cell "oriol.r.ogol@gmail.com" [ref=e52]
+                    - StaticText "oriol.r.ogol@gmail.com"
+                  - cell "8d ago" [ref=e53]
+                    - time
+                      - StaticText "8d ago"
+                  - cell "Review details for InstantClone Approve InstantClone Reject InstantClone" [ref=e54]
+                    - button "Review details for InstantClone" [ref=e151]
+                      - StaticText "Review"
+                    - button "Approve InstantClone" [ref=e152]
+                      - StaticText "Approve"
+                    - button "Reject InstantClone" [ref=e153]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select VideoText Subtitle Tools" [ref=e55]
+                    - checkbox "Select VideoText Subtitle Tools" [checked=false, ref=e154]
+                  - cell "VideoText Subtitle Tools Open VideoText Subtitle Tools in a new tab Free browser-based SRT/VTT validator, reading-speed and line-length checker, timing fixer and converters; files stay on the device." [ref=e56]
+                    - StaticText "VideoText Subtitle Tools"
+                    - link "Open VideoText Subtitle Tools in a new tab" [ref=e155]
+                      - image
+                    - paragraph
+                      - StaticText "Free browser-based SRT/VTT validator, reading-speed and line-length checker, timing fixer and converters; files stay on the device."
+                  - cell "Media Tools" [ref=e57]
+                    - StaticText "Media Tools"
+                  - cell "santhosh.guntupalli09@gmail.com" [ref=e58]
+                    - StaticText "santhosh.guntupalli09@gmail.com"
+                  - cell "12d ago" [ref=e59]
+                    - time
+                      - StaticText "12d ago"
+                  - cell "Review details for VideoText Subtitle Tools Approve VideoText Subtitle Tools Reject VideoText Subtitle Tools" [ref=e60]
+                    - button "Review details for VideoText Subtitle Tools" [ref=e156]
+                      - StaticText "Review"
+                    - button "Approve VideoText Subtitle Tools" [ref=e157]
+                      - StaticText "Approve"
+                    - button "Reject VideoText Subtitle Tools" [ref=e158]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select Deckboy" [ref=e61]
+                    - checkbox "Select Deckboy" [checked=false, ref=e159]
+                  - cell "Deckboy Open Deckboy in a new tab Cue-based media playback and show control for live video. Build a list of clips, slides, web pages and live sources, take each one to air with fades and loops, and stream over SRT while recording. Driven from a Stream Deck, Bitfocus Companion, OSC or MIDI. Free and open source (GPL-3.0) for Windows, macOS and Linux. PLAYOUT SHOW-CONTROL LIVE-VIDEO SRT RECORDING OPEN-SOURCE" [ref=e62]
+                    - StaticText "Deckboy"
+                    - link "Open Deckboy in a new tab" [ref=e160]
+                      - image
+                    - paragraph
+                      - StaticText "Cue-based media playback and show control for live video. Build a list of clips, slides, web pages and live sources, take each one to air with fades and loops, and stream over SRT while recording. Driven from a Stream Deck, Bitfocus Companion, OSC or MIDI. Free and open source (GPL-3.0) for Windows, macOS and Linux."
+                    - StaticText "PLAYOUT"
+                    - StaticText "SHOW-CONTROL"
+                    - StaticText "LIVE-VIDEO"
+                    - StaticText "SRT"
+                    - StaticText "RECORDING"
+                    - StaticText "OPEN-SOURCE"
+                  - cell "Players & Clients Desktop Players" [ref=e63]
+                    - StaticText "Players & Clients"
+                    - StaticText "Desktop Players"
+                  - cell "jamescmckillop@gmail.com" [ref=e64]
+                    - StaticText "jamescmckillop@gmail.com"
+                  - cell "15d ago" [ref=e65]
+                    - time
+                      - StaticText "15d ago"
+                  - cell "Review details for Deckboy Approve Deckboy Reject Deckboy" [ref=e66]
+                    - button "Review details for Deckboy" [ref=e161]
+                      - StaticText "Review"
+                    - button "Approve Deckboy" [ref=e162]
+                      - StaticText "Approve"
+                    - button "Reject Deckboy" [ref=e163]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select PPPlayer" [ref=e67]
+                    - checkbox "Select PPPlayer" [checked=false, ref=e164]
+                  - cell "PPPlayer Open PPPlayer in a new tab PPPlayer is a free, open-source, cross-platform music and video player built with Flutter. It brings local media, YouTube playback, internet radio, and network streams together in one modern, easy-to-use application. Designed for Windows, macOS, Linux, Android, and iOS, PPPlayer supports multiple audio and video formats, playlists, playback queues, background playback, and customizable media controls. Its goal is to provide a powerful, lightweight, and completely free alternative to traditional media players, with no subscriptions and a community-driven development approach. MUSIC PLAYER VIDEO PLAYER OPEN SOURCE FLUTTER MEDIA PLAYER YOUTUBE INTERNET RADIO CROSS-PLATFORM DESKTOP" [ref=e68]
+                    - StaticText "PPPlayer"
+                    - link "Open PPPlayer in a new tab" [ref=e165]
+                      - image
+                    - paragraph
+                      - StaticText "PPPlayer is a free, open-source, cross-platform music and video player built with Flutter. It brings local media, YouTube playback, internet radio, and network streams together in one modern, easy-to-use application. Designed for Windows, macOS, Linux, Android, and iOS, PPPlayer supports multiple audio and video formats, playlists, playback queues, background playback, and customizable media controls. Its goal is to provide a powerful, lightweight, and completely free alternative to traditional media players, with no subscriptions and a community-driven development approach."
+                    - StaticText "MUSIC PLAYER"
+                    - StaticText "VIDEO PLAYER"
+                    - StaticText "OPEN SOURCE"
+                    - StaticText "FLUTTER"
+                    - StaticText "MEDIA PLAYER"
+                    - StaticText "YOUTUBE"
+                    - StaticText "INTERNET RADIO"
+                    - StaticText "CROSS-PLATFORM"
+                    - StaticText "DESKTOP"
+                  - cell "Players & Clients Desktop Players" [ref=e69]
+                    - StaticText "Players & Clients"
+                    - StaticText "Desktop Players"
+                  - cell "lucasveneno@yandex.com" [ref=e70]
+                    - StaticText "lucasveneno@yandex.com"
+                  - cell "16d ago" [ref=e71]
+                    - time
+                      - StaticText "16d ago"
+                  - cell "Review details for PPPlayer Approve PPPlayer Reject PPPlayer" [ref=e72]
+                    - button "Review details for PPPlayer" [ref=e166]
+                      - StaticText "Review"
+                    - button "Approve PPPlayer" [ref=e167]
+                      - StaticText "Approve"
+                    - button "Reject PPPlayer" [ref=e168]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select TrimScript" [ref=e73]
+                    - checkbox "Select TrimScript" [checked=false, ref=e169]
+                  - cell "TrimScript Open TrimScript in a new tab Local transcript-based editor for spoken-word video: delete words to cut the video, trim fillers and pauses, export MP4, captions or FCPXML. TRANSCRIPT EDITING WHISPER CAPTIONS FCPXML" [ref=e74]
+                    - StaticText "TrimScript"
+                    - link "Open TrimScript in a new tab" [ref=e170]
+                      - image
+                    - paragraph
+                      - StaticText "Local transcript-based editor for spoken-word video: delete words to cut the video, trim fillers and pauses, export MP4, captions or FCPXML."
+                    - StaticText "TRANSCRIPT"
+                    - StaticText "EDITING"
+                    - StaticText "WHISPER"
+                    - StaticText "CAPTIONS"
+                    - StaticText "FCPXML"
+                  - cell "Media Tools Non-linear Editing Suites" [ref=e75]
+                    - StaticText "Media Tools"
+                    - StaticText "Non-linear Editing Suites"
+                  - cell "akasilvernine@gmail.com" [ref=e76]
+                    - StaticText "akasilvernine@gmail.com"
+                  - cell "17d ago" [ref=e77]
+                    - time
+                      - StaticText "17d ago"
+                  - cell "Review details for TrimScript Approve TrimScript Reject TrimScript" [ref=e78]
+                    - button "Review details for TrimScript" [ref=e171]
+                      - StaticText "Review"
+                    - button "Approve TrimScript" [ref=e172]
+                      - StaticText "Approve"
+                    - button "Reject TrimScript" [ref=e173]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select ChatGPT Image — browser-based AI image and video creation" [ref=e79]
+                    - checkbox "Select ChatGPT Image — browser-based AI image and video creation" [checked=false, ref=e174]
+                  - cell "ChatGPT Image — browser-based AI image and video creation Open ChatGPT Image — browser-based AI image and video creation in a new tab ChatGPT Image is a browser-based creative workspace with text-to-video and image-to-video generation alongside AI image creation and reference-photo editing. Creators can turn a written scene idea or an uploaded image into a video, and explore supporting still visuals such as story concepts, posters and social graphics in the same workspace. Available model choices and controls vary by generation mode. This is a hosted commercial web application, not an open-source library, codec or video-delivery API. AI-VIDEO IMAGE-TO-VIDEO TEXT-TO-VIDEO WEB-APP CONTENT-CREATION" [ref=e80]
+                    - StaticText "ChatGPT Image — browser-based AI image and video creation"
+                    - link "Open ChatGPT Image — browser-based AI image and video creation in a new tab" [ref=e175]
+                      - image
+                    - paragraph
+                      - StaticText "ChatGPT Image is a browser-based creative workspace with text-to-video and image-to-video generation alongside AI image creation and reference-photo editing. Creators can turn a written scene idea or an uploaded image into a video, and explore supporting still visuals such as story concepts, posters and social graphics in the same workspace. Available model choices and controls vary by generation mode. This is a hosted commercial web application, not an open-source library, codec or video-delivery API."
+                    - StaticText "AI-VIDEO"
+                    - StaticText "IMAGE-TO-VIDEO"
+                    - StaticText "TEXT-TO-VIDEO"
+                    - StaticText "WEB-APP"
+                    - StaticText "CONTENT-CREATION"
+                  - cell "Media Tools" [ref=e81]
+                    - StaticText "Media Tools"
+                  - cell "support@chatgptimage.app" [ref=e82]
+                    - StaticText "support@chatgptimage.app"
+                  - cell "18d ago" [ref=e83]
+                    - time
+                      - StaticText "18d ago"
+                  - cell "Review details for ChatGPT Image — browser-based AI image and video creation Approve ChatGPT Image — browser-based AI image and video creation Reject ChatGPT Image — browser-based AI image and video creation" [ref=e84]
+                    - button "Review details for ChatGPT Image — browser-based AI image and video creation" [ref=e176]
+                      - StaticText "Review"
+                    - button "Approve ChatGPT Image — browser-based AI image and video creation" [ref=e177]
+                      - StaticText "Approve"
+                    - button "Reject ChatGPT Image — browser-based AI image and video creation" [ref=e178]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select M3U8 Player (816800.xyz)" [ref=e85]
+                    - checkbox "Select M3U8 Player (816800.xyz)" [checked=false, ref=e179]
+                  - cell "M3U8 Player (816800.xyz) Open M3U8 Player (816800.xyz) in a new tab Online HLS (.m3u8) and DASH (.mpd) stream tester that checks the stream URL for Access-Control-Allow-Origin when playback fails, which covers the common case where a stream plays in VLC but not in a browser. No signup, nothing uploaded. HLS M3U8 MPEG-DASH VIDEO-PLAYER WEB-PLAYER BROWSER-BASED CORS TESTING" [ref=e86]
+                    - StaticText "M3U8 Player (816800.xyz)"
+                    - link "Open M3U8 Player (816800.xyz) in a new tab" [ref=e180]
+                      - image
+                    - paragraph
+                      - StaticText "Online HLS (.m3u8) and DASH (.mpd) stream tester that checks the stream URL for Access-Control-Allow-Origin when playback fails, which covers the common case where a stream plays in VLC but not in a browser. No signup, nothing uploaded."
+                    - StaticText "HLS"
+                    - StaticText "M3U8"
+                    - StaticText "MPEG-DASH"
+                    - StaticText "VIDEO-PLAYER"
+                    - StaticText "WEB-PLAYER"
+                    - StaticText "BROWSER-BASED"
+                    - StaticText "CORS"
+                    - StaticText "TESTING"
+                  - cell "Players & Clients Web Players" [ref=e87]
+                    - StaticText "Players & Clients"
+                    - StaticText "Web Players"
+                  - cell "scandylau@gmail.com" [ref=e88]
+                    - StaticText "scandylau@gmail.com"
+                  - cell "27d ago" [ref=e89]
+                    - time
+                      - StaticText "27d ago"
+                  - cell "Review details for M3U8 Player (816800.xyz) Approve M3U8 Player (816800.xyz) Reject M3U8 Player (816800.xyz)" [ref=e90]
+                    - button "Review details for M3U8 Player (816800.xyz)" [ref=e181]
+                      - StaticText "Review"
+                    - button "Approve M3U8 Player (816800.xyz)" [ref=e182]
+                      - StaticText "Approve"
+                    - button "Reject M3U8 Player (816800.xyz)" [ref=e183]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select OpenRTMP Server" [ref=e91]
+                    - checkbox "Select OpenRTMP Server" [checked=false, ref=e184]
+                  - cell "OpenRTMP Server Open OpenRTMP Server in a new tab Rust-based RTMP/RTMPS and Enhanced RTMP media server for OBS and FFmpeg, with REST API, live statistics, Docker support, and clustering." [ref=e92]
+                    - StaticText "OpenRTMP Server"
+                    - link "Open OpenRTMP Server in a new tab" [ref=e185]
+                      - image
+                    - paragraph
+                      - StaticText "Rust-based RTMP/RTMPS and Enhanced RTMP media server for OBS and FFmpeg, with REST API, live statistics, Docker support, and clustering."
+                  - cell "Infrastructure & Delivery Live Streaming Servers" [ref=e93]
+                    - StaticText "Infrastructure & Delivery"
+                    - StaticText "Live Streaming Servers"
+                  - cell "info@alexanderwagnerdev.com" [ref=e94]
+                    - StaticText "info@alexanderwagnerdev.com"
+                  - cell "28d ago" [ref=e95]
+                    - time
+                      - StaticText "28d ago"
+                  - cell "Review details for OpenRTMP Server Approve OpenRTMP Server Reject OpenRTMP Server" [ref=e96]
+                    - button "Review details for OpenRTMP Server" [ref=e186]
+                      - StaticText "Review"
+                    - button "Approve OpenRTMP Server" [ref=e187]
+                      - StaticText "Approve"
+                    - button "Reject OpenRTMP Server" [ref=e188]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select librtmp2 (OpenRTMP)" [ref=e97]
+                    - checkbox "Select librtmp2 (OpenRTMP)" [checked=false, ref=e189]
+                  - cell "librtmp2 (OpenRTMP) Open librtmp2 (OpenRTMP) in a new tab Modern Rust library for RTMP/RTMPS and Enhanced RTMP v1/v2, with support for HEVC, AV1, VP9, AMF0/AMF3, server and client APIs, and C FFI." [ref=e98]
+                    - StaticText "librtmp2 (OpenRTMP)"
+                    - link "Open librtmp2 (OpenRTMP) in a new tab" [ref=e190]
+                      - image
+                    - paragraph
+                      - StaticText "Modern Rust library for RTMP/RTMPS and Enhanced RTMP v1/v2, with support for HEVC, AV1, VP9, AMF0/AMF3, server and client APIs, and C FFI."
+                  - cell "Protocols & Transport Transport Protocols" [ref=e99]
+                    - StaticText "Protocols & Transport"
+                    - StaticText "Transport Protocols"
+                  - cell "info@alexanderwagnerdev.com" [ref=e100]
+                    - StaticText "info@alexanderwagnerdev.com"
+                  - cell "28d ago" [ref=e101]
+                    - time
+                      - StaticText "28d ago"
+                  - cell "Review details for librtmp2 (OpenRTMP) Approve librtmp2 (OpenRTMP) Reject librtmp2 (OpenRTMP)" [ref=e102]
+                    - button "Review details for librtmp2 (OpenRTMP)" [ref=e191]
+                      - StaticText "Review"
+                    - button "Approve librtmp2 (OpenRTMP)" [ref=e192]
+                      - StaticText "Approve"
+                    - button "Reject librtmp2 (OpenRTMP)" [ref=e193]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select Frame Player" [ref=e103]
+                    - checkbox "Select Frame Player" [checked=false, ref=e194]
+                  - cell "Frame Player Open Frame Player in a new tab A free, open-source desktop video player for Windows and macOS built on libmpv. It plays a magnet link while the torrent is still downloading, sends a file to a Chromecast or a DLNA television without re-encoding the video, and keeps several viewers on one shared timeline. MEDIA PLAYER MPV OPEN SOURCE CROSS-PLATFORM TORRENT STREAMING CHROMECAST DLNA" [ref=e104]
+                    - StaticText "Frame Player"
+                    - link "Open Frame Player in a new tab" [ref=e195]
+                      - image
+                    - paragraph
+                      - StaticText "A free, open-source desktop video player for Windows and macOS built on libmpv. It plays a magnet link while the torrent is still downloading, sends a file to a Chromecast or a DLNA television without re-encoding the video, and keeps several viewers on one shared timeline."
+                    - StaticText "MEDIA PLAYER"
+                    - StaticText "MPV"
+                    - StaticText "OPEN SOURCE"
+                    - StaticText "CROSS-PLATFORM"
+                    - StaticText "TORRENT STREAMING"
+                    - StaticText "CHROMECAST"
+                    - StaticText "DLNA"
+                  - cell "Players & Clients Desktop Players" [ref=e105]
+                    - StaticText "Players & Clients"
+                    - StaticText "Desktop Players"
+                  - cell "github@risen.dev" [ref=e106]
+                    - StaticText "github@risen.dev"
+                  - cell "31d ago" [ref=e107]
+                    - time
+                      - StaticText "31d ago"
+                  - cell "Review details for Frame Player Approve Frame Player Reject Frame Player" [ref=e108]
+                    - button "Review details for Frame Player" [ref=e196]
+                      - StaticText "Review"
+                    - button "Approve Frame Player" [ref=e197]
+                      - StaticText "Approve"
+                    - button "Reject Frame Player" [ref=e198]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select Clips Kitty" [ref=e109]
+                    - checkbox "Select Clips Kitty" [checked=false, ref=e199]
+                  - cell "Clips Kitty Open Clips Kitty in a new tab Desktop app that turns long videos and stream VODs into vertical short-form clips. Whisper transcription, LLM moment selection, YOLOv8 + TalkNet active-speaker tracking for the 9:16 crop, FFmpeg caption burn-in. Runs entirely locally with no cloud inference. OPEN-SOURCE VIDEO PROCESSING VIDEO EDITING FFMPEG WHISPER YOLO CLIPPING SHORT-FORM TWITCH YOUTUBE" [ref=e110]
+                    - StaticText "Clips Kitty"
+                    - link "Open Clips Kitty in a new tab" [ref=e200]
+                      - image
+                    - paragraph
+                      - StaticText "Desktop app that turns long videos and stream VODs into vertical short-form clips. Whisper transcription, LLM moment selection, YOLOv8 + TalkNet active-speaker tracking for the 9:16 crop, FFmpeg caption burn-in. Runs entirely locally with no cloud inference."
+                    - StaticText "OPEN-SOURCE"
+                    - StaticText "VIDEO PROCESSING"
+                    - StaticText "VIDEO EDITING"
+                    - StaticText "FFMPEG"
+                    - StaticText "WHISPER"
+                    - StaticText "YOLO"
+                    - StaticText "CLIPPING"
+                    - StaticText "SHORT-FORM"
+                    - StaticText "TWITCH"
+                    - StaticText "YOUTUBE"
+                  - cell "Media Tools" [ref=e111]
+                    - StaticText "Media Tools"
+                  - cell "colin_cparsons@hotmail.com" [ref=e112]
+                    - StaticText "colin_cparsons@hotmail.com"
+                  - cell "38d ago" [ref=e113]
+                    - time
+                      - StaticText "38d ago"
+                  - cell "Review details for Clips Kitty Approve Clips Kitty Reject Clips Kitty" [ref=e114]
+                    - button "Review details for Clips Kitty" [ref=e201]
+                      - StaticText "Review"
+                    - button "Approve Clips Kitty" [ref=e202]
+                      - StaticText "Approve"
+                    - button "Reject Clips Kitty" [ref=e203]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select Photo2Reel" [ref=e115]
+                    - checkbox "Select Photo2Reel" [checked=false, ref=e204]
+                  - cell "Photo2Reel Open Photo2Reel in a new tab Photo2Reel is a browser-based tool for combining multiple photos with optional music into a video. Processing runs locally in the browser, so files are not uploaded and no account is required. PHOTO SLIDESHOW VIDEO BROWSER LOCAL" [ref=e116]
+                    - StaticText "Photo2Reel"
+                    - link "Open Photo2Reel in a new tab" [ref=e205]
+                      - image
+                    - paragraph
+                      - StaticText "Photo2Reel is a browser-based tool for combining multiple photos with optional music into a video. Processing runs locally in the browser, so files are not uploaded and no account is required."
+                    - StaticText "PHOTO"
+                    - StaticText "SLIDESHOW"
+                    - StaticText "VIDEO"
+                    - StaticText "BROWSER"
+                    - StaticText "LOCAL"
+                  - cell "General Tools" [ref=e117]
+                    - StaticText "General Tools"
+                  - cell "rpalkhan16@gmail.com" [ref=e118]
+                    - StaticText "rpalkhan16@gmail.com"
+                  - cell "45d ago" [ref=e119]
+                    - time
+                      - StaticText "45d ago"
+                  - cell "Review details for Photo2Reel Approve Photo2Reel Reject Photo2Reel" [ref=e120]
+                    - button "Review details for Photo2Reel" [ref=e206]
+                      - StaticText "Review"
+                    - button "Approve Photo2Reel" [ref=e207]
+                      - StaticText "Approve"
+                    - button "Reject Photo2Reel" [ref=e208]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [ref=e121]
+                    - checkbox "Select streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [checked=false, ref=e209]
+                  - cell "streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics Open streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics in a new tab A zero payload terminal diagnostic tool for live HLS, DASH, and IPTV streams built in Rust. Instead of downloading full multi megabyte media chunks, it uses targeted HTTP Range requests (~2-64 KB) to inspect fMP4 and MPEG-TS container headers, verify cross-segment GOP cadence, extract wire-level audio metadata, and monitor CDN edge cache hit/miss behavior in real time. HLS DASH IPTV TUI DIAGNOSTICS STREAM-MONITORING CDN QOE RUST CLI" [ref=e122]
+                    - StaticText "streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics"
+                    - link "Open streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics in a new tab" [ref=e210]
+                      - image
+                    - paragraph
+                      - StaticText "A zero payload terminal diagnostic tool for live HLS, DASH, and IPTV streams built in Rust. Instead of downloading full multi megabyte media chunks, it uses targeted HTTP Range requests (~2-64 KB) to inspect fMP4 and MPEG-TS container headers, verify cross-segment GOP cadence, extract wire-level audio metadata, and monitor CDN edge cache hit/miss behavior in real time."
+                    - StaticText "HLS"
+                    - StaticText "DASH"
+                    - StaticText "IPTV"
+                    - StaticText "TUI"
+                    - StaticText "DIAGNOSTICS"
+                    - StaticText "STREAM-MONITORING"
+                    - StaticText "CDN"
+                    - StaticText "QOE"
+                    - StaticText "RUST"
+                    - StaticText "CLI"
+                  - cell "Infrastructure & Delivery Streaming Analytics & Monitoring" [ref=e123]
+                    - StaticText "Infrastructure & Delivery"
+                    - StaticText "Streaming Analytics & Monitoring"
+                  - cell "kamaahmetkayra303@outlook.com" [ref=e124]
+                    - StaticText "kamaahmetkayra303@outlook.com"
+                  - cell "60d ago" [ref=e125]
+                    - time
+                      - StaticText "60d ago"
+                  - cell "Review details for streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics Approve streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics Reject streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [ref=e126]
+                    - button "Review details for streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [ref=e211]
+                      - StaticText "Review"
+                    - button "Approve streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [ref=e212]
+                      - StaticText "Approve"
+                    - button "Reject streamtop - Terminal Live HLS/DASH/IPTV Stream Diagnostics" [ref=e213]
+                      - StaticText "Reject"
+                - row
+                  - cell "Select CosmoEdge" [ref=e127]
+                    - checkbox "Select CosmoEdge" [checked=false, ref=e214]
+                  - cell "CosmoEdge Open CosmoEdge in a new tab Production-oriented Apache-2.0 C++ edge video AI engine that turns RTSP streams and CV/VLM models into visually orchestrated analytics workflows with OSD, alarms, and MQTT/webhook event delivery across Sophon and Rockchip NPUs. It includes an x86 quick-start path plus reproducible multi-platform performance and 72-hour stability benchmarks. EDGE AI VIDEO ANALYTICS COMPUTER VISION VLM RTSP C++ OPEN SOURCE NPU" [ref=e128]
+                    - StaticText "CosmoEdge"
+                    - link "Open CosmoEdge in a new tab" [ref=e215]
+                      - image
+                    - paragraph
+                      - StaticText "Production-oriented Apache-2.0 C++ edge video AI engine that turns RTSP streams and CV/VLM models into visually orchestrated analytics workflows with OSD, alarms, and MQTT/webhook event delivery across Sophon and Rockchip NPUs. It includes an x86 quick-start path plus reproducible multi-platform performance and 72-hour stability benchmarks."
+                    - StaticText "EDGE AI"
+                    - StaticText "VIDEO ANALYTICS"
+                    - StaticText "COMPUTER VISION"
+                    - StaticText "VLM"
+                    - StaticText "RTSP"
+                    - StaticText "C++"
+                    - StaticText "OPEN SOURCE"
+                    - StaticText "NPU"
+                  - cell "Media Tools AI & Machine Learning Tools" [ref=e129]
+                    - StaticText "Media Tools"
+                    - StaticText "AI & Machine Learning Tools"
+                  - cell "samuel.hu.seu@gmail.com" [ref=e130]
+                    - StaticText "samuel.hu.seu@gmail.com"
+                  - cell "62d ago" [ref=e131]
+                    - time
+                      - StaticText "62d ago"
+                  - cell "Review details for CosmoEdge Approve CosmoEdge Reject CosmoEdge" [ref=e132]
+                    - button "Review details for CosmoEdge" [ref=e216]
+                      - StaticText "Review"
+                    - button "Approve CosmoEdge" [ref=e217]
+                      - StaticText "Approve"
+                    - button "Reject CosmoEdge" [ref=e218]
+                      - StaticText "Reject"
+            - paragraph
+              - StaticText "Swipe the table sideways to see all columns, including Approve/Reject."

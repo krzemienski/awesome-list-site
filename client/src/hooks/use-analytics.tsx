@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { onCLS, onINP, onLCP } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import {
   getAnalyticsConsent,
   trackError,
@@ -8,6 +8,11 @@ import {
   trackPageEngagement,
   trackPerformance,
 } from '../lib/analytics';
+import {
+  isCancelledRequestError,
+  isForeignScriptError,
+  syncReplitPageviewOptOut,
+} from '../lib/analytics-suppression';
 
 // Single source of GA4 page views + page-engagement duration.
 // gtag is configured with send_page_view:false, so page_view is fired here on
@@ -28,11 +33,29 @@ export const useAnalytics = () => {
       trackPageEngagement(prevLocationRef.current, now - enterTimeRef.current);
     }
 
+    // Before the page view: Replit's tracker records soft navigations ~300 ms
+    // after the URL changes, so a QA path must opt out of it right away.
+    syncReplitPageviewOptOut();
     // Initial mount (prev === null) and every subsequent change fire one page_view.
     trackPageView(location);
     prevLocationRef.current = location;
     enterTimeRef.current = now;
   }, [location]);
+
+  // Replit's tracker learns about SPA navigations only through its
+  // pushState/replaceState wrappers and has no popstate listener, so after
+  // Back/Forward it recorded no page view. A same-URL, same-state replaceState
+  // hands it the current URL; without the tracker the call changes nothing.
+  // Custom events do not rely on this: replitTrack stamps each one with the
+  // URL it fired on.
+  useEffect(() => {
+    const announceTraversal = () => {
+      syncReplitPageviewOptOut();
+      window.history.replaceState(window.history.state, '', window.location.href);
+    };
+    window.addEventListener('popstate', announceTraversal);
+    return () => window.removeEventListener('popstate', announceTraversal);
+  }, []);
 
   // Flush engagement for the active page when the tab is hidden or closed.
   useEffect(() => {
@@ -51,10 +74,11 @@ export const useAnalytics = () => {
     };
   }, []);
 
-  // Start telemetry only after the visitor grants analytics consent. The
-  // web-vitals callbacks do not expose an unsubscribe API, so their observers
-  // are started once per page; sendEvent still checks the current consent if a
-  // visitor revokes it later in the same session.
+  // Web vitals and error capture start unless the visitor declined: they
+  // reach Replit Analytics (cookie-free; errors as their type only) before a
+  // choice and GA4 only after a grant. The web-vitals callbacks do not expose an
+  // unsubscribe API, so their observers are started once per page; track()
+  // still checks the current consent if a visitor declines later.
   useEffect(() => {
     let errorsAttached = false;
 
@@ -68,30 +92,16 @@ export const useAnalytics = () => {
     };
 
     const startCapture = () => {
-      if (getAnalyticsConsent() !== 'granted') return;
+      const consent = getAnalyticsConsent();
+      if (consent === 'denied') return;
 
       if (!vitalsStartedRef.current) {
         vitalsStartedRef.current = true;
         onLCP((metric) => trackPerformance('lcp', metric.value));
         onCLS((metric) => trackPerformance('cls', metric.value));
         onINP((metric) => trackPerformance('inp', metric.value));
-
-        // FID was the signal used by the original instrumentation. Keep
-        // reporting it for dashboard continuity even though modern browsers
-        // have replaced it with INP.
-        if (typeof PerformanceObserver !== 'undefined') {
-          try {
-            const observer = new PerformanceObserver((list) => {
-              const entry = list.getEntries()[0] as PerformanceEventTiming | undefined;
-              if (!entry) return;
-              trackPerformance('fid', entry.processingStart - entry.startTime);
-              observer.disconnect();
-            });
-            observer.observe({ type: 'first-input', buffered: true });
-          } catch {
-            // Older browsers may not support the first-input observer.
-          }
-        }
+        onFCP((metric) => trackPerformance('fcp', metric.value));
+        onTTFB((metric) => trackPerformance('ttfb', metric.value));
       }
 
       if (!errorsAttached) {
@@ -104,9 +114,11 @@ export const useAnalytics = () => {
     // Only send a safe message shape: raw browser messages can include copied
     // text, route/query values, or third-party URLs.
     const handleError = (event: ErrorEvent) => {
+      if (isForeignScriptError(event)) return;
       trackError('javascript_error', messageShapeOf(event.message));
     };
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (isCancelledRequestError(event.reason)) return;
       trackError(
         'unhandled_promise_rejection',
         messageShapeOf(event.reason instanceof Error ? event.reason.message : event.reason),
@@ -114,9 +126,8 @@ export const useAnalytics = () => {
     };
 
     const handleConsentChange = () => {
-      if (getAnalyticsConsent() === 'granted') {
-        startCapture();
-      } else if (errorsAttached) {
+      startCapture();
+      if (getAnalyticsConsent() === 'denied' && errorsAttached) {
         window.removeEventListener('error', handleError);
         window.removeEventListener('unhandledrejection', handleUnhandledRejection);
         errorsAttached = false;

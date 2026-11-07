@@ -1,0 +1,36 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "active": "<input class=\"input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed\" autocomplete=\"name\" data-testid=\"contact-name\" required=\"\" aria-required=\"true\" name=\"name\" id=\":r8:-form-item\" aria-invalid=\"true\" value=\"\" aria-describedby=\":r8:-form-item-message\">",
+  "invalid": [
+    {
+      "name": "name",
+      "id": ":r8:-form-item",
+      "describedby": ":r8:-form-item-message",
+      "description": "Name is required"
+    },
+    {
+      "name": "replyTo",
+      "id": ":r9:-form-item",
+      "describedby": ":r9:-form-item-message",
+      "description": "Enter a valid email address"
+    },
+    {
+      "name": "subject",
+      "id": ":ra:-form-item",
+      "describedby": ":ra:-form-item-message",
+      "description": "Subject is required"
+    },
+    {
+      "name": "message",
+      "id": ":rb:-form-item",
+      "describedby": ":rb:-form-item-message",
+      "description": "Message must be at least 20 characters"
+    }
+  ],
+  "contactRequests": []
+}

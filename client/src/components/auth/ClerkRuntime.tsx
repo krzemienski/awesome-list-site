@@ -12,6 +12,7 @@ import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { setSessionTokenRefresher } from "@/lib/queryClient";
+import { authPageHeadings } from "@shared/seo-templates";
 import { useClerkAppearance } from "@/lib/clerk-appearance";
 import { publishClerkState, useClerkSlots, type BridgedClerk } from "@/lib/clerk-bridge";
 import AuthConversionTracker from "./AuthConversionTracker";
@@ -48,13 +49,13 @@ function stripBase(path: string): string {
 const clerkLocalization = {
   signIn: {
     start: {
-      title: "Welcome back",
+      title: authPageHeadings.signIn,
       subtitle: "Sign in to continue to Awesome Video",
     },
   },
   signUp: {
     start: {
-      title: "Create your account",
+      title: authPageHeadings.signUp,
       subtitle: "Track journeys, bookmarks, and recommendations",
     },
   },

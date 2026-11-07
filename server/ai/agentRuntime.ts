@@ -1,13 +1,8 @@
 import dns from "dns/promises";
 import { safeFetch, isPublicAddress } from "./safeFetch";
 import { decryptAuthToken, encryptAuthToken, isConfigEncryptionAvailable } from "./configCrypto";
-import {
-  FLOW_TIERS,
-  resolveAnthropicCredentials,
-  resolveFlowModel,
-  resolveTierModel,
-  subagentModelForTier,
-} from "./anthropicConfig";
+import { configuredBaseUrl, resolveAnthropicCredentials, resolveFlowModel } from "./anthropicConfig";
+import { baseUrlSyntaxError } from "@shared/validation";
 
 /**
  * Shared runtime helpers for the Claude Agent SDK multi-agent flows (Researcher + Enrichment):
@@ -23,25 +18,12 @@ export interface AgentRunConfig {
 }
 
 /**
- * Default models for each flow when no per-run override is supplied. Resolved
- * from the shared config at call time (ANTHROPIC_MODEL / ANTHROPIC_DEFAULT_*)
- * so the agents follow the same endpoint + model mapping as every other call.
+ * Default model for the enrichment flow when no per-run override is supplied,
+ * resolved from the shared config at call time (ANTHROPIC_DEFAULT_*). The
+ * Researcher resolves its models strictly instead — see researchRunConfig.ts.
  */
-export function defaultResearchModel(): string {
-  return resolveFlowModel("researchOrchestrator");
-}
 export function defaultEnrichmentModel(): string {
   return resolveFlowModel("enrichment");
-}
-/**
- * Default scout SUBAGENT model. Subagents receive the tier ALIAS (the CLI
- * maps it through ANTHROPIC_DEFAULT_<TIER>_MODEL) because a literal custom id
- * would be rejected by the CLI's per-agent model allowlist and silently
- * swapped — see anthropicConfig.subagentModelForTier.
- */
-export function defaultScoutModel(): { value: string; resolved: string } {
-  const tier = FLOW_TIERS.researchScout;
-  return { value: subagentModelForTier(tier), resolved: resolveTierModel(tier) };
 }
 
 /**
@@ -51,17 +33,9 @@ export function defaultScoutModel(): { value: string; resolved: string } {
  * travels unencrypted — the admin UI warns about this.
  */
 export async function validateBaseUrl(raw: string): Promise<string> {
-  let u: URL;
-  try {
-    u = new URL(raw.trim());
-  } catch {
-    throw new Error("Base URL is not a valid URL");
-  }
-  if (u.protocol !== "https:" && u.protocol !== "http:") {
-    throw new Error("Base URL must use http:// or https://");
-  }
-  if (!u.hostname) throw new Error("Base URL must include a host");
-  if (u.username || u.password) throw new Error("Base URL must not contain credentials");
+  const syntaxError = baseUrlSyntaxError(raw);
+  if (syntaxError) throw new Error(syntaxError);
+  const u = new URL(raw.trim());
 
   let addresses: string[] = [];
   try {
@@ -76,7 +50,7 @@ export async function validateBaseUrl(raw: string): Promise<string> {
   }
 
   const normalizedPath = u.pathname.replace(/\/$/, "");
-  return u.origin + normalizedPath + (u.search || "");
+  return u.origin + normalizedPath;
 }
 
 export interface PreflightResult {
@@ -112,6 +86,9 @@ const CREDENTIAL_ENV_KEYS = [
   "ANTHROPIC_CUSTOM_HEADERS",
 ];
 
+const TOKEN_ONLY_NEEDS_BASE_URL =
+  "An auth token without a base URL is sent to the server's ANTHROPIC_BASE_URL, which is not set — enter a base URL too.";
+
 /**
  * Build the env map passed to query() options.env for a run.
  *
@@ -126,7 +103,9 @@ const CREDENTIAL_ENV_KEYS = [
  * set, no platform credential is passed (the API key/token is only valid
  * against the platform host and must NEVER travel to a third-party endpoint);
  * the run authenticates only with the admin-supplied token, which
- * parseAgentConfigFromRequest requires alongside any custom base URL.
+ * parseAgentConfigFromRequest requires alongside any custom base URL. A
+ * token-only override always goes to ANTHROPIC_BASE_URL and throws when it is
+ * unset, so an admin token never reaches api.anthropic.com by default.
  *
  * Also disables the CLI's non-essential network traffic (telemetry, error
  * reporting, auto-updater, version checks) — a server-side agent has no use
@@ -144,12 +123,13 @@ export function buildAgentEnv(config: AgentRunConfig): Record<string, string> {
     if (config.baseUrl) {
       env.ANTHROPIC_BASE_URL = config.baseUrl;
     } else {
-      // Token-only override: the admin token replaces the credential but the
-      // run must still go to the server's configured router. Without this the
-      // CLI would fall back to api.anthropic.com and the token would be sent
-      // to an endpoint the operator never configured.
-      const creds = resolveAnthropicCredentials();
-      if (creds.kind === "router" && creds.baseURL) env.ANTHROPIC_BASE_URL = creds.baseURL;
+      // Token-only override: the admin token replaces the credential, the
+      // endpoint stays the configured router whether or not the server also
+      // has a credential for it. Without ANTHROPIC_BASE_URL the CLI would
+      // send the token to api.anthropic.com, which nobody configured.
+      const routerUrl = configuredBaseUrl();
+      if (!routerUrl) throw new Error(TOKEN_ONLY_NEEDS_BASE_URL);
+      env.ANTHROPIC_BASE_URL = routerUrl;
     }
     if (config.authTokenEncrypted) {
       env.ANTHROPIC_AUTH_TOKEN = decryptAuthToken(config.authTokenEncrypted);
@@ -212,6 +192,9 @@ export async function parseAgentConfigFromRequest(body: any): Promise<ParsedAgen
     throw new Error(
       "A custom base URL requires an auth token — the platform key is never sent to a custom endpoint.",
     );
+  }
+  if (rawToken && !baseUrl && !configuredBaseUrl()) {
+    throw new Error(TOKEN_ONLY_NEEDS_BASE_URL);
   }
   if (rawToken) {
     if (!isConfigEncryptionAvailable()) {

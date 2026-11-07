@@ -1,0 +1,74 @@
+RESOURCES
+3,826
+across 9 categories
+SUBCATEGORIES
+99
+all canonical
+ACTIVE USERS
+20
+2 admins · 18 contributors
+PENDING APPROVALS
+16
+oldest 63d ago
+Recent activity
+
+Latest 6 events
+
+TX#27626
+a•••@example.com
+users.exported
+Admin exported 133 user rows (unmasked emails, CSV)
+10m ago
+TX#27625
+a•••@example.com
+users.exported
+Admin exported 133 user rows (unmasked emails, CSV)
+10m ago
+TX#27624
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Second
+11m ago
+TX#27623
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Cat renamed
+11m ago
+TX#27622
+a•••@example.com
+category updated
+Updated category: [QA-audit-1026] Second
+13m ago
+TX#27621
+a•••@example.com
+category updated
+Updated category: [QA-audit-1026] Second
+13m ago
+System health
+
+Some systems are still working
+
+Database
+ready · 154ms
+GitHub sync
+Completed · 99d ago
+Link checker
+last 84d ago · 12 broken
+Enrichment queue
+last run cancelled before finishing · 39h ago
+Researcher API
+healthy
+Top categories
+
+By resource count
+
+▥ Media Tools
+704
+◇ Encoding & Codecs
+580
+◆ General Tools
+514
+⟁ Protocols & Transport
+467
+▶ Players & Clients
+447

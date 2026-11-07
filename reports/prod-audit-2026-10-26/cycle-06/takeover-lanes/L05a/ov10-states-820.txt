@@ -1,0 +1,74 @@
+RESOURCES
+3,826
+across 12 categories
+SUBCATEGORIES
+99
+all canonical
+ACTIVE USERS
+20
+2 admins · 18 contributors
+PENDING APPROVALS
+16
+oldest 63d ago
+Recent activity
+
+Latest 6 events
+
+TX#27649
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Café Ünï Ætest w820
+45s ago
+TX#27648
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Cancel390x
+46s ago
+TX#27647
+a•••@example.com
+category deleted
+Deleted category: [QA-audit-1026] Café Ünï Ætest w390
+47s ago
+TX#27646
+a•••@example.com
+categories.exported
+Admin exported the category tree (OPML, 3826 resources)
+1m ago
+TX#27645
+a•••@example.com
+resources.exported
+Admin exported 4019 resources (CSV)
+1m ago
+TX#27644
+a•••@example.com
+database.exported
+Admin exported non-restorable catalog JSON snapshot (4019 resources, 133 user summaries)
+1m ago
+System health
+
+One or more systems need attention
+
+Database
+degraded · timeout
+GitHub sync
+no runs
+Link checker
+no completed runs
+Enrichment queue
+no runs
+Researcher API
+Unavailable
+Top categories
+
+By resource count
+
+▥ Media Tools
+704
+◇ Encoding & Codecs
+580
+◆ General Tools
+514
+⟁ Protocols & Transport
+467
+▶ Players & Clients
+447

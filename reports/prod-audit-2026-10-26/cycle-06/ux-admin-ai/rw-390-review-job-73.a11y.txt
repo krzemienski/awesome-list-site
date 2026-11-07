@@ -1,0 +1,440 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Use, account menu" [expanded=false, ref=e7]
+          - StaticText "Use"
+          - StaticText ", account menu"
+      - main
+        - navigation "Breadcrumb" [ref=e8]
+          - list
+            - listitem [level=1]
+              - link "Home" [ref=e31]
+            - listitem [level=1]
+              - link "Admin" [ref=e32]
+            - listitem [level=1]
+              - link "Researcher" [disabled, ref=e33]
+        - StaticText "Authorized admin area"
+        - StaticText "ADMIN CONSOLE · "
+        - StaticText "USE"
+        - heading "Operations dashboard" [level=1, ref=e9]
+          - StaticText "Operations "
+          - emphasis
+            - StaticText "dashboard"
+        - paragraph
+          - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+        - button "Settings" [expanded=false, ref=e10]
+          - image
+          - StaticText "Settings"
+        - button "New entry: add a resource" [ref=e11]
+          - image
+          - StaticText "New entry"
+        - status
+        - generic
+          - button "Scroll tabs left" [ref=e13]
+          - tablist "Admin sections" [ref=e14] focusable [tabindex]
+            - tab "Overview" [ref=e16]
+              - StaticText "Overview"
+            - tab "Approvals" [ref=e17]
+              - StaticText "Approvals"
+            - tab "Edits" [ref=e18]
+              - StaticText "Edits"
+            - tab "Enrichment" [ref=e19]
+              - StaticText "Enrichment"
+            - tab "Researcher" [selected, ref=e20]
+              - StaticText "Researcher"
+            - tab "Export" [ref=e21]
+              - StaticText "Export"
+            - tab "Database" [ref=e22]
+              - StaticText "Database"
+            - tab "Resources" [ref=e23]
+              - StaticText "Resources"
+            - tab "Categories" [ref=e24]
+              - StaticText "Categories"
+            - tab "Subcategories" [ref=e25]
+              - StaticText "Subcategories"
+            - tab "Users" [ref=e26]
+              - StaticText "Users"
+            - tab "GitHub" [ref=e27]
+              - StaticText "GitHub"
+            - tab "Link Health" [ref=e28]
+              - StaticText "Link Health"
+            - tab "Audit" [ref=e29]
+              - StaticText "Audit"
+            - tab "Research" [ref=e30]
+              - StaticText "Research"
+          - button "Scroll tabs right" [ref=e15]
+        - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+          - generic
+            - generic
+              - region "Research run #73" [ref=e34]
+                - heading "Research run #73" [level=3, ref=e37]
+                  - StaticText "Research run #73"
+                - paragraph
+                  - StaticText "All categories · running for 10:18"
+                - image
+                - StaticText "RUNNING"
+                - button "Cancel run" [ref=e38]
+                  - image
+                  - StaticText "Cancel run"
+                - paragraph
+                  - StaticText "Phase: Verifying."
+                - list "Run phases"
+                  - listitem [level=1]
+                    - StaticText "Planning"
+                    - StaticText "02:31:21 AM"
+                    - StaticText "(done)"
+                  - listitem [level=1]
+                    - StaticText "Scouting"
+                    - StaticText "02:31:55 AM"
+                    - StaticText "(done)"
+                  - listitem [level=1]
+                    - StaticText "Verifying"
+                    - StaticText "02:33:18 AM"
+                    - StaticText "(current)"
+                  - listitem [level=1]
+                    - StaticText "Saving"
+                    - StaticText "02:33:46 AM"
+                    - StaticText "(done)"
+                  - listitem [level=1]
+                    - StaticText "Done"
+                    - StaticText "(not reached)"
+                - heading "Scouts 22 started" [level=4, ref=e39]
+                  - StaticText "Scouts"
+                  - StaticText "22 started"
+                - list "Scouts"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "1"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout neural codecs quality"
+                    - paragraph
+                      - StaticText "10 searches · 0 candidates · 18s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "2"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout WebRTC observability tools"
+                    - paragraph
+                      - StaticText "14 searches · 0 candidates · 30s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "3"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout DCVC neural codecs"
+                    - paragraph
+                      - StaticText "5 searches · 10 candidates · 37s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "4"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout quality metrics WebRTC"
+                    - paragraph
+                      - StaticText "8 searches · 0 candidates · 36s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "5"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout packaging and audio tools"
+                    - paragraph
+                      - StaticText "12 searches · 0 candidates · 34s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "6"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout codec benchmarks test fixtures"
+                    - paragraph
+                      - StaticText "20 searches · 0 candidates · 38s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "7"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Verify URLs via curl"
+                    - paragraph
+                      - StaticText "10 searches · 5 candidates · 41s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "8"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "GitHub API gap search"
+                    - paragraph
+                      - StaticText "9 searches · 0 candidates · 111s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "9"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Curl GitHub API"
+                    - paragraph
+                      - StaticText "0 searches · 0 candidates · 22s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "10"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Shell curl GitHub"
+                    - paragraph
+                      - StaticText "0 searches · 0 candidates · 29s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "11"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Retry short web searches"
+                    - paragraph
+                      - StaticText "4 searches · 0 candidates · 5s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "12"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Query arXiv API directly"
+                    - paragraph
+                      - StaticText "6 searches · 1 candidate · 10s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "13"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Query known project pages"
+                    - paragraph
+                      - StaticText "8 searches · 0 candidates · 10s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "14"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Search podcasts and forums"
+                    - paragraph
+                      - StaticText "10 searches · 0 candidates · 28s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "15"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout audio and packaging"
+                    - paragraph
+                      - StaticText "11 searches · 0 candidates · 24s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "16"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout standards and players"
+                    - paragraph
+                      - StaticText "4 searches · 0 candidates · 24s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "17"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout fresh video tools"
+                    - paragraph
+                      - StaticText "11 searches · 0 candidates · 13s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "18"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout ACM and papers"
+                    - paragraph
+                      - StaticText "4 searches · 0 candidates · 20s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "19"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout smart TV player docs"
+                    - paragraph
+                      - StaticText "10 searches · 0 candidates · 10s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "20"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout standards and metrics docs"
+                    - paragraph
+                      - StaticText "4 searches · 0 candidates · 33s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "21"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout packaging origin HDR"
+                    - paragraph
+                      - StaticText "10 searches · 0 candidates · 24s"
+                  - listitem [level=1]
+                    - StaticText "Scout "
+                    - StaticText "22"
+                    - StaticText "REPORTED"
+                    - paragraph
+                      - StaticText "Scout ffmpeg automation QoE"
+                    - paragraph
+                      - StaticText "4 searches · 0 candidates · 20s"
+                - DescriptionList
+                  - term "Discoveries"
+                  - definition
+                    - StaticText "3 of 10 saved"
+                  - progressbar "Discoveries saved against the target": 30
+                  - term "Turns"
+                  - definition
+                    - StaticText "counted at the end · cap 200"
+                  - term "Spend"
+                  - definition
+                    - StaticText "reported at the end · cap $8.00"
+                - region "Discoveries so far" [ref=e40]
+                  - heading "Discoveries so far" [level=4, ref=e42]
+                  - list "Discoveries from this run"
+                    - listitem [level=1]
+                      - StaticText "Neural Video Compression with Diverse Contexts (CVPR 2024)"
+                      - image
+                      - StaticText "PENDING"
+                      - image
+                      - StaticText "LINK CHECK FAILED"
+                      - link "https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf" [ref=e79]
+                        - StaticText "https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Neural_Video_Compression_with_Diverse_Contexts_CVPR_2024_paper.pdf"
+                      - paragraph
+                        - StaticText "Official CVPR 2024 paper on DCVC-DC, a neural video codec that conditions entropy coding on diverse spatial and temporal contexts to improve compression over earlier DCVC models."
+                      - StaticText "ENCODING & CODECS"
+                      - StaticText "NEXT-GENERATION CODECS AV1 VVC"
+                      - StaticText "80"
+                      - StaticText "% CONFIDENCE"
+                      - button "Approve discovery: Neural Video Compression with Diverse Contexts (CVPR 2024)" [ref=e80]
+                        - image
+                        - StaticText "Approve"
+                      - button "Reject discovery: Neural Video Compression with Diverse Contexts (CVPR 2024)" [ref=e81]
+                        - image
+                        - StaticText "Reject"
+                    - listitem [level=1]
+                      - StaticText "Towards Practical Real-Time Neural Video Compression (CVPR 2025)"
+                      - image
+                      - StaticText "PENDING"
+                      - image
+                      - StaticText "LINK OK"
+                      - link "https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf" [ref=e82]
+                        - StaticText "https://openaccess.thecvf.com/content/CVPR2025/papers/Jia_Towards_Practical_Real-Time_Neural_Video_Compression_CVPR_2025_paper.pdf"
+                      - paragraph
+                        - StaticText "CVPR 2025 paper on DCVC-RT, a practical real-time neural video codec with integerized models and implicit temporal modeling that encodes and decodes 1080p above 100 fps."
+                      - StaticText "ENCODING & CODECS"
+                      - StaticText "REAL-TIME ENCODING SOLUTIONS"
+                      - StaticText "82"
+                      - StaticText "% CONFIDENCE"
+                      - button "Approve discovery: Towards Practical Real-Time Neural Video Compression (CVPR 2025)" [ref=e83]
+                        - image
+                        - StaticText "Approve"
+                      - button "Reject discovery: Towards Practical Real-Time Neural Video Compression (CVPR 2025)" [ref=e84]
+                        - image
+                        - StaticText "Reject"
+                    - listitem [level=1]
+                      - StaticText "PyTorchVideoCompression"
+                      - image
+                      - StaticText "PENDING"
+                      - image
+                      - StaticText "LINK OK"
+                      - generic
+                        - image
+                        - StaticText "394"
+                      - link "https://github.com/ZhihaoHu/PyTorchVideoCompression" [ref=e85]
+                        - StaticText "https://github.com/ZhihaoHu/PyTorchVideoCompression"
+                      - paragraph
+                        - StaticText "PyTorch implementations of learned video compression methods (DVC, FVC, DCVC and related neural codecs) with training and inference code used as a common research baseline."
+                      - StaticText "ENCODING & CODECS"
+                      - StaticText "NEXT-GENERATION CODECS AV1 VVC"
+                      - StaticText "78"
+                      - StaticText "% CONFIDENCE"
+                      - button "Approve discovery: PyTorchVideoCompression" [ref=e86]
+                        - image
+                        - StaticText "Approve"
+                      - button "Reject discovery: PyTorchVideoCompression" [ref=e87]
+                        - image
+                        - StaticText "Reject"
+                - button "Run details: raw event log and agent graph" [expanded=false, ref=e43]
+                  - StaticText "Run details: raw event log and agent graph"
+                  - image
+            - generic
+              - sectionheader
+                - heading "Researcher jobs" [level=2, ref=e41]
+                - paragraph
+                  - StaticText "Latest 5 of 73 research runs"
+              - region "Researcher jobs table, scrollable" [ref=e35] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "STATUS" [ref=e88]
+                      - columnheader "PROMPT" [ref=e89]
+                      - columnheader "FOUND" [ref=e90]
+                      - columnheader "APPROVED / REJECTED" [ref=e91]
+                      - columnheader "COST" [ref=e92]
+                      - columnheader "TURNS" [ref=e93]
+                      - columnheader "CREATED" [ref=e94]
+                  - row
+                    - cell "PROCESSING" [ref=e44]
+                    - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e45]
+                    - cell "3" [ref=e46]
+                    - cell "0/0" [ref=e47]
+                      - StaticText "0/0"
+                    - cell "$0.0000" [ref=e48]
+                    - cell "0/200" [ref=e49]
+                      - StaticText "0/200"
+                    - cell "Oct 27, 2026" [ref=e50]
+                  - row
+                    - cell "FAILED" [ref=e51]
+                    - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e52]
+                    - cell "0" [ref=e53]
+                    - cell "0/0" [ref=e54]
+                      - StaticText "0/0"
+                    - cell "$0.0000" [ref=e55]
+                    - cell "1/200" [ref=e56]
+                      - StaticText "1/200"
+                    - cell "Oct 27, 2026" [ref=e57]
+                  - row
+                    - cell "COMPLETED" [ref=e58]
+                    - cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e59]
+                    - cell "9" [ref=e60]
+                    - cell "0/0" [ref=e61]
+                      - StaticText "0/0"
+                    - cell "$3.3100" [ref=e62]
+                    - cell "41/200" [ref=e63]
+                      - StaticText "41/200"
+                    - cell "Oct 27, 2026" [ref=e64]
+                  - row
+                    - cell "COMPLETED" [ref=e65]
+                    - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e66]
+                    - cell "0" [ref=e67]
+                    - cell "0/0" [ref=e68]
+                      - StaticText "0/0"
+                    - cell "$1.1166" [ref=e69]
+                    - cell "18/80" [ref=e70]
+                      - StaticText "18/80"
+                    - cell "Oct 27, 2026" [ref=e71]
+                  - row
+                    - cell "COMPLETED" [ref=e72]
+                    - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e73]
+                    - cell "0" [ref=e74]
+                    - cell "0/0" [ref=e75]
+                      - StaticText "0/0"
+                    - cell "$0.4199" [ref=e76]
+                    - cell "10/80" [ref=e77]
+                      - StaticText "10/80"
+                    - cell "Oct 27, 2026" [ref=e78]
+              - button "Show more" [ref=e36]
+            - group
+              - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]

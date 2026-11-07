@@ -1,0 +1,8 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":true,"isLandscape":false,"width":820,"height":1180}
+Emulating color scheme: dark
+## Console messages
+Showing 1-2 of 2 (Page 1 of 1).
+msgid=16 [warn] Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <input.input file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed min-h-11 pl-10>
+Ancestor with aria-hidden: <div#root> (0 args)
+msgid=17 [issue] A form field element should have an id or name attribute (count: 7)

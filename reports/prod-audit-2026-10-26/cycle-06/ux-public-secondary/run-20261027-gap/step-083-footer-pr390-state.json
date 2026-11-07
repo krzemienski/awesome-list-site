@@ -1,0 +1,37 @@
+{
+  "url": "https://awesome.video/about",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "link": {
+    "rect": {
+      "x": 93.71875,
+      "y": 512.421875,
+      "width": 71.25,
+      "height": 24,
+      "top": 512.421875,
+      "right": 164.96875,
+      "bottom": 536.421875,
+      "left": 93.71875
+    },
+    "display": "inline-flex",
+    "parent": "Open-source. PRs welcome.\nIndexed automatically from README.md."
+  },
+  "nearby": [
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "rect": {
+        "x": 20,
+        "y": 456.421875,
+        "width": 258.734375,
+        "height": 44,
+        "top": 456.421875,
+        "right": 278.734375,
+        "bottom": 500.421875,
+        "left": 20
+      }
+    }
+  ]
+}

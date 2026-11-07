@@ -1,0 +1,16 @@
+=== 820
+Profile -> "/profile menuOpen=false h1=Admin User"
+Bookmarks -> "/bookmarks menuOpen=false h1=Saved, then finished."
+Notifications -> "/notifications menuOpen=false h1=Notifications"
+Settings -> "/settings menuOpen=false h1=Settings"
+Theme Settings -> "/settings/theme menuOpen=false h1=Theme Settings"
+Admin -> "/admin menuOpen=false h1=Operations dashboard"
+"[[\"Profile\",44],[\"Bookmarks\",44],[\"Notifications\",44],[\"Settings\",44],[\"Theme Settings\",44],[\"Admin\",44],[\"Sign out\",44]]"
+=== 390
+Profile -> "/profile menuOpen=false h1=Admin User"
+Bookmarks -> "/bookmarks menuOpen=false h1=Saved, then finished."
+Notifications -> "/notifications menuOpen=false h1=Notifications"
+Settings -> "/settings menuOpen=false h1=Settings"
+Theme Settings -> "/settings/theme menuOpen=false h1=Theme Settings"
+Admin -> "/admin menuOpen=false h1=Operations dashboard"
+"[[\"Profile\",44],[\"Bookmarks\",44],[\"Notifications\",44],[\"Settings\",44],[\"Theme Settings\",44],[\"Admin\",44],[\"Sign out\",44]]"

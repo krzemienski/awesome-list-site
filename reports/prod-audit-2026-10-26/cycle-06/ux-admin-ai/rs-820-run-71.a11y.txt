@@ -1,0 +1,452 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [selected, ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Researcher" [ref=e12] focusable [tabindex]
+            - generic
+              - generic
+                - region "Research run #71" [ref=e33]
+                  - heading "Research run #71" [level=3, ref=e36]
+                    - StaticText "Research run #71"
+                  - paragraph
+                    - StaticText "All categories · ran for 5:57"
+                  - image
+                  - StaticText "COMPLETED"
+                  - paragraph
+                  - list "Run phases"
+                    - listitem [level=1]
+                      - StaticText "Planning"
+                      - StaticText "02:01:59 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Scouting"
+                      - StaticText "02:03:06 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Verifying"
+                      - StaticText "02:04:10 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Saving"
+                      - StaticText "02:05:54 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Done"
+                      - StaticText "02:07:56 AM"
+                      - StaticText "(current)"
+                  - heading "Scouts 7 started" [level=4, ref=e37]
+                    - StaticText "Scouts"
+                    - StaticText "7 started"
+                  - list "Scouts"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "1"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Neural compression metrics scout"
+                      - paragraph
+                        - StaticText "4 searches · 19 candidates · 45s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "2"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Realtime WebRTC observability scout"
+                      - paragraph
+                        - StaticText "8 searches · 0 candidates · 40s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "3"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "WebRTC MoQ player scout"
+                      - paragraph
+                        - StaticText "88 searches · 0 candidates · 59s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "4"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Packaging fixtures audio scout"
+                      - paragraph
+                        - StaticText "57 searches · 0 candidates · 64s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "5"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Live infra DRM learning scout"
+                      - paragraph
+                        - StaticText "48 searches · 2 candidates · 68s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "6"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "GPAC SRS QCTools scout"
+                      - paragraph
+                        - StaticText "10 searches · 0 candidates · 13s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "7"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Retry project homepage scout"
+                      - paragraph
+                        - StaticText "2 searches · 0 candidates · 9s"
+                  - DescriptionList
+                    - term "Discoveries"
+                    - definition
+                      - StaticText "9 of 10 saved"
+                    - progressbar "Discoveries saved against the target": 90
+                    - term "Turns"
+                    - definition
+                      - StaticText "41 of 200"
+                    - progressbar "Turns used against the cap": 20.5
+                    - term "Spend"
+                    - definition
+                      - StaticText "$3.3100 of $8.00"
+                    - progressbar "Spend against the budget cap": 41.375
+                  - note
+                    - image
+                    - paragraph
+                      - StaticText "Run finished with 9 saved discoveries. Review them below."
+                  - region "Review discoveries · 9 pending" [ref=e38]
+                    - heading "Review discoveries · 9 pending" [level=4, ref=e40]
+                    - list "Discoveries from this run"
+                      - listitem [level=1]
+                        - StaticText "WebRTC Encoded Transform (Insertable Streams)"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://www.w3.org/TR/webrtc-encoded-transform/" [ref=e79]
+                          - StaticText "https://www.w3.org/TR/webrtc-encoded-transform/"
+                        - paragraph
+                          - StaticText "W3C specification for accessing and transforming encoded audio and video frames on RTCPeerConnection, the basis of WebRTC insertable streams and frame-level E2EE."
+                        - StaticText "STANDARDS & INDUSTRY"
+                        - StaticText "SPECS & STANDARDS"
+                        - StaticText "80"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: WebRTC Encoded Transform (Insertable Streams)" [ref=e80]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: WebRTC Encoded Transform (Insertable Streams)" [ref=e81]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "NVIDIA Video Codec SDK"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://developer.nvidia.com/video-codec-sdk" [ref=e82]
+                          - StaticText "https://developer.nvidia.com/video-codec-sdk"
+                        - paragraph
+                          - StaticText "Official NVIDIA developer hub for the Video Codec SDK, covering NVENC hardware encode and NVDEC hardware decode APIs on NVIDIA GPUs."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "HARDWARE CODECS & ACCELERATION"
+                        - StaticText "82"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: NVIDIA Video Codec SDK" [ref=e83]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: NVIDIA Video Codec SDK" [ref=e84]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "MSU Video Codecs Comparison 2025"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://www.compression.ru/video/codec_comparison/2025/" [ref=e85]
+                          - StaticText "https://www.compression.ru/video/codec_comparison/2025/"
+                        - paragraph
+                          - StaticText "MSU Graphics & Media Lab’s 2025 independent codec comparison covering AV1, VVC, HEVC and other encoders with objective and subjective results."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "BENCHMARKING & PERFORMANCE TOOLS FOR CODECS"
+                        - StaticText "82"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: MSU Video Codecs Comparison 2025" [ref=e86]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: MSU Video Codecs Comparison 2025" [ref=e87]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "JPEG XS software (official)"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://jpeg.org/jpegxs/software.html" [ref=e88]
+                          - StaticText "https://jpeg.org/jpegxs/software.html"
+                        - paragraph
+                          - StaticText "Official JPEG committee page listing JPEG XS reference software and open-source implementations of the low-latency mezzanine codec."
+                        - StaticText "STANDARDS & INDUSTRY"
+                        - StaticText "VIDEO CODEC SPECIFICATIONS"
+                        - StaticText "80"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: JPEG XS software (official)" [ref=e89]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: JPEG XS software (official)" [ref=e90]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "OpenJXS"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK CHECK FAILED"
+                        - link "https://github.com/InterDigitalInc/OpenJXS" [ref=e91]
+                          - StaticText "https://github.com/InterDigitalInc/OpenJXS"
+                        - paragraph
+                          - StaticText "Open-source JPEG XS (ISO/IEC 21122) encoder and decoder for lightweight, low-latency mezzanine video compression."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "SOFTWARE CODECS"
+                        - StaticText "85"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: OpenJXS" [ref=e92]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: OpenJXS" [ref=e93]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "JPEG AI reference software"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK CHECK FAILED"
+                        - link "https://github.com/InterDigitalInc/JPEGAI" [ref=e94]
+                          - StaticText "https://github.com/InterDigitalInc/JPEGAI"
+                        - paragraph
+                          - StaticText "InterDigital implementation of the JPEG AI learned image coding verification model and reference software used in the JPEG AI standardization process."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "NEXT-GENERATION CODECS AV1 VVC"
+                        - StaticText "85"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: JPEG AI reference software" [ref=e95]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: JPEG AI reference software" [ref=e96]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "MPEG Enhanced Compression Model (ECM)"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK CHECK FAILED"
+                        - link "https://github.com/MPEGGroup/ECM" [ref=e97]
+                          - StaticText "https://github.com/MPEGGroup/ECM"
+                        - paragraph
+                          - StaticText "Official MPEG reference software for the Enhanced Compression Model, the exploration codec used to study compression beyond VVC/H.266."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "NEXT-GENERATION CODECS AV1 VVC"
+                        - StaticText "88"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: MPEG Enhanced Compression Model (ECM)" [ref=e98]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: MPEG Enhanced Compression Model (ECM)" [ref=e99]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "FovVideoVDP"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - generic
+                          - image
+                          - StaticText "89"
+                        - link "https://github.com/gfxdisp/FovVideoVDP" [ref=e100]
+                          - StaticText "https://github.com/gfxdisp/FovVideoVDP"
+                        - paragraph
+                          - StaticText "Cambridge Rainbow Group’s foveated visible-difference predictor for video and images, with Python and Matlab implementations used as a perceptual quality metric beyond VMAF."
+                        - StaticText "MEDIA TOOLS"
+                        - StaticText "VMAF PSNR SSIM TOOLS"
+                        - StaticText "85"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: FovVideoVDP" [ref=e101]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: FovVideoVDP" [ref=e102]
+                          - image
+                          - StaticText "Reject"
+                      - listitem [level=1]
+                        - StaticText "CompressAI"
+                        - image
+                        - StaticText "PENDING"
+                        - image
+                        - StaticText "LINK OK"
+                        - generic
+                          - image
+                          - StaticText "1,652"
+                        - link "https://github.com/InterDigitalInc/CompressAI" [ref=e103]
+                          - StaticText "https://github.com/InterDigitalInc/CompressAI"
+                        - paragraph
+                          - StaticText "InterDigital’s PyTorch library and evaluation platform for end-to-end learned image and video compression, with reference models, training code, and codec benchmarks."
+                        - StaticText "ENCODING & CODECS"
+                        - StaticText "NEXT-GENERATION CODECS AV1 VVC"
+                        - StaticText "85"
+                        - StaticText "% CONFIDENCE"
+                        - button "Approve discovery: CompressAI" [ref=e104]
+                          - image
+                          - StaticText "Approve"
+                        - button "Reject discovery: CompressAI" [ref=e105]
+                          - image
+                          - StaticText "Reject"
+                    - button "Review later — go to job history" [ref=e41]
+                      - image
+                      - StaticText "Review later — go to job history"
+                    - button "Start another run" [ref=e42]
+                      - image
+                      - StaticText "Start another run"
+                  - button "Run details: raw event log and agent graph" [expanded=false, ref=e43]
+                    - StaticText "Run details: raw event log and agent graph"
+                    - image
+              - generic
+                - sectionheader
+                  - heading "Researcher jobs" [level=2, ref=e39]
+                  - paragraph
+                    - StaticText "Latest 5 of 72 research runs"
+                - region "Researcher jobs table, scrollable" [ref=e34] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "STATUS" [ref=e106]
+                        - columnheader "PROMPT" [ref=e107]
+                        - columnheader "FOUND" [ref=e108]
+                        - columnheader "APPROVED / REJECTED" [ref=e109]
+                        - columnheader "COST" [ref=e110]
+                        - columnheader "TURNS" [ref=e111]
+                        - columnheader "CREATED" [ref=e112]
+                    - row
+                      - cell "FAILED" [ref=e44]
+                      - cell "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting." [ref=e45]
+                      - cell "0" [ref=e46]
+                      - cell "0/0" [ref=e47]
+                        - StaticText "0/0"
+                      - cell "$0.0000" [ref=e48]
+                      - cell "1/200" [ref=e49]
+                        - StaticText "1/200"
+                      - cell "Oct 27, 2026" [ref=e50]
+                    - row
+                      - cell "COMPLETED" [ref=e51]
+                      - cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e52]
+                      - cell "9" [ref=e53]
+                      - cell "0/0" [ref=e54]
+                        - StaticText "0/0"
+                      - cell "$3.3100" [ref=e55]
+                      - cell "41/200" [ref=e56]
+                        - StaticText "41/200"
+                      - cell "Oct 27, 2026" [ref=e57]
+                    - row
+                      - cell "COMPLETED" [ref=e58]
+                      - cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e59]
+                      - cell "0" [ref=e60]
+                      - cell "0/0" [ref=e61]
+                        - StaticText "0/0"
+                      - cell "$1.1166" [ref=e62]
+                      - cell "18/80" [ref=e63]
+                        - StaticText "18/80"
+                      - cell "Oct 27, 2026" [ref=e64]
+                    - row
+                      - cell "COMPLETED" [ref=e65]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e66]
+                      - cell "0" [ref=e67]
+                      - cell "0/0" [ref=e68]
+                        - StaticText "0/0"
+                      - cell "$0.4199" [ref=e69]
+                      - cell "10/80" [ref=e70]
+                        - StaticText "10/80"
+                      - cell "Oct 27, 2026" [ref=e71]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e72]
+                      - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e73]
+                      - cell "0" [ref=e74]
+                      - cell "0/0" [ref=e75]
+                        - StaticText "0/0"
+                      - cell "$0.3062" [ref=e76]
+                      - cell "3/10" [ref=e77]
+                        - StaticText "3/10"
+                      - cell "Oct 26, 2026" [ref=e78]
+                - button "Show more" [ref=e35]
+              - group
+                - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]

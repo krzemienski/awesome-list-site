@@ -3,11 +3,11 @@
 This document is the source of truth for how the app tracks usage. The
 **[Tracking plan](#tracking-plan)** (next section) owns the usage questions,
 funnels, naming rules, property hygiene and the **shared event catalog** for
-all four consent-gated tools — Google Analytics 4, Mixpanel, PostHog and
-Amplitude. The rest of the document covers GA4 specifics (gtag.js): where each
+the consent-gated tools — Google Analytics 4, Mixpanel, PostHog and Amplitude
+— and the cookie-free Replit Analytics, which also receives events before a
+consent choice (see [Replit Analytics](#replit-analytics)). The rest of the document covers GA4 specifics (gtag.js): where each
 GA4 event is wired, the parameters each carries, first-touch acquisition, the
-PII exclusion policy, and how tracking is validated end-to-end against the real
-GA4 network endpoint. Mixpanel specifics (identity, server-side conversions)
+PII exclusion policy, and how to check tracking by hand. Mixpanel specifics (identity, server-side conversions)
 live in `MIXPANEL.md`.
 
 Measurement ID comes from the `VITE_GA_MEASUREMENT_ID` env var. If it is unset,
@@ -35,9 +35,9 @@ it is turned off, SPA `page_view` counts are inflated (~2×), **and** those
 automatic page views bypass the app's URL hygiene: gtag fills their `dr` with
 the raw previous URL (query string included), so a token in a landing URL can
 reach GA4 through them. Every hit the app itself sends is sanitized (see
-[Property hygiene](#property-hygiene-enforced-in-code)). This was observed
-live during validation on the configured property (an automatic `page_view` with
-the `ae` flag appeared alongside our manual one on the one true SPA navigation).
+[Property hygiene](#property-hygiene-enforced-in-code)). Observed once during an earlier validation run (harness since removed; an
+automatic `page_view` with the `ae` flag appeared alongside our manual one on
+the one true SPA navigation); re-check in the GA4 UI.
 
 > Title-timing note: because `SEOHead` sets `document.title` via `react-helmet`
 > (deferred a tick) and detail-page titles depend on async data, the manual
@@ -54,29 +54,42 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 
 ```
 typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
-   └─ track(name, props, { ga?, product? })      module-private, consent-gated
+   └─ track(name, props, { ga?, product?, replit? })  module-private, consent-aware
         └─ dispatchAnalyticsEvent()              analytics-dispatch.ts — lazy chunk,
-             ├─ sanitizeEventProps()             analytics-hygiene.ts  fetched after consent
+             ├─ sanitizeEventProps()             analytics-hygiene.ts  fetched on first event
+             ├─ replitTrack   → Replit Analytics unless declined (platform-injected Umami)
              ├─ sendGaEvent   → GA4      (legacy GA name/params when the event predates the catalog)
              ├─ mpTrack       → Mixpanel
              ├─ phCapture     → PostHog
-             └─ ampTrack      → Amplitude
+             └─ ampTrack      → Amplitude                       (these four after a grant only)
 ```
 
-- **One call, four tools.** App code only calls typed helpers — in
+- **One call, every tool.** App code only calls typed helpers — in
   `client/src/lib/analytics.ts` or an area module such as
   `client/src/lib/analytics-contributions.ts`; each helper calls the shared
   `track()` (exported only for those helper modules, never imported by
   components). Components never import `mpTrack` / `phCapture` / `ampTrack` /
   `sendGaEvent` — those are the vendor halves of the dispatcher.
-- **Consent is unchanged per tool.** `track()` returns before doing anything
-  unless `analytics-consent` is `granted`; the dispatcher re-checks before
-  sending (events queued while its chunk loads are dropped on revoke). Each
-  vendor half then applies its own gate: pre-SDK buffering only while a
-  consented init is under way, and a revoke kill switch that clears its buffer
-  (`optOutGA` / `optOutMixpanel` / `optOutPostHog` / `optOutAmplitude`).
-- **Stays out of the pre-consent bundle.** The dispatcher and the hygiene
-  rules are a separate chunk, imported on the first post-consent event (keep
+- **Consent per tool.** `track()` returns before doing anything when
+  `analytics-consent` is `denied`, and also when it is unset and the event has
+  no Replit half. GA4, Mixpanel, PostHog and Amplitude only receive events once
+  it is `granted`; Replit Analytics receives them while it is unset or
+  granted. The dispatcher re-checks before sending (events queued while its
+  chunk loads are dropped on Decline). Each
+  vendor half then applies its own gate: a pre-SDK buffer (at most 100
+  events) that holds an event only while `vendorSdksAllowed()` is true (a
+  grant and not suppressed) and the SDK is not ready yet, and a revoke kill
+  switch that clears it (`optOutGA` / `optOutMixpanel` / `optOutPostHog` /
+  `optOutAmplitude`). The buffer also covers the gap before init starts: with
+  a stored grant, `page_viewed` fires when React mounts, while `main.tsx`
+  starts the SDKs only after first paint. The buffer is flushed once each SDK
+  is ready. Page context (`page_path`, Mixpanel's `$current_url`) is read when
+  the event fires, not at flush time.
+- **Admin sessions and QA paths send nothing** (see
+  [Admin sessions and QA paths](#admin-sessions-and-qa-paths)): `track()`
+  returns first thing, so the dispatcher chunk is never even fetched.
+- **Stays out of the entry bundle.** The dispatcher and the hygiene
+  rules are a separate chunk, imported on the first event (keep
   it out of the entry closure). Once loaded, dispatch
   is synchronous, so `page_engaged` on `pagehide` still goes out.
 - **Names.** Mixpanel, PostHog and Amplitude receive the catalog name. GA4
@@ -117,7 +130,7 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
 ### Property hygiene (enforced in code)
 
 `sanitizeEventProps()` (`client/src/lib/analytics-hygiene.ts`) runs once per
-event, before any vendor sees it, and the same cleaned object goes to all four:
+event, before any vendor sees it, and the same cleaned object goes to every tool:
 
 | Rule | Effect |
 |---|---|
@@ -155,7 +168,7 @@ the naming rules).
 | 2 | **Retention** — do activated visitors come back and get value again? | weekly cohort retention on the same value events; returning-learner path `journey_resumed` → `journey_step_completed` | value events (live) + `journey_resumed` (live) | live — continue-learning area |
 | 3 | **Collection usage** — are collections created, filled and shared? | `collection_created` → `collection_resource_added` / `collection_items_moved` → `collection_published` → `collection_shared` → `public_collection_viewed` → `public_collection_resource_opened` (owner and public events join on `collection_share_id`) | the collection rows in the catalog below | live |
 | 4 | **Notification engagement** — do notifications and digests bring people back? | `notification_opened` → value event; opt-ins / opt-outs via `notification_preference_changed`, `notifications_paused` / `notifications_resumed`, `notifications_unsubscribed_all`; preview interest via `digest_preview_item_opened` | `notification_opened`, `notification_marked_read`, `notifications_marked_all_read`, `notification_preference_changed`, `notifications_paused`, `notifications_resumed`, `notifications_unsubscribed_all`, `digest_preview_item_opened`, `learning_preferences_saved`, `learning_preferences_reset` | live (in-app + Settings); email opens/clicks not tracked |
-| 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `resource_submit_started` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` (`entry_point`) → optional `resource_edit_ai_analysis_requested` → `resource_edit_ai_suggestions_applied` → `resource_edit_submitted`, exits via `resource_edit_cancelled`; follow-up on `/contributions` (`contribution_withdrawn`, `contribution_public_resource_opened`) | `resource_submit_started`, `resource_submitted` (server, live), `resource_edit_*` (live), `contribution_*` (live) | edit funnel + contributions page live; `resource_submit_started` planned — contributions area |
+| 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `submit_form_started` → `submit_step_completed` (`sign_in_required` / `details` / `category` / `review`) → `submit_form_submitted` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` (`entry_point`) → optional `resource_edit_ai_analysis_requested` → `resource_edit_ai_suggestions_applied` → `resource_edit_submitted`, exits via `resource_edit_cancelled`; follow-up on `/contributions` (`contribution_withdrawn`, `contribution_public_resource_opened`) | `submit_form_started`, `submit_step_completed`, `submit_validation_failed`, `submit_form_submitted`, `resource_submitted` (server, live), `resource_edit_*` (live), `contribution_*` (live) | edit funnel + contributions page live; `submit_*` form funnel live (`resource_submit_started` is superseded by `submit_form_started`) |
 | 6 | **Recommendation quality** — are recommendations opened, and from which position? Is feedback positive? | `recommendations_viewed` (`recommendation_count`, `signed_in`, `source`) → `recommendation_opened` (`position`, `resource_id`, `recommendation_type`) → value event on that resource; quality via `recommendation_feedback_saved` (`feedback`) and `recommendation_restored`; guest upgrade via `recommendation_sign_in_clicked` | `recommendations_viewed`, `recommendations_refreshed`, `recommendations_retried`, `recommendation_opened`, `recommendation_feedback_saved`, `recommendation_restored`, `recommendation_sign_in_clicked` | live |
 | 7 | **Onboarding drop-off** — where do new accounts abandon onboarding? | `onboarding_step_viewed` (`step_number`, `step_name`) → `onboarding_step_completed` → … → `onboarding_completed` (`answer_count` + choice values); exits via `onboarding_skipped` (`step_number` it was left on); hesitation via `onboarding_navigated_back` | `onboarding_step_viewed`, `onboarding_step_completed`, `onboarding_navigated_back`, `onboarding_skipped`, `onboarding_completed` | live |
 | — | **Learning journeys** (existing funnel) | `journey_started` → `journey_step_completed` → `journey_completed` | listed | live |
@@ -185,11 +198,149 @@ journey start…) already records the outcome. The exception is the Bookmarks
 empty state's Explore resources (`library_explore_clicked`), which has no
 single follow-up event.
 
+### Replit Analytics
+
+The published site carries Replit's own analytics tracker
+(`https://i.replit.com/script.js`, Umami), which the hosting platform injects
+into the HTML once analytics is enabled in Publishing settings. The app never
+adds the script, a website id or an env var for it, and `script-src` /
+`connect-src` already allow `https://i.replit.com`.
+
+- **Page views** are recorded by the tracker itself on every load and SPA
+  navigation, independent of the consent banner (cookieless, platform-level).
+  For that reason `page_viewed` is **not** forwarded as a custom event — it
+  would double the count. The tracker sees SPA navigations only through
+  `history.pushState`/`replaceState` and has no `popstate` listener, so on
+  Back/Forward `use-analytics.tsx` re-announces the current URL with a
+  same-URL, same-state `replaceState`. Without that, a traversal recorded no
+  page view and later custom events carried the previous page's URL.
+  Custom events also carry the URL they were fired on (captured in
+  `replitTrack`, before any queueing), because on Back/Forward the page's
+  tracking effect runs before `popstate`, i.e. before the tracker learns the new URL.
+- **Custom events:** every *product* event in the catalog below (the rows
+  whose Tools column says "all four" or "product") also goes to Replit
+  Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
+  same catalog name, with the same cleaned properties minus free-form visitor
+  text (`search_term`). GA4-only legacy events (`{ product: false }`) are not
+  sent, except the ones marked `{ replit: true }`: `performance` (web vitals),
+  `page_not_found` (path only), `site_error` (error type only) and the client
+  halves of the two server-side conversions, `sign_up_completed` and
+  `resource_submitted`. Mixpanel still gets those two conversions from the
+  server only (`product: false` on the client keeps them from double-counting
+  there); Replit Analytics has no server feed, so it gets them from the
+  browser under the same catalog name.
+- **Not sent to Replit:** `page_engaged` (Replit computes visit duration from
+  its own page views) and every GA4-only legacy row not listed above.
+- **Consent:** the tracker is cookie-free and the events carry no identity,
+  so they are sent while the visitor has not answered the banner (most never
+  do — before this, under 2% of visitors produced any custom event). An
+  explicit Decline stops them; events queued while the tracker script is still
+  loading (max 50) are re-checked at flush and dropped on Decline. The privacy
+  policy (Analytics section) describes this.
+- **Shape:** Umami takes flat values only, so arrays (e.g. onboarding
+  `topics`) arrive as comma-separated strings, as in GA4; event names over 50
+  characters are not sent (none exist today).
+- **No tracker** (dev, analytics disabled, blocked script) is a silent no-op.
+  The consent banner does not name Replit Analytics: it lists only the tools
+  the banner switches on.
+
+### Admin sessions and QA paths
+
+Signed-in admin sessions and known QA/test paths send nothing to Replit
+Analytics, GA4, Mixpanel, PostHog or Amplitude. Real visitors are tracked
+exactly as before. The rules live in
+`client/src/lib/analytics-suppression.ts`.
+
+- **What is suppressed.** An admin session (below), any `/qa-*` path, the
+  all-nines sentinel resource ids test runs use (`/resource/99999999`,
+  `/resource/999999999`, …: `^/resource/9{8,}$`) and the owner sign-in page
+  `/sign-in?admin`. `/admin` and `/bookmarks` are **not** path-blocked:
+  visitors' `/bookmarks` stays tracked, and admin pages are covered by the
+  session rule.
+- **Automated browsers.** `navigator.webdriver === true` suppresses every
+  vendor (and Replit's Umami via `umami.disabled`) from the first page view.
+  Verified true in agent-browser and the chrome-devtools MCP browser, so audit
+  lanes with device emulation send nothing. Real Safari/Chrome report false.
+  There is no separate E2E suite or staging target: audits run against
+  production with agent-browser and the chrome-devtools MCP, and both set
+  `navigator.webdriver`, so those runs send nothing to any vendor. The check
+  is `isAutomatedBrowser()`, one of three terms in `isAnalyticsSuppressed()`
+  (with the admin marker and the QA-path test). `track()` in
+  `client/src/lib/analytics.ts` returns on it first, the vendor SDK start-ups
+  gate on it through `vendorSdksAllowed()`, and the dispatcher in
+  `client/src/lib/analytics-dispatch.ts` re-checks the admin marker. A run that
+  needs events on the wire must use a browser that does not set the flag.
+- **Not site errors.** `site_error` / `error` skip window errors from another
+  origin (extensions, translate tools, third-party tags, "Script error."),
+  ResizeObserver notices, `AbortError` rejections and cancelled API requests,
+  and every error card or route crash seen while the browser reports offline;
+  `ErrorPage` reports once per visit, not once per automatic retry.
+- **Admin marker.** `localStorage['analytics-admin-session'] = '1'` is set
+  when `/api/auth/user` reports `role: "admin"` (any sign-in path, in
+  `useAuth`) and right after the owner password sign-in succeeds, before its
+  reload. It is cleared in `clearSignedInClientState()`, which every sign-out
+  path runs (account menu, "sign out all devices", `/logout`), and when a
+  non-admin account is reported on the device. An anonymous answer does not
+  clear it: an expired admin session on the owner's device stays quiet.
+  localStorage is read synchronously, so the marker covers events fired before
+  Clerk loads or the auth check answers on every load after the first.
+- **One check in the shared sender.** `track()` returns when
+  `isAnalyticsSuppressed()` is true; the dispatcher re-checks the admin marker
+  for events queued while its chunk loaded.
+- **SDK self-sends.** PostHog (`$pageview`, autocapture, replay), Amplitude
+  (autocapture, `Viewed Home Page`, replay) and Mixpanel (`$opt_in`, people
+  `engage` on identify) send without going through `track()`. The choke point
+  for them is SDK start-up: `initGA` / `initMixpanel` / `initPosthog` /
+  `initAmplitude` all gate on `vendorSdksAllowed()` (a grant **and** not
+  suppressed), so an admin load or a QA landing never loads any vendor SDK.
+  Mid-session (a visitor who granted consent signs in as admin), each tab
+  stops its own running SDKs with the existing revoke functions and skips
+  identify the first time its `/api/auth/user` answer reports the admin role,
+  whether or not another tab set the shared marker first (`useAuth` keeps a
+  per-tab "stopped for admin" flag). If a non-admin account replaces the
+  marker within a page load (a non-admin signs in on a device with an expired
+  admin marker), `useAuth` starts the SDKs again and records the current page
+  view; each init still checks consent and QA paths. For a visitor who
+  navigates into a QA path while the SDKs run, PostHog's `before_send` and the
+  Amplitude URL-scrub enrichment plugin drop every event while suppressed, and
+  the Amplitude Session Replay and Guides & Surveys transports refuse every
+  upload while suppressed. That transport check also stops replay uploads in
+  a visitor tab as soon as another tab sets the admin marker, before that tab
+  has re-asked `/api/auth/user`. Server conversion
+  headers (`serverConversionHeaders`) are also withheld, so the server sends no
+  Mixpanel conversion for an admin.
+- **Replit page views.** The injected Umami tracker checks
+  `localStorage['umami.disabled']` before every send, page views included
+  ([Umami docs](https://umami.is/docs/exclude-my-own-visits)).
+  `syncReplitPageviewOptOut()` sets it (plus the flag
+  `analytics-umami-disabled-by-app`) while suppressed, at entry-module load
+  and on every route change before the tracker's ~300 ms soft-navigation
+  delay, and removes both when no longer suppressed. A value set by hand (no
+  app flag beside it) is never changed or removed.
+- **Residual gaps.**
+  - The first page of a device that has never had the marker is, by
+    definition, not yet an admin session.
+  - Clerk sign-in on a device without the marker: `logged_in` (fired by
+    `AuthConversionTracker` when the Clerk session appears) and the landing
+    page view can go out before `/api/auth/user` reports the role; SDK
+    autocapture on the sign-in page itself is also sent. The owner password
+    path has no gap (the marker is set before its reload, and
+    `/sign-in?admin` is a suppressed path). Every sign-out clears the marker,
+    so this boundary recurs on each Clerk sign-in.
+  - A visitor session that lands on a QA path does not start the SDKs for
+    that page load. The Umami tracker never installs its SPA hook if
+    `umami.disabled` was set before it evaluated, so Replit misses the rest of
+    that page load's soft navigations.
+  - GA4 Enhanced Measurement history page views on SPA navigation into a QA
+    path from a normal page are not filtered (keep that GA4 setting off, see
+    the deployment prerequisite).
+
 ### Shared event catalog
 
 Every custom event the client emits. **Area tasks add their events here** (one
 row each, same columns) in the same change that adds the typed helper. "Product"
-= Mixpanel + PostHog + Amplitude. GA4-only legacy events are listed in the GA4
+= Mixpanel + PostHog + Amplitude + Replit Analytics, and "all four" = GA4 +
+product (both include Replit Analytics; `page_viewed` excepted, see above). GA4-only legacy events are listed in the GA4
 taxonomy further down and are not repeated here.
 
 | Catalog event (product name) | GA4 name | Tools | Properties | Helper / source |
@@ -199,9 +350,9 @@ taxonomy further down and are not repeated here.
 | `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`search_palette` \| `resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← palette, detail page, `ResourceCard`, home cards |
 | `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
-| `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` | `trackFilterUsage` |
-| `sort_changed` | `sort_change` | all four | `sort_type`, `surface`, `result_count`, `zero_results` | `trackSortChange` |
-| `tag_interaction` | `tag_interaction` | all four | `tag`, `action`, `surface`, `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event) |
+| `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` (`search_page` \| `taxonomy_*` \| `home` (kind filter / clear all) \| `journeys_page` (category)) | `trackFilterUsage` |
+| `sort_changed` | `sort_change` | all four | `sort_type`, `surface` (`search_page` \| `taxonomy_*` \| `home` \| `categories_page`), `result_count`, `zero_results` | `trackSortChange` |
+| `tag_interaction` | `tag_interaction` | all four | `tag`, `action` (`apply` \| `remove` \| `card_click` \| `landing_viewed` \| `link_click` — a resource page's Keep exploring tag link), `surface` (adds `home`, `tag_page`, `resource_onward`), `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event; `/tag/:slug` sends `landing_viewed` once per tag visit) |
 | `logged_in` | `login` | all four | `login_method` (GA4: `method`) + acquisition | `trackLogin` ← `AuthConversionTracker` |
 | `content_shared` | `share` | all four | `share_method` (GA4: `method`), `content_type`, `content_id` | `trackShare` |
 | `journey_started` | `journey_start` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyStart` |
@@ -227,7 +378,14 @@ taxonomy further down and are not repeated here.
 | `public_collection_resource_opened` | same | all four | `collection_share_id`, `resource_id`, `position` (1-based), `item_count`, `link_target: "detail" \| "external"` — click or middle-click on a card's title / View Details (detail) or Open Link (external) | `trackPublicCollectionResourceOpened` ← `PublicCollection` |
 | `public_collection_recovery_clicked` | same | all four | `collection_share_id` (only when well-formed), `recovery_action: "retry_error" \| "retry_offline" \| "explore_journeys" \| "home" \| "categories"`, `page_state: "not_found" \| "error" \| "offline"` | `trackPublicCollectionRecoveryClicked` ← `PublicCollection` |
 | `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title` \| `view_details`) | `trackResourceCardOpened` ← `ResourceCard`, home cards (the detail page's `resource_viewed` fires on arrival) |
-| `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` |
+| `related_resource_opened` | same | all four | `resource_id` (opened), `from_resource_id`, `position` (1-based), `match_score`, `surface` (`related_list` — Related Resources card; `resource_onward` — Keep exploring "More like this", retired: that list moved to the top block and now emits `resource_next_step_clicked`) | `trackRelatedResourceOpened` ← `ResourceDetail` Related Resources list |
+| `related_category_opened` | same | all four | `from_resource_id`, `category` (the collection's name), `surface` (`resource_onward`; `related_list` is the default for any other caller) | `trackRelatedCategoryOpened` ← `ResourceOnwardPaths` "More in …" / "View all in …" |
+| `resource_next_step_clicked` | same | all four | `surface` (`resource_top`), `kind` (`category` \| `related`), `from_resource_id`; `category` adds `target_slug`; `related` adds `target_id`, `position` (1-based, shared tags first) | `trackResourceNextStepClicked` ← `ResourceDetail` category chip and `ResourceTopNextSteps` "More like this" (above the description; the lower Related Resources card keeps `related_resource_opened`, Keep exploring keeps `related_category_opened`) |
+| `submit_form_started` | same | all four | `signed_in` | `trackSubmitFormStarted` ← `SubmitResource`, first focus or change inside the form (once per visit; signed-out visitors cannot reach it, the fields are disabled) |
+| `submit_step_completed` | same | all four | `step` (`sign_in_required` \| `details` \| `category` \| `review`) | `trackSubmitStepCompleted` ← `SubmitResource`: `sign_in_required` when the login wall renders for a signed-out visitor; `details` when title, URL and description pass validation; `category` when one is chosen; `review` when the submit click passes client validation (each once per visit) |
+| `submit_validation_failed` | same | all four | `field` (form field NAME: `title`, `url`, `description`, `category`, `subcategory`, `subSubcategory`, `tags`), `source` (`client` \| `server`) — never the value or message | `trackSubmitValidationFailed` ← `SubmitResource` invalid submit (one per failing field) and server field errors |
+| `submit_form_submitted` | same | all four | `tag_count`, `has_subcategory` | `trackSubmitFormSubmitted` ← `SubmitResource` submit handler once validation passes and the visitor is signed in (before the server answers; the server-confirmed outcome stays `resource_submitted`) |
+| `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button` \| `resource_page_button` \| `listing_page_button`), `surface` (page entries only: `resource_onward` \| `tag_page`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` (page entries open it through `openSearchPalette`) |
 | `export_started` / `export_downloaded` | same | all four | `export_format`, `export_scope` (`all` \| `selected_categories`), `category_count`, `resource_count` — never file contents | `trackExportStarted` / `trackExportDownloaded` ← `export-tools` |
 | `api_key_created` | same | all four | `expiry_option` (`30` \| `90` \| `365` \| `never`) — never the key or its name | `trackApiKeyCreated` ← `ApiKeysCard` (server-confirmed) |
 | `api_key_copied` | same | all four | `copy_method` (`clipboard` \| `manual_select`) | `trackApiKeyCopied` ← `ApiKeysCard` |
@@ -257,8 +415,12 @@ taxonomy further down and are not repeated here.
 | `notifications_marked_all_read` | same | all four | `marked_count` (server's updated count) | `trackNotificationsMarkedAllRead` ← "Mark all read" |
 | `digest_preview_item_opened` | same | all four | `notification_kind`, `digest_section` (`new_resources` \| `watch_next` \| `journey_step`), `item_position` (1-based) | `trackDigestPreviewItemOpened` ← preferences card preview |
 | `learning_preferences_saved` / `learning_preferences_reset` | same | all four | `surface: 'settings'`; saved adds `first_save` — preference values are never sent | `trackLearningPreferencesSaved` / `Reset` ← `Settings` (after the server confirms) |
-| `sign_up_completed` | (`sign_up`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — Clerk JIT provisioning |
-| `resource_submitted` | (`generate_lead`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — resource-submit handler |
+| `sign_up_completed` | `sign_up` | GA4 + Replit (client); Mixpanel (**server**) | client: `signup_method` + acquisition (GA4: `method` + acquisition); server: see `MIXPANEL.md` | `trackSignUp` ← `AuthConversionTracker`; server — Clerk JIT provisioning |
+| `resource_submitted` | `generate_lead` | GA4 + Replit (client); Mixpanel (**server**) | client: `content_type: "resource_submission"`, `category` (taxonomy name) + acquisition — never title, URL or description; server: see `MIXPANEL.md` | `trackGenerateLead` ← `SubmitResource` (server-confirmed); server — resource-submit handler |
+| `page_not_found` | same (legacy `event_category: "navigation"`, `event_label`: path only, no query, ≤200 chars) | GA4 + Replit | Replit: `page_path` (path only, no query, ≤200 chars) | `trackPageNotFound` ← `NotFound` (every 404 surface) |
+| `site_error` | — (GA4 keeps its legacy `error` event) | Replit | `error_type` only (`javascript_error` \| `unhandled_promise_rejection` \| `api_error` \| `component_crash` \| `route_crash` \| `chunk_load_failed` \| `page_load_failed`) — never the message | `trackSiteError` ← `trackError`, `ErrorBoundary`, `RouteErrorBoundary`, `ErrorPage` |
+| `contact_message_sent` | same | all four | none — never the name, address, subject or message (the reply address is required, so no reply flag is sent) | `trackContactMessageSent` ← contact dialog (server-confirmed) |
+| `tool_tab_opened` | same | all four | `page: "advanced"`, `tab` (`explorer` \| `metrics` \| `export` \| `recommendations`) | `trackToolTabOpened` ← `Advanced` |
 
 
 #### Contributions and continue learning
@@ -289,6 +451,18 @@ Amplitude additionally sends its own `Viewed Home Page` verification event and
 autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` and
 `$pageleave`. Those are SDK events, not catalog events.
 
+### Cutover: `/tag/:slug` cards report `taxonomy_card` (2026-10)
+
+Cards on `/tag/:slug` moved from the default resource card to the taxonomy card
+variant (the same card `/category/*` uses). Their `resource_link_opened` and
+`resource_card_opened` events therefore carry `surface: 'taxonomy_card'`
+(before: `resource_card`). Event names are unchanged. A funnel that filtered
+tag-page clicks by `surface = 'resource_card'` drops to zero from the cutover
+date and reappears under `taxonomy_card`, mixed with category-page clicks;
+split the two by the event's page path (`/tag/…` vs `/category/…`). The
+favorite and bookmark buttons on these cards are unchanged (`resource_favorited`, `resource_bookmarked`
+events carry no `surface`).
+
 ### Adding an event (area tasks)
 
 1. Pick the name with the naming rules; add a catalog row (and update the
@@ -316,10 +490,9 @@ autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` an
   and attaches it to conversion events.
 - **`client/src/hooks/use-analytics.tsx`** — fires exactly one `page_view` per
   navigation (mount + every route change) and a `page_engaged` (with dwell time)
-  when leaving a page or hiding the tab. After consent, the same mounted hook
-  reports Core Web Vitals (LCP/CLS/INP) and global JavaScript errors. The
-  historical FID signal is also retained when the browser supports it. Mounted
-  once in `App.tsx`.
+  when leaving a page or hiding the tab. Unless analytics was declined, the
+  same mounted hook reports web vitals through `web-vitals` (LCP, INP, CLS,
+  FCP, TTFB) and global JavaScript errors. Mounted once in `App.tsx`.
 
 ### Initialization order (important)
 
@@ -343,9 +516,9 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `page_view` | Every navigation — `use-analytics` on mount + route change | `page_location`, `page_path`, `page_title`, `page_referrer` |
 | `search` | Search dialog, once per debounced query — `search-dialog.tsx` | `search_term`, `result_count` |
 | `select_content` | Resource detail page mount — `ResourceDetail.tsx` | `content_type: "resource"`, `content_id`, `content_name`, `content_category` |
-| `login` | A Clerk sign-in attempt completes and produces a session — `AuthConversionTracker.tsx`. Session restores, page reloads and token refreshes never fire it. | `method` (verification strategy, e.g. `password`, `google`) + acquisition |
-| `sign_up` | A Clerk sign-up attempt completes and produces a session — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (verification strategy, e.g. `email_code`, `google`) + acquisition |
-| `generate_lead` | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
+| `login` | The page goes from signed out to a new Clerk session — `AuthConversionTracker.tsx`. One-step password sign-ins never expose an in-flight `signIn` status, so the transition itself is the trigger. Session restores, page reloads and token refreshes never fire it. | `method` (`client.lastAuthenticationStrategy`, e.g. `password`, `google`) + acquisition |
+| `sign_up` (catalog `sign_up_completed`) | Same transition, when the account was created within 10 s of the session (or a live `signUp` attempt was seen) and this browser has not already reported that account's sign-up — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (the account's OAuth provider, else `password`) + acquisition |
+| `generate_lead` (catalog `resource_submitted`) | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 
 ### Learning-journey funnel (Task #330)
@@ -367,9 +540,9 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
-| `performance` | Core Web Vitals after analytics consent — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
+| `performance` | Web vitals from `web-vitals` unless analytics was declined (GA4 after consent; Replit Analytics before a choice too) — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "cls" \| "fcp" \| "ttfb"`, `value` (milliseconds for LCP/INP/FCP/TTFB, unitless score for CLS). `fid` stopped in October 2026. |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
-| `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
+| `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` (the browser listeners run unless analytics was declined; GA4 still only after a grant). Each also sends `site_error` (type only) to Replit Analytics | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest — toggle hook / `GuestBookmarks.tsx` | `prompt_context: "guest_save_toast" \| "guest_save_cap" \| "bookmarks_page"`, `guest_saved_count` |
 | `bookmarks_merged` | Guest saves merged into the account after sign-in — `GuestBookmarkMerge.tsx` | `merged_count`, `duplicate_count`, `failed_count` |
@@ -380,11 +553,11 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 ### FID to INP transition
 
 Google replaced First Input Delay (FID) with **Interaction to Next Paint (INP)**
-as the responsiveness Core Web Vital. The mounted, consent-gated performance
-capture therefore reports `inp` using the current `web-vitals` package. The
-existing `fid` observer remains intentionally enabled where the browser exposes
-the `first-input` PerformanceObserver entry, preserving historical dashboard
-continuity while the dashboard transitions to INP.
+as the responsiveness Core Web Vital. The performance capture (skipped after a
+Decline) reports `inp` from the `web-vitals` package. The hand-written
+`first-input` observer that sent `fid` was removed in October 2026; FID series
+end there. `fcp` and `ttfb` were added at the same time, also from
+`web-vitals`.
 
 ### First-touch acquisition
 
@@ -412,8 +585,7 @@ tracking plan, applies to all four):
 - Acquisition stores the referrer **hostname** and landing **pathname** only —
   no full referrer URLs or query strings; UTM values are capped at 100 chars.
 
-This is enforced by test: the validation harness scans every raw `/g/collect`
-request body for the throwaway email and password and fails if either appears.
+Enforced in code by `sanitizeEventProps()`; checked by hand in a consented browser.
 
 ## Interaction helpers
 
@@ -433,80 +605,8 @@ exception: it is restored together with its call site in the already-mounted
 JavaScript-error capture, so no unreferenced session hook can silently recreate
 the same measurement gap.
 
-## Validation (real GA4 network, no mocks)
+## Validation
 
-Tracking is validated against the **real** GA4 collection endpoint
-(`https://*.google-analytics.com/g/collect`) with a real browser — no mocks,
-stubs, or fixtures. The harness `scripts/vg2-ga4-validate.mjs` drives a pinned
-Chromium through real user flows, intercepts every `/g/collect` request, decodes
-the batched event payloads, and asserts on event names, parameters, de-duplication,
-and the absence of PII.
+Tracking is verified by hand in a consented real browser (see [Adding an event](#adding-an-event-area-tasks), step 4). There is no validation script: the `vg2-*` harness was removed in `b4040bfe`.
 
-Flows exercised: landing (with UTM query) → consent-gated performance and a real
-interaction for INP → deliberate browser-error capture → search → resource detail view → in-app SPA
-navigation → theme change → taxonomy page → Clerk sign-up → signed-in reload →
-Clerk sign-in → consent revoke and re-grant.
-
-### Gotchas the harness handles
-
-- **gtag batches events** and flushes on `visibilitychange → hidden`. The harness
-  toggles document visibility to force a flush, then polls for the expected event
-  (`waitForEvent`) rather than using a fixed sleep — a freshly loaded page needs
-  several seconds for gtag.js to load and drain its queue.
-- **A search-result click opens the resource's external URL** in a new tab
-  (`window.open`); it does **not** navigate to `/resource/:id`. So the harness
-  reaches `select_content` via the real resource route, not via search results.
-- **The auth conversions need a real Clerk attempt.** The harness registers a
-  throwaway `__qa_test_*+clerk_test@example.com` account through the prebuilt
-  `<SignUp>` card, signs out, signs back in through `<SignIn>`, and deletes the
-  Clerk account afterwards. Registration — and only registration — sits behind
-  Cloudflare Turnstile, which serves headless Chromium an interactive challenge,
-  so the harness attaches a Clerk [Testing Token](https://clerk.com/docs/guides/development/testing/overview)
-  to every Frontend API call and forces `Clerk.client.captchaBypass`. The
-  registration, session, app code and GA4 network path all stay real; only the
-  third-party bot gate is stepped around. Without `CLERK_SECRET_KEY` and a
-  `pk_test_` publishable key these flows are reported as **SKIP**, never as pass.
-
-### Net-zero teardown
-
-Any DB rows created during validation (throwaway `__qa_test_*@example.com` users
-and `qa-test-*` resource submissions) are purged afterward via
-`scripts/vg2-teardown.ts`, returning the database to baseline.
-
-### Running it
-
-```bash
-node scripts/vg2-ga4-validate.mjs   # drives Chromium through the full local flow
-npx tsx scripts/vg2-teardown.ts     # purge throwaway QA rows after the full flow
-```
-
-### Post-publish smoke check
-
-Run the production-safe smoke mode immediately after every publish, using the
-published site's exact URL:
-
-```bash
-node scripts/vg2-ga4-validate.mjs --smoke --base-url https://published.example
-```
-
-Smoke mode uses a fresh browser context and only loads the landing page, checks
-that no GA4 collection request occurs before consent, grants consent through the
-real banner, performs the real `/` keyboard interaction, and waits for an
-`INP` performance event on the wire. It does not load the catalog, call Clerk,
-create accounts, submit resources, or exercise any other mutating flow. It also
-scans every captured payload in raw and percent-decoded form for common PII
-fields and email-shaped values.
-
-The smoke command requires an explicit `--base-url` (or `BASE_URL`) when
-targeting a non-local site. It exits non-zero if consent gating, GA4 delivery,
-INP delivery, or the PII scan fails. The full validator remains the development
-check for the broader event taxonomy and auth flows.
-
-The GitHub Pages release workflow runs this smoke automatically after
-`deploy-pages` succeeds, passing the deployment action's exact `page_url`.
-The workflow uploads `ga4-smoke-evidence-<run id>` even when an assertion fails,
-then marks the workflow failed without rolling back or mutating the published
-site. The report records both the published URL and the workflow run URL.
-
-The validator prints event counts, per-assertion results, and sample decoded
-payloads to stdout (and any output paths it is configured with at run time).
+Manual-check tip: gtag batches events and flushes on `visibilitychange → hidden`, so a freshly loaded page can need several seconds before its `/g/collect` request appears. Switch tabs to force a flush rather than waiting.

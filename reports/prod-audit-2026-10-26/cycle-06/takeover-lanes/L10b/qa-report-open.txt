@@ -1,0 +1,2 @@
+openCount 1
+190365 open [QA-audit-1026] L10b open-state probe https://example.com/qa-audit-1026-l10b email

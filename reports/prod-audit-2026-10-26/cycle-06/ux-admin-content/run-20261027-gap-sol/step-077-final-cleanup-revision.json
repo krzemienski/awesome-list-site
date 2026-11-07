@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-10-27T07:57:37.462Z",
+  "version": {
+    "revision": "520d6778369bc7ce495204cfcacc7e0533f941cc"
+  },
+  "cleanup": [
+    {
+      "type": "categories",
+      "ids": [
+        1202,
+        1203,
+        1204
+      ],
+      "remaining": [],
+      "total": 9
+    },
+    {
+      "type": "subcategories",
+      "ids": [
+        2340,
+        2341,
+        2342
+      ],
+      "remaining": [],
+      "total": 99
+    },
+    {
+      "type": "subsubcategories",
+      "ids": [
+        3777,
+        3778,
+        3779
+      ],
+      "remaining": [],
+      "total": 32
+    },
+    {
+      "resource": 190360,
+      "status": 404
+    },
+    {
+      "resource": 190361,
+      "status": 404
+    },
+    {
+      "resource": 190362,
+      "status": 404
+    },
+    {
+      "resource": 190363,
+      "status": 404
+    },
+    {
+      "edit": 69,
+      "absent": true
+    },
+    {
+      "step": 262,
+      "absent": true,
+      "rows": 13,
+      "maxStep": 6
+    }
+  ]
+}

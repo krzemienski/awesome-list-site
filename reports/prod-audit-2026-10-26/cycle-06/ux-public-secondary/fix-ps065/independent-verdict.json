@@ -1,0 +1,19 @@
+{
+  "agent": "C6PS065FixSol.FooterProofSol",
+  "runtimeModel": "omniroute/cx/gpt-6.1-sol",
+  "verdict": "PARTIAL / UNVERIFIED; not a complete independent acceptance PASS",
+  "observed": [
+    "1440 native mouse-down/up at Encoding bottom edge routed to /category/encoding-codecs with correct H1; General top edge routed to /category/general-tools with correct H1",
+    "1440,820,390 each had nine 44px-high category targets with 44px pitch and no horizontal overflow",
+    "820 Tab three times from footer home focused General Tools with focus-visible; Enter routed correctly",
+    "390 Tab twice from footer home focused Encoding & Codecs; focus screenshot viewed, Enter routed correctly"
+  ],
+  "unverified": [
+    "Independent touch input: CLI viewport controls left navigator.maxTouchPoints=0 at 820 and 390, so no independent touch PASS is claimed",
+    "Independent Shift+Tab and complete desktop keyboard traversal",
+    "Independent explicit CDP browser-cache clearing",
+    "Independent complete console/network capture"
+  ],
+  "relationshipToDirectProof": "The implementation owner separately executed native touchscreen taps with pointer:coarse=true,maxTouchPoints=1, both top/bottom edges and full native Tab/Shift+Tab/Enter at all required widths. Those direct artifacts, not this partial independent run, carry full ticket acceptance.",
+  "isolation": "Validator used its own named tab, fresh Chrome profile on CDP9265 after prior owned browser listener was absent. Did not edit production code or touch production data. Closed its own tab only."
+}

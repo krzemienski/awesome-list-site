@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -59,6 +59,11 @@ const formatStorageSize = (bytes: number): string => {
   return `${(mb / 1024).toFixed(1)} GB`;
 };
 
+const keyTablesSummary = (keyCount: number, totalTables: number): string => {
+  const total = totalTables.toLocaleString();
+  if (keyCount === 0) return `None of the key tables exist in the primary PostgreSQL database (${total} tables in total)`;
+  return `${keyCount} key table${keyCount === 1 ? "" : "s"} of ${total} in the primary PostgreSQL database`;
+};
 
 /**
  * @description Response type from the seed database API endpoint
@@ -89,11 +94,24 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // confirmation inside a proper AlertDialog instead of a native confirm().
   const [reseedDialogOpen, setReseedDialogOpen] = useState(false);
   const [reseedConfirmText, setReseedConfirmText] = useState("");
-  const reseedConfirmed = reseedConfirmText.trim().toUpperCase() === "RESEED";
+  const reseedConfirmed = reseedConfirmText.trim() === "RESEED";
   // Run16 BUG-010: plain Seed Database is also a DB mutation — it must ask
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
+  // Both dialogs are controlled and have no AlertDialogTrigger, so Radix has
+  // nothing to return focus to. Remember the button that opened each one and
+  // restore it on close; otherwise focus is lost and lands on the neighbouring
+  // "Export" tab trigger, whose automatic activation switches tabs.
+  const seedOpenerRef = useRef<HTMLElement | null>(null);
+  const reseedOpenerRef = useRef<HTMLElement | null>(null);
+  const restoreOpenerFocus = (openerRef: { current: HTMLElement | null }) => (event: Event) => {
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (!opener?.isConnected) return;
+    event.preventDefault();
+    opener.focus({ preventScroll: true });
+  };
   // F01/F02: the outcome of the last run stays on screen (toasts vanish) and
   // never claims success when items failed or the run was rolled back.
   const [seedResult, setSeedResult] = useState<(SeedDatabaseResponse & { mode: "seed" | "reseed" }) | null>(null);
@@ -111,10 +129,13 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       setSeedFailure(null);
     },
     onSuccess: (data: SeedDatabaseResponse, options) => {
-      setSeedResult({ ...data, mode: options.clearExisting ? "reseed" : "seed" });
+      const reseed = Boolean(options.clearExisting);
+      setSeedResult({ ...data, mode: reseed ? "reseed" : "seed" });
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({
-        title: data.totalErrors > 0 ? "Database Seeding Partially Failed" : "Database Seeded Successfully",
+        title: data.totalErrors > 0
+          ? reseed ? "Clear & Re-seed Partially Failed" : "Database Seeding Partially Failed"
+          : reseed ? "Clear & Re-seed Completed" : "Database Seeded Successfully",
         variant: data.totalErrors > 0 ? "destructive" : "default",
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
@@ -134,14 +155,15 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         message,
       });
       toast({
-        title: "Database Seeding Failed",
+        title: options.clearExisting ? "Clear & Re-seed Failed" : "Database Seeding Failed",
         description: message,
         variant: "destructive",
       });
     },
   });
 
-  const handleClearAndReseed = () => {
+  const handleClearAndReseed = (event: MouseEvent<HTMLElement>) => {
+    reseedOpenerRef.current = event.currentTarget;
     setReseedConfirmText("");
     setReseedDialogOpen(true);
   };
@@ -201,7 +223,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </div>
         </header>
         <div className="admin-ops-database__seed-body">
-          <Alert className="admin-ops-database__seed-alert">
+          <Alert live="off" className="admin-ops-database__seed-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Database Seeding</AlertTitle>
             <AlertDescription>
@@ -214,7 +236,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           <div className="admin-ops-database__seed-actions">
             <div className="admin-ops-database__seed-action">
               <Button
-                onClick={() => setSeedDialogOpen(true)}
+                onClick={(event) => {
+                  seedOpenerRef.current = event.currentTarget;
+                  setSeedDialogOpen(true);
+                }}
                 disabled={seedDatabaseMutation.isPending}
                 data-testid="button-seed-database"
               >
@@ -259,7 +284,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedFailure && (
             <Alert
               variant="destructive"
-              role="alert"
               className="admin-ops-database__seed-result admin-ops-database__seed-result--bad"
               data-testid="seed-result-failed"
             >
@@ -277,7 +301,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedResult && (
             <Alert
               variant={seedResult.totalErrors > 0 ? "destructive" : "default"}
-              role={seedResult.totalErrors > 0 ? "alert" : "status"}
+              live={seedResult.totalErrors > 0 ? "assertive" : "polite"}
               className={`admin-ops-database__seed-result${seedResult.totalErrors > 0 ? " admin-ops-database__seed-result--warn" : ""}`}
               data-testid={seedResult.totalErrors > 0 ? "seed-result-partial" : "seed-result-success"}
             >
@@ -289,7 +313,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               )}
               <AlertTitle className="flex flex-wrap items-center gap-2">
                 {seedResult.totalErrors > 0
-                  ? `Seeding partially failed — ${seedResult.totalErrors} item${seedResult.totalErrors === 1 ? "" : "s"} not imported`
+                  ? `${seedResult.mode === "reseed" ? "Clear & Re-seed" : "Seeding"} partially failed — ${seedResult.totalErrors} item${seedResult.totalErrors === 1 ? "" : "s"} not imported`
                   : seedResult.mode === "reseed" ? "Clear & Re-seed completed" : "Seeding completed"}
                 <StatusChip status={seedResult.totalErrors > 0 ? "Warning" : "Completed"} />
               </AlertTitle>
@@ -324,8 +348,20 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       </section>
       </details>
 
-      <TableShell title="Tables" sub="PostgreSQL — primary database">
-        <Table className="table admin-ops-table" data-testid="table-database-tables">
+      <TableShell
+        title="Key tables"
+        sub={
+          <span data-testid="text-database-key-tables">
+            {database ? keyTablesSummary(tableRows.length, database.tables) : "PostgreSQL — primary database"}
+          </span>
+        }
+      >
+        {database && tableRows.length === 0 ? (
+          <p className="admin-ops-table__empty" data-testid="text-database-key-tables-empty">
+            No key tables to list.
+          </p>
+        ) : (
+        <Table className="table admin-ops-table" data-testid="table-database-tables" scrollLabel="Key tables, scrollable">
           <thead>
             <tr>
               <th>Name</th>
@@ -347,10 +383,14 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             ))}
           </tbody>
         </Table>
+        )}
       </TableShell>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
-        <AlertDialogContent data-testid="dialog-seed-database">
+        <AlertDialogContent
+          data-testid="dialog-seed-database"
+          onCloseAutoFocus={restoreOpenerFocus(seedOpenerRef)}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Database className="h-5 w-5 text-primary" />
@@ -378,7 +418,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       </AlertDialog>
 
       <AlertDialog open={reseedDialogOpen} onOpenChange={setReseedDialogOpen}>
-        <AlertDialogContent data-testid="dialog-clear-reseed">
+        <AlertDialogContent
+          data-testid="dialog-clear-reseed"
+          onCloseAutoFocus={restoreOpenerFocus(reseedOpenerRef)}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />

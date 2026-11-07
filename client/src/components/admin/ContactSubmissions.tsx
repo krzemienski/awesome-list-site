@@ -9,6 +9,9 @@ import { AlertCircle, ChevronLeft, ChevronRight, Eye, EyeOff, RefreshCw } from "
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 interface ContactSubmission {
   id: string;
@@ -57,14 +60,14 @@ export default function ContactSubmissions() {
   // Reply-to stays masked until an admin explicitly reveals it for the open submission.
   const [revealedId, setRevealedId] = useState<string | null>(null);
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<ContactSubmissionsResponse>({
+  const submissionsQuery = useQuery<ContactSubmissionsResponse>({
     queryKey: ["/api/admin/contact-submissions", PAGE_SIZE, offset],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: String(PAGE_SIZE),
         offset: String(offset),
       });
-      const response = await fetch(`/api/admin/contact-submissions?${params}`, {
+      const response = await apiFetch(`/api/admin/contact-submissions?${params}`, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -79,6 +82,9 @@ export default function ContactSubmissions() {
     // The old predicate (retry unless 404) returned true forever, so a 5xx
     // kept the skeleton on screen instead of ever reaching the error state.
   });
+  const { data, isLoading, error, refetch, isFetching } = submissionsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(submissionsQuery);
 
   const pageSize = data?.limit ?? PAGE_SIZE;
   const total = data?.total ?? 0;
@@ -88,7 +94,9 @@ export default function ContactSubmissions() {
 
   if (isLoading) {
     return (
-      <div data-testid="contact-submissions-shell">
+      // aria-busy: a Try again focus handoff waits for the result instead of
+      // giving up on the skeleton (handoffFocusOnUnmount polls while busy).
+      <div data-testid="contact-submissions-shell" aria-busy="true">
         <TableShell
           title={<Skeleton className="h-5 w-44" />}
           className="admin-ops-contact-shell"
@@ -108,7 +116,7 @@ export default function ContactSubmissions() {
         description={data ? `Private inbox · ${total} ${total === 1 ? "message" : "messages"}` : "Private inbox"}
         className="admin-ops-contact-shell"
       >
-        {isError ? (
+        {unavailable ? (
           errorStatus(error) === 404 ? (
             <div
               className="admin-ops-status-panel"
@@ -118,13 +126,19 @@ export default function ContactSubmissions() {
               <AlertCircle className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="font-medium mb-1">Contact inbox unavailable</p>
               <p className="text-sm text-muted-foreground mb-4">
-                The contact submissions endpoint returned 404. No inbox data is available.
+                This server isn&apos;t providing the contact inbox right now. Nothing was changed — try again later.
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => { void refetch(); }}
+                onClick={(event) => {
+                  // The panel unmounts while the retry runs: refocus its new
+                  // Try again if the 404 repeats, else the page heading.
+                  handoffFocusOnUnmount(event.currentTarget, () =>
+                    document.querySelector<HTMLElement>('[data-testid="button-contact-submissions-retry"]'));
+                  void refetch();
+                }}
                 disabled={isFetching}
                 data-testid="button-contact-submissions-retry"
               >
@@ -136,6 +150,7 @@ export default function ContactSubmissions() {
             <AdminLoadError
               subject="contact submissions"
               error={error}
+              offline={unavailable === "offline"}
               onRetry={() => { void refetch(); }}
               retrying={isFetching}
               testId="alert-contact-submissions-error"
@@ -145,11 +160,7 @@ export default function ContactSubmissions() {
         ) : (
           <>
             <div className="admin-ops-table-wrap relative">
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-                aria-hidden="true"
-              />
-              <Table className="admin-ops-table admin-ops-contact-table">
+              <Table className="admin-ops-table admin-ops-contact-table" scrollLabel="Contact submissions table, scrollable">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
@@ -208,14 +219,12 @@ export default function ContactSubmissions() {
                 </TableBody>
               </Table>
             </div>
-            <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-              Swipe the table sideways to see all columns.
-            </p>
             {total > 0 && (
               <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-4">
                 <p className="text-sm text-muted-foreground" data-testid="text-contact-submissions-range">
-                  {currentOffset + 1}–{Math.min(currentOffset + (data?.submissions.length ?? 0), total)} of{" "}
-                  {total.toLocaleString()} submissions
+                  {(data?.submissions.length ?? 0) === 0
+                    ? `No submissions on this page, ${total.toLocaleString()} in total`
+                    : `${currentOffset + 1}–${Math.min(currentOffset + (data?.submissions.length ?? 0), total)} of ${total.toLocaleString()} submissions`}
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -276,7 +285,7 @@ export default function ContactSubmissions() {
                     {revealedId === selectedSubmission.id ? (
                       <a
                         href={`mailto:${selectedSubmission.replyTo}?subject=${encodeURIComponent(`Re: ${selectedSubmission.subject}`)}`}
-                        className="min-w-0 break-all underline underline-offset-4"
+                        className="inline-flex min-h-6 min-w-0 max-lg:min-h-11 items-center break-all underline underline-offset-4"
                         data-testid="text-contact-detail-email"
                       >
                         {selectedSubmission.replyTo}

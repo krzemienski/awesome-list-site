@@ -1,0 +1,13 @@
+[7155.325] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.569] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.584] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.591] POST https://awesome.video/api/user/api-keys (Fetch) 201
+[7155.592] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.596] POST https://awesome.video/api/user/api-keys (Fetch) 201
+[7155.597] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.821] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.1052] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.1068] POST https://awesome.video/api/user/api-keys (Fetch) 201
+[7155.1069] GET https://awesome.video/api/user/api-keys (Fetch) 200
+[7155.1071] DELETE https://awesome.video/api/user/api-keys/3e983021-501b-4d65-b59d-f6bf7c7c07f5 (Fetch) 200
+[7155.1072] GET https://awesome.video/api/user/api-keys (Fetch) 200

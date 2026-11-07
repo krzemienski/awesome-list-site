@@ -17,36 +17,51 @@
   transition: background 140ms ease;
 }
 
-.av-sidebar-l2-row:hover {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l2-row:hover {
+    background: var(--surface);
+  }
 }
 
+/* .active is the row whose own page is current; .contains-active only holds
+   the current page, so it takes bright ink, not the accent fill. */
 .av-sidebar-l2-row.active {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
+.av-sidebar-l2-row.contains-active .av-sidebar-l2-link {
+  color: var(--text);
+}
+
+/* Labels wrap at word boundaries and the row grows with them (BUG-022). The
+   14px block padding plus a 16px line is the 44px minimum a one-line row has
+   always had; the count chip shares the 16px line so it sits level with the
+   first line of a wrapped label. */
 .av-sidebar-l2-link {
-  align-items: center;
+  align-items: flex-start;
   color: var(--text-2);
   display: flex;
   flex: 1 1 auto;
   font-size: 12.5px;
-  gap: 8px;
-  line-height: normal;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  line-height: 16px;
   min-width: 0;
-  padding: 8px 4px 8px 11px;
+  padding: 14px 4px 14px 11px;
 }
 
 .av-sidebar-l2-row.active .av-sidebar-l2-link {
   color: var(--accent-ink);
 }
 
+/* The label's basis is its longest word, so a label never breaks inside a
+   word: when that word plus the count do not fit, the count wraps below
+   instead (the 240px tablet sidebar left "Containerization" 85px). */
 .av-sidebar-l2-link > span:first-child {
-  flex: 1 1 auto;
+  flex: 1 1 min-content;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .av-sidebar-l2-link > span:last-child {
@@ -88,15 +103,15 @@
 
 .av-sidebar-l3-all,
 .av-sidebar-l3-row {
-  align-items: center;
+  align-items: start;
   color: var(--text-3);
   display: grid;
   font-size: 12px;
   gap: 8px;
   grid-template-columns: 14px minmax(0, 1fr) auto;
-  line-height: normal;
+  line-height: 15px;
   min-height: 44px;
-  padding: 8px 11px 8px 0;
+  padding: 14.5px 11px 14.5px 0;
   text-align: left;
   width: 100%;
 }
@@ -105,6 +120,7 @@
   font-size: 11.5px;
   font-style: italic;
   grid-template-columns: 14px minmax(0, 1fr);
+  align-items: center;
   min-height: 44px;
   margin-bottom: 2px;
   padding-block: 4px;
@@ -115,39 +131,79 @@
   color: var(--text-4);
   font-family: var(--font-mono);
   font-size: 11px;
-  line-height: 1;
+  line-height: 15px;
   text-align: center;
 }
 
 .av-sidebar-l3-row > span:nth-child(2) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
+/* The count is information, so it takes --text-3 (the 4.5:1 ink, 0.49 alpha
+   in both systems), not the decorative --text-4. */
 .av-sidebar-l3-row > span:last-child {
-  color: var(--text-4);
+  color: var(--text-3);
   font-size: 9.5px;
 }
 
-.av-sidebar-l3-row:hover,
-.av-sidebar-l3-row[data-active="true"] {
-  color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l3-row:hover {
+    color: var(--text);
+  }
 }
 
-/* Leaf taxonomy rows share the V2 L2Row type in both sidebars: one line,
-   ellipsised, with a 10px mono count that takes the accent when active. */
+/* The current page's row gets the strongest paint in the tree: the accent
+   fill and ink the L2 .active row uses, on an inset ::before. */
+.av-sidebar-l3-row {
+  position: relative;
+}
+
+.av-sidebar-l3-row > span {
+  position: relative;
+}
+
+.av-sidebar-l3-row::before {
+  border-radius: 6px; /* DS-OK: matches the refined L2 row radius above. */
+  content: "";
+  inset: 6px 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.av-sidebar-l3-row[data-active="true"],
+.av-sidebar-l3-row[data-active="true"] > span:last-child {
+  color: var(--accent-ink);
+}
+
+.av-sidebar-l3-row[data-active="true"]::before {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Leaf taxonomy rows share the V2 L2Row type in both sidebars: the label
+   wraps at word boundaries (never ellipsised) beside a 10px mono count that
+   takes the accent when active. Both sit on a 16px line so the count stays
+   level with the first line; 14px block padding keeps the 44px row minimum. */
+.av-sidebar-shell .av-sidebar-leaf,
+.av-sidebar-drawer .av-sidebar-leaf {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding-block: 14px;
+  row-gap: 0;
+}
+
 .av-sidebar-leaf-label {
-  flex: 1 1 auto;
+  flex: 1 1 min-content;
+  line-height: 16px;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .av-sidebar-leaf-count {
   color: var(--text-3);
   font-size: 10px;
+  line-height: 16px;
 }
 
 .av-sidebar-leaf[data-active="true"] .av-sidebar-leaf-count {
@@ -156,10 +212,12 @@
 
 /*
  * V2 desktop tree geometry. SidebarFull paints its rows at their reference
- * heights (All row 36px, L2 rows 27px, L3 rows 25px / 22px). Each row keeps a
- * 44px target that overhangs its neighbours by the difference (negative
- * block margins), and row paint moves to an inset ::before so hover and
- * active fills stay at the reference size.
+ * heights (All row 36px, L2 rows 27px, L3 rows 25px / 22px). With a fine
+ * pointer each row keeps a 44px box that overhangs its neighbours by the
+ * difference (negative block margins). Only blank padding may overlap:
+ * label and count spans sit above the neighbouring boxes so later padding
+ * cannot steal visible text. A touch pointer gets real 44px rows (end of
+ * file). Inset paint retains the reference rhythm.
  */
 .av-sidebar-shell .av-sidebar-all-category,
 .av-sidebar-shell .av-sidebar-leaf,
@@ -185,6 +243,17 @@
   position: relative;
 }
 
+/* Raise visible content, not the overlapping 44px row box. */
+.av-sidebar-shell .av-sidebar-all-category > span,
+.av-sidebar-shell .av-sidebar-leaf > span,
+.av-sidebar-shell .av-sidebar-l2-link > span,
+.av-sidebar-shell .av-sidebar-l2-toggle > *,
+.av-sidebar-shell .av-sidebar-l3-all > span,
+.av-sidebar-shell .av-sidebar-l3-row > span {
+  position: relative;
+  z-index: 1;
+}
+
 /* Flex columns so adjacent overhangs add instead of collapsing. */
 .av-sidebar-shell .accordion-body-inner,
 .av-sidebar-shell .av-sidebar-l3-tree {
@@ -201,18 +270,20 @@
   background: transparent;
   border-color: transparent;
 }
-.av-sidebar-shell .av-sidebar-all-category:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-all-category:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
 }
 
 /* L2 rows (leaf links, and the link + disclosure pair for nested groups). */
 .av-sidebar-shell .av-sidebar-leaf {
   border: 0;
-  gap: 8px;
+  gap: 0 8px;
   line-height: normal;
   margin-block: -8.5px;
-  padding: 6px 11px;
+  padding: 14px 11px;
 }
 .av-sidebar-shell .av-sidebar-leaf::before { border: 0; inset: 8.5px 0; }
 .av-sidebar-shell .av-sidebar-leaf:hover,
@@ -221,9 +292,11 @@
   transform: none;
 }
 .av-sidebar-shell .av-sidebar-leaf:hover { color: var(--text-2); }
-.av-sidebar-shell .av-sidebar-leaf:hover::before,
-.av-sidebar-shell .av-sidebar-l2-row:hover::before {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-leaf:hover::before,
+  .av-sidebar-shell .av-sidebar-l2-row:hover::before {
+    background: var(--surface);
+  }
 }
 .av-sidebar-shell .av-sidebar-leaf[data-active="true"]::before,
 .av-sidebar-shell .av-sidebar-l2-row.active::before {
@@ -239,9 +312,10 @@
   background: transparent;
 }
 .av-sidebar-shell .av-sidebar-l2-link {
-  padding: 0 0 0 11px;
+  padding: 14px 0 14px 11px;
 }
-.av-sidebar-l2-row.active .av-sidebar-nested-count {
+.av-sidebar-l2-row.active .av-sidebar-nested-count,
+.av-sidebar-l2-row.contains-active .av-sidebar-nested-count {
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
   color: var(--accent-ink);
 }
@@ -273,10 +347,24 @@
 
 .av-sidebar-shell .av-sidebar-l3-row {
   margin-block: -9.5px;
-  padding: 5px 11px 5px 0;
+  padding: 14.5px 11px 14.5px 0;
+}
+.av-sidebar-shell .av-sidebar-l3-row::before { inset: 9.5px 0; }
+
+/* The top overhang stops at the tree's 4px padding: the accordion body clips
+   (overflow: hidden) anything above it. */
+.av-sidebar-shell .av-sidebar-l3-all {
+  margin-block: -4px -9px;
+  padding: 4px 11px 4px 0;
+  position: relative;
 }
 
-.av-sidebar-shell .av-sidebar-l3-all {
-  margin-block: -11px -9px;
-  padding: 4px 11px 4px 0;
+@media not all and (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-all-category,
+  .av-sidebar-shell .av-sidebar-leaf,
+  .av-sidebar-shell .av-sidebar-l2-row,
+  .av-sidebar-shell .av-sidebar-l3-row,
+  .av-sidebar-shell .av-sidebar-l3-all {
+    margin-block: 0;
+  }
 }

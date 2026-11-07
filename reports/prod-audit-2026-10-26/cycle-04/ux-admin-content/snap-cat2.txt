@@ -1,0 +1,118 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#categories"
+  uid=251_0 region "Notifications (F8)"
+    uid=251_1 list
+  uid=251_2 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=251_4 banner
+    uid=251_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=251_8 button "Search 3,825 resources"
+    uid=251_9 navigation "Primary"
+      uid=251_10 link "Browse" url="https://awesome.video/categories"
+      uid=251_12 link "Submit" url="https://awesome.video/submit"
+      uid=251_14 link "About" url="https://awesome.video/about"
+      uid=251_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=251_18 link "Admin" url="https://awesome.video/admin"
+    uid=251_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=251_21 main
+    uid=251_22 navigation "Breadcrumb"
+      uid=251_23 link "Home" url="https://awesome.video/"
+      uid=251_25 "Admin"
+    uid=251_26 "Authorized admin area"
+    uid=251_27 "ADMIN CONSOLE · "
+    uid=251_28 "ADMIN USER"
+    uid=251_29 heading "Operations dashboard" level="1"
+    uid=251_30 "Manage the "
+    uid=251_31 "3,825"
+    uid=251_32 " resources, jobs, and contributors that keep the index alive."
+    uid=251_33 button "Settings" expandable haspopup="menu"
+    uid=251_34 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=251_35 status atomic live="polite" relevant="additions text"
+    uid=251_36 tablist "Admin sections" orientation="horizontal"
+      uid=251_37 tab "Overview" selectable
+      uid=251_38 tab "Approvals" selectable
+      uid=251_39 tab "Edits" selectable
+      uid=251_40 tab "Enrichment" selectable
+      uid=251_41 tab "Researcher" selectable
+      uid=251_42 tab "Export" selectable
+      uid=251_43 tab "Database" selectable
+      uid=251_44 tab "Resources" selectable
+      uid=251_45 tab "Categories" selectable selected
+      uid=251_46 tab "Subcategories" selectable
+      uid=251_47 tab "Users" selectable
+      uid=251_48 tab "GitHub" selectable
+      uid=251_49 tab "Link Health" selectable
+      uid=251_50 tab "Audit" selectable
+      uid=251_51 tab "Research" selectable
+    uid=251_52 button "Scroll tabs right"
+    uid=251_53 tabpanel "Categories"
+      uid=251_54 "Categories"
+      uid=251_55 "10 top-level domains"
+      uid=251_56 button "Search" expandable
+      uid=251_57 button "Add category" focusable focused
+      uid=251_58 region "Categories table, scrollable"
+        uid=251_59 "ICON"
+        uid=251_60 "NAME"
+        uid=251_61 "SLUG"
+        uid=251_62 "RESOURCES"
+        uid=251_63 "SUBCATEGORIES"
+        uid=251_64 "Community & Events"
+        uid=251_65 "community-events"
+        uid=251_66 "129"
+        uid=251_67 "2"
+        uid=251_68 button "Edit Community & Events"
+        uid=251_69 button "Delete Community & Events unavailable: 129 resources still assigned" disableable disabled
+        uid=251_70 "Encoding & Codecs"
+        uid=251_71 "encoding-codecs"
+        uid=251_72 "579"
+        uid=251_73 "16"
+        uid=251_74 button "Edit Encoding & Codecs"
+        uid=251_75 button "Delete Encoding & Codecs unavailable: 579 resources still assigned" disableable disabled
+        uid=251_76 "General Tools"
+        uid=251_77 "general-tools"
+        uid=251_78 "514"
+        uid=251_79 "19"
+        uid=251_80 button "Edit General Tools"
+        uid=251_81 button "Delete General Tools unavailable: 514 resources still assigned" disableable disabled
+        uid=251_82 "Infrastructure & Delivery"
+        uid=251_83 "infrastructure-delivery"
+        uid=251_84 "353"
+        uid=251_85 "10"
+        uid=251_86 button "Edit Infrastructure & Delivery"
+        uid=251_87 button "Delete Infrastructure & Delivery unavailable: 353 resources still assigned" disableable disabled
+        uid=251_88 "Intro & Learning"
+        uid=251_89 "intro-learning"
+        uid=251_90 "297"
+        uid=251_91 "9"
+        uid=251_92 button "Edit Intro & Learning"
+        uid=251_93 button "Delete Intro & Learning unavailable: 297 resources still assigned" disableable disabled
+        uid=251_94 "Media Tools"
+        uid=251_95 "media-tools"
+        uid=251_96 "704"
+        uid=251_97 "16"
+        uid=251_98 button "Edit Media Tools"
+        uid=251_99 button "Delete Media Tools unavailable: 704 resources still assigned" disableable disabled
+        uid=251_100 "Players & Clients"
+        uid=251_101 "players-clients"
+        uid=251_102 "447"
+        uid=251_103 "10"
+        uid=251_104 button "Edit Players & Clients"
+        uid=251_105 button "Delete Players & Clients unavailable: 447 resources still assigned" disableable disabled
+        uid=251_106 "Protocols & Transport"
+        uid=251_107 "protocols-transport"
+        uid=251_108 "467"
+        uid=251_109 "9"
+        uid=251_110 button "Edit Protocols & Transport"
+        uid=251_111 button "Delete Protocols & Transport unavailable: 467 resources still assigned" disableable disabled
+        uid=251_112 "Standards & Industry"
+        uid=251_113 "standards-industry"
+        uid=251_114 "335"
+        uid=251_115 "8"
+        uid=251_116 button "Edit Standards & Industry"
+        uid=251_117 button "Delete Standards & Industry unavailable: 335 resources still assigned" disableable disabled
+        uid=251_118 "[QA-audit-1026] c4 category"
+        uid=251_119 "qa-audit-1026-c4-category"
+        uid=251_120 "0"
+        uid=251_121 "0"
+        uid=251_122 button "Edit [QA-audit-1026] c4 category"
+        uid=251_123 button "Delete [QA-audit-1026] c4 category"
+      uid=251_124 "Rows per page:"
+      uid=251_125 combobox "Items per page" expandable haspopup="listbox" value="10"

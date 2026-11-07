@@ -5,7 +5,9 @@ import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import "./queues-agent.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
 const NOTE_TITLE_MAX = 80;
@@ -46,10 +48,10 @@ function toResearchNote(job: ResearchJob, now = Date.now()) {
 export function ResearchWorkspace() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const noteTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const { data, isError, error, isLoading, isFetching, refetch } = useQuery<{ jobs: ResearchJob[]; total: number }>({
+  const notesQuery = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ["/api/researcher/jobs", { limit: RESEARCH_WORKSPACE_LIMIT }],
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs?limit=${RESEARCH_WORKSPACE_LIMIT}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/jobs?limit=${RESEARCH_WORKSPACE_LIMIT}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
@@ -60,11 +62,14 @@ export function ResearchWorkspace() {
       query.state.data?.jobs.some((job) => job.status === "pending" || job.status === "processing") ? 5_000 : 30_000,
     refetchOnWindowFocus: true,
   });
+  const { data, error, isLoading, isFetching, refetch } = notesQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(notesQuery);
   const { data: selectedJob, isError: detailError, error: detailErrorValue, isFetching: detailFetching, refetch: refetchDetail } = useQuery<ResearchJob>({
     queryKey: ["/api/researcher/jobs", selectedJobId],
     enabled: selectedJobId !== null,
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
@@ -79,10 +84,11 @@ export function ResearchWorkspace() {
       <div className="card admin-research-workspace">
         <h2 id="admin-research-heading">Research workspace</h2>
         <p>Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.</p>
-        {isError ? (
+        {unavailable ? (
           <AdminLoadError
             subject="research notes"
             error={error}
+            offline={unavailable === "offline"}
             note={data ? "The notes below may be out of date." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
@@ -95,7 +101,7 @@ export function ResearchWorkspace() {
             <p role="status" className="admin-research-notes__status" data-testid="research-notes-loading">
               Loading research notes…
             </p>
-          ) : notes.length === 0 && !isError ? (
+          ) : notes.length === 0 && !unavailable ? (
             <p role="status" className="admin-research-notes__status" data-testid="research-notes-empty">
               No research notes yet.
             </p>
@@ -163,7 +169,7 @@ export function ResearchWorkspace() {
           {!selectedJob && !detailError && <p role="status">Loading research details…</p>}
           {selectedJob && (
             <div className="space-y-4">
-              <a className="text-primary underline" href={`/admin/researcher?jobId=${selectedJob.id}`}>
+              <a className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary underline" href={`/admin/researcher?jobId=${selectedJob.id}`}>
                 Review candidates for job #{selectedJob.id}
               </a>
               <div>

@@ -36,6 +36,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { db } from "../db";
+import { createLogger } from "../lib/logger";
+import { PrivateStorageError, resolvePrivateStorage, storageEnvironment, type PrivateStorage } from "../lib/privateStorage";
 import { eq, sql } from "drizzle-orm";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -114,16 +116,68 @@ export interface ValidationResults {
 }
 
 /**
- * In-memory holder for the most recent validation results. Validation status is
- * ephemeral (regenerated on demand from the live resource set), so it does not
- * warrant a database table — it only needs to survive between a validate/check
- * run and the subsequent status read within the same server process.
+ * Holder for the most recent validation results. They do not warrant a database
+ * table: every store is also written to the private App Storage bucket, and the
+ * first read after a restart hydrates from it, so the result survives deploys.
+ * Without a bucket (local dev) it lives in this process only.
  */
 const latestValidationResults: ValidationResults = {
   awesomeLint: null,
   linkCheck: null,
   lastUpdated: null,
 };
+
+const logger = createLogger("admin-repository");
+let validationHydration: Promise<boolean> | null = null;
+
+interface ValidationStorage {
+  client: PrivateStorage["client"];
+  objectName: string;
+}
+let validationStorageCache: ValidationStorage | null | undefined;
+
+/** The App Storage object for this environment, built once; null when no bucket is configured. */
+function validationStorage(): ValidationStorage | null {
+  if (validationStorageCache !== undefined) return validationStorageCache;
+  try {
+    const { client, prefix } = resolvePrivateStorage(`validation/${storageEnvironment()}`);
+    validationStorageCache = { client, objectName: `${prefix}latest.json` };
+  } catch (error) {
+    if (!(error instanceof PrivateStorageError) || error.reason !== "unconfigured") throw error;
+    validationStorageCache = null;
+  }
+  return validationStorageCache;
+}
+
+/** Resolves true when memory now reflects storage (including "nothing stored yet"), false when the read failed. */
+async function hydrateValidationResults(): Promise<boolean> {
+  try {
+    const storage = validationStorage();
+    if (!storage) return true;
+    const exists = await storage.client.exists(storage.objectName);
+    if (!exists.ok) throw new Error(exists.error?.message ?? "unknown error");
+    if (!exists.value) return true;
+    const downloaded = await storage.client.downloadAsText(storage.objectName);
+    if (!downloaded.ok) throw new Error(downloaded.error?.message ?? "unknown error");
+    const stored = JSON.parse(downloaded.value) as ValidationResults;
+    // A run that finished before this read wins over the older stored value.
+    latestValidationResults.awesomeLint ??= stored.awesomeLint ?? null;
+    latestValidationResults.linkCheck ??= stored.linkCheck ?? null;
+    latestValidationResults.lastUpdated ??= stored.lastUpdated ?? null;
+    return true;
+  } catch (error) {
+    logger.error("Could not read the stored validation results", error);
+    return false;
+  }
+}
+
+/** Hydrates once per process; a failed read is not cached, so the next call retries. */
+async function ensureValidationHydrated(): Promise<boolean> {
+  validationHydration ??= hydrateValidationResults();
+  const hydrated = await validationHydration;
+  if (!hydrated) validationHydration = null;
+  return hydrated;
+}
 
 let journaledMigrationCount: number | null | undefined;
 /** Entries in migrations/meta/_journal.json (same lookup order as server/migrate.ts); cached per process. */
@@ -292,7 +346,9 @@ export class AdminRepository {
   }
 
   /**
-   * Store the result of a validation or link-check run for later retrieval.
+   * Store the result of a validation or link-check run for later retrieval. Kept in
+   * memory and persisted to App Storage so it survives restarts; a storage failure
+   * is logged and never fails the run.
    * @param result - The validation result to persist (awesome-lint or link-check)
    */
   async storeValidationResult(result: ValidationStorageItem): Promise<void> {
@@ -302,6 +358,17 @@ export class AdminRepository {
       latestValidationResults.linkCheck = result.result;
     }
     latestValidationResults.lastUpdated = result.timestamp;
+    try {
+      // Only write over a stored object we have read: otherwise fields we never
+      // loaded would be replaced by null. Memory keeps the value; the next store retries.
+      if (!(await ensureValidationHydrated())) return;
+      const storage = validationStorage();
+      if (!storage) return;
+      const written = await storage.client.uploadFromText(storage.objectName, JSON.stringify(latestValidationResults));
+      if (!written.ok) throw new Error(written.error?.message ?? "unknown error");
+    } catch (error) {
+      logger.error("Could not store the validation results in App Storage", error);
+    }
   }
 
   /**
@@ -309,6 +376,7 @@ export class AdminRepository {
    * @returns The latest awesome-lint and link-check results with last-updated time
    */
   async getLatestValidationResults(): Promise<ValidationResults> {
+    await ensureValidationHydrated();
     return { ...latestValidationResults };
   }
 }

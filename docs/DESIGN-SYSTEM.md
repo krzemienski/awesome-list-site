@@ -1,8 +1,9 @@
 # Design System
 
 The authoritative catalog of the unified Awesome.Video design system:
-**5 systems × 10 accents**, switchable live at [`/settings/theme`](/settings/theme) and
-presented at the living showcase [`/design-system`](/design-system).
+**2 systems (Editorial, Geist) × 10 accents**, switchable live at [`/settings/theme`](/settings/theme) and
+presented at the living showcase [`/design-system`](/design-system). Terminal, Brutalist and Swiss
+were retired (`REMOVED_THEME_SYSTEM_VALUES` in `shared/onboarding-values.ts`).
 
 Replit recognizes the same system through the first-class
 `artifacts/awesome-video-design-system` artifact. That artifact imports the shipping CSS

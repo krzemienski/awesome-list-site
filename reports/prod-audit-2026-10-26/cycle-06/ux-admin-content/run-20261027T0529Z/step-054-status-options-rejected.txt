@@ -1,0 +1,7 @@
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - tabpanel "Resources" [ref=e6] focusable [tabindex]
+    - navigation "Pagination" [ref=e7]
+- listbox [ref=e2]
+  - option "Approved" [ref=e3]
+  - option "Pending" [ref=e4]
+  - option "Rejected" [selected, ref=e5]

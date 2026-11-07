@@ -1,0 +1,20 @@
+{
+  "noReportFileWritten": true,
+  "knownInvalidPhoneLabels": [
+    "step-113",
+    "step-114",
+    "step-115",
+    "step-116",
+    "step-117",
+    "step-118",
+    "step-119",
+    "step-120",
+    "step-121"
+  ],
+  "reason": "tab.run reset viewport to 1280x577; superseded exact-width captures step-125 through 132",
+  "readFailureMethod": "Browser URL-specific GET route abort with abort:\"internetdisconnected\"; unroute before recovery. No fabricated response/body.",
+  "offlineLimitation": "agent-browser/tab.emulate offline changed navigator but continued cached GET 200; genuine read-error claims instead use witnessed aborted requests.",
+  "realTouch": "BLOCKED: maxTouchPoints=0, pointer:coarse=false outside raw run; no real touch device exercised.",
+  "ownerSafety": "No production start/import/export/approval/rejection/cancel write controls confirmed; only dryRun:true API permitted temporarily; no rows created.",
+  "securityIncident": "An early raw request diagnostic exposed owner-session headers in tool output; never copied into artifacts; Main informed; no logout/revocation attempted."
+}

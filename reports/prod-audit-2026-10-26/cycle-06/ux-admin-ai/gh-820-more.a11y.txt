@@ -1,0 +1,757 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Use, account menu" [expanded=false, ref=e7]
+          - StaticText "Use"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e31]
+              - listitem [level=1]
+                - link "Admin" [ref=e32]
+              - listitem [level=1]
+                - link "GitHub" [disabled, ref=e33]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "USE"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e13]
+            - tablist "Admin sections" [ref=e14] focusable [tabindex]
+              - tab "Overview" [ref=e16]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e17]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e18]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e19]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e20]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e21]
+                - StaticText "Export"
+              - tab "Database" [ref=e22]
+                - StaticText "Database"
+              - tab "Resources" [ref=e23]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e24]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e25]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e26]
+                - StaticText "Users"
+              - tab "GitHub" [selected, ref=e27]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e28]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e29]
+                - StaticText "Audit"
+              - tab "Research" [ref=e30]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e15]
+          - tabpanel "GitHub" [ref=e12] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "krzemienski/awesome-video"
+                - paragraph
+                  - StaticText "master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs"
+                - button "Preview import" [ref=e34]
+                - button "Pull" [ref=e35]
+                - button "Sync now" [ref=e36]
+                - LabelText [ref=e37] clickable [cursor:pointer]
+                  - StaticText "Target Repository"
+                - textbox "Target Repository" [ref=e38]: krzemienski/awesome-video
+                  - StaticText "krzemienski/awesome-video"
+                - button "Reset to configured repository" [ref=e39]
+                  - image
+                - paragraph
+                  - StaticText "Format: owner/repository (configured: krzemienski/awesome-video)"
+              - article
+                - image
+                - StaticText "Sync Status"
+                - image
+                - StaticText "38"
+                - StaticText " FAILED"
+                - paragraph
+                  - StaticText "38 earlier sync jobs failed; the latest sync completed."
+                - status
+                  - image
+                  - StaticText "Last "
+                  - StaticText "Export"
+                  - image
+                  - StaticText "JUL 20, 2026, 02:42 PM"
+                  - paragraph
+                    - StaticText "Initial awesome list export"
+                  - generic
+                    - StaticText "+2283"
+                  - StaticText "Added"
+                  - generic
+                    - StaticText "~0"
+                  - StaticText "Updated"
+                  - generic
+                    - StaticText "-0"
+                  - StaticText "Removed"
+                  - StaticText "2283"
+                  - StaticText "Total"
+                  - link "View Commit on GitHub" [ref=e42]
+                    - image
+                    - StaticText "View Commit on GitHub"
+                - heading "Recent Sync Jobs" [level=4, ref=e40]
+                - region "Recent sync jobs, scrollable" [ref=e43] focusable [tabindex]
+                  - LayoutTable
+                    - image
+                    - StaticText "Job #49"
+                    - StaticText "Export"
+                    - StaticText "Jul 20, 2026, 02:42 PM"
+                    - StaticText "COMPLETED"
+                    - image
+                    - StaticText "Job #48"
+                    - StaticText "Export"
+                    - StaticText "Jul 18, 2026, 03:12 PM"
+                    - StaticText "×"
+                    - StaticText "4"
+                    - StaticText "COMPLETED"
+                    - image
+                    - StaticText "Job #45"
+                    - StaticText "Export"
+                    - StaticText "Jul 17, 2026, 08:32 AM"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Export failed: timeout exceeded when trying to connect"
+                    - image
+                    - StaticText "Job #3"
+                    - StaticText "Import"
+                    - StaticText "Jul 17, 2026, 01:41 AM"
+                    - StaticText "×"
+                    - StaticText "2"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                    - paragraph
+                      - StaticText "Orphaned by server restart"
+                    - image
+                    - StaticText "Job #12"
+                    - StaticText "Export"
+                    - StaticText "Jul 17, 2026, 01:41 AM"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Orphaned by server restart"
+                    - image
+                    - StaticText "Job #41"
+                    - StaticText "Import"
+                    - StaticText "Jul 17, 2026, 01:41 AM"
+                    - StaticText "×"
+                    - StaticText "7"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                    - paragraph
+                      - StaticText "Orphaned by server restart"
+                    - image
+                    - StaticText "Job #21"
+                    - StaticText "Import"
+                    - StaticText "Jul 17, 2026, 01:41 AM"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                    - paragraph
+                      - StaticText "Orphaned by server restart"
+                    - image
+                    - StaticText "Job #40"
+                    - StaticText "Export"
+                    - StaticText "Jul 17, 2026, 01:41 AM"
+                    - StaticText "×"
+                    - StaticText "5"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Orphaned by server restart"
+                    - image
+                    - StaticText "Job #43"
+                    - StaticText "Export"
+                    - StaticText "Jun 25, 2026, 05:59 PM"
+                    - StaticText "×"
+                    - StaticText "5"
+                    - StaticText "FAILED"
+                    - image
+                    - StaticText "Job #34"
+                    - StaticText "Import"
+                    - StaticText "Feb 11, 2026, 08:06 PM"
+                    - StaticText "×"
+                    - StaticText "2"
+                    - StaticText "COMPLETED"
+                    - paragraph
+                      - StaticText "Imported: 1; updated: 680; skipped: 0; failed: 0."
+                    - image
+                    - StaticText "Job #32"
+                    - StaticText "Import"
+                    - StaticText "Feb 11, 2026, 08:02 PM"
+                    - StaticText "×"
+                    - StaticText "4"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                    - image
+                    - StaticText "Job #22"
+                    - StaticText "Import"
+                    - StaticText "Dec 3, 2025, 05:01 PM"
+                    - StaticText "COMPLETED"
+                    - paragraph
+                      - StaticText "Imported: 1062; updated: 16; skipped: 0; failed: 0."
+                    - image
+                    - StaticText "Job #18"
+                    - StaticText "Export"
+                    - StaticText "Dec 3, 2025, 02:32 PM"
+                    - StaticText "×"
+                    - StaticText "8"
+                    - StaticText "FAILED"
+                    - image
+                    - StaticText "Job #13"
+                    - StaticText "Export"
+                    - StaticText "Dec 1, 2025, 01:43 AM"
+                    - StaticText "FAILED"
+                    - image
+                    - StaticText "Job #11"
+                    - StaticText "Import"
+                    - StaticText "Nov 18, 2025, 07:54 PM"
+                    - StaticText "×"
+                    - StaticText "3"
+                    - StaticText "COMPLETED"
+                    - paragraph
+                      - StaticText "Imported: 201; updated: 597; skipped: 0; failed: 0."
+                    - image
+                    - StaticText "Job #10"
+                    - StaticText "Import"
+                    - StaticText "Nov 18, 2025, 07:51 PM"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+                    - image
+                    - StaticText "Job #5"
+                    - StaticText "Export"
+                    - StaticText "Nov 18, 2025, 07:29 PM"
+                    - StaticText "FAILED"
+                    - image
+                    - StaticText "Job #2"
+                    - StaticText "Import"
+                    - StaticText "Nov 18, 2025, 06:00 PM"
+                    - StaticText "FAILED"
+                    - paragraph
+                      - StaticText "Imported: 0; updated: 0; skipped: 0; failed: 0."
+              - generic
+                - sectionheader
+                  - heading "Sync jobs" [level=2, ref=e44]
+                  - paragraph
+                    - StaticText "All 49 import/export operations"
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID" [ref=e241]
+                      - columnheader "TYPE" [ref=e242]
+                      - columnheader "STATUS" [ref=e243]
+                      - columnheader
+                  - row
+                    - cell "Job #49" [ref=e45]
+                    - cell "Export Jul 20, 2026, 02:42 PM" [ref=e46]
+                      - StaticText "Export"
+                      - StaticText "Jul 20, 2026, 02:42 PM"
+                    - cell "COMPLETED" [ref=e47]
+                    - cell "View logs for export Job #49" [ref=e48]
+                      - button "View logs for export Job #49" [ref=e244]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #48" [ref=e49]
+                    - cell "Export Jul 18, 2026, 03:12 PM" [ref=e50]
+                      - StaticText "Export"
+                      - StaticText "Jul 18, 2026, 03:12 PM"
+                    - cell "COMPLETED" [ref=e51]
+                    - cell "View logs for export Job #48" [ref=e52]
+                      - button "View logs for export Job #48" [ref=e245]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #47" [ref=e53]
+                    - cell "Export Jul 18, 2026, 05:30 AM" [ref=e54]
+                      - StaticText "Export"
+                      - StaticText "Jul 18, 2026, 05:30 AM"
+                    - cell "COMPLETED" [ref=e55]
+                    - cell "View logs for export Job #47" [ref=e56]
+                      - button "View logs for export Job #47" [ref=e246]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #46" [ref=e57]
+                    - cell "Export Jul 17, 2026, 08:54 AM" [ref=e58]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 08:54 AM"
+                    - cell "COMPLETED" [ref=e59]
+                    - cell "View logs for export Job #46" [ref=e60]
+                      - button "View logs for export Job #46" [ref=e247]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #45" [ref=e61]
+                    - cell "Export Jul 17, 2026, 08:32 AM" [ref=e62]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 08:32 AM"
+                    - cell "FAILED" [ref=e63]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #45" [ref=e64]
+                      - button "View logs for export Job #45" [ref=e248]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #44" [ref=e65]
+                    - cell "Export Jul 17, 2026, 08:31 AM" [ref=e66]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 08:31 AM"
+                    - cell "COMPLETED" [ref=e67]
+                    - cell "View logs for export Job #44" [ref=e68]
+                      - button "View logs for export Job #44" [ref=e249]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #1" [ref=e69]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e70]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e71]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #1" [ref=e72]
+                      - button "View logs for import Job #1" [ref=e250]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #3" [ref=e73]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e74]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e75]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #3" [ref=e76]
+                      - button "View logs for import Job #3" [ref=e251]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #12" [ref=e77]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e78]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e79]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #12" [ref=e80]
+                      - button "View logs for export Job #12" [ref=e252]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #19" [ref=e81]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e82]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e83]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #19" [ref=e84]
+                      - button "View logs for import Job #19" [ref=e253]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #21" [ref=e85]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e86]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e87]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #21" [ref=e88]
+                      - button "View logs for import Job #21" [ref=e254]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #23" [ref=e89]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e90]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e91]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #23" [ref=e92]
+                      - button "View logs for import Job #23" [ref=e255]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #25" [ref=e93]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e94]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e95]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #25" [ref=e96]
+                      - button "View logs for export Job #25" [ref=e256]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #27" [ref=e97]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e98]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e99]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #27" [ref=e100]
+                      - button "View logs for import Job #27" [ref=e257]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #29" [ref=e101]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e102]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e103]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #29" [ref=e104]
+                      - button "View logs for import Job #29" [ref=e258]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #31" [ref=e105]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e106]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e107]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #31" [ref=e108]
+                      - button "View logs for import Job #31" [ref=e259]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #33" [ref=e109]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e110]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e111]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #33" [ref=e112]
+                      - button "View logs for import Job #33" [ref=e260]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #35" [ref=e113]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e114]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e115]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #35" [ref=e116]
+                      - button "View logs for export Job #35" [ref=e261]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #37" [ref=e117]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e118]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e119]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #37" [ref=e120]
+                      - button "View logs for export Job #37" [ref=e262]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #39" [ref=e121]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e122]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e123]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #39" [ref=e124]
+                      - button "View logs for export Job #39" [ref=e263]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #40" [ref=e125]
+                    - cell "Export Jul 17, 2026, 01:41 AM" [ref=e126]
+                      - StaticText "Export"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e127]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #40" [ref=e128]
+                      - button "View logs for export Job #40" [ref=e264]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #41" [ref=e129]
+                    - cell "Import Jul 17, 2026, 01:41 AM" [ref=e130]
+                      - StaticText "Import"
+                      - StaticText "Jul 17, 2026, 01:41 AM"
+                    - cell "FAILED" [ref=e131]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #41" [ref=e132]
+                      - button "View logs for import Job #41" [ref=e265]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #43" [ref=e133]
+                    - cell "Export Jun 25, 2026, 05:59 PM" [ref=e134]
+                      - StaticText "Export"
+                      - StaticText "Jun 25, 2026, 05:59 PM"
+                    - cell "FAILED" [ref=e135]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #43" [ref=e136]
+                      - button "View logs for export Job #43" [ref=e266]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #42" [ref=e137]
+                    - cell "Export Jun 25, 2026, 05:59 PM" [ref=e138]
+                      - StaticText "Export"
+                      - StaticText "Jun 25, 2026, 05:59 PM"
+                    - cell "FAILED" [ref=e139]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #42" [ref=e140]
+                      - button "View logs for export Job #42" [ref=e267]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #38" [ref=e141]
+                    - cell "Export Jun 3, 2026, 01:17 AM" [ref=e142]
+                      - StaticText "Export"
+                      - StaticText "Jun 3, 2026, 01:17 AM"
+                    - cell "FAILED" [ref=e143]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #38" [ref=e144]
+                      - button "View logs for export Job #38" [ref=e268]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #36" [ref=e145]
+                    - cell "Export Feb 11, 2026, 08:07 PM" [ref=e146]
+                      - StaticText "Export"
+                      - StaticText "Feb 11, 2026, 08:07 PM"
+                    - cell "FAILED" [ref=e147]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #36" [ref=e148]
+                      - button "View logs for export Job #36" [ref=e269]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #34" [ref=e149]
+                    - cell "Import Feb 11, 2026, 08:06 PM" [ref=e150]
+                      - StaticText "Import"
+                      - StaticText "Feb 11, 2026, 08:06 PM"
+                    - cell "COMPLETED" [ref=e151]
+                    - cell "View logs for import Job #34" [ref=e152]
+                      - button "View logs for import Job #34" [ref=e270]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #32" [ref=e153]
+                    - cell "Import Feb 11, 2026, 08:02 PM" [ref=e154]
+                      - StaticText "Import"
+                      - StaticText "Feb 11, 2026, 08:02 PM"
+                    - cell "FAILED" [ref=e155]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #32" [ref=e156]
+                      - button "View logs for import Job #32" [ref=e271]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #30" [ref=e157]
+                    - cell "Import Feb 11, 2026, 07:20 PM" [ref=e158]
+                      - StaticText "Import"
+                      - StaticText "Feb 11, 2026, 07:20 PM"
+                    - cell "FAILED" [ref=e159]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #30" [ref=e160]
+                      - button "View logs for import Job #30" [ref=e272]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #28" [ref=e161]
+                    - cell "Import Feb 11, 2026, 06:35 PM" [ref=e162]
+                      - StaticText "Import"
+                      - StaticText "Feb 11, 2026, 06:35 PM"
+                    - cell "FAILED" [ref=e163]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #28" [ref=e164]
+                      - button "View logs for import Job #28" [ref=e273]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #26" [ref=e165]
+                    - cell "Export Jan 28, 2026, 03:25 AM" [ref=e166]
+                      - StaticText "Export"
+                      - StaticText "Jan 28, 2026, 03:25 AM"
+                    - cell "FAILED" [ref=e167]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #26" [ref=e168]
+                      - button "View logs for export Job #26" [ref=e274]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #24" [ref=e169]
+                    - cell "Import Jan 28, 2026, 03:25 AM" [ref=e170]
+                      - StaticText "Import"
+                      - StaticText "Jan 28, 2026, 03:25 AM"
+                    - cell "FAILED" [ref=e171]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #24" [ref=e172]
+                      - button "View logs for import Job #24" [ref=e275]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #22" [ref=e173]
+                    - cell "Import Dec 3, 2025, 05:01 PM" [ref=e174]
+                      - StaticText "Import"
+                      - StaticText "Dec 3, 2025, 05:01 PM"
+                    - cell "COMPLETED" [ref=e175]
+                    - cell "View logs for import Job #22" [ref=e176]
+                      - button "View logs for import Job #22" [ref=e276]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #20" [ref=e177]
+                    - cell "Import Dec 3, 2025, 04:16 PM" [ref=e178]
+                      - StaticText "Import"
+                      - StaticText "Dec 3, 2025, 04:16 PM"
+                    - cell "COMPLETED" [ref=e179]
+                    - cell "View logs for import Job #20" [ref=e180]
+                      - button "View logs for import Job #20" [ref=e277]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #18" [ref=e181]
+                    - cell "Export Dec 3, 2025, 02:32 PM" [ref=e182]
+                      - StaticText "Export"
+                      - StaticText "Dec 3, 2025, 02:32 PM"
+                    - cell "FAILED" [ref=e183]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #18" [ref=e184]
+                      - button "View logs for export Job #18" [ref=e278]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #17" [ref=e185]
+                    - cell "Export Dec 3, 2025, 02:30 PM" [ref=e186]
+                      - StaticText "Export"
+                      - StaticText "Dec 3, 2025, 02:30 PM"
+                    - cell "FAILED" [ref=e187]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #17" [ref=e188]
+                      - button "View logs for export Job #17" [ref=e279]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #16" [ref=e189]
+                    - cell "Export Dec 3, 2025, 02:28 PM" [ref=e190]
+                      - StaticText "Export"
+                      - StaticText "Dec 3, 2025, 02:28 PM"
+                    - cell "FAILED" [ref=e191]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #16" [ref=e192]
+                      - button "View logs for export Job #16" [ref=e280]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #15" [ref=e193]
+                    - cell "Export Dec 3, 2025, 02:27 PM" [ref=e194]
+                      - StaticText "Export"
+                      - StaticText "Dec 3, 2025, 02:27 PM"
+                    - cell "FAILED" [ref=e195]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #15" [ref=e196]
+                      - button "View logs for export Job #15" [ref=e281]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #14" [ref=e197]
+                    - cell "Export Dec 3, 2025, 02:24 PM" [ref=e198]
+                      - StaticText "Export"
+                      - StaticText "Dec 3, 2025, 02:24 PM"
+                    - cell "FAILED" [ref=e199]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #14" [ref=e200]
+                      - button "View logs for export Job #14" [ref=e282]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #13" [ref=e201]
+                    - cell "Export Dec 1, 2025, 01:43 AM" [ref=e202]
+                      - StaticText "Export"
+                      - StaticText "Dec 1, 2025, 01:43 AM"
+                    - cell "FAILED" [ref=e203]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #13" [ref=e204]
+                      - button "View logs for export Job #13" [ref=e283]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #11" [ref=e205]
+                    - cell "Import Nov 18, 2025, 07:54 PM" [ref=e206]
+                      - StaticText "Import"
+                      - StaticText "Nov 18, 2025, 07:54 PM"
+                    - cell "COMPLETED" [ref=e207]
+                    - cell "View logs for import Job #11" [ref=e208]
+                      - button "View logs for import Job #11" [ref=e284]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #10" [ref=e209]
+                    - cell "Import Nov 18, 2025, 07:51 PM" [ref=e210]
+                      - StaticText "Import"
+                      - StaticText "Nov 18, 2025, 07:51 PM"
+                    - cell "FAILED" [ref=e211]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #10" [ref=e212]
+                      - button "View logs for import Job #10" [ref=e285]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #9" [ref=e213]
+                    - cell "Import Nov 18, 2025, 07:51 PM" [ref=e214]
+                      - StaticText "Import"
+                      - StaticText "Nov 18, 2025, 07:51 PM"
+                    - cell "COMPLETED" [ref=e215]
+                    - cell "View logs for import Job #9" [ref=e216]
+                      - button "View logs for import Job #9" [ref=e286]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #8" [ref=e217]
+                    - cell "Export Nov 18, 2025, 07:40 PM" [ref=e218]
+                      - StaticText "Export"
+                      - StaticText "Nov 18, 2025, 07:40 PM"
+                    - cell "FAILED" [ref=e219]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #8" [ref=e220]
+                      - button "View logs for export Job #8" [ref=e287]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #7" [ref=e221]
+                    - cell "Export Nov 18, 2025, 07:30 PM" [ref=e222]
+                      - StaticText "Export"
+                      - StaticText "Nov 18, 2025, 07:30 PM"
+                    - cell "FAILED" [ref=e223]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #7" [ref=e224]
+                      - button "View logs for export Job #7" [ref=e288]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #6" [ref=e225]
+                    - cell "Export Nov 18, 2025, 07:29 PM" [ref=e226]
+                      - StaticText "Export"
+                      - StaticText "Nov 18, 2025, 07:29 PM"
+                    - cell "FAILED" [ref=e227]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #6" [ref=e228]
+                      - button "View logs for export Job #6" [ref=e289]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #5" [ref=e229]
+                    - cell "Export Nov 18, 2025, 07:29 PM" [ref=e230]
+                      - StaticText "Export"
+                      - StaticText "Nov 18, 2025, 07:29 PM"
+                    - cell "FAILED" [ref=e231]
+                      - StaticText "FAILED"
+                    - cell "View logs for export Job #5" [ref=e232]
+                      - button "View logs for export Job #5" [ref=e290]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #4" [ref=e233]
+                    - cell "Import Nov 18, 2025, 06:19 PM" [ref=e234]
+                      - StaticText "Import"
+                      - StaticText "Nov 18, 2025, 06:19 PM"
+                    - cell "COMPLETED" [ref=e235]
+                    - cell "View logs for import Job #4" [ref=e236]
+                      - button "View logs for import Job #4" [ref=e291]
+                        - StaticText "Logs"
+                  - row
+                    - cell "Job #2" [ref=e237]
+                    - cell "Import Nov 18, 2025, 06:00 PM" [ref=e238]
+                      - StaticText "Import"
+                      - StaticText "Nov 18, 2025, 06:00 PM"
+                    - cell "FAILED" [ref=e239]
+                      - StaticText "FAILED"
+                    - cell "View logs for import Job #2" [ref=e240]
+                      - button "View logs for import Job #2" [ref=e292]
+                        - StaticText "Logs"
+              - button "Less" [expanded=true, ref=e41]

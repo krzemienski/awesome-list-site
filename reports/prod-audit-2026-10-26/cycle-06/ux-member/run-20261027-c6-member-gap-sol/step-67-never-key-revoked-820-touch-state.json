@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/profile?tab=security",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 445,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 min-w-[44px] px-3 min-h-[44px] self-start sm:self-auto\" data-ds-variant=\"outline\" type=\"button\" aria-label=\"Revoke API key [QA-audit-1026] gap key never\" data-testid=\"button-revoke-api-key-1a36c34c-f766-4d62-8cc3-efee49578444\">Revoke</button>",
+  "umami": "1",
+  "consent": "denied"
+}

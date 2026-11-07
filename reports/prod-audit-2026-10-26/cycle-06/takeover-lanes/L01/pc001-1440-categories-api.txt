@@ -1,0 +1,1 @@
+"[{\"u\":\"/api/awesome-list/nav\",\"s\":200},{\"u\":\"/api/config\",\"s\":200},{\"u\":\"/api/auth/user\",\"s\":200}]"

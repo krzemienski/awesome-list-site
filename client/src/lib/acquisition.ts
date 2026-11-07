@@ -81,6 +81,19 @@ export function captureAcquisition(): void {
 }
 
 /**
+ * Drop the stored first-touch record. It exists only to enrich analytics
+ * events, so withdrawing analytics consent removes it too.
+ */
+export function clearAcquisition(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // storage unavailable — nothing to clear
+  }
+}
+
+/**
  * Acquisition params to attach to conversion events: first-touch utm_* plus the
  * referrer domain. Returns {} when nothing was captured (direct traffic).
  */

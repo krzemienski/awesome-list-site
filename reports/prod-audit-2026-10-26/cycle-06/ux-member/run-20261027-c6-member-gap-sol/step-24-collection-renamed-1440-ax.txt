@@ -1,0 +1,248 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list:
+        - listitem [ref=e4]:
+          - generic [ref=e6]: Collection renamed
+          - button "Dismiss notification":
+            - img
+    - generic [ref=e8]:
+      - link "Skip to main content" [ref=e9] [cursor=pointer]:
+        - /url: "#main"
+      - generic [ref=e10]:
+        - banner [ref=e11]:
+          - link "AWESOME.VIDEO home" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e13]: av
+            - generic [ref=e14]: AWESOME.VIDEO
+            - generic [ref=e15]: AWESOME.VIDEO home
+          - button "Search 3,826 resources" [ref=e16] [cursor=pointer]:
+            - img [ref=e17]
+            - generic [ref=e20]: Search 3,826 resources
+            - generic [ref=e21]:
+              - text: Search
+              - generic [ref=e22]: 3,826 resources…
+            - generic [ref=e23]: ⌘K
+          - navigation "Primary" [ref=e24]:
+            - link "Browse" [ref=e25] [cursor=pointer]:
+              - /url: /categories
+            - link "Submit" [ref=e26] [cursor=pointer]:
+              - /url: /submit
+            - link "About" [ref=e27] [cursor=pointer]:
+              - /url: /about
+            - link "Docs ↗" [ref=e28] [cursor=pointer]:
+              - /url: /design-system
+            - link "Admin" [ref=e29] [cursor=pointer]:
+              - /url: /admin
+          - button "Admin, account menu" [ref=e30] [cursor=pointer]:
+            - generic [ref=e32]: A
+            - generic [ref=e33]: Admin
+            - generic [ref=e34]: Admin, account menu
+        - generic [ref=e36]:
+          - main [ref=e37]:
+            - generic [ref=e38]:
+              - navigation "Breadcrumb" [ref=e39]:
+                - list [ref=e40]:
+                  - listitem [ref=e41]:
+                    - link "Home" [ref=e42] [cursor=pointer]:
+                      - /url: /
+                  - listitem [ref=e43]:
+                    - img [ref=e44]
+                  - listitem:
+                    - link "Bookmarks" [disabled]
+              - generic [ref=e46]:
+                - generic [ref=e47]:
+                  - generic [ref=e48]: // Learning library
+                  - generic [ref=e49]:
+                    - generic [ref=e50]:
+                      - generic [ref=e51]:
+                        - img [ref=e52]
+                        - heading "Saved, then finished." [level=1] [ref=e54]:
+                          - text: Saved, then
+                          - emphasis [ref=e55]: finished.
+                      - paragraph [ref=e56]: Turn bookmarks into a queue you can actually work through.
+                    - button "New collection" [ref=e57] [cursor=pointer]:
+                      - img
+                      - text: New collection
+                - region "Library summary" [ref=e58]:
+                  - button "12 Active" [ref=e59] [cursor=pointer]:
+                    - generic [ref=e60]: "12"
+                    - text: Active
+                  - button "12 Saved" [ref=e61] [cursor=pointer]:
+                    - generic [ref=e62]: "12"
+                    - text: Saved
+                  - button "0 Watch next" [ref=e63] [cursor=pointer]:
+                    - generic [ref=e64]: "0"
+                    - text: Watch next
+                  - button "0 In progress" [ref=e65] [cursor=pointer]:
+                    - generic [ref=e66]: "0"
+                    - text: In progress
+                  - button "0 Done" [ref=e67] [cursor=pointer]:
+                    - generic [ref=e68]: "0"
+                    - text: Done
+                  - button "0 Archived" [ref=e69] [cursor=pointer]:
+                    - generic [ref=e70]: "0"
+                    - text: Archived
+                - generic [ref=e71]:
+                  - complementary "Bookmark collections" [ref=e72]:
+                    - generic [ref=e73]:
+                      - button "All saved 12" [ref=e74] [cursor=pointer]:
+                        - generic [ref=e75]:
+                          - img [ref=e76]
+                          - text: All saved
+                        - generic [ref=e78]: "12"
+                      - generic [ref=e79]:
+                        - button "[QA-audit-1026] gap collection B renamed 0" [pressed] [ref=e80] [cursor=pointer]:
+                          - generic [ref=e81]:
+                            - generic [ref=e82]: "[QA-audit-1026] gap collection B renamed"
+                            - generic [ref=e83]: "0"
+                        - group "Reorder [QA-audit-1026] gap collection B renamed" [ref=e84]:
+                          - button "Move [QA-audit-1026] gap collection B renamed up" [disabled]:
+                            - img
+                          - button "Move [QA-audit-1026] gap collection B renamed down" [ref=e85] [cursor=pointer]:
+                            - img
+                      - generic [ref=e86]:
+                        - button "[QA-audit-1026] gap collection A 0" [ref=e87] [cursor=pointer]:
+                          - generic [ref=e88]:
+                            - generic [ref=e89]: "[QA-audit-1026] gap collection A"
+                            - generic [ref=e90]: "0"
+                        - group "Reorder [QA-audit-1026] gap collection A" [ref=e91]:
+                          - button "Move [QA-audit-1026] gap collection A up" [ref=e92] [cursor=pointer]:
+                            - img
+                          - button "Move [QA-audit-1026] gap collection A down" [disabled]:
+                            - img
+                  - generic [ref=e93]:
+                    - region "Selected collection controls" [ref=e94]:
+                      - generic [ref=e95]:
+                        - generic [ref=e96]:
+                          - generic [ref=e97]:
+                            - img [ref=e98]
+                            - heading "[QA-audit-1026] gap collection B renamed" [level=2] [ref=e100]
+                          - paragraph [ref=e101]: 0 saved resources
+                        - generic [ref=e102]:
+                          - button "Rename" [active] [ref=e103] [cursor=pointer]:
+                            - img
+                            - text: Rename
+                          - button "Archive" [ref=e104] [cursor=pointer]:
+                            - img
+                            - text: Archive
+                          - button "Publish link" [ref=e105] [cursor=pointer]:
+                            - img
+                            - text: Publish link
+                          - button "Delete" [ref=e106] [cursor=pointer]:
+                            - img
+                            - text: Delete
+                    - region "Library filters" [ref=e107]:
+                      - generic [ref=e108]:
+                        - generic [ref=e109] [cursor=pointer]: Queue status
+                        - combobox "Queue status" [ref=e110] [cursor=pointer]:
+                          - generic: All statuses
+                          - img [ref=e111]
+                      - generic [ref=e113]:
+                        - generic [ref=e114] [cursor=pointer]: Visibility
+                        - combobox "Visibility" [ref=e115] [cursor=pointer]:
+                          - generic: Active bookmarks
+                          - img [ref=e116]
+                      - generic [ref=e118]:
+                        - generic [ref=e119] [cursor=pointer]: Sort
+                        - combobox "Sort" [ref=e120] [cursor=pointer]:
+                          - generic: Newest saved
+                          - img [ref=e121]
+                    - generic [ref=e124]:
+                      - paragraph [ref=e125]: ── EMPTY COLLECTION
+                      - heading "This collection is empty" [level=2] [ref=e126]
+                      - generic [ref=e127]: To add bookmarks, open All saved, select the bookmarks you want, then pick this collection under Move to collection and choose Move.
+                      - button "Go to All saved" [ref=e129] [cursor=pointer]
+          - contentinfo [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - paragraph [ref=e133]: ── INDEX
+                - link "awesome.video home" [ref=e134] [cursor=pointer]:
+                  - /url: /
+                  - text: awesome.video
+                - paragraph [ref=e135]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+              - generic [ref=e137]:
+                - heading "INDEXED" [level=2] [ref=e138]
+                - paragraph [ref=e139]: 3,826
+                - paragraph [ref=e140]:
+                  - text: 9 categories
+                  - text: 99 subcategories
+                  - generic [ref=e141]: live
+              - navigation "Explore categories" [ref=e143]:
+                - heading "EXPLORE" [level=2] [ref=e144]
+                - generic [ref=e145]:
+                  - link "Community & Events" [ref=e146] [cursor=pointer]:
+                    - /url: /category/community-events
+                    - generic [ref=e147]: ◈
+                    - generic [ref=e148]: Community
+                  - link "Encoding & Codecs" [ref=e149] [cursor=pointer]:
+                    - /url: /category/encoding-codecs
+                    - generic [ref=e150]: ◇
+                    - generic [ref=e151]: Encoding
+                  - link "General Tools" [ref=e152] [cursor=pointer]:
+                    - /url: /category/general-tools
+                    - generic [ref=e153]: ◆
+                    - generic [ref=e154]: General
+                  - link "Infrastructure & Delivery" [ref=e155] [cursor=pointer]:
+                    - /url: /category/infrastructure-delivery
+                    - generic [ref=e156]: ▣
+                    - generic [ref=e157]: Infrastructure
+                  - link "Intro & Learning" [ref=e158] [cursor=pointer]:
+                    - /url: /category/intro-learning
+                    - generic [ref=e159]: ▤
+                    - generic [ref=e160]: Intro
+                  - link "Media Tools" [ref=e161] [cursor=pointer]:
+                    - /url: /category/media-tools
+                    - generic [ref=e162]: ▥
+                    - generic [ref=e163]: Media
+                  - link "Players & Clients" [ref=e164] [cursor=pointer]:
+                    - /url: /category/players-clients
+                    - generic [ref=e165]: ▶
+                    - generic [ref=e166]: Players
+                  - link "Protocols & Transport" [ref=e167] [cursor=pointer]:
+                    - /url: /category/protocols-transport
+                    - generic [ref=e168]: ⟁
+                    - generic [ref=e169]: Protocols
+                  - link "Standards & Industry" [ref=e170] [cursor=pointer]:
+                    - /url: /category/standards-industry
+                    - generic [ref=e171]: ◉
+                    - generic [ref=e172]: Standards
+              - generic [ref=e173]:
+                - heading "SOURCE" [level=2] [ref=e174]
+                - link "krzemienski/awesome-video" [ref=e175] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video
+                  - img [ref=e176]
+                  - generic [ref=e178]:
+                    - text: krzemienski
+                    - generic [ref=e179]:
+                      - text: /
+                      - text: awesome-video
+                  - generic [ref=e180]: ↗
+                - paragraph [ref=e181]:
+                  - text: Open-source.
+                  - link "PRs welcome" [ref=e182] [cursor=pointer]:
+                    - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                  - text: .
+                  - text: Indexed automatically from README.md.
+                - button "Contact maintainers" [ref=e184] [cursor=pointer]:
+                  - img
+                  - text: Contact maintainers
+            - generic [ref=e185]:
+              - generic [ref=e186]: © 2026 awesome.video · content CC0, code MIT
+              - navigation "Site policies" [ref=e187]:
+                - link "About" [ref=e188] [cursor=pointer]:
+                  - /url: /about
+                - link "Terms" [ref=e189] [cursor=pointer]:
+                  - /url: /terms
+                - link "Privacy" [ref=e190] [cursor=pointer]:
+                  - /url: /privacy
+                - link "Code of Conduct" [ref=e191] [cursor=pointer]:
+                  - /url: /code-of-conduct
+                  - text: Conduct
+                - button "Cookie settings" [ref=e192] [cursor=pointer]
+                - link "Issues ↗" [ref=e193] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/issues
+                - link "Sitemap" [ref=e194] [cursor=pointer]:
+                  - /url: /sitemap.xml
+              - generic [ref=e195]: built with the awesome-list framework
+  - status [ref=e196]: Notification Collection renamed

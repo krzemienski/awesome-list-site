@@ -1,0 +1,89 @@
+{
+  "url": "http://127.0.0.1:5064/advanced?tab=export",
+  "issues": [
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "652",
+            "url": "http://127.0.0.1:5064/advanced?tab=export",
+            "lineNumber": 153,
+            "columnNumber": 109
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "652",
+            "url": "http://127.0.0.1:5064/advanced?tab=export",
+            "lineNumber": 164,
+            "columnNumber": 103
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "41",
+            "url": "http://127.0.0.1:5064/src/lib/clerk-bridge.tsx",
+            "lineNumber": 84,
+            "columnNumber": 26
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "821",
+            "url": "http://127.0.0.1:5064/advanced?tab=export",
+            "lineNumber": 153,
+            "columnNumber": 109
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "821",
+            "url": "http://127.0.0.1:5064/advanced?tab=export",
+            "lineNumber": 164,
+            "columnNumber": 103
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "41",
+            "url": "http://127.0.0.1:5064/src/lib/clerk-bridge.tsx",
+            "lineNumber": 84,
+            "columnNumber": 26
+          }
+        }
+      }
+    }
+  ]
+}

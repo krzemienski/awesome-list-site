@@ -24,34 +24,62 @@ export type DigestAttemptOutcome =
 
 export type NotificationKind = "new_resource" | "watch_next" | "journey_step";
 
-export const notificationPreferencesUpdateSchema = z
-  .object({
-    emailDigestEnabled: z.boolean(),
-    inAppEnabled: z.boolean(),
-    includeNewResources: z.boolean(),
-    includeWatchNext: z.boolean(),
-    includeJourneyStep: z.boolean(),
-    cadence: z.enum(DIGEST_CADENCES),
-    timezone: z.string().trim().min(1).max(64),
-    pausedUntil: z.string().datetime({ offset: true }).nullable(),
-  })
-  .superRefine((value, context) => {
-    if (
-      (value.emailDigestEnabled || value.inAppEnabled) &&
-      !value.includeNewResources &&
-      !value.includeWatchNext &&
-      !value.includeJourneyStep
-    ) {
+const notificationPreferenceFields = z.object({
+  emailDigestEnabled: z.boolean(),
+  inAppEnabled: z.boolean(),
+  includeNewResources: z.boolean(),
+  includeWatchNext: z.boolean(),
+  includeJourneyStep: z.boolean(),
+  cadence: z.enum(DIGEST_CADENCES),
+  timezone: z.string().trim().min(1).max(64),
+  pausedUntil: z.string().datetime({ offset: true }).nullable(),
+});
+
+export const DIGEST_SECTION_REQUIRED_MESSAGE = "Choose at least one digest section.";
+
+/** An enabled channel needs at least one section to send. */
+export function hasDigestSection(value: {
+  emailDigestEnabled: boolean;
+  inAppEnabled: boolean;
+  includeNewResources: boolean;
+  includeWatchNext: boolean;
+  includeJourneyStep: boolean;
+}): boolean {
+  return (
+    !(value.emailDigestEnabled || value.inAppEnabled) ||
+    value.includeNewResources ||
+    value.includeWatchNext ||
+    value.includeJourneyStep
+  );
+}
+
+/** PUT: the whole form, saved explicitly (it always names a time zone). */
+export const notificationPreferencesUpdateSchema =
+  notificationPreferenceFields.superRefine((value, context) => {
+    if (!hasDigestSection(value)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["includeNewResources"],
-        message: "Choose at least one digest section.",
+        message: DIGEST_SECTION_REQUIRED_MESSAGE,
       });
     }
   });
 
 export type NotificationPreferencesUpdate = z.infer<
   typeof notificationPreferencesUpdateSchema
+>;
+
+/**
+ * PATCH: quick actions (pause, resume, unsubscribe all) send only the fields
+ * they change; every other stored value, the time zone included, stays.
+ */
+export const notificationPreferencesPatchSchema = notificationPreferenceFields
+  .partial()
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, "Nothing to update.");
+
+export type NotificationPreferencesPatch = z.infer<
+  typeof notificationPreferencesPatchSchema
 >;
 
 export interface NotificationPreferencesResponse {
@@ -61,7 +89,7 @@ export interface NotificationPreferencesResponse {
   includeWatchNext: boolean;
   includeJourneyStep: boolean;
   cadence: DigestCadence;
-  /** null until the user has saved preferences at least once. */
+  /** null until the user saves a time zone; digests use UTC until then. */
   timezone: string | null;
   pausedUntil: string | null;
   emailOptedInAt: string | null;

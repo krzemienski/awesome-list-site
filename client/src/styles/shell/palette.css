@@ -13,7 +13,7 @@
   top: 12vh;
   left: 50%;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
   width: calc(100vw - 40px);
   max-width: 640px;
   max-height: 76vh;
@@ -34,6 +34,8 @@
 }
 
 .search-palette [cmdk-input-wrapper] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   padding: 14px 18px;
   border-bottom: var(--hairline-w) solid var(--hairline);
   color: var(--accent-ink);
@@ -47,18 +49,37 @@
 }
 
 .search-palette [cmdk-input] {
+  grid-column: 2;
+  grid-row: 1;
   height: auto;
   padding: 0;
   color: var(--text);
   font-family: inherit;
   font-size: 15px;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   outline: none;
   box-shadow: none;
 }
 
 .search-palette [cmdk-input]::placeholder {
+  color: transparent;
+}
+
+/* Native focused inputs clip their placeholder even with text-overflow.
+   Paint its non-interactive text in the same column so ellipsis survives focus. */
+.search-palette-placeholder {
   color: var(--text-3);
+  font-size: 15px;
+  grid-column: 2;
+  grid-row: 1;
+  line-height: calc(10 / 7);
+  overflow: hidden;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-palette-list {
@@ -302,9 +323,15 @@
 
 .search-palette-close {
   display: inline-flex;
+  grid-column: 3;
+  grid-row: 1;
   flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  margin-block: -10px;
   margin-left: 12px;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   border: 0;
   background: transparent;
@@ -319,4 +346,40 @@
 .search-palette-close svg {
   width: 14px;
   height: 14px;
+}
+
+/* One-line rows (View all, recent searches) retain the touch target floor. */
+@media (max-width: 1024px) {
+  .search-palette-row {
+    min-height: 44px;
+    align-content: center;
+  }
+
+  /* Out of flow, so the 44px target leaves the heading row's height alone.
+     Centred on the heading label; it reaches into the first recent row
+     rather than the previous group's last row. */
+  .search-palette-clear {
+    z-index: 1;
+    top: -2px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-palette [cmdk-input-wrapper] {
+    padding-inline: 12px;
+  }
+
+  /* The input keeps the generic 16px rule (mobile-optimizations.css) so iOS
+     Safari does not zoom on focus; the overlay placeholder matches it and
+     ellipsizes when the column is narrow. */
+  .search-palette-placeholder {
+    font-size: 16px;
+  }
+
+  .search-palette-close {
+    margin-left: 8px;
+  }
 }

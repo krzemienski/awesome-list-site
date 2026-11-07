@@ -58,12 +58,33 @@ SendMessage({ to: "researcher", summary: "Start", message: "[task context]" })
 
 ## Build & Test
 
-- ALWAYS run tests after code changes
+- There are no test suites (owner rule, removed in b4040bfe; see replit.md). Verify changes in the real running app and API.
 - ALWAYS verify build succeeds before committing
 
 ```bash
 npm run build
 ```
 
-There is no bare `npm test` script; the suites are `npm run test:unit`, `npm run test:integration`, `npm run test:e2e`, and `npm run test:parity`.
+Gates per change: `npm run build` (it runs `tsc --noEmit` and `npm run lint:guards` before bundling) and `npx eslint <touched files>`. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (and on gitignored `.claude/worktrees`), so lint only what you touch.
 
+### Rule table
+
+Each rule names what enforces it. When a correction repeats a rule whose enforcer says "nothing", raise it to a check in the same change.
+
+| Rule | Enforced by |
+|---|---|
+| Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` and the merge gate both run |
+| The nav tree has one producer (`HomeNavRepository`) and one type (`shared/catalog-nav.ts`). Every node carries `totalResourceCount`: display it, never re-sum. Corpus-tree counts and the non-category README names come only from `shared/catalog-counts.ts` (`corpusTotalCount`, `countNestedGroups`, `isRealCategory`). | `tsc` (producer and consumers share `CatalogNav`; nav nodes have no `resources`) and `npm run lint:guards` inside `npm run build` |
+| Every Retry / Try again control is `<RetryButton>` (`client/src/components/layout/StatePanel.tsx`): it hands focus to `focusTarget` or the page heading when the error state unmounts. | Ratchet rule in `eslint.guards.config.js` (`editorRules`): the merge gate fails a file that gains a hand-rolled one. 25 legacy hits remain |
+| Controls are 44px tall at touch widths. `<Button>` sizes itself, and a class below `min-h-11` needs `max-lg:min-h-11` beside it. | Same ratchet rule. A link with no size class at all is invisible to it, so that case stays with the browser audit |
+| A changed file never gains ESLint errors. | `scripts/merge-gate.sh`, eslint step (exit 13) |
+| User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
+
+An exception to a guard goes on the offending line with a reason, an expiry date and the approving human: `// eslint-disable-next-line no-restricted-syntax -- <reason>; expires YYYY-MM-DD; approved by <name>`.
+
+Before merging, run main's copy of the merge gate: `bash <(git show origin/main:scripts/merge-gate.sh) <branch>`. Deploys go through the `replit-deploy` skill, whose pre-publish checks (schema diff, running jobs, one backup per deploy) must pass before `publish_app`, and whose final step runs the read-only prod-check runner `npx tsx scripts/prod-check/index.ts --tier 0,1`.
+
+## Deploy
+
+- Production (https://awesome.video) deploys from GitHub `main` through `.claude/skills/replit-deploy/SKILL.md`. A deploy is done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200.
+- Known pitfalls (the empty "Published your App" commit, analytics turned off under `navigator.webdriver`, held-key radio checks) are in `replit.md` under "Production audit cycles 20–21"; cycle 22 root causes (error copy, Retry focus, offline writes) and audit-harness traps are under "Production audit cycle 22".

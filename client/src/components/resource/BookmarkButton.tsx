@@ -5,13 +5,12 @@ import { Bookmark, BookmarkPlus, NotebookPen } from "lucide-react";
 import BookmarkNotesDialog from "./BookmarkNotesDialog";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
-import { restoreRemovedBookmark } from "@/lib/bookmarkRestore";
 import { cn } from "@/lib/utils";
+import { bookmarkAriaLabel } from "@/lib/a11y-labels";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import type { BookmarkQueueStatus } from "@shared/bookmarkCollections";
@@ -75,9 +74,6 @@ function BookmarkButton({
     staleTime: 60_000,
   });
   const serverEntry = bookmarksList?.find((b) => String(b.id) === String(resourceId));
-  // Snapshot of the saved row taken when a removal starts, so Undo can put
-  // back its collections and queue state, not just the bookmark itself.
-  const removedEntryRef = useRef<typeof serverEntry>(undefined);
   const serverBookmarked = bookmarksList !== undefined ? !!serverEntry : initialBookmarked;
   const serverNotes = bookmarksList !== undefined ? (serverEntry?.notes ?? "") : initialNotes;
   // Task #329: signed-out surfaces derive saved state from the on-device
@@ -104,10 +100,7 @@ function BookmarkButton({
   const bookmark = useBookmarkToggle({
     resourceId,
     isActive: isBookmarked,
-    onOptimistic: (next) => {
-      if (!next) removedEntryRef.current = serverEntry;
-      setIsBookmarked(next);
-    },
+    onOptimistic: setIsBookmarked,
     onSuccess: (data, vars, showToast) => {
       // Update with server response
       if (data?.isBookmarked !== undefined) {
@@ -120,48 +113,8 @@ function BookmarkButton({
         setNotes(vars.notes);
       }
 
-      if (vars.remove) {
-        // Run17 BUG-013: removal is one click — give the toast a working Undo
-        // so a misclick isn't permanent (notes are restored too).
-        const restoredNotes = notes;
-        const removedEntry = removedEntryRef.current;
-        void queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
-        showToast({
-          description: "Bookmark removed",
-          duration: 6000,
-          action: (
-            <ToastAction
-              altText="Undo bookmark removal"
-              onClick={() => void (async () => {
-                try {
-                  const { partial } = await restoreRemovedBookmark(resourceId, {
-                    ...removedEntry,
-                    notes: restoredNotes,
-                  });
-                  setIsBookmarked(true);
-                  showToast(
-                    partial
-                      ? {
-                          title: "Bookmark restored",
-                          description: "Some collections or queue settings couldn't be restored.",
-                          variant: "destructive",
-                        }
-                      : { description: "Bookmark restored", duration: 2000 },
-                  );
-                } catch {
-                  toast({
-                    title: "Error",
-                    description: "Couldn't restore the bookmark. Please try again.",
-                    variant: "destructive",
-                  });
-                }
-              })()}
-            >
-              Undo
-            </ToastAction>
-          ),
-        });
-      } else {
+      // The removed toast and its Undo come from useBookmarkToggle.
+      if (!vars.remove) {
         showToast({
           description: saveModeRef.current === "edit" ? "Notes saved" : "Bookmark added",
           duration: 2000,
@@ -272,11 +225,7 @@ function BookmarkButton({
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
 
-  // Bookmarks work without an account while favorites do not, so the label
-  // says where the bookmark lives. Owned here so it follows auth state.
-  const bookmarkLabel = isBookmarked
-    ? (isAuthenticated ? "Remove bookmark" : "Remove bookmark saved on this device")
-    : (isAuthenticated ? "Add bookmark" : "Bookmark on this device — no sign-in required");
+  const bookmarkLabel = bookmarkAriaLabel(isBookmarked, isAuthenticated);
 
   return (
     <>
@@ -291,7 +240,7 @@ function BookmarkButton({
         onClick={handleClick}
         aria-disabled={bookmark.isPending}
         aria-busy={bookmark.isPending}
-        aria-label={resourceTitle ? `${bookmarkLabel}: ${resourceTitle}` : bookmarkLabel}
+        aria-label={bookmarkAriaLabel(isBookmarked, isAuthenticated, resourceTitle)}
         title={bookmarkLabel}
         aria-pressed={isBookmarked}
         data-testid="button-bookmark"

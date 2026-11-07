@@ -1,0 +1,14 @@
+{
+ "cadence": "weekly",
+ "emailDigestEnabled": false,
+ "emailOptedInAt": null,
+ "emailUnsubscribedAt": null,
+ "inAppEnabled": false,
+ "inAppOptedInAt": null,
+ "includeJourneyStep": true,
+ "includeNewResources": true,
+ "includeWatchNext": true,
+ "pausedUntil": null,
+ "timezone": "America/New_York",
+ "updatedAt": "2026-10-26T10:05:07.524Z"
+}

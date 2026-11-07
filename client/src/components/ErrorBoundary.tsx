@@ -1,5 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
+import { trackSiteError } from "@/lib/analytics";
+import { isChunkLoadError } from "@/lib/chunk-load-error";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -24,6 +26,8 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    if (isChunkLoadError(error)) return;
+    trackSiteError("component_crash");
     console.error(`[ErrorBoundary${this.props.label ? `:${this.props.label}` : ""}]`, error, info.componentStack);
   }
 
@@ -32,6 +36,10 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   };
 
   render() {
+    // A chunk that failed to load (deploy rotated its hash) can't recover by
+    // re-rendering: React caches the rejected lazy() import. Let it reach the
+    // route boundary, which reloads once onto the new build (C22-LH-CHUNK).
+    if (this.state.error && isChunkLoadError(this.state.error)) throw this.state.error;
     if (this.state.error) {
       return (
         <StatePanel tone="error" label="Error · crashed" inline testId="error-boundary-fallback"

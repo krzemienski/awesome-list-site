@@ -6,6 +6,7 @@ import { ResourceRepository } from '../repositories/ResourceRepository';
 import { AuditRepository } from '../repositories/AuditRepository';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
+import { checkSingleLink, type SingleLinkCheck } from '../services/linkRemediation';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
 import { classifyKindForStorage } from '../lib/resourceKinds';
 import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../github/importHygiene';
@@ -16,6 +17,9 @@ import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STA
 import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { defaultEnrichmentModel, resolveModel, type AgentRunConfig } from './agentRuntime';
 import type { EnrichmentJob, EnrichmentQueueItem } from '@shared/schema';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("enrichment");
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
 
@@ -61,6 +65,7 @@ interface BatchItem {
   kind: string | null;
   metadata: Record<string, any>;
   urlMetadata: UrlMetadata | null;
+  linkCheck: SingleLinkCheck | null;
   submitted: boolean;
 }
 
@@ -128,6 +133,8 @@ interface EnrichmentRunTotals {
   tokensOut: number;
   turns: number;
   batches: number;
+  /** A batch ended without an SDK result, so part of costUsd is estimated from streamed usage. */
+  costEstimated?: boolean;
 }
 
 export class EnrichmentService {
@@ -227,13 +234,20 @@ export class EnrichmentService {
           completedAt: new Date(),
         });
       } catch (cleanupError) {
-        console.error(`Failed to mark job ${job.id} failed after init error:`, cleanupError);
+        logger.error(`Failed to mark job ${job.id} failed after init error:`, cleanupError);
       }
       throw initError;
     }
 
+    logger.info('Enrichment job queued', {
+      jobId: job.id,
+      filter,
+      resources: resourcesToEnrich.length,
+      batchSize,
+    });
+
     this.startProcessing(job.id).catch(error => {
-      console.error(`Error processing enrichment job ${job.id}:`, error);
+      logger.error(`Error processing enrichment job ${job.id}:`, error);
       this.enrichmentRepo.updateEnrichmentJob(job.id, {
         status: 'failed',
         errorMessage: error.message,
@@ -242,7 +256,7 @@ export class EnrichmentService {
         .then(() => this.enrichmentRepo.closeOutQueue(job.id, 'Not processed: the job failed'))
         .catch(updateError => {
           // Previously an unhandled rejection; the job row stays as it was.
-          console.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
+          logger.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
         });
     });
 
@@ -251,7 +265,7 @@ export class EnrichmentService {
 
   private async startProcessing(jobId: number): Promise<void> {
     if (this.processingJobs.has(jobId)) {
-      console.log(`Job ${jobId} is already being processed`);
+      logger.info("Enrichment job already running", { jobId });
       return;
     }
 
@@ -285,7 +299,7 @@ export class EnrichmentService {
       }
 
       if (job.status === 'cancelled') {
-        console.log(`Job ${jobId} was cancelled`);
+        logger.info('Enrichment job cancelled before start', { jobId });
         return;
       }
 
@@ -302,6 +316,7 @@ export class EnrichmentService {
         authTokenEncrypted: job.authTokenEncrypted || null,
       };
       const model = resolveModel(config, defaultEnrichmentModel());
+      logger.info('Enrichment job started', { jobId, model, resources: job.totalResources ?? 0 });
 
       await this.processJobBatches(jobId, job.batchSize || 10, model, config, abortController, emitter, totals, agentLog);
 
@@ -312,6 +327,7 @@ export class EnrichmentService {
           metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
         });
         await this.enrichmentRepo.closeOutQueue(jobId, 'Not processed: the job was orphaned by a server restart');
+        logger.warn('Enrichment job stopped', { jobId, reason: 'reclaimed as orphaned while running' });
         return;
       }
       const cancelled = updatedJob?.status === 'cancelled' || abortController.signal.aborted;
@@ -320,10 +336,17 @@ export class EnrichmentService {
         completedAt: new Date(),
         metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
       });
+      logger.info('Enrichment job finished', {
+        jobId,
+        status: cancelled ? 'cancelled' : 'completed',
+        processed: updatedJob?.processedResources ?? 0,
+        succeeded: updatedJob?.successfulResources ?? 0,
+        failed: updatedJob?.failedResources ?? 0,
+        costUsd: Number(totals.costUsd.toFixed(4)),
+      });
       // A completed run drained its queue; a cancelled one leaves items behind.
       await this.enrichmentRepo.closeOutQueue(jobId, 'Not processed: the job was cancelled');
     } catch (error: any) {
-      console.error(`Error processing job ${jobId}:`, error);
       // A failed batch still spent tokens; fold its reported usage into the totals.
       const usage = agentUsageFromError(error);
       if (usage) {
@@ -331,6 +354,7 @@ export class EnrichmentService {
         totals.tokensIn += usage.tokensIn;
         totals.tokensOut += usage.tokensOut;
         totals.costUsd += usage.totalCostUsd;
+        if (usage.costBasis !== 'reported') totals.costEstimated = true;
       }
       const cur = await this.enrichmentRepo.getEnrichmentJob(jobId);
       agentLog.push({ role: 'error', content: `Job failed: ${error.message}`, timestamp: new Date().toISOString() });
@@ -355,6 +379,13 @@ export class EnrichmentService {
         jobId,
         budgetStop ? 'Not processed: the job stopped at its budget cap' : 'Not processed: the job failed',
       );
+      logger[status === 'failed' ? 'error' : 'warn']('Enrichment job ended with an error', {
+        jobId,
+        status,
+        processed,
+        failed: failedItems,
+        reason: error.message,
+      }, ...(status === 'failed' ? [error] : []));
     } finally {
       stopHeartbeat();
       this.processingJobs.delete(jobId);
@@ -377,6 +408,7 @@ export class EnrichmentService {
         totalInputTokens: totals.tokensIn,
         totalOutputTokens: totals.tokensOut,
         estimatedCostUsd: totals.costUsd.toFixed(4),
+        costBasis: totals.costEstimated ? 'lower_bound' : 'reported',
       },
       // Keep only the most recent lines; agent_events holds the full structured trace.
       agentLog: agentLog.slice(-100),
@@ -398,7 +430,7 @@ export class EnrichmentService {
 
       const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
       if (!job || (job.status !== 'pending' && job.status !== 'processing')) {
-        console.log(`Job ${jobId} was cancelled, reclaimed or not found`);
+        logger.info("Enrichment job stopped between batches", { jobId, reason: "cancelled, reclaimed or not found" });
         break;
       }
 
@@ -481,12 +513,16 @@ export class EnrichmentService {
         continue;
       }
 
-      let urlMetadata: UrlMetadata | null = null;
-      try {
-        urlMetadata = await fetchUrlMetadata(resource.url);
-      } catch (error) {
-        console.error(`Error fetching URL metadata for ${resource.url}:`, error);
-      }
+      const [urlMetadata, linkCheck] = await Promise.all([
+        fetchUrlMetadata(resource.url).catch((error: unknown) => {
+          logger.error(`Error fetching URL metadata for ${resource.url}:`, error);
+          return null;
+        }),
+        checkSingleLink(resource.url).catch((error: unknown) => {
+          logger.error(`Link check failed for ${resource.url}:`, error);
+          return null;
+        }),
+      ]);
 
       enrichable.push({
         queueItemId: queueItem.id,
@@ -500,6 +536,7 @@ export class EnrichmentService {
         kind: resource.kind ?? null,
         metadata,
         urlMetadata,
+        linkCheck,
         submitted: false,
       });
     }
@@ -528,7 +565,7 @@ export class EnrichmentService {
     const addLog = async (role: string, content: string) => {
       const stored = content.length > 8000 ? content.slice(0, 8000) + `\n…[truncated]` : content;
       agentLog.push({ role, content: stored, timestamp: new Date().toISOString() });
-      console.log(`[enrichment:${jobId}] [${role}] ${content}`);
+      logger.info(`Agent ${role}: ${content}`, { jobId });
     };
     const emitCall = (name: string, input: any) =>
       emitter.emit({ actor: 'orchestrator', actorType: 'orchestrator', eventType: 'tool_call', targetActor: name, summary: preview(JSON.stringify(input)) });
@@ -663,6 +700,7 @@ ${taxonomyHint}`;
     totals.tokensIn += result.tokensIn;
     totals.tokensOut += result.tokensOut;
     totals.costUsd += result.totalCostUsd;
+    if (result.costBasis !== 'reported') totals.costEstimated = true;
 
     const submitted = batch.filter(b => b.submitted).length;
     await addLog('system', `Batch ${result.aborted ? 'cancelled' : (result.subtype || 'done')}: ${submitted}/${items} enriched, turns ${result.numTurns}, cost $${result.totalCostUsd.toFixed(4)}`);
@@ -709,6 +747,9 @@ ${taxonomyHint}`;
     if (ai.subSubcategory) ai.subSubcategory = decodeHtmlEntities(ai.subSubcategory);
 
     const scrapedFields = buildScrapedFields(item.urlMetadata, item.metadata);
+    // Same verdict a scheduled scan would reach; a dead link is hidden by the
+    // next scans' remediation, never by enrichment alone.
+    if (item.linkCheck) scrapedFields.linkCheck = item.linkCheck;
 
     const enhancedMetadata = {
       ...item.metadata,

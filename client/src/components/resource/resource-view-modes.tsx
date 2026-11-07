@@ -99,8 +99,8 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             data-testid={`button-external-row-${resource.id || resource.url}`}
-            title="Open in new tab"
-            aria-label="Open in new tab"
+            title={`Open Link ${resource.title} (opens in new tab)`}
+            aria-label={`Open Link ${resource.title} (opens in new tab)`}
           >
             <ExternalLink className="h-4 w-4" />
           </a>
@@ -133,8 +133,8 @@ export function ResourceCompactCard({ resource }: { resource: ViewModeResource }
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             data-testid={`button-external-compact-${resource.id || resource.url}`}
-            title="Open in new tab"
-            aria-label="Open in new tab"
+            title={`Open Link ${resource.title} (opens in new tab)`}
+            aria-label={`Open Link ${resource.title} (opens in new tab)`}
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </a>

@@ -20,6 +20,8 @@ import ContactSubmissions from "@/components/admin/ContactSubmissions";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import "@/styles/pages/admin-ops-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 interface AuditLogEntry {
   id: number;
@@ -49,6 +51,8 @@ const ACTION_STATUS: Record<string, string> = {
   updated: "completed",
   approved: "approved",
   rejected: "rejected",
+  pending: "pending",
+  archived: "completed",
   deleted: "completed",
   synced: "completed",
   imported: "completed",
@@ -58,6 +62,14 @@ const ACTION_STATUS: Record<string, string> = {
   skip: "completed",
   ai_enriched: "completed",
   ai_enrichment_failed: "failed",
+  ai_enriched_degraded: "degraded",
+  recommendation_clicked: "completed",
+  recommendation_dismissed: "completed",
+  recommendation_feedback_helpful: "completed",
+  recommendation_feedback_not_for_me: "completed",
+  recommendation_feedback_already_known: "completed",
+  recommendation_feedback_hidden: "completed",
+  recommendation_feedback_restored: "completed",
   edit_suggested: "pending",
   edit_approved: "approved",
   edit_rejected: "rejected",
@@ -79,6 +91,9 @@ const ACTION_STATUS: Record<string, string> = {
   "catalog.exported": "completed",
   "catalog.exported_github": "pending",
   "database.exported": "completed",
+  "resources.exported": "completed",
+  "categories.exported": "completed",
+  "database.backed_up": "completed",
   maintenance_backfill_approved_at: "completed",
   maintenance_canonicalize_tags: "completed",
   "user.name_changed": "completed",
@@ -91,6 +106,11 @@ const ACTION_STATUS: Record<string, string> = {
   "journey.step_deleted": "completed",
   "journey.step_group_deleted": "completed",
   "journey.steps_reordered": "completed",
+  // Legacy rows from the retired local-auth routes; nothing writes these now.
+  "auth.login": "completed",
+  "auth.register": "completed",
+  "auth.logout": "completed",
+  "auth.login_failed": "failed",
 };
 
 /* User-management and journey entries carry their own target identity in
@@ -132,12 +152,12 @@ export default function AuditTab() {
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
+  const auditQuery = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
       if (appliedFilter) params.set('resourceId', appliedFilter);
-      const response = await fetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
+      const response = await apiFetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch audit logs');
       return response.json();
     },
@@ -148,6 +168,9 @@ export default function AuditTab() {
     // while the next page loads instead of swapping in the skeleton.
     placeholderData: keepPreviousData,
   });
+  const { data, isLoading, error, refetch, isFetching, isPlaceholderData, dataUpdatedAt } = auditQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const unavailable = queryUnavailableReason(auditQuery);
 
   // C9-V5B-01: a taller next page can push the focused pager button below the
   // fold; bring it back into view once the new page has rendered.
@@ -324,14 +347,20 @@ export default function AuditTab() {
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
+          {/* Refresh feedback: the log rarely changes between clicks, so name
+              when it was last read instead of leaving the click silent. */}
+          <p className="self-center text-xs text-muted-foreground" role="status" data-testid="text-audit-updated">
+            {isFetching ? "Refreshing…" : dataUpdatedAt ? `Updated ${new Date(dataUpdatedAt).toLocaleTimeString()}` : null}
+          </p>
         </form>}
 
         {/* Run23 NB-041: fetch failures render a distinct, retryable error
             state — never the "No audit log entries found" empty state. */}
-        {isError ? (
+        {unavailable ? (
           <AdminLoadError
             subject="the audit log"
             error={error}
+            offline={unavailable === "offline"}
             note="Your filter is still applied."
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
@@ -340,15 +369,8 @@ export default function AuditTab() {
           />
         ) : (
         <>
-        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
-            right-edge fade + explicit hint make the hidden columns
-            discoverable instead of silently clipping them. */}
         <div className="admin-ops-table-wrap relative">
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-            aria-hidden="true"
-          />
-          <Table className="admin-ops-table admin-ops-audit-table">
+          <Table className="admin-ops-table admin-ops-audit-table" scrollLabel="Audit log table, scrollable">
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
@@ -397,7 +419,7 @@ export default function AuditTab() {
                       {actorLabel(log)}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {log.action.replace(/_/g, " ")}
+                      {log.action.replace(/[._]/g, " ")}
                     </TableCell>
                     <TableCell className="text-sm" title={targetLabel(log)}>
                        {targetLabel(log)}
@@ -422,11 +444,6 @@ export default function AuditTab() {
             </TableBody>
           </Table>
         </div>
-        {/* The right-edge fade above is the visible cue; the frozen card ends
-            at the table, so the sideways hint stays for assistive tech only. */}
-        <p className="sr-only">
-          Swipe the table sideways to see all columns.
-        </p>
         </>
         )}
 
@@ -490,7 +507,7 @@ export default function AuditTab() {
               <DialogDescription>
                 {selectedLog && (
                   <>
-                    {selectedLog.action.replace(/_/g, ' ')} ·{" "}
+                    {selectedLog.action.replace(/[._]/g, ' ')} ·{" "}
                     {selectedLog.originalResourceId || selectedLog.resourceId
                       ? `Resource #${selectedLog.originalResourceId || selectedLog.resourceId}`
                       : recordedTarget(selectedLog.changes) ?? "system"}{" "}
@@ -514,7 +531,7 @@ export default function AuditTab() {
                 <div>
                   <div className="text-muted-foreground mb-1">Changes</div>
                   {selectedLog.changes && Object.keys(selectedLog.changes).length > 0 ? (
-                    <ScrollArea className="max-h-[300px] border rounded p-2">
+                    <ScrollArea className="max-h-[300px] border rounded p-2" scrollLabel="Changes, scrollable">
                       <pre className="text-xs whitespace-pre-wrap break-all" data-testid="text-audit-detail-changes">
                         {JSON.stringify(selectedLog.changes, null, 2)}
                       </pre>

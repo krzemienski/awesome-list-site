@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useClerk } from "@clerk/react";
-import type { ClientResource } from "@clerk/react/types";
+import type { ClientResource, UserResource } from "@clerk/react/types";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { trackLogin, trackSignUp } from "@/lib/analytics";
 
@@ -14,26 +14,38 @@ import { trackLogin, trackSignUp } from "@/lib/analytics";
 // it would count one conversion per visit, per tab, forever. A conversion is
 // the *completion of an auth attempt*, which is a transition, not a state.
 //
-// Clerk does not hand us that transition directly: by the time `session` is
-// populated it has already cleared `client.signIn` / `client.signUp`, so the
-// completed attempt and the session it created are never visible in the same
-// update. What the listener does see is the sequence — an attempt goes past
-// with a live `status`, and a session appears a few updates later. So the
-// attempt is remembered as it passes and redeemed when the session shows up.
+// The transition this listens for is "signed out → session". Every completed
+// attempt in this page produces it; a restore never does, because Clerk hands
+// the listener its loaded state with the restored session already present.
+// Multi-step attempts (an emailed code, a new-device check) also pass by with a
+// live `status`, which is kept as a hint. One-step attempts (email + password,
+// no extra check) never surface one: on awesome.video both a password sign-in
+// and a sign-up arrived as a bare session with `signIn`/`signUp` already null.
+// So sign-up vs sign-in is read off the account itself — a sign-up's session is
+// created in the same instant as its user. The session id we last reported is
+// persisted as an idempotent guard: Clerk emits several updates per completion
+// and shares localStorage across tabs.
 //
-// That sequence is exactly what a session restore lacks: reloading a page,
-// restoring a session and refreshing a token all publish a session with no
-// attempt before it, so nothing fires. The session id we last reported is
-// persisted as a second, idempotent guard — Clerk emits several updates per
-// completion, invokes each new listener immediately with current state, and
-// shares localStorage across tabs.
-//
-// No PII: only the verification STRATEGY is read. `signIn.identifier` and
-// `signUp.emailAddress` hold the visitor's email and are never touched.
+// No PII: only strategy/provider names and timestamps are read.
+// `signIn.identifier` and `signUp.emailAddress` hold the visitor's email and
+// are never touched.
 
 const REPORTED_SESSION_KEY = "av_auth_conversion_session";
+// The account whose sign-up this browser already reported: any later session
+// for it (sign out, sign straight back in) is a sign-in, however young the
+// account still is.
+const SIGNED_UP_USER_KEY = "av_auth_signed_up_user";
 
-type PendingAttempt = { kind: "sign-up" | "sign-in"; method?: string };
+// A sign-up's user and session are created in the same request (observed:
+// 16 ms apart; email verification happens before either exists). A sign-in
+// needs a fresh form submission, so it cannot land inside this window.
+const SIGN_UP_SESSION_WINDOW_MS = 10_000;
+
+type AttemptKind = "sign-up" | "sign-in";
+interface PendingAttempt {
+  kind: AttemptKind;
+  method?: string;
+}
 
 /**
  * Clerk verification strategy → GA4 `method`. OAuth strategies arrive as
@@ -46,13 +58,8 @@ function methodFromStrategy(strategy: string | null | undefined): string | undef
   return oauth ? oauth[1] : strategy;
 }
 
-/**
- * The strategy an in-flight attempt is using, if it has committed to one yet.
- * Attempts are observed mid-flight, so this is often still empty — it is a
- * fallback for `client.lastAuthenticationStrategy`, which Clerk sets once the
- * attempt succeeds.
- */
-function attemptStrategy(client: ClientResource | null | undefined, kind: PendingAttempt["kind"]): string | undefined {
+/** The strategy an in-flight attempt is using, if it has committed to one yet. */
+function attemptStrategy(client: ClientResource | null | undefined, kind: AttemptKind): string | undefined {
   if (kind === "sign-up") {
     const signUp = client?.signUp;
     return (
@@ -63,19 +70,34 @@ function attemptStrategy(client: ClientResource | null | undefined, kind: Pendin
   return methodFromStrategy(client?.signIn?.firstFactorVerification?.strategy);
 }
 
+/** How a brand-new account was created: its OAuth provider, else its password. */
+function signUpMethodFromUser(user: UserResource | null | undefined): string | undefined {
+  const provider = user?.externalAccounts?.[0]?.provider;
+  if (provider) return methodFromStrategy(provider);
+  return user?.passwordEnabled ? "password" : undefined;
+}
+
+function isNewAccount(user: UserResource | null | undefined, sessionCreatedAt: Date | undefined): boolean {
+  const userCreatedAt = user?.createdAt?.getTime();
+  const sessionAt = sessionCreatedAt?.getTime();
+  if (userCreatedAt === undefined || sessionAt === undefined) return false;
+  return Math.abs(sessionAt - userCreatedAt) <= SIGN_UP_SESSION_WINDOW_MS;
+}
+
 export default function AuthConversionTracker() {
-  const { addListener } = useClerk();
+  const clerk = useClerk();
 
   useEffect(() => {
     let pending: PendingAttempt | null = null;
+    let sawSignedOut = false;
 
-    return addListener(({ client, session }: { client: ClientResource; session?: unknown }) => {
+    return clerk.addListener(({ client, session, user }) => {
       // Clerk runs its listeners inline while it propagates auth state, so an
       // exception here would escape into the sign-in itself. Measurement must
       // never be able to break the flow it measures.
       try {
-        // An attempt is in flight. Check sign-up first: an OAuth "sign in" with
-        // no account is transferred into a sign-up, and that is a registration.
+        // Check sign-up first: an OAuth "sign in" with no account is
+        // transferred into a sign-up, and that is a registration.
         const kind = client?.signUp?.status ? "sign-up" : client?.signIn?.status ? "sign-in" : null;
         if (kind) {
           // Keep the strategy once it appears — a later update in the same
@@ -84,23 +106,32 @@ export default function AuthConversionTracker() {
           pending = { kind, method };
         }
 
-        const sessionId = (session as { id?: string } | null | undefined)?.id;
-        // No session yet, or a session with no attempt behind it (a restore).
-        if (!sessionId || !pending) return;
+        if (!session) {
+          if (clerk.loaded) sawSignedOut = true;
+          return;
+        }
+        // A session with neither a signed-out moment nor an attempt before it
+        // is a restore or a token refresh.
+        if (!sawSignedOut && !pending) return;
 
         const attempt = pending;
         pending = null;
-        if (safeGetItem(REPORTED_SESSION_KEY) === sessionId) return;
-        safeSetItem(REPORTED_SESSION_KEY, sessionId);
+        sawSignedOut = false;
+        if (safeGetItem(REPORTED_SESSION_KEY) === session.id) return;
+        safeSetItem(REPORTED_SESSION_KEY, session.id);
 
-        const method = methodFromStrategy(client?.lastAuthenticationStrategy) ?? attempt.method ?? "unknown";
-        if (attempt.kind === "sign-up") trackSignUp(method);
-        else trackLogin(method);
+        const alreadySignedUp = !!user && safeGetItem(SIGNED_UP_USER_KEY) === user.id;
+        if (!alreadySignedUp && (attempt?.kind === "sign-up" || isNewAccount(user, session.createdAt))) {
+          if (user) safeSetItem(SIGNED_UP_USER_KEY, user.id);
+          trackSignUp(signUpMethodFromUser(user) ?? attempt?.method ?? "unknown");
+        } else {
+          trackLogin(methodFromStrategy(client?.lastAuthenticationStrategy) ?? attempt?.method ?? "unknown");
+        }
       } catch {
         /* analytics is never worth a failed sign-in */
       }
     });
-  }, [addListener]);
+  }, [clerk]);
 
   return null;
 }

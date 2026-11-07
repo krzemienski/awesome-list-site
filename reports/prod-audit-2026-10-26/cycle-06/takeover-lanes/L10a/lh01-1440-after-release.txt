@@ -1,0 +1,1 @@
+"Healthy\n3,809\nRedirect\n0\nBroken\n12\nTimeout\n0\nSuspect\n2\n\nCounts are the totals saved when scan #8 finished (Aug 4, 2026, 08:18 PM).\n\nMember reports\n0 open\nOpen\nLinks that signed-in members reported as broken from a resource page.\n\nNo open reports.\n\nRecent failures\n\nBroken, DNS and timeout failures pl"

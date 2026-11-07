@@ -1,0 +1,61 @@
+# Follow-up lane queue (12-row chunks). Status column updated by the lead.
+
+| lane | rows | ids | status |
+|---|---|---|---|
+| L06a | 12 | RM-01, RM-02, RM-03, RM-04, RM-05, RM-06, RM-07, RM-08, RM-09, RM-10, RM-11, RM-12 | DONE (opus): 6 PASS, 5 FAIL -> FIX-O..V, RM-04 BLOCKED |
+| L06b | 12 | RM-13, RM-14, RM-15, RM-16, RM-17, RM-18, RM-19, RM-20, RM-21, RM-22, RM-23, RM-25 | queued |
+| L06c | 12 | RM-26, RM-27, RM-29, RM-30, RM-32, RM-33, RM-34, RM-35, RM-36, RM-37, RM-39, RM-40 | queued |
+| L06d | 12 | RM-41, RM-42, RM-43, RM-44, RM-45, RM-46, RM-47, RM-48, RM-49, RM-50, RM-51, RM-52 | queued |
+| L06e | 12 | RM-53, RM-54, RM-55, RM-56, RM-57, RM-58, RM-59, RM-60, RM-61, RM-62, RM-63, RM-64 | queued |
+| L06f | 9 | RM-65, RM-66, RM-67, RM-68, RM-69, RM-70, RM-71, RM-72, RM-73 | queued |
+| L07a | 12 | CAT-01, CAT-02, CAT-03, CAT-04, CAT-05, CAT-06, CAT-07, CAT-08, CAT-09, CAT-10, CAT-11, CAT-12 | DONE (opus): 10 PASS, 2 FAIL -> FIX-A, FIX-N; QA 1211/1212 deleted, 9 cats re-read |
+| L07b | 12 | CAT-13, CAT-14, CAT-15, CAT-16, CAT-17, CAT-18, CAT-19, CAT-20, CAT-22, SC-01, SC-02, SC-03 | running (opus a589fdc70cc0b9c93) |
+| L07c | 12 | SC-04, SC-05, SC-06, SC-07, SC-08, SC-09, SC-10, SC-11, SC-12, SC-13, SC-14, SC-15 | queued |
+| L07d | 12 | SC-16, SC-17, SC-18, SC-19, SC-20, SC-21, SC-22, SC-24, SSC-01, SSC-02, SSC-03, SSC-04 | queued |
+| L07e | 12 | SSC-05, SSC-06, SSC-07, SSC-08, SSC-09, SSC-10, SSC-11, SSC-12, SSC-13, SSC-14, SSC-15, SSC-16 | queued |
+| L07f | 8 | SSC-17, SSC-18, SSC-19, SSC-20, SSC-21, SSC-22, SSC-23, SSC-25 | queued |
+| L08a | 12 | EN-01, EN-02, EN-03, EN-04, EN-05, EN-06, EN-07, EN-08, EN-09, EN-10, EN-11, EN-12 | running |
+| L08b | 12 | EN-13, EN-14, EN-15, EN-16, EN-18, EN-19, EN-20, EN-21, EN-22, EN-23, EN-25, EN-26 | queued |
+| L08c | 12 | EN-27, EN-28, EN-29, EN-30, EN-31, RS-01, RS-02, RS-03, RS-04, RS-05, RS-11, RS-12 | queued |
+| L08d | 12 | RS-13, RS-14, RS-16, RS-18, RS-23, RS-25, RS-26, RS-27, RS-32, RS-37, RS-46, RS-48 | queued |
+| L08e | 12 | RS-53, GH-01, GH-02, GH-03, GH-04, GH-05, GH-07, GH-08, GH-10, GH-11, GH-12, GH-13 | queued |
+| L08f | 12 | GH-14, GH-15, GH-16, GH-17, GH-18, GH-19, GH-20, GH-21, GH-22, GH-23, RW-01, RW-02 | queued |
+| L08g | 7 | RW-03, RW-04, RW-05, RW-06, RW-07, RW-08, RW-09 | queued |
+| L09a | 12 | EX-01, EX-02, EX-03, EX-05, EX-06, EX-08, EX-09, EX-10, EX-12, EX-13, EX-14, EX-15 | DONE (sonnet run completed before quota): 10 PASS, EX-05/EX-08 non-idle states BLOCKED-BY-LEAD |
+| L09b | 12 | EX-16, EX-17, EX-18, EX-19, EX-20, EX-21, EX-22, EX-23, EX-24, EX-26, EX-27, DB-01 | queued |
+| L09c | 12 | DB-02, DB-03, DB-04, DB-06, DB-07, DB-08, DB-13, DB-14, US-01, US-02, US-03, US-04 | queued |
+| L09d | 12 | US-05, US-06, US-07, US-08, US-09, US-10, US-11, US-12, US-13, US-14, US-15, US-16 | queued |
+| L09e | 7 | US-17, US-18, US-20, US-21, US-22, US-24, US-25 | queued |
+| L10a | 12 | LH-01, LH-02, LH-03, LH-04, LH-05, LH-06, LH-08, LH-09, LH-10, LH-12, LH-13, LH-14 | running |
+| L10b | 12 | LH-15, LH-16, LH-17, LH-18, LH-19, LH-20, LH-23, LH-24, LH-25, LH-26, LH-27, LH-28 | running (opus a4b4fc499dc6e29ed) |
+| L10c | 12 | LH-29, LH-30, LH-31, LH-32, DG-01, DG-02, DG-03, DG-04, DG-05, DG-06, DG-07, AU-01 | queued |
+| L10d | 12 | AU-02, AU-03, AU-04, AU-05, AU-06, AU-07, AU-08, AU-09, AU-10, AU-11, AU-12, AU-13 | queued |
+| L10e | 12 | AU-14, AU-15, AU-16, AU-17, AU-18, AU-19, AU-20, AU-21, AU-22, AU-23, AU-24, AU-25 | queued |
+| L10f | 2 | AU-26, AU-27 | queued |
+| HOLD | 3 | RS-19, RS-21, RS-24 | after FIX-C deploy and no active research run |
+| L04a | 12 | C6-MB-001, C6-MB-002, C6-MB-003, C6-MB-005, C6-MB-006, C6-MB-007, C6-MB-008, C6-MB-009, C6-MB-010, C6-MB-011, C6-MB-012, C6-MB-013 | running (opus a4f93d02bf20a612f, session L04a-2) |
+| L04b | 12 | C6-MB-016, C6-MB-017, C6-MB-018, C6-MB-019, C6-MB-020, C6-MB-021, C6-MB-022, C6-MB-023, C6-MB-024, C6-MB-025, C6-MB-026, C6-MB-027 | queued |
+| L04c | 12 | C6-MB-028, C6-MB-029, C6-MB-030, C6-MB-031, C6-MB-032, C6-MB-033, C6-MB-034, C6-MB-035, C6-MB-036, C6-MB-037, C6-MB-038, C6-MB-039 | queued |
+| L04d | 12 | C6-MB-040, C6-MB-041, C6-MB-042, C6-MB-043, C6-MB-044, C6-MB-045, C6-MB-046, C6-MB-047, C6-MB-048, C6-MB-049, C6-MB-050, C6-MB-051 | queued |
+| L04e | 12 | C6-MB-052, C6-MB-053, C6-MB-054, C6-MB-055, C6-MB-056, C6-MB-057, C6-MB-058, C6-MB-059, C6-MB-060, C6-MB-061, C6-MB-062, C6-MB-063 | queued |
+| L04f | 12 | C6-MB-064, C6-MB-065, C6-MB-066, C6-MB-067, C6-MB-068, C6-MB-069, C6-MB-070, C6-MB-071, C6-MB-072, C6-MB-073, C6-MB-074, C6-MB-075 | queued |
+| L04g | 6 | C6-MB-076, C6-MB-077, C6-MB-078, C6-MB-079, C6-MB-080, C6-MB-081 | queued |
+| L05a | 12 | OV-04, OV-05, OV-06, OV-07, OV-08, OV-09, OV-10, OV-11, OV-12, OV-13, OV-14, OV-15 | DONE (sonnet): 10 PASS, 2 FAIL -> FIX-I..L |
+| L05b | 12 | AP-01, AP-02, AP-03, AP-04, AP-05, AP-06, AP-07, AP-08, AP-09, AP-10, AP-12, AP-13 | queued |
+| L05c | 12 | AP-15, AP-16, AP-17, AP-18, AP-19, AP-20, AP-21, AP-23, AP-25, ED-01, ED-02, ED-03 | queued |
+| L05d | 12 | ED-04, ED-05, ED-06, ED-07, ED-08, ED-09, ED-10, ED-11, ED-12, ED-13, ED-14, ED-16 | queued |
+| L05e | 12 | ED-17, ED-18, ED-19, ED-21, ED-22, JN-01, JN-02, JN-03, JN-04, JN-05, JN-06, JN-07 | queued |
+| L05f | 12 | JN-08, JN-09, JN-10, JN-11, JN-12, JN-13, JN-14, JN-15, JN-16, JN-17, JN-18, JN-19 | queued |
+| L05g | 4 | JN-21, JN-24, JN-28, JN-29 | queued |
+| L01a | 12 | C6-PC-001, C6-PC-005, C6-PC-007, C6-PC-008, C6-PC-009, C6-PC-010, C6-PC-011, C6-PC-012, C6-PC-013, C6-PC-014, C6-PC-015, C6-PC-016 | running (opus) |
+| L01b | 12 | C6-PC-017, C6-PC-025, C6-PC-026, C6-PC-027, C6-PC-028, C6-PC-029, C6-PC-030, C6-PC-031, C6-PC-032, C6-PC-033, C6-PC-034, C6-PC-035 | queued |
+| L01c | 12 | C6-PC-036, C6-PC-037, C6-PC-038, C6-PC-039, C6-PC-040, C6-PC-041, C6-PC-042, C6-PC-043, C6-PC-044, C6-PC-045, C6-PC-046, C6-PC-047 | queued |
+| L01d | 12 | C6-PC-048, C6-PC-049, C6-PC-050, C6-PC-051, C6-PC-052, C6-PC-053, C6-PC-054, C6-PC-055, C6-PC-056, C6-PC-057, C6-PC-058, C6-PC-059 | queued |
+| L01e | 7 | C6-PC-060, C6-PC-061, C6-PC-062, C6-PC-063, C6-PC-064, C6-PC-065, C6-PC-066 | queued |
+| L02a | 12 | C6-PS-001, C6-PS-003, C6-PS-004, C6-PS-005, C6-PS-006, C6-PS-007, C6-PS-008, C6-PS-009, C6-PS-010, C6-PS-011, C6-PS-012, C6-PS-013 | running (opus) |
+| L02b | 12 | C6-PS-014, C6-PS-015, C6-PS-018, C6-PS-020, C6-PS-021, C6-PS-022, C6-PS-023, C6-PS-024, C6-PS-025, C6-PS-027, C6-PS-029, C6-PS-030 | queued |
+| L02c | 12 | C6-PS-032, C6-PS-033, C6-PS-034, C6-PS-035, C6-PS-036, C6-PS-038, C6-PS-042, C6-PS-043, C6-PS-044, C6-PS-045, C6-PS-046, C6-PS-047 | queued |
+| L02d | 7 | C6-PS-048, C6-PS-049, C6-PS-050, C6-PS-051, C6-PS-054, C6-PS-058, C6-PS-059 | queued |
+| L03b | 12 | C6-AX-003, C6-AX-004, C6-AX-006, C6-AX-007, C6-AX-010, C6-AX-012, C6-AX-013, C6-AX-019, C6-AX-008, C6-AX-009, C6-AX-015, C6-AX-016 | running (opus a8886382568892ce3) |
+| L03c | 12 | C6-AX-011, SH-01, SH-02, SH-03, SH-10, SH-15, SH-16, SH-17, SH-20, SH-30, SH-36, SH-37 | queued |
+| L03d | 10 | SH-38, SH-39, SH-40, SH-41, SH-42, SH-43, SH-13, SH-09, C6-AX-005, C6-AX-014 | queued |

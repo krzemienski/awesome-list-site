@@ -1,0 +1,1 @@
+"{\"reduced\":true,\"animations\":[],\"toasts\":[\"Added to favorites\",\"Notification Added to favorites\"]}"

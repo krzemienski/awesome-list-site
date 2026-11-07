@@ -61,6 +61,9 @@ import {
 import { PG_INT_MAX } from "../../validation/inputs";
 import { stripInternalResourceFields } from "../../lib/publicResource";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("user-features");
 
 /**
  * Everything the user-features handlers need from the composition root.
@@ -123,7 +126,7 @@ export function registerUserFeatureRoutes(
       if (isForeignKeyViolation(error)) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      console.error('Error adding favorite:', error);
+      logger.error('Error adding favorite:', error);
       res.status(500).json({ message: 'Failed to add favorite' });
     }
   }));
@@ -137,7 +140,7 @@ export function registerUserFeatureRoutes(
       await userFeatureRepo.removeFavorite(userId, resourceId);
       res.json({ message: 'Favorite removed successfully' });
     } catch (error) {
-      console.error('Error removing favorite:', error);
+      logger.error('Error removing favorite:', error);
       res.status(500).json({ message: 'Failed to remove favorite' });
     }
   }));
@@ -149,7 +152,7 @@ export function registerUserFeatureRoutes(
       const favorites = await userFeatureRepo.getUserFavorites(userId);
       res.json(favorites.map(stripInternalResourceFields));
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      logger.error('Error fetching favorites:', error);
       res.status(500).json({ message: 'Failed to fetch favorites' });
     }
   }));
@@ -196,7 +199,7 @@ export function registerUserFeatureRoutes(
       if (isForeignKeyViolation(error)) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      console.error('Error adding bookmark:', error);
+      logger.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
     }
   }));
@@ -210,7 +213,7 @@ export function registerUserFeatureRoutes(
       await userFeatureRepo.removeBookmark(userId, resourceId);
       res.json({ message: 'Bookmark removed successfully' });
     } catch (error) {
-      console.error('Error removing bookmark:', error);
+      logger.error('Error removing bookmark:', error);
       res.status(500).json({ message: 'Failed to remove bookmark' });
     }
   }));
@@ -222,7 +225,7 @@ export function registerUserFeatureRoutes(
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
       res.json(bookmarks.map(stripInternalResourceFields));
     } catch (error) {
-      console.error('Error fetching bookmarks:', error);
+      logger.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });
     }
   }));
@@ -316,7 +319,7 @@ export function registerUserFeatureRoutes(
       );
       res.json(collections.map(collectionResponse));
     } catch (error) {
-      console.error('Error fetching bookmark collections:', error);
+      logger.error('Error fetching bookmark collections:', error);
       res.status(500).json({ message: 'Failed to fetch collections' });
     }
   }));
@@ -331,7 +334,7 @@ export function registerUserFeatureRoutes(
       );
       res.status(201).json(collectionResponse({ ...collection, itemCount: 0 }));
     } catch (error) {
-      console.error('Error creating bookmark collection:', error);
+      logger.error('Error creating bookmark collection:', error);
       res.status(500).json({ message: 'Failed to create collection' });
     }
   }));
@@ -347,7 +350,7 @@ export function registerUserFeatureRoutes(
       if (!reordered) return res.status(404).json({ message: 'Collection not found' });
       res.json({ orderedIds: parsed.data.orderedIds });
     } catch (error) {
-      console.error('Error reordering bookmark collections:', error);
+      logger.error('Error reordering bookmark collections:', error);
       res.status(500).json({ message: 'Failed to reorder collections' });
     }
   }));
@@ -366,7 +369,7 @@ export function registerUserFeatureRoutes(
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collectionResponse(collection));
     } catch (error) {
-      console.error('Error updating bookmark collection:', error);
+      logger.error('Error updating bookmark collection:', error);
       res.status(500).json({ message: 'Failed to update collection' });
     }
   }));
@@ -379,7 +382,7 @@ export function registerUserFeatureRoutes(
       if (!deleted) return res.status(404).json({ message: 'Collection not found' });
       res.json({ message: 'Collection deleted; bookmarks were preserved' });
     } catch (error) {
-      console.error('Error deleting bookmark collection:', error);
+      logger.error('Error deleting bookmark collection:', error);
       res.status(500).json({ message: 'Failed to delete collection' });
     }
   }));
@@ -407,7 +410,7 @@ export function registerUserFeatureRoutes(
         }
         res.status(result === "added" ? 201 : 200).json({ collectionId, resourceId, result });
       } catch (error) {
-        console.error('Error adding bookmark to collection:', error);
+        logger.error('Error adding bookmark to collection:', error);
         res.status(500).json({ message: 'Failed to add bookmark to collection' });
       }
     }),
@@ -433,7 +436,7 @@ export function registerUserFeatureRoutes(
         }
         res.json({ collectionId, resourceId, result });
       } catch (error) {
-        console.error('Error removing bookmark from collection:', error);
+        logger.error('Error removing bookmark from collection:', error);
         res.status(500).json({ message: 'Failed to remove bookmark from collection' });
       }
     }),
@@ -447,7 +450,7 @@ export function registerUserFeatureRoutes(
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collectionResponse(collection));
     } catch (error) {
-      console.error('Error publishing bookmark collection:', error);
+      logger.error('Error publishing bookmark collection:', error);
       res.status(500).json({ message: 'Failed to publish collection' });
     }
   }));
@@ -460,7 +463,7 @@ export function registerUserFeatureRoutes(
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collectionResponse(collection));
     } catch (error) {
-      console.error('Error unpublishing bookmark collection:', error);
+      logger.error('Error unpublishing bookmark collection:', error);
       res.status(500).json({ message: 'Failed to unpublish collection' });
     }
   }));
@@ -479,7 +482,7 @@ export function registerUserFeatureRoutes(
       if (!bookmark) return res.status(404).json({ message: 'Bookmark not found' });
       res.json(bookmark);
     } catch (error) {
-      console.error('Error updating bookmark state:', error);
+      logger.error('Error updating bookmark state:', error);
       res.status(500).json({ message: 'Failed to update bookmark state' });
     }
   }));
@@ -499,7 +502,7 @@ export function registerUserFeatureRoutes(
       if (error instanceof CollectionNotFoundError) {
         return res.status(404).json({ message: 'Collection not found' });
       }
-      console.error('Error applying bulk bookmark action:', error);
+      logger.error('Error applying bulk bookmark action:', error);
       res.status(500).json({ message: 'Failed to update bookmarks' });
     }
   }));
@@ -512,7 +515,7 @@ export function registerUserFeatureRoutes(
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collection);
     } catch (error) {
-      console.error('Error fetching public bookmark collection:', error);
+      logger.error('Error fetching public bookmark collection:', error);
       res.status(500).json({ message: 'Failed to fetch collection' });
     }
   }));
@@ -576,7 +579,7 @@ export function registerUserFeatureRoutes(
         },
       });
     } catch (error) {
-      console.error('[POST /api/user/api-keys] Error:', error);
+      logger.error('[POST /api/user/api-keys] Error:', error);
       return res.status(500).json({ message: 'Failed to create API key' });
     }
   }));
@@ -588,7 +591,7 @@ export function registerUserFeatureRoutes(
       const keys = await storage.listApiKeys(userId);
       return res.json({ apiKeys: keys });
     } catch (error) {
-      console.error('[GET /api/user/api-keys] Error:', error);
+      logger.error('[GET /api/user/api-keys] Error:', error);
       return res.status(500).json({ message: 'Failed to list API keys' });
     }
   }));
@@ -603,7 +606,7 @@ export function registerUserFeatureRoutes(
       }
       return res.json({ message: 'API key revoked' });
     } catch (error) {
-      console.error('[DELETE /api/user/api-keys/:id] Error:', error);
+      logger.error('[DELETE /api/user/api-keys/:id] Error:', error);
       return res.status(500).json({ message: 'Failed to revoke API key' });
     }
   }));
@@ -650,7 +653,7 @@ export function registerUserFeatureRoutes(
         role: updated.role,
       });
     } catch (error) {
-      console.error('[PATCH /api/user/profile] Error:', error);
+      logger.error('[PATCH /api/user/profile] Error:', error);
       return res.status(500).json({ message: 'Failed to update profile' });
     }
   }));
@@ -679,7 +682,7 @@ export function registerUserFeatureRoutes(
           : 'Deletion request received. A maintainer will process it privately.',
       });
     } catch (error) {
-      console.error('[POST /api/user/deletion-request] Error:', error);
+      logger.error('[POST /api/user/deletion-request] Error:', error);
       return res.status(500).json({ message: 'Failed to submit deletion request' });
     }
   }));
@@ -698,7 +701,7 @@ export function registerUserFeatureRoutes(
       await userRepo.setDeletionRequested(userId, false);
       return res.json({ message: 'Deletion request withdrawn.' });
     } catch (error) {
-      console.error('[DELETE /api/user/deletion-request] Error:', error);
+      logger.error('[DELETE /api/user/deletion-request] Error:', error);
       return res.status(500).json({ message: 'Failed to withdraw deletion request' });
     }
   }));
@@ -795,10 +798,10 @@ export function registerUserFeatureRoutes(
       
       // Debug: Log sample data to verify timestamps are available
       if (favorites.length > 0) {
-        console.log('Favorites sample:', favorites[0]);
+        logger.info('Favorites sample:', favorites[0]);
       }
       if (bookmarks.length > 0) {
-        console.log('Bookmarks sample:', bookmarks[0]);
+        logger.info('Bookmarks sample:', bookmarks[0]);
       }
       
       // Get all activity dates from favorites and bookmarks
@@ -848,7 +851,7 @@ export function registerUserFeatureRoutes(
           skillLevel = userPrefs.skillLevel;
         }
       } catch (error) {
-        console.log('User preferences not found, using default skill level');
+        logger.info('User preferences not found, using default skill level');
       }
 
       const progressData = {
@@ -862,7 +865,7 @@ export function registerUserFeatureRoutes(
 
       res.json(progressData);
     } catch (error) {
-      console.error('Error fetching user progress:', error);
+      logger.error('Error fetching user progress:', error);
       res.status(500).json({ message: 'Failed to fetch user progress' });
     }
   }));
@@ -899,7 +902,7 @@ export function registerUserFeatureRoutes(
         revision: preferences?.revision ?? null,
       });
     } catch (error) {
-      console.error('Error fetching user preferences:', error);
+      logger.error('Error fetching user preferences:', error);
       res.status(500).json({ message: 'Failed to fetch learning preferences' });
     }
   }));
@@ -1060,7 +1063,7 @@ export function registerUserFeatureRoutes(
         revision: preferences.revision,
       });
     } catch (error) {
-      console.error('Error saving user preferences:', error);
+      logger.error('Error saving user preferences:', error);
       res.status(500).json({ message: 'Failed to save learning preferences' });
     }
   }));
@@ -1099,7 +1102,7 @@ export function registerUserFeatureRoutes(
         revision: reset.revision,
       });
     } catch (error) {
-      console.error('Error resetting user preferences:', error);
+      logger.error('Error resetting user preferences:', error);
       res.status(500).json({ message: 'Failed to reset learning preferences' });
     }
   }));
@@ -1206,7 +1209,7 @@ export function registerUserFeatureRoutes(
         },
       });
     } catch (error) {
-      console.error('Error fetching contributor dashboard:', error);
+      logger.error('Error fetching contributor dashboard:', error);
       return res.status(500).json({ message: 'Failed to fetch contributions' });
     }
   }));
@@ -1253,7 +1256,7 @@ export function registerUserFeatureRoutes(
         totalEdits: editItems.length,
       });
     } catch (error) {
-      console.error('Error fetching user submissions:', error);
+      logger.error('Error fetching user submissions:', error);
       return res.status(500).json({ message: 'Failed to fetch user submissions' });
     }
   }));
@@ -1339,7 +1342,7 @@ export function registerUserFeatureRoutes(
         current: { id: current.id, kind, status: currentStatus },
       });
     } catch (error) {
-      console.error('Error withdrawing contribution:', error);
+      logger.error('Error withdrawing contribution:', error);
       return res.status(500).json({ message: 'Failed to withdraw contribution' });
     }
   };
@@ -1385,7 +1388,7 @@ export function registerUserFeatureRoutes(
 
       res.json(journeysWithDetails);
     } catch (error) {
-      console.error('Error fetching user journeys:', error);
+      logger.error('Error fetching user journeys:', error);
       res.status(500).json({ message: 'Failed to fetch user journeys' });
     }
   }));
@@ -1557,7 +1560,7 @@ export function registerUserFeatureRoutes(
 
       return res.json(summary);
     } catch (error) {
-      console.error('Error fetching Continue Learning summary:', error);
+      logger.error('Error fetching Continue Learning summary:', error);
       return res.status(500).json({ message: 'Failed to load your learning summary' });
     }
   }));

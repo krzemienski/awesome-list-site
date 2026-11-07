@@ -5,6 +5,8 @@
 import type { Config as MixpanelConfig } from 'mixpanel-browser';
 import type { PostHogConfig } from 'posthog-js';
 import { scrubSdkUrlFields } from './analytics-hygiene';
+import { isAnalyticsSuppressed } from './analytics-suppression';
+import { getAnalyticsConsent } from './analytics';
 
 export interface IdentityUser {
   id: string;
@@ -44,6 +46,12 @@ export const posthogPersonProps = (
 export const mixpanelInitOptions: Partial<MixpanelConfig> = {
   // EU/CA compliance: nothing is tracked unless explicitly opted in afterwards.
   opt_out_tracking_by_default: true,
+  // The SDK otherwise treats navigator.doNotTrack="1" as a permanent opt-out
+  // (has_opted_out_tracking() stays true even after opt_in_tracking()), so a
+  // visitor who clicked Allow analytics with DNT on sent nothing. Explicit
+  // consent decides here, as it does for PostHog and Amplitude, whose SDKs
+  // ignore DNT by default. This init only runs after that consent.
+  ignore_dnt: true,
   // Default api host (api-js.mixpanel.com) is allowlisted in the server CSP
   // connect-src (server/index.ts).
   debug: import.meta.env.DEV,
@@ -92,6 +100,14 @@ export const posthogInitOptions = (apiHost: string): Partial<PostHogConfig> => (
   // skipped — they are large and their inputs are already masked.
   sanitize_properties: (props: Record<string, unknown>, eventName: string) =>
     eventName === '$snapshot' ? props : scrubSdkUrlFields(props),
+  // A running SDK drops its own events ($pageview, autocapture, ...) on a
+  // QA path or once an admin session starts (analytics-suppression.ts).
+  before_send: (event) => (isAnalyticsSuppressed() ? null : event),
+  // opt_out_capturing() stops new captures but not the batch queue: events
+  // queued in the last flush interval still upload after the visitor declines
+  // (request-queue.js never checks consent). Sending each event when it is
+  // captured leaves nothing consented waiting in a queue at withdrawal.
+  request_batching: false,
   debug: import.meta.env.DEV,
 });
 
@@ -110,6 +126,11 @@ export const amplitudeInitOptions = () => ({
     sameSite: 'Lax' as const,
     secure: window.location.protocol === 'https:',
   },
+  // setOptOut(true) only blocks events recorded afterwards; the destination
+  // still uploads its queue on the next flush timer (analytics-core
+  // destination.js has no opt-out hook), i.e. after the visitor declines.
+  // Flushing on the next tick leaves no consented backlog at withdrawal.
+  flushIntervalMillis: 0,
 });
 
 interface AmplitudeEnrichmentEvent {
@@ -127,7 +148,13 @@ interface AmplitudeEnrichmentEvent {
 export const amplitudeUrlScrubPlugin = {
   name: 'awesome-video-url-scrub',
   type: 'enrichment' as const,
-  execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T> => {
+  // Also drops every event (autocapture page views included) on a QA path or
+  // in an admin session, like PostHog's before_send. Autocapture records the
+  // Decline/Save click before React's handler stores the withdrawal, but the
+  // timeline runs enrichment on a later task, so checking consent here drops
+  // that click instead of uploading it after the visitor said no.
+  execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T | null> => {
+    if (isAnalyticsSuppressed() || getAnalyticsConsent() !== 'granted') return Promise.resolve(null);
     for (const field of [event.event_properties, event.user_properties]) {
       if (field && typeof field === 'object') scrubSdkUrlFields(field as Record<string, unknown>);
     }

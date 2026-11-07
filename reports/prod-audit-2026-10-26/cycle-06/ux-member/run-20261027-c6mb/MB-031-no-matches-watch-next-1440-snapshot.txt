@@ -1,0 +1,92 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e5]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e61]
+              - listitem [level=1]
+                - link "Bookmarks" [disabled, ref=e62]
+          - sectionheader
+            - heading "Saved, then finished." [level=1, ref=e25]
+            - paragraph
+            - button "New collection" [ref=e26]
+          - region "Library summary" [ref=e14]
+            - button "12 Active" [ref=e27]
+            - button "12 Saved" [ref=e28]
+            - button "0 Watch next" [ref=e29]
+            - button "0 In progress" [ref=e30]
+            - button "0 Done" [ref=e31]
+            - button "0 Archived" [ref=e32]
+          - complementary "Bookmark collections"
+            - button "All saved 12" [ref=e57]
+          - region "Library filters" [ref=e15]
+            - LabelText [ref=e33] clickable [cursor:pointer]
+            - combobox "Queue status" [expanded=false, ref=e34]: Watch next
+              - generic [ref=e58] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e35] clickable [cursor:pointer]
+            - combobox "Visibility" [expanded=false, ref=e36]: Active bookmarks
+              - generic [ref=e59] clickable [cursor:pointer, onclick]
+            - LabelText [ref=e37] clickable [cursor:pointer]
+            - combobox "Sort" [expanded=false, ref=e38]: Newest saved
+              - generic [ref=e60] clickable [cursor:pointer, onclick]
+          - heading "Nothing matches this view" [level=2, ref=e16]
+          - StaticText "Try another collection, status, or archive filter."
+          - button "Clear filters" [ref=e17]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e18]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e19]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e20]
+            - heading "EXPLORE" [level=2, ref=e39]
+            - link "Community & Events" [ref=e40]
+            - link "Encoding & Codecs" [ref=e41]
+            - link "General Tools" [ref=e42]
+            - link "Infrastructure & Delivery" [ref=e43]
+            - link "Intro & Learning" [ref=e44]
+            - link "Media Tools" [ref=e45]
+            - link "Players & Clients" [ref=e46]
+            - link "Protocols & Transport" [ref=e47]
+            - link "Standards & Industry" [ref=e48]
+          - heading "SOURCE" [level=2, ref=e21]
+          - link "krzemienski/ awesome-video" [ref=e22]
+          - paragraph
+            - link "PRs welcome" [ref=e49]
+          - button "Contact maintainers" [ref=e23]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e24]
+            - link "About" [ref=e50]
+            - link "Terms" [ref=e51]
+            - link "Privacy" [ref=e52]
+            - link "Code of Conduct" [ref=e53]
+            - button "Cookie settings" [ref=e54]
+            - link "Issues ↗" [ref=e55]
+            - link "Sitemap" [ref=e56]

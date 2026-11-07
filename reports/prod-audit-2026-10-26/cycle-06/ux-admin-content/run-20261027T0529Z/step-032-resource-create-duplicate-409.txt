@@ -1,0 +1,85 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Resources" [ref=e38] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e39]
+                - status
+  - dialog "Add New Resource"
+    - heading "Add New Resource" [level=2, ref=e2]
+      - image
+      - StaticText "Add New Resource"
+    - paragraph
+      - StaticText "Create a new resource entry. Required fields are marked with *."
+    - generic
+      - LabelText [ref=e6] clickable [cursor:pointer]
+        - StaticText "Title *"
+      - textbox "Title *" [ref=e7]: [QA-audit-1026] c6 duplicate create
+        - StaticText "[QA-audit-1026] c6 duplicate create"
+      - LabelText [ref=e8] clickable [cursor:pointer]
+        - StaticText "URL *"
+      - textbox "URL *" [ref=e9]: https://github.com/Flipatic/flip-reel
+        - StaticText "https://github.com/Flipatic/flip-reel"
+      - paragraph
+        - StaticText "Another resource already uses this URL (id 190350: \"FlipReel\"). URLs must be unique."
+      - LabelText [ref=e10] clickable [cursor:pointer]
+        - StaticText "Description"
+      - textbox "Description" [ref=e11]: QA-only duplicate URL attempt; this must not create a row.
+        - StaticText "QA-only duplicate URL attempt; this must not create a row."
+      - LabelText [ref=e12] clickable [cursor:pointer]
+        - StaticText "Category *"
+      - combobox "Category *" [expanded=false, required, ref=e13]: Players & Clients
+        - generic [ref=e30] clickable [cursor:pointer, onclick]
+          - StaticText "Players & Clients"
+      - LabelText [ref=e14] clickable [cursor:pointer]
+        - StaticText "Status"
+      - combobox "Status" [expanded=false, ref=e15]: Pending
+        - generic [ref=e31] clickable [cursor:pointer, onclick]
+          - StaticText "Pending"
+      - LabelText [ref=e16] clickable [cursor:pointer]
+        - StaticText "Subcategory"
+      - combobox "Subcategory" [expanded=false, ref=e17]: Desktop Players
+        - generic [ref=e32] clickable [cursor:pointer, onclick]
+          - StaticText "Desktop Players"
+      - LabelText [ref=e18] clickable [cursor:pointer]
+        - StaticText "Sub-subcategory"
+      - combobox "Sub-subcategory" [expanded=false, disabled, ref=e19]: Select subcategory first
+        - StaticText "Select subcategory first"
+      - LabelText [ref=e20] clickable [cursor:pointer]
+        - StaticText "Kind override"
+      - combobox "Kind override" [expanded=false, ref=e21]: Automatic (classified on save)
+        - generic [ref=e33] clickable [cursor:pointer, onclick]
+          - StaticText "Automatic (classified on save)"
+      - paragraph
+        - StaticText "Kind is decided from category, link and title when the resource is saved"
+      - LabelText [ref=e22] clickable [cursor:pointer]
+        - StaticText "Curated placement"
+      - LabelText [ref=e23] clickable [cursor:pointer]
+        - checkbox "Curated placement Feature this resource" [checked=false, ref=e34]
+        - StaticText "Feature this resource"
+      - paragraph
+        - StaticText "Persists as metadata.featured."
+      - LabelText [ref=e24] clickable [cursor:pointer]
+        - StaticText "Format"
+      - combobox "Format" [expanded=false, ref=e25]: Not yet classified
+        - generic [ref=e35] clickable [cursor:pointer, onclick]
+          - StaticText "Not yet classified"
+      - LabelText [ref=e26] clickable [cursor:pointer]
+        - StaticText "Provider"
+      - combobox "Provider" [expanded=false, ref=e27]: Not yet classified
+        - generic [ref=e36] clickable [cursor:pointer, onclick]
+          - StaticText "Not yet classified"
+      - LabelText [ref=e28] clickable [cursor:pointer]
+        - StaticText "Skill level"
+      - combobox "Skill level" [expanded=false, ref=e29]: Not yet classified
+        - generic [ref=e37] clickable [cursor:pointer, onclick]
+          - StaticText "Not yet classified"
+    - button "Cancel" [ref=e3]
+    - button "Create Resource" [ref=e4]
+      - image
+      - StaticText "Create Resource"
+    - button "Close" [ref=e5]
+      - image
+      - StaticText "Close"

@@ -1,0 +1,28 @@
+uid=35_0 RootWebArea "Awesome Video — 3825+ Curated Video & Streaming Resources" url="https://awesome.video/"
+  uid=39_0 dialog "Sidebar" description="Displays the sidebar navigation." modal
+    uid=39_1 heading "Sidebar" level="2"
+    uid=39_2 "Displays the sidebar navigation."
+    uid=39_3 navigation "Sidebar"
+      uid=39_4 link "AWESOME.VIDEO home, 3,825 resources" focusable focused url="https://awesome.video/"
+      uid=39_8 form
+        uid=39_9 searchbox "Search resources"
+      uid=39_10 navigation "Primary"
+        uid=39_11 link "Home" url="https://awesome.video/"
+        uid=39_13 link "Submit" url="https://awesome.video/submit"
+        uid=39_15 link "About" url="https://awesome.video/about"
+      uid=39_17 "CATEGORIES"
+      uid=39_18 button "Community & Events 129 resources" description="Community & Events" expandable
+      uid=39_19 button "Encoding & Codecs 579 resources" description="Encoding & Codecs" expandable
+      uid=39_20 button "General Tools 514 resources" description="General Tools" expandable
+      uid=39_21 button "Infrastructure & Delivery 353 resources" description="Infrastructure & Delivery" expandable
+      uid=39_22 button "Intro & Learning 297 resources" description="Intro & Learning" expandable
+      uid=39_23 button "Media Tools 704 resources" description="Media Tools" expandable
+      uid=39_24 button "Players & Clients 447 resources" description="Players & Clients" expandable
+      uid=39_25 button "Protocols & Transport 467 resources" description="Protocols & Transport" expandable
+      uid=39_26 button "Standards & Industry 335 resources" description="Standards & Industry" expandable
+      uid=39_27 "3,825 indexed"
+      uid=39_28 " · live"
+      uid=39_29 link "Docs ↗" url="https://github.com/krzemienski/awesome-video/tree/master/docs"
+      uid=39_31 link "Source: krzemienski/awesome-video" description="Source: krzemienski/awesome-video" url="https://github.com/krzemienski/awesome-video"
+      uid=39_32 DisclosureTriangle "More navigation" description="More navigation" expandable
+    uid=39_33 button "Close sidebar"

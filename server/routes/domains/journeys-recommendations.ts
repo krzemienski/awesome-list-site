@@ -44,6 +44,10 @@ import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
 import { isForeignKeyViolation } from "../../errors/pgErrors";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { buildValidationEnvelope } from "../../contracts/envelope";
+import { createLogger } from "../../lib/logger";
+import { CATALOG_CACHE_CONTROL, PUBLIC_API_KEYED_CACHE_CONTROL } from "../../http-cache-policy";
+
+const logger = createLogger("journeys");
 
 // ---------------------------------------------------------------------------
 // Journeys registrar
@@ -165,7 +169,7 @@ export function registerJourneyRoutes(
         res.json(enrichedJourneys);
       }
     } catch (error) {
-      console.error('Error fetching journeys:', error);
+      logger.error('Error fetching journeys:', error);
       res.status(500).json({ message: 'Failed to fetch journeys' });
     }
   }));
@@ -213,7 +217,7 @@ export function registerJourneyRoutes(
         } : null
       });
     } catch (error) {
-      console.error('Error fetching journey:', error);
+      logger.error('Error fetching journey:', error);
       res.status(500).json({ message: 'Failed to fetch journey' });
     }
   }));
@@ -237,7 +241,7 @@ export function registerJourneyRoutes(
       if (isForeignKeyViolation(error)) {
         return res.status(404).json({ message: 'Journey not found' });
       }
-      console.error('Error starting journey:', error);
+      logger.error('Error starting journey:', error);
       res.status(500).json({ message: 'Failed to start journey' });
     }
   }));
@@ -298,7 +302,7 @@ export function registerJourneyRoutes(
           message: `Step ID(s) do not belong to this journey: ${(error.foreignStepIds ?? []).join(', ')}`,
         });
       }
-      console.error('Error updating journey progress:', error);
+      logger.error('Error updating journey progress:', error);
       res.status(500).json({ message: 'Failed to update journey progress' });
     }
   }));
@@ -324,7 +328,7 @@ export function registerJourneyRoutes(
       
       res.json(progress);
     } catch (error) {
-      console.error('Error fetching journey progress:', error);
+      logger.error('Error fetching journey progress:', error);
       res.status(500).json({ message: 'Failed to fetch journey progress' });
     }
   }));
@@ -352,7 +356,7 @@ export function registerJourneyRoutes(
       }));
       res.json({ journeys: enriched });
     } catch (error) {
-      console.error('Error fetching admin journeys:', error);
+      logger.error('Error fetching admin journeys:', error);
       res.status(500).json({ message: 'Failed to fetch journeys' });
     }
   }));
@@ -381,7 +385,7 @@ export function registerJourneyRoutes(
       const updated = await learningJourneyRepo.updateLearningJourney(journeyId, parsed.data, { actorId: (req as any).dbUser?.id });
       res.json(updated);
     } catch (error) {
-      console.error('Error updating journey:', error);
+      logger.error('Error updating journey:', error);
       res.status(500).json({ message: 'Failed to update journey' });
     }
   }));
@@ -400,7 +404,7 @@ export function registerJourneyRoutes(
       const steps = await learningJourneyRepo.listJourneySteps(journeyId, true);
       res.json({ steps });
     } catch (error) {
-      console.error('Error listing journey steps:', error);
+      logger.error('Error listing journey steps:', error);
       res.status(500).json({ message: 'Failed to list journey steps' });
     }
   }));
@@ -445,7 +449,7 @@ export function registerJourneyRoutes(
       if (error instanceof z.ZodError) {
         return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid step data'));
       }
-      console.error('Error creating journey step:', error);
+      logger.error('Error creating journey step:', error);
       if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
         return res.status(400).json({ message: 'Selected resource no longer exists or is not approved. Choose another resource.' });
       }
@@ -493,7 +497,7 @@ export function registerJourneyRoutes(
         if (error instanceof z.ZodError) {
           return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid step data'));
         }
-        console.error('Error updating journey step:', error);
+        logger.error('Error updating journey step:', error);
         if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
           return res.status(400).json({ message: 'Selected resource no longer exists or is not approved. Choose another resource.' });
         }
@@ -530,7 +534,7 @@ export function registerJourneyRoutes(
         await learningJourneyRepo.deleteJourneyStep(stepId, req.query.group === 'true', { actorId: (req as any).dbUser?.id });
         res.json({ success: true });
       } catch (error) {
-        console.error('Error deleting journey step:', error);
+        logger.error('Error deleting journey step:', error);
         // B05: the delete runs in one transaction, so a failure changed nothing.
         // The response contract replaces 500 bodies with a generic message, so
         // the admin editor renders its own "nothing was changed" text for 5xx.
@@ -597,7 +601,7 @@ export function registerJourneyRoutes(
         if (error instanceof z.ZodError) {
           return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid reorder payload'));
         }
-        console.error('Error reordering journey steps:', error);
+        logger.error('Error reordering journey steps:', error);
         res.status(500).json({ message: 'Failed to reorder journey steps' });
       }
     }),
@@ -641,7 +645,7 @@ export function registerRecommendationRoutes(
     try {
       res.json({ status: 'ready', message: 'Recommendation engine initialized' });
     } catch (error) {
-      console.error('Error initializing recommendations:', error);
+      logger.error('Error initializing recommendations:', error);
       res.status(500).json({ message: 'Failed to initialize recommendations' });
     }
   }));
@@ -706,10 +710,15 @@ export function registerRecommendationRoutes(
         false
       );
 
+      // The anonymous profile above is built from the query string alone (the
+      // session is never read), so the body is identical for every caller,
+      // except when the engine fell back to an unranked list after a failed
+      // popularity query: that response must not be edge-cached.
+      res.set('Cache-Control', result.degraded ? PUBLIC_API_KEYED_CACHE_CONTROL : CATALOG_CACHE_CONTROL);
       // NB-015 (run23): pass embedded resources through the public serializer.
       res.json(stripRecommendationInternals(result.recommendations || []));
     } catch (error) {
-      console.error('Error generating recommendations:', error);
+      logger.error('Error generating recommendations:', error);
       res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   }));
@@ -767,7 +776,7 @@ export function registerRecommendationRoutes(
       // NB-015 (run23): pass embedded resources through the public serializer.
       res.json(stripRecommendationInternals(result.recommendations || []));
     } catch (error) {
-      console.error('Error generating AI recommendations:', error);
+      logger.error('Error generating AI recommendations:', error);
       res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   }));
@@ -831,7 +840,7 @@ export function registerRecommendationRoutes(
 
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
-      console.error('Error recording recommendation feedback:', error);
+      logger.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
     }
   }));
@@ -856,7 +865,7 @@ export function registerRecommendationRoutes(
       }));
       res.json(states);
     } catch (error) {
-      console.error('Error listing recommendation feedback:', error);
+      logger.error('Error listing recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to load recommendation feedback' });
     }
   }));
@@ -893,7 +902,7 @@ export function registerRecommendationRoutes(
         updatedAt: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Error updating recommendation feedback:', error);
+      logger.error('Error updating recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to update recommendation feedback' });
     }
   }));
@@ -932,7 +941,7 @@ export function registerRecommendationRoutes(
 
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
-      console.error('Error recording recommendation feedback:', error);
+      logger.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
     }
   }));
@@ -1000,7 +1009,7 @@ export function registerRecommendationRoutes(
         timestamp: interaction.timestamp,
       });
     } catch (error) {
-      console.error('Error recording interaction:', error);
+      logger.error('Error recording interaction:', error);
       res.status(500).json({ message: 'Failed to record interaction' });
     }
   }));

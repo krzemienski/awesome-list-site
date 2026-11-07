@@ -1,0 +1,6 @@
+- listbox [ref=e1]
+  - option "All Status" [selected, ref=e2]
+  - option "Approved" [ref=e3]
+  - option "Pending" [ref=e4]
+  - option "Rejected" [ref=e5]
+  - option "Withdrawn" [ref=e6]

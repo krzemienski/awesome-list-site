@@ -19,17 +19,12 @@ import {
 } from "@/lib/analytics-collections";
 import type { PublicCollectionRecoveryAction } from "@/lib/analytics-collections";
 import { getAnalyticsConsent } from "@/lib/analytics";
+import { publicCollectionSeo } from "@shared/seo-templates";
 
 const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(
   /\/+$/,
   "",
 );
-
-function collectionDescription(count: number): string {
-  return `A read-only collection of ${count} curated video development ${
-    count === 1 ? "resource" : "resources"
-  } shared on Awesome Video.`;
-}
 
 export default function PublicCollection({ shareId }: { shareId: string }) {
   const url = `/api/public/collections/${encodeURIComponent(shareId)}`;
@@ -154,12 +149,12 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
     );
   }
 
-  const description = collectionDescription(data.resources.length);
+  const description = publicCollectionSeo.description(data.resources.length);
 
   return (
     <div className="discovery-page space-y-6">
       <SEOHead
-        title={`${data.name} — Shared collection`}
+        title={publicCollectionSeo.titleCore(data.name)}
         description={description}
         noindex
         follow

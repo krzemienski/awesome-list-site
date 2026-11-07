@@ -1,0 +1,147 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subsubcategories"
+  uid=258_0 region "Notifications (F8)"
+    uid=258_1 list
+  uid=258_2 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=258_4 banner
+    uid=258_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=258_8 button "Search 3,825 resources"
+    uid=258_9 navigation "Primary"
+      uid=258_10 link "Browse" url="https://awesome.video/categories"
+      uid=258_12 link "Submit" url="https://awesome.video/submit"
+      uid=258_14 link "About" url="https://awesome.video/about"
+      uid=258_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=258_18 link "Admin" url="https://awesome.video/admin"
+    uid=258_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=251_21 main
+    uid=258_21 navigation "Breadcrumb"
+      uid=258_22 link "Home" url="https://awesome.video/"
+      uid=258_24 "Admin"
+    uid=258_25 "Authorized admin area"
+    uid=258_26 "ADMIN CONSOLE · "
+    uid=258_27 "ADMIN USER"
+    uid=258_28 heading "Operations dashboard" level="1"
+    uid=258_29 "Manage the "
+    uid=258_30 "3,825"
+    uid=258_31 " resources, jobs, and contributors that keep the index alive."
+    uid=258_32 button "Settings, Sub-Subcats section open" expandable haspopup="menu"
+    uid=258_33 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=258_34 status atomic live="polite" relevant="additions text"
+      uid=258_35 "Sub-Subcats section open"
+    uid=258_36 tablist "Admin sections" orientation="horizontal"
+      uid=258_37 tab "Overview" selectable
+      uid=258_38 tab "Approvals" selectable
+      uid=258_39 tab "Edits" selectable
+      uid=258_40 tab "Enrichment" selectable
+      uid=258_41 tab "Researcher" selectable
+      uid=258_42 tab "Export" selectable
+      uid=258_43 tab "Database" selectable
+      uid=258_44 tab "Resources" selectable
+      uid=258_45 tab "Categories" selectable
+      uid=258_46 tab "Subcategories" selectable selected
+      uid=258_47 tab "Users" selectable
+      uid=258_48 tab "GitHub" selectable
+      uid=258_49 tab "Link Health" selectable
+      uid=258_50 tab "Audit" selectable
+      uid=258_51 tab "Research" selectable
+    uid=258_52 button "Scroll tabs right"
+    uid=252_0 tabpanel "Subcategories"
+      uid=258_53 "Sub-Subcategories"
+      uid=258_54 "32 third-level groupings"
+      uid=258_55 button "Search" expandable
+      uid=258_56 button "Add sub-subcategory"
+      uid=258_57 region "Sub-Subcategories table, scrollable"
+        uid=258_58 "NAME"
+        uid=258_59 "SLUG"
+        uid=258_60 "PARENT CATEGORY"
+        uid=258_61 "PARENT SUBCATEGORY"
+        uid=258_62 "RESOURCES"
+        uid=258_63 "ACTIONS"
+        uid=258_64 "AV1"
+        uid=258_65 "av1"
+        uid=258_66 "Encoding & Codecs"
+        uid=258_67 "Codecs"
+        uid=258_68 "22"
+        uid=258_69 button "Edit AV1"
+        uid=258_70 button "Delete AV1 unavailable: 22 resources still assigned" disableable disabled
+        uid=258_71 "Advertising"
+        uid=258_72 "advertising"
+        uid=258_73 "Media Tools"
+        uid=258_74 "Ads & QoE"
+        uid=258_75 "22"
+        uid=258_76 button "Edit Advertising"
+        uid=258_77 button "Delete Advertising unavailable: 22 resources still assigned" disableable disabled
+        uid=258_78 "Android"
+        uid=258_79 "android"
+        uid=258_80 "Players & Clients"
+        uid=258_81 "Mobile & Web Players"
+        uid=258_82 "20"
+        uid=258_83 button "Edit Android"
+        uid=258_84 button "Delete Android unavailable: 20 resources still assigned" disableable disabled
+        uid=258_85 "Audio"
+        uid=258_86 "audio"
+        uid=258_87 "Media Tools"
+        uid=258_88 "Audio & Subtitles"
+        uid=258_89 "32"
+        uid=258_90 button "Edit Audio"
+        uid=258_91 button "Delete Audio unavailable: 32 resources still assigned" disableable disabled
+        uid=258_92 "CDN Integration"
+        uid=258_93 "cdn-integration"
+        uid=258_94 "Infrastructure & Delivery"
+        uid=258_95 "CDN Integration & Distribution"
+        uid=258_96 "11"
+        uid=258_97 button "Edit CDN Integration"
+        uid=258_98 button "Delete CDN Integration unavailable: 11 resources still assigned" disableable disabled
+        uid=258_99 "Chromecast"
+        uid=258_100 "chromecast"
+        uid=258_101 "Players & Clients"
+        uid=258_102 "Smart TV Players"
+        uid=258_103 "12"
+        uid=258_104 button "Edit Chromecast"
+        uid=258_105 button "Delete Chromecast unavailable: 12 resources still assigned" disableable disabled
+        uid=258_106 "Cloud Platforms"
+        uid=258_107 "cloud-platforms"
+        uid=258_108 "Infrastructure & Delivery"
+        uid=258_109 "Cloud & CDN"
+        uid=258_110 "14"
+        uid=258_111 button "Edit Cloud Platforms"
+        uid=258_112 button "Delete Cloud Platforms unavailable: 14 resources still assigned" disableable disabled
+        uid=258_113 "Conferences"
+        uid=258_114 "conferences"
+        uid=258_115 "Community & Events"
+        uid=258_116 "Events & Conferences"
+        uid=258_117 "23"
+        uid=258_118 button "Edit Conferences"
+        uid=258_119 button "Delete Conferences unavailable: 23 resources still assigned" disableable disabled
+        uid=258_120 "DASH"
+        uid=258_121 "dash"
+        uid=258_122 "Protocols & Transport"
+        uid=258_123 "Adaptive Streaming"
+        uid=258_124 "49"
+        uid=258_125 button "Edit DASH"
+        uid=258_126 button "Delete DASH unavailable: 49 resources still assigned" disableable disabled
+        uid=258_127 "FFmpeg"
+        uid=258_128 "ffmpeg"
+        uid=258_129 "Encoding & Codecs"
+        uid=258_130 "Encoding Tools"
+        uid=258_131 "65"
+        uid=258_132 button "Edit FFmpeg"
+        uid=258_133 button "Delete FFmpeg unavailable: 65 resources still assigned" disableable disabled
+      uid=258_134 "Rows per page:"
+      uid=258_135 combobox "Items per page" expandable haspopup="listbox" value="10"
+      uid=258_136 navigation "Pagination"
+        uid=258_137 generic disableable disabled
+          uid=258_138 "Previous"
+        uid=258_139 link "Page 1, current page" url="https://awesome.video/admin#subsubcategories"
+          uid=258_140 "1"
+        uid=258_141 link "Go to page 2" url="https://awesome.video/admin?page=2#subsubcategories"
+          uid=258_142 "2"
+        uid=258_143 link "Go to page 3" url="https://awesome.video/admin?page=3#subsubcategories"
+          uid=258_144 "3"
+        uid=258_145 link "Go to page 4" url="https://awesome.video/admin?page=4#subsubcategories"
+          uid=258_146 "4"
+        uid=258_147 link "Next" url="https://awesome.video/admin?page=2#subsubcategories"
+        uid=258_149 "Page "
+        uid=258_150 "1"
+        uid=258_151 " of "
+        uid=258_152 "4"
+        uid=258_153 status atomic live="polite" relevant="additions text"

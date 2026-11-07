@@ -1,0 +1,6 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":true,"isLandscape":false,"width":820,"height":1180}
+Emulating prefers-reduced-motion: reduce
+## Console messages
+Showing 1-2 of 2 (Page 1 of 1).
+msgid=2 [issue] A form field element should have an id or name attribute (count: 3)
+msgid=3 [error] Failed to load resource: the server responded with a status of 429 () (0 args) [2 times]

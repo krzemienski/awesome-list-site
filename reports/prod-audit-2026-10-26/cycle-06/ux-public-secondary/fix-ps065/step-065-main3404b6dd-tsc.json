@@ -1,0 +1,13 @@
+{
+  "command": "node_modules/.bin/tsc --noEmit (unpiped)",
+  "integratedOriginMain": "3404b6dd",
+  "capturedAt": "2026-10-27T07:47:46.017Z",
+  "result": {
+    "text": "\nTSC_EXIT=0\n\n\nWall time: 30.32 seconds",
+    "details": {
+      "wallTimeNoticeEmitted": true,
+      "timeoutSeconds": 300,
+      "wallTimeMs": 30322.92591699958
+    }
+  }
+}

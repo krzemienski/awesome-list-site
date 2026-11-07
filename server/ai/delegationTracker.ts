@@ -1,0 +1,155 @@
+/**
+ * Follows subagent delegations through the Agent SDK message stream so the
+ * caller gets one start and one end per delegation, plus per-delegation web
+ * search counts, and so a concurrency cap can be enforced in the PreToolUse
+ * hook.
+ *
+ * A delegation is a blocking Task/Agent tool call: it starts with a
+ * `system/task_started` message and ends when the orchestrator receives the
+ * tool_result for that tool_use_id. Subagent assistant messages carry the
+ * delegation's tool_use_id as `parent_tool_use_id`. Every delegation
+ * tool_result yields an "ended" event, so the caller sees every report even
+ * when its start could not be tied to a tool_use_id.
+ */
+
+export interface DelegationStarted {
+  kind: "started";
+  taskId: string;
+  toolUseId: string | null;
+  subagentType: string | null;
+  description: string;
+  /** Delegations running now, including this one. */
+  concurrent: number;
+}
+
+export interface DelegationEnded {
+  kind: "ended";
+  taskId: string;
+  toolUseId: string | null;
+  subagentType: string | null;
+  status: "completed" | "failed";
+  durationMs: number;
+  webSearches: number;
+  /** Text of the subagent's report (the delegation tool_result). */
+  output: string;
+}
+
+export type DelegationEvent = DelegationStarted | DelegationEnded;
+
+interface ActiveDelegation {
+  taskId: string;
+  toolUseId: string | null;
+  subagentType: string | null;
+  startedAt: number;
+  webSearches: number;
+  /** Unkeyed start that was open when a delegation result could not be tied to a start. */
+  ambiguous?: boolean;
+}
+
+export class DelegationTracker {
+  /** Delegation tool calls the model issued, keyed by tool_use_id, not yet matched to a task. */
+  private readonly calls = new Map<string, { subagentType: string | null; description: string }>();
+  /** Started delegations keyed by tool_use_id (or `task:<id>` when the SDK omits it). */
+  private readonly active = new Map<string, ActiveDelegation>();
+  /** tool_use_ids the PreToolUse hook admitted that have not returned yet. */
+  private readonly admitted = new Set<string>();
+  /** Every delegation tool_use_id seen (tool_use block or hook) that has not returned yet. */
+  private readonly delegationCalls = new Set<string>();
+  /** Delegation calls the cap refused; their tool_result is the refusal, not a report. */
+  private readonly denied = new Set<string>();
+
+  constructor(private readonly maxConcurrent: number | null) {}
+
+  /** PreToolUse gate: false when the cap is already full. */
+  admit(toolUseId: string): boolean {
+    if (this.maxConcurrent != null && this.admitted.size >= this.maxConcurrent) {
+      this.denied.add(toolUseId);
+      return false;
+    }
+    this.admitted.add(toolUseId);
+    this.delegationCalls.add(toolUseId);
+    return true;
+  }
+
+  get cap(): number | null {
+    return this.maxConcurrent;
+  }
+
+  noteToolUse(toolUseId: string, input: unknown): void {
+    const i = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+    this.delegationCalls.add(toolUseId);
+    this.calls.set(toolUseId, {
+      subagentType: typeof i.subagent_type === "string" ? i.subagent_type : null,
+      description: typeof i.description === "string" ? i.description : "",
+    });
+  }
+
+  taskStarted(msg: { task_id?: string | number | null; tool_use_id?: unknown; subagent_type?: unknown; description?: unknown }): DelegationStarted | null {
+    if (msg.task_id == null) return null;
+    const taskId = String(msg.task_id);
+    let toolUseId = typeof msg.tool_use_id === "string" ? msg.tool_use_id : null;
+    // Older payloads omit tool_use_id: pair with the oldest unmatched call.
+    toolUseId ??= this.calls.keys().next().value ?? null;
+    const call = toolUseId ? this.calls.get(toolUseId) : undefined;
+    if (toolUseId) this.calls.delete(toolUseId);
+    const key = toolUseId ?? `task:${taskId}`;
+    if (this.active.has(key)) return null;
+    const subagentType = typeof msg.subagent_type === "string" ? msg.subagent_type : call?.subagentType ?? null;
+    this.active.set(key, { taskId, toolUseId, subagentType, startedAt: Date.now(), webSearches: 0 });
+    return {
+      kind: "started",
+      taskId,
+      toolUseId,
+      subagentType,
+      description: typeof msg.description === "string" && msg.description ? msg.description : call?.description ?? "",
+      concurrent: this.active.size,
+    };
+  }
+
+  noteSubagentWebSearch(parentToolUseId: string | null | undefined): void {
+    if (!parentToolUseId) return;
+    const d = this.active.get(parentToolUseId);
+    if (d) d.webSearches++;
+  }
+
+  /** Call for every tool_result the orchestrator receives. */
+  toolResult(toolUseId: string, isError: boolean, output: string): DelegationEnded | null {
+    this.admitted.delete(toolUseId);
+    const call = this.calls.get(toolUseId);
+    this.calls.delete(toolUseId);
+    const denied = this.denied.delete(toolUseId);
+    const isDelegation = this.delegationCalls.delete(toolUseId) && !denied;
+    // A start stored under `task:<id>` (no tool_use_id to pair with at the
+    // time) is paired with a result only by elimination: it is the one such
+    // start open, no other delegation is still out without a start of its own,
+    // and no earlier result went unpaired while it was open. Anything looser
+    // can hand one scout's status and duration to another when results return
+    // out of order. An ambiguous start is never paired; the caller closes it
+    // as aborted when the run stops.
+    let key: string | undefined = this.active.has(toolUseId) ? toolUseId : undefined;
+    if (!key && isDelegation) {
+      const unkeyed = [...this.active].filter(([, a]) => a.toolUseId === null);
+      const otherUnstarted = [...this.delegationCalls].some((id) => !this.active.has(id) && !this.denied.has(id));
+      if (unkeyed.length === 1 && !otherUnstarted && !unkeyed[0][1].ambiguous) key = unkeyed[0][0];
+      else for (const [, a] of unkeyed) a.ambiguous = true;
+    }
+    const d = key ? this.active.get(key) : undefined;
+    if (!d && !isDelegation) return null;
+    if (key) this.active.delete(key);
+    return {
+      kind: "ended",
+      taskId: d?.taskId ?? toolUseId,
+      toolUseId,
+      subagentType: d?.subagentType ?? call?.subagentType ?? null,
+      status: isError ? "failed" : "completed",
+      durationMs: d ? Date.now() - d.startedAt : 0,
+      webSearches: d?.webSearches ?? 0,
+      output,
+    };
+  }
+
+  /** Delegations still running (for the caller to close out after an abort). */
+  get inFlight(): number {
+    return this.active.size;
+  }
+}

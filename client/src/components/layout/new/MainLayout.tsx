@@ -1,5 +1,6 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
+import { lazyOptional, retryOptionalChunks } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
@@ -11,7 +12,10 @@ import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
+import { preloadSearchDialog, takePendingPalette } from "@/lib/search-dialog-loader";
+import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/search-palette";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
@@ -19,10 +23,11 @@ import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/
 // b/e host the contact dialog.
 import AppFooter from "./AppFooter";
 import { useContactConfig } from "@/lib/contact";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 // Guard the import itself so disabled builds do not emit the contact chunk.
 const ContactDialogHost =
   import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
-    ? lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
+    ? lazyOptional(() => import("@/components/contact/contact-dialog"), (module) => module.ContactDialogHost)
     : null;
 
 /** Mounts the lazy contact host only after hydration. Server-rendered, its
@@ -33,27 +38,15 @@ function ClientContactDialogHost() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!ContactDialogHost || !mounted) return null;
-  return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
+  return <ContactDialogHost />;
 }
 
-/** R2-L01: floating "back to top" button, appears after scrolling ~600px.
- * It steps aside once the footer's meta strip is on screen: that strip spans
- * the content column to its right edge, exactly where the button floats. */
+/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      // Read scrollY first: measuring the footer forces a synchronous layout,
-      // which on mount (scrollY 0) cost a full-page layout mid-commit.
-      if (window.scrollY <= 600) {
-        setVisible(false);
-        return;
-      }
-      const meta = document.querySelector(".app-footer-meta");
-      const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
-      setVisible(!metaOnScreen);
-    };
+    const onScroll = () => setVisible(window.scrollY > 600);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -69,27 +62,19 @@ function BackToTop() {
         // The button unmounts once the page is back near the top; hand focus
         // to the page heading so keyboard users don't drop to <body>.
         handoffFocusOnUnmount(e.currentTarget);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
       }}
       aria-label="Back to top"
       data-testid="button-back-to-top"
       // Fixed to the SCREEN, so it is lifted by the app shell's
       // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      className="fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+      // It floats in --back-to-top-lane (index.css), which the shell's end
+      // gutter keeps clear of content at every width.
+      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>
   );
-}
-
-interface User {
-  id: string;
-  email?: string;
-  name?: string;
-  avatar?: string;
-  provider?: string;
-  role?: string;
-  createdAt?: string;
 }
 
 interface MainLayoutProps {
@@ -105,7 +90,7 @@ interface MainLayoutProps {
   // the /categories card's Retry button.
   onRetryNav?: () => void;
   children: React.ReactNode;
-  user?: User;
+  user?: AuthUser;
   onLogout?: () => void;
   logoutError?: string | null;
   renderSearchDialog?: (controls: {
@@ -121,7 +106,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   // still represent a new route for the global palette's lifecycle.
   const search = useSearch();
   const isAdmin = /^\/admin(?:\/|$)/.test(location);
-  const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory)\//.test(location);
+  const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory|tag)\//.test(location);
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: publicConfig } = useContactConfig(true);
 
@@ -132,12 +117,49 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
     setSearchOpen(false);
   }, [location, search]);
 
+  useEffect(() => {
+    retryOptionalChunks();
+  }, [location]);
+
+  // Fetch the palette chunk before anyone asks for it: once the browser is
+  // idle after first paint, and when the pointer or keyboard reaches the
+  // header trigger. The open handlers below call it again, which is a no-op
+  // when the chunk is already loading or loaded.
+  useEffect(() => {
+    const warm = (event: Event) => {
+      if ((event.target as Element | null)?.closest?.(".header-search-trigger")) preloadSearchDialog();
+    };
+    document.addEventListener("pointerover", warm);
+    document.addEventListener("focusin", warm);
+    const hasIdle = "requestIdleCallback" in window;
+    const idle = hasIdle
+      ? window.requestIdleCallback(preloadSearchDialog, { timeout: 3000 })
+      : window.setTimeout(preloadSearchDialog, 1500);
+    return () => {
+      document.removeEventListener("pointerover", warm);
+      document.removeEventListener("focusin", warm);
+      if (hasIdle) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, []);
+
+  // A search requested before hydration (see the capture script in
+  // index.html) opens the palette now; SearchPalette reads the buffered draft.
+  // Declared after the location-reset effect above so its open wins on mount.
+  useEffect(() => {
+    const pending = takePendingPalette();
+    if (!pending?.open) return;
+    trackCommandPaletteOpened(pending.method);
+    setSearchOpen(true);
+  }, []);
+
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
   useEffect(() => {
     // One open event per closed → open transition, tagged with its trigger.
-    const openPalette = (method: CommandPaletteOpenMethod) => {
-      if (!searchOpen) trackCommandPaletteOpened(method);
+    const openPalette = (method: CommandPaletteOpenMethod, surface?: string) => {
+      if (!searchOpen) trackCommandPaletteOpened(method, surface);
+      preloadSearchDialog();
       setSearchOpen(true);
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -154,29 +176,31 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         openPalette("keyboard_shortcut");
         return;
       }
+      // "/" opens the palette only from outside a text field; once it is open
+      // the key is ordinary input ("h.264/avc").
       if (
         event.key === "/" &&
         !event.ctrlKey &&
         !event.metaKey &&
-        !event.altKey
+        !event.altKey &&
+        !searchOpen &&
+        !inField
       ) {
-        if (searchOpen) {
-          if (inField) event.preventDefault();
-          return;
-        }
-        if (!inField) {
-          event.preventDefault();
-          openPalette("slash_key");
-        }
+        event.preventDefault();
+        openPalette("slash_key");
       }
     };
-    // Only the /search page input dispatches this (on a pristine "/" press).
-    const openSearch = () => openPalette("slash_key");
+    // Page-level search entries (resource and listing pages) pass their method;
+    // the /search input's pristine "/" press sends a bare event.
+    const openSearch = (event: Event) => {
+      const detail = (event as CustomEvent<OpenSearchPaletteDetail | undefined>).detail;
+      openPalette(detail?.method ?? "slash_key", detail?.surface);
+    };
     document.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("awesome:open-search-palette", openSearch);
+    window.addEventListener(OPEN_SEARCH_PALETTE_EVENT, openSearch);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("awesome:open-search-palette", openSearch);
+      window.removeEventListener(OPEN_SEARCH_PALETTE_EVENT, openSearch);
     };
   }, [searchOpen]);
 
@@ -222,9 +246,12 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         <AppHeader
           onSearchOpen={() => {
             if (!searchOpen) trackCommandPaletteOpened("header_button");
+            preloadSearchDialog();
             setSearchOpen(true);
           }}
           siteName={publicConfig?.site?.title}
+          repoUrl={publicConfig?.site?.repoUrl}
+          repoBranch={publicConfig?.site?.repoBranch}
           user={user}
           onLogout={onLogout}
           logoutError={logoutError}

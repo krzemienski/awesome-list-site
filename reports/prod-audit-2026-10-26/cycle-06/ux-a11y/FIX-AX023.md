@@ -1,0 +1,7 @@
+Fix C6-AX-023 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-ax023-contextual-external-links. Never edit stale main checkout or merge/deploy.
+
+Read fresh evidence reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-175-list-1440-state.txt and step-179-compact-external-names-1440-state.txt. Taxonomy List and Compact external links all use aria-label/title “Open in new tab”, losing resource context. In client/src/components/resource/resource-view-modes.tsx make each accessible name resource-specific, matching existing external-link conventions (e.g. “Open Link {resource.title} (opens in new tab)” or the established equivalent). Keep title/aria-label aligned, icon/44px targets, href, rel, test IDs and visual layout unchanged. Scope List and Compact only; do not alter Grid or analytics.
+
+Run tsc --noEmit and npm run build unpiped. Drive real local taxonomy List and Compact at 1440, 820 touch and 390 touch: inspect repeated accessible names for distinct resources, keyboard focus/activation, and no layout/target regressions. Save screenshots, accessibility snapshots and console/network evidence under reports/prod-audit-2026-10-26/cycle-06/ux-a11y/fix-ax023/. No test files/mocks/validation harnesses.
+
+Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks, evidence and UNVERIFIED items. Never merge.

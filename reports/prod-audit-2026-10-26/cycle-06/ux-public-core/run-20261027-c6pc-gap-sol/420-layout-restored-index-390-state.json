@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/settings","title":"Settings — Awesome Video","width":390,"height":844,"touch":true,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BUTTON","id":"home-layout-index","label":null,"text":"","rect":{"x":54,"y":606.390625,"width":16,"height":16,"top":606.390625,"right":70,"bottom":622.390625,"left":54}},"headings":[{"text":"Settings","id":""},{"text":"Appearance","id":"link-settings-theme-title"},{"text":"Sign in for more","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Settings","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

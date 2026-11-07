@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
-import { trackEvent } from "@/lib/analytics";
+import { trackPageNotFound } from "@/lib/analytics";
 import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 import { missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
@@ -27,8 +27,7 @@ interface NotFoundProps {
 export default function NotFound({ suggestion }: NotFoundProps) {
   useMissingRouteTelemetry(true);
   useEffect(() => {
-    const path = window.location.pathname + window.location.search;
-    trackEvent("page_not_found", "navigation", path);
+    trackPageNotFound(window.location.pathname);
   }, []);
 
   // min-h-full, not a 100vh calc: <main> already fills whatever the app shell
@@ -54,11 +53,8 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         <p className="system-state-kicker caret" aria-hidden="true">
           ~/awesome.video/404 → not_found
         </p>
-        <h1 className="display-h system-state-title">Page Not Found</h1>
-        <p className="system-state-copy">
-          We couldn't find the page you're looking for. The page may have been
-          moved or doesn't exist.
-        </p>
+        <h1 className="display-h system-state-title">{missingPageSeo.heading}</h1>
+        <p className="system-state-copy">{missingPageSeo.lead}</p>
         {suggestion && (
           <p className="system-state-copy">
             <Link

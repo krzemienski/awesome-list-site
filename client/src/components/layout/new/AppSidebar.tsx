@@ -1,8 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsomorphicLayoutEffect } from "@/hooks/use-isomorphic-layout-effect";
 import { useState, useEffect, useMemo, useRef, useId, type ReactNode } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import {
   Home,
+  LayoutGrid,
   Plus,
   BookOpen,
   Zap,
@@ -12,9 +14,9 @@ import {
   Palette,
   Search,
   MoreHorizontal,
-  PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { getCategoryGlyph } from "./category-glyphs";
 import {
   Sidebar,
@@ -29,21 +31,17 @@ import {
 import "@/styles/shell/sidebar.css";
 import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
+import { docsUrl, shellRepo } from "@/lib/docs-url";
+import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
+import { visibleNavCategories } from "@/lib/static-data";
+import type { CatalogNavCategory } from "@shared/catalog-nav";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
  * (name/slug/resourceCount, no resource arrays) so cold loads of non-listing
- * pages never download the 2.7MB corpus. The corpus shape (resources arrays)
- * is still accepted for compatibility.
+ * pages never download the 2.7MB corpus.
  */
-interface NavCategory {
-  name: string;
-  slug?: string;
-  resourceCount?: number;
-  resources?: any[];
-  subcategories?: NavCategory[];
-  subSubcategories?: NavCategory[];
-}
+type NavCategory = CatalogNavCategory;
 
 interface AppSidebarProps {
   categories: NavCategory[];
@@ -65,65 +63,12 @@ interface AppSidebarProps {
 
 /* -------- helpers -------- */
 
-// Resources filed on the node itself, not in any child.
-function directResourceCount(item: any): number {
-  return item.resources ? item.resources.length : (item.resourceCount ?? 0);
-}
-
-function getTotalResourceCount(item: any): number {
-  let total = directResourceCount(item);
-  if (item.subcategories) {
-    total += item.subcategories.reduce(
-      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
-      0,
-    );
-  }
-  if (item.subSubcategories) {
-    total += item.subSubcategories.reduce(
-      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
-      0,
-    );
-  }
-  return total;
-}
-
-function filterCategories(categories: NavCategory[]) {
-  return categories
-    .filter(
-      (cat) =>
-        cat.name !== "Table of contents" &&
-        !cat.name.startsWith("List of") &&
-        !["Contributing", "License", "External Links", "Anti-features"].includes(
-          cat.name,
-        ) &&
-        // Drop top-level categories that contain no resources at all (e.g. the
-        // "Categories"/"Projects"/"Resources" meta-entries). Mirrors the
-        // count>0 filter Home uses so the nav and landing page agree on which
-        // categories are real. Empty SUBcategories are still kept (dimmed)
-        // below — this only removes wholly empty top-level entries.
-        getTotalResourceCount(cat) > 0,
-    )
-    .map((cat) => {
-      // BUG-006: hide wholly empty subcategories / sub-subcategories from the
-      // nav. (This reverses follow-up #51's "keep dimmed empties visible"
-      // decision.) On the clean dev tree every node has resources so this is a
-      // no-op; on prod it removes the empty rows the QA audit flagged. Counts
-      // still reconcile because an empty node contributes 0 to the parent sum.
-      const subcategories = (cat.subcategories ?? [])
-        .map((sub) => ({
-          ...sub,
-          subSubcategories: (sub.subSubcategories ?? []).filter(
-            (ss) => getTotalResourceCount(ss) > 0,
-          ),
-        }))
-        .filter((sub) => getTotalResourceCount(sub) > 0);
-      return { ...cat, subcategories };
-    });
-}
-
 function formatCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-  return String(n);
+  return n.toLocaleString();
+}
+
+function resourceCountLabel(n: number): string {
+  return `${formatCount(n)} ${n === 1 ? "resource" : "resources"}`;
 }
 
 /* Bring an item into its nearest scrolling ancestor ("block: nearest").
@@ -226,6 +171,7 @@ function SubItem({
       )}
       style={count === 0 ? { opacity: 0.45 } : undefined}
       title={count === 0 ? `${label} (no resources yet)` : label}
+      aria-label={typeof count === "number" ? `${label}, ${resourceCountLabel(count)}` : undefined}
     >
       <span className="av-sidebar-leaf-label" title={label}>{label}</span>
       {typeof count === "number" && (
@@ -234,8 +180,7 @@ function SubItem({
           // BUG-049 (run19): bare numbers were ambiguous next to the labeled
           // "N resources" header — give every count an explicit unit for
           // assistive tech and a hover title for sighted users.
-          title={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
-          aria-label={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
+          title={resourceCountLabel(count)}
         >
           {formatCount(count)}
         </span>
@@ -298,10 +243,14 @@ function DismissibleDetails({ className, children }: { className: string; childr
 /* -------- top-level accordion category -------- */
 
 function MeasuredAccordionBody({
-  id, open, children,
-}: { id: string; open: boolean; children: () => ReactNode }) {
+  id, open, animate, children,
+}: { id: string; open: boolean; animate: boolean; children: () => ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
+  // A non-animated open leaves max-height unset until the content has settled,
+  // so nested accordions that open in the same commit never get clipped by a
+  // premature measurement.
+  const [settled, setSettled] = useState(false);
   // Keep the control's target in the DOM while closed, but delay the expensive
   // taxonomy subtree (and its ResizeObserver) until a user opens it once.
   // `open` makes an active route mount immediately; `hasBeenOpened` keeps the
@@ -314,7 +263,10 @@ function MeasuredAccordionBody({
     if (open) setHasBeenOpened(true);
   }, [open]);
 
-  useEffect(() => {
+  // Layout effect: a body that opens because of the route (not a click) must
+  // be measured before first paint, so it never paints collapsed and then
+  // pushes the rows below it down.
+  useIsomorphicLayoutEffect(() => {
     if (!shouldMountContent) return;
     const content = contentRef.current;
     if (!content) return;
@@ -327,9 +279,27 @@ function MeasuredAccordionBody({
     return () => observer.disconnect();
   }, [shouldMountContent]);
 
+  // Once open, re-measure after nested bodies have laid out, then pin the
+  // height so a later user close can transition from a pixel value.
+  useEffect(() => {
+    if (!open) {
+      setSettled(false);
+      return;
+    }
+    const content = contentRef.current;
+    if (content) setHeight(content.scrollHeight);
+    setSettled(true);
+  }, [open]);
+
+  const unclamped = open && !animate && !settled;
+
   return (
     <div id={id} className="accordion-body"
-      style={{ maxHeight: open ? height : 0 }}
+      style={{
+        maxHeight: !open ? 0 : unclamped ? "none" : height,
+        // Only a user toggle animates; route-driven auto-expand snaps open.
+        ...(animate ? null : { transition: "none" }),
+      }}
       {...(!open ? ({ inert: "" } as any) : {})}>
       {shouldMountContent ? (
         <div ref={contentRef} className="flow-root">{children()}</div>
@@ -349,6 +319,7 @@ function CategoryAccordion({
   matchQuery,
   openSubs,
   toggleSub,
+  toggledKey,
 }: {
   cat: NavCategory;
   isOpen: boolean;
@@ -361,10 +332,13 @@ function CategoryAccordion({
   matchQuery: string;
   openSubs: string[];
   toggleSub: (key: string) => void;
+  /** The group the user just toggled on this route; only it animates. Route-driven opens snap. */
+  toggledKey: string | null;
 }) {
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const subKey = (subName: string, subSlug?: string) =>
     `${catSlug}::${subSlug || slugify(subName)}`;
+  const catAnimate = toggledKey === categoryStorageKey(cat);
   // Tablet can mount both the sidebar and drawer; disclosure IDs must belong
   // to the mounted instance, not just the shared category.
   const instanceId = useId();
@@ -375,9 +349,9 @@ function CategoryAccordion({
   // /api/awesome-list hierarchy. The backend folds orphaned resources into the
   // nearest valid node, so this always equals COUNT(*) WHERE category = X and
   // always equals (direct + sum of child badges) — no "mixed validators".
-  const totalCount = getTotalResourceCount(cat);
+  const totalCount = cat.totalResourceCount;
   // Without this row the child badges sum short of the category badge.
-  const catDirectCount = directResourceCount(cat);
+  const catDirectCount = cat.resourceCount;
   const catGeneralPath = `${catPath}?filter=general`;
   const hasGrandchildren = subs.some(
     (sub) => (sub.subSubcategories?.length ?? 0) > 0,
@@ -444,8 +418,8 @@ function CategoryAccordion({
             style={{ fontSize: 12, color: "var(--text-3)" }}
             // BUG-049 (run19): unit-label the category badge like the header's
             // "N resources" so the bare number is unambiguous.
-            title={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
-            aria-label={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
+            title={resourceCountLabel(totalCount)}
+            aria-label={resourceCountLabel(totalCount)}
           >
             {formatCount(totalCount)}
           </span>
@@ -458,7 +432,7 @@ function CategoryAccordion({
       </button>
 
       {subs.length > 0 && (
-        <MeasuredAccordionBody id={bodyId} open={isOpen}>
+        <MeasuredAccordionBody id={bodyId} open={isOpen} animate={catAnimate}>
           {() => (
             <div className="accordion-body-inner">
               <a
@@ -482,7 +456,7 @@ function CategoryAccordion({
               .map((sub) => {
                 const subSlug = sub.slug || slugify(sub.name);
                 const subPath = `/subcategory/${subSlug}`;
-                const subCount = getTotalResourceCount(sub);
+                const subCount = sub.totalResourceCount;
                 const subSubs = sub.subSubcategories || [];
                 const subActive =
                   activePath === subPath ||
@@ -491,8 +465,9 @@ function CategoryAccordion({
                       activePath ===
                       `/sub-subcategory/${ss.slug || slugify(ss.name)}`,
                   );
+                const subIsPage = activePath === subPath && !generalActive;
                 const subOpen = openSubs.includes(subKey(sub.name));
-                const subDirectCount = directResourceCount(sub);
+                const subDirectCount = sub.resourceCount;
                 const subGeneralPath = `${subPath}?filter=general`;
 
                 if (subSubs.length === 0) {
@@ -511,7 +486,12 @@ function CategoryAccordion({
 
                 return (
                   <div key={sub.name} className="av-sidebar-l2-group">
-                    <div className={cn("av-sidebar-l2-row", subActive && "active")}>
+                    <div
+                      className={cn(
+                        "av-sidebar-l2-row",
+                        subIsPage ? "active" : subActive && "contains-active",
+                      )}
+                    >
                       <a
                         href={subPath}
                         onClick={(event) => {
@@ -519,18 +499,18 @@ function CategoryAccordion({
                           navigate(subPath);
                         }}
                         data-testid={`sub-${subSlug}`}
-                        // The row highlight marks the group holding the current
-                        // page; only the exact unfiltered listing is "page".
-                        aria-current={activePath === subPath && !generalActive ? "page" : undefined}
+                        // Only the exact unfiltered listing is "page"; a group
+                        // that holds the current page is only "contains-active".
+                        aria-current={subIsPage ? "page" : undefined}
                         data-active={subActive || undefined}
                         title={sub.name}
+                        aria-label={`${sub.name}, ${resourceCountLabel(subCount)}`}
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
                         <span
                           className="font-mono tabular-nums"
-                          title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
-                          aria-label={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
+                          title={resourceCountLabel(subCount)}
                         >
                           {formatCount(subCount)}
                         </span>
@@ -553,7 +533,7 @@ function CategoryAccordion({
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>
-                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen}>
+                    <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen} animate={toggledKey === subKey(sub.name)}>
                       {() => (
                         <div className="av-sidebar-l3-tree">
                           <a
@@ -579,13 +559,14 @@ function CategoryAccordion({
                                   navigate(ssPath);
                                 }}
                                 data-testid={`subsub-${ssSlug}`}
+                                aria-label={`${ss.name}, ${resourceCountLabel(ss.totalResourceCount)}`}
                                 data-active={activePath === ssPath || undefined}
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
                               >
                                 <span aria-hidden="true">{index === subSubs.length - 1 && subDirectCount === 0 ? "└" : "├"}</span>
                                 <span title={ss.name}>{ss.name}</span>
-                                <span className="font-mono tabular-nums">{formatCount(getTotalResourceCount(ss))}</span>
+                                <span className="font-mono tabular-nums">{formatCount(ss.totalResourceCount)}</span>
                               </a>
                             );
                           })}
@@ -597,6 +578,7 @@ function CategoryAccordion({
                                 navigate(subGeneralPath);
                               }}
                               data-testid={`subsub-${subSlug}-uncategorized`}
+                              aria-label={`Uncategorized in ${sub.name}, ${resourceCountLabel(subDirectCount)}`}
                               data-active={(activePath === subPath && generalActive) || undefined}
                               aria-current={activePath === subPath && generalActive ? "page" : undefined}
                               className="av-sidebar-l3-row no-underline"
@@ -637,12 +619,15 @@ export default function AppSidebar({
   totalResources,
   isLoading,
   siteName,
-  repoUrl,
-  repoBranch = "main",
+  repoUrl: configuredRepoUrl,
+  repoBranch: configuredRepoBranch,
   navError,
   onRetryNav,
   user,
 }: AppSidebarProps) {
+  const { repoUrl, repoBranch } = shellRepo(configuredRepoUrl, configuredRepoBranch);
+  const docsHref = docsUrl(repoUrl, repoBranch);
+  const sourceLabel = `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}`;
   const homeBoot = useHomeBoot();
   const isInitialHomeHydration = homeBoot?.isAnonymous === true;
   const [location, setLocation] = useLocation();
@@ -655,6 +640,12 @@ export default function AppSidebar({
     isInitialHomeHydration ? [] : readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY),
   );
   const [openKeysReady, setOpenKeysReady] = useState(!isInitialHomeHydration);
+  const [toggled, setToggled] = useState<{ key: string; location: string } | null>(null);
+  // A toggle animates only its own group and only on the route it happened on.
+  const toggledKey = toggled && toggled.location === location ? toggled.key : null;
+  useEffect(() => {
+    setToggled(null);
+  }, [location]);
   const {
     setOpenMobile,
     isMobile,
@@ -688,7 +679,7 @@ export default function AppSidebar({
       ?.focus();
   }, [isRailCompact]);
 
-  const filtered = useMemo(() => filterCategories(categories), [categories]);
+  const filtered = useMemo(() => visibleNavCategories(categories), [categories]);
 
   useEffect(() => {
     if (!homeBoot || openKeysReady) return;
@@ -799,6 +790,10 @@ export default function AppSidebar({
   };
   const activePath = normalizePath(location);
   const isActive = (path: string) => activePath === normalizePath(path);
+  const isBrowseSection = (path: string) =>
+    path === "/categories" &&
+    (location === "/" ||
+      BROWSE_ROUTE_PREFIXES.some((prefix) => location.startsWith(prefix)));
 
   const navItems = [
     { label: "Home", icon: Home, href: "/" },
@@ -853,7 +848,7 @@ export default function AppSidebar({
               style={{ padding: "13px 18px" }}
             >
               <div className="flex items-center gap-3">
-                <Skeleton className="size-5 rounded" />
+                <Skeleton className="size-6 rounded" />
                 <Skeleton
                   className="h-3 rounded"
                   style={{ width: `${55 + ((i * 17) % 30)}%` }}
@@ -887,26 +882,29 @@ export default function AppSidebar({
                 key={cat.name}
                 cat={cat}
                 isOpen={isOpen}
-                onToggle={() =>
+                toggledKey={toggledKey}
+                onToggle={() => {
+                  setToggled({ key: catKey, location });
                   setOpenCategories((prev) =>
                     prev.includes(catKey) || prev.includes(cat.name)
                       ? prev.filter((c) => c !== catKey && c !== cat.name)
                       : [...prev, catKey],
-                  )
-                }
+                  );
+                }}
                 isActive={catActive}
                 activePath={activePath}
                 generalActive={generalFilterActive}
                 navigate={navigate}
                 matchQuery=""
                 openSubs={openSubcategories}
-                toggleSub={(name) =>
+                toggleSub={(name) => {
+                  setToggled({ key: name, location });
                   setOpenSubcategories((prev) =>
                     prev.includes(name)
                       ? prev.filter((s) => s !== name)
                       : [...prev, name],
-                  )
-                }
+                  );
+                }}
               />
             );
           })}
@@ -926,7 +924,10 @@ export default function AppSidebar({
           {onRetryNav && (
             <button
               type="button"
-              onClick={() => onRetryNav()}
+              onClick={(event) => {
+                handoffFocusOnUnmount(event.currentTarget);
+                onRetryNav();
+              }}
               className="btn ghost min-h-[44px]"
               data-testid="sidebar-nav-retry"
             >
@@ -951,6 +952,12 @@ export default function AppSidebar({
 
   const drawerNavItems = [
     { label: "Home", icon: Home, href: "/", testId: "nav-home" },
+    {
+      label: "Browse",
+      icon: LayoutGrid,
+      href: "/categories",
+      testId: "nav-browse",
+    },
     {
       label: "Submit",
       icon: Plus,
@@ -1002,7 +1009,6 @@ export default function AppSidebar({
     }>,
     className = "",
     compact = false,
-    showNavigationModeToggle = false,
   ) => (
     <DismissibleDetails className={`av-sidebar-more-navigation ${className}`}>
       <summary
@@ -1017,25 +1023,6 @@ export default function AppSidebar({
         )}
       </summary>
       <SidebarMenu className="px-2 pb-2">
-        {showNavigationModeToggle && (
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="min-h-[44px]">
-              <button
-                type="button"
-                onClick={(e) => setNavigationMode(false, e.currentTarget)}
-                data-testid="sidebar-compact-navigation"
-                aria-label="Compact navigation"
-                title="Compact navigation"
-                className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
-              >
-                <span className="flex min-w-0 items-center gap-[10px]">
-                  <PanelLeft aria-hidden="true" className="size-[14px] shrink-0" />
-                  <span className="break-words">Compact navigation</span>
-                </span>
-              </button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        )}
         {items.map((item) => {
           const MoreIcon = item.icon;
           return (
@@ -1047,6 +1034,7 @@ export default function AppSidebar({
                 e.preventDefault();
                 navigate(item.href);
               }}
+              aria-label={item.label}
               data-testid={item.testId ?? `nav-${slugify(item.label)}`}
               data-active={isActive(item.href) || undefined}
               aria-current={isActive(item.href) ? "page" : undefined}
@@ -1132,7 +1120,6 @@ export default function AppSidebar({
     className: string,
     includeDocs = false,
     exposeResourceTestId = false,
-    showNavigationModeToggle = false,
   ) => (
     <SidebarFooter className={`av-sidebar-compact-footer ${className}`}>
       <div className="av-sidebar-compact-footer-status">
@@ -1150,9 +1137,9 @@ export default function AppSidebar({
           <span className="av-sidebar-compact-footer-live"> · live</span>
         </span>
         <div className="av-sidebar-compact-footer-links">
-          {includeDocs && repoUrl && (
+          {includeDocs && docsHref && (
             <a
-              href={`${repoUrl.replace(/\/$/, "")}/tree/${encodeURIComponent(repoBranch)}/docs`}
+              href={docsHref}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -1160,13 +1147,11 @@ export default function AppSidebar({
             </a>
           )}
           <a
-            {...(repoUrl ? { href: repoUrl } : {})}
+            href={repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-            title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-            aria-disabled={!repoUrl || undefined}
-            tabIndex={repoUrl ? undefined : -1}
+            aria-label={sourceLabel}
+            title={sourceLabel}
           >
             <svg
               width="13"
@@ -1179,12 +1164,7 @@ export default function AppSidebar({
             </svg>
           </a>
         </div>
-        {renderMoreNavigation(
-          items,
-          "av-sidebar-footer-more",
-          true,
-          showNavigationModeToggle,
-        )}
+        {renderMoreNavigation(items, "av-sidebar-footer-more", true)}
       </div>
     </SidebarFooter>
   );
@@ -1226,8 +1206,14 @@ export default function AppSidebar({
                 navigate(item.href);
               }}
               data-testid={item.testId}
-              data-active={isActive(item.href) || undefined}
-              aria-current={isActive(item.href) ? "page" : undefined}
+              data-active={isActive(item.href) || isBrowseSection(item.href) || undefined}
+              aria-current={
+                isActive(item.href)
+                  ? "page"
+                  : isBrowseSection(item.href)
+                    ? "true"
+                    : undefined
+              }
               className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
             >
               <span className="flex items-center gap-[10px] min-w-0">
@@ -1328,7 +1314,7 @@ export default function AppSidebar({
                     e.preventDefault();
                     navigate(href);
                   }}
-                  title={`${cat.name} · ${formatCount(getTotalResourceCount(cat))}`}
+                  title={`${cat.name} · ${formatCount(cat.totalResourceCount)}`}
                   aria-label={cat.name}
                   data-testid={`rail-${catSlug}`}
                   data-active={catActive || undefined}
@@ -1344,14 +1330,12 @@ export default function AppSidebar({
               );
             })}
             <a
-              {...(repoUrl ? { href: repoUrl } : {})}
+              href={repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="rail-icon-btn av-sidebar-rail-repo no-underline"
-              aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-              title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
-              aria-disabled={!repoUrl || undefined}
-              tabIndex={repoUrl ? undefined : -1}
+              aria-label={sourceLabel}
+              title={sourceLabel}
             >
               <span aria-hidden="true" className="font-mono text-sm">↗</span>
             </a>

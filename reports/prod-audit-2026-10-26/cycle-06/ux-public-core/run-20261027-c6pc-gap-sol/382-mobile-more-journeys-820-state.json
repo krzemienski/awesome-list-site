@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/journeys","title":"Learning Journeys — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":814,"online":true,"focus":{"tag":"H1","id":"","label":null,"text":"Learning Journeys","rect":{"x":40,"y":140,"width":714,"height":40.59375,"top":140,"right":754,"bottom":180.59375,"left":40}},"headings":[{"text":"Learning Journeys","id":""},{"text":"Building Your First Streaming Platform","id":""},{"text":"Advanced Live Streaming Architecture","id":""},{"text":"DRM & Content Protection","id":""},{"text":"FFmpeg Mastery","id":""},{"text":"Video Streaming Fundamentals","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Learning Journeys","label":null,"current":"page"},{"text":"Learning Journeys","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

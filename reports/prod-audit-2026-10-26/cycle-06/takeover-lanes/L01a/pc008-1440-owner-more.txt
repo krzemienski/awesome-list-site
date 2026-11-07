@@ -1,0 +1,1 @@
+"{\"sb\":[[\"Submit Resource\",\"/submit\"],[\"Learning Journeys\",\"/journeys\"],[\"Advanced\",\"/advanced\"],[\"Theme\",\"/settings/theme\"],[\"Home dashboard\",\"/?context=account\"],[\"Admin\",\"/admin\"],[\"About\",\"/about\"]],\"moreEx\":[[\"SUMMARY\",\"More navigation\",null]]}"

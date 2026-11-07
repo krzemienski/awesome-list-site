@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/search?q=hls","title":"Search: hls — Awesome Video","width":1440,"height":900,"touch":false,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"INPUT","id":"","label":"Search resources","text":"","rect":{"x":117,"y":190.390625,"width":1012.46875,"height":44,"top":190.390625,"right":1129.46875,"bottom":234.390625,"left":117}},"headings":[{"text":"Search","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Search","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

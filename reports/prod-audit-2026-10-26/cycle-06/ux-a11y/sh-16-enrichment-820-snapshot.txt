@@ -1,0 +1,108 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Enrichment" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [selected, ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Enrichment" [ref=e12] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "LAST ENRICHED"
+                - StaticText "—"
+                - StaticText "No recent batch enriched resources"
+              - article
+                - StaticText "QUEUE"
+                - StaticText "0"
+                - StaticText "idle"
+              - article
+                - StaticText "AVG COST"
+                - StaticText "—"
+                - StaticText "per batch"
+              - generic
+                - sectionheader
+                  - heading "Enrichment jobs" [level=2, ref=e34]
+                  - paragraph
+                    - StaticText "LLM-driven metadata enhancement"
+                  - button "Run job" [disabled, ref=e35]
+                - region "Enrichment jobs table, scrollable" [ref=e33] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "JOB" [ref=e36]
+                        - columnheader "STATUS" [ref=e37]
+                        - columnheader "STARTED" [ref=e38]
+                        - columnheader "COMPLETED" [ref=e39]
+                        - columnheader "ACTIONS" [ref=e40]
+                          - StaticText "ACTIONS"
+              - group
+                - DisclosureTriangle "Job controls & monitoring" [expanded=false]

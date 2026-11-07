@@ -1,0 +1,10 @@
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video
+  https://awesome.video/category/encoding-codecs

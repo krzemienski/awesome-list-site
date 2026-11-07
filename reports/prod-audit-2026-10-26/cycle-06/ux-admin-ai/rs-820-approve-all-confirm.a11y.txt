@@ -1,0 +1,7 @@
+- generic
+  - alertdialog "Approve all pending discoveries?"
+    - heading "Approve all pending discoveries?" [level=2, ref=e1]
+    - paragraph
+      - StaticText "This approves all 9 pending discoveries and publishes them as live resources. Discoveries whose URL already exists in the database are skipped as duplicates. This cannot be undone in bulk — each resource would need to be removed individually."
+    - button "Cancel" [ref=e2]
+    - button "Approve All" [ref=e3]

@@ -1,0 +1,820 @@
+- generic [active]:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic:
+              - text: Search
+              - generic: 3,826 resources…
+            - generic: ⌘K
+          - navigation:
+            - link:
+              - /url: /categories
+              - text: Browse
+            - link:
+              - /url: /submit
+              - text: Submit
+            - link:
+              - /url: /about
+              - text: About
+            - link:
+              - /url: /design-system
+              - text: Docs ↗
+            - link:
+              - /url: /admin
+              - text: Admin
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - generic: // Learning library
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img
+                          - heading [level=1]:
+                            - text: Saved, then
+                            - emphasis: finished.
+                        - paragraph: Turn bookmarks into a queue you can actually work through.
+                      - button:
+                        - img
+                        - text: New collection
+                  - region:
+                    - button:
+                      - generic: "12"
+                      - text: Active
+                    - button:
+                      - generic: "12"
+                      - text: Saved
+                    - button:
+                      - generic: "0"
+                      - text: Watch next
+                    - button:
+                      - generic: "0"
+                      - text: In progress
+                    - button:
+                      - generic: "0"
+                      - text: Done
+                    - button:
+                      - generic: "0"
+                      - text: Archived
+                  - generic:
+                    - complementary:
+                      - generic:
+                        - button [pressed]:
+                          - generic:
+                            - img
+                            - text: All saved
+                          - generic: "12"
+                        - generic:
+                          - button:
+                            - generic:
+                              - generic: "[QA-audit-1026] gap collection A"
+                              - generic: "0"
+                    - generic:
+                      - region:
+                        - generic:
+                          - generic: Queue status
+                          - combobox:
+                            - generic: All statuses
+                            - img
+                        - generic:
+                          - generic: Visibility
+                          - combobox:
+                            - generic: Active bookmarks
+                            - img
+                        - generic:
+                          - generic: Sort
+                          - combobox:
+                            - generic: Newest saved
+                            - img
+                      - region "Bulk bookmark actions":
+                        - generic:
+                          - generic:
+                            - checkbox
+                            - text: Select all shown
+                          - paragraph: 0 bookmarks selected
+                      - generic:
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: "Select 2025 NAB Show: CineCentral"
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ◈
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/184751
+                                    - text: "2025 NAB Show: CineCentral"
+                              - paragraph: The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/184751
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Community & Events
+                                - generic: Events
+                              - generic:
+                                - link:
+                                  - /url: https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique
+                                  - img
+                                  - generic: Open Link
+                                  - generic: "2025 NAB Show: CineCentral (opens in new tab)"
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select Transcoding Performance Trial
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ◇
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/186231
+                                    - text: Transcoding Performance Trial
+                              - paragraph: Runs FFmpeg transcoding processes simultaneously and measures CPU performance
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/186231
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Encoding & Codecs
+                                - generic: Tools & SDKs
+                              - generic:
+                                - link:
+                                  - /url: https://github.com/2501world/transcoding-performance-trial
+                                  - img
+                                  - generic: Open Link
+                                  - generic: Transcoding Performance Trial (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select 3DLUT Creator
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▥
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/186477
+                                    - text: 3DLUT Creator
+                              - paragraph: A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/186477
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Media Tools
+                                - generic: Tools & SDKs
+                              - generic:
+                                - link:
+                                  - /url: https://3dlutcreator.com/
+                                  - img
+                                  - generic: Open Link
+                                  - generic: 3DLUT Creator (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select AVPlayer
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▶
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/184763
+                                    - text: AVPlayer
+                              - paragraph: AVPlayer is Apple's framework for playing and streaming audio and video content on iOS and macOS. It supports a variety of formats and provides developers with a powerful API to control playback, manage buffering, and handle interruptions, making it a fundamental tool for media playback in iOS applications.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/184763
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Players & Clients
+                                - generic: Libraries
+                              - generic:
+                                - link:
+                                  - /url: https://developer.apple.com/documentation/avfoundation/avplayer
+                                  - img
+                                  - generic: Open Link
+                                  - generic: AVPlayer (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select Able Player
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▶
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/186609
+                                    - text: Able Player
+                              - paragraph: A fully accessible, cross-browser HTML5 media player library that supports captions, audio descriptions, and sign language tracks, designed to be inclusive for users with disabilities.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/186609
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Players & Clients
+                                - generic: Libraries
+                              - generic:
+                                - link:
+                                  - /url: https://ableplayer.github.io/ableplayer
+                                  - img
+                                  - generic: Open Link
+                                  - generic: Able Player (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select About Frame Rates or Why 29.97?
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▤
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/186212
+                                    - text: About Frame Rates or Why 29.97?
+                              - paragraph: I recently remembered this popular post from my old blog. Since that blog no longer exists, I thought I would repost it here. Since I wrote this post about a decade ago, many others of done a much better job describing this in detail. I highly recommend the following two videos by Alec Watson fro
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/186212
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Intro & Learning
+                              - generic:
+                                - link:
+                                  - /url: https://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html
+                                  - img
+                                  - generic: Open Link
+                                  - generic: About Frame Rates or Why 29.97? (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select AWS Media Services
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▣
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/184789
+                                    - text: AWS Media Services
+                              - paragraph: AWS Media Services offer a suite of cloud-based services that enable the creation, transformation, and delivery of digital content. These services include AWS Elemental MediaConnect for live video transport, AWS Elemental MediaConvert for file-based video transcoding, and AWS Elemental MediaLive for live video processing. They provide scalable and flexible solutions for video streaming and encoding, allowing developers to build and adapt video workflows quickly without the overhead of managing physical infrastructure.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/184789
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Infrastructure & Delivery
+                                - generic: Tools & SDKs
+                              - generic:
+                                - link:
+                                  - /url: https://aws.amazon.com/media-services/
+                                  - img
+                                  - generic: Open Link
+                                  - generic: AWS Media Services (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▤
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/184838
+                                    - text: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App
+                              - paragraph: An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/184838
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Intro & Learning
+                              - generic:
+                                - link:
+                                  - /url: https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+                                  - img
+                                  - generic: Open Link
+                                  - generic: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select M3U8Parser
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ⟁
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/185574
+                                    - text: M3U8Parser
+                              - paragraph: A light weight M3U8 parser. Support X-Key & X-Session-Key.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/185574
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Protocols & Transport
+                                - generic: Libraries
+                              - generic:
+                                - link:
+                                  - /url: https://github.com/M3U8Kit/M3U8Parser
+                                  - img
+                                  - generic: Open Link
+                                  - generic: M3U8Parser (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select ABR Video Player
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ⟁
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/187911
+                                    - text: ABR Video Player
+                              - paragraph: Sophisticated web-based video player implementing advanced ABR algorithms including BOLA (Buffer Occupancy based Lyapunov Algorithm) and bandwidth-based strategies. Features MSE-based streaming, dual EWMA bandwidth estimation, and intelligent quality switching.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/187911
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Protocols & Transport
+                                - generic: Tools & SDKs
+                              - generic:
+                                - link:
+                                  - /url: https://github.com/LennartPaduch/abr-video-player
+                                  - img
+                                  - generic: Open Link
+                                  - generic: ABR Video Player (opens in new tab)
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: "Select 3 Cases from a Video Expert: Encoding Basics"
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ▤
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/186145
+                                    - text: "3 Cases from a Video Expert: Encoding Basics"
+                              - paragraph: Vicuesoft blog article explaining fundamental video encoding concepts through practical case studies.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/186145
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Intro & Learning
+                              - generic:
+                                - link:
+                                  - /url: https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8
+                                  - img
+                                  - generic: Open Link
+                                  - generic: "3 Cases from a Video Expert: Encoding Basics (opens in new tab)"
+                                - button:
+                                  - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - checkbox
+                              - generic: Select AMD Advanced Media Acceleration (AMA) SDK
+                            - combobox:
+                              - generic: Saved
+                              - img
+                            - button:
+                              - img
+                              - text: Note
+                            - button:
+                              - img
+                              - text: Archive
+                          - article:
+                            - generic:
+                              - generic:
+                                - generic: ◇
+                                - generic:
+                                  - generic:
+                                    - button:
+                                      - generic:
+                                        - img
+                                    - button [pressed]:
+                                      - generic:
+                                        - img
+                              - generic:
+                                - heading [level=2]:
+                                  - link:
+                                    - /url: /resource/184847
+                                    - text: AMD Advanced Media Acceleration (AMA) SDK
+                              - paragraph: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.
+                            - generic:
+                              - generic:
+                                - link:
+                                  - /url: /resource/184847
+                                  - generic:
+                                    - img
+                                    - generic: View Details
+                                - generic: Encoding & Codecs
+                                - generic: Libraries
+                              - generic:
+                                - link:
+                                  - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                                  - img
+                                  - generic: Open Link
+                                  - generic: AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)
+                                - button:
+                                  - img
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 3,826
+                  - paragraph:
+                    - text: 9 categories 99 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+                  - generic:
+                    - button:
+                      - img
+                      - text: Contact maintainers
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - button: Cookie settings
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+  - dialog "Create a collection" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Create a collection" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Collections organize bookmarks without duplicating or moving your saved notes.
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8] [cursor=pointer]: Name
+        - textbox "Name" [ref=e9]:
+          - /placeholder: e.g. Streaming fundamentals
+          - text: "[QA-audit-1026] gap collection A"
+      - generic [ref=e10]:
+        - button "Cancel" [ref=e11] [cursor=pointer]
+        - button "Create collection" [disabled]
+    - button "Close" [ref=e12] [cursor=pointer]:
+      - img [ref=e13]
+      - generic [ref=e16]: Close

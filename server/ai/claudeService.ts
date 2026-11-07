@@ -43,6 +43,9 @@ import {
   StructuredOutputError,
   type ModelTier,
 } from './anthropicConfig';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("claude");
 
 /**
  * Model tiers callers may request. Ids are resolved from the environment at
@@ -281,16 +284,16 @@ export class ClaudeService {
     try {
       this.anthropic = getAnthropicClient();
     } catch (error) {
-      console.error('Failed to initialize Claude service:', error);
+      logger.error('Failed to initialize Claude service:', error);
       this.anthropic = null;
     }
     const cfg = describeAnthropicConfig();
     if (this.anthropic) {
-      console.log(
+      logger.info(
         `Claude service initialized: ${cfg.label}; models haiku=${cfg.models.haiku} sonnet=${cfg.models.sonnet} opus=${cfg.models.opus}; primary=${cfg.primaryModel}`,
       );
     } else {
-      console.log('Claude credentials not found - AI features will use fallback methods');
+      logger.info('Claude credentials not found - AI features will use fallback methods');
     }
   }
 
@@ -339,7 +342,7 @@ export class ClaudeService {
     const modelConfig = CLAUDE_MODELS[selectedModel];
 
     if (!this.isAvailable()) {
-      console.log('Claude service not available, returning null');
+      logger.info('Claude service not available, returning null');
       return {
         data: null,
         usage: null,
@@ -354,7 +357,7 @@ export class ClaudeService {
     // Check cache first
     const cached = this.getFromCache(cacheKey);
     if (cached) {
-      console.log('Returning cached Claude response');
+      logger.info('Returning cached Claude response');
       return {
         data: cached,
         usage: null,
@@ -366,7 +369,7 @@ export class ClaudeService {
     await this.applyRateLimit();
 
     try {
-      console.log(`Generating new Claude response using ${selectedModel}...`);
+      logger.info(`Generating new Claude response using ${selectedModel}...`);
 
       // Opus needs longer; the SDK option aborts the underlying request on
       // timeout (Promise.race left the HTTP call running in the background).
@@ -392,7 +395,7 @@ export class ClaudeService {
         .map((block) => block.text)
         .join('');
       if (response.stop_reason === 'max_tokens') {
-        console.warn(`Claude response truncated at max_tokens=${Math.min(maxTokens, modelConfig.maxTokens)} (${selectedModel})`);
+        logger.warn(`Claude response truncated at max_tokens=${Math.min(maxTokens, modelConfig.maxTokens)} (${selectedModel})`);
       }
 
       // Extract usage information
@@ -415,14 +418,14 @@ export class ClaudeService {
       };
 
     } catch (error: any) {
-      console.error('Claude API error:', error.message || error);
+      logger.error('Claude API error:', error.message || error);
 
       // Handle specific error types
       if (error.status === 429) {
-        console.log('Rate limited by Claude API, backing off...');
+        logger.info('Rate limited by Claude API, backing off...');
         // Exponential backoff could be implemented here
       } else if (error.status === 401) {
-        console.error('Invalid API key - disabling Claude service');
+        logger.error('Invalid API key - disabling Claude service');
         this.anthropic = null;
       }
 
@@ -456,7 +459,7 @@ export class ClaudeService {
     // Note: Claude doesn't directly support embeddings
     // This is a placeholder for potential future implementation
     // or integration with a different embedding service
-    console.log('Embedding generation not implemented for Claude');
+    logger.info('Embedding generation not implemented for Claude');
     return null;
   }
 
@@ -467,7 +470,7 @@ export class ClaudeService {
     const timeSinceLastRequest = Date.now() - this.lastRequestTime;
     if (timeSinceLastRequest < this.RATE_LIMIT_DELAY) {
       const delay = this.RATE_LIMIT_DELAY - timeSinceLastRequest;
-      console.log(`Rate limiting: waiting ${delay}ms before next request`);
+      logger.info(`Rate limiting: waiting ${delay}ms before next request`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -567,7 +570,7 @@ export class ClaudeService {
       this.recordUsage(DEFAULT_MODEL, response.usage.input_tokens || 0, response.usage.output_tokens || 0);
       return text.length > 0;
     } catch (error) {
-      console.error('Claude connection test failed:', error);
+      logger.error('Claude connection test failed:', error);
       return false;
     }
   }
@@ -635,7 +638,7 @@ export class ClaudeService {
    */
   public async analyzeURL(url: string): Promise<UrlAnalysis | null> {
     if (!this.isAvailable()) {
-      console.log('Claude service not available for URL analysis');
+      logger.info('Claude service not available for URL analysis');
       return null;
     }
 
@@ -671,7 +674,7 @@ export class ClaudeService {
     // Check cache
     const cached = this.getCachedAnalysis(url);
     if (cached) {
-      console.log('Returning cached URL analysis');
+      logger.info('Returning cached URL analysis');
       return cached;
     }
 
@@ -721,7 +724,7 @@ export class ClaudeService {
         // through to a paid Claude call analyzing zero content (the old
         // fallback also produced confidently-wrong metadata). Throw a
         // recognizable error so callers map it to a 4xx.
-        console.error('Error fetching URL:', fetchError);
+        logger.error('Error fetching URL:', fetchError);
         throw new Error(
           `URL fetch failed: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
         );
@@ -769,11 +772,11 @@ Guidance:
         this.recordUsage('haiku', structured.usage.inputTokens, structured.usage.outputTokens);
       } catch (error: any) {
         if (error instanceof StructuredOutputError) {
-          console.error(`URL analysis structured output failed (${error.reason}):`, error.message);
+          logger.error(`URL analysis structured output failed (${error.reason}):`, error.message);
           return null;
         }
         if (error?.status === 401) {
-          console.error('Anthropic rejected the credentials (401) - disabling Claude service');
+          logger.error('Anthropic rejected the credentials (401) - disabling Claude service');
           this.anthropic = null;
         }
         throw error;
@@ -794,7 +797,7 @@ Guidance:
       // Cache sanitized result
       this.cacheAnalysis(url, sanitizedResult);
 
-      console.log('URL analysis completed:', { url, confidence: sanitizedResult.confidence });
+      logger.info('URL analysis completed:', { url, confidence: sanitizedResult.confidence });
       return sanitizedResult;
 
     } catch (error) {
@@ -804,7 +807,7 @@ Guidance:
       if (msg === 'Request timeout' || msg.startsWith('URL fetch failed') || msg.includes('Content too large')) {
         throw error;
       }
-      console.error('Error analyzing URL:', error);
+      logger.error('Error analyzing URL:', error);
       return null;
     }
   }

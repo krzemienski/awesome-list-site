@@ -61,6 +61,38 @@ const FEEDBACK_OPTIONS: {
   },
 ];
 
+/**
+ * Choices that take a card out of the list. Each gets the same recovery: an
+ * Undo on the toast and a Restore row in the panel's list.
+ */
+export const REMOVING_FEEDBACK_LABELS: Partial<Record<RecommendationFeedbackValue, string>> = {
+  hidden: "Hidden",
+  not_for_me: "Not for me",
+  already_known: "Already known",
+};
+
+export function isRemovingFeedback(value: RecommendationFeedbackValue | null | undefined): boolean {
+  return value != null && value in REMOVING_FEEDBACK_LABELS;
+}
+
+const REMOVAL_TOASTS: Partial<Record<RecommendationFeedbackValue, { title: string; description: string; undoAlt: string }>> = {
+  hidden: {
+    title: "Recommendation hidden",
+    description: "It will stay out of future recommendations until restored.",
+    undoAlt: "Undo hiding this recommendation",
+  },
+  not_for_me: {
+    title: "Marked not for me",
+    description: "It will stay out of future recommendations until restored.",
+    undoAlt: "Undo marking this recommendation not for me",
+  },
+  already_known: {
+    title: "Marked as already known",
+    description: "It will stay out of future recommendations until restored.",
+    undoAlt: "Undo marking this recommendation as already known",
+  },
+};
+
 function RecommendationFeedback({
   resourceId,
   title,
@@ -92,15 +124,16 @@ function RecommendationFeedback({
         feedback: next,
         previousFeedback: previous,
       });
-      if (next === "hidden") {
+      const removal = next ? REMOVAL_TOASTS[next] : undefined;
+      if (removal) {
         toast({
-          title: "Recommendation hidden",
-          description: "It will stay out of future recommendations until restored.",
+          title: removal.title,
+          description: removal.description,
           action: (
             <ToastAction
-              altText="Undo hiding this recommendation"
+              altText={removal.undoAlt}
               onClick={() => {
-                void save(null, "hidden");
+                void save(null, next);
               }}
             >
               Undo

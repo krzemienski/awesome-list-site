@@ -18,8 +18,9 @@ export function Toaster() {
           // BUG-052 (run26): toasts carrying an action must not vanish before
           // the action can be used (WCAG 2.2.1) — they persist until dismissed
           // (swipe, Esc/F6 hotkey, close button, or clicking the action).
-          // Plain informational toasts keep the default auto-dismiss.
-          <Toast key={id} {...props} duration={props.duration ?? (action ? Infinity : undefined)}>
+          // A caller's duration never overrides this (MB-04). Plain
+          // informational toasts keep their duration or the default.
+          <Toast key={id} {...props} duration={action ? Infinity : props.duration}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}

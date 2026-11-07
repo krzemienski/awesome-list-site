@@ -2,7 +2,10 @@
 // activation must hand keyboard focus to something, or it falls to <body>.
 
 /** Focus an element that may not be naturally focusable (headings, regions). */
-export function focusElement(el: HTMLElement | null | undefined): boolean {
+export function focusElement(
+  el: HTMLElement | null | undefined,
+  options?: FocusOptions,
+): boolean {
   if (!el || !el.isConnected) return false;
   if (
     !el.hasAttribute("tabindex") &&
@@ -10,7 +13,7 @@ export function focusElement(el: HTMLElement | null | undefined): boolean {
   ) {
     el.setAttribute("tabindex", "-1");
   }
-  el.focus();
+  el.focus(options);
   return document.activeElement === el;
 }
 

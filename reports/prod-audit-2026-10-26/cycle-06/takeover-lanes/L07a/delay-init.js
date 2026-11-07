@@ -1,0 +1,1 @@
+(function(){var f=window.fetch.bind(window);window.fetch=function(u,o){var s=typeof u==='string'?u:(u&&u.url)||'';var m=((o&&o.method)||(u&&u.method)||'GET').toUpperCase();if(s.indexOf('/api/admin/categories')>-1&&m==='GET'){return new Promise(function(r){setTimeout(r,9000)}).then(function(){return f(u,o)})}return f(u,o)}})();

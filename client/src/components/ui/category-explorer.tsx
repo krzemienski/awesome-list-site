@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useId } from "react";
 import { Search, Filter, Tag, Folder, ExternalLink, Star, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,37 +14,12 @@ import { cn } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { resourceTags } from "@/lib/tags";
 import { parseTagFilterValues } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
 
 interface CategoryExplorerProps {
   categories: Category[];
   resources: Resource[];
   className?: string;
-}
-
-// BUG-001 (July 2026 audit): the tree nests most resources under
-// category.subcategories[].resources (and their subSubcategories), so
-// `category.resources.length` is the DIRECT-only count and wildly understates
-// totals. Same recursive helper as Home.tsx / AppSidebar.tsx / Categories.tsx —
-// card counts here must agree with the sidebar and home cards.
-function getTotalResourceCount(item: {
-  resources?: Resource[];
-  subcategories?: unknown[];
-  subSubcategories?: unknown[];
-}): number {
-  let total = item.resources?.length || 0;
-  if (item.subcategories) {
-    total += (item.subcategories as any[]).reduce(
-      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
-      0,
-    );
-  }
-  if (item.subSubcategories) {
-    total += (item.subSubcategories as any[]).reduce(
-      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
-      0,
-    );
-  }
-  return total;
 }
 
 // Flatten every resource in a category (direct + subcategories + sub-subs) so
@@ -89,6 +64,7 @@ function syncExplorerParam(
 }
 
 export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
+  const searchInputId = useId();
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(window.location.search).get("q") || "",
@@ -181,7 +157,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
         case "name":
           return a.name.localeCompare(b.name);
         case "count":
-          return getTotalResourceCount(b) - getTotalResourceCount(a);
+          return corpusTotalCount(b) - corpusTotalCount(a);
         case "activity": {
           // Run16 BUG-023: most recently updated/added first; ties fall back
           // to name so the order is stable and visibly distinct from count.
@@ -233,7 +209,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const getCategoryStats = (category: Category) => {
-    const totalResources = getTotalResourceCount(category);
+    const totalResources = corpusTotalCount(category);
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
       getAllCategoryResources(category).flatMap((r) => resourceTags(r))
@@ -257,15 +233,22 @@ export default function CategoryExplorer({ categories, resources, className }: C
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              ref={searchInputRef}
-              placeholder="Search categories and resources..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-            />
+          <div className="space-y-2">
+            <label htmlFor={searchInputId} className="text-sm font-medium">
+              Search categories and resources
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id={searchInputId}
+                name="explorer-search"
+                ref={searchInputRef}
+                placeholder="Search categories and resources..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           {/* Controls Row */}
@@ -273,10 +256,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
-              <Select value={sortBy} onValueChange={handleSortChange}>
+              <Select name="explorer-sort-categories" value={sortBy} onValueChange={handleSortChange}>
                 {/* C5-V2-02: size to the selected label — a fixed w-32 clipped
                     "Resource Count" to "Resource..." in every design system. */}
-                <SelectTrigger className="w-auto min-w-32" aria-label="Sort categories">
+                <SelectTrigger id={`explorer-sort-${searchInputId}`} className="w-auto min-w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,8 +272,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="h-10 w-10"
+                className="h-10 w-10 max-lg:h-11 max-lg:w-11"
                 id="subcategories"
+                name="explorer-show-subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
                 onCheckedChange={(checked) => setShowSubcategories(checked === true)}
@@ -313,7 +297,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   <ChipButton
                     key={tag}
                     aria-pressed={selectedTags.includes(tag)}
-                    className="text-xs"
+                    className="text-xs max-lg:min-h-11"
                     onClick={() => toggleTag(tag)}
                     data-testid={`button-explorer-tag-${tag}`}
                   >
@@ -325,7 +309,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="min-h-10 px-2 text-xs"
+                    className="min-h-10 px-2 text-xs max-lg:min-h-11"
                     aria-expanded={showAllTags}
                     onClick={() => setShowAllTags(value => !value)}
                     data-testid="button-explorer-tags-toggle"
@@ -339,7 +323,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
           {/* Active Filters */}
           {(searchTerm || selectedTags.length > 0) && (
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">Active filters:</span>
               {searchTerm && (
                 <Badge variant="secondary" className="text-xs">
@@ -355,7 +339,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="min-h-10 px-2 text-xs"
+                className="min-h-10 px-2 text-xs max-lg:min-h-11"
               >
                 Clear all
               </Button>
@@ -397,7 +381,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           F1231: a real link, not a bordered p-0 ghost button. */}
                       <Link
                         href={`/category/${category.slug}`}
-                        className="inline-flex min-h-10 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
+                        className="inline-flex min-h-10 max-lg:min-h-11 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
                       >
                         {/* Raw text in a flex box is an anonymous item with
                             min-width:auto; the span lets unbroken names wrap. */}
@@ -468,7 +452,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-h-10 items-center text-foreground hover:text-primary transition-colors font-medium"
+                        className="inline-flex min-h-10 max-lg:min-h-11 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
                         {/* C7-V2-04: the cue belongs on the links that really open a new tab. */}
@@ -497,7 +481,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   <Collapsible open={isExpanded}>
                     <CollapsibleContent>
                       <div className="space-y-2 pt-3 border-t">
-                        <h4 className="text-sm font-medium text-muted-foreground">Subcategories:</h4>
+                        <p className="text-sm font-medium text-muted-foreground">Subcategories:</p>
                         <div className="flex flex-wrap gap-1">
                           {category.subcategories.map(subcategory => (
                             <Button
@@ -509,9 +493,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               // long chip labels rigid — one wide chip overflowed the
                               // card and clipped past the tablet viewport edge. Chips
                               // now cap at the card width and wrap their text.
-                              className="min-h-10 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
+                              className="min-h-10 max-lg:min-h-11 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
                             >
-                              {subcategory.name} ({getTotalResourceCount(subcategory)})
+                              {subcategory.name} ({corpusTotalCount(subcategory)})
                             </Button>
                           ))}
                         </div>

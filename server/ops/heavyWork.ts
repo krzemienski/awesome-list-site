@@ -1,4 +1,7 @@
 import { ServiceUnavailableError } from "../middleware/errors";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("heavy-work");
 
 export type HeavyWorkLabel =
   | "catalog-export"
@@ -104,21 +107,22 @@ export async function startHeavyWork(
   const startedAt = Date.now();
   const stats = metric(label);
   stats.started++;
+  logger.info("Background work started", { label });
   Promise.resolve()
     .then(work)
     .then(
       () => {
         stats.completed++;
+        logger.info("Background work finished", { label, ms: Date.now() - startedAt });
       },
       (error) => {
         stats.failed++;
-        console.error(
-          JSON.stringify({
-            event: "ops.heavy_work_failed",
-            label,
-            errorClass: error instanceof Error ? error.name : "unknown",
-          }),
-        );
+        logger.error("Background work failed", {
+          label,
+          ms: Date.now() - startedAt,
+          errorClass: error instanceof Error ? error.name : "unknown",
+          reason: error instanceof Error ? error.message : String(error),
+        });
       },
     )
     .finally(() => {

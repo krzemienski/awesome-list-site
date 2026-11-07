@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/settings\",\"online\":true,\"viewport\":[1440,900],\"coarse\":false,\"touch\":0,\"reducedMotion\":false,\"analyticsDisabled\":\"1\",\"dialog\":false}"

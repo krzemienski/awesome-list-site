@@ -32,14 +32,19 @@ import type {
   DigestPreviewItem,
   DigestPreviewSection,
   NotificationPreferencesResponse,
-  NotificationPreferencesUpdate,
+  NotificationPreferencesPatch,
 } from "@shared/notifications";
+import { hasDigestSection } from "@shared/notifications";
 import { summarizeLogicalJourneySteps } from "@shared/journeyProgress";
 import { db } from "../db";
 import {
   probeEmailTransport,
   sendTransactionalEmail,
 } from "../email";
+import { clerkUserHasVerifiedEmail, rowEmailIsVerifiedInClerk } from "../lib/clerkAccountLink";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("digest");
 
 const MAX_SELECTOR_ITEMS = 3;
 const JOB_LEASE_MINUTES = 15;
@@ -47,6 +52,8 @@ const COMPLETED_RETENTION_DAYS = 90;
 const NOTIFICATION_RETENTION_DAYS = 180;
 const UNSUBSCRIBE_RETENTION_DAYS = 400;
 const ENQUEUE_PAGE_SIZE = 250;
+// Digest periods for someone who never chose a time zone.
+const DIGEST_DEFAULT_TIMEZONE = "UTC";
 
 type RowResult<T> = { rows?: T[] };
 
@@ -64,7 +71,7 @@ function defaultPreferences(userId: string): NotificationPreferences {
     includeWatchNext: true,
     includeJourneyStep: true,
     cadence: "weekly",
-    timezone: "UTC",
+    timezone: null,
     policyVersion: 1,
     pausedUntil: null,
     emailOptedInAt: null,
@@ -164,30 +171,21 @@ export async function getNotificationPreferences(
     .from(notificationPreferences)
     .where(eq(notificationPreferences.userId, userId))
     .limit(1);
-  if (preferences) return preferenceResponse(preferences);
-  // Nothing saved yet: leave the time zone unset so the client can offer the
-  // browser's zone instead of a server-side UTC placeholder.
-  return { ...preferenceResponse(defaultPreferences(userId)), timezone: null };
+  return preferenceResponse(preferences ?? defaultPreferences(userId));
 }
 
+/**
+ * Saves a full form (PUT) or a quick action's few fields (PATCH). Fields the
+ * patch omits keep their stored value, so a pause never writes a time zone the
+ * user did not choose. Turning the email digest on needs the account email
+ * verified in Clerk (`clerkUserId` is the session's Clerk id, not the row id).
+ */
 export async function updateNotificationPreferences(
   userId: string,
-  values: NotificationPreferencesUpdate,
+  patch: NotificationPreferencesPatch,
+  clerkUserId?: string,
 ): Promise<NotificationPreferencesResponse> {
-  if (!isValidTimeZone(values.timezone)) {
-    throw new Error("invalid_timezone");
-  }
   const now = new Date();
-  const pausedUntil = values.pausedUntil
-    ? new Date(values.pausedUntil)
-    : null;
-  if (
-    pausedUntil &&
-    pausedUntil.getTime() > now.getTime() + 366 * 86_400_000
-  ) {
-    throw new Error("pause_too_long");
-  }
-
   const [account, existing] = await Promise.all([
     db
       .select({ email: users.email })
@@ -202,8 +200,45 @@ export async function updateNotificationPreferences(
       .limit(1)
       .then((result) => result[0]),
   ]);
-  if (values.emailDigestEnabled && !account?.email) {
+  const stored = existing ?? defaultPreferences(userId);
+  const values = {
+    emailDigestEnabled: patch.emailDigestEnabled ?? stored.emailDigestEnabled,
+    inAppEnabled: patch.inAppEnabled ?? stored.inAppEnabled,
+    includeNewResources: patch.includeNewResources ?? stored.includeNewResources,
+    includeWatchNext: patch.includeWatchNext ?? stored.includeWatchNext,
+    includeJourneyStep: patch.includeJourneyStep ?? stored.includeJourneyStep,
+    cadence: patch.cadence ?? stored.cadence,
+    timezone: patch.timezone ?? stored.timezone,
+  };
+  if (values.timezone !== null && !isValidTimeZone(values.timezone)) {
+    throw new Error("invalid_timezone");
+  }
+  const patchedPause = patch.pausedUntil ? new Date(patch.pausedUntil) : null;
+  if (
+    patchedPause &&
+    patchedPause.getTime() > now.getTime() + 366 * 86_400_000
+  ) {
+    throw new Error("pause_too_long");
+  }
+  const pausedUntil =
+    patch.pausedUntil === undefined ? stored.pausedUntil : patchedPause;
+  if (!hasDigestSection(values)) {
+    throw new Error("section_required");
+  }
+  if (patch.emailDigestEnabled && !account?.email) {
     throw new Error("email_required");
+  }
+  if (patch.emailDigestEnabled && !existing?.emailDigestEnabled && account?.email) {
+    let verified = false;
+    if (clerkUserId) {
+      try {
+        verified = await clerkUserHasVerifiedEmail(clerkUserId, account.email);
+      } catch (error) {
+        logger.error("[digest] Clerk email verification lookup failed:", error);
+        throw new Error("clerk_unavailable");
+      }
+    }
+    if (!verified) throw new Error("email_unverified");
   }
 
   const emailJustEnabled =
@@ -461,7 +496,7 @@ export async function selectDigestContent(
   return {
     generatedAt: now.toISOString(),
     cadence: preferences.cadence,
-    timezone: preferences.timezone,
+    timezone: preferences.timezone ?? DIGEST_DEFAULT_TIMEZONE,
     sections,
     itemCount: sections.reduce(
       (total, section) => total + section.items.length,
@@ -518,7 +553,7 @@ export async function enqueueDueDigestJobs(now = new Date()): Promise<number> {
         }
         const period = periodKey(
           preferences.cadence,
-          preferences.timezone,
+          preferences.timezone ?? DIGEST_DEFAULT_TIMEZONE,
           now,
         );
         const idempotencyKey = [
@@ -967,6 +1002,23 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
       await completeAttempt(job, "skipped", { errorCode: "email_missing" });
       return;
     }
+    // One Clerk call per email job (digests are weekly at most). Consent given
+    // before the opt-in check existed may sit on an unverified address.
+    let verified: boolean;
+    try {
+      verified = await rowEmailIsVerifiedInClerk(job.userId, account.email);
+    } catch (error) {
+      logger.error("Digest recipient verification lookup failed", {
+        digestJobId: job.id,
+        errorClass: error instanceof Error ? error.name : "unknown",
+      });
+      await failAttempt(job, "transport_unavailable");
+      return;
+    }
+    if (!verified) {
+      await completeAttempt(job, "skipped", { errorCode: "email_unverified" });
+      return;
+    }
     const unsubscribeUrl = await createUnsubscribeUrl(job.userId);
     const message = buildDigestEmail(preview, unsubscribeUrl);
     emailDeliveryAttempted = true;
@@ -1001,9 +1053,11 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
       providerMessageId: result.providerMessageId,
     });
   } catch (error) {
-    console.error(
-      `[digest] Job ${job.id} failed (${error instanceof Error ? error.name : "unknown"})`,
-    );
+    logger.error("Digest delivery failed", {
+      digestJobId: job.id,
+      channel: job.channel,
+      errorClass: error instanceof Error ? error.name : "unknown",
+    });
     if (job.channel === "email" && emailDeliveryAttempted) {
       await markDeliveryUnknownAttempt(job, "post_send_processing_error");
     } else {

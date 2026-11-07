@@ -1,0 +1,10 @@
+uid=213_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#resources"
+  uid=213_22 main
+    uid=213_54 tabpanel "Resources"
+      uid=213_344 navigation "Pagination"
+        uid=213_361 status atomic live="polite" relevant="additions text"
+  uid=217_0 listbox orientation="vertical"
+    uid=217_1 option "Newest first" focusable focused selected
+    uid=217_2 option "Oldest first"
+    uid=217_3 option "Title A–Z"
+    uid=217_4 option "Title Z–A"

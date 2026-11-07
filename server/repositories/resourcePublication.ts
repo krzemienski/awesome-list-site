@@ -1,5 +1,5 @@
 import { resources, resourceAuditLog, type InsertResource, type Resource } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { ensureMinDescription } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
@@ -28,7 +28,14 @@ export async function transitionResourceInTransaction(
   id: number,
   patch: Partial<InsertResource>,
   actor?: string,
-  options: { expectedStatus?: string; notes?: string; audit?: boolean; rejectionReason?: string } = {},
+  options: {
+    expectedStatus?: string; notes?: string; audit?: boolean; rejectionReason?: string;
+    /**
+     * Keys merged into the stored metadata inside the UPDATE, so a writer that
+     * read the row earlier cannot drop keys another writer (enrichment) set since.
+     */
+    mergeMetadata?: Record<string, unknown>;
+  } = {},
 ): Promise<Resource> {
   const [before] = await tx.select().from(resources).where(eq(resources.id, id)).for('update');
   if (!before) throw new Error('Resource not found');
@@ -57,7 +64,21 @@ export async function transitionResourceInTransaction(
       patch.url ?? before.url,
     );
   }
-  const [updated] = await tx.update(resources).set(data).where(eq(resources.id, id)).returning();
+  // metadata.linkHealth belongs to link-health remediation, which writes it
+  // only through mergeMetadata. A writer that replaces the whole metadata
+  // object from an earlier read (enrichment, admin edits) always keeps the
+  // stored value, even if its stale copy carries the key.
+  if (!options.mergeMetadata && 'metadata' in patch) {
+    const rest = { ...((patch.metadata ?? {}) as Record<string, unknown>) };
+    delete rest.linkHealth;
+    data.metadata = sql`${JSON.stringify(rest)}::jsonb || jsonb_strip_nulls(jsonb_build_object('linkHealth', ${resources.metadata} -> 'linkHealth'))`;
+  }
+  const [updated] = await tx.update(resources)
+    .set(options.mergeMetadata
+      ? { ...data, metadata: sql`coalesce(${resources.metadata}, '{}'::jsonb) || ${JSON.stringify(options.mergeMetadata)}::jsonb` }
+      : data)
+    .where(eq(resources.id, id))
+    .returning();
   // Status changes are always audited, even when an internal caller suppresses
   // ordinary edit audits because it owns a separate edit-approval audit.
   if (changed || options.audit !== false) {

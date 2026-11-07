@@ -1,0 +1,29 @@
+✓ Done
+== 1100 compact-on-load railW=55
+"{\"last\":\"Source: krzemienski/awesome-video\",\"bottom\":888,\"vh\":900,\"href\":\"https://github.com/krzemienski/awesome-video\"}"
+✓ Done
+expanded: focus="btn icon av-sidebar-collapse-toggle|Collapse sidebar" ls="true"
+✓ Done
+== 1200 compact-on-load railW=0
+✗ Evaluation error: TypeError: Cannot read properties of undefined (reading 'getBoundingClientRect')
+    at <anonymous>:1:89
+    at <anonymous>:1:228
+✗ Element not found. Verify the selector is correct and the element exists in the DOM.
+✓ Done
+expanded: focus="|" ls="true"
+✓ Done
+== 1250 compact-on-load railW=0
+✗ Evaluation error: TypeError: Cannot read properties of undefined (reading 'getBoundingClientRect')
+    at <anonymous>:1:89
+    at <anonymous>:1:228
+✗ Element not found. Verify the selector is correct and the element exists in the DOM.
+✓ Done
+expanded: focus="|" ls="true"
+✓ Done
+== 1440 compact-on-load railW=0
+✗ Evaluation error: TypeError: Cannot read properties of undefined (reading 'getBoundingClientRect')
+    at <anonymous>:1:89
+    at <anonymous>:1:228
+✗ Element not found. Verify the selector is correct and the element exists in the DOM.
+✓ Done
+expanded: focus="|" ls="true"

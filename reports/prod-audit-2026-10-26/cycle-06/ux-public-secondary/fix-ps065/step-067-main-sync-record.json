@@ -1,0 +1,22 @@
+{
+  "ticket": "C6-PS-065",
+  "capturedAt": "2026-10-27T07:48:11.351Z",
+  "integratedOriginMain": "3404b6dd",
+  "priorSync": "126fbcd0",
+  "request": "Main requested current origin/main integration, preserve all changelog entries, rerun tsc/build, push; no re-drive solely for main sync.",
+  "resolution": "Retained both footer fix and C6-AI-030 Researcher history changelog additions. Users availability entry from126fbcd0 also retained. Shared footer production CSS unchanged during both merges.",
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "artifact": "step-065-main3404b6dd-tsc.json"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "artifact": "step-066-main3404b6dd-build.json"
+    }
+  ],
+  "browserEvidence": "Existing all-width native proof remains applicable; main sync adds only upstream admin/researcher changes plus additive changelog entries. Per Main, no browser re-drive solely for sync.",
+  "mergeDeploy": "Only merged origin/main INTO fix branch; PR113 not merged, no deployment."
+}

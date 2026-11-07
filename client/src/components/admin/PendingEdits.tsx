@@ -1,12 +1,14 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { RECENT_EDITS_KEY, RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +21,7 @@ import { ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "l
 import type { Resource, ResourceEdit } from "@shared/schema";
 import { Link } from "wouter";
 import "./queues-review.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 interface ResourceEditWithResource extends ResourceEdit {
   resource: Resource;
@@ -77,6 +80,12 @@ export default function PendingEdits() {
   const [editToApprove, setEditToApprove] = useState<ResourceEditWithResource | null>(null);
   const [editToReject, setEditToReject] = useState<ResourceEditWithResource | null>(null);
   const [approveError, setApproveError] = useState<string | null>(null);
+  const [approveSuperseded, setApproveSuperseded] = useState(false);
+  const approveCancelRef = useRef<HTMLButtonElement>(null);
+  // The focused Approve & Merge button unmounts once the edit is superseded.
+  useEffect(() => {
+    if (approveSuperseded) approveCancelRef.current?.focus();
+  }, [approveSuperseded]);
   const [rejectError, setRejectError] = useState<string | null>(null);
 
   const editsQuery = useQuery<ResourceEditWithResource[]>({
@@ -88,32 +97,9 @@ export default function PendingEdits() {
   const unavailable = queryUnavailableReason(editsQuery);
   const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked' | 'offline'>('idle');
 
-  // R5-013 (run24): same keyboard-operable scroller + right-edge gradient cue
-  // as PendingResources (R5-058) — the edits table clipped its Actions column
-  // at narrow widths with no affordance that more columns existed.
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
-  // R5-058 (run25): track the table viewport's scrollLeft so the gradient
-  // cue hides at max scroll and re-shows when the user scrolls back.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-    const check = () => {
-      const hasOverflow = scroller.scrollWidth > scroller.clientWidth + 1;
-      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
-      setShowSwipeHint(hasOverflow && !atEnd);
-    };
-    check();
-    const ro = new ResizeObserver(check);
-    ro.observe(el);
-    ro.observe(scroller);
-    scroller.addEventListener('scroll', check, { passive: true });
-    return () => {
-      ro.disconnect();
-      scroller.removeEventListener('scroll', check);
-    };
-  }, [isLoading, edits.length]);
+  // R5-013 (run24): the edits table clipped its Actions column at narrow
+  // widths with no affordance that more columns existed.
+  const scrollCue = useHorizontalScrollCue();
 
   // C6-SWEEP-13: approving/rejecting removes the row whose button opened the
   // dialog, so the dialog's return-focus target disappears. Plan a surviving
@@ -164,6 +150,7 @@ export default function PendingEdits() {
       });
     },
     onSuccess: (_data, editId) => {
+      const approvedTitle = editToApprove?.id === editId ? editToApprove.resource?.title : undefined;
       planFocusAfterRemoval(editId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -172,11 +159,18 @@ export default function PendingEdits() {
       setEditToApprove(null);
       setApproveError(null);
       toast({
-        title: "Edit Approved",
-        description: "The changes have been applied to the resource.",
+        title: "Edit approved",
+        description: `Edit #${editId} was applied to ${approvedTitle ? `"${approvedTitle}"` : "the resource"}.`,
       });
     },
     onError: (error: Error) => {
+      // 409: the server found the resource changed and marked this edit
+      // superseded, so the queue the admin is looking at is stale.
+      if (error instanceof ApiError && error.status === 409) {
+        setApproveSuperseded(true);
+        void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+        void queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] });
+      }
       setApproveError(describeWriteError(error, { fallback: "Failed to approve edit. Please try again.", outcome: NOTHING_CHANGED_OUTCOME }));
       // The dialog remains open so the inline error can be read and retried.
     }
@@ -190,6 +184,7 @@ export default function PendingEdits() {
       });
     },
     onSuccess: (_data, { editId }) => {
+      const rejectedTitle = editToReject?.id === editId ? editToReject.resource?.title : undefined;
       planFocusAfterRemoval(editId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -198,8 +193,8 @@ export default function PendingEdits() {
       setRejectionReason("");
       setRejectError(null);
       toast({
-        title: "Edit Rejected",
-        description: "The edit suggestion has been rejected.",
+        title: "Edit rejected",
+        description: `Edit #${editId} for ${rejectedTitle ? `"${rejectedTitle}"` : "the resource"} was rejected; the contributor will see your reason.`,
       });
     },
     onError: (error: Error) => {
@@ -222,6 +217,14 @@ export default function PendingEdits() {
     setRejectError(null);
     setEditToReject(edit);
     setRejectDialogOpen(true);
+  };
+
+  const handleRejectOpenChange = (open: boolean) => {
+    setRejectDialogOpen(open);
+    if (!open) {
+      setRejectError(null);
+      setRejectionReason("");
+    }
   };
 
   const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
@@ -288,18 +291,13 @@ export default function PendingEdits() {
             <p>
               {"You're offline, so pending edits can't be loaded. The queue may still contain suggestions awaiting review."}
             </p>
-            <Button
-              aria-disabled={isFetching}
-              aria-busy={isFetching}
-              onClick={(event) => {
-                if (isFetching) return;
-                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-edits-heading"));
-                void refetch();
-              }}
-              data-testid="pending-edits-retry"
-            >
-              {isFetching ? "Retrying…" : "Retry"}
-            </Button>
+            <RetryButton
+              variant="default"
+              busy={isFetching}
+              focusTarget={() => document.getElementById("pending-edits-heading")}
+              onRetry={() => void refetch()}
+              testId="pending-edits-retry"
+            />
           </div>
         ) : (
           <AdminLoadError
@@ -358,15 +356,20 @@ export default function PendingEdits() {
             aria-busy={recheckState === 'checking'}
             onClick={() => {
               if (recheckState === 'checking') return;
+              setRecheckState('checking');
               if (!navigator.onLine) {
-                setRecheckState('offline');
+                // Clear first so a repeat press while still offline empties and
+                // refills the status text instead of re-setting the same value.
+                setTimeout(() => setRecheckState('offline'), 400);
                 return;
               }
-              setRecheckState('checking');
               const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
-              void queryClient
-                .invalidateQueries({ queryKey: ['/api/admin/resource-edits'] })
-                .then(done, done);
+              // Query keys match per element, so the recent list's key is not
+              // under ['/api/admin/resource-edits'] and needs its own refetch.
+              void Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] }),
+                queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] }),
+              ]).then(done, done);
             }}
             data-testid="button-refresh-pending-edits"
           >
@@ -387,13 +390,19 @@ export default function PendingEdits() {
             <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
-        <span className="sr-only" role="status" aria-live="polite">
+        <p
+          className={`system-state-note${recheckState === 'offline' ? ' font-medium text-[var(--accent-ink)]' : ''}`}
+          role="status"
+          aria-live="polite"
+          data-testid="text-pending-edits-recheck"
+        >
           {recheckState === 'checked'
             ? 'Checked — still no pending edits.'
             : recheckState === 'offline'
               ? "You're offline — couldn't check for new edits."
               : ''}
-        </span>
+        </p>
+        <RecentResourceEdits />
       </section>
     );
   }
@@ -414,7 +423,7 @@ export default function PendingEdits() {
             Actions column ≤768px. max-h keeps short lists compact; the
             desktop layout (table already fits, no scroll) is unchanged. */}
         <div className="relative">
-          {showSwipeHint && (
+          {scrollCue.showCue && (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
@@ -422,18 +431,12 @@ export default function PendingEdits() {
             />
           )}
           <div
-            ref={scrollRef}
+            ref={scrollCue.ref}
             className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"
             aria-label="Pending edits table, scrollable"
-            onKeyDown={(e) => {
-              const el = scrollRef.current;
-              if (!el) return;
-              const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-              if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
-              else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
-            }}
+            onKeyDown={scrollCue.onKeyDown}
           >
             <table className="table queue-review-table queue-review-table--edits">
               <colgroup>
@@ -468,7 +471,7 @@ export default function PendingEdits() {
                           />
                         )}
                         <span title={title}>
-                          <Link href={`/resource/${edit.resourceId}`} data-testid={`link-edit-resource-detail-${edit.id}`}>
+                          <Link href={`/resource/${edit.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center" data-testid={`link-edit-resource-detail-${edit.id}`}>
                             {title}
                           </Link>
                         </span>
@@ -552,12 +555,13 @@ export default function PendingEdits() {
               </tbody>
             </table>
           </div>
-          {showSwipeHint && (
+          {scrollCue.showCue && (
             <p className="admin-ops-scroll-hint mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
               Swipe the table sideways to see all columns, including Approve/Reject.
             </p>
           )}
         </div>
+        <RecentResourceEdits />
       </section>
 
       {/* View Details Dialog */}
@@ -580,8 +584,8 @@ export default function PendingEdits() {
                         Conflict Detected
                       </h4>
                       <p className="text-sm text-foreground mt-1">
-                        The resource has been modified since this edit was suggested. 
-                        Review changes carefully before approving.
+                        The resource has been modified since this edit was suggested, so it
+                        can no longer be approved. Reject it, or ask the contributor to resubmit.
                       </p>
                     </div>
                   </div>
@@ -592,7 +596,7 @@ export default function PendingEdits() {
                 <h3 className="font-semibold mb-2">Resource Information</h3>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1">
                   <p className="text-sm"><strong>Title:</strong> {selectedEdit.resource?.title}</p>
-                  <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
+                  <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
                   <p className="text-sm"><strong>Category:</strong> {selectedEdit.resource?.category}</p>
                   <p className="text-sm" data-testid="text-edit-detail-editor"><strong>Suggested by:</strong> {selectedEdit.submittedByEmail ?? selectedEdit.submittedBy}</p>
                 </div>
@@ -654,23 +658,29 @@ export default function PendingEdits() {
       {/* Approve Confirmation Dialog */}
       <AlertDialog open={approveDialogOpen} onOpenChange={(open) => {
         setApproveDialogOpen(open);
-        if (!open) setApproveError(null);
+        if (!open) {
+          setApproveError(null);
+          setApproveSuperseded(false);
+        }
       }}>
         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve Edit Suggestion?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {editToApprove && hasConflict(editToApprove) ? "Edit Out of Date" : "Approve Edit Suggestion?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {editToApprove && hasConflict(editToApprove) ? (
                 <div className="space-y-2">
                   <div className={"flex items-start gap-2 text-[var(--status-warn)]" /* DS-OK: status warn */}>
                     <AlertTriangle className="h-4 w-4 mt-0.5" />
                     <span>
-                      Warning: The resource has been modified since this edit was created.
-                      Approving will overwrite current changes.
+                      This edit can&apos;t be merged: "{editToApprove?.resource?.title}" was changed after it
+                      was suggested, and merging it could undo those newer changes.
                     </span>
                   </div>
                   <p className="text-foreground">
-                    This will merge the suggested changes into the resource "{editToApprove?.resource?.title}".
+                    Reject it with a reason, or ask the contributor to suggest it again against the
+                    current version.
                   </p>
                 </div>
               ) : (
@@ -686,28 +696,28 @@ export default function PendingEdits() {
           )}
           <AlertDialogFooter>
             <AlertDialogCancel
+              ref={approveCancelRef}
               onClick={() => setApproveError(null)}
               data-testid="button-cancel-approve-edit"
             >
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleApproveConfirm}
-              disabled={approveMutation.isPending}
-              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
-              data-testid="button-confirm-approve-edit"
-            >
-              {approveMutation.isPending ? "Approving..." : "Approve & Merge"}
-            </AlertDialogAction>
+            {editToApprove && !hasConflict(editToApprove) && !approveSuperseded && (
+              <AlertDialogAction
+                onClick={handleApproveConfirm}
+                disabled={approveMutation.isPending}
+                className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
+                data-testid="button-confirm-approve-edit"
+              >
+                {approveMutation.isPending ? "Approving..." : "Approve & Merge"}
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Reject Dialog */}
-      <Dialog open={rejectDialogOpen} onOpenChange={(open) => {
-        setRejectDialogOpen(open);
-        if (!open) setRejectError(null);
-      }}>
+      <Dialog open={rejectDialogOpen} onOpenChange={handleRejectOpenChange}>
         <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <DialogHeader>
             <DialogTitle>Reject Edit Suggestion</DialogTitle>
@@ -741,11 +751,7 @@ export default function PendingEdits() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => {
-                setRejectDialogOpen(false);
-                setRejectionReason("");
-                setRejectError(null);
-              }}
+              onClick={() => handleRejectOpenChange(false)}
               data-testid="button-cancel-reject-edit"
             >
               Cancel

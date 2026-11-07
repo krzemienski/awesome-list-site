@@ -3,6 +3,9 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
+  // Deployment prerequisite: the zone administrator must confirm AI crawler
+  // edge permissions and managed robots policy per README.md. Wrangler does
+  // not apply these zone settings; robots.txt cannot override an edge block.
   "routes": [{ "pattern": "cf.awesome.video", "custom_domain": true }],
   "containers": [
     {

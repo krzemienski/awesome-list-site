@@ -3,7 +3,7 @@ name: Aborted agent run usage
 description: Why cancelled Claude Agent SDK runs must accumulate streamed usage, and how to prove cancellation on scratch without over-spending.
 ---
 
-An aborted Claude Agent SDK run never emits the final result message. Anything that reads usage or cost only from that message records 0 tokens and $0 for cancelled runs, even after real paid work. The run helper therefore accumulates per-message usage, deduplicated by message.id, while streaming. Cost remains unknown on abort, so treat the recorded tokens as a lower bound.
+An aborted Claude Agent SDK run never emits the final result message. Anything that reads usage or cost only from that message records 0 tokens and $0 for cancelled runs, even after real paid work. The run helper therefore accumulates per-message usage, deduplicated by message.id, while streaming. On abort the cost is priced from that streamed usage and stored with `research_jobs.cost_basis = 'lower_bound'` (completed runs store the SDK's `total_cost_usd` as `reported`). It is a real lower bound, not an estimate: on a calibration run the stream priced to about 45% of the reported cost, because model calls made inside tools (WebSearch) never appear in the stream. Final output-token counts arrive only on `message_delta` stream events, so the query must set `includePartialMessages` (piece B, Oct 2026).
 
 **Why:** a live research cancel recorded tokens 0/0 even though 3 web searches had run. "Preserve accrued usage on cancel" cannot be proven without the streamed accumulation.
 

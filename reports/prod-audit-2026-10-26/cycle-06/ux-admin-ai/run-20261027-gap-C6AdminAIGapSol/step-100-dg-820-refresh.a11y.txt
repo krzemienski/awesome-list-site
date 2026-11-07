@@ -1,0 +1,146 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e37]: Authorized admin area
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e44]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e45]:
+                  - text: Operations
+                  - emphasis [ref=e46]: dashboard
+                - paragraph [ref=e47]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e48]:
+                - button "Settings, Digests section open" [ref=e49] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                  - generic [ref=e50]: · Digests
+                - 'button "New entry: add a resource" [ref=e51] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e52]: Digests section open
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - tablist "Admin sections" [ref=e55]:
+                  - tab "Overview" [ref=e56] [cursor=pointer]:
+                    - img [ref=e57]
+                    - text: Overview
+                  - tab "Approvals" [ref=e62] [cursor=pointer]:
+                    - img [ref=e63]
+                    - text: Approvals
+                  - tab "Edits" [ref=e65] [cursor=pointer]:
+                    - img [ref=e66]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e67] [cursor=pointer]:
+                    - img [ref=e68]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Researcher
+                  - tab "Export" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Export
+                  - tab "Database" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Database
+                  - tab "Resources" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Resources
+                  - tab "Categories" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e86] [cursor=pointer]:
+                    - img [ref=e87]
+                    - text: Subcategories
+                  - tab "Users" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Users
+                  - tab "GitHub" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: Link Health
+                  - tab "Audit" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: Audit
+                  - tab "Research" [ref=e103] [cursor=pointer]:
+                    - img [ref=e104]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e106] [cursor=pointer]:
+                  - img [ref=e107]
+              - tabpanel "Digests" [ref=e109]:
+                - article [ref=e110]:
+                  - generic [ref=e111]:
+                    - generic [ref=e112]:
+                      - img [ref=e113]
+                      - text: Digest delivery health
+                    - paragraph [ref=e115]: Aggregate transport and queue signals only. No message contents, user data, recipient identifiers, or secret tokens are shown.
+                    - generic [ref=e116]:
+                      - paragraph [ref=e117]: Updated 03:29:14 AM · refreshes every 30s
+                      - button "Refresh" [disabled] [active] [ref=e118]:
+                        - img
+                        - text: Refresh
+                  - generic [ref=e120]:
+                    - generic [ref=e121]:
+                      - article [ref=e122]:
+                        - generic [ref=e124]:
+                          - img [ref=e125]
+                          - text: Transport
+                        - generic [ref=e131]: Available
+                      - article [ref=e132]:
+                        - generic [ref=e134]:
+                          - img [ref=e135]
+                          - text: Queue total
+                        - generic [ref=e138]: "0"
+                      - article [ref=e139]:
+                        - generic [ref=e141]:
+                          - img [ref=e142]
+                          - text: Oldest queued
+                        - generic [ref=e145]: None
+                    - generic [ref=e146]:
+                      - heading "Digest jobs by channel and status" [level=2] [ref=e147]
+                      - generic [ref=e149]:
+                        - paragraph [ref=e150]: In App
+                        - generic [ref=e152]:
+                          - term [ref=e153]: Sent
+                          - definition [ref=e154]: "1"
+                    - generic [ref=e155]:
+                      - heading "Recent failure codes" [level=2] [ref=e156]:
+                        - img [ref=e157]
+                        - text: Recent failure codes
+                      - paragraph [ref=e159]: No recent failure codes recorded.

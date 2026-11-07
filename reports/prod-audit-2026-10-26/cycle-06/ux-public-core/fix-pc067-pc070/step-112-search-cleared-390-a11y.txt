@@ -1,0 +1,617 @@
+13348	RootWebArea	"Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video"	focusable=true focused=true
+13696	generic	""	
+13359	generic	""	
+13364	region	"Notifications (F8)"	focusable=true
+13366	link	"Skip to main content"	focusable=true
+13704	generic	""	
+13365	list	""	focusable=true
+13367	StaticText	"Skip to main content"	
+13368	banner	""	
+13729	generic	""	
+-1000006549	InlineTextBox	"Skip to main content"	
+13369	button	"Toggle sidebar"	focusable=true
+13373	link	"AWESOME.VIDEO home"	focusable=true
+13378	button	"Search 1,949 resources"	focusable=true
+13382	button	"Sign in, account menu"	focusable=true expanded=false
+13387	main	""	focusable=true
+13398	contentinfo	""	
+13371	StaticText	"Toggle sidebar"	
+13376	StaticText	"AWESOME.VIDEO"	
+13377	StaticText	" home"	
+13381	StaticText	"Search 1,949 resources"	
+13385	StaticText	"Sign in"	
+13386	StaticText	", account menu"	
+13388	navigation	"Breadcrumb"	
+13733	generic	""	
+13400	StaticText	"── INDEX"	
+13401	link	"awesome.video home"	focusable=true
+13403	paragraph	""	
+13405	heading	"INDEXED"	level=2
+13407	paragraph	""	
+13409	paragraph	""	
+13415	navigation	"Explore categories"	
+13443	heading	"SOURCE"	level=2
+13445	link	"krzemienski/ awesome-video"	focusable=true
+13451	paragraph	""	
+13459	StaticText	"© "	
+13460	StaticText	"2026"	
+14695	StaticText	" "	
+13461	StaticText	"awesome.video"	
+13462	StaticText	" · content CC0, code MIT"	
+13463	navigation	"Site policies"	
+13476	StaticText	"built with the awesome-list framework"	
+-1000006550	InlineTextBox	"Toggle sidebar"	
+-1000006551	InlineTextBox	"AWESOME.VIDEO"	
+-1000006552	InlineTextBox	" home"	
+-1000006553	InlineTextBox	"Search 1,949 resources"	
+-1000006554	InlineTextBox	"Sign in"	
+-1000006555	InlineTextBox	", account menu"	
+13389	list	""	
+13734	link	"Browse"	focusable=true
+13738	sectionheader	""	
+13759	generic	""	
+13853	region	"Subcategories"	
+13867	generic	""	
+14024	generic	"Resources (372)"	focusable=true
+-1000006669	InlineTextBox	"── INDEX"	
+13402	StaticText	"awesome.video"	
+13404	StaticText	"A curated collection of awesome video resources, tools, and technologies for developers and content creators"	
+13406	StaticText	"INDEXED"	
+13408	StaticText	"1,949"	
+13410	StaticText	"9"	
+13411	StaticText	" categories"	
+14530	LineBreak	"\n"	
+13412	StaticText	"18"	
+13413	StaticText	" subcategories"	
+14531	LineBreak	"\n"	
+14532	generic	""	
+13416	heading	"EXPLORE"	level=2
+13418	link	"Community & Events"	focusable=true
+13361	link	"Encoding & Codecs"	focusable=true
+13423	link	"General Tools"	focusable=true
+13426	link	"Infrastructure & Delivery"	focusable=true
+13429	link	"Intro & Learning"	focusable=true
+13432	link	"Media Tools"	focusable=true
+13435	link	"Players & Clients"	focusable=true
+13362	link	"Protocols & Transport"	focusable=true
+13440	link	"Standards & Industry"	focusable=true
+13444	StaticText	"SOURCE"	
+13447	StaticText	"krzemienski"	
+13448	StaticText	"/"	
+13449	StaticText	"awesome-video"	
+13452	StaticText	"Open-source."	
+13453	link	"PRs welcome"	focusable=true
+13455	StaticText	"."	
+14559	LineBreak	"\n"	
+13456	StaticText	"Indexed automatically from "	
+13457	StaticText	"README.md"	
+13458	StaticText	"."	
+-1000006695	InlineTextBox	"© "	
+-1000006696	InlineTextBox	"2026"	
+-1000006697	InlineTextBox	" "	
+-1000006698	InlineTextBox	"awesome.video"	
+-1000006699	InlineTextBox	" · content CC0, code MIT"	
+13464	link	"About"	focusable=true
+13466	link	"Terms"	focusable=true
+13468	link	"Privacy"	focusable=true
+13470	link	"Code of Conduct"	focusable=true
+13472	link	"Issues ↗"	focusable=true
+13474	link	"Sitemap"	focusable=true
+-1000006706	InlineTextBox	"built with the awesome-list framework"	
+13390	listitem	""	level=1
+13395	listitem	""	level=1
+14578	StaticText	"Browse"	
+13739	generic	""	
+13741	heading	"Encoding & Codecs"	level=1
+13742	region	"About this collection"	
+14585	StaticText	"372"	
+14586	StaticText	" "	
+14587	StaticText	"RESOURCES"	
+14588	StaticText	"2"	
+14589	StaticText	" "	
+14590	StaticText	"SUBCATEGORIES"	
+13617	button	"Close filters"	focusable=true expanded=true
+13760	generic	""	
+13614	combobox	"Limit Encoding & Codecs by subcategory"	focusable=true expanded=false
+13615	combobox	"Limit by resource kind"	focusable=true expanded=false
+13824	combobox	"Sort resources"	focusable=true expanded=false
+13828	generic	"View mode"	
+13854	heading	"Subcategories"	level=2
+13856	link	"Codecs 27"	focusable=true
+13859	link	"Encoding Tools 225"	focusable=true
+13862	button	"Uncategorized 120"	focusable=true pressed="false"
+14011	generic	""	
+14026	heading	"Resources (372)"	focusable=true level=2
+14028	article	""	
+14048	article	""	
+14068	article	""	
+14088	article	""	
+14108	article	""	
+14128	article	""	
+14148	article	""	
+14168	article	""	
+14186	article	""	
+14206	article	""	
+14226	article	""	
+14245	article	""	
+14265	article	""	
+14285	article	""	
+14305	article	""	
+14325	article	""	
+14345	article	""	
+14365	article	""	
+14385	article	""	
+14405	article	""	
+14425	article	""	
+14445	article	""	
+14465	article	""	
+14485	article	""	
+14506	navigation	"Pagination"	
+-1000006670	InlineTextBox	"awesome.video"	
+-1000006671	InlineTextBox	"A curated collection of awesome video "	
+-1000006672	InlineTextBox	"resources, tools, and technologies for "	
+-1000006673	InlineTextBox	"developers and content creators"	
+-1000006674	InlineTextBox	"INDEXED"	
+-1000006675	InlineTextBox	"1,949"	
+-1000006676	InlineTextBox	"9"	
+-1000006677	InlineTextBox	" categories"	
+-1000006678	InlineTextBox	"\n"	
+-1000006679	InlineTextBox	"18"	
+-1000006680	InlineTextBox	" subcategories"	
+-1000006681	InlineTextBox	"\n"	
+13414	StaticText	"live"	
+13417	StaticText	"EXPLORE"	
+-1000006684	InlineTextBox	"SOURCE"	
+-1000006685	InlineTextBox	"krzemienski"	
+-1000006686	InlineTextBox	"/"	
+-1000006687	InlineTextBox	"awesome-video"	
+-1000006688	InlineTextBox	"Open-source."	
+13454	StaticText	"PRs welcome"	
+-1000006690	InlineTextBox	"."	
+-1000006691	InlineTextBox	"\n"	
+-1000006692	InlineTextBox	"Indexed automatically from "	
+-1000006693	InlineTextBox	"README.md"	
+-1000006694	InlineTextBox	"."	
+13465	StaticText	"About"	
+13467	StaticText	"Terms"	
+13469	StaticText	"Privacy"	
+13471	StaticText	"Conduct"	
+13473	StaticText	"Issues ↗"	
+13475	StaticText	"Sitemap"	
+13391	link	"Home"	focusable=true
+13396	link	"Encoding & Codecs"	disabled=true
+-1000006558	InlineTextBox	"Browse"	
+14580	StaticText	"CATEGORY · "	
+14581	StaticText	"ENCODING & CODECS"	
+14582	StaticText	"Encoding & Codecs"	
+13743	heading	"About this collection"	level=2
+13744	paragraph	""	
+-1000006568	InlineTextBox	"372"	
+-1000006569	InlineTextBox	" "	
+-1000006570	InlineTextBox	"RESOURCES"	
+-1000006571	InlineTextBox	"2"	
+-1000006572	InlineTextBox	" "	
+-1000006573	InlineTextBox	"SUBCATEGORIES"	
+14591	StaticText	"Close filters"	
+13761	image	""	
+13616	textbox	"Search in Encoding & Codecs"	focusable=true focused=true
+13768	MenuListPopup	""	
+13798	MenuListPopup	""	
+13825	generic	""	
+14593	StaticText	"VIEW"	
+13830	radiogroup	""	focusable=true
+14594	StaticText	"Subcategories"	
+14595	StaticText	"Codecs"	
+14596	StaticText	"27"	
+14597	StaticText	"Encoding Tools"	
+14598	StaticText	"225"	
+14599	StaticText	"Uncategorized"	
+14600	StaticText	"120"	
+14012	button	"Filters"	focusable=true expanded=false
+14656	StaticText	"Resources (372)"	
+14030	heading	"Zulko/moviepy"	level=2
+14032	link	"Open in new tab"	focusable=true
+14037	generic	""	
+14050	heading	"zolinux/MediaArchiver"	level=2
+14052	link	"Open in new tab"	focusable=true
+14057	generic	""	
+14070	heading	"ZaifSenpai/Batch-Py-Remux"	level=2
+14072	link	"Open in new tab"	focusable=true
+14077	generic	""	
+14090	heading	"Yamdi (Yet Another Metadata Injector)"	level=2
+14092	link	"Open in new tab"	focusable=true
+14097	generic	""	
+14110	heading	"xyk2/cloud-transcoder"	level=2
+14112	link	"Open in new tab"	focusable=true
+14117	generic	""	
+14130	heading	"XVC Codec (Divideon)"	level=2
+14132	link	"Open in new tab"	focusable=true
+14137	generic	""	
+14150	heading	"xvc"	level=2
+14152	link	"Open in new tab"	focusable=true
+14157	generic	""	
+14170	heading	"Xuggler"	level=2
+14172	link	"Open in new tab"	focusable=true
+14177	generic	""	
+14188	heading	"XMedia Recode"	level=2
+14190	link	"Open in new tab"	focusable=true
+14195	generic	""	
+14208	heading	"xiph/rav1e"	level=2
+14210	link	"Open in new tab"	focusable=true
+14215	generic	""	
+14228	heading	"Xiph.Org Foundation Projects"	level=2
+14229	link	"Open in new tab"	focusable=true
+14234	generic	""	
+14247	heading	"Xabe.FFmpeg"	level=2
+14249	link	"Open in new tab"	focusable=true
+14254	generic	""	
+14267	heading	"x265 Documentation — x265 documentation"	level=2
+14269	link	"Open in new tab"	focusable=true
+14274	generic	""	
+14287	heading	"x265 (H.265/HEVC Encoder)"	level=2
+14289	link	"Open in new tab"	focusable=true
+14294	generic	""	
+14307	heading	"x264: H.264 Video Encoder"	level=2
+14309	link	"Open in new tab"	focusable=true
+14314	generic	""	
+14327	heading	"x264 FFmpeg Options Guide - Linux Encoding"	level=2
+14329	link	"Open in new tab"	focusable=true
+14334	generic	""	
+14347	heading	"x264 (H.264/AVC Encoder)"	level=2
+14349	link	"Open in new tab"	focusable=true
+14354	generic	""	
+14367	heading	"WritingMinds/ffmpeg-android-java"	level=2
+14369	link	"Open in new tab"	focusable=true
+14374	generic	""	
+14387	heading	"Wirecast"	level=2
+14389	link	"Open in new tab"	focusable=true
+14394	generic	""	
+14407	heading	"WinFF"	level=2
+14409	link	"Open in new tab"	focusable=true
+14414	generic	""	
+14427	heading	"webmquicktime: QuickTime Components for WebM"	level=2
+14429	link	"Open in new tab"	focusable=true
+14434	generic	""	
+14447	heading	"webmdshow: DirectShow Filters for WebM"	level=2
+14449	link	"Open in new tab"	focusable=true
+14454	generic	""	
+14467	heading	"webm-tools: WebM Utilities"	level=2
+14469	link	"Open in new tab"	focusable=true
+14474	generic	""	
+14487	heading	"VVenC and VVdeC"	level=2
+14489	link	"Open in new tab"	focusable=true
+14494	generic	""	
+14508	generic	""	disabled=true focusable=true
+14511	link	"Page 1, current page"	focusable=true
+14512	link	"Go to page 2"	focusable=true
+14514	link	"Go to page 16"	focusable=true
+14515	link	"Next"	focusable=true
+14687	StaticText	"Page "	
+14688	StaticText	"1"	
+14689	StaticText	" of "	
+14690	StaticText	"16"	
+14521	LabelText	""	
+14522	textbox	"Page number, 1 to 16"	focusable=true
+14525	status	""	
+-1000006682	InlineTextBox	"live"	
+-1000006683	InlineTextBox	"EXPLORE"	
+-1000006689	InlineTextBox	"PRs welcome"	
+-1000006700	InlineTextBox	"About"	
+-1000006701	InlineTextBox	"Terms"	
+-1000006702	InlineTextBox	"Privacy"	
+-1000006703	InlineTextBox	"Conduct"	
+-1000006704	InlineTextBox	"Issues ↗"	
+-1000006705	InlineTextBox	"Sitemap"	
+13392	StaticText	"Home"	
+13397	StaticText	"Encoding & Codecs"	
+-1000006559	InlineTextBox	"CATEGORY · "	
+-1000006560	InlineTextBox	"ENCODING & CODECS"	
+-1000006561	InlineTextBox	"Encoding & "	
+-1000006562	InlineTextBox	"Codecs"	
+14583	StaticText	"About this collection"	
+14584	StaticText	"Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools."	
+-1000006574	InlineTextBox	"Close filters"	
+13765	generic	""	
+13772	option	"All subcategories"	focusable=true
+13775	option	"Uncategorized (120)"	focusable=true
+13778	option	"Codecs (27)"	focusable=true
+13781	option	"Codecs › AV1 (5)"	focusable=true
+13784	option	"Codecs › HEVC (10)"	focusable=true
+13787	option	"Codecs › VP9 (1)"	focusable=true
+13790	option	"Encoding Tools (225)"	focusable=true
+13793	option	"Encoding Tools › FFMPEG (65)"	focusable=true
+13802	option	"All resource kinds"	focusable=true
+13805	option	"Tools"	focusable=true
+13808	option	"Libraries"	focusable=true
+13811	option	"Standards"	focusable=true
+13814	option	"Events"	focusable=true
+13817	option	"Protocols"	focusable=true
+13820	option	"Other"	focusable=true
+14592	StaticText	"Name Z-A"	
+-1000006576	InlineTextBox	"VIEW"	
+13831	radio	"Grid view"	focusable=true checked="false"
+13837	radio	"List view"	focusable=true checked="false"
+13845	radio	"Compact view"	focusable=true checked="true"
+-1000006577	InlineTextBox	"Subcategories"	
+-1000006578	InlineTextBox	"Codecs"	
+-1000006579	InlineTextBox	"27"	
+-1000006580	InlineTextBox	"Encoding Tools"	
+-1000006581	InlineTextBox	"225"	
+-1000006582	InlineTextBox	"Uncategorized"	
+-1000006583	InlineTextBox	"120"	
+14013	image	""	
+14655	StaticText	"Filters"	
+-1000006585	InlineTextBox	"Resources (372)"	
+14031	link	"Zulko/moviepy"	focusable=true
+14033	image	""	
+14038	button	"Favorite to your account — sign in required: Zulko/moviepy"	focusable=true pressed="false"
+14042	button	"Bookmark on this device — no sign-in required: Zulko/moviepy"	focusable=true pressed="false"
+14051	link	"zolinux/MediaArchiver"	focusable=true
+14053	image	""	
+14058	button	"Favorite to your account — sign in required: zolinux/MediaArchiver"	focusable=true pressed="false"
+14062	button	"Bookmark on this device — no sign-in required: zolinux/MediaArchiver"	focusable=true pressed="false"
+14071	link	"ZaifSenpai/Batch-Py-Remux"	focusable=true
+14073	image	""	
+14078	button	"Favorite to your account — sign in required: ZaifSenpai/Batch-Py-Remux"	focusable=true pressed="false"
+14082	button	"Bookmark on this device — no sign-in required: ZaifSenpai/Batch-Py-Remux"	focusable=true pressed="false"
+14091	link	"Yamdi (Yet Another Metadata Injector)"	focusable=true
+14093	image	""	
+14098	button	"Favorite to your account — sign in required: Yamdi (Yet Another Metadata Injector)"	focusable=true pressed="false"
+14102	button	"Bookmark on this device — no sign-in required: Yamdi (Yet Another Metadata Injector)"	focusable=true pressed="false"
+14111	link	"xyk2/cloud-transcoder"	focusable=true
+14113	image	""	
+14118	button	"Favorite to your account — sign in required: xyk2/cloud-transcoder"	focusable=true pressed="false"
+14122	button	"Bookmark on this device — no sign-in required: xyk2/cloud-transcoder"	focusable=true pressed="false"
+14131	link	"XVC Codec (Divideon)"	focusable=true
+14133	image	""	
+14138	button	"Favorite to your account — sign in required: XVC Codec (Divideon)"	focusable=true pressed="false"
+14142	button	"Bookmark on this device — no sign-in required: XVC Codec (Divideon)"	focusable=true pressed="false"
+14151	link	"xvc"	focusable=true
+14153	image	""	
+14158	button	"Favorite to your account — sign in required: xvc"	focusable=true pressed="false"
+14162	button	"Bookmark on this device — no sign-in required: xvc"	focusable=true pressed="false"
+14171	link	"Xuggler"	focusable=true
+14173	image	""	
+14178	button	"Favorite to your account — sign in required: Xuggler"	focusable=true pressed="false"
+14182	button	"Remove bookmark saved on this device: Xuggler"	focusable=true pressed="true"
+14189	link	"XMedia Recode"	focusable=true
+14191	image	""	
+14196	button	"Favorite to your account — sign in required: XMedia Recode"	focusable=true pressed="false"
+14200	button	"Bookmark on this device — no sign-in required: XMedia Recode"	focusable=true pressed="false"
+14209	link	"xiph/rav1e"	focusable=true
+14211	image	""	
+14216	button	"Favorite to your account — sign in required: xiph/rav1e"	focusable=true pressed="false"
+14220	button	"Bookmark on this device — no sign-in required: xiph/rav1e"	focusable=true pressed="false"
+13625	link	"Xiph.Org Foundation Projects"	focusable=true
+14230	image	""	
+14235	button	"Favorite to your account — sign in required: Xiph.Org Foundation Projects"	focusable=true pressed="false"
+14239	button	"Bookmark on this device — no sign-in required: Xiph.Org Foundation Projects"	focusable=true pressed="false"
+14248	link	"Xabe.FFmpeg"	focusable=true
+14250	image	""	
+14255	button	"Favorite to your account — sign in required: Xabe.FFmpeg"	focusable=true pressed="false"
+14259	button	"Bookmark on this device — no sign-in required: Xabe.FFmpeg"	focusable=true pressed="false"
+14268	link	"x265 Documentation — x265 documentation"	focusable=true
+14270	image	""	
+14275	button	"Favorite to your account — sign in required: x265 Documentation — x265 documentation"	focusable=true pressed="false"
+14279	button	"Bookmark on this device — no sign-in required: x265 Documentation — x265 documentation"	focusable=true pressed="false"
+14288	link	"x265 (H.265/HEVC Encoder)"	focusable=true
+14290	image	""	
+14295	button	"Favorite to your account — sign in required: x265 (H.265/HEVC Encoder)"	focusable=true pressed="false"
+14299	button	"Bookmark on this device — no sign-in required: x265 (H.265/HEVC Encoder)"	focusable=true pressed="false"
+14308	link	"x264: H.264 Video Encoder"	focusable=true
+14310	image	""	
+14315	button	"Favorite to your account — sign in required: x264: H.264 Video Encoder"	focusable=true pressed="false"
+14319	button	"Bookmark on this device — no sign-in required: x264: H.264 Video Encoder"	focusable=true pressed="false"
+14328	link	"x264 FFmpeg Options Guide - Linux Encoding"	focusable=true
+14330	image	""	
+14335	button	"Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding"	focusable=true pressed="false"
+14339	button	"Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding"	focusable=true pressed="false"
+14348	link	"x264 (H.264/AVC Encoder)"	focusable=true
+14350	image	""	
+14355	button	"Favorite to your account — sign in required: x264 (H.264/AVC Encoder)"	focusable=true pressed="false"
+14359	button	"Bookmark on this device — no sign-in required: x264 (H.264/AVC Encoder)"	focusable=true pressed="false"
+14368	link	"WritingMinds/ffmpeg-android-java"	focusable=true
+14370	image	""	
+14375	button	"Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java"	focusable=true pressed="false"
+14379	button	"Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java"	focusable=true pressed="false"
+14388	link	"Wirecast"	focusable=true
+14390	image	""	
+14395	button	"Favorite to your account — sign in required: Wirecast"	focusable=true pressed="false"
+14399	button	"Bookmark on this device — no sign-in required: Wirecast"	focusable=true pressed="false"
+14408	link	"WinFF"	focusable=true
+14410	image	""	
+14415	button	"Favorite to your account — sign in required: WinFF"	focusable=true pressed="false"
+14419	button	"Bookmark on this device — no sign-in required: WinFF"	focusable=true pressed="false"
+14428	link	"webmquicktime: QuickTime Components for WebM"	focusable=true
+14430	image	""	
+14435	button	"Favorite to your account — sign in required: webmquicktime: QuickTime Components for WebM"	focusable=true pressed="false"
+14439	button	"Bookmark on this device — no sign-in required: webmquicktime: QuickTime Components for WebM"	focusable=true pressed="false"
+14448	link	"webmdshow: DirectShow Filters for WebM"	focusable=true
+14450	image	""	
+14455	button	"Favorite to your account — sign in required: webmdshow: DirectShow Filters for WebM"	focusable=true pressed="false"
+14459	button	"Bookmark on this device — no sign-in required: webmdshow: DirectShow Filters for WebM"	focusable=true pressed="false"
+14468	link	"webm-tools: WebM Utilities"	focusable=true
+14470	image	""	
+14475	button	"Favorite to your account — sign in required: webm-tools: WebM Utilities"	focusable=true pressed="false"
+14479	button	"Bookmark on this device — no sign-in required: webm-tools: WebM Utilities"	focusable=true pressed="false"
+14488	link	"VVenC and VVdeC"	focusable=true
+14490	image	""	
+14495	button	"Favorite to your account — sign in required: VVenC and VVdeC"	focusable=true pressed="false"
+14499	button	"Bookmark on this device — no sign-in required: VVenC and VVdeC"	focusable=true pressed="false"
+14509	image	""	
+14681	StaticText	"Previous"	
+14682	StaticText	"1"	
+14683	StaticText	"2"	
+14685	StaticText	"16"	
+14686	StaticText	"Next"	
+14516	image	""	
+-1000006663	InlineTextBox	"Page "	
+-1000006664	InlineTextBox	"1"	
+-1000006665	InlineTextBox	" of "	
+-1000006666	InlineTextBox	"16"	
+14691	StaticText	"Go to page"	
+14523	generic	""	
+-1000006556	InlineTextBox	"Home"	
+-1000006557	InlineTextBox	"Encoding & Codecs"	
+-1000006563	InlineTextBox	"About this collection"	
+-1000006564	InlineTextBox	"Encoding & Codecs brings together 372 "	
+-1000006565	InlineTextBox	"curated resources from across the video "	
+-1000006566	InlineTextBox	"technology landscape. Notable topics "	
+-1000006567	InlineTextBox	"include Codecs and Encoding Tools."	
+-1000006575	InlineTextBox	"Name Z-A"	
+13832	image	""	
+13838	image	""	
+13846	image	""	
+-1000006584	InlineTextBox	"Filters"	
+14657	StaticText	"Zulko/moviepy"	
+14040	image	""	
+14044	image	""	
+14658	StaticText	"zolinux/MediaArchiver"	
+14060	image	""	
+14064	image	""	
+14659	StaticText	"ZaifSenpai/Batch-Py-Remux"	
+14080	image	""	
+14084	image	""	
+14660	StaticText	"Yamdi (Yet Another Metadata Injector)"	
+14100	image	""	
+14104	image	""	
+14661	StaticText	"xyk2/cloud-transcoder"	
+14120	image	""	
+14124	image	""	
+14662	StaticText	"XVC Codec (Divideon)"	
+14140	image	""	
+14144	image	""	
+14663	StaticText	"xvc"	
+14160	image	""	
+14164	image	""	
+14664	StaticText	"Xuggler"	
+14180	image	""	
+14184	image	""	
+14665	StaticText	"XMedia Recode"	
+14198	image	""	
+14202	image	""	
+14666	StaticText	"xiph/rav1e"	
+14218	image	""	
+14222	image	""	
+14667	StaticText	"Xiph.Org Foundation Projects"	
+14237	image	""	
+14241	image	""	
+14668	StaticText	"Xabe.FFmpeg"	
+14257	image	""	
+14261	image	""	
+14669	StaticText	"x265 Documentation — x265 documentation"	
+14277	image	""	
+14281	image	""	
+14670	StaticText	"x265 (H.265/HEVC Encoder)"	
+14297	image	""	
+14301	image	""	
+14671	StaticText	"x264: H.264 Video Encoder"	
+14317	image	""	
+14321	image	""	
+14672	StaticText	"x264 FFmpeg Options Guide - Linux Encoding"	
+14337	image	""	
+14341	image	""	
+14673	StaticText	"x264 (H.264/AVC Encoder)"	
+14357	image	""	
+14361	image	""	
+14674	StaticText	"WritingMinds/ffmpeg-android-java"	
+14377	image	""	
+14381	image	""	
+14675	StaticText	"Wirecast"	
+14397	image	""	
+14401	image	""	
+14676	StaticText	"WinFF"	
+14417	image	""	
+14421	image	""	
+14677	StaticText	"webmquicktime: QuickTime Components for WebM"	
+14437	image	""	
+14441	image	""	
+14678	StaticText	"webmdshow: DirectShow Filters for WebM"	
+14457	image	""	
+14461	image	""	
+14679	StaticText	"webm-tools: WebM Utilities"	
+14477	image	""	
+14481	image	""	
+14680	StaticText	"VVenC and VVdeC"	
+14497	image	""	
+14501	image	""	
+-1000006658	InlineTextBox	"Previous"	
+-1000006659	InlineTextBox	"1"	
+-1000006660	InlineTextBox	"2"	
+-1000006661	InlineTextBox	"16"	
+-1000006662	InlineTextBox	"Next"	
+-1000006667	InlineTextBox	"Go to page"	
+14692	StaticText	"1"	
+-1000006586	InlineTextBox	"Zulko/moviep"	
+-1000006587	InlineTextBox	"y"	
+-1000006588	InlineTextBox	"zolinux/Media"	
+-1000006589	InlineTextBox	"Archiver"	
+-1000006590	InlineTextBox	"ZaifSenpai/Ba"	
+-1000006591	InlineTextBox	"tch-Py-Remux"	
+-1000006592	InlineTextBox	"Yamdi (Yet "	
+-1000006593	InlineTextBox	"Another "	
+-1000006594	InlineTextBox	"…"	
+-1000006595	InlineTextBox	"Metadata "	
+-1000006596	InlineTextBox	"Injector)"	
+-1000006597	InlineTextBox	"xyk2/cloud-"	
+-1000006598	InlineTextBox	"transcoder"	
+-1000006599	InlineTextBox	"XVC Codec "	
+-1000006600	InlineTextBox	"(Divideon)"	
+-1000006601	InlineTextBox	"xvc"	
+-1000006602	InlineTextBox	"Xuggler"	
+-1000006603	InlineTextBox	"XMedia "	
+-1000006604	InlineTextBox	"Recode"	
+-1000006605	InlineTextBox	"xiph/rav1e"	
+-1000006606	InlineTextBox	"Xiph.Org "	
+-1000006607	InlineTextBox	"Foundation "	
+-1000006608	InlineTextBox	"…"	
+-1000006609	InlineTextBox	"Projects"	
+-1000006610	InlineTextBox	"Xabe.FFmpeg"	
+-1000006611	InlineTextBox	"x265 "	
+-1000006612	InlineTextBox	"Documentatio"	
+-1000006613	InlineTextBox	"Documentat"	
+-1000006614	InlineTextBox	"…"	
+-1000006615	InlineTextBox	"n — x265 "	
+-1000006616	InlineTextBox	"documentatio"	
+-1000006617	InlineTextBox	"n"	
+-1000006618	InlineTextBox	"x265 "	
+-1000006619	InlineTextBox	"(H.265/HEVC "	
+-1000006620	InlineTextBox	"(H.265/HEV"	
+-1000006621	InlineTextBox	"…"	
+-1000006622	InlineTextBox	"Encoder)"	
+-1000006623	InlineTextBox	"x264: H.264 "	
+-1000006624	InlineTextBox	"Video "	
+-1000006625	InlineTextBox	"…"	
+-1000006626	InlineTextBox	"Encoder"	
+-1000006627	InlineTextBox	"x264 FFmpeg "	
+-1000006628	InlineTextBox	"Options Guide "	
+-1000006629	InlineTextBox	"Options Gui"	
+-1000006630	InlineTextBox	"…"	
+-1000006631	InlineTextBox	"- Linux "	
+-1000006632	InlineTextBox	"Encoding"	
+-1000006633	InlineTextBox	"x264 "	
+-1000006634	InlineTextBox	"(H.264/AVC "	
+-1000006635	InlineTextBox	"…"	
+-1000006636	InlineTextBox	"Encoder)"	
+-1000006637	InlineTextBox	"WritingMinds/"	
+-1000006638	InlineTextBox	"ffmpeg-"	
+-1000006639	InlineTextBox	"…"	
+-1000006640	InlineTextBox	"android-java"	
+-1000006641	InlineTextBox	"Wirecast"	
+-1000006642	InlineTextBox	"WinFF"	
+-1000006643	InlineTextBox	"webmquickti"	
+-1000006644	InlineTextBox	"me: "	
+-1000006645	InlineTextBox	"…"	
+-1000006646	InlineTextBox	"QuickTime "	
+-1000006647	InlineTextBox	"Components "	
+-1000006648	InlineTextBox	"for WebM"	
+-1000006649	InlineTextBox	"webmdshow: "	
+-1000006650	InlineTextBox	"DirectShow "	
+-1000006651	InlineTextBox	"…"	
+-1000006652	InlineTextBox	"Filters for "	
+-1000006653	InlineTextBox	"WebM"	
+-1000006654	InlineTextBox	"webm-tools: "	
+-1000006655	InlineTextBox	"WebM Utilities"	
+-1000006656	InlineTextBox	"VVenC and "	
+-1000006657	InlineTextBox	"VVdeC"	
+-1000006668	InlineTextBox	"1"	

@@ -454,3 +454,33 @@
   overflow-wrap: anywhere;
   font-size: 0.75rem;
 }
+
+/* AI-05/06: the header names the target Pull and Sync now act on when it is
+   not the configured repository, and why they are off when it is unusable. */
+.ops-github-panel__repository-target {
+  margin-top: 0.25rem;
+  color: var(--status-warn);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.ops-github-panel__repository-target--blocked {
+  color: var(--status-bad);
+}
+
+/* AI-11: the Last Import/Export title, outcome chip and date chip wrap
+   inside the alert instead of pushing the date past its edge at 390. */
+.ops-github-panel__last-sync-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ops-github-panel__last-sync-date {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

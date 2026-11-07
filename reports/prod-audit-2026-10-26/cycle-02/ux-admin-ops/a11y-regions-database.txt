@@ -1,0 +1,3 @@
+  - region "Notifications (F8)" [ref=e2]
+  - tabpanel "Database" [ref=e17] focusable [tabindex]
+    - region "Key tables, scrollable" [ref=e38] focusable [tabindex]

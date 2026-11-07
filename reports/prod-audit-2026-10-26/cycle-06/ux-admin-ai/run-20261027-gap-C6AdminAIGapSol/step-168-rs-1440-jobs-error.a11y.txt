@@ -1,0 +1,233 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e122]:
+                      - heading "Run a research task" [level=3] [ref=e123]
+                      - paragraph [ref=e124]: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                      - generic [ref=e125]:
+                        - region "Brief" [ref=e126]:
+                          - generic [ref=e127]:
+                            - generic [ref=e128]: "1"
+                            - heading "Brief" [level=4] [ref=e129]
+                            - generic [ref=e130]: Auto-generated at launch
+                          - radiogroup "Research brief" [ref=e132]:
+                            - generic [ref=e133] [cursor=pointer]:
+                              - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [checked] [ref=e134]:
+                                - img [ref=e136]
+                              - generic [ref=e138]:
+                                - generic [ref=e139]: Auto-generate at launch
+                                - generic [ref=e140]: A gap-aware brief built from the catalog and past runs.
+                            - generic [ref=e141] [cursor=pointer]:
+                              - radio "Write my own Describe what to search for, or start from a generated brief." [ref=e142]
+                              - generic [ref=e143]:
+                                - generic [ref=e144]: Write my own
+                                - generic [ref=e145]: Describe what to search for, or start from a generated brief.
+                        - region "Focus" [ref=e146]:
+                          - generic [ref=e147]:
+                            - generic [ref=e148]: "2"
+                            - heading "Focus" [level=4] [ref=e149]
+                            - generic [ref=e150]: All categories
+                          - combobox "Category focus" [ref=e152] [cursor=pointer]:
+                            - generic: All categories
+                            - img [ref=e153]
+                        - region "Limits" [ref=e155]:
+                          - generic [ref=e156]:
+                            - generic [ref=e157]: "3"
+                            - heading "Limits" [level=4] [ref=e158]
+                            - generic [ref=e159]: no target · $3.00 cap · 40 turns
+                          - generic [ref=e160]:
+                            - generic [ref=e161]:
+                              - generic [ref=e162]:
+                                - text: Stop after (discoveries)
+                                - spinbutton "Stop after (discoveries)" [ref=e163]
+                                - paragraph [ref=e164]: No target — runs until the budget or turns end.
+                              - generic [ref=e165]:
+                                - text: Budget cap (USD)
+                                - spinbutton "Budget cap (USD)" [ref=e166]: "3.00"
+                                - paragraph [ref=e167]: Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops.
+                              - generic [ref=e168]:
+                                - text: Max turns
+                                - spinbutton "Max turns" [ref=e169]: "40"
+                                - paragraph [ref=e170]: Positive whole number (blank = no cap).
+                            - paragraph [ref=e171]: Cost depends on scope — check the jobs table after your first run. Discoveries are deduplicated against the 3,826 catalog resources.
+                        - region "Endpoint & model" [ref=e172]:
+                          - generic [ref=e173]:
+                            - generic [ref=e174]: "4"
+                            - heading "Endpoint & model" [level=4] [ref=e175]
+                            - generic [ref=e176]: Server configuration
+                          - button "Override endpoint or models (optional)" [ref=e178] [cursor=pointer]:
+                            - text: Override endpoint or models (optional)
+                            - img
+                        - region "About to run on" [ref=e179]:
+                          - generic [ref=e180]:
+                            - generic [ref=e181]: "5"
+                            - heading "About to run on" [level=4] [ref=e182]
+                          - generic [ref=e183]:
+                            - generic [ref=e186]:
+                              - generic [ref=e187]:
+                                - term [ref=e188]: Endpoint
+                                - definition [ref=e189]:
+                                  - text: router.hack.ski
+                                  - generic [ref=e190]: · ANTHROPIC_BASE_URL
+                              - generic [ref=e191]:
+                                - term [ref=e192]: Credential
+                                - definition [ref=e193]: router via ANTHROPIC_BASE_URL
+                              - generic [ref=e194]:
+                                - term [ref=e195]: Orchestrator model
+                                - definition [ref=e196]:
+                                  - text: cc/claude-opus-5
+                                  - generic [ref=e197]: · ANTHROPIC_MODEL
+                              - generic [ref=e198]:
+                                - term [ref=e199]: Scout model
+                                - definition [ref=e200]:
+                                  - text: cc/claude-haiku-4-5-20251001
+                                  - generic [ref=e201]: · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL
+                            - generic [ref=e202]:
+                              - button "Launch research run" [disabled]:
+                                - img
+                                - text: Launch research run
+                              - paragraph [ref=e203]: Job history failed to load, so an active run can't be ruled out. Retry the jobs table below first.
+                    - generic [ref=e204]:
+                      - generic [ref=e206]:
+                        - heading "Researcher jobs" [level=2] [ref=e207]
+                        - paragraph [ref=e208]: Recent agentic research runs
+                      - region "Researcher jobs table, scrollable" [ref=e210]:
+                        - table [ref=e211]:
+                          - rowgroup [ref=e212]:
+                            - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e213]:
+                              - columnheader "Status" [ref=e214]
+                              - columnheader "Prompt" [ref=e215]
+                              - columnheader "Found" [ref=e216]
+                              - columnheader "Approved / Rejected" [ref=e217]
+                              - columnheader "Cost" [ref=e218]
+                              - columnheader "Turns" [ref=e219]
+                              - columnheader "Created" [ref=e220]
+                          - rowgroup
+                        - alert [ref=e221]:
+                          - img [ref=e222]
+                          - paragraph [ref=e224]: Couldn't load research jobs
+                          - generic [ref=e225]:
+                            - generic [ref=e226]: Could not reach the server. Please check your connection and try again.
+                            - button "Retry" [ref=e227] [cursor=pointer]:
+                              - img
+                              - text: Retry
+                  - group [ref=e228]:
+                    - generic "All pending discoveries & full job history" [ref=e229] [cursor=pointer]

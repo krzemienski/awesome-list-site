@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?layout=index&kind=protocols","title":"Awesome Video — 3825+ Curated Video & Streaming Resources","width":1440,"height":900,"scrollX":0,"scrollY":0,"bodyWidth":1434,"online":true,"focus":{"tag":"BUTTON","id":"","label":"Protocols, 124 resources","text":"Protocols 124"},"headings":[{"text":"~/awesome.videoAwesome Video Resources","id":""},{"text":"Hand-picked highlights","id":"home-index-featured-title"},{"text":"Categories","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"dialogs":[],"pressed":[{"text":"Home","label":null},{"text":"Protocols 124","label":"Protocols, 124 resources"}],"status":[],"analyticsDisabled":"1"}
+```

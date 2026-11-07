@@ -1,0 +1,5 @@
+- generic
+  - alertdialog "Sign out on every device?"
+    - heading "Sign out on every device?" [level=2, ref=e1]
+    - button "Cancel" [ref=e2]
+    - button "Sign out all devices" [ref=e3]

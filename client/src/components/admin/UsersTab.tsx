@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -16,6 +17,7 @@ import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface UsersResponse {
   users: User[];
@@ -64,12 +66,14 @@ export default function UsersTab() {
 
   // Debounce the search box → query param, resetting to page 1 on change.
   useEffect(() => {
+    const nextQuery = searchInput.trim();
+    if (nextQuery === searchQuery) return;
     const t = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
+      setSearchQuery(nextQuery);
       setPage(1);
     }, 300);
     return () => clearTimeout(t);
-  }, [searchInput]);
+  }, [searchInput, searchQuery]);
 
   useEffect(() => {
     if (editingRoleId !== null || pendingRoleChange || !refocusEditIdRef.current) return;
@@ -89,7 +93,7 @@ export default function UsersTab() {
     if (target === "next") nextPageRef.current?.focus();
   }, [page]);
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useQuery<UsersResponse>({
+  const { data, isLoading, isError, error, isFetching, isPaused, isPlaceholderData, refetch } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -99,14 +103,25 @@ export default function UsersTab() {
       if (searchQuery) params.set('q', searchQuery);
       params.set('sortBy', sortBy);
       params.set('sortDir', sortDir);
-      const response = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
+      const response = await apiFetch(`/api/admin/users?${params}`, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch users');
       return response.json();
     },
-    // Keep the previous page rendered while a new search/page loads so the
-    // search input doesn't unmount (and lose focus) mid-typing.
+    // Retain pagination while requests change; placeholder rows must not be
+    // presented as results for the new search, page or sort.
     placeholderData: keepPreviousData,
   });
+
+  const resultsChanging = searchInput.trim() !== searchQuery || isPlaceholderData;
+  const retryUsers = (event: MouseEvent<HTMLButtonElement>) => {
+    handoffFocusOnUnmount(event.currentTarget, () => searchInputRef.current);
+    if (searchInput.trim() !== searchQuery) {
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+    } else {
+      void refetch();
+    }
+  };
 
   const toggleReveal = (id: string) => {
     setRevealedIds(prev => {
@@ -116,6 +131,15 @@ export default function UsersTab() {
     });
   };
 
+  // Toasts name the account the way the table does: its name, else the
+  // masked email (raw emails stay out of the DOM).
+  const userLabel = (userId: string) => {
+    const user = data?.users.find((u) => u.id === userId);
+    const name = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+    if (name) return name;
+    return user?.email ? maskEmail(user.email) : "The account";
+  };
+
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
       return await apiRequest(`/api/admin/users/${userId}/role`, {
@@ -123,9 +147,9 @@ export default function UsersTab() {
         body: JSON.stringify({ role }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, { userId, role }) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: "Role Updated", description: "User role has been changed." });
+      toast({ title: "Role updated", description: `${userLabel(userId)} is now ${role === "admin" ? "an admin" : `a ${role}`}.` });
     },
     onError: (error: Error) => {
       toast({ title: "Update Failed", description: describeWriteError(error, { outcome: "The role may not have changed. Refresh the user list to check before trying again." }), variant: "destructive" });
@@ -139,13 +163,16 @@ export default function UsersTab() {
   // dialog; Radix would return focus to that vanished trigger, so hand it to
   // the user search box instead. A failed delete keeps the row: default return.
   const deletedUserRef = useRef(false);
+  // The Delete button that opened the confirmation, so Cancel can hand focus back to it.
+  const deleteOpenerRef = useRef<HTMLElement | null>(null);
+  const [focusReturnId, setFocusReturnId] = useState<string | null>(null);
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
     },
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: "User Deleted", description: "The account and its sign-in identity have been removed." });
+      toast({ title: "User deleted", description: `${userLabel(userId)} and its sign-in identity were removed.` });
       deletedUserRef.current = true;
       setUserToDelete(null);
       // The Action button closes the dialog on click, so Radix usually
@@ -168,22 +195,9 @@ export default function UsersTab() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <TableShell
-        title={<Skeleton className="h-5 w-40" />}
-        className="admin-ops-users-shell"
-      >
-          <div className="admin-ops-loading space-y-4">
-            {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
-          </div>
-      </TableShell>
-    );
-  }
-
   return (
     <TableShell
-      title={data ? `Users (${data.total})` : "Users"}
+      title={data && !resultsChanging && !isError && !isPaused ? `Users (${data.total})` : "Users"}
       description="Admins and contributors"
       className={`admin-ops-users-shell${userToolsOpen ? " admin-ops-users-shell--tools-open" : ""}`}
       actions={
@@ -208,7 +222,7 @@ export default function UsersTab() {
               // while the button is shown; the aria-label carries the full name.
               placeholder="Email or name…"
               aria-label="Search users by email or name"
-              className={searchInput ? "pl-8 pr-8" : "pl-8"}
+              className={searchInput ? "admin-users-search-input pl-8 pr-8" : "pl-8"}
               data-testid="input-user-search"
             />
             {searchInput && (
@@ -220,7 +234,7 @@ export default function UsersTab() {
                   setSearchInput("");
                   searchInputRef.current?.focus();
                 }}
-                className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="admin-users-search-clear absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label="Clear user search"
                 data-testid="button-clear-user-search"
               >
@@ -253,24 +267,43 @@ export default function UsersTab() {
           <AdminLoadError
             subject="users"
             error={error}
-            note={data ? "Showing the previous results." : undefined}
-            onRetry={() => { void refetch(); }}
+            note={data && !resultsChanging && data.users.length > 0 ? "Showing the last loaded results; they may be out of date." : undefined}
+            onRetry={retryUsers}
             retrying={isFetching}
             className="mb-4"
             testId="alert-users-error"
             retryTestId="button-retry-users"
           />
         )}
-        {isError && !data ? null : <>
-        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
-            right-edge fade + explicit hint make the hidden columns
-            discoverable instead of silently clipping them. */}
-        <div className="admin-ops-table-wrap relative">
+        {isPaused && !isError && (
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-            aria-hidden="true"
-          />
-          <Table className="admin-ops-table admin-ops-users-table">
+            role="status"
+            className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
+            data-testid="alert-users-offline"
+          >
+            <p className="text-sm text-[var(--text)]">
+              You&apos;re offline. Current user results will load when your connection returns.
+              {data && !resultsChanging && data.users.length > 0
+                ? " Showing the last loaded results; they may be out of date."
+                : " No current results are available yet."}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={retryUsers}
+              data-testid="button-retry-users-offline"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+        <div className="admin-ops-table-wrap relative">
+          <Table
+            className="admin-ops-table admin-ops-users-table"
+            scrollLabel="Users table, scrollable"
+            scrollHint="Swipe the table sideways to see role, join date, and actions."
+          >
             <TableHeader>
             <TableRow>
               {/* Run16 BUG-087: sortable column headers (server-side sort). */}
@@ -306,7 +339,16 @@ export default function UsersTab() {
             </TableRow>
             </TableHeader>
             <TableBody>
-            {data?.users && data.users.length > 0 ? (
+            {isLoading || resultsChanging ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-8">
+                  <div role="status" className="space-y-4 text-center text-sm text-muted-foreground">
+                    <p>{isPaused ? "Waiting for a connection to load current users." : "Loading users…"}</p>
+                    {!isPaused && <Skeleton className="h-12 w-full" />}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : data?.users && data.users.length > 0 ? (
               data.users.map((user) => (
                 <TableRow key={user.id} className="admin-ops-row">
                   {/* BUG-012 (run18): cap the name cell + truncate so a legal
@@ -354,7 +396,7 @@ export default function UsersTab() {
                           variant="ghost"
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
-                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
+                          className="shrink-0 text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
                           aria-label={`${revealedIds.has(user.id) ? "Mask" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
@@ -441,10 +483,13 @@ export default function UsersTab() {
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => {
+                          onClick={(event) => {
                             deletedUserRef.current = false;
+                            deleteOpenerRef.current = event.currentTarget;
+                            setFocusReturnId(user.id);
                             setUserToDelete(user);
                           }}
+                          data-return-focus={focusReturnId === user.id || undefined}
                           aria-label={`Delete user ${
                             /* R4-H05: keep the raw email out of the DOM unless revealed.
                                R5-012: masked emails can collide (j***@gmail.com), so the
@@ -462,24 +507,21 @@ export default function UsersTab() {
                   </TableCell>
                 </TableRow>
               ))
-            ) : (
+            ) : data && !isError && !isPaused ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   {searchQuery ? `No users match "${searchQuery}"` : "No users found"}
                 </TableCell>
               </TableRow>
-            )}
+            ) : null}
             </TableBody>
           </Table>
         </div>
-        <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-          Swipe the table sideways to see role, join date, and actions.
-        </p>
 
         {totalPages > 1 && (
           <div className="admin-ops-users-pagination">
             <span className="admin-ops-users-pagination__label">
-              Page {page} of {totalPages}
+              {resultsChanging ? (isPaused ? "Waiting for a connection…" : "Updating users…") : `Page ${page} of ${totalPages}`}
             </span>
             <div className="admin-ops-users-pagination__controls">
               {/* BUG-057 (run25): icon-only pager buttons need accessible names. */}
@@ -487,11 +529,15 @@ export default function UsersTab() {
                 ref={prevPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => {
+                onClick={(event) => {
+                  if (resultsChanging) return;
+                  handoffFocusOnUnmount(event.currentTarget, () => searchInputRef.current);
                   if (page - 1 <= 1) pagerRefocusRef.current = "next";
                   setPage(Math.max(1, page - 1));
                 }}
                 disabled={page <= 1}
+                aria-disabled={resultsChanging || undefined}
+                aria-busy={(resultsChanging && !isPaused) || undefined}
                 aria-label="Previous page"
                 data-testid="button-users-prev-page"
               >
@@ -501,11 +547,15 @@ export default function UsersTab() {
                 ref={nextPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => {
+                onClick={(event) => {
+                  if (resultsChanging) return;
+                  handoffFocusOnUnmount(event.currentTarget, () => searchInputRef.current);
                   if (page + 1 >= totalPages) pagerRefocusRef.current = "prev";
                   setPage(Math.min(totalPages, page + 1));
                 }}
                 disabled={page >= totalPages}
+                aria-disabled={resultsChanging || undefined}
+                aria-busy={(resultsChanging && !isPaused) || undefined}
                 aria-label="Next page"
                 data-testid="button-users-next-page"
               >
@@ -514,8 +564,6 @@ export default function UsersTab() {
             </div>
           </div>
         )}
-        </>}
-
         {/* Run16 BUG-037: explicit confirmation before applying a role change. */}
         <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
           {/* The refocus effect has already put focus on the row's Edit; the
@@ -557,8 +605,20 @@ export default function UsersTab() {
         <AlertDialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
           <AlertDialogContent
             onCloseAutoFocus={(event) => {
-              if (!deletedUserRef.current) return;
+              if (!deletedUserRef.current) {
+                // Cancelled: the controlled dialog has no trigger, so Radix would
+                // drop focus; return it to the Delete button that opened it.
+                const opener = deleteOpenerRef.current;
+                deleteOpenerRef.current = null;
+                if (opener?.isConnected) {
+                  event.preventDefault();
+                  opener.focus();
+                }
+                setFocusReturnId(null);
+                return;
+              }
               deletedUserRef.current = false;
+              setFocusReturnId(null);
               event.preventDefault();
               searchInputRef.current?.focus();
             }}
@@ -571,9 +631,13 @@ export default function UsersTab() {
                     already revealed that row in the table. */}
                 This permanently deletes{" "}
                 <span className="font-medium text-foreground">
+                  {`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim()
+                    ? `${`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim()} (`
+                    : null}
                   {userToDelete?.email
                     ? (revealedIds.has(userToDelete.id) ? userToDelete.email : maskEmail(userToDelete.email))
                     : userToDelete?.id}
+                  {`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim() ? ")" : null}
                 </span>{" "}
                 along with their sign-in identity, bookmarks, favorites, progress,
                 and API keys. They are signed out everywhere and the account

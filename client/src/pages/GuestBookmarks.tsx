@@ -4,11 +4,11 @@ import { useQueries } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { AlertTriangle, Bookmark, CloudUpload, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
-import { bookmarksPageSeo } from "@shared/seo-templates";
+import { bookmarksPageSeo, staticPageHeads } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
-import { queryClient, ApiError } from "@/lib/queryClient";
+import { queryClient, isGoneError } from "@/lib/queryClient";
 import type { Resource } from "@shared/schema";
 import type { ResourceKind } from "@shared/resourceKinds";
 import {
@@ -19,8 +19,9 @@ import {
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // The public resource detail endpoint adds read-time kind resolution to the
 // database row. Keep this response type additive: the server supplies the
@@ -65,13 +66,14 @@ export default function GuestBookmarks() {
     })),
   });
 
-  // Self-healing: a 404 means the resource is gone — drop that save. Network
-  // or server errors keep the save (never silently lose a guest's list).
+  // Self-healing: a 404 (or a 400 validation_failed for a malformed id) means
+  // the resource can never load — drop that save. Network or server errors
+  // keep the save (never silently lose a guest's list).
   const deadIds = useMemo(
     () =>
       results
         .map((result, index) =>
-          result.error instanceof ApiError && result.error.status === 404
+          isGoneError(result.error)
             ? sortedEntries[index]?.id
             : undefined,
         )
@@ -84,7 +86,7 @@ export default function GuestBookmarks() {
 
   const failedIds = results
     .map((result, index) =>
-      result.error && !(result.error instanceof ApiError && result.error.status === 404)
+      result.error && !isGoneError(result.error)
         ? sortedEntries[index]?.id
         : undefined,
     )
@@ -105,6 +107,18 @@ export default function GuestBookmarks() {
 
   const count = entries.length;
 
+  // Removing the last save unmounts the focused remove button along with its
+  // card; land on the empty-state heading instead of <body>. Focus the user
+  // has already moved elsewhere is left alone.
+  const previousCountRef = useRef(count);
+  useEffect(() => {
+    const emptied = previousCountRef.current > 0 && count === 0;
+    previousCountRef.current = count;
+    if (emptied && (!document.activeElement || document.activeElement === document.body)) {
+      focusPageHeading();
+    }
+  }, [count]);
+
   if (count === 0) {
     return (
       <div className="account-page account-page--wide space-y-6">
@@ -113,7 +127,7 @@ export default function GuestBookmarks() {
           description={bookmarksPageSeo.description}
           noindex
         />
-        <StatePanel tone="empty" label="No saves" title="Nothing saved on this device" headingLevel={1}
+        <StatePanel tone="empty" label="No saves" title={staticPageHeads["/bookmarks"].heading} headingLevel={1}
           actions={
             <>
               <Button asChild>
@@ -128,8 +142,7 @@ export default function GuestBookmarks() {
               </Button>
             </>
           }>
-          Tap the bookmark icon on any resource to save it — no account needed.
-          Sign in to keep your saves across devices.
+          {staticPageHeads["/bookmarks"].lead}
         </StatePanel>
       </div>
     );
@@ -225,15 +238,7 @@ export default function GuestBookmarks() {
               : `${failedIds.length} saved resources couldn't load.`}{" "}
             {failedIds.length === 1 ? "It's" : "They're"} still saved on this device.
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="min-h-10"
-            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retryFailed(); }}
-            data-testid="button-guest-retry-failed"
-          >
-            Retry
-          </Button>
+          <RetryButton onRetry={() => retryFailed()} testId="button-guest-retry-failed" />
         </div>
       )}
 
@@ -247,21 +252,15 @@ export default function GuestBookmarks() {
             You're offline. Your saves are still safe on this device; they'll load
             when you're back online.
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="min-h-10"
-            onClick={(e) => {
-              // C7-V4-01: the banner unmounts on reconnect; hand focus on like Retry does.
-              handoffFocusOnUnmount(e.currentTarget);
+          <RetryButton
+            label="Try again"
+            onRetry={() => {
               for (const entry of sortedEntries) {
                 void queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
               }
             }}
-            data-testid="button-guest-offline-retry"
-          >
-            Try again
-          </Button>
+            testId="button-guest-offline-retry"
+          />
         </div>
       )}
 

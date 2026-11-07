@@ -1,0 +1,26 @@
+- generic
+  - dialog "Edit Category"
+    - form
+      - heading "Edit Category" [level=2, ref=e2]
+      - paragraph
+        - StaticText "Update the category details."
+      - LabelText [ref=e3] clickable [cursor:pointer]
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e4]:  
+        - StaticText " "
+      - paragraph
+        - StaticText "Name is required"
+      - generic
+        - LabelText [ref=e7] clickable [cursor:pointer]
+          - StaticText "Slug *"
+        - textbox "Slug *" [ref=e8]: qa-audit-1026-c6-category
+          - StaticText "qa-audit-1026-c6-category"
+      - button "Cancel" [ref=e5]
+        - image
+        - StaticText "Cancel"
+      - button "Save" [ref=e6]
+        - image
+        - StaticText "Save"
+    - button "Close" [ref=e1]
+      - image
+      - StaticText "Close"

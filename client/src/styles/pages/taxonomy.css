@@ -89,7 +89,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  /* Wrapped lines: the links' 44px hit boxes overhang 10px each side. */
+  gap: 20px 8px;
   margin-bottom: 24px;
   color: var(--text-3);
   font-family: var(--font-mono);
@@ -101,6 +102,9 @@
 
 .taxonomy-breadcrumbs a {
   display: inline-flex;
+  /* 44px target; the negative margin keeps the band's 24px rhythm. */
+  min-height: 44px;
+  margin-block: -10px;
   align-items: center;
   color: var(--text-2);
 }
@@ -117,6 +121,12 @@
 .taxonomy-page--subcategory .taxonomy-results-layout,
 .taxonomy-page--sub-subcategory .taxonomy-results-layout {
   margin-top: 40px;
+}
+
+/* Tag landings (TagLanding) are a top-level listing with no subcategory
+   tiles, so the results follow the intro at the category page's gap. */
+.taxonomy-page--tag .taxonomy-results-layout {
+  margin-top: 56px;
 }
 
 /* C8-V1-05 / C10-V1-02: the open filter controls (the Filters trigger below
@@ -151,17 +161,9 @@
   font-weight: 500;
 }
 
-/* The "Uncategorized" tile is a filter button, not a link: same tile geometry. */
-button.taxonomy-child {
-  width: 100%;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
 /* Pressed must out-rank every system's .card.hoverable:hover border. */
-.taxonomy-child.card.hoverable[aria-pressed="true"],
-.taxonomy-child.card.hoverable[aria-pressed="true"]:hover {
+.taxonomy-child.card.hoverable[aria-current="true"],
+.taxonomy-child.card.hoverable[aria-current="true"]:hover {
   border-color: var(--accent);
 }
 
@@ -181,14 +183,8 @@ button.taxonomy-child {
    below 360px, where a 320px track would leave the viewport, does it yield. */
 .taxonomy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 16px;
-}
-
-@media (max-width: 359px) {
-  .taxonomy-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .taxonomy-production-controls {
@@ -341,7 +337,7 @@ button.taxonomy-child {
 
 .taxonomy-page .resource-card--taxonomy .resource-card__title-link {
   display: block;
-  min-height: 0;
+  min-height: 44px;
   overflow: visible;
   -webkit-line-clamp: unset;
 }
@@ -384,7 +380,9 @@ button.taxonomy-child {
    revealed on hover/focus. Inserted into the chip row they pushed the tag
    pills right/down and grew the card ~88px, so a click aimed at a pill landed
    on View Details. They now float over the empty band right of the mark
-   (36px tall) and only toggle visibility, so nothing reflows. */
+   (36px tall) and only fade, so nothing reflows. The tray is first in the
+   card's tab order, so at rest it is transparent and ignores the pointer but
+   stays focusable: Tab lands on it and :focus-within shows it. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
   position: absolute;
   z-index: 10;
@@ -396,15 +394,15 @@ button.taxonomy-child {
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-  visibility: hidden;
   opacity: 0;
-  transition: opacity 160ms ease, visibility 160ms;
+  pointer-events: none;
+  transition: opacity 160ms ease;
 }
 
 .taxonomy-page .resource-card--taxonomy:hover .resource-card__reveal,
 .taxonomy-page .resource-card--taxonomy:focus-within .resource-card__reveal {
-  visibility: visible;
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* The tray takes the featured chip's corner while it is shown. */
@@ -413,12 +411,25 @@ button.taxonomy-child {
   visibility: hidden;
 }
 
+/* Cards that carry favorite/bookmark controls (tag pages) have them at the
+   right of the top row, where the tray would sit. The tray drops to its own
+   strip under that row, reserved at rest so showing it never reflows. */
+.taxonomy-page .resource-card--personal .resource-card__top {
+  margin-bottom: 58px !important;
+}
+
+.taxonomy-page .resource-card--personal .resource-card__reveal {
+  top: 72px;
+  left: 20px;
+  justify-content: flex-start;
+}
+
 /* Touch screens never hover, so the tray stays shown there; it sits in the
    empty band, so showing it costs no layout. */
 @media (hover: none) {
   .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
-    visibility: visible;
     opacity: 1;
+    pointer-events: auto;
   }
 
   .taxonomy-page .resource-card--taxonomy .resource-card__featured {
@@ -429,16 +440,21 @@ button.taxonomy-child {
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
   flex: none;
-  min-height: 32px;
+  min-height: 44px;
   margin: 0;
   white-space: nowrap;
+  /* The tray ignores the pointer at rest so it never blocks the stretched
+     title link, but its controls must still win a press that arrives without
+     a prior hover (click, tap, synthetic input): they sit at z-10 above the
+     title's ::after overlay. */
+  pointer-events: auto;
 }
 
 /* The band right of the mark is 232px on the narrowest (320px) card, so Open
    Link is icon-only here; its label stays as the accessible name. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
 }
 
@@ -451,8 +467,8 @@ button.taxonomy-child {
    (257px of controls in a 230-247px band). It is icon-only here too, like
    Open Link; the title link above already names the detail page. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-badge {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   justify-content: center;
   padding: 0;
 }
@@ -480,7 +496,6 @@ button.taxonomy-child {
 }
 
 .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
-  min-height: 0;
   pointer-events: auto;
 }
 
@@ -531,12 +546,13 @@ button.taxonomy-child {
   padding-top: 0;
 }
 
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child {
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child,
+.taxonomy-pagination .paginator-pages {
   gap: 8px;
 }
 
 .taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a,
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-disabled] {
+.taxonomy-pagination .paginator-pages > a {
   box-sizing: border-box;
   height: auto;
   min-height: 44px;
@@ -553,28 +569,37 @@ button.taxonomy-child {
   box-shadow: none;
 }
 
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a svg,
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-disabled] svg {
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a svg {
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
 }
 
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-label] {
+.taxonomy-pagination .paginator-pages > a {
   padding-inline: 12px;
 }
 
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-current="page"] {
+.taxonomy-pagination .paginator-pages > a[aria-current="page"] {
   border-color: var(--border-strong);
   background: var(--surface-2);
   color: var(--text);
   font-weight: 600;
 }
 
-.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-hidden] {
+.taxonomy-pagination .paginator-pages > span[aria-hidden] {
   padding-inline: 4px;
   color: var(--text-3);
   font-size: 13px;
+}
+
+@media (max-width: 639px) {
+  .taxonomy-pagination .paginator-pages {
+    gap: 2px;
+  }
+
+  .taxonomy-pagination .paginator-pages > span[aria-hidden] {
+    padding-inline: 0;
+  }
 }
 
 .taxonomy-pagination [data-testid="pagination-controls"] > div:last-of-type {

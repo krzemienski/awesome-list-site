@@ -4,6 +4,113 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## November 4, 2026
+
+### Equivalent responsive analytics consent (BUG-044)
+- Keep the full provider and signed-in name/email disclosure visible on short and mobile viewports. Native browser zoom wraps the Privacy Policy link instead of ellipsizing it, with the same Decline / Allow analytics controls and 44px action targets at every size.
+### Balanced responsive pagination (BUG-045)
+- Keep Previous and Next together above a centered group of page numbers whenever the paginator has limited space, including tablet layouts beside the sidebar, rather than wrapping Next onto a row by itself. Grouping follows the paginator's available width, not the viewport. Narrow numeric spacing also keeps the longest six-number window aligned without reducing 44px targets. The page summary and existing jump input stay separate; wide desktop ordering, modified clicks and BUG-041 page clamping are unchanged.
+
+### Consistent page jumps (BUG-041)
+- Go-to-page submissions now recover invalid or fractional text to page 1, like direct taxonomy URLs, rather than leaving the visitor on the previous page with a whole-number error. Zero and negative pages still clamp to page 1, and overflow still clamps to the last page, with accessible adjustment feedback.
+- The adjustment notice never echoes an empty box and bounds any echoed text; typed text and `?page=abc` URLs read the same ("Page “abc” doesn't exist, so page 1 is shown."). It is announced through the listing's existing status notice.
+
+## October 27, 2026
+
+### Research continuation usage accounting
+- Preserve prior rounds' turns, tokens and cost when a later continuation ends with an SDK error, including budget-cap stops.
+
+### Reliable validation focus callbacks
+- Use a zero-delay timer for Profile name and notification timezone focus handoffs so background/headless browser throttling cannot leave focus on Save.
+
+### Sustained researcher runs
+- Add an optional minimum-duration launch limit. Early orchestrator completions now resume with fresh gap research and the previous terminal summary instead of ending the job, while elapsed time, remaining turns and remaining budget are enforced across all continuations. Turn, token, web-search, duration and cost accounting is cumulative.
+
+### Curated Home card target sizing
+- C6-MEMBER-04: private Home curated-card title and tag links now meet the
+  same 44×44px minimum as shared resource cards at every width, with layout,
+  destinations and focus behavior unchanged.
+### Notification timezone validation focus
+- C6-MEMBER-03: invalid timezone submissions now focus the timezone input
+  after its associated inline error renders, instead of leaving keyboard users
+  on Save choices. Validation and valid-save behavior are unchanged.
+
+### Shared resource-card target sizing (C6-MEMBER-02)
+- Give title, details, tag, tag-expansion and outbound-link actions a 44×44px
+  minimum at every width, including taxonomy reveal trays. Existing labels,
+  link destinations, focus treatments and guest/member behavior are unchanged.
+- Local 1440px, 820px-touch and 390px-touch geometry and interaction evidence
+  is in `reports/prod-audit-2026-10-26/cycle-06/ux-member/fix-member02/`.
+  Home uses a separate card implementation; its independently observed
+  undersized title/tag targets are reported there and are not changed here.
+
+### Contextual List and Compact external links
+- Fixed C6-AX-023 by naming each external-link action with its resource title
+  and new-tab behavior. Matching tooltips and accessible names retain the
+  existing icons, 44px targets, URLs, and List/Compact layouts.
+
+### Advanced offline error recovery (C6-AX-020 / C6-AX-022)
+- The catalog ErrorPage distinguishes a disconnected device from an online server failure. Retry while offline keeps the page in place and explains that reconnection is required.
+- Automatic recovery from a displayed offline error hands focus to the recovered page heading only while focus still belongs to that error or the document body. Navigation and subsequent user-directed focus cancel the handoff; ordinary background refetches do not arm it.
+
+### Profile name validation focus
+- C6-MEMBER-01: invalid empty or invisible display-name submissions focus the first invalid name field after inline feedback renders. Only invalid fields are marked and linked to the existing error message; validation still returns before PATCH, and valid save/cancel behavior is unchanged.
+- Browser proof is blocked because no authorized local member session is available. Post-deploy verification at 1440, 820-touch, and 390-touch remains unverified; no production cookies were transferred and authentication was not bypassed.
+
+### Taxonomy card actions and recovery
+- Restored Favorite and Bookmark controls to taxonomy Grid cards using the same guest/member actions as List and Compact.
+- Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Recovery replaces the unavailable history entry even when saved view preferences or query normalization also apply. Invalid page text and unknown taxonomy routes retain their existing validation.
+- Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
+
+### Footer category target separation
+- Fixed C6-PS-065 by giving each Explore category link its full 44px layout
+  row instead of overlapping neighboring targets with negative margins.
+  Category typography, ordering, focus rings and responsive footer columns
+  are unchanged.
+
+### Researcher history navigation (C6-AI-030)
+- `Done` and `Review later` now open the full-history disclosure, activate Job History, highlight the requested run, and focus the named history region instead of the compact jobs table.
+- A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.
+- Browser verification remains blocked pending an authorized local admin session; the 1440, 820-touch, and 390-touch production journeys are unverified until deployment.
+
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
+### Link Health chart reduced motion
+- C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
+  preference for all four line/dot series and tooltip transitions. Normal-motion
+  animation is retained; authorized browser verification is pending.
+
+### Admin initial-stats availability (C6-AX-021)
+- Handle an initial offline stats query as unavailable instead of rendering a zero-resource dashboard with permanently pending activity. Reuse the existing offline state, focusable Retry, still-offline feedback, and reconnect behavior.
+- Keep genuine zero counts distinct from missing values; remove numeric fallback counts from the admin masthead and stat cards.
+- Local authenticated admin proof remains UNVERIFIED: no approved local owner session was available. The fix does not change authentication, analytics, APIs, or query retry policy.
+
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
+
+### Admin export failure states
+- Fixed C6-AO-022 by naming Markdown in README export failure toasts.
+- Fixed C6-AO-023 by distinguishing uncached offline export history from a
+  successful empty history response. The load error offers a focusable Retry,
+  preserves reconnect recovery, and hands focus back to the history heading
+  when Retry is replaced. Authenticated browser proof remains unverified
+  pending authorized post-deploy verification.
+
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
+### Admin Users search availability
+- Addressed C6-AO025 by withholding previous Users rows and counts during
+  debounced search, page and sort transitions. Offline or failed loads expose
+  Retry rather than a false no-match state; same-query retained rows are marked
+  as potentially out of date. Search remains mounted through loading and retries.
+- Authenticated browser verification is blocked pending an authorized session.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification

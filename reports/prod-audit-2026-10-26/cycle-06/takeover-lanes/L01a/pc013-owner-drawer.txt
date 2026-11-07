@@ -1,0 +1,12 @@
+=== 390
+"[[\"avAWESOME.VIDEO ho\",\"/\",null,44],[\"Home\",\"/\",null,44],[\"Submit\",\"/submit\",null,44],[\"About\",\"/about\",\"page\",44],[\"Admin\",\"/admin\",null,44],[\"Docs ↗\",\"https://github.com/krzemienski/awesome-video/tree/master/docs\",null,44],[\"\",\"https://github.com/krzemienski/awesome-video\",null,44],[\"Learning Journeys\",\"/journeys\",null,44],[\"Advanced\",\"/advanced\",null,44],[\"Theme\",\"/settings/theme\",null,44],[\"Home dashboard\",\"/?context=account\",null,44]]"
+Home -> "{\"dlg\":false,\"p\":\"/\"}"
+Submit -> "{\"dlg\":false,\"p\":\"/submit\"}"
+About -> "{\"dlg\":false,\"p\":\"/about\"}"
+Admin -> "{\"dlg\":false,\"p\":\"/admin\"}"
+=== 820
+"[[\"avAWESOME.VIDEO ho\",\"/\",null,44],[\"Home\",\"/\",null,44],[\"Submit\",\"/submit\",null,44],[\"About\",\"/about\",\"page\",44],[\"Admin\",\"/admin\",null,44],[\"Docs ↗\",\"https://github.com/krzemienski/awesome-video/tree/master/docs\",null,44],[\"\",\"https://github.com/krzemienski/awesome-video\",null,44],[\"Learning Journeys\",\"/journeys\",null,44],[\"Advanced\",\"/advanced\",null,44],[\"Theme\",\"/settings/theme\",null,44],[\"Home dashboard\",\"/?context=account\",null,44]]"
+Home -> "{\"dlg\":false,\"p\":\"/\"}"
+Submit -> "{\"dlg\":false,\"p\":\"/submit\"}"
+About -> "{\"dlg\":false,\"p\":\"/about\"}"
+Admin -> "{\"dlg\":false,\"p\":\"/admin\"}"

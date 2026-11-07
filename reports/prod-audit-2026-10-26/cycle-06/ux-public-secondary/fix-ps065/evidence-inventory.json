@@ -1,0 +1,434 @@
+{
+  "capturedAt": "2026-10-27T07:48:11.376Z",
+  "root": "reports/prod-audit-2026-10-26/cycle-06/ux-public-secondary/fix-ps065",
+  "count": 85,
+  "totalBytes": 3144002,
+  "files": [
+    {
+      "file": "independent-1440-ax.txt",
+      "bytes": 3794,
+      "sha256": "ef228720c645aaef11a7036314d07e10d011f4a771e26c324a29ef34274e52a5"
+    },
+    {
+      "file": "independent-1440-encoding.txt",
+      "bytes": 72,
+      "sha256": "b590a65e218b8fe1692c45e8d8aa726b61f3bb69a0008f11fb718b0a50494a5b"
+    },
+    {
+      "file": "independent-1440-footer.png",
+      "bytes": 101771,
+      "sha256": "b177c5e06743c7a4c69ff19260cf7e537ad5882191629a921f3897843286403d"
+    },
+    {
+      "file": "independent-1440-general.txt",
+      "bytes": 66,
+      "sha256": "b897f122597e4c425b1012cb044c9f948b76f82500414c19869acc6058f04221"
+    },
+    {
+      "file": "independent-1440-geometry.txt",
+      "bytes": 4467,
+      "sha256": "209c3d4a29197853c439eb455610ee5d6ee53ea7744257ce63639b22ec347383"
+    },
+    {
+      "file": "independent-1440-visible-geometry.txt",
+      "bytes": 4336,
+      "sha256": "30890a3e752a21628679521da9b339137bb1861a896935f865b79ecf80228208"
+    },
+    {
+      "file": "independent-390-ax.txt",
+      "bytes": 3794,
+      "sha256": "2f3ff6d155188ee6d46dcf7a54aa411c9aa86cd7118dd5756283b39c5bd0f439"
+    },
+    {
+      "file": "independent-390-focus.png",
+      "bytes": 85764,
+      "sha256": "9a25de0695f7b56df80069ac27015cbc2d4410f680298e4510a644ede4ac82f0"
+    },
+    {
+      "file": "independent-390-focus.txt",
+      "bytes": 58,
+      "sha256": "2aa4cda9d33f3df678e12b51cdaa600a5e6c01961218d04e13f532b73f887219"
+    },
+    {
+      "file": "independent-390-footer.png",
+      "bytes": 85770,
+      "sha256": "0ff48e7d701666adabd4ba58915c855328d378224283a35c672ad6965a15346d"
+    },
+    {
+      "file": "independent-390-geometry.txt",
+      "bytes": 3183,
+      "sha256": "1c1b550146780b5dc2790b5533433bc3fd06cb7e72cc169d020551399454e296"
+    },
+    {
+      "file": "independent-820-all-targets.txt",
+      "bytes": 3622,
+      "sha256": "81683fb67e833528989a79e3c589d36d80a39d7be843dfe0300420e59fb0989d"
+    },
+    {
+      "file": "independent-820-ax.txt",
+      "bytes": 3794,
+      "sha256": "2f3ff6d155188ee6d46dcf7a54aa411c9aa86cd7118dd5756283b39c5bd0f439"
+    },
+    {
+      "file": "independent-820-focus.txt",
+      "bytes": 54,
+      "sha256": "6c1e804262bfe4044af7e62b416c8670915b55d6ee5de50b75abbcb624af0a56"
+    },
+    {
+      "file": "independent-820-footer.png",
+      "bytes": 73733,
+      "sha256": "d3de39d172207c9e7bd2a2e6bd587dd8600ee66773de2979132541d602e1d075"
+    },
+    {
+      "file": "independent-820-geometry.txt",
+      "bytes": 1890,
+      "sha256": "9e3d6e1e22c2d1fe17de19e5dfdc6c36c52ab74558c64f8633067d079f0b2e0d"
+    },
+    {
+      "file": "independent-verdict.json",
+      "bytes": 1563,
+      "sha256": "5a253a5c7b851b107f0cefeb369ee08dc01893c388351888e55e4bbb447d908e"
+    },
+    {
+      "file": "run-20261027-local-contract.json",
+      "bytes": 2640,
+      "sha256": "55d03b033e05dbf2e048aee1457e14b1503ddae45ef743fa97578fc6645040b9"
+    },
+    {
+      "file": "step-001-tsc-no-emit.json",
+      "bytes": 349,
+      "sha256": "d8ec213b7bb4e11e358c3124ee1e5d493955642a6b18a04fb0b96892db2f25b7"
+    },
+    {
+      "file": "step-002-build.json",
+      "bytes": 26141,
+      "sha256": "223078d01955589b6bad2e94534d1fc9e59ea7e0cf1b123b4508a77d93cb6fb6"
+    },
+    {
+      "file": "step-003-footer-1440-geometry.json",
+      "bytes": 28429,
+      "sha256": "ccc4689c349567bf738f8f62dd564d9ec0699bace577f077872b2102a66847b6"
+    },
+    {
+      "file": "step-004-footer-1440-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-005-footer-1440.png",
+      "bytes": 91372,
+      "sha256": "2900bdc18f9af37b82e9746427653eceb23b8b3b94f383b2ac250c69ed10338d"
+    },
+    {
+      "file": "step-006-footer-1440-clicks.json",
+      "bytes": 999,
+      "sha256": "426a99adf609c4c76908351a5fdf9aab36ea5387fcb7587318604060a1ffa452"
+    },
+    {
+      "file": "step-007-desktop-encoding-route.png",
+      "bytes": 203978,
+      "sha256": "70410b5d6d1f4363c72fcfb492b592dc22b848d4280cea5f298833fae701f1d2"
+    },
+    {
+      "file": "step-008-desktop-encoding-route-ax.txt",
+      "bytes": 52427,
+      "sha256": "e3781e5ca80d62a32095ecc154b98da79699ed57da7e429937a763e27293ba21"
+    },
+    {
+      "file": "step-009-desktop-general-route.png",
+      "bytes": 181757,
+      "sha256": "8ccd528b9f3af20db089c38eb43de48727380aa87813f150800f9a127de081a5"
+    },
+    {
+      "file": "step-010-desktop-general-route-settled.png",
+      "bytes": 188193,
+      "sha256": "c15f7a57a6a5768e50205694791da1ea63d144648cecd63dd34adfd914fac1c4"
+    },
+    {
+      "file": "step-011-footer-1440-keyboard.json",
+      "bytes": 16170,
+      "sha256": "a1e34cf23eded91fd345bf668f16b4d54f432abc7729fb40699f91584c776cdd"
+    },
+    {
+      "file": "step-012-footer-1440-keyboard-focus.png",
+      "bytes": 91344,
+      "sha256": "abbff049c2bd6bec46194e338912782fcf2c545ec943602cf340f7b45690e29f"
+    },
+    {
+      "file": "step-013-footer-1440-console-network.json",
+      "bytes": 50160,
+      "sha256": "9b480b3eeb3200d8b0d4493a8c9f3c40a2f707d8c202961abc1386a6f36ecae4"
+    },
+    {
+      "file": "step-014-footer-820-geometry.json",
+      "bytes": 28575,
+      "sha256": "52da08af5d411815fe7a4c99e8d72ff09cd7688b5872888b37fb9ff03a07a758"
+    },
+    {
+      "file": "step-015-footer-820-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-016-footer-820.png",
+      "bytes": 79634,
+      "sha256": "dbd7ca440088c059270de3afee9d5d91b1fd2761748a6c66f73cf3924d645f43"
+    },
+    {
+      "file": "step-017-footer-820-taps.json",
+      "bytes": 860,
+      "sha256": "ad57d132b23c4b11d612829a0d83dd40a50b22f0516b86185aa4ba6a00f6c0a9"
+    },
+    {
+      "file": "step-018-tablet-encoding-route.png",
+      "bytes": 135270,
+      "sha256": "92945e1921380d5e5a0f6e4c18a7b50651f9a507887632b6a78e0eda96417723"
+    },
+    {
+      "file": "step-019-tablet-general-route.png",
+      "bytes": 135221,
+      "sha256": "bd268ff42521ce25ef9afa147e3b11689c4a8342682a64e9add4d7cda46a39c5"
+    },
+    {
+      "file": "step-020-footer-820-keyboard.json",
+      "bytes": 3366,
+      "sha256": "189b51824bde09a22596fe748a6911c4b122f522967e5e3438f94e3c832ecf51"
+    },
+    {
+      "file": "step-021-footer-820-keyboard-focus.png",
+      "bytes": 170101,
+      "sha256": "2ccfd614f3eb9058d05623401f5551c2fc8612c4e513d43b78839c7811838e36"
+    },
+    {
+      "file": "step-022-footer-820-console-network.json",
+      "bytes": 48949,
+      "sha256": "88c8624e677fc21e88a41c1685c24c397d2a8bd0f88faebd3ad4bf074700f662"
+    },
+    {
+      "file": "step-023-footer-390-geometry.json",
+      "bytes": 27325,
+      "sha256": "4530ba35d45bdd4fbcb84ad299ef2b1e0d438a1d64a9553258723d0511edc1a5"
+    },
+    {
+      "file": "step-024-footer-390-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-025-footer-390-lower.png",
+      "bytes": 47876,
+      "sha256": "d0bb88c64e00e037431defe5fef5632bbb487a08a3ca93e5aa0d0427df731aef"
+    },
+    {
+      "file": "step-026-footer-390-upper.png",
+      "bytes": 42862,
+      "sha256": "b94c44a73ae1d7d9a923507c5c8970a2d5ec583bdeb024aab113a2116aa89e30"
+    },
+    {
+      "file": "step-027-footer-390-taps.json",
+      "bytes": 844,
+      "sha256": "393680a2a69d42aec20f9e178083ca88c0285f5c5f8dcde13f3519940a209903"
+    },
+    {
+      "file": "step-028-phone-encoding-route.png",
+      "bytes": 52856,
+      "sha256": "a73e66d90123583dba3de244891ea13f8bd3b9a9e4fb61b220de16a4e71cbbb4"
+    },
+    {
+      "file": "step-029-phone-general-route.png",
+      "bytes": 50918,
+      "sha256": "ffa5d2c52bab0d31354fc1198de61f8a5316a32894295139515b7e25690f1a1a"
+    },
+    {
+      "file": "step-030-footer-390-keyboard.json",
+      "bytes": 3556,
+      "sha256": "4e0ab36da5fea63a917af747fb0c994a44467e9795643ddf55585cce9c88f865"
+    },
+    {
+      "file": "step-031-footer-390-keyboard-focus.png",
+      "bytes": 40329,
+      "sha256": "8e03c64eee460efa75217e1fcb41e65b370a61e8f4f78285ea7834a5f4c3ab47"
+    },
+    {
+      "file": "step-032-footer-390-console-network.json",
+      "bytes": 48891,
+      "sha256": "99e12c0c965dfb3591f819e46bfd88ead789bac08e4942921685e1e25bba4362"
+    },
+    {
+      "file": "step-033-footer-1440-focus-visible.png",
+      "bytes": 91214,
+      "sha256": "da91df1cd4db94d7f3480089a188e364676d2b2fa10631e2ea634f40f9521d82"
+    },
+    {
+      "file": "step-034-footer-1440-focus-visible.json",
+      "bytes": 452,
+      "sha256": "35c60b633145d07f8ea1fcf2d63b2c7dc359254cc06998fca9487ca5133faf16"
+    },
+    {
+      "file": "step-035-footer-820-focus-visible.png",
+      "bytes": 75953,
+      "sha256": "af90ed4c92a51af5e0369b0c31c00973eba7fda6a4ba156d8f8feb04cb2dfceb"
+    },
+    {
+      "file": "step-036-footer-820-focus-visible.json",
+      "bytes": 449,
+      "sha256": "315abdcc6c1b849eb01fb18915d13bd899824bae1cd53dee756f0e41c3e6c25a"
+    },
+    {
+      "file": "step-037-footer-820-opposite-edge-taps.json",
+      "bytes": 839,
+      "sha256": "7f204433ae10a535ce5804c9a1c6e7c23adf964b1e3cc4a3ce0bd5809bd0bbbc"
+    },
+    {
+      "file": "step-038-footer-1440-opposite-edge-clicks.json",
+      "bytes": 841,
+      "sha256": "77eb58500f47ba1f121e226a7948ca27250b1fb79d546da8ef5ede7acf81453e"
+    },
+    {
+      "file": "step-039-footer-1440-final-console-network.json",
+      "bytes": 47713,
+      "sha256": "b506050fc853defa7fd82b48a4f324f8e074f4452313642db2242a69bfc87d7e"
+    },
+    {
+      "file": "step-040-footer-390-opposite-edge-taps.json",
+      "bytes": 823,
+      "sha256": "66747d4aec31e7272e8fe8e3c88599406a3b191f953d3f1cf21338d9f464104d"
+    },
+    {
+      "file": "step-041-screenshot-dimensions.json",
+      "bytes": 2182,
+      "sha256": "1d173bed22376b41d824b5c1702e20f3c6dc14b4f451f326df28fa3ccef7130d"
+    },
+    {
+      "file": "step-042-server-output.txt",
+      "bytes": 6910,
+      "sha256": "7e2d9b344b068db05866ff0c6573db2ee0892f6dcb7ce3adc960cdac3680ef9a"
+    },
+    {
+      "file": "step-043-direct-proof-summary.json",
+      "bytes": 12819,
+      "sha256": "9e3e444035d9bf3de226a17434b900bedee0ec616108e1f10ebf295cda964605"
+    },
+    {
+      "file": "step-044-integrated-tsc.json",
+      "bytes": 343,
+      "sha256": "dbb16f20db4e015b6e35669ccf06fe4c5aaef89ac075314eabda37b9f79cb2f9"
+    },
+    {
+      "file": "step-045-integrated-build.json",
+      "bytes": 26126,
+      "sha256": "9f8bb260de08749f8aeedcfeb054c7e19a212bdf1a9ad2428b8c035658d8b46d"
+    },
+    {
+      "file": "step-046-integrated-1440-geometry.json",
+      "bytes": 28429,
+      "sha256": "6d8f27cce8682aa4e27f50951d48a697350a15051a9df5d1afa96c995b1d8944"
+    },
+    {
+      "file": "step-047-integrated-1440-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-048-integrated-1440.png",
+      "bytes": 91368,
+      "sha256": "a0f9f75d4ce56970c59d615fda8eeff3b489c8ed35fa908a682db23884e142e7"
+    },
+    {
+      "file": "step-049-integrated-1440-interactions.json",
+      "bytes": 1144,
+      "sha256": "96f769060cc726228fe8d75e15f81642390595bad1faeb2d81dcb36f7548f1b8"
+    },
+    {
+      "file": "step-050-integrated-1440-focus.png",
+      "bytes": 88236,
+      "sha256": "2e177d366cc3e46798c73b095edc7ea7fbbb45c838a8fd7a689cc88934d589f5"
+    },
+    {
+      "file": "step-051-integrated-820-geometry.json",
+      "bytes": 28575,
+      "sha256": "ff502906f19e2727ae9328b404e688752f65f9936040a05d5626c9be64274608"
+    },
+    {
+      "file": "step-052-integrated-820-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-053-integrated-820.png",
+      "bytes": 76075,
+      "sha256": "2a613262ad51c7266a5c7ff323426279468f3fdaf49234f12f56e515df77af00"
+    },
+    {
+      "file": "step-054-integrated-820-interactions.json",
+      "bytes": 1238,
+      "sha256": "ffeebe329d17d370fdaeb433b249a3b47371a71ae1c63e1c301fb847f16d83e0"
+    },
+    {
+      "file": "step-055-integrated-820-focus.png",
+      "bytes": 76038,
+      "sha256": "e3778e8140bd5b1f142e70cbae9e57bf61595343f7a6a40450f41eb069678659"
+    },
+    {
+      "file": "step-056-integrated-390-geometry.json",
+      "bytes": 27541,
+      "sha256": "04b0231ffda0ad2a4513f019f5daaed6f4f1bde40b9c0157bb4d055ec8c0c685"
+    },
+    {
+      "file": "step-057-integrated-390-ax.txt",
+      "bytes": 4726,
+      "sha256": "4ed020b4f4d4fbc7cf33d98fcf4bdc6b288f2b4f9cfee69722544092ee869b78"
+    },
+    {
+      "file": "step-058-integrated-390.png",
+      "bytes": 42887,
+      "sha256": "dc26e11e95b6fae8b34b4cf75b0668419c7b148677882f304af6fc5b169e63dc"
+    },
+    {
+      "file": "step-059-integrated-390-interactions.json",
+      "bytes": 1222,
+      "sha256": "79ac524b5db934e18b1a6565f27411c7edae7d00750fcfaf6a9a96c3ecea1105"
+    },
+    {
+      "file": "step-060-integrated-390-focus.png",
+      "bytes": 40145,
+      "sha256": "edd35f26c2e0e7fb669d91b567c2fe38f03cb66e82a420147f6fe6aa42497cee"
+    },
+    {
+      "file": "step-061-integrated-console-network.json",
+      "bytes": 54635,
+      "sha256": "bd9b9942556c5c15bb366a8d8d16ede2bcf19b7f3cc01295eed46c96a952b1d5"
+    },
+    {
+      "file": "step-062-integration-proof-summary.json",
+      "bytes": 8305,
+      "sha256": "1dc9188bf1f16b8821d24abac149a26ad12d86e96eb1b2fc8338711c6e9cd2e6"
+    },
+    {
+      "file": "step-063-main126fbcd0-tsc.json",
+      "bytes": 345,
+      "sha256": "c8802761da0975a9f1af97f363e023245f948f5a96e094407fdaef708449fd29"
+    },
+    {
+      "file": "step-064-main126fbcd0-build.json",
+      "bytes": 26126,
+      "sha256": "02caae9934e0602a49a334b4e31a60231bf5a90eacfea906192598e1fff35738"
+    },
+    {
+      "file": "step-065-main3404b6dd-tsc.json",
+      "bytes": 346,
+      "sha256": "dc79d258332c8a8635bb31c0e7714c80596c9bb687374dc168ddb426c117b9e5"
+    },
+    {
+      "file": "step-066-main3404b6dd-build.json",
+      "bytes": 26125,
+      "sha256": "0a740d7dc4e98df2ec029eb3a03da5f695fe2f9f9b56c5cb050d65d0b595cb66"
+    },
+    {
+      "file": "step-067-main-sync-record.json",
+      "bytes": 1079,
+      "sha256": "cdeb06be096e7e56272b26197338b2b73fb1a4379c4d356f10e7e5d78763fcac"
+    }
+  ],
+  "note": "Inventory excludes itself. step065/066 are latest checks after main3404b6dd synchronization. All previous direct browser evidence and independent UNVERIFIED scope retained."
+}

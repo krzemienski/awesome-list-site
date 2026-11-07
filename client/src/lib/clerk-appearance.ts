@@ -284,6 +284,14 @@ function buildClerkAppearance(
       // styles below keep painting from tokens. `auth-edge` restores the DS
       // border over Clerk's shadow ring (app-bridge.css).
       button: "btn auth-edge",
+      // Clerk caps the card at the VIEWPORT width less 2.5rem, which is wider
+      // than the page column on a phone: the card spilled past both gutters
+      // and under the back-to-top button. Cap both boxes at the column.
+      rootBox: { maxWidth: "100%" },
+      // The account modal (openUserProfile) renders an 880px card inside
+      // modalContent, a flex item with no width cap, so the 100% caps above
+      // resolve to 880 and the card spills off both edges below ~920px.
+      modalContent: { maxWidth: "calc(100vw - 2rem)" },
       // Task #404: Clerk rounds the card at TWICE the base above (its own
       // ladder step), which overshoots the DS card token — 16px against the
       // 12px every other card on the page sits at. `cardBox` is the outer,
@@ -291,6 +299,7 @@ function buildClerkAppearance(
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
       cardBox: {
+        maxWidth: "100%",
         ...(radii.card ? { borderRadius: radii.card } : {}),
         // Clerk's card/footer are transparent in the auth treatment;
         // this outer clipping surface owns the single DS background.
@@ -380,6 +389,15 @@ function buildClerkAppearance(
       // The design system's `.input` paints the field; the 44px touch minimum
       // rides on `.cl-formFieldInput.input` in app-bridge.css.
       formFieldInput: "input auth-edge",
+      // Clerk insets the toggle 3px inside the 44px field, leaving it 38px
+      // tall; pinning it to the field's edges gives it the full 44px.
+      formFieldInputShowPasswordButton: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        minHeight: "44px",
+        minWidth: "44px",
+      },
       otpCodeFieldInput: {
         ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         ...(palette.ink ? { color: palette.ink } : {}),
@@ -393,8 +411,18 @@ function buildClerkAppearance(
       formFieldErrorText: {
         ...(palette.danger ? { color: palette.danger } : {}),
       },
+      // "Use phone" / "Forgot password?" sit in the label row: 24px on
+      // desktop (the inline-link floor), 44px on touch widths.
       formFieldAction: {
         ...(palette.accent ? { color: palette.accent } : {}),
+        display: "inline-flex",
+        alignItems: "center",
+        minHeight: "24px",
+        "@media (pointer: coarse), (max-width: 1024px)": {
+          display: "inline-flex",
+          alignItems: "center",
+          minHeight: "44px",
+        },
       },
       // The 44px link stretches its row; center the prompt text against it.
       footerAction: { alignItems: "center" },

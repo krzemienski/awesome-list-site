@@ -137,9 +137,15 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+// A toast with an action persists until dismissed (WCAG 2.2.1, enforced in
+// Toaster), so the type rejects a duration next to an action (MB-04).
+export type ToastOptions = Omit<ToasterToast, "id" | "action" | "duration"> &
+  (
+    | { action: ToastActionElement; duration?: never }
+    | { action?: undefined; duration?: number }
+  )
 
-function toast({ ...props }: Toast) {
+function toast({ ...props }: ToastOptions) {
   const id = genId()
 
   const update = (props: ToasterToast) =>

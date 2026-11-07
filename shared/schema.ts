@@ -24,6 +24,7 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
+import type { CostBasis, ResolvedResearchConfig } from "./researcherContract";
 import { resourceKindSchema, type ResourceKind } from "./resourceKinds";
 import type {
   DigestAttemptOutcome,
@@ -116,8 +117,8 @@ export const users = pgTable("users", {
   // issue needed); admins see and action the request privately. NULL = no
   // pending request.
   deletionRequestedAt: timestamp("deletion_requested_at"),
-  // Owner password cookies issued at or before this time are rejected
-  // ("Sign out all devices" for the stateless owner session).
+  // Owner password cookies issued at or before this time are rejected. Every
+  // owner sign-out sets it, because the stateless cookie cannot be deleted.
   sessionsRevokedAt: timestamp("sessions_revoked_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -125,6 +126,14 @@ export const users = pgTable("users", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+/**
+ * How the signed-in request authenticated (GET /api/auth/user `user.authMethod`):
+ * a Clerk session, the owner password cookie, or the audit-key header.
+ * Only a Clerk session has a Clerk account portal to open.
+ */
+export const AUTH_METHODS = ["clerk", "owner_password", "audit_key"] as const;
+export type AuthMethod = (typeof AUTH_METHODS)[number];
 
 /**
  * Deleted account tombstones (migrations/0053_deleted_user_tombstones.sql).
@@ -523,6 +532,23 @@ export const insertResourceEditSchema = createInsertSchema(resourceEdits).pick({
 
 export type InsertResourceEdit = z.infer<typeof insertResourceEditSchema>;
 export type ResourceEdit = typeof resourceEdits.$inferSelect;
+
+/**
+ * A resolved edit suggestion as GET /api/admin/resource-edits/recent lists it.
+ * The server builds it with `Date`s; the client reads the JSON, so its dates
+ * are ISO strings (the default).
+ */
+export interface ResolvedResourceEdit<TDate extends Date | string = string> {
+  id: number;
+  resourceId: number;
+  status: Exclude<ResourceEdit["status"], "pending">;
+  fields: string[];
+  rejectionReason: string | null;
+  createdAt: TDate;
+  resolvedAt: TDate;
+  submittedByEmail: string | null;
+  resourceTitle: string | null;
+}
 
 /**
  * Categories table - Top-level taxonomy
@@ -1274,7 +1300,8 @@ export const notificationPreferences = pgTable(
     includeWatchNext: boolean("include_watch_next").notNull().default(true),
     includeJourneyStep: boolean("include_journey_step").notNull().default(true),
     cadence: text("cadence").$type<DigestCadence>().notNull().default("weekly"),
-    timezone: varchar("timezone", { length: 64 }).notNull().default("UTC"),
+    // null until the user saves a time zone (digests use UTC until then).
+    timezone: varchar("timezone", { length: 64 }),
     policyVersion: integer("policy_version").notNull().default(1),
     pausedUntil: timestamp("paused_until", { withTimezone: true }),
     emailOptedInAt: timestamp("email_opted_in_at", { withTimezone: true }),
@@ -1900,6 +1927,10 @@ export const researchJobs = pgTable(
     totalOutputTokens: integer("total_output_tokens").default(0),
     estimatedCostUsd: text("estimated_cost_usd").default("0.00"),
     turnsUsed: integer("turns_used").default(0),
+    // How estimatedCostUsd was obtained (see shared/researcherContract.ts). Null on legacy rows.
+    costBasis: text("cost_basis").$type<CostBasis>(),
+    // Secret-free endpoint/credential/model resolution the run launched with.
+    resolvedConfig: jsonb("resolved_config").$type<ResolvedResearchConfig>(),
     agentLog: jsonb("agent_log").$type<Array<{ role: string; content: string; timestamp: string }>>().default([]),
     errorMessage: text("error_message"),
     startedBy: varchar("started_by").references(() => users.id),

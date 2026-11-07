@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
   trackJourneyStart,
   trackJourneyStepComplete,
@@ -39,6 +40,7 @@ import { journeySeoDescription } from "@shared/seo-templates";
 import { parseRouteId } from "@shared/route-id";
 import NotFound from "@/pages/not-found";
 import "@/styles/pages/discovery-journeys.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface JourneyStep {
   id: number;
@@ -111,7 +113,7 @@ export default function JourneyDetail() {
   const journeyQuery = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
     queryFn: async () => {
-      const response = await fetch(`/api/journeys/${id}`);
+      const response = await apiFetch(`/api/journeys/${id}`);
       if (!response.ok) throw new ApiError(response.status, await response.text());
       return response.json();
     },
@@ -148,7 +150,7 @@ export default function JourneyDetail() {
     const target = document.getElementById(window.location.hash.slice(1));
     if (!target) return;
     const frame = requestAnimationFrame(() => {
-      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.scrollIntoView({ block: "start", behavior: scrollBehavior() });
       target.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
@@ -572,17 +574,17 @@ export default function JourneyDetail() {
 
           {/* Enroll Button */}
           {!isAuthenticated ? (
-            <Alert className="journey-enroll-note mt-6">
+            <Alert live="off" className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
+              <AlertDescription className="leading-7">
                 {/* P1-08: canonical /sign-in with a redirect_url back to this
                     journey. A real link (not a button) so it opens in a new
-                    tab; inline padding widens the target without stretching
-                    the line box. */}
+                    tab; py-1 gives it a 24px hit area and leading-7 keeps it
+                    from overlapping a wrapped neighbour line. */}
                 Please{" "}
                 <Link
                   href={loginHref}
-                  className="underline font-medium py-0.5"
+                  className="underline font-medium py-1"
                   data-testid="button-login-journey"
                 >
                   log in
@@ -785,7 +787,7 @@ export default function JourneyDetail() {
               );
             })
         ) : (
-          <Alert className="journeys-alert">
+          <Alert live="off" className="journeys-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               This journey doesn't have any steps yet. Check back later!

@@ -1,0 +1,40 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Subcategories" [ref=e13] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e14]
+                - status
+  - dialog "Create Subcategory"
+    - form
+      - heading "Create Subcategory" [level=2, ref=e3]
+      - paragraph
+        - StaticText "Add a new subcategory under a parent category."
+      - LabelText [ref=e4] clickable [cursor:pointer]
+        - StaticText "Parent Category *"
+      - combobox "Parent Category *" [expanded=false, ref=e5]: Players & Clients
+        - generic [ref=e12] clickable [cursor:pointer, onclick]
+          - StaticText "Players & Clients"
+      - LabelText [ref=e6] clickable [cursor:pointer]
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e7]
+      - paragraph
+        - StaticText "Name is required"
+      - LabelText [ref=e8] clickable [cursor:pointer]
+        - StaticText "Slug *"
+      - textbox "Slug *" [ref=e9]
+      - paragraph
+        - StaticText "Slug is required"
+      - paragraph
+        - StaticText "Auto-generated from name. Edit if needed."
+      - button "Cancel" [ref=e10]
+        - image
+        - StaticText "Cancel"
+      - button "Create" [ref=e11]
+        - image
+        - StaticText "Create"
+    - button "Close" [ref=e2]
+      - image
+      - StaticText "Close"

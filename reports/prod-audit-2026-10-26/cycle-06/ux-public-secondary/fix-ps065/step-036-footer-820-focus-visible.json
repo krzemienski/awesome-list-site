@@ -1,0 +1,21 @@
+{
+  "url": "http://127.0.0.1:5165/about",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "name": "Encoding & Codecs",
+  "href": "/category/encoding-codecs",
+  "focusVisible": true,
+  "outline": "rgb(255, 61, 82) solid 2px",
+  "rect": {
+    "x": 290.6640625,
+    "y": 653.0078125,
+    "width": 218.6640625,
+    "height": 44,
+    "top": 653.0078125,
+    "right": 509.328125,
+    "bottom": 697.0078125,
+    "left": 290.6640625
+  }
+}

@@ -1,4 +1,5 @@
 import { Resource } from "@shared/schema";
+import { compareTitles } from "../lib/titleOrder";
 
 /**
  * Formatter for generating awesome-lint compliant README files
@@ -186,7 +187,7 @@ export class AwesomeListFormatter {
    */
   private formatResourceList(resources: Resource[]): string {
     return resources
-      .sort((a, b) => a.title.localeCompare(b.title)) // Alphabetical sorting
+      .sort(compareTitles)
       .map(resource => this.formatResource(resource))
       .join('\n');
   }

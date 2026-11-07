@@ -1,7 +1,8 @@
-import { lazy, Suspense } from "react";
 import { Link, useLocation } from "wouter";
+import { lazyOptional } from "@/lib/lazy-optional";
 import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
 import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { countVisibleSubcategories } from "@shared/catalog-counts";
 import { getCategoryGlyph } from "./category-glyphs";
 import "@/styles/shell/footer.css";
 
@@ -9,7 +10,7 @@ const ContactFooter =
   import.meta.env.VITE_CONTACT_VARIANT === "a" ||
   import.meta.env.VITE_CONTACT_VARIANT === "b" ||
   import.meta.env.VITE_CONTACT_VARIANT === "c"
-    ? lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
+    ? lazyOptional(() => import("@/components/contact/contact-footer"), (module) => module.ContactFooter)
     : null;
 
 /** The deployment's display identity is the lowercase domain, as in the
@@ -49,7 +50,7 @@ export default function AppFooter({ nav, site }: {
   const displayName = footerDisplayName(site.name);
   // C9-V1-01: count and link only the categories the rest of the site shows.
   const categories = visibleNavCategories(nav?.categories);
-  const subcategoryCount = categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
+  const subcategoryCount = countVisibleSubcategories(categories);
 
   return (
     <footer className="app-footer" data-testid="site-footer">
@@ -100,7 +101,7 @@ export default function AppFooter({ nav, site }: {
             Indexed automatically from <span className="app-footer-mono">README.md</span>.
           </p>
           {ContactFooter ? (
-            <div className="app-footer-contact"><Suspense fallback={null}><ContactFooter /></Suspense></div>
+            <div className="app-footer-contact"><ContactFooter /></div>
           ) : null}
         </div>
       </div>

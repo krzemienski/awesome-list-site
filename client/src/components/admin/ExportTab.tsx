@@ -34,7 +34,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink } from "wouter";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { formatAdminDateTime } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useToast } from "@/hooks/use-toast";
 import {
   AdminOpsTable as Table,
@@ -47,6 +49,7 @@ import type { LinkHealthJob } from "@shared/schema";
 import DatabaseBackupPanel from "@/components/admin/DatabaseBackupPanel";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./admin-ops-export-database.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface ExportTabProps {
   validationStatus?: ValidationStatus;
@@ -119,20 +122,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   // Export history is read from the audit log, filtered server-side to export
   // actions, so every page holds exports and the total counts exports only.
-  const {
-    data: exportHistoryData,
-    isLoading: isExportHistoryLoading,
-    isError: isExportHistoryError,
-    error: exportHistoryError,
-    isFetching: isExportHistoryFetching,
-    refetch: refetchExportHistory,
-  } = useQuery<AuditLogsResponse>({
+  const exportHistoryQuery = useQuery<AuditLogsResponse>({
     queryKey: ["/api/admin/audit-logs", "export-history", auditHistoryPage],
     staleTime: 30_000,
     refetchOnWindowFocus: true,
     queryFn: async () => {
       const auditOffset = auditHistoryPage * AUDIT_HISTORY_PAGE_SIZE;
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/admin/audit-logs?limit=${AUDIT_HISTORY_PAGE_SIZE}&offset=${auditOffset}&actions=${[...EXPORT_ACTIONS].join(",")}`,
         {
           credentials: "include",
@@ -145,6 +141,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       return body as AuditLogsResponse;
     },
   });
+  const {
+    data: exportHistoryData,
+    isLoading: isExportHistoryLoading,
+    error: exportHistoryError,
+    isFetching: isExportHistoryFetching,
+    refetch: refetchExportHistory,
+  } = exportHistoryQuery;
+  const exportHistoryUnavailable = queryUnavailableReason(exportHistoryQuery);
 
   const auditHistoryTotal = exportHistoryData?.total ?? 0;
   const auditHistoryOffset = auditHistoryPage * AUDIT_HISTORY_PAGE_SIZE;
@@ -156,13 +160,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const hasNextAuditHistoryPage =
     auditHistoryEnd < auditHistoryTotal &&
     (exportHistoryData?.logs.length ?? 0) > 0;
-  const auditHistoryWindowLabel = isExportHistoryLoading
-    ? "Loading export history…"
-    : isExportHistoryError
-      ? "Export history unavailable."
+  const auditHistoryWindowLabel = exportHistoryUnavailable
+    ? "Export history unavailable."
+    : isExportHistoryLoading || !exportHistoryData
+      ? "Loading export history…"
       : auditHistoryTotal === 0
         ? "No exports recorded yet."
-        : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
+        : (exportHistoryData.logs.length === 0)
+          ? `No exports on page ${auditHistoryPage + 1}, ${auditHistoryTotal.toLocaleString()} in total`
+          : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
 
   const exportHistory = useMemo(
     () =>
@@ -192,7 +198,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     exportingRef.current = true;
     try {
       setIsExporting(true);
-      const response = await fetch("/api/admin/export", {
+      const response = await apiFetch("/api/admin/export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -204,20 +210,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         }),
       });
 
-      if (!response.ok) throw new ApiError(response.status, "Export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const blob = await response.blob();
       triggerBlobDownload(blob, "awesome-list.md");
 
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "Export Successful",
-        description: "Awesome list markdown file has been downloaded.",
+        title: "Markdown export downloaded",
+        description: "Saved awesome-list.md — the full awesome list as Markdown.",
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
-        title: "Export Failed",
-        description: "Failed to export awesome list. Please try again.",
+        title: "Markdown Export Failed",
+        description: describeWriteError(error, { fallback: "Failed to export the awesome list as Markdown.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -229,24 +237,24 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleJsonExport = async () => {
     try {
       setIsJsonExporting(true);
-      const response = await fetch("/api/admin/export-json", {
+      const response = await apiFetch("/api/admin/export-json", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "JSON export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "awesome-list-catalog-snapshot.json"),
-      );
+      const jsonName = exportFileName(response, "awesome-list-catalog-snapshot.json");
+      triggerBlobDownload(await response.blob(), jsonName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "JSON Export Successful",
-        description: "The catalog snapshot has been downloaded. This is not a restorable database backup.",
+        title: "JSON export downloaded",
+        description: `Saved ${jsonName} — the catalog snapshot. This is not a restorable database backup.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "JSON Export Failed",
-        description: "Failed to export the catalog snapshot. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the catalog snapshot.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -257,24 +265,24 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleCsvExport = async () => {
     try {
       setIsCsvExporting(true);
-      const response = await fetch("/api/admin/export-csv", {
+      const response = await apiFetch("/api/admin/export-csv", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "CSV export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "resources-export.csv"),
-      );
+      const csvName = exportFileName(response, "resources-export.csv");
+      triggerBlobDownload(await response.blob(), csvName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "CSV Export Successful",
-        description: "The resource table has been downloaded.",
+        title: "CSV export downloaded",
+        description: `Saved ${csvName} — the resource table.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "CSV Export Failed",
-        description: "Failed to export the resource table. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the resource table.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -285,24 +293,24 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleOpmlExport = async () => {
     try {
       setIsOpmlExporting(true);
-      const response = await fetch("/api/admin/export-opml", {
+      const response = await apiFetch("/api/admin/export-opml", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "OPML export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "categories-export.opml"),
-      );
+      const opmlName = exportFileName(response, "categories-export.opml");
+      triggerBlobDownload(await response.blob(), opmlName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "OPML Export Successful",
-        description: "The category tree has been downloaded.",
+        title: "OPML export downloaded",
+        description: `Saved ${opmlName} — the category tree.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "OPML Export Failed",
-        description: "Failed to export the category tree. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the category tree.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -323,17 +331,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
       return response;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/validation-status"] });
+      const outcome = result as { valid?: boolean; errors?: unknown[] } | null;
+      const problemCount = Array.isArray(outcome?.errors) ? outcome.errors.length : 0;
       toast({
-        title: "Validation Complete",
-        description: "Awesome list validation has been completed.",
+        title: outcome?.valid === false ? "Validation found problems" : "Validation passed",
+        description: outcome?.valid === false
+          ? `The awesome-lint check reported ${problemCount} problem${problemCount === 1 ? "" : "s"}. See the results below.`
+          : "The exported list passes the awesome-lint check.",
+        variant: outcome?.valid === false ? "destructive" : undefined,
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
-        title: "Validation Failed",
-        description: "Failed to validate awesome list. Please try again.",
+        title: "Validation could not run",
+        description: describeWriteError(error, { fallback: "Failed to validate the awesome list.", outcome: "No new validation result was recorded. Try again in a moment." }),
         variant: "destructive",
       });
     },
@@ -478,7 +491,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           ) : linkJob ? (
             <>
               <div className="admin-ops-export__link-job-row">
-                <h2>
+                <h2 id="export-link-job-heading">
                   Link check #{linkJob.id}{" "}
                   <StatusChip
                     status={
@@ -492,7 +505,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => { if (!cancelLinkCheckMutation.isPending) cancelLinkCheckMutation.mutate(linkJob.id); }}
+                    onClick={(event) => {
+                      if (cancelLinkCheckMutation.isPending) return;
+                      // The button unmounts once the job is cancelled; keep focus on
+                      // this panel's heading, which now reads "Cancelled" (C22-EX-08).
+                      handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-link-job-heading"));
+                      cancelLinkCheckMutation.mutate(linkJob.id);
+                    }}
                     aria-disabled={cancelLinkCheckMutation.isPending}
                     aria-busy={cancelLinkCheckMutation.isPending}
                     data-testid="button-cancel-export-link-check"
@@ -508,7 +527,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 {isLinkJobActive
                   ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
                   : linkJob.status === "completed"
-                    ? `Completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
+                    ? `Scan #${linkJob.id} completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}. At scan time: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
                     : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
               </p>
               {isLinkJobError ? (
@@ -521,6 +540,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   testId="alert-export-link-check-stale"
                   retryTestId="button-retry-export-link-check"
                 />
+              ) : null}
+              {linkJob.status === "completed" ? (
+                <p className="admin-ops-export__link-job-scope" data-testid="export-link-check-scan-time-note">
+                  These are the counts saved when the scan finished. Link Health shows the same scan&apos;s problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed.
+                </p>
               ) : null}
               <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
             </>
@@ -617,7 +641,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <details className="admin-ops-more">
         <summary className="btn ghost">Export history &amp; validation results</summary>
       <TableShell
-        title="Export history"
+        title={<span id="export-history-heading" tabIndex={-1}>Export history</span>}
         sub={auditHistoryWindowLabel}
         actions={
           <div className="admin-ops-table-shell__pagination" aria-label="Export history pages">
@@ -651,17 +675,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </div>
         }
       >
-        {isExportHistoryLoading ? (
-          <p className="admin-ops-table__empty">Loading export history...</p>
-        ) : isExportHistoryError ? (
+        {exportHistoryUnavailable ? (
           <AdminLoadError
             subject="export history"
-            error={exportHistoryError}
-            onRetry={() => { void refetchExportHistory(); }}
+            error={exportHistoryUnavailable === "offline"
+              ? "You're offline. Reconnect and retry to load export history."
+              : exportHistoryError}
+            onRetry={(event) => {
+              handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-history-heading"));
+              void refetchExportHistory();
+            }}
             retrying={isExportHistoryFetching}
             testId="alert-export-history-error"
             retryTestId="button-retry-export-history"
           />
+        ) : isExportHistoryLoading || !exportHistoryData ? (
+          <p className="admin-ops-table__empty">Loading export history...</p>
         ) : exportHistory.length === 0 ? (
           <p className="admin-ops-table__empty">
             {auditHistoryTotal === 0
@@ -669,7 +698,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               : "No exports on this page. Use Previous to return to newer exports."}
           </p>
         ) : (
-          <Table className="table admin-ops-table" data-testid="table-export-history">
+          <Table className="table admin-ops-table" data-testid="table-export-history" scrollLabel="Export history table, scrollable">
             <thead>
               <tr>
                 <th>Type</th>
@@ -755,7 +784,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                       Errors ({validationStatus.awesomeLint.errors.length})
                     </button>
                     {showErrors && (
-                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-48">
+                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-48" scrollLabel="Validation errors, scrollable">
                         {groupByRule(validationStatus.awesomeLint.errors).map(([rule, items]) => (
                           <div key={rule} className="admin-ops-validation-group" data-testid={`error-group-${rule}`}>
                             <div className="admin-ops-validation-group__heading admin-ops-validation-group__heading--bad">
@@ -791,7 +820,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                       Warnings ({validationStatus.awesomeLint.warnings.length})
                     </button>
                     {showWarnings && (
-                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--warn h-48">
+                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--warn h-48" scrollLabel="Validation warnings, scrollable">
                         {groupByRule(validationStatus.awesomeLint.warnings).map(([rule, items]) => (
                           <div key={rule} className="admin-ops-validation-group" data-testid={`warning-group-${rule}`}>
                             <div className="admin-ops-validation-group__heading admin-ops-validation-group__heading--warn">
@@ -824,7 +853,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-[var(--text-2)]" />
               <p className="mb-2 text-[var(--text-2)]">No validation results yet</p>
               <p className="text-sm text-[var(--text-2)]">
-                Run validation above to check the exported Markdown against awesome-lint rules.
+                Open “Validation controls” at the top of this tab and use “Run Validation” to check the exported Markdown against awesome-lint rules.
               </p>
             </div>
           </section>

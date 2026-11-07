@@ -1,0 +1,7 @@
+Profile -> "{\"p\":\"/about\",\"menu\":false,\"h1\":\"A field journal for video engi\",\"cur\":[\"About=page\"]}"
+Bookmarks -> "{\"p\":\"/bookmarks\",\"menu\":false,\"h1\":\"Saved, then finished.\",\"cur\":[]}"
+Notifications -> "{\"p\":\"/notifications\",\"menu\":false,\"h1\":\"Notifications\",\"cur\":[]}"
+Settings -> "{\"p\":\"/settings\",\"menu\":false,\"h1\":\"Settings\",\"cur\":[]}"
+Theme Settings -> "{\"p\":\"/settings/theme\",\"menu\":false,\"h1\":\"Theme Settings\",\"cur\":[]}"
+Admin -> "{\"p\":\"/admin\",\"menu\":false,\"h1\":\"Operations dashboard\",\"cur\":[\"Admin=page\"]}"
+Profile -> "{\"vw\":820,\"p\":\"/profile\",\"menu\":false,\"h1\":\"Admin User\",\"cur\":[]}"

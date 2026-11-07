@@ -10,7 +10,7 @@ generated from the css2 URLs by the glyph-font build script (its unit test catch
 **Rule:** a glyph face must mirror EVERY exact (weight, style) the family declares.
 **Why:** Chromium only consults faces in the matched weight/style group — a single 400 face
 worked for regular/italic text but bold 700 text still painted tofu (verified empirically).
-**How to apply:** new family/weight in index.html or FONT_STYLESHEETS → rerun the script with --css.
+**How to apply:** new family/weight in client/public/fonts/fonts.css → rerun the script with --css.
 
 - Verify which font actually painted a node with CDP `CSS.getPlatformFontsForNode`, not screenshots alone.
   It reports per-file names like "AV Category Glyphs Sans (Fontations)" / "… Mono" — not the bare

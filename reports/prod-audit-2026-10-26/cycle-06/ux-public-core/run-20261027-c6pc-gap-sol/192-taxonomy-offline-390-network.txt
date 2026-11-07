@@ -1,0 +1,9 @@
+MCP failure
+server: chrome-devtools
+tool: list_network_requests
+transport: stdio
+stage: receive
+failure: timeout
+retryable: no
+message: Request timeout after 30000ms
+next: Check server health or increase the MCP timeout; the request outcome is unknown.

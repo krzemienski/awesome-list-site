@@ -11,16 +11,14 @@
  *    out-of-range pages onto the last page exactly like the client UI and
  *    never 404s; lenient URL parsing there matches that surface's contract.
  *
- * 2. `parseUrlPageStrict` — URL ?page= meaning on the INDEXABLE taxonomy
- *    listings (/category, /subcategory, /sub-subcategory), per the BUG-027
+ * 2. `parseUrlPageStrict` — URL ?page= meaning on the INDEXABLE listings
+ *    (/category, /subcategory, /sub-subcategory, /tag), per the BUG-027
  *    convention: only a canonical positive decimal spelling ("2", "48") is a
- *    page reference. "1e3", "007", "+2", "2.7", "abc" are malformed — the
- *    crawler pass serves a real 404 and the hydrated client shows page 1 with
- *    a visible invalid-page notice: the SAME judgment, expressed per surface.
- *    "0"/"-5" are whole-number spellings below range — equally rejected
- *    (404 vs clamp-to-1 notice), reported with friendlier wording.
+ *    page reference. "1e3", "007", "+2", "2.7", "abc" are malformed, and
+ *    "0"/"-5" are whole-number spellings below range. Both passes render a
+ *    real 404 (noindex) for either.
  *
- * Callers own only presentation (404 vs notice, which page to clamp onto);
+ * Callers own only presentation (404 page, which page to clamp onto);
  * every "what does this spelling mean?" decision lives here so the two passes
  * can never drift.
  */
@@ -46,16 +44,15 @@ export type UrlPageStrict =
   | { kind: "missing" }
   /** Canonical decimal ≥ 1, int32-capped (may still exceed the last page). */
   | { kind: "page"; page: number }
-  /** A whole-number spelling below 1 ("0", "-5") — server 404s, client clamps to 1. */
+  /** A whole-number spelling below 1 ("0", "-5") — a 404 on both passes. */
   | { kind: "below-range" }
-  /** Anything else ("", "1e3", "007", "+2", "2.7", "abc") — server 404s, client notices. */
+  /** Anything else ("", "1e3", "007", "+2", "2.7", "abc") — a 404 on both passes. */
   | { kind: "malformed" };
 
 /**
- * Strict URL rule for the indexable taxonomy listings (BUG-027):
- * og-middleware turns anything but {kind:"page"} into a soft-404, and the
- * client mirrors the verdict as page-1 + visible notice. Values beyond
- * MAX_PAGE stay {kind:"page"} capped — range policy (404 vs clamp+notice)
+ * Strict URL rule for the indexable listings (BUG-027): og-middleware and
+ * the hydrated client both turn anything but {kind:"page"} into the 404
+ * page. Values beyond MAX_PAGE stay {kind:"page"} capped — range policy
  * belongs to the caller, exactly like any other over-range decimal.
  */
 export function parseUrlPageStrict(raw: string | null | undefined): UrlPageStrict {

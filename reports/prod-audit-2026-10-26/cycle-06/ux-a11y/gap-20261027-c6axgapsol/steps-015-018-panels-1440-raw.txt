@@ -1,0 +1,866 @@
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#categories
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e38]
+    - link "Admin" [disabled, ref=e39]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [selected, ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Categories" [ref=e17] focusable [tabindex]
+    - button "Search" [expanded=false, ref=e35]
+    - button "Add category" [ref=e36]
+    - region "Categories table, scrollable" [ref=e40] focusable [tabindex]
+      - columnheader "ICON" [ref=e92]
+      - columnheader "NAME" [ref=e93]
+      - columnheader "SLUG" [ref=e94]
+      - columnheader "RESOURCES" [ref=e95]
+      - columnheader "SUBCATEGORIES" [ref=e96]
+      - cell "Community & Events" [ref=e42]
+      - cell "community-events" [ref=e43]
+      - cell "129" [ref=e44]
+      - cell "2" [ref=e45]
+      - cell "Edit Community & Events Delete Community & Events unavailable: 129 resources still assigned" [ref=e46]
+        - button "Edit Community & Events" [ref=e97]
+        - button "Delete Community & Events unavailable: 129 resources still assigned" [disabled, ref=e107]
+      - cell "Encoding & Codecs" [ref=e47]
+      - cell "encoding-codecs" [ref=e48]
+      - cell "579" [ref=e49]
+      - cell "16" [ref=e50]
+      - cell "Edit Encoding & Codecs Delete Encoding & Codecs unavailable: 579 resources still assigned" [ref=e51]
+        - button "Edit Encoding & Codecs" [ref=e98]
+        - button "Delete Encoding & Codecs unavailable: 579 resources still assigned" [disabled, ref=e108]
+      - cell "General Tools" [ref=e52]
+      - cell "general-tools" [ref=e53]
+      - cell "514" [ref=e54]
+      - cell "19" [ref=e55]
+      - cell "Edit General Tools Delete General Tools unavailable: 514 resources still assigned" [ref=e56]
+        - button "Edit General Tools" [ref=e99]
+        - button "Delete General Tools unavailable: 514 resources still assigned" [disabled, ref=e109]
+      - cell "Infrastructure & Delivery" [ref=e57]
+      - cell "infrastructure-delivery" [ref=e58]
+      - cell "353" [ref=e59]
+      - cell "10" [ref=e60]
+      - cell "Edit Infrastructure & Delivery Delete Infrastructure & Delivery unavailable: 353 resources still assigned" [ref=e61]
+        - button "Edit Infrastructure & Delivery" [ref=e100]
+        - button "Delete Infrastructure & Delivery unavailable: 353 resources still assigned" [disabled, ref=e110]
+      - cell "Intro & Learning" [ref=e62]
+      - cell "intro-learning" [ref=e63]
+      - cell "297" [ref=e64]
+      - cell "9" [ref=e65]
+      - cell "Edit Intro & Learning Delete Intro & Learning unavailable: 297 resources still assigned" [ref=e66]
+        - button "Edit Intro & Learning" [ref=e101]
+        - button "Delete Intro & Learning unavailable: 297 resources still assigned" [disabled, ref=e111]
+      - cell "Media Tools" [ref=e67]
+      - cell "media-tools" [ref=e68]
+      - cell "704" [ref=e69]
+      - cell "16" [ref=e70]
+      - cell "Edit Media Tools Delete Media Tools unavailable: 704 resources still assigned" [ref=e71]
+        - button "Edit Media Tools" [ref=e102]
+        - button "Delete Media Tools unavailable: 704 resources still assigned" [disabled, ref=e112]
+      - cell "Players & Clients" [ref=e72]
+      - cell "players-clients" [ref=e73]
+      - cell "447" [ref=e74]
+      - cell "10" [ref=e75]
+      - cell "Edit Players & Clients Delete Players & Clients unavailable: 447 resources still assigned" [ref=e76]
+        - button "Edit Players & Clients" [ref=e103]
+        - button "Delete Players & Clients unavailable: 447 resources still assigned" [disabled, ref=e113]
+      - cell "Protocols & Transport" [ref=e77]
+      - cell "protocols-transport" [ref=e78]
+      - cell "467" [ref=e79]
+      - cell "9" [ref=e80]
+      - cell "Edit Protocols & Transport Delete Protocols & Transport unavailable: 467 resources still assigned" [ref=e81]
+        - button "Edit Protocols & Transport" [ref=e104]
+        - button "Delete Protocols & Transport unavailable: 467 resources still assigned" [disabled, ref=e114]
+      - cell "Standards & Industry" [ref=e82]
+      - cell "standards-industry" [ref=e83]
+      - cell "335" [ref=e84]
+      - cell "8" [ref=e85]
+      - cell "Edit Standards & Industry Delete Standards & Industry unavailable: 335 resources still assigned" [ref=e86]
+        - button "Edit Standards & Industry" [ref=e105]
+        - button "Delete Standards & Industry unavailable: 335 resources still assigned" [disabled, ref=e115]
+      - cell "[QA-audit-1026] Cáfé gap A" [ref=e87]
+      - cell "qa-audit-1026-gap-a" [ref=e88]
+      - cell "0" [ref=e89]
+      - cell "1" [ref=e90]
+      - cell "Edit [QA-audit-1026] Cáfé gap A Delete [QA-audit-1026] Cáfé gap A unavailable: 1 subcategory still assigned" [ref=e91]
+        - button "Edit [QA-audit-1026] Cáfé gap A" [ref=e106]
+        - button "Delete [QA-audit-1026] Cáfé gap A unavailable: 1 subcategory still assigned" [disabled, ref=e116]
+    - combobox "Items per page" [expanded=false, ref=e37]: 10
+      - generic "10" [ref=e41] clickable [cursor:pointer, onclick]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-015-categories-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#subcategories
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e39]
+    - link "Admin" [disabled, ref=e40]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [selected, ref=e29]
+    - tab "Users" [ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Subcategories" [ref=e17] focusable [tabindex]
+    - button "Search" [expanded=false, ref=e35]
+    - button "Add subcategory" [ref=e36]
+    - region "Subcategories table, scrollable" [ref=e41] focusable [tabindex]
+      - columnheader "NAME" [ref=e169]
+      - columnheader "SLUG" [ref=e170]
+      - columnheader "PARENT" [ref=e171]
+      - columnheader "RESOURCES" [ref=e172]
+      - cell "Community Groups" [ref=e49]
+      - cell "community-groups" [ref=e50]
+      - cell "Community & Events" [ref=e51]
+      - cell "59" [ref=e52]
+      - cell "Edit Community Groups Delete Community Groups unavailable: 59 resources still assigned" [ref=e53]
+        - button "Edit Community Groups" [ref=e173]
+        - button "Delete Community Groups unavailable: 59 resources still assigned" [disabled, ref=e197]
+      - cell "Events & Conferences" [ref=e54]
+      - cell "events-conferences" [ref=e55]
+      - cell "Community & Events" [ref=e56]
+      - cell "72" [ref=e57]
+      - cell "Edit Events & Conferences Delete Events & Conferences unavailable: 72 resources still assigned" [ref=e58]
+        - button "Edit Events & Conferences" [ref=e174]
+        - button "Delete Events & Conferences unavailable: 72 resources still assigned" [disabled, ref=e198]
+      - cell "Benchmarking & Performance Tools for Codecs" [ref=e59]
+      - cell "benchmarking-performance-tools-for-codecs" [ref=e60]
+      - cell "Encoding & Codecs" [ref=e61]
+      - cell "18" [ref=e62]
+      - cell "Edit Benchmarking & Performance Tools for Codecs Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" [ref=e63]
+        - button "Edit Benchmarking & Performance Tools for Codecs" [ref=e175]
+        - button "Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" [disabled, ref=e199]
+      - cell "Cloud-Based Encoding Solutions" [ref=e64]
+      - cell "cloud-based-encoding-solutions" [ref=e65]
+      - cell "Encoding & Codecs" [ref=e66]
+      - cell "19" [ref=e67]
+      - cell "Edit Cloud-Based Encoding Solutions Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" [ref=e68]
+        - button "Edit Cloud-Based Encoding Solutions" [ref=e176]
+        - button "Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" [disabled, ref=e200]
+      - cell "Codecs" [ref=e69]
+      - cell "codecs" [ref=e70]
+      - cell "Encoding & Codecs" [ref=e71]
+      - cell "69" [ref=e72]
+      - cell "Edit Codecs Delete Codecs unavailable: 69 resources still assigned" [ref=e73]
+        - button "Edit Codecs" [ref=e177]
+        - button "Delete Codecs unavailable: 69 resources still assigned" [disabled, ref=e201]
+      - cell "Comparative Analysis of Codecs" [ref=e74]
+      - cell "comparative-analysis-of-codecs" [ref=e75]
+      - cell "Encoding & Codecs" [ref=e76]
+      - cell "19" [ref=e77]
+      - cell "Edit Comparative Analysis of Codecs Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" [ref=e78]
+        - button "Edit Comparative Analysis of Codecs" [ref=e178]
+        - button "Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" [disabled, ref=e202]
+      - cell "Containerization & Packaging Tools" [ref=e79]
+      - cell "containerization-packaging-tools" [ref=e80]
+      - cell "Encoding & Codecs" [ref=e81]
+      - cell "36" [ref=e82]
+      - cell "Edit Containerization & Packaging Tools Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" [ref=e83]
+        - button "Edit Containerization & Packaging Tools" [ref=e179]
+        - button "Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" [disabled, ref=e203]
+      - cell "Encoding Tools" [ref=e84]
+      - cell "encoding-tools" [ref=e85]
+      - cell "Encoding & Codecs" [ref=e86]
+      - cell "143" [ref=e87]
+      - cell "Edit Encoding Tools Delete Encoding Tools unavailable: 143 resources still assigned" [ref=e88]
+        - button "Edit Encoding Tools" [ref=e180]
+        - button "Delete Encoding Tools unavailable: 143 resources still assigned" [disabled, ref=e204]
+      - cell "FFmpeg-Based Tools" [ref=e89]
+      - cell "ffmpeg-based-tools" [ref=e90]
+      - cell "Encoding & Codecs" [ref=e91]
+      - cell "19" [ref=e92]
+      - cell "Edit FFmpeg-Based Tools Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" [ref=e93]
+        - button "Edit FFmpeg-Based Tools" [ref=e181]
+        - button "Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" [disabled, ref=e205]
+      - cell "Hardware Accelerated Transcoding" [ref=e94]
+      - cell "hardware-accelerated-transcoding" [ref=e95]
+      - cell "Encoding & Codecs" [ref=e96]
+      - cell "25" [ref=e97]
+      - cell "Edit Hardware Accelerated Transcoding Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" [ref=e98]
+        - button "Edit Hardware Accelerated Transcoding" [ref=e182]
+        - button "Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" [disabled, ref=e206]
+      - cell "Hardware Codecs & Acceleration" [ref=e99]
+      - cell "hardware-codecs-acceleration" [ref=e100]
+      - cell "Encoding & Codecs" [ref=e101]
+      - cell "24" [ref=e102]
+      - cell "Edit Hardware Codecs & Acceleration Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" [ref=e103]
+        - button "Edit Hardware Codecs & Acceleration" [ref=e183]
+        - button "Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" [disabled, ref=e207]
+      - cell "Multi-format Packaging Tools" [ref=e104]
+      - cell "multi-format-packaging-tools" [ref=e105]
+      - cell "Encoding & Codecs" [ref=e106]
+      - cell "13" [ref=e107]
+      - cell "Edit Multi-format Packaging Tools Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" [ref=e108]
+        - button "Edit Multi-format Packaging Tools" [ref=e184]
+        - button "Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" [disabled, ref=e208]
+      - cell "Next-Generation Codecs AV1 VVC" [ref=e109]
+      - cell "next-generation-codecs-av1-vvc" [ref=e110]
+      - cell "Encoding & Codecs" [ref=e111]
+      - cell "19" [ref=e112]
+      - cell "Edit Next-Generation Codecs AV1 VVC Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" [ref=e113]
+        - button "Edit Next-Generation Codecs AV1 VVC" [ref=e185]
+        - button "Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" [disabled, ref=e209]
+      - cell "Open Source Encoder Projects" [ref=e114]
+      - cell "open-source-encoder-projects" [ref=e115]
+      - cell "Encoding & Codecs" [ref=e116]
+      - cell "28" [ref=e117]
+      - cell "Edit Open Source Encoder Projects Delete Open Source Encoder Projects unavailable: 28 resources still assigned" [ref=e118]
+        - button "Edit Open Source Encoder Projects" [ref=e186]
+        - button "Delete Open Source Encoder Projects unavailable: 28 resources still assigned" [disabled, ref=e210]
+      - cell "Real-Time Encoding Solutions" [ref=e119]
+      - cell "real-time-encoding-solutions" [ref=e120]
+      - cell "Encoding & Codecs" [ref=e121]
+      - cell "18" [ref=e122]
+      - cell "Edit Real-Time Encoding Solutions Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" [ref=e123]
+        - button "Edit Real-Time Encoding Solutions" [ref=e187]
+        - button "Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" [disabled, ref=e211]
+      - cell "Scripting & Automation Tools" [ref=e124]
+      - cell "scripting-automation-tools" [ref=e125]
+      - cell "Encoding & Codecs" [ref=e126]
+      - cell "17" [ref=e127]
+      - cell "Edit Scripting & Automation Tools Delete Scripting & Automation Tools unavailable: 17 resources still assigned" [ref=e128]
+        - button "Edit Scripting & Automation Tools" [ref=e188]
+        - button "Delete Scripting & Automation Tools unavailable: 17 resources still assigned" [disabled, ref=e212]
+      - cell "Software Codecs" [ref=e129]
+      - cell "software-codecs" [ref=e130]
+      - cell "Encoding & Codecs" [ref=e131]
+      - cell "18" [ref=e132]
+      - cell "Edit Software Codecs Delete Software Codecs unavailable: 18 resources still assigned" [ref=e133]
+        - button "Edit Software Codecs" [ref=e189]
+        - button "Delete Software Codecs unavailable: 18 resources still assigned" [disabled, ref=e213]
+      - cell "Software Transcoding Tools" [ref=e134]
+      - cell "software-transcoding-tools" [ref=e135]
+      - cell "Encoding & Codecs" [ref=e136]
+      - cell "15" [ref=e137]
+      - cell "Edit Software Transcoding Tools Delete Software Transcoding Tools unavailable: 15 resources still assigned" [ref=e138]
+        - button "Edit Software Transcoding Tools" [ref=e190]
+        - button "Delete Software Transcoding Tools unavailable: 15 resources still assigned" [disabled, ref=e214]
+      - cell "API Libraries & SDKs" [ref=e139]
+      - cell "api-libraries-sdks" [ref=e140]
+      - cell "General Tools" [ref=e141]
+      - cell "25" [ref=e142]
+      - cell "Edit API Libraries & SDKs Delete API Libraries & SDKs unavailable: 25 resources still assigned" [ref=e143]
+        - button "Edit API Libraries & SDKs" [ref=e191]
+        - button "Delete API Libraries & SDKs unavailable: 25 resources still assigned" [disabled, ref=e215]
+      - cell "Build Scripts & Automation" [ref=e144]
+      - cell "build-scripts-automation" [ref=e145]
+      - cell "General Tools" [ref=e146]
+      - cell "33" [ref=e147]
+      - cell "Edit Build Scripts & Automation Delete Build Scripts & Automation unavailable: 33 resources still assigned" [ref=e148]
+        - button "Edit Build Scripts & Automation" [ref=e192]
+        - button "Delete Build Scripts & Automation unavailable: 33 resources still assigned" [disabled, ref=e216]
+      - cell "Case Studies & Best Practices in DRM" [ref=e149]
+      - cell "case-studies-best-practices-in-drm" [ref=e150]
+      - cell "General Tools" [ref=e151]
+      - cell "33" [ref=e152]
+      - cell "Edit Case Studies & Best Practices in DRM Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" [ref=e153]
+        - button "Edit Case Studies & Best Practices in DRM" [ref=e193]
+        - button "Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" [disabled, ref=e217]
+      - cell "Command-line Utilities & Wrappers" [ref=e154]
+      - cell "command-line-utilities-wrappers" [ref=e155]
+      - cell "General Tools" [ref=e156]
+      - cell "21" [ref=e157]
+      - cell "Edit Command-line Utilities & Wrappers Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" [ref=e158]
+        - button "Edit Command-line Utilities & Wrappers" [ref=e194]
+        - button "Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" [disabled, ref=e218]
+      - cell "Community & Collaboration Platforms" [ref=e159]
+      - cell "community-collaboration-platforms" [ref=e160]
+      - cell "General Tools" [ref=e161]
+      - cell "19" [ref=e162]
+      - cell "Edit Community & Collaboration Platforms Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" [ref=e163]
+        - button "Edit Community & Collaboration Platforms" [ref=e195]
+        - button "Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" [disabled, ref=e219]
+      - cell "Cross-Platform Media Tools" [ref=e164]
+      - cell "cross-platform-media-tools" [ref=e165]
+      - cell "General Tools" [ref=e166]
+      - cell "23" [ref=e167]
+      - cell "Edit Cross-Platform Media Tools Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" [ref=e168]
+        - button "Edit Cross-Platform Media Tools" [ref=e196]
+        - button "Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" [disabled, ref=e220]
+    - combobox "Items per page" [expanded=false, ref=e37]: 24
+      - generic "24" [ref=e42] clickable [cursor:pointer, onclick]
+    - navigation "Pagination" [ref=e38]
+      - link "Page 1, current page" [ref=e43]
+      - link "Go to page 2" [ref=e44]
+      - link "Go to page 3" [ref=e45]
+      - link "Go to page 4" [ref=e46]
+      - link "Go to page 5" [ref=e47]
+      - link "Next" [ref=e48]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-016-subcategories-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#users
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - tablist "Admin sections" [ref=e18] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [selected, ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - button "Scroll tabs right" [ref=e19]
+  - tabpanel "Users" [ref=e17] focusable [tabindex]
+    - heading "Users (133)" [level=2, ref=e39]
+    - button "Row actions" [expanded=false, ref=e40]
+    - textbox "Search users by email or name" [ref=e43]
+    - link "Export CSV" [ref=e41]
+    - button "Invite unavailable" [disabled, ref=e42]
+    - region "Users table, scrollable" [ref=e44] focusable [tabindex]
+      - columnheader "Sort by Name" [ref=e145]
+        - button "Sort by Name" [ref=e170]
+      - columnheader "Sort by Email" [ref=e146]
+        - button "Sort by Email" [ref=e171]
+      - columnheader "Sort by Role" [ref=e147]
+        - button "Sort by Role" [ref=e172]
+      - columnheader "Sort by Joined" [ref=e148]
+        - button "Sort by Joined" [ref=e173]
+      - columnheader "Actions" [ref=e149]
+      - cell "m•••@gmail.com" [ref=e45]
+      - cell "m•••@gmail.com" [ref=e46]
+      - cell "USER" [ref=e47]
+      - cell "Oct 26, 2026" [ref=e48]
+      - cell "Edit role for m•••@gmail.com" [ref=e49]
+        - button "Edit role for m•••@gmail.com" [ref=e150]
+      - cell "Oghenejivwe" [ref=e50]
+      - cell "j•••@gmail.com" [ref=e51]
+      - cell "USER" [ref=e52]
+      - cell "Oct 24, 2026" [ref=e53]
+      - cell "Edit role for Oghenejivwe" [ref=e54]
+        - button "Edit role for Oghenejivwe" [ref=e151]
+      - cell "aarthi priya" [ref=e55]
+      - cell "a•••@gmail.com" [ref=e56]
+      - cell "USER" [ref=e57]
+      - cell "Oct 22, 2026" [ref=e58]
+      - cell "Edit role for aarthi priya" [ref=e59]
+        - button "Edit role for aarthi priya" [ref=e152]
+      - cell "Frank Brown" [ref=e60]
+      - cell "f•••@gmail.com" [ref=e61]
+      - cell "USER" [ref=e62]
+      - cell "Oct 21, 2026" [ref=e63]
+      - cell "Edit role for Frank Brown" [ref=e64]
+        - button "Edit role for Frank Brown" [ref=e153]
+      - cell "Sumit Das" [ref=e65]
+      - cell "s•••@gmail.com" [ref=e66]
+      - cell "USER" [ref=e67]
+      - cell "Oct 20, 2026" [ref=e68]
+      - cell "Edit role for Sumit Das" [ref=e69]
+        - button "Edit role for Sumit Das" [ref=e154]
+      - cell "s1" [ref=e70]
+      - cell "o•••@gmail.com" [ref=e71]
+      - cell "USER" [ref=e72]
+      - cell "Oct 19, 2026" [ref=e73]
+      - cell "Edit role for s1" [ref=e74]
+        - button "Edit role for s1" [ref=e155]
+      - cell "Vasilios Vikatos" [ref=e75]
+      - cell "v•••@gmail.com" [ref=e76]
+      - cell "USER" [ref=e77]
+      - cell "Oct 18, 2026" [ref=e78]
+      - cell "Edit role for Vasilios Vikatos" [ref=e79]
+        - button "Edit role for Vasilios Vikatos" [ref=e156]
+      - cell "Mohamed Fouad" [ref=e80]
+      - cell "d•••@gmail.com" [ref=e81]
+      - cell "USER" [ref=e82]
+      - cell "Oct 17, 2026" [ref=e83]
+      - cell "Edit role for Mohamed Fouad" [ref=e84]
+        - button "Edit role for Mohamed Fouad" [ref=e157]
+      - cell "SANTHOSH GUNTUPALLI" [ref=e85]
+      - cell "s•••@gmail.com" [ref=e86]
+      - cell "USER" [ref=e87]
+      - cell "Oct 15, 2026" [ref=e88]
+      - cell "Edit role for SANTHOSH GUNTUPALLI" [ref=e89]
+        - button "Edit role for SANTHOSH GUNTUPALLI" [ref=e158]
+      - cell "canlıdinle" [ref=e90]
+      - cell "c•••@gmail.com" [ref=e91]
+      - cell "USER" [ref=e92]
+      - cell "Oct 14, 2026" [ref=e93]
+      - cell "Edit role for canlıdinle" [ref=e94]
+        - button "Edit role for canlıdinle" [ref=e159]
+      - cell "James McKillop" [ref=e95]
+      - cell "j•••@gmail.com" [ref=e96]
+      - cell "USER" [ref=e97]
+      - cell "Oct 11, 2026" [ref=e98]
+      - cell "Edit role for James McKillop" [ref=e99]
+        - button "Edit role for James McKillop" [ref=e160]
+      - cell "Lucas" [ref=e100]
+      - cell "l•••@yandex.com" [ref=e101]
+      - cell "USER" [ref=e102]
+      - cell "Oct 11, 2026" [ref=e103]
+      - cell "Edit role for Lucas" [ref=e104]
+        - button "Edit role for Lucas" [ref=e161]
+      - cell "Eungoo Jung" [ref=e105]
+      - cell "a•••@gmail.com" [ref=e106]
+      - cell "USER" [ref=e107]
+      - cell "Oct 10, 2026" [ref=e108]
+      - cell "Edit role for Eungoo Jung" [ref=e109]
+        - button "Edit role for Eungoo Jung" [ref=e162]
+      - cell "Wranker Seo" [ref=e110]
+      - cell "w•••@gmail.com" [ref=e111]
+      - cell "USER" [ref=e112]
+      - cell "Oct 10, 2026" [ref=e113]
+      - cell "Edit role for Wranker Seo" [ref=e114]
+        - button "Edit role for Wranker Seo" [ref=e163]
+      - cell "s•••@chatgptimage.app" [ref=e115]
+      - cell "s•••@chatgptimage.app" [ref=e116]
+      - cell "USER" [ref=e117]
+      - cell "Oct 9, 2026" [ref=e118]
+      - cell "Edit role for s•••@chatgptimage.app" [ref=e119]
+        - button "Edit role for s•••@chatgptimage.app" [ref=e164]
+      - cell "scandylau" [ref=e120]
+      - cell "s•••@gmail.com" [ref=e121]
+      - cell "USER" [ref=e122]
+      - cell "Sep 30, 2026" [ref=e123]
+      - cell "Edit role for scandylau" [ref=e124]
+        - button "Edit role for scandylau" [ref=e165]
+      - cell "CF Audit" [ref=e125]
+      - cell "c•••@awesome.video" [ref=e126]
+      - cell "ADMIN" [ref=e127]
+      - cell "Sep 29, 2026" [ref=e128]
+      - cell "Edit role for CF Audit" [ref=e129]
+        - button "Edit role for CF Audit" [ref=e166]
+      - cell "Alexander Wagner" [ref=e130]
+      - cell "i•••@alexanderwagnerdev.com" [ref=e131]
+      - cell "USER" [ref=e132]
+      - cell "Sep 29, 2026" [ref=e133]
+      - cell "Edit role for Alexander Wagner" [ref=e134]
+        - button "Edit role for Alexander Wagner" [ref=e167]
+      - cell "Valdo Zichar" [ref=e135]
+      - cell "v•••@gmail.com" [ref=e136]
+      - cell "USER" [ref=e137]
+      - cell "Sep 28, 2026" [ref=e138]
+      - cell "Edit role for Valdo Zichar" [ref=e139]
+        - button "Edit role for Valdo Zichar" [ref=e168]
+      - cell "Luiz Alves" [ref=e140]
+      - cell "s•••@gmail.com" [ref=e141]
+      - cell "USER" [ref=e142]
+      - cell "Sep 26, 2026" [ref=e143]
+      - cell "Edit role for Luiz Alves" [ref=e144]
+        - button "Edit role for Luiz Alves" [ref=e169]
+    - button "Previous page" [disabled, ref=e35]
+    - button "Next page" [ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-017-users-1440.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin#users
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - link "AWESOME.VIDEO home" [ref=e4]
+  - button "Search 3,825 resources" [ref=e5]
+  - navigation "Primary" [ref=e6]
+    - link "Browse" [ref=e8]
+    - link "Submit" [ref=e9]
+    - link "About" [ref=e10]
+    - link "Docs ↗" [ref=e11]
+    - link "Admin" [ref=e12]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e13]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e14]
+  - button "Settings" [expanded=false, ref=e15]
+  - button "New entry: add a resource" [ref=e16]
+  - button "Scroll tabs left" [ref=e18]
+  - tablist "Admin sections" [ref=e19] focusable [tabindex]
+    - tab "Overview" [ref=e20]
+    - tab "Approvals" [ref=e21]
+    - tab "Edits" [ref=e22]
+    - tab "Enrichment" [ref=e23]
+    - tab "Researcher" [ref=e24]
+    - tab "Export" [ref=e25]
+    - tab "Database" [ref=e26]
+    - tab "Resources" [ref=e27]
+    - tab "Categories" [ref=e28]
+    - tab "Subcategories" [ref=e29]
+    - tab "Users" [selected, ref=e30]
+    - tab "GitHub" [ref=e31]
+    - tab "Link Health" [ref=e32]
+    - tab "Audit" [ref=e33]
+    - tab "Research" [ref=e34]
+  - tabpanel "Users" [ref=e17] focusable [tabindex]
+    - heading "Users (133)" [level=2, ref=e39]
+    - button "Row actions" [expanded=false, ref=e40]
+    - textbox "Search users by email or name" [ref=e43]
+    - link "Export CSV" [ref=e41]
+    - button "Invite unavailable" [disabled, ref=e42]
+    - region "Users table, scrollable" [ref=e44] focusable [tabindex]
+      - columnheader "Sort by Name" [ref=e145]
+        - button "Sort by Name" [ref=e170]
+      - columnheader "Sort by Email" [ref=e146]
+        - button "Sort by Email" [ref=e171]
+      - columnheader "Sort by Role" [ref=e147]
+        - button "Sort by Role" [ref=e172]
+      - columnheader "Sort by Joined" [ref=e148]
+        - button "Sort by Joined" [ref=e173]
+      - columnheader "Actions" [ref=e149]
+      - cell "m•••@gmail.com" [ref=e45]
+      - cell "m•••@gmail.com" [ref=e46]
+      - cell "USER" [ref=e47]
+      - cell "Oct 26, 2026" [ref=e48]
+      - cell "Edit role for m•••@gmail.com" [ref=e49]
+        - button "Edit role for m•••@gmail.com" [ref=e150]
+      - cell "Oghenejivwe" [ref=e50]
+      - cell "j•••@gmail.com" [ref=e51]
+      - cell "USER" [ref=e52]
+      - cell "Oct 24, 2026" [ref=e53]
+      - cell "Edit role for Oghenejivwe" [ref=e54]
+        - button "Edit role for Oghenejivwe" [ref=e151]
+      - cell "aarthi priya" [ref=e55]
+      - cell "a•••@gmail.com" [ref=e56]
+      - cell "USER" [ref=e57]
+      - cell "Oct 22, 2026" [ref=e58]
+      - cell "Edit role for aarthi priya" [ref=e59]
+        - button "Edit role for aarthi priya" [ref=e152]
+      - cell "Frank Brown" [ref=e60]
+      - cell "f•••@gmail.com" [ref=e61]
+      - cell "USER" [ref=e62]
+      - cell "Oct 21, 2026" [ref=e63]
+      - cell "Edit role for Frank Brown" [ref=e64]
+        - button "Edit role for Frank Brown" [ref=e153]
+      - cell "Sumit Das" [ref=e65]
+      - cell "s•••@gmail.com" [ref=e66]
+      - cell "USER" [ref=e67]
+      - cell "Oct 20, 2026" [ref=e68]
+      - cell "Edit role for Sumit Das" [ref=e69]
+        - button "Edit role for Sumit Das" [ref=e154]
+      - cell "s1" [ref=e70]
+      - cell "o•••@gmail.com" [ref=e71]
+      - cell "USER" [ref=e72]
+      - cell "Oct 19, 2026" [ref=e73]
+      - cell "Edit role for s1" [ref=e74]
+        - button "Edit role for s1" [ref=e155]
+      - cell "Vasilios Vikatos" [ref=e75]
+      - cell "v•••@gmail.com" [ref=e76]
+      - cell "USER" [ref=e77]
+      - cell "Oct 18, 2026" [ref=e78]
+      - cell "Edit role for Vasilios Vikatos" [ref=e79]
+        - button "Edit role for Vasilios Vikatos" [ref=e156]
+      - cell "Mohamed Fouad" [ref=e80]
+      - cell "d•••@gmail.com" [ref=e81]
+      - cell "USER" [ref=e82]
+      - cell "Oct 17, 2026" [ref=e83]
+      - cell "Edit role for Mohamed Fouad" [ref=e84]
+        - button "Edit role for Mohamed Fouad" [ref=e157]
+      - cell "SANTHOSH GUNTUPALLI" [ref=e85]
+      - cell "s•••@gmail.com" [ref=e86]
+      - cell "USER" [ref=e87]
+      - cell "Oct 15, 2026" [ref=e88]
+      - cell "Edit role for SANTHOSH GUNTUPALLI" [ref=e89]
+        - button "Edit role for SANTHOSH GUNTUPALLI" [ref=e158]
+      - cell "canlıdinle" [ref=e90]
+      - cell "c•••@gmail.com" [ref=e91]
+      - cell "USER" [ref=e92]
+      - cell "Oct 14, 2026" [ref=e93]
+      - cell "Edit role for canlıdinle" [ref=e94]
+        - button "Edit role for canlıdinle" [ref=e159]
+      - cell "James McKillop" [ref=e95]
+      - cell "j•••@gmail.com" [ref=e96]
+      - cell "USER" [ref=e97]
+      - cell "Oct 11, 2026" [ref=e98]
+      - cell "Edit role for James McKillop" [ref=e99]
+        - button "Edit role for James McKillop" [ref=e160]
+      - cell "Lucas" [ref=e100]
+      - cell "l•••@yandex.com" [ref=e101]
+      - cell "USER" [ref=e102]
+      - cell "Oct 11, 2026" [ref=e103]
+      - cell "Edit role for Lucas" [ref=e104]
+        - button "Edit role for Lucas" [ref=e161]
+      - cell "Eungoo Jung" [ref=e105]
+      - cell "a•••@gmail.com" [ref=e106]
+      - cell "USER" [ref=e107]
+      - cell "Oct 10, 2026" [ref=e108]
+      - cell "Edit role for Eungoo Jung" [ref=e109]
+        - button "Edit role for Eungoo Jung" [ref=e162]
+      - cell "Wranker Seo" [ref=e110]
+      - cell "w•••@gmail.com" [ref=e111]
+      - cell "USER" [ref=e112]
+      - cell "Oct 10, 2026" [ref=e113]
+      - cell "Edit role for Wranker Seo" [ref=e114]
+        - button "Edit role for Wranker Seo" [ref=e163]
+      - cell "s•••@chatgptimage.app" [ref=e115]
+      - cell "s•••@chatgptimage.app" [ref=e116]
+      - cell "USER" [ref=e117]
+      - cell "Oct 9, 2026" [ref=e118]
+      - cell "Edit role for s•••@chatgptimage.app" [ref=e119]
+        - button "Edit role for s•••@chatgptimage.app" [ref=e164]
+      - cell "scandylau" [ref=e120]
+      - cell "s•••@gmail.com" [ref=e121]
+      - cell "USER" [ref=e122]
+      - cell "Sep 30, 2026" [ref=e123]
+      - cell "Edit role for scandylau" [ref=e124]
+        - button "Edit role for scandylau" [ref=e165]
+      - cell "CF Audit" [ref=e125]
+      - cell "c•••@awesome.video" [ref=e126]
+      - cell "ADMIN" [ref=e127]
+      - cell "Sep 29, 2026" [ref=e128]
+      - cell "Edit role for CF Audit" [ref=e129]
+        - button "Edit role for CF Audit" [ref=e166]
+      - cell "Alexander Wagner" [ref=e130]
+      - cell "i•••@alexanderwagnerdev.com" [ref=e131]
+      - cell "USER" [ref=e132]
+      - cell "Sep 29, 2026" [ref=e133]
+      - cell "Edit role for Alexander Wagner" [ref=e134]
+        - button "Edit role for Alexander Wagner" [ref=e167]
+      - cell "Valdo Zichar" [ref=e135]
+      - cell "v•••@gmail.com" [ref=e136]
+      - cell "USER" [ref=e137]
+      - cell "Sep 28, 2026" [ref=e138]
+      - cell "Edit role for Valdo Zichar" [ref=e139]
+        - button "Edit role for Valdo Zichar" [ref=e168]
+      - cell "Luiz Alves" [ref=e140]
+      - cell "s•••@gmail.com" [ref=e141]
+      - cell "USER" [ref=e142]
+      - cell "Sep 26, 2026" [ref=e143]
+      - cell "Edit role for Luiz Alves" [ref=e144]
+        - button "Edit role for Luiz Alves" [ref=e169]
+    - button "Previous page" [disabled, ref=e35]
+    - button "Next page" [ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-018-github-1440.png
+
+[2330C73D3DB80E8F026D55F06C424FDB] OPTIONS https://i.replit.com/api/send (Other) 204
+[10579.179] POST https://i.replit.com/api/send (Fetch) 200
+[10579.197] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.198] GET https://awesome.video/api/config (Fetch) 200
+[10579.208] POST https://i.replit.com/api/send (Fetch) 200
+[10579.212] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.269] GET https://awesome.video/api/config (Fetch) 200
+[10579.270] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.334] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.335] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.283] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.336] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.337] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.338] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.339] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.341] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.342] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[10579.343] GET https://awesome.video/api/categories (Fetch) 200
+[10579.344] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.345] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[10579.346] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[10579.347] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.348] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[10579.349] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[10579.350] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.351] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[10579.352] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[10579.353] GET https://awesome.video/api/categories (Fetch) 200
+[10579.354] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.355] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.357] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[10579.358] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.359] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.360] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.361] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.362] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.363] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.364] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.365] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.366] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.367] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.368] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.369] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.370] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.371] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.372] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.373] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.374] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.375] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.376] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.377] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.378] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.379] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.380] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.381] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.382] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.383] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.384] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.385] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.386] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.387] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.388] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.389] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.390] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.391] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.392] GET https://awesome.video/api/admin/pending-resources (Fetch)
+[10579.402] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.574] GET https://awesome.video/api/config (Fetch) 200
+[10579.575] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.587] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.638] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.639] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.640] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.641] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.642] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.643] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.645] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.646] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.648] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.649] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.650] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[10579.651] GET https://awesome.video/api/admin/resource-edits (Fetch)
+[10579.662] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.711] GET https://awesome.video/api/config (Fetch) 200
+[10579.712] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.723] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.774] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.775] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.776] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.777] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.778] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.779] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.781] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.782] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.784] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.785] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.786] GET https://awesome.video/api/admin/resource-edits (Fetch) 200
+[10579.787] GET https://awesome.video/api/admin/resource-edits/recent (Fetch)
+[10579.788] GET https://awesome.video/api/health/ai (Fetch)
+[10579.789] GET https://awesome.video/api/enrichment/jobs (Fetch)
+[10579.790] GET https://awesome.video/api/admin/enrichment/coverage (Fetch)
+[10579.801] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[10579.850] GET https://awesome.video/api/config (Fetch) 200
+[10579.851] GET https://awesome.video/api/auth/user (Fetch) 200
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[10579.862] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[10579.913] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.914] GET https://awesome.video/api/user/preferences (Fetch) 200
+[10579.915] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[10579.916] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[10579.917] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.918] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[10579.920] GET https://awesome.video/api/health/ai (Fetch) 200
+[10579.921] GET https://awesome.video/api/enrichment/jobs (Fetch) 200
+[10579.922] GET https://awesome.video/api/admin/enrichment/coverage (Fetch) 200
+[10579.923] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.924] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.926] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.927] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[10579.928] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.929] GET https://awesome.video/api/researcher/config (Fetch) 200
+[10579.930] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+[10579.931] GET https://awesome.video/api/researcher/discoveries (Fetch) 200
+[10579.932] GET https://awesome.video/api/awesome-list (Fetch) 200
+[10579.934] GET https://awesome.video/api/admin/database-backups (Fetch) 200
+[10579.935] GET https://awesome.video/api/admin/validation-status (Fetch) 200
+[10579.936] GET https://awesome.video/api/admin/audit-logs?limit=20&offset=0&actions=catalog.exported,database.exported,resources.exported,categories.exported (Fetch) 200
+[10579.937] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[10579.940] GET https://awesome.video/api/categories (Fetch) 200
+[10579.941] GET https://awesome.video/api/subcategories (Fetch) 200
+[10579.942] GET https://awesome.video/api/sub-subcategories (Fetch) 200
+[10579.943] GET https://awesome.video/api/admin/resources?page=1&limit=25&status=approved (Fetch) 200
+[10579.944] GET https://awesome.video/api/admin/resources?page=1&limit=1 (Fetch) 200
+[10579.945] GET https://awesome.video/api/admin/resources?page=1&limit=1&status=approved&featured=true (Fetch) 200
+[10579.947] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[10579.948] GET https://awesome.video/api/admin/categories (Fetch) 200
+[10579.950] GET https://awesome.video/api/admin/stats (Fetch) 200
+[10579.951] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[10579.953] GET https://awesome.video/api/admin/users?page=1&limit=20&sortBy=createdAt&sortDir=desc (Fetch) 200
+
+

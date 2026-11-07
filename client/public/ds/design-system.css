@@ -1,6 +1,8 @@
 /* =====================================================================
    AWESOME.VIDEO — STYLES
-   Tokens come from design-systems.jsx via `applyDesignSystem()`.
+   Tokens come from design-system.js via `applyDesignSystem()`.
+   Vite injects font defaults after this sheet from font-options.ts, including
+   the no-JavaScript document; font stacks are never maintained in this file.
    Per-system component skins live at the bottom under [data-system="..."].
    ===================================================================== */
 
@@ -20,9 +22,6 @@
   --text-4: rgba(244,243,238,0.22);
   --accent: #ff3d52;
   --accent-2: #b84dff;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --display-weight: 500;
   --display-tracking: -0.02em;
   --display-leading: 1.04;

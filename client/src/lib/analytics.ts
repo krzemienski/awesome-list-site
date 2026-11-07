@@ -5,9 +5,10 @@
 //    exactly once per navigation from a single source (use-analytics), and adds
 //    `debug_mode` in DEV so events surface in GA4 DebugView.
 //  - Every custom event goes through the module-private `track()`, which
-//    lazily loads the shared dispatcher (analytics-dispatch.ts) after consent.
-//    The dispatcher cleans properties once (analytics-hygiene.ts) and fans the
-//    event out to GA4, Mixpanel, PostHog and Amplitude. GA4's half lands in
+//    lazily loads the shared dispatcher (analytics-dispatch.ts). The
+//    dispatcher cleans properties once (analytics-hygiene.ts) and fans the
+//    event out to GA4, Mixpanel, PostHog and Amplitude after consent, and to
+//    Replit Analytics unless the visitor declined. GA4's half lands in
 //    `sendGaEvent` together with sanitized GA4 page context (page_location
 //    keeps only attribution params; path-only page_path; origin+path referrer).
 //  - Tracking plan + shared event catalog: docs/ANALYTICS.md. New events are
@@ -19,6 +20,7 @@
 
 import { captureAcquisition, getAcquisition } from './acquisition';
 import type { AnalyticsDispatchRequest } from './analytics-dispatch';
+import { isAnalyticsSuppressed } from './analytics-suppression';
 
 // Define the gtag function globally
 declare global {
@@ -39,6 +41,9 @@ export const ANALYTICS_VENDORS = [
   { name: 'Mixpanel', configured: Boolean(import.meta.env.VITE_MIXPANEL_TOKEN) },
   { name: 'PostHog', configured: Boolean(import.meta.env.VITE_POSTHOG_KEY) },
   { name: 'Amplitude', configured: Boolean(import.meta.env.VITE_AMPLITUDE_API_KEY) },
+  // Replit Analytics is not listed: the platform injects its cookie-free
+  // tracker into every published page, so it is not something the banner can
+  // switch on. Only an explicit Decline stops the app's custom events to it.
 ].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
 
 // BUG-020 (run13): analytics is consent-gated. The choice lives in
@@ -56,6 +61,14 @@ export const getAnalyticsConsent = (): AnalyticsConsent => {
     return null;
   }
 };
+
+/**
+ * Gate for starting a vendor SDK (GA4, Mixpanel, PostHog, Amplitude): a
+ * grant, and not an admin session or QA path. SDKs that never start cannot
+ * send their own page views, autocapture or identity calls.
+ */
+export const vendorSdksAllowed = (): boolean =>
+  getAnalyticsConsent() === 'granted' && !isAnalyticsSuppressed();
 
 export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
   try {
@@ -88,13 +101,14 @@ const domainOf = (url: string): string | undefined => {
 // mount-only init would drop the initial page_view.
 let gaInitialized = false;
 
+const MAX_PENDING_GA_EVENTS = 100;
 const pendingEvents: Array<{
   name: string;
   params: Record<string, unknown>;
   context: Record<string, unknown>;
 }> = [];
 export const initGA = () => {
-  if (getAnalyticsConsent() !== 'granted') return;
+  if (!vendorSdksAllowed()) return;
 
   const measurementId = getMeasurementId();
 
@@ -204,8 +218,11 @@ export const sendGaEvent = (
   if (!window.gtag) {
     // With a persisted grant, React can emit its initial page_view before the
     // deferred post-paint SDK bootstrap. Preserve those events without ever
-    // queueing anything before consent.
-    pendingEvents.push({ name, params, context });
+    // queueing anything before consent or while suppressed. Bounded, because
+    // without a measurement id gtag never loads to drain it.
+    if (vendorSdksAllowed() && pendingEvents.length < MAX_PENDING_GA_EVENTS) {
+      pendingEvents.push({ name, params, context });
+    }
     return;
   }
 
@@ -229,7 +246,8 @@ export const trackPageView = (_url?: string) => {
       page_title: typeof document !== 'undefined' ? document.title : undefined,
       referrer_origin: referrerOrigin(),
     },
-    { ga: { name: 'page_view', params: {} } },
+    // Replit Analytics records page views itself.
+    { ga: { name: 'page_view', params: {} }, replit: false },
   );
 };
 
@@ -270,10 +288,15 @@ export const trackLogin = (method: string) => {
 
 // User created an account. Carries first-touch acquisition.
 export const trackSignUp = (method: string) => {
-  // Product half (sign_up_completed) is emitted SERVER-side to Mixpanel from
-  // Clerk JIT provisioning (Task #233) so ad blockers can't undercount it — do
-  // not enable `product` here or the conversion double-counts.
-  track('sign_up', { method, ...getAcquisition() }, { product: false });
+  // Mixpanel's sign_up_completed is emitted SERVER-side from Clerk JIT
+  // provisioning so ad blockers can't undercount it — `product` stays off or
+  // that conversion double-counts. Replit Analytics has no server feed, so it
+  // gets the same catalog name from here (GA4 keeps its `sign_up` name).
+  track(
+    'sign_up_completed',
+    { signup_method: method, ...getAcquisition() },
+    { ga: { name: 'sign_up', params: { method, ...getAcquisition() } }, product: false, replit: true },
+  );
 };
 
 // User selected/opened a piece of content (e.g. viewed a resource detail).
@@ -300,10 +323,32 @@ export const trackSelectContent = (
 
 // User completed a lead-generating form (e.g. submitted a resource).
 export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
-  // Product half (resource_submitted) is emitted SERVER-side from the
-  // resource-submit handler (Task #233) — do not enable `product` here or the
-  // conversion double-counts.
-  track('generate_lead', { ...params, ...getAcquisition() }, { product: false });
+  // Mixpanel's resource_submitted is emitted SERVER-side from the submit
+  // handler — `product` stays off or that conversion double-counts. Replit
+  // Analytics has no server feed, so it gets the same catalog name from here
+  // (GA4 keeps its `generate_lead` name).
+  const props = { ...params, ...getAcquisition() };
+  track('resource_submitted', props, {
+    ga: { name: 'generate_lead', params: props },
+    product: false,
+    replit: true,
+  });
+};
+
+// A visitor landed on a "page not found" surface. Every tool gets the path
+// only (a query string can carry typed search text or tokens), capped in
+// length; GA4 keeps its legacy UA-style param names.
+export const trackPageNotFound = (pathname: string) => {
+  const path = pathname.split(/[?#]/, 1)[0].slice(0, 200) || '/';
+  track(
+    'page_not_found',
+    { page_path: path },
+    {
+      ga: { name: 'page_not_found', params: { event_category: 'navigation', event_label: path } },
+      product: false,
+      replit: true,
+    },
+  );
 };
 
 export type AuthPromptContext =
@@ -517,7 +562,8 @@ export const trackApiPerformance = (
   );
 };
 
-// Track Core Web Vitals. LCP/FID/INP are milliseconds; CLS is a unitless score,
+// Track Core Web Vitals (LCP, INP, CLS) and the loading diagnostics FCP and
+// TTFB, all from web-vitals. Times are milliseconds; CLS is a unitless score,
 // so retain enough precision for the score to remain useful in GA4.
 export const trackPerformance = (metric: string, value: number) => {
   if (!Number.isFinite(value)) return;
@@ -527,13 +573,29 @@ export const trackPerformance = (metric: string, value: number) => {
   track(
     'performance',
     { metric_name: normalizedMetric, value: reportedValue },
-    { product: false },
+    { product: false, replit: true },
   );
 };
 
 // Track error events.
-export const trackError = (errorType: string, errorMessage: string) => {
+export const trackError = (errorType: SiteErrorType, errorMessage: string) => {
   track('error', { error_type: errorType, error_message: errorMessage }, { product: false });
+  trackSiteError(errorType);
+};
+
+export type SiteErrorType =
+  | 'javascript_error'
+  | 'unhandled_promise_rejection'
+  | 'api_error'
+  | 'component_crash'
+  | 'route_crash'
+  | 'chunk_load_failed'
+  | 'page_load_failed';
+
+// Replit Analytics half of every site error: the error TYPE only — never the
+// message, which can carry URLs, copied text or query values.
+export const trackSiteError = (errorType: SiteErrorType) => {
+  track('site_error', { error_type: errorType }, { ga: false, product: false, replit: true });
 };
 
 export const trackFilterUsage = (
@@ -617,16 +679,24 @@ const queuedDispatches: AnalyticsDispatchRequest[] = [];
 
 /**
  * The single entry point for every custom event: one call reaches GA4,
- * Mixpanel, PostHog and Amplitude with identically cleaned properties.
- * Pre-consent it returns before doing anything — the dispatcher chunk (and
- * the property-hygiene rules inside it) is only fetched after a grant.
+ * Mixpanel, PostHog, Amplitude and Replit Analytics with identically cleaned
+ * properties. The four banner-named vendors only receive events after a
+ * grant; Replit Analytics (cookie-free, no identifiers) also receives them
+ * while the visitor has not chosen, and nothing is sent after a Decline.
+ * Nothing is sent from an admin session or a QA path.
  * Components never call it directly: they use typed helpers — the ones in
  * this file or an area module (analytics-<area>.ts) — so the catalog in
  * docs/ANALYTICS.md stays the one place event names are decided.
  */
 export const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
   if (typeof window === 'undefined') return;
-  if (getAnalyticsConsent() !== 'granted') return;
+  // Admin sessions and QA paths reach no vendor (analytics-suppression.ts).
+  if (isAnalyticsSuppressed()) return;
+  const consent = getAnalyticsConsent();
+  if (consent === 'denied') return;
+  const product = options.product !== false;
+  const replit = options.replit ?? product;
+  if (consent !== 'granted' && !replit) return;
   const ga =
     options.ga === false
       ? null
@@ -635,7 +705,9 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     name,
     props,
     ga,
-    product: options.product !== false,
+    product,
+    replit,
+    pageUrl: location.href,
   };
   if (dispatch) {
     dispatch(request);
@@ -656,7 +728,12 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     });
 };
 
-export type CommandPaletteOpenMethod = 'keyboard_shortcut' | 'slash_key' | 'header_button';
+export type CommandPaletteOpenMethod =
+  | 'keyboard_shortcut'
+  | 'slash_key'
+  | 'header_button'
+  | 'resource_page_button'
+  | 'listing_page_button';
 const referrerOrigin = (): string | undefined => {
   if (typeof document === 'undefined' || !document.referrer) return undefined;
   try {
@@ -678,18 +755,38 @@ interface TrackOptions {
   /**
    * Mixpanel + PostHog + Amplitude. Default true; `false` only for the legacy
    * GA4-only events (page_view, page_engaged, performance, api_performance,
-   * error, theme_change, resource_favorite, sign_up, generate_lead,
-   * outbound_link, page_not_found) so their vendor coverage is unchanged.
+   * error, theme_change, resource_favorite, outbound_link) and the client
+   * halves of server-emitted conversions (sign_up_completed,
+   * resource_submitted) so their vendor coverage is unchanged.
    */
   product?: boolean;
+  /**
+   * Replit Analytics. Default: same as `product`. `false` for page_viewed
+   * (the platform records page views); `true` for non-product events that
+   * should still reach Replit Analytics (performance, page_not_found,
+   * site_error, sign_up_completed, resource_submitted).
+   */
+  replit?: boolean;
 }
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
 type EventProps = Record<string, unknown>;
 
-export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod) => {
-  track('command_palette_opened', { open_method: method });
+// A visitor switched tabs on a multi-tool page (e.g. Discovery tools).
+export const trackToolTabOpened = (page: string, tab: string) => {
+  track('tool_tab_opened', { page, tab });
+};
+
+// The contact form was accepted by the server. No properties: the form text,
+// name and address are never sent, and the reply address is mandatory, so a
+// "reply requested" flag would always be true.
+export const trackContactMessageSent = () => {
+  track('contact_message_sent');
+};
+
+export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod, surface?: string) => {
+  track('command_palette_opened', { open_method: method, surface });
 };
 
 export const trackExportStarted = (info: ExportEventInfo) => {
@@ -718,6 +815,73 @@ export const trackResourceCardOpened = (
     surface,
     card_control: control,
   });
+};
+
+export const trackRelatedResourceOpened = (
+  resourceId: string | number,
+  fromResourceId: string | number,
+  position: number,
+  matchScore?: number,
+  surface = 'related_list',
+) => {
+  track('related_resource_opened', {
+    resource_id: String(resourceId),
+    from_resource_id: String(fromResourceId),
+    position,
+    match_score: matchScore,
+    surface,
+  });
+};
+
+export const trackRelatedCategoryOpened = (
+  fromResourceId: string | number,
+  category: string,
+  surface = 'related_list',
+) => {
+  track('related_category_opened', {
+    from_resource_id: String(fromResourceId),
+    category,
+    surface,
+  });
+};
+
+export type ResourceNextStep =
+  | { kind: 'category'; categorySlug: string }
+  | { kind: 'related'; targetId: string | number; position: number };
+
+/** A visitor followed a next-step link near the top of a resource page. */
+export const trackResourceNextStepClicked = (
+  surface: 'resource_top',
+  fromResourceId: string | number,
+  step: ResourceNextStep,
+) => {
+  track('resource_next_step_clicked', {
+    surface,
+    kind: step.kind,
+    from_resource_id: String(fromResourceId),
+    ...(step.kind === 'category'
+      ? { target_slug: step.categorySlug }
+      : { target_id: String(step.targetId), position: step.position }),
+  });
+};
+
+export type SubmitFormStep = 'sign_in_required' | 'details' | 'category' | 'review';
+
+export const trackSubmitFormStarted = (signedIn: boolean) => {
+  track('submit_form_started', { signed_in: signedIn });
+};
+
+export const trackSubmitStepCompleted = (step: SubmitFormStep) => {
+  track('submit_step_completed', { step });
+};
+
+/** `field` is the form field NAME only, never what the visitor typed. */
+export const trackSubmitValidationFailed = (field: string, source: 'client' | 'server') => {
+  track('submit_validation_failed', { field, source });
+};
+
+export const trackSubmitFormSubmitted = (tagCount: number, hasSubcategory: boolean) => {
+  track('submit_form_submitted', { tag_count: tagCount, has_subcategory: hasSubcategory });
 };
 
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {

@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<h1 class=\"page-title text-3xl sm:text-4xl\" data-route-focus=\"\" tabindex=\"-1\">Saved, then <em class=\"not-italic text-primary\">finished.</em></h1>",
+  "umami": "1",
+  "consent": "denied"
+}

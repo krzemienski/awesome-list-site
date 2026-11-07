@@ -1,0 +1,18 @@
+[48639.234] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.304] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.564] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.567] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.568] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.569] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.570] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.571] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.572] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.573] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.574] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.575] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.576] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.807] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.809] GET https://awesome.video/api/awesome-list (Fetch)
+[48639.810] GET https://awesome.video/api/awesome-list (Fetch) 200
+[48639.821] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[48639.822] GET https://awesome.video/api/awesome-list (Fetch) 200

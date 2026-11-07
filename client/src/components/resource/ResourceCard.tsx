@@ -254,7 +254,7 @@ function ResourceCard({
           <ExternalLink className="h-4 w-4 mr-2" />
           <span className="resource-card__visit-label">Open Link</span>
           {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
-          <span className="sr-only">{`${resource.name} (opens in new tab)`}</span>
+          <span className="sr-only">{` ${resource.name} (opens in new tab)`}</span>
         </a>
       </Button>
       {isValidDbResource && showPersonalActions && (
@@ -279,6 +279,7 @@ function ResourceCard({
       className={cn(
         "resource-card card hoverable glow group relative",
         variant === "taxonomy" && "resource-card--taxonomy",
+        variant === "taxonomy" && showPersonalActions && "resource-card--personal",
         className
       )}
       onClick={onClick ? handleCardClick : undefined}
@@ -289,6 +290,16 @@ function ResourceCard({
           <div className="resource-card__mark" aria-hidden="true">
             {categoryMark}
           </div>
+          {isTaxonomy && (
+            /* C4-V1-01: hover/focus-only controls float beside the mark, so
+               revealing them never moves a tag pill. Being in this top row in
+               the DOM too, Tab reaches them before the title and tags. */
+            <div className="resource-card__reveal">
+              {viewDetailsLink}
+              {moreTagsButton}
+              {visitActions}
+            </div>
+          )}
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
           <div className="resource-card__top-actions">
@@ -386,16 +397,6 @@ function ResourceCard({
                 />
               </div>
             )}
-            {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
-              <div className="resource-card__scraped-copy">
-                <span>Page Title:</span> {fullResource.metadata.scrapedTitle}
-              </div>
-            )}
-            {fullResource.metadata.scrapedDescription && fullResource.metadata.scrapedDescription !== resource.description && (
-              <div className="resource-card__scraped-copy resource-card__scraped-copy--clamp">
-                <span>Page Description:</span> {fullResource.metadata.scrapedDescription}
-              </div>
-            )}
           </div>
         )}
         
@@ -443,18 +444,7 @@ function ResourceCard({
           )}
         </div>
         
-        {isTaxonomy ? (
-          /* C4-V1-01: the taxonomy card's hover/focus-only controls float in
-             the empty band beside the mark instead of joining the chip row, so
-             revealing them never moves a tag pill or resizes the card. */
-          <div className="resource-card__reveal">
-            {viewDetailsLink}
-            {moreTagsButton}
-            {visitActions}
-          </div>
-        ) : (
-          visitActions
-        )}
+        {!isTaxonomy && visitActions}
       </CardContent>
 
       {suggestEditOpen && showPersonalActions && (

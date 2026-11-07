@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/category/encoding-codecs?search=ffmpeg&view=compact\",\"view\":\"on\",\"coarse\":true,\"buttons\":[{\"label\":\"Open in new tab\",\"w\":44,\"h\":44},{\"label\":\"Open in new tab\",\"w\":44,\"h\":44},{\"label\":\"Open in new tab\",\"w\":44,\"h\":44}]}"

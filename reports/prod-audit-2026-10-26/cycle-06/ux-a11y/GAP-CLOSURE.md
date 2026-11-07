@@ -1,0 +1,5 @@
+Complete remaining ux-a11y cycle-6 production coverage on https://awesome.video at 520d6778369bc7ce495204cfcacc7e0533f941cc. Read reports/prod-audit-2026-10-26/cycle-06/BRIEF.md, cycle-06/ux-a11y/findings.md and all assigned public-a11y/shared-admin rows in the two inventory files. Do not edit code or merge/deploy.
+
+Drive every UNVERIFIED row at 1440x900, 820x1180 touch and 390x844 touch, including complete fragment Back/Forward/malformed/missing cases, offline/online-unreachable distinctions, keyboard/focus/targets, reduced motion, admin shell, responsive navigation and error recovery. AX-020/021/022 are being fixed separately; do not duplicate code work. Use signed-out public context and authorized owner session for read-only admin only; never sign out, mutate real rows or run paid jobs. Decline analytics and set umami.disabled=1.
+
+Every UI PASS needs real interaction, fresh screenshot, accessibility snapshot and console/network state personally reviewed. No test files/mocks/validation harnesses. Return a complete assigned-row verdict matrix with evidence and exact BLOCKED/UNVERIFIED reasons; do not promote incomplete or wrong-target captures.

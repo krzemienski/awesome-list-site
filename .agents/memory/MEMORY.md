@@ -63,7 +63,7 @@
 - [Shared PG rate-limit store](pg-shared-rate-limit-store.md) — limits are global via rate_limit_hits; localKeys=false stores need distinct `prefix` or layered limiters trip ERR_ERL_DOUBLE_COUNT; fails open to memory on DB trouble.
 - [Export URL normalization](export-url-normalization.md) — export strips trailing slashes (a live slashed URL can 404 slashless); allowlist bare domains, %-encoded entries never match.
 - [awesome_bot export check](awesome-bot-export-check.md) — gem via nix-shell ruby; chunk big lists past the 5-min shell budget; ReadTimeout/418/202 are bot-blocks, not dead.
-- [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.
+- [www/apex split-brain DNS](www-domain-split-brain.md) — www handled only at Cloudflare edge; current redirect rule loops (Location lacks https://); connector token lacks ruleset perms.
 - [z.json() wire vs memory](zod-json-wire-vs-memory.md) — res.json-wrapper validation sees pre-serialization bodies; z.json() rejects Dates → false mismatch spam; validate JSON.stringify-ability instead.
 - [Link Health scan lifecycle](link-health-scan-lifecycle.md) — dashboard flags = latest COMPLETED job only; URL fixes need a fresh ~90-min scan; "suspect" = off-domain redirect, repoint to final host.
 - [HTTP cache edge rewrite](http-cache-edge-rewrite.md) — Google-Frontend can downgrade a cookie-less first asset response to private when it emits GAESA; verify origin policy separately.
@@ -91,7 +91,7 @@
 - [Vite component probes](vite-browser-component-probes.md) — discover dependency URLs from transformed modules; optimized CJS React dependencies may expose default rather than named exports.
 - [cmdk live regions](cmdk-live-region-placement.md) — audit populated results too; aria-live count elements inside the listbox violate its required-child semantics.
 - [Lighthouse Lantern loopback artifact](lantern-loopback-artifact.md) — simulate scores vs 127.0.0.1 sit ~5–15 below same-day prod for identical code (bundle/fonts enter the FCP graph, h1 chunk fan-out); compare same tool same day, probe with real throttling.
-- [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
+- [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — historical: the .page::before/::after clip and --bg-atmosphere-clip token are gone from the CSS; re-measure against current .page rules before re-applying.
 - [Census state replay](census-state-replay.md) — historical global control ordinals drift across layout/disclosure states; repeated controls require a stable resource owner.
 - [JIT teardown order](jit-teardown-order.md) — delete the Clerk user BEFORE the local row; a live session re-provisions it via JIT within seconds, faking net-zero.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
@@ -129,7 +129,7 @@
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
 - [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
-- [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.
+- [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; "/" kept in headings (iOS/tvOS); dry run writes nothing, `wouldCreateTaxonomy` should be empty on prod.
 - [AI job liveness](ai-job-liveness.md) — enrichment/research orphans judged by worker_id+heartbeat, not age; queue leftovers → 'cancelled'; USD-cap stops = budget_stopped.
 - [Full database backup design](database-backup-design.md) — private storage, no download route, CLI-only restore, archive-derived counts; never claim api_keys are hashed.
 - [Parity header-band split](header-band-split.md) — approved tablet header deviations judged band (≤5%) vs body (≤0.5%); add widths only with user approval.
@@ -141,16 +141,10 @@
 - [Page title face](page-title-face.md) — page h1s use .page-title (body face 700) per the reference; display face only for wordmark/numerals/state titles/accents.
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
-- [Server-authoritative JSON-LD](jsonld-server-authority.md) — og-middleware emits route JSON-LD; client SEOHead ships none, so the two pipelines never produce conflicting graphs.
 - [Resource browsing parity](resource-browsing-parity.md) — listing pages share ResourceCard; SSR prerender must flatten the SAME tree the client fetches (24/page lockstep), not a parallel DB query.
-- [Crawler prerender versus SSR](spa-crawler-prerender.md) — semantic crawler markup is not hydrateable React; exact-tree SSR also needs the client manifest's split CSS before paint.
-- [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
 - [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.
-- [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
 - [Playwright browsers here](playwright-browser-version-pin.md) — revision comes from @playwright/test + test:e2e:browsers; WebKitGTK runtime rules; WebKit never gets a Clerk session over http (skip, don't fix).
 - [Playwright audit batching](playwright-audit-batching.md) — full-goto sweeps die at 120s (≤8/call); SPA pushState+popstate nav reuses the cached tree (~0.75s/route) → ~100 routes/call; count parity vs nested tree count.
-- [Client/server noindex lockstep](seo-client-server-noindex-lockstep.md) — every server-noindex route must pass `noindex` to client SEOHead, or hydration adds a contradictory indexable robots + self-canonical.
-- [Canonical base env divergence](canonical-base-env-divergence.md) — client canonical uses VITE_SITE_URL (stale github.io in .env), server uses SITE_URL; they can disagree, but noindex pages omit canonicals so are safe.
 - [Claude Agent SDK migration](agent-sdk-migration.md) — shared router resolver (fail-closed on URL-without-cred), alias subagent models, token-only override pinned to router, tool lockdown, SDK peers.
 - [LLM JSON output hygiene](llm-json-output-hygiene.md) — small max_tokens truncates JSON mid-string and the catch->fallback masks it for months; slice outermost braces + assert generationType, not just 200s.
 - [Publish diff vs boot migrator](publish-diff-vs-boot-migrator.md) — Publish pre-applies the dev schema diff to prod, then the boot migrator re-runs the same DDL; every migration MUST be idempotent or publish 42P07-loops.
@@ -158,43 +152,38 @@
 - [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
 - [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id; never count msgs as unanswered calls; dedupe tokens by id.
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
-- [Reserved characters in SPA routes](reserved-character-spa-routes.md) — encode canonical path segments once; dotted routes need exemptions from asset detection, and percent escapes must not be lowercased.
-- [New SPA route registration](spa-new-route-registration.md) — a wouter Route alone 404s: also add KNOWN_ROUTE_PATTERNS (App.tsx), AppHeader crumb labels, og-middleware staticRoutes + SEOHead parity.
 - [Browser lease cleanup ownership](browser-lease-cleanup-ownership.md) — a released slot can belong to another worker; verify the exact run's process tree before terminating browsers.
 - [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0, Select scroll-to-top mid smooth scroll: re-check recipes before logging a bug.
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [Browser capture protocol](browser-capture-protocol.md) — determinism knobs, the 16384px tile-and-stitch ceiling, pre-paint filmstrip reading, and the three read-only enforcement layers.
 - [Axe first-frame animation race](axe-first-frame-race.md) — reduced-motion animations still paint opacity 0 for a frame; wait 2 rAF + finite animations before axe.
-- [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; never republish mid-wave.
+- [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; autosave also commits untracked files (634e8afd); never republish mid-wave or with a dirty/untracked workspace.
 - [Aborted agent run usage](aborted-agent-run-usage.md) — cancelled SDK runs emit no result msg; accumulate streamed usage (lower bound); count the enrichment queue the server way before paid scratch runs.
 - [Live smoke of production](live-smoke-prod-revision.md) — publish may leave prod on the parent commit; verify by server-behaviour markers; prod sign-up blocked → owner account net-zero.
 - [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
 - [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
 - [Publish build gate isolation](publish-build-gate-isolation.md) — deploy-build gates run with PROD env before the schema diff applies; never boot the app or open a DB there (chicken-and-egg block + scratch-DB DDL hit prod).
-- [Validation workflow registration](validation-workflow-registration.md) — drift gates are validation workflows via setValidationCommand (configureWorkflow hits the 10-workflow cap); in-process contract harness must install+probe before registerRoutes.
-- [Completion gate DB contention](completion-gate-db-contention.md) — DB-outage + crawl gates must share the "db-heavy" file lease (gate-lease.mjs); fixed sleep staggers lose the race as the suite grows.
-- [Validation thread exhaustion](validation-thread-exhaustion.md) — EAGAIN/lost listeners cascade; cgroup pids.max ~1152 caps parallel Chromium auditors at ~6.
-- [Cold-cache gate flattery](cold-cache-gate-flattery.md) — a crawl gate passing right after a warm-up burst proves nothing; confirm cold-boot solo (ladders lose to sustained saturation — cap uncached resolutions below the pool).
 - [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.
 - [Dead-code reachability gate](dead-code-reachability-gate.md) — BFS from execution roots (importer counts miss mutual clusters); strip comments/.js→.ts swap; repo root is a separate blind spot needing an evidence gate.
-- [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.
-- [Last-green gate baselines](last-green-baselines.md) — lint/integration were never green; diff per file+test vs last green sha; e2e runs all 5 projects (~40 min, background it).
-- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
 - [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
 - [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
-- [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
 - [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
-- [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
-- [DS verify skill copies](ds-verify-skill-copies.md) — repo copy authoritative (mirror .local); the frozen verbatim skill always FAILs this app’s data-ds hooks; md5 both before a panel.
-- [DS deep gates vs Claude Design](ds-gates-post-claude-design.md) — post-adoption deep verify FAIL is baseline (frozen gates/pre-boot, ENOENT design-system.css, swiss/orange gate race); restore docs/parity after runs.
 - [Dead-code gates miss harness readers](dead-code-harness-readers.md) — tests/parity reads app source by path; grep tests/ scripts/ for file+symbol before deleting or un-exporting.
 - [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
 - [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev; must hold db-heavy lease while up or seo-snapshot sheds random /tag/* 503s.
 - [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
-- [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
 - [Analytics browser verification](analytics-browser-verification.md) — PostHog drops headless; Mixpanel/GA resend on quick nav → count $insert_id or wait 15s; sanitizer drops `email*` keys.
 - [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes never reach stored kinds; never bulk-reset (erases admin overrides).
 - [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.
 - [Click-time auth gates](click-time-auth-gates.md) — isAuthenticated is provisional false while auth resolves; click gates must wait on isAuthPending.
+- [CLS hidden under the prerender hold](hidden-fallback-cls.md) — occluded layout still counts; seed boot data + await route chunk + modulepreload; banner copy is first-visit LCP.
+- [Pageview titles from loading heads](pageview-loading-titles.md) — analytics read the title ~300ms after soft nav; loading heads must name the page (SEOHead `loading`).
+- [Sync history run matching](sync-history-run-matching.md) — tie history rows to queue runs by queueId/commitSha identity; time windows mis-attribute commits when exports overlap.
+- [Clerk conversion detection](clerk-conversion-detection.md) — one-step Clerk sign-in/up never expose in-flight status; trigger on signed-out→session; tight createdAt window + per-user guard.
+- [Umami SPA pageviews wiped](umami-spa-pageviews-history-restore.md) — SSR-hold cleanup reassigns saved history.pushState, dropping the Replit tracker's hook; only landing pageviews record.
+- [Server logging conventions](server-logging.md) — one area logger, job start/outcome/reason; scrubPath must keep readable slugs; JIT sign-up needs .returning() or concurrent calls triple-count.
+- [Radix Tabs double activation](radix-tabs-double-activation.md) — Radix Tabs ≥1.2 calls onValueChange twice per click; use @/components/ui/tabs (dedupes), never Radix Tabs directly; count one event per click.
+- [Window Escape vs overlays](window-escape-default-prevented.md) — Radix layers preventDefault the Escape they consume; window/document Escape handlers must skip defaultPrevented events.
+- [Research admission guard](research-admission-guard.md) — POST /api/researcher/start returns 409 RESEARCH_JOB_ACTIVE while a run is live; prove it via the real path (start, start again, DELETE /api/researcher/jobs/:id), never a hand-inserted row (local PG tz skew makes it look orphaned).

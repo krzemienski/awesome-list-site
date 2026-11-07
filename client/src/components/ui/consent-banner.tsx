@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useAppBottomInset } from "@/hooks/use-app-bottom-inset";
 import {
   ANALYTICS_VENDORS,
@@ -13,6 +18,7 @@ import {
 import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
 import { initPosthog, optOutPosthog } from "@/lib/posthog";
 import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
+import { clearAcquisition } from "@/lib/acquisition";
 import "@/styles/pages/system-overlays.css";
 import { useHomeBoot } from "@/lib/home-boot";
 
@@ -44,22 +50,20 @@ export default function ConsentBanner() {
       ? homeBoot?.consent !== null
       : getAnalyticsConsent() !== null,
   );
-  // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
-  // banner grew tall enough to sit over the /login submit button. Track a
-  // compact breakpoint so we can render a single-row, reduced-copy bar there.
-  // R4-042: ALSO go compact on short viewports (<500px tall, e.g. 812×375
-  // landscape) — the two-row banner covered the Sign-in CTA there; the compact
-  // single-row bar is short enough to leave it reachable at first paint.
-  const isCompactViewport = () =>
-    typeof window !== "undefined" && (window.innerWidth < 360 || window.innerHeight < 500);
-  // A server cannot know the exact visual viewport. Keep the first hydrated
-  // markup equal to SSR, then apply the compact breakpoint in the effect below.
-  const [isCompact, setIsCompact] = useState(
-    () => (isInitialHomeHydration ? false : isCompactViewport()),
-  );
+  // Cookie settings is a modal dialog, separate from the first-visit banner:
+  // it shows the saved choice, lets the visitor change it, and Cancel/Escape
+  // leave that choice exactly as it was.
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [draft, setDraft] = useState<"granted" | "denied" | "">("");
   const [legacyConsentReconciled, setLegacyConsentReconciled] = useState(
     () => !isInitialHomeHydration,
   );
+  // The server-rendered Home banner is inert until React hydrates: a click on
+  // its buttons before then is dropped and the banner silently stays. Render
+  // them disabled (identically on server and first client render) until the
+  // mount effect proves the handlers are attached.
+  const [interactive, setInteractive] = useState(() => !isInitialHomeHydration);
+  useEffect(() => setInteractive(true), []);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   // Two consumers of the same node: `bannerRef` for the focus move on re-open,
   // and state so the inset hook re-observes if React ever swaps the element.
@@ -92,19 +96,13 @@ export default function ConsentBanner() {
   }, [choiceMade]);
 
   // Task #380: the banner no longer reaches into layout it does not own. It is
-  // a row of the #root column (index.css) — `order-first` in flow at the top
-  // below 640px, `sticky bottom-0` from 640px up — so normal flow keeps page
-  // content and the footer clear of it without any padding written onto body,
-  // #root or the footer's container. The one thing flow cannot move is
+  // the last row of the #root column (index.css), `position: sticky; bottom: 0`
+  // at every width, so normal flow keeps page content and the footer clear of
+  // it without any padding written onto body, #root or the footer's container.
+  // Being last in the DOM and last on screen at every width keeps focus order
+  // and visual order the same (WCAG 2.4.3). The one thing flow cannot move is
   // viewport-fixed UI, which reads the shell's --app-bottom-inset instead.
   useAppBottomInset(bannerEl, !choiceMade);
-
-  useEffect(() => {
-    const onResize = () => setIsCompact(isCompactViewport());
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   // Existing installations stored consent only in localStorage. New decisions
   // also set a small same-site cookie for SSR, while this one-time post-hydrate
@@ -142,7 +140,10 @@ export default function ConsentBanner() {
   useEffect(() => {
     if (choiceMade) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
+      // An overlay that consumed this Escape (Radix dialogs, sheets and the
+      // search palette preventDefault when they close) owns it; the banner
+      // only dismisses on an Escape nothing else claimed.
+      if (e.key !== "Escape" || e.defaultPrevented) return;
       closeBanner();
     };
     window.addEventListener("keydown", onKeyDown);
@@ -154,27 +155,20 @@ export default function ConsentBanner() {
   // (or an Escape dismissal) can always be revisited in-product.
   useEffect(() => {
     const onOpen = () => {
-      const active = document.activeElement;
-      openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
-      setChoiceMade(false);
-      // Re-focus after the banner re-renders. On phones the banner is an
-      // in-flow row at the top of the document; prevent focus from preserving
-      // the footer's old scroll anchor, then explicitly bring that row back
-      // into view so the reopened settings are reachable.
-      setTimeout(() => {
-        const banner = bannerRef.current;
-        if (!banner) return;
-        const phone = window.innerWidth < 640;
-        banner.focus({ preventScroll: phone });
-        if (phone) window.scrollTo({ top: 0, behavior: "instant" });
-      }, 0);
+      // The dialog preselects the saved choice; with none saved (the banner
+      // was dismissed with Escape) nothing is preselected and Save waits.
+      setDraft(getAnalyticsConsent() ?? "");
+      setSettingsOpen(true);
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
   }, []);
 
-  if (choiceMade || !hasAnalyticsVendors) return null;
+  if (!hasAnalyticsVendors) return null;
 
+  // ph-no-capture on the banner and dialog roots keeps PostHog autocapture off
+  // these controls: the Decline/Save click would otherwise be queued while
+  // consent is still on and sent after the visitor said no.
   const decide = (value: "granted" | "denied") => {
     setAnalyticsConsent(value);
     closeBanner();
@@ -193,85 +187,85 @@ export default function ConsentBanner() {
       optOutMixpanel();
       optOutPosthog();
       optOutAmplitude();
+      // First-touch UTM/referrer record is analytics-only: withdrawn with consent.
+      clearAcquisition();
     }
   };
 
-  // NB-003 (run18): condensed single-row bar for <360px viewports. Reduced
-  // padding, trimmed copy and inline Accept/Decline buttons keep the banner
-  // short (and max-h capped) so it no longer covers the centred /login submit
-  // button at 320×568. The bar is in flow either way, so the form keeps its
-  // own space; the compact variant just gives the page more of the viewport.
-  if (isCompact) {
-    return (
-      <div
-        ref={attachBanner}
-        role="region"
-        aria-label="Analytics consent"
-        tabIndex={-1}
-        className="system-consent-banner system-consent-banner--compact relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
-        data-testid="consent-banner"
-      >
-        <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
-          <p className="system-consent-banner__copy min-w-0 flex-1 truncate text-xs">
-            Analytics cookies?{" "}
-            <Link
-              href="/privacy"
-              className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
-              data-testid="consent-privacy-link"
-            >
-              Privacy
+  const settingsDialog = (
+    <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+      <DialogContent className="ph-no-capture" data-testid="cookie-settings-dialog">
+        <DialogHeader>
+          <DialogTitle>Cookie settings</DialogTitle>
+          <DialogDescription>
+            Analytics ({vendorList}) load only if you allow them. Your current choice is selected;
+            Cancel keeps it unchanged.{" "}
+            <Link href="/privacy" onClick={() => setSettingsOpen(false)} className="system-consent-banner__privacy-link" data-testid="cookie-settings-privacy-link">
+              Privacy Policy
             </Link>
-          </p>
-          <div className="system-consent-banner__actions flex shrink-0 items-center gap-1.5">
-            <Button
-              variant="outline"
-              size="sm"
-              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
-              onClick={() => decide("denied")}
-              data-testid="consent-decline"
-            >
-              Decline
-            </Button>
-            <Button
-              size="sm"
-              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
-              onClick={() => decide("granted")}
-              data-testid="consent-accept"
-            >
-              Accept
-            </Button>
+          </DialogDescription>
+        </DialogHeader>
+        <RadioGroup
+          value={draft}
+          onValueChange={(v) => setDraft(v as "granted" | "denied")}
+          aria-label="Analytics cookies"
+          data-testid="cookie-settings-choice"
+        >
+          <div className="flex min-h-[44px] items-center gap-3">
+            <RadioGroupItem value="granted" id="cookie-settings-granted" data-testid="cookie-settings-granted" />
+            <Label htmlFor="cookie-settings-granted" className="flex min-h-[44px] flex-1 cursor-pointer items-center">Allow analytics</Label>
           </div>
-        </div>
-      </div>
-    );
-  }
+          <div className="flex min-h-[44px] items-center gap-3">
+            <RadioGroupItem value="denied" id="cookie-settings-denied" data-testid="cookie-settings-denied" />
+            <Label htmlFor="cookie-settings-denied" className="flex min-h-[44px] flex-1 cursor-pointer items-center">Decline analytics</Label>
+          </div>
+        </RadioGroup>
+        <DialogFooter className="gap-2">
+          <Button variant="ghost" className="min-h-[44px]" onClick={() => setSettingsOpen(false)} data-testid="cookie-settings-cancel">Cancel</Button>
+          <Button
+            className="min-h-[44px]"
+            disabled={draft === ""}
+            onClick={() => {
+              if (draft === "") return;
+              if (draft !== getAnalyticsConsent()) decide(draft);
+              setSettingsOpen(false);
+            }}
+            data-testid="cookie-settings-save"
+          >
+            Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 
-  return (
+  // One stable tree: the dialog stays mounted while the banner appears and
+  // disappears, so saving a choice never remounts it (and drops focus return).
+  const banner = choiceMade ? null : (
     <div
       ref={attachBanner}
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="system-consent-banner relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
+      className="system-consent-banner outline-none ph-no-capture"
       data-testid="consent-banner"
     >
-      {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
-          sentence hidden on xs) so the bar takes less of the viewport at
-          375px, where it sits in flow at the top and scrolls away. */}
       <div className="system-consent-banner__inner mx-auto w-full flex flex-col items-start gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6 sm:py-3 md:px-12">
         <p className="system-consent-banner__copy flex-1 text-xs sm:text-sm">
           We use analytics ({vendorList}) to understand how the site is used — only if you allow
           it.{" "}
-          <span className="hidden sm:inline">
+          <span>
             Decline and none of them load.
             {ANALYTICS_VENDORS.includes("Mixpanel")
               ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
               : ""}{" "}
           </span>
-          See our {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
+          See our{" "}
+          {/* An inline link in running text is exempt from the 24px target
+              minimum (WCAG 2.5.8); a taller box would stretch its line. */}
           <Link
             href="/privacy"
-            className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
+            className="system-consent-banner__privacy-link"
             data-testid="consent-privacy-link"
           >
             Privacy Policy
@@ -283,6 +277,7 @@ export default function ConsentBanner() {
             variant="ghost"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
+            disabled={!interactive}
             onClick={() => decide("denied")}
             data-testid="consent-decline"
           >
@@ -293,6 +288,7 @@ export default function ConsentBanner() {
             variant="outline"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
+            disabled={!interactive}
             onClick={() => decide("granted")}
             data-testid="consent-accept"
           >
@@ -301,5 +297,12 @@ export default function ConsentBanner() {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {settingsDialog}
+      {banner}
+    </>
   );
 }

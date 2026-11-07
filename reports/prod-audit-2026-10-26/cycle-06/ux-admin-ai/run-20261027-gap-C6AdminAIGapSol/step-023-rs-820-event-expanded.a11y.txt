@@ -1,0 +1,550 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,827 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,827 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,827 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Researcher" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - 'region "Research run #68" [ref=e117]':
+                      - generic [ref=e118]:
+                        - generic [ref=e119]:
+                          - 'heading "Research run #68" [level=3] [ref=e120]'
+                          - paragraph [ref=e121]: All categories · ran for 0:32
+                        - generic [ref=e123]:
+                          - img [ref=e124]
+                          - text: Stopped at budget
+                      - paragraph [ref=e126]
+                      - generic [ref=e127]:
+                        - list "Run phases" [ref=e128]:
+                          - listitem [ref=e129]:
+                            - img [ref=e131]
+                            - generic [ref=e133]:
+                              - text: Planning
+                              - generic [ref=e134]: 05:39:04 AM
+                            - generic [ref=e135]: (done)
+                          - listitem [ref=e136]:
+                            - img [ref=e138]
+                            - generic [ref=e140]:
+                              - text: Scouting
+                              - generic [ref=e141]: 05:39:31 AM
+                            - generic [ref=e142]: (done)
+                          - listitem [ref=e143]:
+                            - generic [ref=e145]: Verifying
+                            - generic [ref=e147]: (not reached)
+                          - listitem [ref=e148]:
+                            - generic [ref=e150]: Saving
+                            - generic [ref=e152]: (not reached)
+                          - listitem [ref=e153]:
+                            - generic [ref=e156]:
+                              - text: Stopped at budget
+                              - generic [ref=e157]: 05:39:36 AM
+                            - generic [ref=e158]: (current)
+                        - generic [ref=e159]:
+                          - heading "Scouts 1 started" [level=4] [ref=e160]:
+                            - img [ref=e161]
+                            - text: Scouts
+                            - generic [ref=e164]: 1 started
+                          - list "Scouts" [ref=e165]:
+                            - listitem [ref=e166]:
+                              - generic [ref=e167]:
+                                - generic [ref=e168]: Scout 1
+                                - generic [ref=e169]: Stopped
+                              - paragraph [ref=e170]: Find packaging tools
+                              - paragraph [ref=e171]: 0 searches · 0 candidates · 5s
+                      - generic [ref=e172]:
+                        - generic [ref=e173]:
+                          - term [ref=e174]: Discoveries
+                          - definition [ref=e175]: 0 of 1 saved
+                          - progressbar "Discoveries saved against the target" [ref=e176]
+                        - generic [ref=e178]:
+                          - term [ref=e179]: Turns
+                          - definition [ref=e180]: 3 of 10
+                          - progressbar "Turns used against the cap" [ref=e181]
+                        - generic [ref=e183]:
+                          - term [ref=e184]: Spend
+                          - definition [ref=e185]: $0.3062 of $0.30
+                          - progressbar "Spend against the budget cap" [ref=e186]
+                      - note [ref=e188]:
+                        - img [ref=e189]
+                        - generic [ref=e191]:
+                          - paragraph [ref=e192]: Budget cap reached ($0.30) before the run saved a discovery. Relaunch with a higher cap.
+                          - button "Relaunch with a higher cap" [ref=e193] [cursor=pointer]:
+                            - img
+                            - text: Relaunch with a higher cap
+                      - region "Review discoveries" [ref=e194]:
+                        - heading "Review discoveries" [level=4] [ref=e195]
+                        - paragraph [ref=e196]: This run saved no discoveries.
+                        - generic [ref=e197]:
+                          - button "Done — go to job history" [ref=e198] [cursor=pointer]:
+                            - img
+                            - text: Done — go to job history
+                          - button "Start another run" [ref=e199] [cursor=pointer]:
+                            - img
+                            - text: Start another run
+                      - generic [ref=e200]:
+                        - 'button "Run details: raw event log and agent graph" [expanded] [ref=e201] [cursor=pointer]':
+                          - text: "Run details: raw event log and agent graph"
+                          - img
+                        - generic [ref=e203]:
+                          - tablist [ref=e204]:
+                            - tab "Event log" [selected] [ref=e205] [cursor=pointer]
+                            - tab "Agent graph" [ref=e206] [cursor=pointer]
+                          - tabpanel "Event log" [ref=e207]:
+                            - region "Agent Events (structured)" [ref=e208]:
+                              - generic [ref=e209]:
+                                - heading "Agent Events (structured)" [level=3] [ref=e210]
+                                - generic [ref=e211]: 24 events
+                              - log "Structured agent events for research job 68" [ref=e212]:
+                                - list [ref=e215]:
+                                  - listitem [ref=e216]:
+                                    - generic [ref=e217]:
+                                      - generic [ref=e218]:
+                                        - generic [ref=e219]: 5:39:04 AM
+                                        - generic [ref=e220]: orchestrator
+                                        - generic [ref=e221]: phase
+                                      - generic [ref=e222]:
+                                        - generic [ref=e223]: "Phase: planning"
+                                        - button "Hide detail for event 0" [expanded] [active] [ref=e224] [cursor=pointer]:
+                                          - img [ref=e225]
+                                    - generic [ref=e227]: "{ \"phase\": \"planning\", \"trigger\": \"run_started\", \"previous\": null }"
+                                  - listitem [ref=e228]:
+                                    - generic [ref=e229]:
+                                      - generic [ref=e230]:
+                                        - generic [ref=e231]: 5:39:11 AM
+                                        - generic [ref=e232]: orchestrator
+                                        - generic [ref=e233]: lifecycle
+                                      - generic [ref=e234]:
+                                        - generic [ref=e235]: Run started (model cc/claude-opus-5, maxTurns 10, budget $0.3)
+                                        - button "Show detail for event 1" [ref=e236] [cursor=pointer]:
+                                          - img [ref=e237]
+                                    - generic [ref=e240]: cc/claude-opus-5
+                                  - listitem [ref=e241]:
+                                    - generic [ref=e242]:
+                                      - generic [ref=e243]:
+                                        - generic [ref=e244]: 5:39:13 AM
+                                        - generic [ref=e245]: orchestrator
+                                        - generic [ref=e246]: message
+                                      - generic [ref=e247]:
+                                        - generic [ref=e248]: I'll start by confirming the top coverage gaps, then delegate a scout search.
+                                        - button "Show detail for event 2" [ref=e249] [cursor=pointer]:
+                                          - img [ref=e250]
+                                    - generic [ref=e252]:
+                                      - generic [ref=e253]: claude-opus-5
+                                      - 'generic "raw: 2 + cache_read: 0 + cache_creation: 11911" [ref=e254]':
+                                        - text: in 11,913
+                                        - generic [ref=e255]: (⊕11,911)
+                                      - generic [ref=e256]: out 1
+                                  - listitem [ref=e257]:
+                                    - generic [ref=e258]:
+                                      - generic [ref=e259]:
+                                        - generic [ref=e260]: 5:39:14 AM
+                                        - generic [ref=e261]: orchestrator
+                                        - generic [ref=e262]: message
+                                      - generic [ref=e263]:
+                                        - generic [ref=e264]: "→ tools: ToolSearch"
+                                        - button "Show detail for event 3" [ref=e265] [cursor=pointer]:
+                                          - img [ref=e266]
+                                    - generic [ref=e269]: claude-opus-5
+                                  - listitem [ref=e270]:
+                                    - generic [ref=e271]:
+                                      - generic [ref=e272]:
+                                        - generic [ref=e273]: 5:39:16 AM
+                                        - generic [ref=e274]: orchestrator
+                                        - generic [ref=e275]: message
+                                      - generic [ref=e276]:
+                                        - generic [ref=e277]: "→ tools: mcp__research__get_coverage_gaps"
+                                        - button "Show detail for event 4" [ref=e278] [cursor=pointer]:
+                                          - img [ref=e279]
+                                    - generic [ref=e281]:
+                                      - generic [ref=e282]: claude-opus-5
+                                      - 'generic "raw: 2 + cache_read: 0 + cache_creation: 12399" [ref=e283]':
+                                        - text: in 12,401
+                                        - generic [ref=e284]: (⊕12,399)
+                                      - generic [ref=e285]: out 32
+                                  - listitem [ref=e286]:
+                                    - generic [ref=e287]:
+                                      - generic [ref=e288]:
+                                        - generic [ref=e289]: 5:39:16 AM
+                                        - generic [ref=e290]: orchestrator
+                                        - generic [ref=e291]: tool_call
+                                        - generic [ref=e292]: → get_coverage_gaps
+                                      - generic [ref=e294]: "{\"limit\":\"12\"}"
+                                  - listitem [ref=e295]:
+                                    - generic [ref=e296]:
+                                      - generic [ref=e297]:
+                                        - generic [ref=e298]: 5:39:16 AM
+                                        - generic [ref=e299]: get_coverage_gaps
+                                        - generic [ref=e300]: tool_result
+                                        - generic [ref=e301]: → orchestrator
+                                      - generic [ref=e303]: 12 gaps
+                                    - generic [ref=e305]: 74ms
+                                  - listitem [ref=e306]:
+                                    - generic [ref=e307]:
+                                      - generic [ref=e308]:
+                                        - generic [ref=e309]: 5:39:25 AM
+                                        - generic [ref=e310]: orchestrator
+                                        - generic [ref=e311]: message
+                                      - generic [ref=e312]:
+                                        - generic [ref=e313]: (no text)
+                                        - button "Show detail for event 7" [ref=e314] [cursor=pointer]:
+                                          - img [ref=e315]
+                                    - generic [ref=e317]:
+                                      - generic [ref=e318]: claude-opus-5
+                                      - 'generic "raw: 2 + cache_read: 12399 + cache_creation: 2281" [ref=e319]':
+                                        - text: in 14,682
+                                        - generic [ref=e320]: (↩12,399 ⊕2,281)
+                                      - generic [ref=e321]: out 3
+                                  - listitem [ref=e322]:
+                                    - generic [ref=e323]:
+                                      - generic [ref=e324]:
+                                        - generic [ref=e325]: 5:39:31 AM
+                                        - generic [ref=e326]: orchestrator
+                                        - generic [ref=e327]: message
+                                      - generic [ref=e328]:
+                                        - generic [ref=e329]: "→ tools: Agent"
+                                        - button "Show detail for event 8" [ref=e330] [cursor=pointer]:
+                                          - img [ref=e331]
+                                    - generic [ref=e334]: claude-opus-5
+                                  - listitem [ref=e335]:
+                                    - generic [ref=e336]:
+                                      - generic [ref=e337]:
+                                        - generic [ref=e338]: 5:39:31 AM
+                                        - generic [ref=e339]: orchestrator
+                                        - generic [ref=e340]: scout_start
+                                        - generic [ref=e341]: → scout
+                                      - generic [ref=e342]:
+                                        - generic [ref=e343]: "Scout #1 started: Find packaging tools"
+                                        - button "Show detail for event 9" [ref=e344] [cursor=pointer]:
+                                          - img [ref=e345]
+                                  - listitem [ref=e347]:
+                                    - generic [ref=e348]:
+                                      - generic [ref=e349]:
+                                        - generic [ref=e350]: 5:39:31 AM
+                                        - generic [ref=e351]: orchestrator
+                                        - generic [ref=e352]: phase
+                                      - generic [ref=e353]:
+                                        - generic [ref=e354]: "Phase: scouting"
+                                        - button "Show detail for event 10" [ref=e355] [cursor=pointer]:
+                                          - img [ref=e356]
+                                  - listitem [ref=e358]:
+                                    - generic [ref=e359]:
+                                      - generic [ref=e360]:
+                                        - generic [ref=e361]: 5:39:31 AM
+                                        - generic [ref=e362]: orchestrator
+                                        - generic [ref=e363]: delegation
+                                        - generic [ref=e364]: → scout
+                                      - generic [ref=e365]:
+                                        - generic [ref=e366]: Find packaging tools
+                                        - button "Show detail for event 11" [ref=e367] [cursor=pointer]:
+                                          - img [ref=e368]
+                                  - listitem [ref=e370]:
+                                    - generic [ref=e371]:
+                                      - generic [ref=e372]:
+                                        - generic [ref=e373]: 5:39:35 AM
+                                        - generic [ref=e374]: scout
+                                        - generic [ref=e375]: message
+                                      - generic [ref=e376]:
+                                        - generic [ref=e377]: "→ tools: WebSearch"
+                                        - button "Show detail for event 12" [ref=e378] [cursor=pointer]:
+                                          - img [ref=e379]
+                                    - generic [ref=e381]:
+                                      - generic [ref=e382]: claude-haiku-4-5-20251001
+                                      - 'generic "raw: 10 + cache_read: 0 + cache_creation: 4278" [ref=e383]':
+                                        - text: in 4,288
+                                        - generic [ref=e384]: (⊕4,278)
+                                      - generic [ref=e385]: out 6
+                                  - listitem [ref=e386]:
+                                    - generic [ref=e387]:
+                                      - generic [ref=e388]:
+                                        - generic [ref=e389]: 5:39:35 AM
+                                        - generic [ref=e390]: scout
+                                        - generic [ref=e391]: tool_call
+                                        - generic [ref=e392]: → WebSearch
+                                      - generic [ref=e393]:
+                                        - generic [ref=e394]: "{\"query\":\"\\\"open source CMAF packager\\\" HLS DASH 2024\"}"
+                                        - button "Show detail for event 13" [ref=e395] [cursor=pointer]:
+                                          - img [ref=e396]
+                                  - listitem [ref=e398]:
+                                    - generic [ref=e399]:
+                                      - generic [ref=e400]:
+                                        - generic [ref=e401]: 5:39:35 AM
+                                        - generic [ref=e402]: scout
+                                        - generic [ref=e403]: message
+                                      - generic [ref=e404]:
+                                        - generic [ref=e405]: "→ tools: WebSearch"
+                                        - button "Show detail for event 14" [ref=e406] [cursor=pointer]:
+                                          - img [ref=e407]
+                                    - generic [ref=e410]: claude-haiku-4-5-20251001
+                                  - listitem [ref=e411]:
+                                    - generic [ref=e412]:
+                                      - generic [ref=e413]:
+                                        - generic [ref=e414]: 5:39:35 AM
+                                        - generic [ref=e415]: scout
+                                        - generic [ref=e416]: tool_call
+                                        - generic [ref=e417]: → WebSearch
+                                      - generic [ref=e418]:
+                                        - generic [ref=e419]: "{\"query\":\"github \\\"dash\\\" \\\"hls\\\" packager rust OR go 2025 maintained\"}"
+                                        - button "Show detail for event 15" [ref=e420] [cursor=pointer]:
+                                          - img [ref=e421]
+                                  - listitem [ref=e423]:
+                                    - generic [ref=e424]:
+                                      - generic [ref=e425]:
+                                        - generic [ref=e426]: 5:39:36 AM
+                                        - generic [ref=e427]: scout
+                                        - generic [ref=e428]: message
+                                      - generic [ref=e429]:
+                                        - generic [ref=e430]: "→ tools: WebSearch"
+                                        - button "Show detail for event 16" [ref=e431] [cursor=pointer]:
+                                          - img [ref=e432]
+                                    - generic [ref=e435]: claude-haiku-4-5-20251001
+                                  - listitem [ref=e436]:
+                                    - generic [ref=e437]:
+                                      - generic [ref=e438]:
+                                        - generic [ref=e439]: 5:39:36 AM
+                                        - generic [ref=e440]: scout
+                                        - generic [ref=e441]: tool_call
+                                        - generic [ref=e442]: → WebSearch
+                                      - generic [ref=e443]:
+                                        - generic [ref=e444]: "{\"query\":\"\\\"live packager\\\" open source origin \\\"LL-HLS\\\" \\\"DASH\\\" github\"}"
+                                        - button "Show detail for event 17" [ref=e445] [cursor=pointer]:
+                                          - img [ref=e446]
+                                  - listitem [ref=e448]:
+                                    - generic [ref=e449]:
+                                      - generic [ref=e450]:
+                                        - generic [ref=e451]: 5:39:36 AM
+                                        - generic [ref=e452]: scout
+                                        - generic [ref=e453]: message
+                                      - generic [ref=e454]:
+                                        - generic [ref=e455]: "→ tools: WebSearch"
+                                        - button "Show detail for event 18" [ref=e456] [cursor=pointer]:
+                                          - img [ref=e457]
+                                    - generic [ref=e460]: claude-haiku-4-5-20251001
+                                  - listitem [ref=e461]:
+                                    - generic [ref=e462]:
+                                      - generic [ref=e463]:
+                                        - generic [ref=e464]: 5:39:36 AM
+                                        - generic [ref=e465]: scout
+                                        - generic [ref=e466]: tool_call
+                                        - generic [ref=e467]: → WebSearch
+                                      - generic [ref=e468]:
+                                        - generic [ref=e469]: "{\"query\":\"alternatives to shaka-packager open source\"}"
+                                        - button "Show detail for event 19" [ref=e470] [cursor=pointer]:
+                                          - img [ref=e471]
+                                  - listitem [ref=e473]:
+                                    - generic [ref=e474]:
+                                      - generic [ref=e475]:
+                                        - generic [ref=e476]: 5:39:36 AM
+                                        - generic [ref=e477]: orchestrator
+                                        - generic [ref=e478]: result
+                                      - generic [ref=e479]:
+                                        - generic [ref=e480]: "Run error: Reached maximum budget ($0.3) (reason: budget_exhausted)"
+                                        - button "Show detail for event 20" [ref=e481] [cursor=pointer]:
+                                          - img [ref=e482]
+                                    - generic [ref=e484]:
+                                      - generic [ref=e485]: cc/claude-opus-5
+                                      - generic [ref=e486]: in 6
+                                      - generic [ref=e487]: out 909
+                                      - generic [ref=e488]: $0.3062
+                                      - generic [ref=e489]: 24839ms
+                                  - listitem [ref=e490]:
+                                    - generic [ref=e491]:
+                                      - generic [ref=e492]:
+                                        - generic [ref=e493]: 5:39:36 AM
+                                        - generic [ref=e494]: orchestrator
+                                        - generic [ref=e495]: error
+                                      - generic [ref=e496]:
+                                        - generic [ref=e497]: "Claude Code returned an error result: Reached maximum budget ($0.3)"
+                                        - button "Show detail for event 21" [ref=e498] [cursor=pointer]:
+                                          - img [ref=e499]
+                                  - listitem [ref=e501]:
+                                    - generic [ref=e502]:
+                                      - generic [ref=e503]:
+                                        - generic [ref=e504]: 5:39:36 AM
+                                        - generic [ref=e505]: scout
+                                        - generic [ref=e506]: scout_end
+                                        - generic [ref=e507]: → orchestrator
+                                      - generic [ref=e508]:
+                                        - generic [ref=e509]: "Scout #1 aborted: 0 searches, 0 candidate URLs"
+                                        - button "Show detail for event 22" [ref=e510] [cursor=pointer]:
+                                          - img [ref=e511]
+                                    - generic [ref=e514]: 4735ms
+                                  - listitem [ref=e515]:
+                                    - generic [ref=e516]:
+                                      - generic [ref=e517]:
+                                        - generic [ref=e518]: 5:39:36 AM
+                                        - generic [ref=e519]: orchestrator
+                                        - generic [ref=e520]: phase
+                                      - generic [ref=e521]:
+                                        - generic [ref=e522]: "Phase: finishing (budget_stopped)"
+                                        - button "Show detail for event 23" [ref=e523] [cursor=pointer]:
+                                          - img [ref=e524]
+                    - generic [ref=e526]:
+                      - generic [ref=e528]:
+                        - heading "Researcher jobs" [level=2] [ref=e529]
+                        - paragraph [ref=e530]: Latest 5 of 75 research runs
+                      - generic [ref=e531]:
+                        - region "Researcher jobs table, scrollable" [ref=e532]:
+                          - table [ref=e533]:
+                            - rowgroup [ref=e534]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e535]:
+                                - columnheader "Status" [ref=e536]
+                                - columnheader "Prompt" [ref=e537]
+                                - columnheader "Found" [ref=e538]
+                                - columnheader "Approved / Rejected" [ref=e539]
+                                - columnheader "Cost" [ref=e540]
+                                - columnheader "Turns" [ref=e541]
+                                - columnheader "Created" [ref=e542]
+                            - rowgroup [ref=e543]:
+                              - row [ref=e544]:
+                                - cell "processing" [ref=e545]:
+                                  - generic [ref=e546]: processing
+                                - cell [ref=e547]
+                                - cell "0" [ref=e548]
+                                - cell "0/0" [ref=e549]
+                                - cell "$0.0000" [ref=e550]
+                                - cell "0/600" [ref=e551]
+                                - cell "Oct 27, 2026" [ref=e552]
+                              - row [ref=e553]:
+                                - cell "completed" [ref=e554]:
+                                  - generic [ref=e555]: completed
+                                - cell [ref=e556]
+                                - cell "0" [ref=e557]
+                                - cell "0/0" [ref=e558]
+                                - cell "$0.5650" [ref=e559]
+                                - cell "13/600" [ref=e560]
+                                - cell "Oct 27, 2026" [ref=e561]
+                              - row [ref=e562]:
+                                - cell "completed" [ref=e563]:
+                                  - generic [ref=e564]: completed
+                                - cell [ref=e565]
+                                - cell "4" [ref=e566]
+                                - cell "1/0" [ref=e567]
+                                - cell "$5.4603" [ref=e568]
+                                - cell "155/200" [ref=e569]
+                                - cell "Oct 27, 2026" [ref=e570]
+                              - row [ref=e571]:
+                                - cell "failed" [ref=e572]:
+                                  - generic [ref=e573]: failed
+                                - cell [ref=e574]
+                                - cell "0" [ref=e575]
+                                - cell "0/0" [ref=e576]
+                                - cell "$0.0000" [ref=e577]
+                                - cell "1/200" [ref=e578]
+                                - cell "Oct 27, 2026" [ref=e579]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e580]':
+                                - cell "completed" [ref=e581]:
+                                  - generic [ref=e582]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e583]'
+                                - cell "9" [ref=e584]
+                                - cell "0/0" [ref=e585]
+                                - cell "$3.3100" [ref=e586]
+                                - cell "41/200" [ref=e587]
+                                - cell "Oct 27, 2026" [ref=e588]
+                        - button "Show more" [ref=e590] [cursor=pointer]
+                  - group [ref=e591]:
+                    - generic "All pending discoveries & full job history" [ref=e592] [cursor=pointer]

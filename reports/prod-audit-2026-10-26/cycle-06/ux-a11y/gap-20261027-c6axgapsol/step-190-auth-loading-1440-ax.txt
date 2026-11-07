@@ -1,0 +1,29 @@
+- generic [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+    - list
+  - link "Skip to main content" [ref=e3]
+  - generic
+    - banner
+      - link "AWESOME.VIDEO home" [ref=e4]
+        - StaticText "AWESOME.VIDEO"
+        - StaticText " home"
+      - button "Search 3,826 resources" [ref=e5]
+        - StaticText "Search 3,826 resources"
+      - navigation "Primary" [ref=e6]
+        - link "Browse" [ref=e8]
+        - link "Submit" [ref=e9]
+        - link "About" [ref=e10]
+        - link "Docs ↗" [ref=e11]
+      - button "Sign in, account menu" [expanded=false, ref=e7]
+        - StaticText "Sign in"
+        - StaticText ", account menu"
+    - generic
+      - main
+        - navigation "Breadcrumb" [ref=e12]
+          - list
+            - listitem [level=1]
+              - link "Home" [ref=e13]
+            - listitem [level=1]
+              - link "Admin" [disabled, ref=e14]
+        - paragraph
+          - StaticText "Verifying access..."

@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/sign-up?redirect_url=%2Fbookmarks","title":"Create an Account — Awesome Video","width":390,"height":844,"touch":true,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BODY","id":"","label":null,"text":"\n    \n    \n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--bord","rect":{"x":0,"y":0,"width":384,"height":1279.765625,"top":0,"right":384,"bottom":1279.765625,"left":0}},"headings":[{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Sign up","label":null,"current":"page"}],"status":["Checking your sign-in status…"],"analyticsDisabled":"1"}
+```

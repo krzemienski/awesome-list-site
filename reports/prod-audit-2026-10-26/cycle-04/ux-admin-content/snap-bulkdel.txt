@@ -1,0 +1,10 @@
+uid=221_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin?search=QA-audit-1026#resources"
+  uid=236_0 alertdialog "Delete 1 resource?" description="This permanently deletes the selected resource from the catalog, including any bookmarks, favorites, and journey references pointing at it. This cannot be undone."
+    uid=236_1 heading "Delete 1 resource?" level="2"
+    uid=236_2 "This permanently deletes the selected resource"
+    uid=236_3 " from the catalog, including any bookmarks, favorites, and journey references pointing at "
+    uid=236_4 "it"
+    uid=236_5 ". This cannot be undone."
+    uid=236_6 "[QA-audit-1026] c4 admin-content resource"
+    uid=236_7 button "Cancel" focusable focused
+    uid=236_8 button "Delete"

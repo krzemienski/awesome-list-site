@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/?layout=index&kind=events","title":"Awesome Video — 3826+ Curated Video & Streaming Resources","width":390,"height":844,"touch":true,"scrollY":0,"bodyWidth":384,"online":true,"focus":{"tag":"BUTTON","id":"","label":"Events, 142 resources","text":"Events 142","rect":{"x":162.734375,"y":188.59375,"width":113.234375,"height":44,"top":188.59375,"right":275.96875,"bottom":232.59375,"left":162.734375}},"headings":[{"text":"~/awesome.videoAwesome Video Resources","id":""},{"text":"Hand-picked highlights","id":"home-index-featured-title"},{"text":"Categories","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Events 142","label":"Events, 142 resources","current":null}],"status":[],"analyticsDisabled":"1"}
+```

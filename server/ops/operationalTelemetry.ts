@@ -1,3 +1,7 @@
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("ops");
+
 type MetricAggregate = {
   count: number;
   errors: number;
@@ -92,15 +96,13 @@ export function recordDatabaseQuery(
   const safeCommand = QUERY_COMMANDS.has(command) ? command : "other";
   updateAggregate(queryMetrics, safeCommand, durationMs, !!error, 500);
   if (durationMs >= 500 || error) {
-    console.log(
-      JSON.stringify({
-        event: "ops.db_query",
-        command: safeCommand,
-        durationMs,
-        outcome: error ? "error" : "ok",
-        ...(error ? { errorClass: classifyDatabaseError(error) } : {}),
-      }),
-    );
+    const details = {
+      command: safeCommand,
+      ms: durationMs,
+      ...(error ? { errorClass: classifyDatabaseError(error) } : {}),
+    };
+    if (error) logger.warn("Database query failed", details);
+    else logger.info("Slow database query", details);
   }
 }
 
@@ -176,6 +178,61 @@ export function recordEndpointLatency(
   const statusClass = `${Math.floor(statusCode / 100)}xx`;
   const label = `${safeMethod}:${group}:${statusClass}`;
   updateAggregate(endpointMetrics, label, durationMs, statusCode >= 500, 1_000);
+}
+
+export type DocTemplate =
+  | "home"
+  | "category"
+  | "subcategory"
+  | "subsubcategory"
+  | "resource"
+  | "search"
+  | "tag"
+  | "journey"
+  | "journeys"
+  | "collection"
+  | "other";
+
+const DOC_TEMPLATE_PREFIXES: ReadonlyArray<readonly [string, DocTemplate]> = [
+  ["/category/", "category"],
+  ["/subcategory/", "subcategory"],
+  ["/sub-subcategory/", "subsubcategory"],
+  ["/resource/", "resource"],
+  ["/tag/", "tag"],
+  ["/journey/", "journey"],
+  ["/collection/", "collection"],
+];
+
+export function documentTemplate(path: string): DocTemplate {
+  if (path === "/" || path === "") return "home";
+  if (path === "/search") return "search";
+  if (path === "/journeys") return "journeys";
+  return DOC_TEMPLATE_PREFIXES.find(([prefix]) => path.startsWith(prefix))?.[1] ?? "other";
+}
+
+export type ClientClass = "human" | "bot-search" | "bot-ai" | "bot-other";
+
+const SEARCH_BOT = /googlebot|bingbot|duckduckbot|yandexbot|baiduspider|slurp/i;
+const AI_BOT = /gptbot|chatgpt-user|oai-searchbot|claudebot|claude-web|anthropic-ai|perplexitybot|applebot|google-extended|ccbot|bytespider|meta-externalagent/i;
+const OTHER_BOT = /bot|crawl|spider|curl|wget|python|go-http|node-fetch|axios|headless|lighthouse/i;
+
+/** Class only; the caller never keeps the user-agent string. */
+export function clientClass(userAgent: string | undefined): ClientClass {
+  const ua = userAgent ?? "";
+  if (SEARCH_BOT.test(ua)) return "bot-search";
+  if (AI_BOT.test(ua)) return "bot-ai";
+  if (OTHER_BOT.test(ua) || ua === "") return "bot-other";
+  return "human";
+}
+
+/** Counts only (`DOC:<template>:<class>:<Nxx>`); no IP, path or UA is stored. */
+export function recordDocumentRequest(
+  template: DocTemplate,
+  cls: ClientClass,
+  statusCode: number,
+): void {
+  const label = `DOC:${template}:${cls}:${Math.floor(statusCode / 100)}xx`;
+  updateAggregate(endpointMetrics, label, 0, statusCode >= 500, Infinity);
 }
 
 export function getOperationalTelemetrySnapshot() {

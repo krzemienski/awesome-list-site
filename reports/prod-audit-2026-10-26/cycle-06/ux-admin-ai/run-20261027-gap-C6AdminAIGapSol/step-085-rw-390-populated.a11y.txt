@@ -1,0 +1,139 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - navigation "Breadcrumb" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "Home" [ref=e29] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e30]:
+                - img [ref=e31]
+              - listitem [ref=e33]:
+                - link "Admin" [ref=e34] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e35]:
+                - img [ref=e36]
+              - listitem:
+                - link "Research" [disabled]
+          - generic [ref=e38]: Authorized admin area
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e45]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e46]:
+                  - text: Operations
+                  - emphasis [ref=e47]: dashboard
+                - paragraph [ref=e48]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e49]:
+                - button "Settings" [ref=e50] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e51] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e52]
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - button "Scroll tabs left" [ref=e55] [cursor=pointer]:
+                  - img [ref=e56]
+                - tablist "Admin sections" [ref=e58]:
+                  - tab "Overview" [ref=e59] [cursor=pointer]:
+                    - img [ref=e60]
+                    - text: Overview
+                  - tab "Approvals" [ref=e65] [cursor=pointer]:
+                    - img [ref=e66]
+                    - text: Approvals
+                  - tab "Edits" [ref=e68] [cursor=pointer]:
+                    - img [ref=e69]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Researcher
+                  - tab "Export" [ref=e76] [cursor=pointer]:
+                    - img [ref=e77]
+                    - text: Export
+                  - tab "Database" [ref=e79] [cursor=pointer]:
+                    - img [ref=e80]
+                    - text: Database
+                  - tab "Resources" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Resources
+                  - tab "Categories" [ref=e87] [cursor=pointer]:
+                    - img [ref=e88]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Subcategories
+                  - tab "Users" [ref=e91] [cursor=pointer]:
+                    - img [ref=e92]
+                    - text: Users
+                  - tab "GitHub" [ref=e97] [cursor=pointer]:
+                    - img [ref=e98]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: Link Health
+                  - tab "Audit" [ref=e104] [cursor=pointer]:
+                    - img [ref=e105]
+                    - text: Audit
+                  - tab "Research" [selected] [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Research
+              - tabpanel "Research" [ref=e109]:
+                - region "Research workspace" [ref=e110]:
+                  - generic [ref=e111]:
+                    - heading "Research workspace" [level=2] [ref=e112]
+                    - paragraph [ref=e113]: Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.
+                    - generic [ref=e114]:
+                      - article [ref=e115] [cursor=pointer]:
+                        - generic [ref=e116]: NOTE · 01
+                        - button "Five-pass sustained catalog audit. 0 candidates 41s ago" [ref=e117]:
+                          - heading "Five-pass sustained catalog audit." [level=3] [ref=e118]
+                          - generic [ref=e119]:
+                            - generic [ref=e120]: 0 candidates
+                            - generic [ref=e121]: 41s ago
+                      - article [ref=e122] [cursor=pointer]:
+                        - generic [ref=e123]: NOTE · 02
+                        - button "Sustained catalog coverage and duplicate-audit run requiring at least 30… 0 candidates 9m ago" [ref=e124]:
+                          - heading "Sustained catalog coverage and duplicate-audit run requiring at least 30…" [level=3] [ref=e125]
+                          - generic [ref=e126]:
+                            - generic [ref=e127]: 0 candidates
+                            - generic [ref=e128]: 9m ago
+                      - article [ref=e129] [cursor=pointer]:
+                        - generic [ref=e130]: NOTE · 03
+                        - button "Sustained production research requiring at least 30 minutes and at least 450… 0 candidates 34m ago" [ref=e131]:
+                          - heading "Sustained production research requiring at least 30 minutes and at least 450…" [level=3] [ref=e132]
+                          - generic [ref=e133]:
+                            - generic [ref=e134]: 0 candidates
+                            - generic [ref=e135]: 34m ago
+                      - article [ref=e136] [cursor=pointer]:
+                        - generic [ref=e137]: NOTE · 04
+                        - button "Sustained production research for at least 30 minutes of genuine work. 4 candidates 46m ago" [ref=e138]:
+                          - heading "Sustained production research for at least 30 minutes of genuine work." [level=3] [ref=e139]
+                          - generic [ref=e140]:
+                            - generic [ref=e141]: 4 candidates
+                            - generic [ref=e142]: 46m ago

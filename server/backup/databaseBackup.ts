@@ -46,14 +46,24 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import pg from "pg";
-import { Client as ObjectStorageClient } from "@replit/object-storage";
+import { createLogger } from "../lib/logger";
+import {
+  isPrivateStorageConfigured,
+  PrivateStorageError,
+  resolvePrivateStorage,
+  storageEnvironment,
+  type PrivateStorage,
+  type StorageEnvironment,
+} from "../lib/privateStorage";
+
+const logger = createLogger("backup");
 
 export const BACKUP_FORMAT_VERSION = 1;
 /** Platform-owned schema on the managed production database; not app data. */
 export const EXCLUDED_SCHEMAS = ["_system"] as const;
 const SYSTEM_SCHEMAS = ["pg_catalog", "information_schema", "pg_toast"];
 
-export type BackupEnvironment = "production" | "development";
+export type BackupEnvironment = StorageEnvironment;
 
 /** An operator-actionable backup/restore failure (message is safe to show). */
 export class DatabaseBackupError extends Error {
@@ -127,37 +137,23 @@ export interface BackupManifest {
 // Environment + storage
 // ---------------------------------------------------------------------------
 
-export function backupEnvironment(): BackupEnvironment {
-  return process.env.REPLIT_DEPLOYMENT === "1" ? "production" : "development";
-}
+export const backupEnvironment = storageEnvironment;
 
-interface BackupStorage {
-  client: ObjectStorageClient;
-  prefix: string;
-}
+export const isBackupStorageConfigured = isPrivateStorageConfigured;
 
-export function isBackupStorageConfigured(): boolean {
-  return Boolean(process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID && process.env.PRIVATE_OBJECT_DIR);
-}
-
-function resolveStorage(environment: BackupEnvironment = backupEnvironment()): BackupStorage {
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  const privateDir = process.env.PRIVATE_OBJECT_DIR;
-  if (!bucketId || !privateDir) {
-    throw new DatabaseBackupError(
-      "Backup storage is not configured: the private App Storage bucket (DEFAULT_OBJECT_STORAGE_BUCKET_ID / PRIVATE_OBJECT_DIR) is missing.",
-    );
+function resolveStorage(environment: BackupEnvironment = backupEnvironment()): PrivateStorage {
+  try {
+    return resolvePrivateStorage(`db-backups/${environment}`);
+  } catch (error) {
+    if (error instanceof PrivateStorageError) {
+      throw new DatabaseBackupError(
+        error.reason === "unconfigured"
+          ? "Backup storage is not configured: the private App Storage bucket (DEFAULT_OBJECT_STORAGE_BUCKET_ID / PRIVATE_OBJECT_DIR) is missing."
+          : "Backup storage is misconfigured: PRIVATE_OBJECT_DIR names no private directory.",
+      );
+    }
+    throw error;
   }
-  // PRIVATE_OBJECT_DIR is "/<bucket>/<dir>"; object names are bucket-relative.
-  const segments = privateDir.split("/").filter(Boolean);
-  if (segments[0] === bucketId) segments.shift();
-  if (segments.length === 0) {
-    throw new DatabaseBackupError("Backup storage is misconfigured: PRIVATE_OBJECT_DIR names no private directory.");
-  }
-  return {
-    client: new ObjectStorageClient({ bucketId }),
-    prefix: `${segments.join("/")}/db-backups/${environment}/`,
-  };
 }
 
 function unwrap<T>(result: { ok: true; value: T } | { ok: false; error: { message?: string } }, action: string): T {
@@ -395,11 +391,14 @@ export async function createDatabaseBackup(options: {
   if (!databaseUrl) throw new DatabaseBackupError("DATABASE_URL is not set.");
   if (backupInFlight) throw new DatabaseBackupError("A database backup is already running.", 409);
   backupInFlight = true;
+  let backupId: string | undefined;
   try {
     const storage = resolveStorage();
     const environment = backupEnvironment();
     const startedAt = new Date();
     const id = newBackupId(startedAt);
+    backupId = id;
+    logger.info("Database backup started", { backupId: id, environment });
     const pgDumpVersion = (await runTool("pg_dump", ["--version"])).trim();
 
     const { database, serverVersion, inventory } = await withClient(databaseUrl, async (client) => {
@@ -455,8 +454,21 @@ export async function createDatabaseBackup(options: {
         await storage.client.uploadFromText(`${storage.prefix}${id}.manifest.json`, JSON.stringify(manifest, null, 2)),
         "manifest upload",
       );
+      logger.info("Database backup finished", {
+        backupId: id,
+        bytes: size,
+        tables: tables.length,
+        rows: manifest.coverage.totalRows,
+        ms: manifest.durationMs,
+      });
       return manifest;
     });
+  } catch (error) {
+    logger.error("Database backup failed; nothing was stored", {
+      backupId,
+      reason: redact(error instanceof Error ? error.message : String(error)),
+    });
+    throw error;
   } finally {
     backupInFlight = false;
   }
@@ -466,13 +478,31 @@ export async function createDatabaseBackup(options: {
 // List / read
 // ---------------------------------------------------------------------------
 
-export async function listDatabaseBackups(environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest[]> {
+export interface BackupListing {
+  backups: BackupManifest[];
+  /** Manifest object names that could not be read or parsed; callers that delete must treat any as "unknown state". */
+  unreadable: string[];
+}
+
+export async function listDatabaseBackupsDetailed(environment: BackupEnvironment = backupEnvironment()): Promise<BackupListing> {
   const storage = resolveStorage(environment);
   const objects = unwrap(await storage.client.list({ prefix: storage.prefix }), "list");
   const manifestNames = objects.map((o) => o.name).filter((name) => name.endsWith(".manifest.json"));
-  const manifests = await Promise.all(manifestNames.map(async (name) =>
+  const settled = await Promise.allSettled(manifestNames.map(async (name) =>
     JSON.parse(unwrap(await storage.client.downloadAsText(name), "read")) as BackupManifest));
-  return manifests.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const backups: BackupManifest[] = [];
+  const unreadable: string[] = [];
+  settled.forEach((result, i) => {
+    if (result.status === "fulfilled") return void backups.push(result.value);
+    unreadable.push(manifestNames[i]);
+    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(String(result.reason?.message ?? result.reason)) });
+  });
+  backups.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return { backups, unreadable };
+}
+
+export async function listDatabaseBackups(environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest[]> {
+  return (await listDatabaseBackupsDetailed(environment)).backups;
 }
 
 export async function readBackupManifest(id: string, environment: BackupEnvironment = backupEnvironment()): Promise<BackupManifest> {
@@ -482,6 +512,19 @@ export async function readBackupManifest(id: string, environment: BackupEnvironm
   const exists = unwrap(await storage.client.exists(name), "lookup");
   if (!exists) throw new DatabaseBackupError(`No ${environment} backup with id ${id}.`, 422);
   return JSON.parse(unwrap(await storage.client.downloadAsText(name), "read")) as BackupManifest;
+}
+
+/** Remove one backup. The manifest goes first, so a half-deleted backup is never listed as restorable. */
+export async function deleteDatabaseBackup(id: string, environment: BackupEnvironment = backupEnvironment()): Promise<void> {
+  assertBackupId(id);
+  const storage = resolveStorage(environment);
+  unwrap(await storage.client.delete(`${storage.prefix}${id}.manifest.json`), "manifest delete");
+  try {
+    unwrap(await storage.client.delete(`${storage.prefix}${id}.dump`), "dump delete");
+  } catch (error) {
+    logger.error("Backup manifest deleted but its dump remains (orphan object)", { backupId: id });
+    throw error;
+  }
 }
 
 // ---------------------------------------------------------------------------

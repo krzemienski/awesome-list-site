@@ -95,6 +95,95 @@
       })();
     </script>
 
+    <script>
+      // Pre-hydration search capture (BUG-043). The React key handler only
+      // exists after hydration, which on a throttled load is long after the
+      // server-rendered page is visible. Until the app mounts, Ctrl/Cmd+K and
+      // "/" (outside a text field) set a pending flag and the keys typed after
+      // them are buffered; MainLayout opens the palette with that draft. Escape
+      // cancels. MainLayout and App call __awvStopPaletteCapture on mount, so
+      // this listener never outlives the app's first commit.
+      (function () {
+        try {
+          function isField(t) {
+            return !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
+          }
+          // Anything focusable owns its own keys (Space on a button, Enter on
+          // a link), so a pending request must end once focus lands there.
+          function isInteractive(t) {
+            return !!t && !!t.closest && !!t.closest('a[href],button,input,select,textarea,summary,[role=button],[tabindex]:not([tabindex="-1"]),[contenteditable]');
+          }
+          var timer = 0;
+          // Successful hydration stops capture but keeps the draft for the
+          // palette. A boot that never completes cancels via the timeout; page
+          // errors are not a signal (third-party scripts throw independently).
+          function stop() {
+            document.removeEventListener('keydown', onKey, true);
+            document.removeEventListener('focusin', onFocusIn, true);
+            document.removeEventListener('DOMContentLoaded', armTimeout);
+            clearTimeout(timer);
+            window.__awvStopPaletteCapture = undefined;
+          }
+          function cancel() {
+            window.__awvPendingPalette = undefined;
+            stop();
+          }
+          function onFocusIn(e) {
+            if (isInteractive(e.target)) window.__awvPendingPalette = undefined;
+          }
+          function onKey(e) {
+            var k = e.key;
+            if (typeof k !== 'string' || e.defaultPrevented || e.isComposing || e.keyCode === 229) return;
+            var t = e.target;
+            var pending = window.__awvPendingPalette;
+            var isK = (e.metaKey || e.ctrlKey) && k.toLowerCase() === 'k';
+            if (pending) {
+              // Asymmetric on purpose: a focus move (onFocusIn) ends the request,
+              // but the key's current target does not. Ctrl+K may be pressed on
+              // a link, and the typed query must still reach the palette.
+              if (isField(t)) {
+                window.__awvPendingPalette = undefined;
+                return;
+              }
+              // Focus may stay on a non-field ancestor after a heading click.
+              // The queued palette owns keys there just as it does on body.
+              if (k === 'Escape') {
+                e.preventDefault();
+                window.__awvPendingPalette = undefined;
+              } else if (isK) {
+                e.preventDefault();
+              } else if (e.metaKey || (e.ctrlKey && !e.altKey) || (e.altKey && !e.ctrlKey)) {
+                return;
+              } else if (k === 'Backspace') {
+                e.preventDefault();
+                pending.draft = pending.draft.slice(0, -1);
+              } else if (k.length === 1) {
+                // ctrl+alt together is AltGr on Windows: printable, so buffered.
+                e.preventDefault();
+                pending.draft += k;
+              }
+              return;
+            }
+            var method = null;
+            var inTextField = !!t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+            if (isK) {
+              if (inTextField) return;
+              method = 'keyboard_shortcut';
+            } else if (k === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inTextField) method = 'slash_key';
+            if (!method) return;
+            e.preventDefault();
+            window.__awvPendingPalette = { open: true, draft: '', method: method };
+          }
+          window.__awvStopPaletteCapture = stop;
+          document.addEventListener('keydown', onKey, true);
+          document.addEventListener('focusin', onFocusIn, true);
+          function armTimeout() { timer = setTimeout(cancel, 30000); }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', armTimeout);
+          else armTimeout();
+        } catch (e) {}
+      })();
+    </script>
+
     <style>
       #home-layout-boot-skeleton { display: none; }
       html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
@@ -170,11 +259,12 @@
           } else if (tagMatch) {
             var tagPage = searchParams.get('page') || '1';
             var tagValue = decodeURIComponent(tagMatch[1]);
-            // Over-length tags (TAG_MAX_LENGTH = 50) are a 404 page; the API
-            // would answer 400, so skip the prefetch.
-            if (/^[1-9]\d*$/.test(tagPage) && tagValue.length <= 50) {
-              var tagOffset = (Number(tagPage) - 1) * 24;
-              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=true';
+            // Over-length tags (TAG_MAX_LENGTH = 50) and offsets past int4
+            // (MAX_PAGE) are a 404 page; the API would answer 400, so skip
+            // the prefetch.
+            var tagOffset = (Number(tagPage) - 1) * 24;
+            if (/^[1-9]\d*$/.test(tagPage) && tagValue.length <= 50 && tagOffset <= 2147483647) {
+              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=categories';
               var tagFetch = fetch(tagUrl, { credentials: 'same-origin' });
               window.__tagListingEarlyFetch = { url: tagUrl, promise: tagFetch };
               tagFetch.catch(function () {});
@@ -259,40 +349,20 @@
       })();
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- The ONE webfont request, originally copied byte-for-byte from the
-         design source (awesome-list-site-ds/index.html). Pixel parity with the design needs
-         both documents to declare the same @font-face set — same families,
-         weights, styles and axes — because a different axis subset (Fraunces
-         with `opsz`, Inter without 800) shapes different glyph outlines and
-         metrics. The families the two kept design systems (Editorial, Geist)
-         name, plus IBM Plex Sans for the font picker, ride on this single
-         pre-paint link, so switching systems never fetches another
-         stylesheet; only picker overrides not in this set load on demand
-         (client/src/lib/font-options.ts). Families only the removed systems
-         used (Instrument Serif, Space Grotesk, IBM Plex Mono, Manrope) were
-         dropped; never add families here. Unused families cost only CSS bytes: the
-         font files themselves download when a face is first used.
-         BUG-014: no inline onload handler (the nonce-based CSP would block it).
-         X-03: the link starts as media="print" so the cross-origin request
-         never blocks first paint; the nonce-stamped script beside it switches
-         it to "all" once it loads. display=swap keeps FOUT control. -->
-    <link rel="stylesheet" id="shell-webfonts" media="print"
-           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
-    <script>
-      (function () {
-        var l = document.getElementById("shell-webfonts");
-        if (!l) return;
-        var on = function () { l.media = "all"; };
-        if (l.sheet) on(); else { l.addEventListener("load", on); l.addEventListener("error", on); }
-      })();
-    </script>
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" /></noscript>
+    <!-- Webfonts are self-hosted (OFL): no request leaves the origin before
+         the visitor chooses on the consent banner. fonts.css declares the
+         same families, weights, styles, axes and unicode-range the former
+         Google Fonts css2 request did (Inter, Fraunces, JetBrains Mono, Geist
+         and IBM Plex Sans), so pixel parity with the design source holds.
+         Fonts download only when used. Inter is the default body face of
+         both kept design systems, so it is the one font preloaded. -->
+    <link rel="preload" href="/fonts/inter-bec94a.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
 
-    <!-- The design system, verbatim from the design source (never edited here;
-         app CSS lives in the Vite bundle, which links after this sheet). -->
+    <!-- Vite generates the six font defaults after this sheet for no-JS SSR. -->
     <link rel="stylesheet" href="/ds/design-system.css" />
+    <style id="font-system-defaults">__AWESOME_VIDEO_FONT_SYSTEM_CSS__</style>
+    <script>window.FONT_SYSTEM_STACKS = __AWESOME_VIDEO_FONT_SYSTEM_STACKS__;</script>
     <!-- Classic, parser-blocking script on purpose: it defines
          window.DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT /
          applyDesignSystem before the boot below runs. -->

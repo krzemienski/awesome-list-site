@@ -1,0 +1,82 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e30]
+              - listitem [level=1]
+                - link "Admin" [ref=e31]
+              - listitem [level=1]
+                - link "Journeys" [disabled, ref=e32]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings, Journeys section open" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+            - StaticText "Journeys section open"
+          - generic
+            - tablist "Admin sections" [ref=e13] focusable [tabindex]
+              - tab "Overview" [ref=e15]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e16]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e17]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e18]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e19]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e20]
+                - StaticText "Export"
+              - tab "Database" [ref=e21]
+                - StaticText "Database"
+              - tab "Resources" [ref=e22]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e23]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e24]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e25]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e26]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e27]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e28]
+                - StaticText "Audit"
+              - tab "Research" [ref=e29]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e14]
+          - tabpanel "Journeys" [ref=e12] focusable [tabindex]
+            - article
+              - image
+              - StaticText "Learning Journeys"
+              - StaticText "Edit the steps shown on each learning journey. Changes go live immediately."

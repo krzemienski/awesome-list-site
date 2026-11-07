@@ -1,0 +1,77 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Resources" [ref=e36] focusable [tabindex]
+            - article
+              - navigation "Pagination" [ref=e37]
+                - status
+  - dialog "Add New Resource"
+    - heading "Add New Resource" [level=2, ref=e2]
+      - image
+      - StaticText "Add New Resource"
+    - paragraph
+      - StaticText "Create a new resource entry. Required fields are marked with *."
+    - LabelText [ref=e3] clickable [cursor:pointer]
+      - StaticText "Title *"
+    - textbox "Title *" [ref=e4]
+    - LabelText [ref=e5] clickable [cursor:pointer]
+      - StaticText "URL *"
+    - textbox "URL *" [ref=e6]
+    - LabelText [ref=e7] clickable [cursor:pointer]
+      - StaticText "Description"
+    - textbox "Description" [ref=e8]
+    - LabelText [ref=e9] clickable [cursor:pointer]
+      - StaticText "Category *"
+    - combobox "Category *" [expanded=false, required, ref=e10]: Select category
+      - StaticText "Select category"
+    - LabelText [ref=e11] clickable [cursor:pointer]
+      - StaticText "Status"
+    - combobox "Status" [expanded=false, ref=e12]: Pending
+      - generic [ref=e30] clickable [cursor:pointer, onclick]
+        - StaticText "Pending"
+    - LabelText [ref=e13] clickable [cursor:pointer]
+      - StaticText "Subcategory"
+    - combobox "Subcategory" [expanded=false, disabled, ref=e14]: Select category first
+      - StaticText "Select category first"
+    - LabelText [ref=e15] clickable [cursor:pointer]
+      - StaticText "Sub-subcategory"
+    - combobox "Sub-subcategory" [expanded=false, disabled, ref=e16]: Select subcategory first
+      - StaticText "Select subcategory first"
+    - LabelText [ref=e17] clickable [cursor:pointer]
+      - StaticText "Kind override"
+    - combobox "Kind override" [expanded=false, ref=e18]: Automatic (classified on save)
+      - generic [ref=e31] clickable [cursor:pointer, onclick]
+        - StaticText "Automatic (classified on save)"
+    - paragraph
+      - StaticText "Kind is decided from category, link and title when the resource is saved"
+    - LabelText [ref=e19] clickable [cursor:pointer]
+      - StaticText "Curated placement"
+    - LabelText [ref=e20] clickable [cursor:pointer]
+      - checkbox "Curated placement Feature this resource" [checked=false, ref=e32]
+      - StaticText "Feature this resource"
+    - paragraph
+      - StaticText "Persists as metadata.featured."
+    - LabelText [ref=e21] clickable [cursor:pointer]
+      - StaticText "Format"
+    - combobox "Format" [expanded=false, ref=e22]: Not yet classified
+      - generic [ref=e33] clickable [cursor:pointer, onclick]
+        - StaticText "Not yet classified"
+    - LabelText [ref=e23] clickable [cursor:pointer]
+      - StaticText "Provider"
+    - combobox "Provider" [expanded=false, ref=e24]: Not yet classified
+      - generic [ref=e34] clickable [cursor:pointer, onclick]
+        - StaticText "Not yet classified"
+    - LabelText [ref=e25] clickable [cursor:pointer]
+      - StaticText "Skill level"
+    - combobox "Skill level" [expanded=false, ref=e26]: Not yet classified
+      - generic [ref=e35] clickable [cursor:pointer, onclick]
+        - StaticText "Not yet classified"
+    - button "Cancel" [ref=e27]
+    - button "Create Resource" [ref=e28]
+      - image
+      - StaticText "Create Resource"
+    - button "Close" [ref=e29]
+      - image
+      - StaticText "Close"

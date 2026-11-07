@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/category/encoding-codecs/not-real","title":"Page Not Found — Awesome Video","width":820,"height":1180,"touch":true,"scrollY":0,"bodyWidth":814,"online":true,"focus":{"tag":"BODY","id":"","label":null,"text":"\n    \n    \n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--bord","rect":{"x":0,"y":0,"width":814,"height":1403.828125,"top":0,"right":814,"bottom":1403.828125,"left":0}},"headings":[{"text":"Page Not Found","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Browse","label":null,"current":"true"},{"text":"Page Not Found","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```

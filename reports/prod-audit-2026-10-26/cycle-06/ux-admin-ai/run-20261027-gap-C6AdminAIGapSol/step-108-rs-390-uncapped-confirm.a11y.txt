@@ -1,0 +1,295 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab [selected]:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=3]: Run a research task
+                                - paragraph: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                                - generic:
+                                  - region:
+                                    - generic:
+                                      - generic: "1"
+                                      - heading [level=4]: Brief
+                                      - generic: 41 characters
+                                    - generic:
+                                      - radiogroup:
+                                        - generic:
+                                          - radio
+                                          - generic:
+                                            - generic: Auto-generate at launch
+                                            - generic: A gap-aware brief built from the catalog and past runs.
+                                        - generic:
+                                          - radio [checked]:
+                                            - generic:
+                                              - img
+                                          - generic:
+                                            - generic: Write my own
+                                            - generic: Describe what to search for, or start from a generated brief.
+                                      - generic:
+                                        - generic:
+                                          - generic: Research brief
+                                          - button:
+                                            - img
+                                            - text: Start from a generated brief
+                                        - textbox:
+                                          - /placeholder: e.g. Find open-source AV1 encoders not yet in the index
+                                          - text: Gap-closure read-only draft, not launched
+                                        - paragraph: 41 characters
+                                  - region:
+                                    - generic:
+                                      - generic: "2"
+                                      - heading [level=4]: Focus
+                                      - generic: All categories
+                                    - generic:
+                                      - combobox:
+                                        - generic: All categories
+                                        - img
+                                  - region:
+                                    - generic:
+                                      - generic: "3"
+                                      - heading [level=4]: Limits
+                                      - generic: stop after 1 · no budget cap · no turn cap
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - text: Stop after (discoveries)
+                                          - spinbutton: "1"
+                                          - paragraph: Stops after 1 new discovery.
+                                        - generic:
+                                          - text: Budget cap (USD)
+                                          - spinbutton
+                                          - paragraph: No cap — the run spends until it stops or you cancel it.
+                                        - generic:
+                                          - text: Max turns
+                                          - spinbutton
+                                          - paragraph: No turn cap.
+                                      - paragraph: Past runs cost $0.15–$41.78. Discoveries are deduplicated against the 3,826 catalog resources.
+                                  - region:
+                                    - generic:
+                                      - generic: "4"
+                                      - heading [level=4]: Endpoint & model
+                                      - generic: Server configuration
+                                    - generic:
+                                      - button:
+                                        - text: Override endpoint or models (optional)
+                                        - img
+                                  - region:
+                                    - generic:
+                                      - generic: "5"
+                                      - heading [level=4]: About to run on
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - term: Endpoint
+                                              - definition:
+                                                - text: router.hack.ski
+                                                - generic: · ANTHROPIC_BASE_URL
+                                            - generic:
+                                              - term: Credential
+                                              - definition: router via ANTHROPIC_BASE_URL
+                                            - generic:
+                                              - term: Orchestrator model
+                                              - definition:
+                                                - text: cc/claude-opus-5
+                                                - generic: · ANTHROPIC_MODEL
+                                            - generic:
+                                              - term: Scout model
+                                              - definition:
+                                                - text: cc/claude-haiku-4-5-20251001
+                                                - generic: · haiku via ANTHROPIC_DEFAULT_HAIKU_MODEL
+                                      - generic:
+                                        - button:
+                                          - img
+                                          - text: Launch research run
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=2]: Researcher jobs
+                                - paragraph: Latest 5 of 76 research runs
+                            - generic:
+                              - region:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: Status
+                                      - columnheader: Prompt
+                                      - columnheader: Found
+                                      - columnheader: Approved / Rejected
+                                      - columnheader: Cost
+                                      - columnheader: Turns
+                                      - columnheader: Created
+                                  - rowgroup:
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: "Five-pass sustained catalog audit. Work for at least 30 minutes and complete at least 495 substantive orchestrator turns before finalizing. For EACH of the 99 real subcategories, perform FIVE SEPARATE ORCHESTRATOR TURNS, one subcategory at a time with no batching: (1) retrieve its existing resources and assess topic coverage, (2) compare its coverage gaps with sibling subcategories, (3) check_duplicate for one plausible official candidate, (4) check_duplicate for a second distinct plausible official candidate, and (5) record a concise coverage/duplicate ledger conclusion for that subcategory. Continue through every real subcategory, including Uncategorized; do not substitute only top-level categories. Use scouts for independent coverage assessment throughout. WebSearch is optional and capped at 10 calls; zero searches is fine and search failure must not stop the five-pass audit. Save up to 25 discoveries only for actually verified official URLs; zero saves is acceptable. Do not finalize before all 99 subcategories have five separate turns (495 total) and at least 30 minutes of genuine work. Never invent URLs/metadata and never idle-wait."
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.7600
+                                      - cell: 28/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: Sustained catalog coverage and duplicate-audit run requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. This run is NOT dependent on web-search success or saving discoveries. Use get_coverage_gaps, check_duplicate and scouts throughout to evaluate every catalog category and subcategory for missing video-engineering topics, stale overlaps and duplicate candidates; maintain a detailed candidate and coverage ledger. Search is optional and capped at 20 WebSearch calls total. If search returns no results or becomes exhausted, continue the substantive catalog coverage, taxonomy comparison and duplicate analysis without stopping. Save up to 25 discoveries only when an official URL is actually verified; zero saves is acceptable. Do not finalize before 30 minutes and 450 substantive turns covering all categories. Never invent URLs/metadata and never idle-wait to pad runtime.
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $1.2973
+                                      - cell: 93/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: Sustained production research requiring at least 30 minutes and at least 450 substantive orchestrator turns of genuine work. Find up to 25 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Evaluate at least 150 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Use scouts throughout for direct-source retrieval, URL verification, taxonomy comparison and candidate evaluation. Keep a written candidate ledger. Use at most 40 WebSearch calls in the entire run so the shared search budget cannot end the work; after that continue substantive direct official-source retrieval and evaluation with remaining tools. Do not finalize before 30 minutes, 450 substantive turns and 150 evaluated candidates. Never invent URLs/metadata and never idle-wait to pad runtime.
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.5650
+                                      - cell: 13/600
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: completed
+                                      - cell: "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting."
+                                      - cell: "4"
+                                      - cell: 1/0
+                                      - cell: $5.4603
+                                      - cell: 155/200
+                                      - cell: Oct 27, 2026
+                                    - row:
+                                      - cell:
+                                        - generic: failed
+                                      - cell: "Sustained production research for at least 30 minutes of genuine work. Find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Critically evaluate at least 50 distinct candidate official project pages, repositories, standards documents or technical papers; verify every candidate URL and check duplicates before saving. Keep a candidate ledger and use up to 180 turns of substantive research. Do not finalize before 30 minutes and 50 evaluated candidates. If the shared web-search budget becomes exhausted, do NOT stop: continue direct official-source retrieval, URL verification, duplicate checks, taxonomy comparison and candidate evaluation with the remaining tools. Never invent URLs or metadata and never pad time with idle waiting."
+                                      - cell: "0"
+                                      - cell: 0/0
+                                      - cell: $0.0000
+                                      - cell: 1/200
+                                      - cell: Oct 27, 2026
+                              - generic:
+                                - button: Show more
+                        - group:
+                          - generic: All pending discoveries & full job history
+      - button:
+        - img
+  - alertdialog "Launch research run?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Launch research run?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: This starts a paid Claude research agent (stop after 1 · no budget cap · no turn cap) on router.hack.ski. It runs in the background.
+    - generic [ref=e6]:
+      - button "Cancel" [active] [ref=e7] [cursor=pointer]
+      - button "Launch" [ref=e8] [cursor=pointer]

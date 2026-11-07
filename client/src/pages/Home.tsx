@@ -1,5 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { focusPageHeading } from "@/hooks/focus-handoff";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -8,14 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
   fetchKindCounts,
-  isRealCategory,
-  navTotalCount,
   STRIP_KINDS,
   visibleNavCategories,
   type AwesomeListNav,
   type AwesomeListNavNode,
   type ResourceKindCounts,
 } from "@/lib/static-data";
+import {
+  countNestedGroups,
+  countVisibleSubcategories,
+  isRealCategory,
+} from "@shared/catalog-counts";
 import {
   resolveResourceKindFrom,
   type ResourceKind,
@@ -26,13 +29,15 @@ import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
-import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { trackFilterUsage, trackSortChange, trackTagInteraction } from "@/lib/analytics";
+import { writeFilterParams } from "@/lib/url-filter-state";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
 import { useHomeLayout } from "@/components/home/use-home-layout";
+import { useLegacyReadmeAnchor } from "@/lib/legacy-readme-anchor";
 import HomePresentation, {
   type HomeCategoryView,
   type HomeStats,
@@ -103,24 +108,6 @@ interface DisplayCategory {
   subcategories: AwesomeListNavNode[];
 }
 
-function countSubcategories(categories: AwesomeListNavNode[]): number {
-  return categories.reduce(
-    (total, category) => total + (category.subcategories?.length ?? 0),
-    0,
-  );
-}
-
-function countNestedGroups(categories: AwesomeListNavNode[]): number {
-  return categories.reduce((total, category) => {
-    const direct = category.subSubcategories?.length ?? 0;
-    const nested = (category.subcategories ?? []).reduce(
-      (subtotal, subcategory) => subtotal + (subcategory.subSubcategories?.length ?? 0),
-      0,
-    );
-    return total + direct + nested;
-  }, 0);
-}
-
 import { categoryGlyph } from "@/lib/category-glyph";
 
 function categoryIcon(name: string, slug: string): string {
@@ -157,14 +144,8 @@ function resourceMatchesTags(resource: Resource, selectedTags: string[]): boolea
   return normalizedSelectedTags.some((tag) => tags.includes(tag));
 }
 
-function resourceMatchesFilters(
-  resource: Resource,
-  selectedTags: string[],
-  selectedKind: ResourceKind | null,
-): boolean {
-  const matchesTags =
-    selectedTags.length === 0 || resourceMatchesTags(resource, selectedTags);
-  const resolvedKind =
+function resolvedKindOf(resource: Resource): ResourceKind {
+  return (
     resource.resolvedKind ??
     resolveResourceKindFrom({
       storedKind: resource.kind,
@@ -175,8 +156,18 @@ function resourceMatchesFilters(
         resource.subSubcategory,
         ...(resource.metadata?.sourceCategories ?? []),
       ],
-    }).kind;
-  const matchesKind = selectedKind === null || resolvedKind === selectedKind;
+    }).kind
+  );
+}
+
+function resourceMatchesFilters(
+  resource: Resource,
+  selectedTags: string[],
+  selectedKind: ResourceKind | null,
+): boolean {
+  const matchesTags =
+    selectedTags.length === 0 || resourceMatchesTags(resource, selectedTags);
+  const matchesKind = selectedKind === null || resolvedKindOf(resource) === selectedKind;
   return matchesTags && matchesKind;
 }
 
@@ -223,7 +214,10 @@ function HomeSkeleton({
         </div>
       </div>
       {layout === "index" ? (
-        <div className="home-skeleton-line home-skeleton-index-title" />
+        <>
+          <div className="home-skeleton-line home-skeleton-index-title" />
+          <div className="home-skeleton-line home-skeleton-index-search" />
+        </>
       ) : (
         <div className="home-hero">
           <div className="home-skeleton-line home-skeleton-hero-title" />
@@ -434,6 +428,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { layout, isLoading: layoutLoading } = useHomeLayout();
+  useLegacyReadmeAnchor(nav);
   const {
     preferences,
     isLoading: preferencesLoading,
@@ -470,72 +465,65 @@ export default function Home({ nav, navLoading }: HomeProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
-    parseTagsParam(
-      new URLSearchParams(typeof window === "undefined" ? search : window.location.search),
-    ),
+  // The query string is the only filter state. In-page links (a featured
+  // card's tag pill), writeFilterParams and Back/Forward all change it, and
+  // wouter's useSearch re-renders on each of them.
+  const selectedTags = useMemo(() => parseTagsParam(currentParams), [currentParams]);
+  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(
+    () =>
+      (currentParams.has("tags") || currentParams.has("tag")) &&
+      parseTagsParam(currentParams).length === 0,
   );
-  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
-    const params = new URLSearchParams(
-      typeof window === "undefined" ? search : window.location.search,
-    );
-    return (
-      (params.has("tags") || params.has("tag")) &&
-      parseTagsParam(params).length === 0
-    );
-  });
-  const [selectedKind, setSelectedKindState] = useState<ResourceKind | null>(() => {
-    if (typeof window === "undefined") return null;
-    const rawKind = new URLSearchParams(window.location.search).get("kind");
-    return rawKind && (STRIP_KINDS as readonly string[]).includes(rawKind)
+  const rawKind = currentParams.get("kind");
+  const selectedKind: ResourceKind | null =
+    rawKind && (STRIP_KINDS as readonly string[]).includes(rawKind)
       ? (rawKind as ResourceKind)
       : null;
-  });
+
+  // Filter analytics wait for the filtered result count (the corpus loads on
+  // the first tag/kind filter), like the search and taxonomy pages.
+  const pendingAnalyticsRef = useRef<
+    | { kind: "sort"; value: string }
+    | { kind: "tag"; value: string; action: "apply" | "remove" }
+    | { kind: "filter"; type: string; value: string }
+    | null
+  >(null);
+  const [analyticsTick, setAnalyticsTick] = useState(0);
+  const queueAnalytics = (pending: NonNullable<typeof pendingAnalyticsRef.current>) => {
+    pendingAnalyticsRef.current = pending;
+    setAnalyticsTick((tick) => tick + 1);
+  };
 
   const setSelectedTags = (next: string[]) => {
-    setSelectedTagsState(next);
+    const previous = new Set(selectedTags.map(normalizeTag));
+    const incoming = new Set(next.map(normalizeTag));
+    const added = next.find((tag) => !previous.has(normalizeTag(tag)));
+    const removed = selectedTags.find((tag) => !incoming.has(normalizeTag(tag)));
+    const changed = added ?? removed;
+    if (changed) queueAnalytics({ kind: "tag", value: changed, action: added ? "apply" : "remove" });
     writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
   };
 
   const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"] as const;
   type HomeSort = (typeof VALID_SORTS)[number];
-  const [sortBy, setSortBy] = useState<HomeSort>(() => {
-    const fromUrl = new URLSearchParams(
-      typeof window === "undefined" ? search : window.location.search,
-    ).get("sort");
-    return fromUrl && (VALID_SORTS as readonly string[]).includes(fromUrl)
-      ? (fromUrl as HomeSort)
+  const rawSort = currentParams.get("sort");
+  const sortBy: HomeSort =
+    rawSort && (VALID_SORTS as readonly string[]).includes(rawSort)
+      ? (rawSort as HomeSort)
       : "default";
-  });
 
   const handleSortChange = (next: string) => {
     const safeNext = (VALID_SORTS as readonly string[]).includes(next)
       ? (next as HomeSort)
       : "default";
-    setSortBy(safeNext);
+    if (safeNext !== sortBy) queueAnalytics({ kind: "sort", value: safeNext });
     writeFilterParams({ sort: safeNext === "default" ? null : safeNext });
   };
 
   const handleKindChange = (next: ResourceKind | null) => {
-    setSelectedKindState(next);
+    if (next !== selectedKind) queueAnalytics({ kind: "filter", type: "kind", value: next ?? "all" });
     writeFilterParams({ kind: next });
   };
-
-  usePopstateParams((params) => {
-    setSelectedTagsState(parseTagsParam(params));
-    const kind = params.get("kind");
-    setSelectedKindState(
-      kind && (STRIP_KINDS as readonly string[]).includes(kind)
-        ? (kind as ResourceKind)
-        : null,
-    );
-    const sort = params.get("sort");
-    setSortBy(
-      sort && (VALID_SORTS as readonly string[]).includes(sort)
-        ? (sort as HomeSort)
-        : "default",
-    );
-  });
 
   const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
   const showFilters =
@@ -582,14 +570,15 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const kindCountsUnavailable = queryUnavailableReason(kindCountsQuery) !== null;
   const corpusUnavailable = corpusFilterActive ? queryUnavailableReason(corpusQuery) : null;
 
+  // The pruned public taxonomy (no empty subcategories), the same tree the
+  // stats, sidebar and crawler HTML list.
   const navCategories = useMemo<DisplayCategory[]>(() => {
     if (!nav?.categories) return [];
-    return nav.categories
-      .filter((category) => isRealCategory(category.name) && navTotalCount(category) > 0)
+    return visibleNavCategories(nav.categories)
       .map((category) => ({
         name: category.name,
         slug: category.slug ?? "",
-        count: navTotalCount(category),
+        count: category.totalResourceCount,
         teaser: category.teaser,
         subcategories: category.subcategories ?? [],
       }));
@@ -640,12 +629,35 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return categories;
   }, [corpusFilterActive, navCategories, corpusBaseCategories, selectedTags, selectedKind, sortBy]);
 
-  const filteredCorpusResources = useMemo(() => {
-    if (!corpusFilterActive) return [] as Resource[];
+  // Resources matching the tag filter alone: the scope the kind chips count
+  // and the denominator of the "N OF M" header, like a category listing's scope.
+  const tagScopedResources = useMemo(() => {
+    if (selectedTags.length === 0) return [] as Resource[];
     return corpusBaseCategories
       .flatMap((category) => getAllResources(category))
-      .filter((resource) => resourceMatchesFilters(resource, selectedTags, selectedKind));
-  }, [corpusBaseCategories, corpusFilterActive, selectedKind, selectedTags]);
+      .filter((resource) => resourceMatchesFilters(resource, selectedTags, null));
+  }, [corpusBaseCategories, selectedTags]);
+
+  const tagScopedKindCounts = useMemo<ResourceKindCounts | undefined>(() => {
+    if (selectedTags.length === 0) return undefined;
+    const counts = { total: tagScopedResources.length, other: 0 } as ResourceKindCounts;
+    for (const kind of STRIP_KINDS) counts[kind] = 0;
+    for (const resource of tagScopedResources) {
+      const kind = resolvedKindOf(resource);
+      counts[kind] = (counts[kind] ?? 0) + 1;
+    }
+    return counts;
+  }, [selectedTags.length, tagScopedResources]);
+
+  const filteredCorpusResources = useMemo(() => {
+    if (!corpusFilterActive) return [] as Resource[];
+    if (selectedTags.length > 0) {
+      return tagScopedResources.filter((resource) => resourceMatchesFilters(resource, [], selectedKind));
+    }
+    return corpusBaseCategories
+      .flatMap((category) => getAllResources(category))
+      .filter((resource) => resourceMatchesFilters(resource, [], selectedKind));
+  }, [corpusBaseCategories, corpusFilterActive, selectedKind, selectedTags.length, tagScopedResources]);
 
   // The home feed is intentionally a bounded API response by default. Once a
   // kind/tag filter is active, derive both visible feeds from the authoritative
@@ -707,7 +719,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
             return {
               name: subcategory.name,
               slug: subcategory.slug ?? "",
-              count: corpusFilterActive ? matchingResources.length : navTotalCount(subcategory),
+              count: corpusFilterActive ? matchingResources.length : subcategory.totalResourceCount,
               nestedCount: corpusFilterActive
                 ? filteredNestedCount
                 : (subcategory.subSubcategories?.length ?? 0) +
@@ -732,13 +744,26 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return {
       total: homeData?.total ?? nav?.totalResources ?? 0,
       categories: realCategories,
-      subcategories: countSubcategories(rawCategories),
+      subcategories: countVisibleSubcategories(rawCategories),
       nestedGroups: countNestedGroups(rawCategories),
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,
       matching: corpusFilterActive ? filteredCorpusResources.length : undefined,
+      scopeTotal: selectedTags.length > 0 ? tagScopedResources.length : undefined,
     };
-  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length, selectedTags.length, tagScopedResources.length]);
+
+  useEffect(() => {
+    const pending = pendingAnalyticsRef.current;
+    if (!pending) return;
+    // A tag/kind filter counts the live corpus; wait until it has loaded.
+    if (corpusFilterActive && (!rawCorpus || corpusLoading)) return;
+    const resultCount = corpusFilterActive ? filteredCorpusResources.length : stats.total;
+    pendingAnalyticsRef.current = null;
+    if (pending.kind === "sort") trackSortChange(pending.value, "home", resultCount);
+    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.action, "home", resultCount);
+    else trackFilterUsage(pending.type, pending.value, resultCount, "home");
+  }, [analyticsTick, corpusFilterActive, rawCorpus, corpusLoading, filteredCorpusResources.length, stats.total]);
 
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
@@ -807,7 +832,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
   return (
     <>
       <SEOHead
-        title={homeSeoTitle(nav.totalResources)}
+        title={homeSeoTitle(nav.totalResources, selectedTags)}
         description={homeSeoDescription(nav.totalResources, nav.categories.length)}
       />
       <HomePresentation
@@ -816,16 +841,14 @@ export default function Home({ nav, navLoading }: HomeProps) {
         recent={filteredRecent}
         featured={filteredFeatured}
         stats={stats}
-        kindCounts={kindCounts}
-        kindCountsLoading={kindCountsLoading}
-        kindCountsError={kindCountsUnavailable}
+        kindCounts={tagScopedKindCounts ?? kindCounts}
+        kindCountsLoading={tagScopedKindCounts ? false : kindCountsLoading}
+        kindCountsError={tagScopedKindCounts ? false : kindCountsUnavailable}
         selectedKind={selectedKind}
         onKindChange={handleKindChange}
         selectedTags={selectedTags}
         onClearFilters={() => {
-          setSelectedTags([]);
-          setSelectedKindState(null);
-          setSortBy("default");
+          queueAnalytics({ kind: "filter", type: "all", value: "cleared" });
           writeFilterParams({ tags: null, kind: null, sort: null });
         }}
         filters={filters}

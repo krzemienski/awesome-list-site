@@ -1,6 +1,6 @@
 import { homeHeading } from "@shared/page-headings";
-import type { ReactNode } from "react";
-import { Link } from "wouter";
+import { useLayoutEffect, useRef, type FormEvent, type ReactNode } from "react";
+import { Link, useLocation } from "wouter";
 import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
 import { STRIP_KINDS, type ResourceKindCounts } from "@/lib/static-data";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { tagLandingPath } from "@shared/tagNormalize";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 
@@ -38,6 +40,8 @@ export interface HomeStats {
   approvedThisWeek: number;
   /** Resources matching the active kind/tag filter; undefined when unfiltered. */
   matching?: number;
+  /** Resources matching the tag filter alone; undefined when no tag is active. */
+  scopeTotal?: number;
 }
 
 export interface HomePresentationProps {
@@ -248,6 +252,7 @@ function PageMeta({
   kindCountsError,
   selectedKind,
   onKindChange,
+  selectedTags,
 }: {
   layout: "index" | "curated";
   stats: HomeStats;
@@ -256,17 +261,40 @@ function PageMeta({
   kindCountsError?: boolean;
   selectedKind?: ResourceKind | null;
   onKindChange?: (kind: ResourceKind | null) => void;
+  selectedTags: string[];
 }) {
+  // The category groups only preview a tag match. A single tag has a landing
+  // page listing every match; several tags (a union) list on /search.
+  const viewAllHref =
+    selectedTags.length === 1
+      ? tagLandingPath(selectedTags[0])
+      : selectedTags.length > 1
+        ? `/search?${selectedTags.map((tag) => `tags=${encodeURIComponent(tag)}`).join("&")}`
+        : null;
   const eyebrow =
     layout === "index"
       ? stats.matching === undefined
         ? `INDEX · ${formatCount(stats.total)} ENTRIES`
-        : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.total)} ENTRIES`
+        : stats.matching === (stats.scopeTotal ?? stats.total)
+          ? `INDEX · ${formatCount(stats.matching)} ENTRIES`
+          : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.scopeTotal ?? stats.total)} ENTRIES`
       : `CURATED · WEEK ${isoWeekNumber(new Date())} · ${formatCount(stats.total)} INDEXED`;
   return (
     <div className="home-meta-row">
       <div className="home-eyebrow eyebrow">
         {eyebrow}
+        {viewAllHref && !selectedKind && stats.matching !== undefined ? (
+          <>
+            {" · "}
+            <Link
+              href={viewAllHref}
+              className="underline underline-offset-4 max-lg:inline-flex max-lg:min-h-11 max-lg:items-center"
+              data-testid="link-home-view-all-matches"
+            >
+              View all {formatCount(stats.matching)} →
+            </Link>
+          </>
+        ) : null}
       </div>
       <KindStrip
         counts={kindCounts}
@@ -357,7 +385,7 @@ function ResourceCard({
         </ResourceLink>
       </h3>
       <p className="home-resource-description">{resource.description}</p>
-      <div className="home-resource-tags" aria-label={`Tags for ${resource.title}`}>
+      <div className="home-resource-tags" role="group" aria-label={`Tags for ${resource.title}`}>
         {tags.slice(0, 3).map((tag) => (
           <Link
             key={tag}
@@ -427,6 +455,20 @@ function CategoryHeading({
   );
 }
 
+function NoFilterMatches({ onClearFilters, headingSelector }: {
+  onClearFilters: () => void;
+  headingSelector: string;
+}) {
+  return (
+    <div className="home-empty-categories" data-testid="empty-categories">
+      <p>No categories match the selected filters.</p>
+      <Button variant="outline" size="sm" onClick={(e) => { /* C6-SWEEP-02: the card unmounts once categories return; focus the page heading */ handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(headingSelector)); onClearFilters(); }} data-testid="button-clear-filters">
+        Clear filters
+      </Button>
+    </div>
+  );
+}
+
 function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters }: {
   categories: HomeCategoryView[];
   selectedTags: string[];
@@ -434,14 +476,7 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
   onClearFilters: () => void;
 }) {
   if (categories.length === 0) {
-    return (
-      <div className="home-empty-categories" data-testid="empty-categories">
-        <p>No categories match the selected filters.</p>
-        <Button variant="outline" size="sm" onClick={(e) => { /* C6-SWEEP-02: the card unmounts once categories return; focus the index heading */ handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(".home-index-title")); onClearFilters(); }} data-testid="button-clear-filters">
-          Clear filters
-        </Button>
-      </div>
-    );
+    return <NoFilterMatches onClearFilters={onClearFilters} headingSelector=".home-index-title" />;
   }
 
   const filterQuery = (() => {
@@ -510,8 +545,18 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
 }
 
 function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resource[] }) {
+  const railRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const publish = () => rail.style.setProperty("--home-rail-h", `${rail.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(rail);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <aside className="home-index-rail">
+    <aside ref={railRef} className="home-index-rail">
       {featured.length > 0 ? (
         <div data-testid="home-featured-rail">
           <div className="eyebrow home-rail-eyebrow">── FEATURED</div>
@@ -534,6 +579,7 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
           </div>
         </div>
       ) : null}
+      {recent.length > 0 ? (
       <div>
         <div className="eyebrow home-rail-eyebrow">── RECENTLY INDEXED</div>
         <div className="home-recent-list">
@@ -557,6 +603,7 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
           ))}
         </div>
       </div>
+      ) : null}
       <div className="home-contribute-card card">
         <div className="eyebrow home-rail-eyebrow">── CONTRIBUTE</div>
         <p>Know a tool, spec, or event that belongs here? Submissions are reviewed weekly.</p>
@@ -567,6 +614,34 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
         </Button>
       </div>
     </aside>
+  );
+}
+
+// On a phone the only search affordance was the header icon; half of home
+// landers left without a second page. A visible field opens /search directly.
+function HomeSearch() {
+  const [, navigate] = useLocation();
+  // Uncontrolled on purpose: the field is server-rendered and usable before
+  // hydration; a controlled value="" would overwrite text typed in that window.
+  // action/method let a pre-hydration Enter submit a native GET to /search?q=.
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const q = String(new FormData(event.currentTarget).get("q") ?? "").trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
+  return (
+    <form role="search" className="home-index-search" action="/search" method="get" onSubmit={submit} data-testid="home-search-form">
+      <Input
+        type="search"
+        name="q"
+        defaultValue=""
+        placeholder="Search codecs, players…"
+        aria-label="Search the catalog"
+        enterKeyHint="search"
+        data-testid="input-home-search"
+      />
+      <Button type="submit" className="min-h-11" data-testid="button-home-search">Search</Button>
+    </form>
   );
 }
 
@@ -588,6 +663,7 @@ function IndexLayout({
         <span className="caret" aria-hidden="true">~/awesome.video</span>
         <span className="sr-only">{homeHeading}</span>
       </h1>
+      <HomeSearch />
       <StatStrip stats={stats} layout="index" />
       {shownFeatured.length > 0 ? (
         <section className="home-index-featured" aria-labelledby="home-index-featured-title" data-testid="home-featured-index">
@@ -631,7 +707,8 @@ function CuratedLayout({
   stats,
   selectedTags,
   selectedKind,
-}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind">) {
+  onClearFilters,
+}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
   const query = new URLSearchParams();
   if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
   if (selectedKind) query.set("kind", selectedKind);
@@ -673,7 +750,11 @@ function CuratedLayout({
                 Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
               </>
             }
-            sub={`${formatCount(shownFeatured.length)} of ${formatCount(stats.total)} resources stand out this week.`}
+            sub={
+              shownFeatured.length < stats.featured
+                ? `${formatCount(shownFeatured.length)} of ${formatCount(stats.featured)} hand-picked resources.`
+                : `${formatCount(stats.featured)} hand-picked resources.`
+            }
           />
           <div className="home-resource-grid">
             {shownFeatured.map((resource) => (
@@ -698,64 +779,70 @@ function CuratedLayout({
             </>
           }
         />
-        <div className="home-curated-category-grid" data-testid="list-categories">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/category/${category.slug}${tagSearch}`}
-              className="home-curated-category card hoverable glow"
-              data-testid={`link-category-${category.slug}`}
-            >
-              <div className="home-curated-category-top">
-                <span className="home-category-icon" aria-hidden="true">
-                  {category.icon}
+        {categories.length === 0 ? (
+          <NoFilterMatches onClearFilters={onClearFilters} headingSelector=".home-hero-title" />
+        ) : (
+          <div className="home-curated-category-grid" data-testid="list-categories">
+            {categories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/category/${category.slug}${tagSearch}`}
+                className="home-curated-category card hoverable glow"
+                data-testid={`link-category-${category.slug}`}
+              >
+                <div className="home-curated-category-top">
+                  <span className="home-category-icon" aria-hidden="true">
+                    {category.icon}
+                  </span>
+                  <span className="home-category-count mono">{formatCount(category.count)}</span>
+                </div>
+                <h3>{category.name}</h3>
+                <p>{category.description ?? `Explore ${formatCount(category.count)} resources in ${category.name}.`}</p>
+                <span className="home-curated-explore">
+                  Explore <HomeArrow className="h-3 w-3" />
                 </span>
-                <span className="home-category-count mono">{formatCount(category.count)}</span>
-              </div>
-              <h3>{category.name}</h3>
-              <p>{category.description ?? `Explore ${formatCount(category.count)} resources in ${category.name}.`}</p>
-              <span className="home-curated-explore">
-                Explore <HomeArrow className="h-3 w-3" />
-              </span>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="home-curated-section home-curated-recent">
-        <SectionHeader
-          eyebrow="── RECENTLY UPDATED"
-          title={
-            <>
-              Fresh from <span className="serif-italic home-muted-italic">the index</span>
-            </>
-          }
-        />
-        <div className="home-recent-table card">
-          {recent.slice(0, 5).map((resource, index) => {
-            const category = categoryShortName(resource);
-            return (
-              <ResourceLink
-                key={String(resource.id)}
-                resource={resource}
-                className="home-curated-recent-row"
-                dataTestId={`link-home-curated-recent-${resource.id}`}
-                analyticsSurface="home_recent_list"
-              >
-                <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
-                <span className="home-curated-recent-copy">
-                  <span className="home-curated-recent-title">
-                    <span className="home-curated-recent-title-text">{resource.title}</span>
-                    <span className="home-curated-category chip muted">{category}</span>
+      {recent.length > 0 ? (
+        <div className="home-curated-section home-curated-recent">
+          <SectionHeader
+            eyebrow="── RECENTLY UPDATED"
+            title={
+              <>
+                Fresh from <span className="serif-italic home-muted-italic">the index</span>
+              </>
+            }
+          />
+          <div className="home-recent-table card">
+            {recent.slice(0, 5).map((resource, index) => {
+              const category = categoryShortName(resource);
+              return (
+                <ResourceLink
+                  key={String(resource.id)}
+                  resource={resource}
+                  className="home-curated-recent-row"
+                  dataTestId={`link-home-curated-recent-${resource.id}`}
+                  analyticsSurface="home_recent_list"
+                >
+                  <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="home-curated-recent-copy">
+                    <span className="home-curated-recent-title">
+                      <span className="home-curated-recent-title-text">{resource.title}</span>
+                      <span className="home-curated-category chip muted">{category}</span>
+                    </span>
+                    <span className="home-curated-recent-description">{resource.description}</span>
                   </span>
-                  <span className="home-curated-recent-description">{resource.description}</span>
-                </span>
-                <HomeArrow className="home-recent-arrow" />
-              </ResourceLink>
-            );
-          })}
+                  <HomeArrow className="home-recent-arrow" />
+                </ResourceLink>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
     </>
   );
 }
@@ -787,6 +874,7 @@ export default function HomePresentation({
         kindCountsError={kindCountsError}
         selectedKind={selectedKind}
         onKindChange={onKindChange}
+        selectedTags={selectedTags}
       />
       {emptyTagParamNotice}
       {layout === "index" ? (
@@ -807,6 +895,7 @@ export default function HomePresentation({
           stats={stats}
           selectedTags={selectedTags}
           selectedKind={selectedKind}
+          onClearFilters={onClearFilters}
         />
       )}
       {filters}

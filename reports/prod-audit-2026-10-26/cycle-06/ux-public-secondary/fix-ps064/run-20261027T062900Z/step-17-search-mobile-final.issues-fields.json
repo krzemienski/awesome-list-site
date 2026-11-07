@@ -1,0 +1,65 @@
+{
+  "url": "http://127.0.0.1:5064/search?q=video",
+  "width": 390,
+  "issues": [
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "1296",
+            "url": "http://127.0.0.1:5064/search?q=ffmpeg",
+            "lineNumber": 149,
+            "columnNumber": 109
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "1296",
+            "url": "http://127.0.0.1:5064/search?q=ffmpeg",
+            "lineNumber": 160,
+            "columnNumber": 103
+          }
+        }
+      }
+    },
+    {
+      "code": "PerformanceIssue",
+      "details": {
+        "performanceIssueDetails": {
+          "performanceIssueType": "DocumentCookie",
+          "sourceCodeLocation": {
+            "scriptId": "41",
+            "url": "http://127.0.0.1:5064/src/lib/clerk-bridge.tsx",
+            "lineNumber": 84,
+            "columnNumber": 26
+          }
+        }
+      }
+    }
+  ],
+  "fields": {
+    "tagFields": [
+      {
+        "id": "search-filter-tags-:rc:-desktop",
+        "name": "search-filter-tags-desktop",
+        "value": "ffmpeg"
+      },
+      {
+        "id": "search-filter-tags-:rc:-mobile",
+        "name": "search-filter-tags-mobile",
+        "value": "ffmpeg"
+      }
+    ],
+    "activeId": "search-filter-tags-:rc:-mobile",
+    "missing": [],
+    "duplicateIds": []
+  }
+}

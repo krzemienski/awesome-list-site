@@ -1,0 +1,180 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - generic [ref=e4] focusable [tabindex]
+      - list [ref=e5] clickable [onclick]
+        - listitem [level=1, ref=e7] focusable [tabindex]
+          - StaticText "Learning preferences reset"
+          - StaticText "Personalized surfaces will use general picks until you choose new preferences."
+          - button "Dismiss notification" [ref=e12]
+            - image
+      - generic [ref=e6] focusable [tabindex]
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e8]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e9]
+          - StaticText "Search 3,826 resources"
+        - navigation "Primary" [ref=e10]
+          - link "Browse" [ref=e13]
+          - link "Submit" [ref=e14]
+          - link "About" [ref=e15]
+          - link "Docs ↗" [ref=e16]
+          - link "Admin" [ref=e17]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e11]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e18]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e68]
+              - listitem [level=1]
+                - link "Settings" [disabled, ref=e69]
+          - link "Back" [ref=e19]
+            - image
+            - StaticText "Back"
+          - heading "Settings" [level=1, ref=e20]
+          - paragraph
+            - StaticText "Manage your preferences and account. Pick a section below."
+          - link [ref=e21]
+            - article
+              - image
+              - heading "Appearance" [level=2, ref=e54]
+              - image
+              - paragraph
+                - StaticText "Switch design system, accent color, and font."
+          - link [ref=e22]
+            - article
+              - image
+              - heading "Account" [level=2, ref=e55]
+              - image
+              - paragraph
+                - StaticText "View your profile, submissions, favorites, and progress."
+          - link [ref=e23]
+            - article
+              - image
+              - heading "Security" [level=2, ref=e56]
+              - image
+              - paragraph
+                - StaticText "Change your password from the Security tab on your profile."
+          - link [ref=e24]
+            - article
+              - image
+              - heading "Bookmarks" [level=2, ref=e57]
+              - image
+              - paragraph
+                - StaticText "Review the resources you've saved for later."
+          - link [ref=e25]
+            - article
+              - image
+              - heading "Recommendations" [level=2, ref=e58]
+              - image
+              - paragraph
+                - StaticText "Personalized resource suggestions based on your interests."
+          - region "Home layout" [ref=e26]
+            - article
+              - StaticText "Home layout"
+              - StaticText "Choose the default view you see on the Home page."
+              - group "Home layout"
+                - Legend
+                  - StaticText "Home layout"
+                - paragraph
+                  - StaticText "Choose how the home page opens for you."
+                - radiogroup "Home layout" [ref=e70] focusable [tabindex]
+                  - LabelText [ref=e84] clickable [cursor:pointer]
+                    - radio "Index The full catalog, organized for browsing." [checked=true, ref=e86]
+                  - LabelText [ref=e85] clickable [cursor:pointer]
+                    - radio "Curated A focused home feed with recent and featured picks." [checked=false, ref=e87]
+          - region "Learning preferences" [ref=e27]
+            - article
+              - generic
+                - image
+                - StaticText "Learning preferences"
+              - StaticText "Review the same profile used by optional onboarding. These values shape only surfaces explicitly labeled personalized and are not sent to analytics."
+              - heading "No learning preferences saved" [level=3, ref=e59]
+              - paragraph
+                - StaticText "General recommendations stay available. Choose preferences here whenever you want clearly labeled personalized picks."
+              - button "Choose preferences" [ref=e60]
+          - region "Notifications" [ref=e28]
+            - article
+              - generic
+                - image
+                - StaticText "Notifications"
+              - StaticText "Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in."
+              - LabelText [ref=e61] clickable [cursor:pointer]
+                - checkbox "Email digest A considered digest, never a stream. Off" [checked=false, ref=e71]
+                - StaticText "Email digest"
+                - StaticText "A considered digest, never a stream."
+                - StaticText "Off"
+              - LabelText [ref=e62] clickable [cursor:pointer]
+                - checkbox "In-app updates A small inbox inside your account. Off" [checked=false, ref=e72]
+                - StaticText "In-app updates"
+                - StaticText "A small inbox inside your account."
+                - StaticText "Off"
+              - image
+              - paragraph
+                - StaticText "These channels are independent. Delivery content excludes private notes, learning history, and external URLs."
+              - region "Digest sections" [ref=e63]
+                - heading "Digest sections" [level=3, ref=e73]
+                - checkbox "New resources" [checked=true, ref=e74]
+                - checkbox "Watch next" [checked=true, ref=e75]
+                - checkbox "Journey steps" [checked=true, ref=e76]
+              - generic
+                - LabelText [ref=e77] clickable [cursor:pointer]
+                  - StaticText "Cadence"
+                - combobox "Cadence" [expanded=false, ref=e78]: Weekly
+                  - MenuListPopup
+                    - option "Weekly" [selected, ref=e88]
+                    - option "Every 2 weeks" [ref=e89]
+                    - option "Monthly" [ref=e90]
+              - generic
+                - LabelText [ref=e79] clickable [cursor:pointer]
+                - textbox "Time zone" [ref=e80]: America/New_York
+              - button "Pause for 7 days" [ref=e64]
+              - button "Unsubscribe all" [disabled, ref=e65]
+              - button "Save choices" [ref=e66]
+              - region "Preview" [ref=e67]
+                - heading "Preview" [level=3, ref=e81]
+                - link "NEW FOR YOU PyTorchVideoCompression New in Encoding & Codecs" [ref=e82]
+                - link "CONTINUE YOUR JOURNEY Live Streaming Fundamentals Next in Advanced Live Streaming Architecture" [ref=e83]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e29]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e30]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e31]
+            - heading "EXPLORE" [level=2, ref=e36]
+            - link "Community & Events" [ref=e37]
+            - link "Encoding & Codecs" [ref=e38]
+            - link "General Tools" [ref=e39]
+            - link "Infrastructure & Delivery" [ref=e40]
+            - link "Intro & Learning" [ref=e41]
+            - link "Media Tools" [ref=e42]
+            - link "Players & Clients" [ref=e43]
+            - link "Protocols & Transport" [ref=e44]
+            - link "Standards & Industry" [ref=e45]
+          - heading "SOURCE" [level=2, ref=e32]
+          - link "krzemienski/ awesome-video" [ref=e33]
+          - paragraph
+            - link "PRs welcome" [ref=e46]
+          - button "Contact maintainers" [ref=e34]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e35]
+            - link "About" [ref=e47]
+            - link "Terms" [ref=e48]
+            - link "Privacy" [ref=e49]
+            - link "Code of Conduct" [ref=e50]
+            - button "Cookie settings" [ref=e51]
+            - link "Issues ↗" [ref=e52]
+            - link "Sitemap" [ref=e53]

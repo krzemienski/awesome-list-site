@@ -1,0 +1,413 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem:
+                  - link "Advanced Search" [disabled]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - img [ref=e42]
+                  - heading "Advanced Features" [level=1] [ref=e44]
+                - paragraph [ref=e45]: Discover powerful tools for exploring, analyzing, and sharing awesome list data
+              - generic [ref=e46]:
+                - tablist [ref=e47]:
+                  - tab "Explorer" [ref=e48] [cursor=pointer]:
+                    - img [ref=e49]
+                    - text: Explorer
+                  - tab "Metrics" [ref=e52] [cursor=pointer]:
+                    - img [ref=e53]
+                    - text: Metrics
+                  - tab "Export" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - text: Export
+                  - tab "AI Recommendations" [active] [selected] [ref=e59] [cursor=pointer]:
+                    - img [ref=e60]
+                    - generic [ref=e62]: AI Recommendations
+                - tabpanel "AI Recommendations" [ref=e63]:
+                  - generic [ref=e65]:
+                    - article [ref=e66]:
+                      - generic [ref=e67]:
+                        - generic [ref=e68]:
+                          - img [ref=e69]
+                          - text: Popular Recommendations
+                        - generic [ref=e71]: Popular picks from across the catalog. Sign in to personalize them with your preferences and activity.
+                    - generic [ref=e72]:
+                      - generic [ref=e73]:
+                        - heading "Popular recommendations" [level=2] [ref=e74]:
+                          - img [ref=e75]
+                          - text: Popular recommendations
+                        - paragraph [ref=e79]: 10 popular resources from across the catalog. Sign in to personalize them.
+                      - generic [ref=e80]:
+                        - article [ref=e81]:
+                          - generic [ref=e82]:
+                            - generic [ref=e83]:
+                              - heading "pAV0NE" [level=3] [ref=e84]
+                              - paragraph [ref=e85]: Android multimedia player built with Kotlin + ExoPlayer using GAV1 decoder for AV1, with DASH support.
+                            - generic [ref=e86]:
+                              - generic [ref=e87]: Players & Clients
+                              - generic [ref=e88]:
+                                - img [ref=e89]
+                                - text: 81% · High
+                              - generic [ref=e92]:
+                                - img [ref=e93]
+                                - text: Rule ranked
+                            - group [ref=e95]:
+                              - generic "Why this? pAV0NE" [ref=e96] [cursor=pointer]:
+                                - generic [ref=e97]:
+                                  - img [ref=e98]
+                                  - text: Why this?
+                            - generic [ref=e101]: "#Mobile Players"
+                            - 'link "View resource: pAV0NE (opens in new tab)" [ref=e103] [cursor=pointer]':
+                              - /url: https://github.com/federicoserraino/pAV0NE
+                              - img
+                              - text: View resource
+                        - article [ref=e104]:
+                          - generic [ref=e105]:
+                            - generic [ref=e106]:
+                              - heading "AV1-discuss Mailing List" [level=3] [ref=e107]
+                              - paragraph [ref=e108]: Official AOMedia developer mailing list for AV1 spec and codec discussion.
+                            - generic [ref=e109]:
+                              - generic [ref=e110]: General Tools
+                              - generic [ref=e111]:
+                                - img [ref=e112]
+                                - text: 81% · High
+                              - generic [ref=e115]:
+                                - img [ref=e116]
+                                - text: Rule ranked
+                            - group [ref=e118]:
+                              - generic "Why this? AV1-discuss Mailing List" [ref=e119] [cursor=pointer]:
+                                - generic [ref=e120]:
+                                  - img [ref=e121]
+                                  - text: Why this?
+                            - generic [ref=e124]: "#Community & Collaboration Platforms"
+                            - 'link "View resource: AV1-discuss Mailing List (opens in new tab)" [ref=e126] [cursor=pointer]':
+                              - /url: https://groups.google.com/a/aomedia.org/forum/#!forum/av1-discuss
+                              - img
+                              - text: View resource
+                        - article [ref=e127]:
+                          - generic [ref=e128]:
+                            - generic [ref=e129]:
+                              - 'heading "MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [level=3] [ref=e130]'
+                              - paragraph [ref=e131]: Academic paper on a neural video codec targeting competitive compression, real-time speed, and cross-platform (Apple/Intel/Qualcomm NPU) inference.
+                            - generic [ref=e132]:
+                              - generic [ref=e133]: Encoding & Codecs
+                              - generic [ref=e134]:
+                                - img [ref=e135]
+                                - text: 80% · High
+                              - generic [ref=e138]:
+                                - img [ref=e139]
+                                - text: Rule ranked
+                            - group [ref=e141]:
+                              - 'generic "Why this? MLVC: Multi-platform Learned Video Codec for Real-World Deployment" [ref=e142] [cursor=pointer]':
+                                - generic [ref=e143]:
+                                  - img [ref=e144]
+                                  - text: Why this?
+                            - generic [ref=e147]: "#Comparative Analysis of Codecs"
+                            - 'link "View resource: MLVC: Multi-platform Learned Video Codec for Real-World Deployment (opens in new tab)" [ref=e149] [cursor=pointer]':
+                              - /url: https://arxiv.org/abs/2606.28027
+                              - img
+                              - text: View resource
+                        - article [ref=e150]:
+                          - generic [ref=e151]:
+                            - generic [ref=e152]:
+                              - heading "100-4K (BVI-1004K) Test Sequence Dataset" [level=3] [ref=e153]
+                              - paragraph [ref=e154]: 100 open UHD test sequences aggregated from Netflix Chimera, UVG, SJTU, and AWS sources, cropped/normalized for ML video-coding research.
+                            - generic [ref=e155]:
+                              - generic [ref=e156]: General Tools
+                              - generic [ref=e157]:
+                                - img [ref=e158]
+                                - text: 80% · High
+                              - generic [ref=e161]:
+                                - img [ref=e162]
+                                - text: Rule ranked
+                            - group [ref=e164]:
+                              - generic "Why this? 100-4K (BVI-1004K) Test Sequence Dataset" [ref=e165] [cursor=pointer]:
+                                - generic [ref=e166]:
+                                  - img [ref=e167]
+                                  - text: Why this?
+                            - generic [ref=e170]: "#Test Content & Sample Streams"
+                            - 'link "View resource: 100-4K (BVI-1004K) Test Sequence Dataset (opens in new tab)" [ref=e172] [cursor=pointer]':
+                              - /url: https://angkats.github.io/Dataset-1004K/
+                              - img
+                              - text: View resource
+                        - article [ref=e173]:
+                          - generic [ref=e174]:
+                            - generic [ref=e175]:
+                              - heading "vvDecPlayer" [level=3] [ref=e176]
+                              - paragraph [ref=e177]: Qt desktop player wrapping Fraunhofer VVdeC (H.266/VVC) decoder with a 4-thread pipeline for HTTP segment download, bitstream parse, decode, and YUV→RGB conversion, real-time UHD capable.
+                            - generic [ref=e178]:
+                              - generic [ref=e179]: Players & Clients
+                              - generic [ref=e180]:
+                                - img [ref=e181]
+                                - text: 80% · High
+                              - generic [ref=e184]:
+                                - img [ref=e185]
+                                - text: Rule ranked
+                            - group [ref=e187]:
+                              - generic "Why this? vvDecPlayer" [ref=e188] [cursor=pointer]:
+                                - generic [ref=e189]:
+                                  - img [ref=e190]
+                                  - text: Why this?
+                            - generic [ref=e193]: "#Desktop Players"
+                            - 'link "View resource: vvDecPlayer (opens in new tab)" [ref=e195] [cursor=pointer]':
+                              - /url: https://github.com/bitmovin/vvDecPlayer
+                              - img
+                              - text: View resource
+                        - article [ref=e196]:
+                          - generic [ref=e197]:
+                            - generic [ref=e198]:
+                              - heading "NextPlayer" [level=3] [ref=e199]
+                              - paragraph [ref=e200]: Native Android video player with H.265/VP9/AV1 decode, HDR10+/Dolby Vision support, and modern Compose UI.
+                            - generic [ref=e201]:
+                              - generic [ref=e202]: Players & Clients
+                              - generic [ref=e203]:
+                                - img [ref=e204]
+                                - text: 80% · High
+                              - generic [ref=e207]:
+                                - img [ref=e208]
+                                - text: Rule ranked
+                            - group [ref=e210]:
+                              - generic "Why this? NextPlayer" [ref=e211] [cursor=pointer]:
+                                - generic [ref=e212]:
+                                  - img [ref=e213]
+                                  - text: Why this?
+                            - generic [ref=e216]: "#Mobile Players"
+                            - 'link "View resource: NextPlayer (opens in new tab)" [ref=e218] [cursor=pointer]':
+                              - /url: https://github.com/anilbeesetti/nextplayer
+                              - img
+                              - text: View resource
+                        - article [ref=e219]:
+                          - generic [ref=e220]:
+                            - generic [ref=e221]:
+                              - heading "Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [level=3] [ref=e222]
+                              - paragraph [ref=e223]: Academic comparison of VMAF, AVQBits, and FasterVQA no-reference quality metrics on 4K content.
+                            - generic [ref=e224]:
+                              - generic [ref=e225]: Media Tools
+                              - generic [ref=e226]:
+                                - img [ref=e227]
+                                - text: 79% · Medium
+                              - generic [ref=e230]:
+                                - img [ref=e231]
+                                - text: Rule ranked
+                            - group [ref=e233]:
+                              - generic "Why this? Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1)" [ref=e234] [cursor=pointer]:
+                                - generic [ref=e235]:
+                                  - img [ref=e236]
+                                  - text: Why this?
+                            - generic [ref=e239]: "#Video Analytics & Benchmarking"
+                            - 'link "View resource: Evaluating Video Quality Metrics for Neural and Traditional Codecs (4K/UHD-1) (opens in new tab)" [ref=e241] [cursor=pointer]':
+                              - /url: https://arxiv.org/abs/2511.00969
+                              - img
+                              - text: View resource
+                        - article [ref=e242]:
+                          - generic [ref=e243]:
+                            - generic [ref=e244]:
+                              - heading "multiflux" [level=3] [ref=e245]
+                              - paragraph [ref=e246]: Self-hostable multistreaming platform powered by Cloudflare Workers/Pages/Stream with edge fanout.
+                            - generic [ref=e247]:
+                              - generic [ref=e248]: Infrastructure & Delivery
+                              - generic [ref=e249]:
+                                - img [ref=e250]
+                                - text: 79% · Medium
+                              - generic [ref=e253]:
+                                - img [ref=e254]
+                                - text: Rule ranked
+                            - group [ref=e256]:
+                              - generic "Why this? multiflux" [ref=e257] [cursor=pointer]:
+                                - generic [ref=e258]:
+                                  - img [ref=e259]
+                                  - text: Why this?
+                            - generic [ref=e262]: "#CDN Integration & Distribution"
+                            - 'link "View resource: multiflux (opens in new tab)" [ref=e264] [cursor=pointer]':
+                              - /url: https://github.com/mackenly/multiflux
+                              - img
+                              - text: View resource
+                        - article [ref=e265]:
+                          - generic [ref=e266]:
+                            - generic [ref=e267]:
+                              - 'heading "FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC" [level=3] [ref=e268]'
+                              - paragraph [ref=e269]: FOSDEM Open Media devroom talk by Fraunhofer HHI developers presenting the VVenC encoder and VVdeC decoder for the VVC/H.266 codec.
+                            - generic [ref=e270]:
+                              - generic [ref=e271]: Encoding & Codecs
+                              - generic [ref=e272]:
+                                - img [ref=e273]
+                                - text: 79% · Medium
+                              - generic [ref=e276]:
+                                - img [ref=e277]
+                                - text: Rule ranked
+                            - group [ref=e279]:
+                              - 'generic "Why this? FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC" [ref=e280] [cursor=pointer]':
+                                - generic [ref=e281]:
+                                  - img [ref=e282]
+                                  - text: Why this?
+                            - generic [ref=e285]: "#Next-Generation Codecs AV1 VVC"
+                            - 'link "View resource: FOSDEM 2023: VVenC & VVdeC — Open Source Video Encoding and Playback for VVC (opens in new tab)" [ref=e287] [cursor=pointer]':
+                              - /url: https://archive.fosdem.org/2023/schedule/event/om_vvc/
+                              - img
+                              - text: View resource
+                        - article [ref=e288]:
+                          - generic [ref=e289]:
+                            - generic [ref=e290]:
+                              - heading "AV1 Encoding with libsvtav1 on Qencode" [level=3] [ref=e291]
+                              - paragraph [ref=e292]: "The libsvtav1 encoder (SVT-AV1) is an AV1 implementation tuned for both compression efficiency and parallel performance. This guide covers the preset scale from 0 to 13 and its speed-versus-efficiency trade-off, CRF selection in the 20-40 range, MP4 versus WebM output, and advanced controls including tune, aq_mode, film_grain, fast_decode, enable_dlf, enable_restoration, hierarchical_levels and pred_struct. It gives concrete starting points: preset 3 for archival, preset 8 for fast turnaround, preset 5 with CRF 30-35 for web streaming, and fast_decode when targeting low-power devices such as set-top boxes and budget phones. On why AV1 at all: roughly 30-40% bitrate savings versus H.264 and 20-30% versus HEVC or VP9 at equivalent quality, royalty-free under the Alliance for Open Media, with decode support in Chrome, Firefox and Edge."
+                            - generic [ref=e293]:
+                              - generic [ref=e294]: Encoding & Codecs
+                              - generic [ref=e295]:
+                                - img [ref=e296]
+                                - text: 79% · Medium
+                              - generic [ref=e299]:
+                                - img [ref=e300]
+                                - text: Rule ranked
+                            - group [ref=e302]:
+                              - generic "Why this? AV1 Encoding with libsvtav1 on Qencode" [ref=e303] [cursor=pointer]:
+                                - generic [ref=e304]:
+                                  - img [ref=e305]
+                                  - text: Why this?
+                            - generic [ref=e308]: "#Next-Generation Codecs AV1 VVC"
+                            - 'link "View resource: AV1 Encoding with libsvtav1 on Qencode (opens in new tab)" [ref=e310] [cursor=pointer]':
+                              - /url: https://docs.qencode.com/tutorials/transcoding/codecs/using-av1-codec/
+                              - img
+                              - text: View resource
+                    - article [ref=e311]:
+                      - generic [ref=e312]:
+                        - paragraph [ref=e313]: These picks are popularity-based. Sign in to tailor them to your topics, goals, and activity.
+                        - generic [ref=e314]:
+                          - link "Sign in to personalize" [ref=e315] [cursor=pointer]:
+                            - /url: /sign-in?redirect_url=%2Fadvanced%3Ftab%3Drecommendations
+                          - button "Refreshing…" [disabled] [ref=e316]:
+                            - img
+                            - text: Refreshing…
+              - article [ref=e317]:
+                - generic [ref=e318]:
+                  - heading "Explore More Features" [level=2] [ref=e319]
+                  - paragraph [ref=e320]: These advanced features help you discover, analyze, and share awesome list data more effectively
+                  - generic [ref=e321]:
+                    - link "Browse All Resources" [ref=e322] [cursor=pointer]:
+                      - /url: /categories
+                    - link "Explore Categories" [ref=e323] [cursor=pointer]:
+                      - /url: /category/community-events
+        - contentinfo [ref=e324]:
+          - generic [ref=e325]:
+            - generic [ref=e326]:
+              - paragraph [ref=e327]: ── INDEX
+              - link "awesome.video home" [ref=e328] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e329]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e331]:
+              - heading "INDEXED" [level=2] [ref=e332]
+              - paragraph [ref=e333]: 3,825
+              - paragraph [ref=e334]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e335]: live
+            - navigation "Explore categories" [ref=e337]:
+              - heading "EXPLORE" [level=2] [ref=e338]
+              - generic [ref=e339]:
+                - link "Community & Events" [ref=e340] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e341]: ◈
+                  - generic [ref=e342]: Community
+                - link "Encoding & Codecs" [ref=e343] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e344]: ◇
+                  - generic [ref=e345]: Encoding
+                - link "General Tools" [ref=e346] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e347]: ◆
+                  - generic [ref=e348]: General
+                - link "Infrastructure & Delivery" [ref=e349] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e350]: ▣
+                  - generic [ref=e351]: Infrastructure
+                - link "Intro & Learning" [ref=e352] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e353]: ▤
+                  - generic [ref=e354]: Intro
+                - link "Media Tools" [ref=e355] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e356]: ▥
+                  - generic [ref=e357]: Media
+                - link "Players & Clients" [ref=e358] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e359]: ▶
+                  - generic [ref=e360]: Players
+                - link "Protocols & Transport" [ref=e361] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e362]: ⟁
+                  - generic [ref=e363]: Protocols
+                - link "Standards & Industry" [ref=e364] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e365]: ◉
+                  - generic [ref=e366]: Standards
+            - generic [ref=e367]:
+              - heading "SOURCE" [level=2] [ref=e368]
+              - link "krzemienski/awesome-video" [ref=e369] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e370]
+                - generic [ref=e372]:
+                  - text: krzemienski
+                  - generic [ref=e373]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e374]: ↗
+              - paragraph [ref=e375]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e376] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e378] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e379]:
+            - generic [ref=e380]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e381]:
+              - link "About" [ref=e382] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e383] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e384] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e385] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e386] [cursor=pointer]
+              - link "Issues ↗" [ref=e387] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e388] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e389]: built with the awesome-list framework

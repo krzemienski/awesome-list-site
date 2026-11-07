@@ -1,0 +1,8 @@
+[7155.1390] GET https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1406] GET https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1407] GET https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1410] PUT https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1411] GET https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1413] GET https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1414] PATCH https://awesome.video/api/notification-preferences (Fetch) 200
+[7155.1415] GET https://awesome.video/api/notification-preferences (Fetch) 200

@@ -1,0 +1,35 @@
+{
+  "capturedAt": "2026-10-27T08:34:46.237Z",
+  "scrollY": 1957,
+  "notifications": [
+    {
+      "tag": "LI",
+      "role": null,
+      "bounds": {
+        "x": 16,
+        "y": 666,
+        "width": 358,
+        "height": 118,
+        "top": 666,
+        "right": 374,
+        "bottom": 784,
+        "left": 16
+      },
+      "text": "Saved on this device\nYour saved resource will move to your account when you sign in.\nSign in"
+    }
+  ],
+  "backToTop": [
+    {
+      "bounds": {
+        "x": 334,
+        "y": 788,
+        "width": 44,
+        "height": 44,
+        "top": 788,
+        "right": 378,
+        "bottom": 832,
+        "left": 334
+      }
+    }
+  ]
+}

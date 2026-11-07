@@ -1,0 +1,1 @@
+MB-06 evidence: switch-focus3.png (Email digest input :focus-visible=true, label border unchanged rgba(244,243,238,.08), no ring) vs cmp-crop.png (checkbox ring visible)

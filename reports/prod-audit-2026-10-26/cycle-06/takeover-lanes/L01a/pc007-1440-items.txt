@@ -1,0 +1,6 @@
+Profile -> "/profile menuOpen=false h1=Admin User"
+Bookmarks -> "/bookmarks menuOpen=false h1=Saved, then finished."
+Notifications -> "/notifications menuOpen=false h1=Notifications"
+Settings -> "/settings menuOpen=false h1=Settings"
+Theme Settings -> "/settings/theme menuOpen=false h1=Theme Settings"
+Admin -> "/admin menuOpen=false h1=Operations dashboard"

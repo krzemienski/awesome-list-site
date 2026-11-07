@@ -1,0 +1,30 @@
+HTTP/2 200 
+access-control-allow-origin: *
+access-control-expose-headers: RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, RateLimit-Policy, Retry-After
+cache-control: private, max-age=60
+content-length: 957
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-zCpnFlwQRibgJRr2QuqSnQ==' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+content-type: application/json; charset=utf-8
+cross-origin-opener-policy: same-origin-allow-popups
+cross-origin-resource-policy: same-origin
+date: Tue, 27 Oct 2026 06:37:21 GMT
+etag: W/"3bd-TyB3dmqjGmCrzu1aoVQExAf+fUA"
+expires: Tue, 27 Oct 2026 06:37:21 GMT
+permissions-policy: camera=(), microphone=(), geolocation=()
+ratelimit-limit: 60
+ratelimit-policy: 60;w=3600
+ratelimit-remaining: 59
+ratelimit-reset: 3600
+referrer-policy: strict-origin
+server: Google Frontend
+set-cookie: GAESA=CrIBMDAxMGRkODYwN2ExYmEwNWI3ZmM5MDA1MmExYjc3Mjk5MGE0NGMxYzY3NGI0ZjYyZDZkODYzZjljM2Y5NjcxYTI3MmZjYzhmZWZlNzcyZGNhYzBmMTI1ZDAwNzVjZjJmYTVhNDk5MWVlMzEwNTc0MmM2NWZmMWQzMTc0NjFkZGFlOTgzZGY2YjBkMzVjZDE3YTcwNGY1ZWQ4OTU5YjQxNjhmNGMwOTJhYTUyYWMwYjFlORC7y8_glzQ; expires=Thu, 26-Nov-2026 06:37:21 GMT; path=/
+strict-transport-security: max-age=63072000; includeSubDomains
+vary: Authorization, Accept-Encoding
+x-clerk-auth-reason: session-token-and-uat-missing
+x-clerk-auth-status: signed-out
+x-cloud-trace-context: 7d6d82730683922992f9527fb8b6363c
+x-content-type-options: nosniff
+x-frame-options: DENY
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+

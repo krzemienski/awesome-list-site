@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/search?q=hls","dialogs":[],"buttons":[{"r":{"x":14,"y":4.5,"width":44,"height":44,"top":4.5,"right":58,"bottom":48.5,"left":14},"pointer":"auto"}],"focus":"<input class=\"input file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:rin"}
+```

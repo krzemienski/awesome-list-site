@@ -1,0 +1,690 @@
+[
+  {
+    "path": "/api/favorites",
+    "status": 200,
+    "body": [
+      {
+        "id": 186357,
+        "title": "Alliance for Open Media (AOMedia)",
+        "url": "https://aomedia.org/",
+        "description": "An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image formats and tools.",
+        "category": "Encoding & Codecs",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "standards",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:31:02.213Z",
+        "resourceId": 186357,
+        "favoritedAt": "2026-10-27T06:33:07.542Z",
+        "metadata": {
+          "tags": [
+            "codec",
+            "AV1",
+            "open-source",
+            "video compression",
+            "royalty-free"
+          ]
+        },
+        "resolvedKind": "standards"
+      },
+      {
+        "id": 185551,
+        "title": "Audacity",
+        "url": "https://audacity.sourceforge.net/",
+        "description": "Audacity is an open-source audio editor available for all major platforms. It offers a range of features for recording and editing audio, making it a valuable tool for developers working with audio components in video projects.",
+        "category": "Standards & Industry",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "tools",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:30:27.860Z",
+        "resourceId": 185551,
+        "favoritedAt": "2026-10-27T06:32:40.504Z",
+        "metadata": {
+          "tags": [
+            "audio editing",
+            "open-source",
+            "Cross-platform",
+            "recording",
+            "editing"
+          ]
+        },
+        "resolvedKind": "tools"
+      }
+    ]
+  },
+  {
+    "path": "/api/bookmarks",
+    "status": 200,
+    "body": [
+      {
+        "id": 184751,
+        "title": "2025 NAB Show: CineCentral",
+        "url": "https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique",
+        "description": "The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production.",
+        "category": "Community & Events",
+        "subcategory": "Events & Conferences",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "events",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:29:54.014Z",
+        "resourceId": 184751,
+        "bookmarkedAt": "2026-08-02T17:33:24.571Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "video production",
+            "storytelling",
+            "workshops",
+            "training",
+            "media formats"
+          ]
+        },
+        "resolvedKind": "events"
+      },
+      {
+        "id": 186231,
+        "title": "Transcoding Performance Trial",
+        "url": "https://github.com/2501world/transcoding-performance-trial",
+        "description": "Runs FFmpeg transcoding processes simultaneously and measures CPU performance",
+        "category": "Encoding & Codecs",
+        "subcategory": "Benchmarking & Performance Tools for Codecs",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "tools",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:30:56.739Z",
+        "resourceId": 186231,
+        "bookmarkedAt": "2026-08-02T17:33:24.174Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {},
+        "resolvedKind": "tools"
+      },
+      {
+        "id": 186477,
+        "title": "3DLUT Creator",
+        "url": "https://3dlutcreator.com/",
+        "description": "A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "tools",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:31:07.636Z",
+        "resourceId": 186477,
+        "bookmarkedAt": "2026-08-02T17:33:23.757Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "color grading",
+            "LUT",
+            "video processing",
+            "color correction",
+            "post-production"
+          ]
+        },
+        "resolvedKind": "tools"
+      },
+      {
+        "id": 184763,
+        "title": "AVPlayer",
+        "url": "https://developer.apple.com/documentation/avfoundation/avplayer",
+        "description": "AVPlayer is Apple's framework for playing and streaming audio and video content on iOS and macOS. It supports a variety of formats and provides developers with a powerful API to control playback, manage buffering, and handle interruptions, making it a fundamental tool for media playback in iOS applications.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "libraries",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:29:54.520Z",
+        "resourceId": 184763,
+        "bookmarkedAt": "2026-08-02T17:33:23.361Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "video player",
+            "iOS",
+            "macOS",
+            "media playback",
+            "streaming"
+          ]
+        },
+        "resolvedKind": "libraries"
+      },
+      {
+        "id": 186609,
+        "title": "Able Player",
+        "url": "https://ableplayer.github.io/ableplayer",
+        "description": "A fully accessible, cross-browser HTML5 media player library that supports captions, audio descriptions, and sign language tracks, designed to be inclusive for users with disabilities.",
+        "category": "Players & Clients",
+        "subcategory": "Mobile & Web Players",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "libraries",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:31:13.637Z",
+        "resourceId": 186609,
+        "bookmarkedAt": "2026-08-02T17:33:22.970Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {},
+        "resolvedKind": "libraries"
+      },
+      {
+        "id": 186212,
+        "title": "About Frame Rates or Why 29.97?",
+        "url": "https://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html",
+        "description": "I recently remembered this popular post from my old blog. Since that blog no longer exists, I thought I would repost it here. Since I wrote this post about a decade ago, many others of done a much better job describing this in detail. I highly recommend the following two videos by Alec Watson fro",
+        "category": "Intro & Learning",
+        "subcategory": "Community Blogs & Forums",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "other",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:30:55.932Z",
+        "resourceId": 186212,
+        "bookmarkedAt": "2026-08-02T17:33:22.582Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {},
+        "resolvedKind": "other"
+      },
+      {
+        "id": 184789,
+        "title": "AWS Media Services",
+        "url": "https://aws.amazon.com/media-services/",
+        "description": "AWS Media Services offer a suite of cloud-based services that enable the creation, transformation, and delivery of digital content. These services include AWS Elemental MediaConnect for live video transport, AWS Elemental MediaConvert for file-based video transcoding, and AWS Elemental MediaLive for live video processing. They provide scalable and flexible solutions for video streaming and encoding, allowing developers to build and adapt video workflows quickly without the overhead of managing physical infrastructure.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "tools",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:29:55.620Z",
+        "resourceId": 184789,
+        "bookmarkedAt": "2026-08-02T17:33:22.198Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "cloud video services",
+            "video streaming",
+            "video encoding",
+            "AWS",
+            "media processing"
+          ]
+        },
+        "resolvedKind": "tools"
+      },
+      {
+        "id": 184838,
+        "title": "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App",
+        "url": "https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915",
+        "description": "An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks.",
+        "category": "Intro & Learning",
+        "subcategory": null,
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "other",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:29:57.703Z",
+        "resourceId": 184838,
+        "bookmarkedAt": "2026-08-02T17:33:21.811Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "live streaming",
+            "on-demand",
+            "app development",
+            "technology stack"
+          ]
+        },
+        "resolvedKind": "other"
+      },
+      {
+        "id": 185574,
+        "title": "M3U8Parser",
+        "url": "https://github.com/M3U8Kit/M3U8Parser",
+        "description": "A light weight M3U8 parser. Support X-Key & X-Session-Key.",
+        "category": "Protocols & Transport",
+        "subcategory": "Adaptive Streaming",
+        "subSubcategory": "HLS",
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "libraries",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:30:28.820Z",
+        "resourceId": 185574,
+        "bookmarkedAt": "2026-08-02T17:33:21.415Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "m3u8",
+            "parser",
+            "streaming",
+            "HLS",
+            "playlist"
+          ]
+        },
+        "resolvedKind": "libraries"
+      },
+      {
+        "id": 187911,
+        "title": "ABR Video Player",
+        "url": "https://github.com/LennartPaduch/abr-video-player",
+        "description": "Sophisticated web-based video player implementing advanced ABR algorithms including BOLA (Buffer Occupancy based Lyapunov Algorithm) and bandwidth-based strategies. Features MSE-based streaming, dual EWMA bandwidth estimation, and intelligent quality switching.",
+        "category": "Protocols & Transport",
+        "subcategory": "Adaptive Bitrate Algorithms & Tools",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "tools",
+        "status": "approved",
+        "createdAt": "2026-07-06T17:29:32.590Z",
+        "resourceId": 187911,
+        "bookmarkedAt": "2026-08-02T17:33:21.030Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {},
+        "resolvedKind": "tools"
+      },
+      {
+        "id": 186145,
+        "title": "3 Cases from a Video Expert: Encoding Basics",
+        "url": "https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8",
+        "description": "Vicuesoft blog article explaining fundamental video encoding concepts through practical case studies.",
+        "category": "Intro & Learning",
+        "subcategory": "Encoding & Transcoding Guides",
+        "subSubcategory": null,
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "other",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:30:53.036Z",
+        "resourceId": 186145,
+        "bookmarkedAt": "2026-08-02T17:33:20.631Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {},
+        "resolvedKind": "other"
+      },
+      {
+        "id": 184847,
+        "title": "AMD Advanced Media Acceleration (AMA) SDK",
+        "url": "https://amd.github.io/ama-sdk/latest/git_hub.html",
+        "description": "A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.",
+        "category": "Encoding & Codecs",
+        "subcategory": "",
+        "subSubcategory": "",
+        "resourceFormat": "unknown",
+        "provider": "unknown",
+        "skillLevel": "unknown",
+        "kind": "libraries",
+        "status": "approved",
+        "createdAt": "2026-01-20T20:29:58.087Z",
+        "resourceId": 184847,
+        "bookmarkedAt": "2026-08-02T17:33:20.248Z",
+        "queueStatus": "saved",
+        "archivedAt": null,
+        "personalTags": [],
+        "collectionIds": [],
+        "metadata": {
+          "tags": [
+            "AMD",
+            "media acceleration",
+            "SDK",
+            "video encoding",
+            "hardware acceleration"
+          ]
+        },
+        "resolvedKind": "libraries"
+      }
+    ]
+  },
+  {
+    "path": "/api/collections",
+    "status": 200,
+    "body": []
+  },
+  {
+    "path": "/api/user/preferences",
+    "status": 200,
+    "body": {
+      "preferences": {
+        "id": 10,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "preferredCategories": [
+          "Encoding & Codecs"
+        ],
+        "skillLevel": "beginner",
+        "learningGoals": [
+          "learn-fundamentals"
+        ],
+        "preferredResourceTypes": [
+          "video"
+        ],
+        "timeCommitment": "flexible",
+        "homeLayout": "index",
+        "onboardingStatus": "completed",
+        "onboardingStep": 5,
+        "onboardingCompletedAt": "2026-10-27T07:24:04.463Z",
+        "onboardingDismissedAt": null,
+        "themeSystem": "editorial",
+        "themeAccent": "crimson",
+        "revision": 58,
+        "createdAt": "2026-10-06T10:29:42.445Z",
+        "updatedAt": "2026-10-27T07:43:15.783Z"
+      },
+      "homeLayout": "index",
+      "theme": {
+        "systemId": "editorial",
+        "accentId": "crimson"
+      },
+      "revision": 58
+    }
+  },
+  {
+    "path": "/api/notification-preferences",
+    "status": 200,
+    "body": {
+      "emailDigestEnabled": false,
+      "inAppEnabled": false,
+      "includeNewResources": true,
+      "includeWatchNext": true,
+      "includeJourneyStep": true,
+      "cadence": "weekly",
+      "timezone": "America/New_York",
+      "pausedUntil": null,
+      "emailOptedInAt": "2026-10-27T07:16:48.676Z",
+      "emailUnsubscribedAt": "2026-10-27T07:17:24.297Z",
+      "inAppOptedInAt": "2026-10-27T07:16:48.676Z",
+      "updatedAt": "2026-10-27T07:18:27.990Z"
+    }
+  },
+  {
+    "path": "/api/user/journeys",
+    "status": 200,
+    "body": [
+      {
+        "id": 6,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "journeyId": 9,
+        "currentStepId": 217,
+        "completedSteps": [],
+        "startedAt": "2026-07-17T06:57:50.792Z",
+        "lastAccessedAt": "2026-10-27T06:02:05.649Z",
+        "completedAt": null,
+        "journey": {
+          "id": 9,
+          "title": "Advanced Live Streaming Architecture",
+          "description": "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms.",
+          "difficulty": "advanced",
+          "estimatedDuration": "20-25 hours",
+          "icon": null,
+          "orderIndex": null,
+          "category": "Protocols & Transport",
+          "status": "published",
+          "createdAt": "2025-11-18T21:51:10.236Z",
+          "updatedAt": "2026-07-12T20:19:12.646Z"
+        },
+        "isAvailable": true
+      },
+      {
+        "id": 4,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "journeyId": 7,
+        "currentStepId": 198,
+        "completedSteps": [
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          181,
+          182,
+          183
+        ],
+        "startedAt": "2026-07-17T06:57:28.623Z",
+        "lastAccessedAt": "2026-10-06T10:42:26.853Z",
+        "completedAt": "2026-10-06T10:42:26.853Z",
+        "journey": {
+          "id": 7,
+          "title": "Building Your First Streaming Platform",
+          "description": "Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of managed versus self-hosted infrastructure.",
+          "difficulty": "intermediate",
+          "estimatedDuration": "15-20 hours",
+          "icon": null,
+          "orderIndex": null,
+          "category": "Infrastructure & Delivery",
+          "status": "published",
+          "createdAt": "2025-11-18T21:51:09.017Z",
+          "updatedAt": "2026-07-12T20:19:11.984Z"
+        },
+        "isAvailable": true
+      },
+      {
+        "id": 3,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "journeyId": 6,
+        "currentStepId": 165,
+        "completedSteps": [
+          172,
+          175,
+          166,
+          167,
+          168,
+          169,
+          171
+        ],
+        "startedAt": "2026-07-16T22:30:01.558Z",
+        "lastAccessedAt": "2026-08-02T16:58:41.351Z",
+        "completedAt": null,
+        "journey": {
+          "id": 6,
+          "title": "Video Streaming Fundamentals",
+          "description": "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence.",
+          "difficulty": "beginner",
+          "estimatedDuration": "8-10 hours",
+          "icon": null,
+          "orderIndex": null,
+          "category": "Intro & Learning",
+          "status": "published",
+          "createdAt": "2025-11-18T21:51:08.661Z",
+          "updatedAt": "2026-10-27T07:04:38.413Z"
+        },
+        "isAvailable": true
+      },
+      {
+        "id": 7,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "journeyId": 10,
+        "currentStepId": 235,
+        "completedSteps": [],
+        "startedAt": "2026-07-17T06:58:01.797Z",
+        "lastAccessedAt": "2026-07-20T17:10:37.614Z",
+        "completedAt": null,
+        "journey": {
+          "id": 10,
+          "title": "DRM & Content Protection",
+          "description": "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach.",
+          "difficulty": "advanced",
+          "estimatedDuration": "10-12 hours",
+          "icon": null,
+          "orderIndex": null,
+          "category": "General Tools",
+          "status": "published",
+          "createdAt": "2025-11-18T21:51:10.814Z",
+          "updatedAt": "2026-07-12T20:19:12.972Z"
+        },
+        "isAvailable": true
+      },
+      {
+        "id": 5,
+        "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "journeyId": 8,
+        "currentStepId": 201,
+        "completedSteps": [],
+        "startedAt": "2026-07-17T06:57:39.942Z",
+        "lastAccessedAt": "2026-07-19T18:45:16.977Z",
+        "completedAt": null,
+        "journey": {
+          "id": 8,
+          "title": "FFmpeg Mastery",
+          "description": "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes.",
+          "difficulty": "intermediate",
+          "estimatedDuration": "12-15 hours",
+          "icon": null,
+          "orderIndex": null,
+          "category": "Encoding & Codecs",
+          "status": "published",
+          "createdAt": "2025-11-18T21:51:09.629Z",
+          "updatedAt": "2026-07-17T22:12:45.663Z"
+        },
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "path": "/api/user/api-keys",
+    "status": 200,
+    "body": {
+      "apiKeys": [
+        {
+          "id": "0035eb9d-5a07-4a6b-ac7a-1e85452069bd",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "[QA-audit-1026] c6 key1y",
+          "scopes": [],
+          "createdAt": "2026-10-27T07:06:40.962Z",
+          "lastUsedAt": null,
+          "expiresAt": "2027-01-25T07:06:40.947Z",
+          "revokedAt": "2026-10-27T07:07:41.598Z"
+        },
+        {
+          "id": "3e983021-501b-4d65-b59d-f6bf7c7c07f5",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "[QA-audit-1026] c6 key90",
+          "scopes": [],
+          "createdAt": "2026-10-27T07:05:30.595Z",
+          "lastUsedAt": null,
+          "expiresAt": "2027-01-25T07:05:30.580Z",
+          "revokedAt": "2026-10-27T07:06:15.440Z"
+        },
+        {
+          "id": "73a9de53-c4fe-476f-abe0-c7fdd2fddf50",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "[QA-audit-1026] c6 key30",
+          "scopes": [],
+          "createdAt": "2026-10-27T06:59:04.185Z",
+          "lastUsedAt": "2026-10-27T07:00:30.553Z",
+          "expiresAt": "2026-11-26T06:59:04.167Z",
+          "revokedAt": "2026-10-27T07:09:34.799Z"
+        },
+        {
+          "id": "5f09c037-1327-401b-adb7-e61df432edb7",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "[QA-audit-1026] c6 key30",
+          "scopes": [],
+          "createdAt": "2026-10-27T06:56:45.333Z",
+          "lastUsedAt": null,
+          "expiresAt": "2026-11-26T06:56:45.318Z",
+          "revokedAt": "2026-10-27T07:09:56.938Z"
+        },
+        {
+          "id": "9d675734-453d-446a-8572-c896b7c8c75e",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "[QA-audit-1026] c4 key",
+          "scopes": [],
+          "createdAt": "2026-10-27T01:44:48.893Z",
+          "lastUsedAt": null,
+          "expiresAt": "2027-01-25T01:44:48.873Z",
+          "revokedAt": "2026-10-27T01:45:54.794Z"
+        },
+        {
+          "id": "4289eca3-4fd5-476e-bcf1-cba262f9a0cc",
+          "userId": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "name": "__qa_test_578_api_key_1791282860771",
+          "scopes": [
+            "read"
+          ],
+          "createdAt": "2026-10-06T10:34:21.353Z",
+          "lastUsedAt": "2026-10-06T10:34:22.588Z",
+          "expiresAt": "2026-10-07T10:34:21.337Z",
+          "revokedAt": "2026-10-06T10:34:23.167Z"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/notifications?limit=50",
+    "status": 200,
+    "body": {
+      "notifications": [],
+      "unreadCount": 0
+    }
+  }
+]

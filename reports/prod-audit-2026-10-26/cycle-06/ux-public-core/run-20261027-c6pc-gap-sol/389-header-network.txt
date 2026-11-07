@@ -1,0 +1,12 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+Emulating color scheme: dark
+## Network requests
+Showing 1-8 of 8 (Page 1 of 1).
+reqid=9516 GET https://awesome.video/ [200]
+reqid=9534 GET https://awesome.video/api/config [200]
+reqid=9535 GET https://awesome.video/api/auth/user [304]
+reqid=9543 GET https://awesome.video/api/home [pending]
+reqid=9544 GET https://awesome.video/api/resources/kinds/counts [pending]
+reqid=9581 GET https://awesome.video/api/auth/user [304]
+reqid=9582 GET https://awesome.video/api/config [200]
+reqid=9624 GET https://awesome.video/api/awesome-list [200]

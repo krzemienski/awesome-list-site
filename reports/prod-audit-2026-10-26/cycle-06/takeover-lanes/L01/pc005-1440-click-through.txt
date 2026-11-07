@@ -1,0 +1,5 @@
+Browse -> https://awesome.video/categories
+Submit -> https://awesome.video/submit
+About -> https://awesome.video/about
+  [t1] Submit a Resource — Awesome Video - https://awesome.video/about
+→ [t2] awesome.video/design-system - https://awesome.video/design-system

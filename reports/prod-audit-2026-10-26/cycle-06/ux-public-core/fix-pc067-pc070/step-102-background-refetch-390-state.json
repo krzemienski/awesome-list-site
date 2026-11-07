@@ -1,0 +1,39 @@
+{
+  "before": {
+    "at": 1793085726640,
+    "focus": "input-search-resources",
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=2",
+    "requests": [
+      {
+        "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+        "start": 51.099999994039536
+      },
+      {
+        "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=2",
+        "start": 11426.199999988079
+      }
+    ]
+  },
+  "after": {
+    "at": 1793085774192,
+    "focus": "input-search-resources",
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=2",
+    "width": 390,
+    "height": 844,
+    "touch": 1,
+    "requests": [
+      {
+        "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+        "start": 51.099999994039536
+      },
+      {
+        "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=2",
+        "start": 11426.199999988079
+      },
+      {
+        "url": "http://127.0.0.1:5067/api/awesome-list/listing?level=category&slug=encoding-codecs&page=2",
+        "start": 72447.40000000596
+      }
+    ]
+  }
+}

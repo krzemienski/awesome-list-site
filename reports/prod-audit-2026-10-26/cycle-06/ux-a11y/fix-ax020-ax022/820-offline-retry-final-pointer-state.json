@@ -1,0 +1,30 @@
+{
+  "at": 1793087413074,
+  "url": "http://127.0.0.1:5167/advanced",
+  "online": false,
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "touch": 1,
+  "coarse": true,
+  "h1": "You're offline",
+  "errorPage": true,
+  "copy": "OfflineYou're offlineThe catalog couldn't load because your device has no connection. It will load on its own when you reconnect.Still offline — reconnect and try again.Retry",
+  "stillOffline": "Still offline — reconnect and try again.",
+  "focus": {
+    "tag": "BUTTON",
+    "text": "Retry",
+    "testId": "button-error-page-retry",
+    "isH1": false
+  },
+  "navigation": [
+    {
+      "type": "navigate",
+      "name": "http://127.0.0.1:5167/about",
+      "start": 0
+    }
+  ],
+  "consent": "denied",
+  "umamiDisabled": "1",
+  "overflow": 0
+}

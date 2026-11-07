@@ -1,7 +1,10 @@
 import { Resource } from "@shared/schema";
-import yaml from "js-yaml";
+import { load as loadYaml } from "js-yaml";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { isJunkResource, humanizeTitle, sanitizeDescription, decodeHtmlEntities } from "./importHygiene";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("github");
 
 /**
  * Parser for awesome list README files
@@ -296,9 +299,9 @@ export class AwesomeListParser {
     
     try {
       const frontMatter = this.content.substring(3, endIndex);
-      return yaml.load(frontMatter) as Record<string, any>;
+      return loadYaml(frontMatter) as Record<string, any>;
     } catch (error) {
-      console.error('Error parsing front matter:', error);
+      logger.error('Error parsing front matter:', error);
       return null;
     }
   }
@@ -357,8 +360,11 @@ function normalizeCategory(category: string): string {
   // Markdown headings arrive as "Community &amp; Events"; without decoding,
   // the entity text persisted verbatim into the denormalized category
   // columns and rendered as literal "&amp;" site-wide.
+  // "/" is kept: stripping it turned "iOS/tvOS" into "iOStvOS", whose slug
+  // "iostvos" misses the existing "ios-tvos" node, so a re-import minted a
+  // duplicate sub-subcategory.
   return decodeHtmlEntities(category)
-    .replace(/[^a-zA-Z0-9\s&-]/g, '') // Remove special characters
+    .replace(/[^a-zA-Z0-9\s&/-]/g, '') // Remove special characters
     .replace(/\s+/g, ' ')              // Normalize whitespace
     .trim();
 }

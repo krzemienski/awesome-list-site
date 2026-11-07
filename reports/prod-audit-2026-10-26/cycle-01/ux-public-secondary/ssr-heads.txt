@@ -1,0 +1,231 @@
+== 200 /search
+   <meta name="description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Search — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsearch" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /search?q=ffmpeg
+   <meta name="description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Search: ffmpeg — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Search curated video development tools, libraries, players, codecs, and learning resources." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsearch" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /journeys
+   <meta name="description" content="Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/journeys" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/journeys" data-react-helmet="true" />
+   <meta property="og:title" content="Learning Journeys — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fjourneys" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /journey/7
+   <meta name="description" content="Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers…" data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/journey/7" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/journey/7" data-react-helmet="true" />
+   <meta property="og:title" content="Building Your First Streaming Platform — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers…" data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fjourney%2F7" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /submit
+   <meta name="description" content="Suggest a new video development tool, library, article, or course for inclusion in Awesome Video." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/submit" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/submit" data-react-helmet="true" />
+   <meta property="og:title" content="Submit a Resource — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Suggest a new video development tool, library, article, or course for inclusion in Awesome Video." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsubmit" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /about
+   <meta name="description" content="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/about" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/about" data-react-helmet="true" />
+   <meta property="og:title" content="About — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fabout" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /terms
+   <meta name="description" content="The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/terms" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/terms" data-react-helmet="true" />
+   <meta property="og:title" content="Terms of Use — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fterms" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /privacy
+   <meta name="description" content="How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/privacy" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/privacy" data-react-helmet="true" />
+   <meta property="og:title" content="Privacy Policy — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fprivacy" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /code-of-conduct
+   <meta name="description" content="The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resources." data-react-helmet="true" />
+   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />
+   <link rel="canonical" href="https://awesome.video/code-of-conduct" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/code-of-conduct" data-react-helmet="true" />
+   <meta property="og:title" content="Code of Conduct — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resources." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fcode-of-conduct" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /design-system
+   <meta name="description" content="The Awesome Video design system — 5 systems × 10 accents, live tokens, type scale, and core components." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Design System — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The Awesome Video design system — 5 systems × 10 accents, live tokens, type scale, and core components." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fdesign-system" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /settings/theme
+   <meta name="description" content="Customize the look and feel of Awesome Video — switch fonts and color themes." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Theme Settings — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Customize the look and feel of Awesome Video — switch fonts and color themes." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsettings%2Ftheme" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /sign-in
+   <meta name="description" content="Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Sign In — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsign-in" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /sign-up
+   <meta name="description" content="Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Create an Account — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Create an Awesome Video account to save bookmarks, submit resources, and track your learning journeys." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsign-up" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /sign-in?admin
+   <meta name="description" content="Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Sign In — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsign-in" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /bookmarks
+   <meta name="description" content="Your saved video development resources on Awesome Video." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Bookmarks — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Your saved video development resources on Awesome Video." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fbookmarks" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /recommendations
+   <meta name="description" content="Personalized video development resource recommendations based on your interests and learning goals." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Personalized Recommendations — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Personalized video development resource recommendations based on your interests and learning goals." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Frecommendations" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /continue-learning
+   <meta name="description" content="Resume journeys, revisit resources, and see learning milestones on Awesome Video." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Continue Learning — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Resume journeys, revisit resources, and see learning milestones on Awesome Video." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fcontinue-learning" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 302 /notifications
+== 404 /no-such-page
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /category/nope
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /tag/zzqxv-nope
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /resource/999999999
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /resource/abc
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /journey/999999
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /collection/nope
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 404 /collections
+   <meta name="description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:url" content="https://awesome.video/" data-react-helmet="true" />
+   <meta property="og:title" content="Page Not Found — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+== 200 /settings
+   <meta name="description" content="Manage your Awesome Video preferences — appearance, account, security, and saved resources." data-react-helmet="true" />
+   <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />
+   <meta property="og:type" content="website" data-react-helmet="true" />
+   <meta property="og:title" content="Settings — Awesome Video" data-react-helmet="true" />
+   <meta property="og:description" content="Manage your Awesome Video preferences — appearance, account, security, and saved resources." data-react-helmet="true" />
+   <meta property="og:image" content="https://awesome.video/og-image.png?path=%2Fsettings" data-react-helmet="true" />
+   <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />

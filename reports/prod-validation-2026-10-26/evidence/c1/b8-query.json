@@ -1,0 +1,1 @@
+{"success":false,"message":"Base URL must not contain a query string or fragment","error":"validation_failed","fieldErrors":{},"errors":[]} HTTP400

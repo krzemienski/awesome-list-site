@@ -1,0 +1,8 @@
+[5406.486] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.487] GET https://awesome.video/api/enrichment/jobs/34/events (Fetch) 200
+[5406.488] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.489] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.491] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.493] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.494] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200
+[5406.495] GET https://awesome.video/api/enrichment/jobs/34 (Fetch) 200

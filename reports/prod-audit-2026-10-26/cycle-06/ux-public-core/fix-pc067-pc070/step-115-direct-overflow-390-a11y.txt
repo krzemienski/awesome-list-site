@@ -1,0 +1,435 @@
+15629	RootWebArea	"Video Encoding & Codecs: AV1… — Page 16 — Awesome Video"	focusable=true
+15708	generic	""	
+15630	generic	""	
+15715	region	"Notifications (F8)"	focusable=true
+15718	link	"Skip to main content"	focusable=true
+15719	generic	""	
+15716	list	""	focusable=true
+16261	StaticText	"Skip to main content"	
+15721	banner	""	
+15756	generic	""	
+-1000006852	InlineTextBox	"Skip to main content"	
+15723	button	"Toggle sidebar"	focusable=true
+15730	link	"AWESOME.VIDEO home"	focusable=true
+15735	button	"Search 1,949 resources"	focusable=true
+15748	button	"Sign in, account menu"	focusable=true expanded=false
+15758	main	""	focusable=true
+16190	contentinfo	""	
+16262	StaticText	"Toggle sidebar"	
+16265	StaticText	"AWESOME.VIDEO"	
+16266	StaticText	" home"	
+16267	StaticText	"Search 1,949 resources"	
+16277	StaticText	"Sign in"	
+16278	StaticText	", account menu"	
+15760	navigation	"Breadcrumb"	
+15769	generic	""	
+16336	StaticText	"── INDEX"	
+16194	link	"awesome.video home"	focusable=true
+16195	paragraph	""	
+16198	heading	"INDEXED"	level=2
+16199	paragraph	""	
+16200	paragraph	""	
+16205	navigation	"Explore categories"	
+16236	heading	"SOURCE"	level=2
+16237	link	"krzemienski/ awesome-video"	focusable=true
+16244	paragraph	""	
+16376	StaticText	"© "	
+16377	StaticText	"2026"	
+16378	StaticText	" "	
+16379	StaticText	"awesome.video"	
+16380	StaticText	" · content CC0, code MIT"	
+16250	navigation	"Site policies"	
+16387	StaticText	"built with the awesome-list framework"	
+-1000006853	InlineTextBox	"Toggle sidebar"	
+-1000006854	InlineTextBox	"AWESOME.VIDEO"	
+-1000006855	InlineTextBox	" home"	
+-1000006856	InlineTextBox	"Search 1,949 resources"	
+-1000006857	InlineTextBox	"Sign in"	
+-1000006858	InlineTextBox	", account menu"	
+15761	list	""	
+15770	link	"Browse"	focusable=true
+15774	sectionheader	""	
+15890	region	"Subcategories"	
+15924	generic	"Resources (372)"	focusable=true
+-1000006959	InlineTextBox	"── INDEX"	
+16337	StaticText	"awesome.video"	
+16338	StaticText	"A curated collection of awesome video resources, tools, and technologies for developers and content creators"	
+16339	StaticText	"INDEXED"	
+16340	StaticText	"1,949"	
+16341	StaticText	"9"	
+16342	StaticText	" categories"	
+16201	LineBreak	"\n"	
+16343	StaticText	"18"	
+16344	StaticText	" subcategories"	
+16202	LineBreak	"\n"	
+16203	generic	""	
+16206	heading	"EXPLORE"	level=2
+16208	link	"Community & Events"	focusable=true
+16211	link	"Encoding & Codecs"	focusable=true
+16214	link	"General Tools"	focusable=true
+16217	link	"Infrastructure & Delivery"	focusable=true
+16220	link	"Intro & Learning"	focusable=true
+16223	link	"Media Tools"	focusable=true
+16226	link	"Players & Clients"	focusable=true
+16229	link	"Protocols & Transport"	focusable=true
+16232	link	"Standards & Industry"	focusable=true
+16365	StaticText	"SOURCE"	
+16366	StaticText	"krzemienski"	
+16367	StaticText	"/"	
+16368	StaticText	"awesome-video"	
+16370	StaticText	"Open-source."	
+16245	link	"PRs welcome"	focusable=true
+16372	StaticText	"."	
+16246	LineBreak	"\n"	
+16373	StaticText	"Indexed automatically from "	
+16374	StaticText	"README.md"	
+16375	StaticText	"."	
+-1000006985	InlineTextBox	"© "	
+-1000006986	InlineTextBox	"2026"	
+-1000006987	InlineTextBox	" "	
+-1000006988	InlineTextBox	"awesome.video"	
+-1000006989	InlineTextBox	" · content CC0, code MIT"	
+16251	link	"About"	focusable=true
+16252	link	"Terms"	focusable=true
+16253	link	"Privacy"	focusable=true
+15633	link	"Code of Conduct"	focusable=true
+16254	link	"Issues ↗"	focusable=true
+16255	link	"Sitemap"	focusable=true
+-1000006996	InlineTextBox	"built with the awesome-list framework"	
+15762	listitem	""	level=1
+15767	listitem	""	level=1
+16281	StaticText	"Browse"	
+15775	generic	""	
+15777	heading	"Encoding & Codecs"	level=1
+15778	region	"About this collection"	
+16288	StaticText	"372"	
+16289	StaticText	" "	
+16290	StaticText	"RESOURCES"	
+16291	StaticText	"2"	
+16292	StaticText	" "	
+16293	StaticText	"SUBCATEGORIES"	
+15784	button	"Filters & view"	focusable=true expanded=false
+15891	heading	"Subcategories"	level=2
+15893	link	"Codecs 27"	focusable=true
+15896	link	"Encoding Tools 225"	focusable=true
+15899	button	"Uncategorized 120"	focusable=true pressed="false"
+15926	heading	"Resources (372)"	focusable=true level=2
+15927	status	""	
+15930	article	""	
+15950	article	""	
+15970	article	""	
+15990	article	""	
+16010	article	""	
+16030	article	""	
+16050	article	""	
+16070	article	""	
+16090	article	""	
+16110	article	""	
+16130	article	""	
+16150	article	""	
+16171	navigation	"Pagination"	
+-1000006960	InlineTextBox	"awesome.video"	
+-1000006961	InlineTextBox	"A curated collection of awesome video "	
+-1000006962	InlineTextBox	"resources, tools, and technologies for "	
+-1000006963	InlineTextBox	"developers and content creators"	
+-1000006964	InlineTextBox	"INDEXED"	
+-1000006965	InlineTextBox	"1,949"	
+-1000006966	InlineTextBox	"9"	
+-1000006967	InlineTextBox	" categories"	
+-1000006968	InlineTextBox	"\n"	
+-1000006969	InlineTextBox	"18"	
+-1000006970	InlineTextBox	" subcategories"	
+-1000006971	InlineTextBox	"\n"	
+16345	StaticText	"live"	
+16346	StaticText	"EXPLORE"	
+-1000006974	InlineTextBox	"SOURCE"	
+-1000006975	InlineTextBox	"krzemienski"	
+-1000006976	InlineTextBox	"/"	
+-1000006977	InlineTextBox	"awesome-video"	
+-1000006978	InlineTextBox	"Open-source."	
+16371	StaticText	"PRs welcome"	
+-1000006980	InlineTextBox	"."	
+-1000006981	InlineTextBox	"\n"	
+-1000006982	InlineTextBox	"Indexed automatically from "	
+-1000006983	InlineTextBox	"README.md"	
+-1000006984	InlineTextBox	"."	
+16381	StaticText	"About"	
+16382	StaticText	"Terms"	
+16383	StaticText	"Privacy"	
+16384	StaticText	"Conduct"	
+16385	StaticText	"Issues ↗"	
+16386	StaticText	"Sitemap"	
+15763	link	"Home"	focusable=true
+15768	link	"Encoding & Codecs"	disabled=true
+-1000006861	InlineTextBox	"Browse"	
+16283	StaticText	"CATEGORY · "	
+16284	StaticText	"ENCODING & CODECS"	
+16285	StaticText	"Encoding & Codecs"	
+15779	heading	"About this collection"	level=2
+15780	paragraph	""	
+-1000006871	InlineTextBox	"372"	
+-1000006872	InlineTextBox	" "	
+-1000006873	InlineTextBox	"RESOURCES"	
+-1000006874	InlineTextBox	"2"	
+-1000006875	InlineTextBox	" "	
+-1000006876	InlineTextBox	"SUBCATEGORIES"	
+16294	StaticText	"Filters & view"	
+16297	StaticText	"Subcategories"	
+16298	StaticText	"Codecs"	
+16299	StaticText	"27"	
+16300	StaticText	"Encoding Tools"	
+16301	StaticText	"225"	
+16302	StaticText	"Uncategorized"	
+16303	StaticText	"120"	
+16307	StaticText	"Resources (372)"	
+16308	StaticText	"Page 999 is not available; showing page 16 instead."	
+15928	button	"Dismiss"	focusable=true
+15932	heading	"realeyes-media/alpine-bento-ffmpeg"	level=2
+15934	link	"Open in new tab"	focusable=true
+15939	generic	""	
+15952	heading	"sambios/ffmpeg_transcoder"	level=2
+15954	link	"Open in new tab"	focusable=true
+15959	generic	""	
+15972	heading	"serverlesspub/ffmpeg-aws-lambda-layer"	level=2
+15974	link	"Open in new tab"	focusable=true
+15979	generic	""	
+15992	heading	"slhck/ffmpeg-bitrate-stats"	level=2
+15994	link	"Open in new tab"	focusable=true
+15999	generic	""	
+16012	heading	"slhck/ffmpeg-debug-qp"	level=2
+16014	link	"Open in new tab"	focusable=true
+16019	generic	""	
+16032	heading	"SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder"	level=2
+16034	link	"Open in new tab"	focusable=true
+16039	generic	""	
+16052	heading	"This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed."	level=2
+16054	link	"Open in new tab"	focusable=true
+16059	generic	""	
+16072	heading	"transitive-bullshit/awesome-ffmpeg"	level=2
+16074	link	"Open in new tab"	focusable=true
+16079	generic	""	
+16092	heading	"Use of Look-Up Tables (LUTs) in FFmpeg"	level=2
+16094	link	"Open in new tab"	focusable=true
+16099	generic	""	
+16112	heading	"VCDP/FFmpeg-patch"	level=2
+16114	link	"Open in new tab"	focusable=true
+16119	generic	""	
+16132	heading	"x264 FFmpeg Options Guide - Linux Encoding"	level=2
+16134	link	"Open in new tab"	focusable=true
+16139	generic	""	
+16152	heading	"Xabe.FFmpeg"	level=2
+16154	link	"Open in new tab"	focusable=true
+16159	generic	""	
+16173	link	"Previous"	focusable=true
+16176	link	"Go to page 1"	focusable=true
+16178	link	"Go to page 15"	focusable=true
+16179	link	"Page 16, current page"	focusable=true
+16180	generic	""	disabled=true focusable=true
+16328	StaticText	"Page "	
+16329	StaticText	"16"	
+16330	StaticText	" of "	
+16331	StaticText	"16"	
+16186	LabelText	""	
+15637	textbox	"Page number, 1 to 16"	focusable=true
+16189	status	""	
+-1000006972	InlineTextBox	"live"	
+-1000006973	InlineTextBox	"EXPLORE"	
+-1000006979	InlineTextBox	"PRs welcome"	
+-1000006990	InlineTextBox	"About"	
+-1000006991	InlineTextBox	"Terms"	
+-1000006992	InlineTextBox	"Privacy"	
+-1000006993	InlineTextBox	"Conduct"	
+-1000006994	InlineTextBox	"Issues ↗"	
+-1000006995	InlineTextBox	"Sitemap"	
+16279	StaticText	"Home"	
+16280	StaticText	"Encoding & Codecs"	
+-1000006862	InlineTextBox	"CATEGORY · "	
+-1000006863	InlineTextBox	"ENCODING & CODECS"	
+-1000006864	InlineTextBox	"Encoding & "	
+-1000006865	InlineTextBox	"Codecs"	
+16286	StaticText	"About this collection"	
+16287	StaticText	"Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools."	
+-1000006877	InlineTextBox	"Filters & view"	
+-1000006878	InlineTextBox	"Subcategories"	
+-1000006879	InlineTextBox	"Codecs"	
+-1000006880	InlineTextBox	"27"	
+-1000006881	InlineTextBox	"Encoding Tools"	
+-1000006882	InlineTextBox	"225"	
+-1000006883	InlineTextBox	"Uncategorized"	
+-1000006884	InlineTextBox	"120"	
+-1000006885	InlineTextBox	"Resources (372)"	
+-1000006886	InlineTextBox	"Page 999 is not available; showing page "	
+-1000006887	InlineTextBox	"16 instead."	
+16309	StaticText	"Dismiss"	
+15933	link	"realeyes-media/alpine-bento-ffmpeg"	focusable=true
+15935	image	""	
+15940	button	"Favorite to your account — sign in required: realeyes-media/alpine-bento-ffmpeg"	focusable=true pressed="false"
+15944	button	"Bookmark on this device — no sign-in required: realeyes-media/alpine-bento-ffmpeg"	focusable=true pressed="false"
+15953	link	"sambios/ffmpeg_transcoder"	focusable=true
+15955	image	""	
+15960	button	"Favorite to your account — sign in required: sambios/ffmpeg_transcoder"	focusable=true pressed="false"
+15964	button	"Bookmark on this device — no sign-in required: sambios/ffmpeg_transcoder"	focusable=true pressed="false"
+15973	link	"serverlesspub/ffmpeg-aws-lambda-layer"	focusable=true
+15975	image	""	
+15980	button	"Favorite to your account — sign in required: serverlesspub/ffmpeg-aws-lambda-layer"	focusable=true pressed="false"
+15984	button	"Bookmark on this device — no sign-in required: serverlesspub/ffmpeg-aws-lambda-layer"	focusable=true pressed="false"
+15993	link	"slhck/ffmpeg-bitrate-stats"	focusable=true
+15995	image	""	
+16000	button	"Favorite to your account — sign in required: slhck/ffmpeg-bitrate-stats"	focusable=true pressed="false"
+16004	button	"Bookmark on this device — no sign-in required: slhck/ffmpeg-bitrate-stats"	focusable=true pressed="false"
+16013	link	"slhck/ffmpeg-debug-qp"	focusable=true
+16015	image	""	
+16020	button	"Favorite to your account — sign in required: slhck/ffmpeg-debug-qp"	focusable=true pressed="false"
+16024	button	"Bookmark on this device — no sign-in required: slhck/ffmpeg-debug-qp"	focusable=true pressed="false"
+16033	link	"SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder"	focusable=true
+16035	image	""	
+16040	button	"Favorite to your account — sign in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder"	focusable=true pressed="false"
+16044	button	"Bookmark on this device — no sign-in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder"	focusable=true pressed="false"
+16053	link	"This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed."	focusable=true
+16055	image	""	
+16060	button	"Favorite to your account — sign in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed."	focusable=true pressed="false"
+16064	button	"Bookmark on this device — no sign-in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed."	focusable=true pressed="false"
+16073	link	"transitive-bullshit/awesome-ffmpeg"	focusable=true
+16075	image	""	
+16080	button	"Favorite to your account — sign in required: transitive-bullshit/awesome-ffmpeg"	focusable=true pressed="false"
+16084	button	"Bookmark on this device — no sign-in required: transitive-bullshit/awesome-ffmpeg"	focusable=true pressed="false"
+16093	link	"Use of Look-Up Tables (LUTs) in FFmpeg"	focusable=true
+16095	image	""	
+16100	button	"Favorite to your account — sign in required: Use of Look-Up Tables (LUTs) in FFmpeg"	focusable=true pressed="false"
+16104	button	"Bookmark on this device — no sign-in required: Use of Look-Up Tables (LUTs) in FFmpeg"	focusable=true pressed="false"
+16113	link	"VCDP/FFmpeg-patch"	focusable=true
+16115	image	""	
+16120	button	"Favorite to your account — sign in required: VCDP/FFmpeg-patch"	focusable=true pressed="false"
+16124	button	"Bookmark on this device — no sign-in required: VCDP/FFmpeg-patch"	focusable=true pressed="false"
+16133	link	"x264 FFmpeg Options Guide - Linux Encoding"	focusable=true
+16135	image	""	
+16140	button	"Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding"	focusable=true pressed="false"
+16144	button	"Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding"	focusable=true pressed="false"
+16153	link	"Xabe.FFmpeg"	focusable=true
+16155	image	""	
+16160	button	"Favorite to your account — sign in required: Xabe.FFmpeg"	focusable=true pressed="false"
+16164	button	"Bookmark on this device — no sign-in required: Xabe.FFmpeg"	focusable=true pressed="false"
+16174	image	""	
+16322	StaticText	"Previous"	
+16323	StaticText	"1"	
+16325	StaticText	"15"	
+16326	StaticText	"16"	
+16327	StaticText	"Next"	
+16181	image	""	
+-1000006953	InlineTextBox	"Page "	
+-1000006954	InlineTextBox	"16"	
+-1000006955	InlineTextBox	" of "	
+-1000006956	InlineTextBox	"16"	
+16332	StaticText	"Go to page"	
+16187	generic	""	
+-1000006859	InlineTextBox	"Home"	
+-1000006860	InlineTextBox	"Encoding & Codecs"	
+-1000006866	InlineTextBox	"About this collection"	
+-1000006867	InlineTextBox	"Encoding & Codecs brings together 372 "	
+-1000006868	InlineTextBox	"curated resources from across the video "	
+-1000006869	InlineTextBox	"technology landscape. Notable topics "	
+-1000006870	InlineTextBox	"include Codecs and Encoding Tools."	
+-1000006888	InlineTextBox	"Dismiss"	
+16310	StaticText	"realeyes-media/alpine-bento-ffmpeg"	
+15942	image	""	
+15946	image	""	
+16311	StaticText	"sambios/ffmpeg_transcoder"	
+15962	image	""	
+15966	image	""	
+16312	StaticText	"serverlesspub/ffmpeg-aws-lambda-layer"	
+15982	image	""	
+15986	image	""	
+16313	StaticText	"slhck/ffmpeg-bitrate-stats"	
+16002	image	""	
+16006	image	""	
+16314	StaticText	"slhck/ffmpeg-debug-qp"	
+16022	image	""	
+16026	image	""	
+16315	StaticText	"SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder"	
+16042	image	""	
+16046	image	""	
+16316	StaticText	"This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed."	
+16062	image	""	
+16066	image	""	
+16317	StaticText	"transitive-bullshit/awesome-ffmpeg"	
+16082	image	""	
+16086	image	""	
+16318	StaticText	"Use of Look-Up Tables (LUTs) in FFmpeg"	
+16102	image	""	
+16106	image	""	
+16319	StaticText	"VCDP/FFmpeg-patch"	
+16122	image	""	
+16126	image	""	
+16320	StaticText	"x264 FFmpeg Options Guide - Linux Encoding"	
+16142	image	""	
+16146	image	""	
+16321	StaticText	"Xabe.FFmpeg"	
+16162	image	""	
+16166	image	""	
+-1000006948	InlineTextBox	"Previous"	
+-1000006949	InlineTextBox	"1"	
+-1000006950	InlineTextBox	"15"	
+-1000006951	InlineTextBox	"16"	
+-1000006952	InlineTextBox	"Next"	
+-1000006957	InlineTextBox	"Go to page"	
+16333	StaticText	"16"	
+-1000006889	InlineTextBox	"realeyes-"	
+-1000006890	InlineTextBox	"media/alpine-"	
+-1000006891	InlineTextBox	"media/alpin"	
+-1000006892	InlineTextBox	"…"	
+-1000006893	InlineTextBox	"bento-ffmpeg"	
+-1000006894	InlineTextBox	"sambios/ffmp"	
+-1000006895	InlineTextBox	"eg_transcoder"	
+-1000006896	InlineTextBox	"serverlesspub"	
+-1000006897	InlineTextBox	"/ffmpeg-aws-"	
+-1000006898	InlineTextBox	"/ffmpeg-aw"	
+-1000006899	InlineTextBox	"…"	
+-1000006900	InlineTextBox	"lambda-layer"	
+-1000006901	InlineTextBox	"slhck/ffmpeg-"	
+-1000006902	InlineTextBox	"bitrate-stats"	
+-1000006903	InlineTextBox	"slhck/ffmpeg-"	
+-1000006904	InlineTextBox	"debug-qp"	
+-1000006905	InlineTextBox	"SmurfManX/ff"	
+-1000006906	InlineTextBox	"mpeg-nvidia-"	
+-1000006907	InlineTextBox	"mpeg-nvidi"	
+-1000006908	InlineTextBox	"…"	
+-1000006909	InlineTextBox	"adaptive-vod-"	
+-1000006910	InlineTextBox	"transcoder"	
+-1000006911	InlineTextBox	"This gist will "	
+-1000006912	InlineTextBox	"generate an "	
+-1000006913	InlineTextBox	"…"	
+-1000006914	InlineTextBox	"Intel QSV-"	
+-1000006915	InlineTextBox	"enabled "	
+-1000006916	InlineTextBox	"FFmpeg build "	
+-1000006917	InlineTextBox	"using the "	
+-1000006918	InlineTextBox	"open source "	
+-1000006919	InlineTextBox	"Intel Media "	
+-1000006920	InlineTextBox	"SDK. Testbed "	
+-1000006921	InlineTextBox	"used: Ubuntu "	
+-1000006922	InlineTextBox	"18.04LTS. A "	
+-1000006923	InlineTextBox	"fallback is "	
+-1000006924	InlineTextBox	"also provided "	
+-1000006925	InlineTextBox	"for the intel "	
+-1000006926	InlineTextBox	"vaapi driver "	
+-1000006927	InlineTextBox	"where "	
+-1000006928	InlineTextBox	"needed."	
+-1000006929	InlineTextBox	"transitive-"	
+-1000006930	InlineTextBox	"bullshit/awes"	
+-1000006931	InlineTextBox	"bullshit/awe"	
+-1000006932	InlineTextBox	"…"	
+-1000006933	InlineTextBox	"ome-ffmpeg"	
+-1000006934	InlineTextBox	"Use of Look-"	
+-1000006935	InlineTextBox	"Up Tables "	
+-1000006936	InlineTextBox	"…"	
+-1000006937	InlineTextBox	"(LUTs) in "	
+-1000006938	InlineTextBox	"FFmpeg"	
+-1000006939	InlineTextBox	"VCDP/FFmpe"	
+-1000006940	InlineTextBox	"g-patch"	
+-1000006941	InlineTextBox	"x264 FFmpeg "	
+-1000006942	InlineTextBox	"Options Guide "	
+-1000006943	InlineTextBox	"Options Gui"	
+-1000006944	InlineTextBox	"…"	
+-1000006945	InlineTextBox	"- Linux "	
+-1000006946	InlineTextBox	"Encoding"	
+-1000006947	InlineTextBox	"Xabe.FFmpeg"	
+-1000006958	InlineTextBox	"16"	

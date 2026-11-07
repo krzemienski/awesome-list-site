@@ -1,0 +1,1 @@
+JSON.stringify([...document.querySelectorAll("[data-sonner-toast],[role=status],li[role=status],[data-radix-toast-viewport] li,ol li[data-state=open]")].map(e=>e.innerText.slice(0,80)).filter(Boolean))

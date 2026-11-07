@@ -1,15 +1,59 @@
 import type { MouseEvent, ReactNode } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { describeLoadError } from "@/lib/apiError";
 import { cn } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+
+const OFFLINE_MESSAGE = "You're offline; this will load when your connection returns.";
+const BUSY_CAP_MS = 10000;
+const POLL_MS = 100;
+
+/**
+ * Some callers unmount the alert while the retry runs, and a failed retry
+ * re-renders it only when the refetch settles. Once the trigger has left the
+ * DOM, mark its slot busy until no query is fetching, so
+ * handoffFocusOnUnmount waits for the outcome. A caller that keeps the alert
+ * mounted never sets the flag.
+ */
+function holdBusyWhileRefetching(host: HTMLElement, trigger: HTMLElement, isFetching: () => boolean): void {
+  // Watch from above the host: some callers unmount the host itself along with
+  // the alert (C22-EX-09), and that removal is a mutation on the host's parent.
+  const scope = host.parentElement ?? host;
+  let poll: number | undefined;
+  let busyEl: HTMLElement | null = null;
+  const stop = () => {
+    observer.disconnect();
+    window.clearTimeout(cap);
+    window.clearTimeout(poll);
+    busyEl?.removeAttribute("aria-busy");
+  };
+  const waitForSettle = () => {
+    poll = window.setTimeout(() => (isFetching() ? waitForSettle() : stop()), POLL_MS);
+  };
+  const observer = new MutationObserver(() => {
+    if (trigger.isConnected) return;
+    observer.disconnect();
+    // Mark the slot that is still on the page: the host, or its parent when
+    // the host left with the alert.
+    busyEl = host.isConnected ? host : scope.isConnected ? scope : null;
+    if (!busyEl) return stop();
+    busyEl.setAttribute("aria-busy", "true");
+    waitForSettle();
+  });
+  observer.observe(scope, { childList: true, subtree: true });
+  const cap = window.setTimeout(stop, BUSY_CAP_MS);
+}
 
 export interface AdminLoadErrorProps {
   /** What failed to load, phrased to follow "Couldn't load" — e.g. "the audit log". */
   subject: string;
   /** The query error; 5xx responses get the shared server-failure copy. */
   error: unknown;
+  /** True when the request is paused because the browser is offline; shows the offline copy and no Retry (refetch stays paused offline). */
+  offline?: boolean;
   /** Re-runs the failed request(s). Omit only when the parent owns the retry. */
   onRetry?: (event: MouseEvent<HTMLButtonElement>) => void;
   /** True while the retry is in flight. */
@@ -33,6 +77,7 @@ export interface AdminLoadErrorProps {
 export function AdminLoadError({
   subject,
   error,
+  offline = false,
   onRetry,
   retrying = false,
   note,
@@ -40,6 +85,7 @@ export function AdminLoadError({
   retryTestId,
   className,
 }: AdminLoadErrorProps) {
+  const queryClient = useQueryClient();
   return (
     <Alert
       variant="destructive"
@@ -52,17 +98,35 @@ export function AdminLoadError({
       </p>
       <AlertDescription className="flex flex-wrap items-center gap-3">
         <span data-load-error-message="">
-          {describeLoadError(error)}
+          {offline ? OFFLINE_MESSAGE : describeLoadError(error)}
           {note ? <> {note}</> : null}
         </span>
-        {onRetry ? (
+        {onRetry && !offline ? (
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={(event) => {
               if (retrying) return;
+              const trigger = event.currentTarget;
+              const host = trigger.closest(".admin-load-error")?.parentElement ?? null;
+              if (host) holdBusyWhileRefetching(host, trigger, () => queryClient.isFetching() > 0);
               onRetry(event);
+              // The alert unmounts while the retry runs. If it fails again the
+              // alert re-renders in the same place: refocus its new Retry,
+              // otherwise the page heading. Registered after onRetry so a
+              // caller's own handoff target fires first and wins.
+              // When a wrapper around the alert unmounts too (e.g. the whole
+              // section is gated on the error), the host is detached: find the
+              // re-rendered Retry by its test id instead (C22-EX-09).
+              handoffFocusOnUnmount(trigger, () => {
+                if (host?.isConnected) {
+                  return host.querySelector<HTMLElement>(":scope > .admin-load-error button");
+                }
+                return retryTestId
+                  ? document.querySelector<HTMLElement>(`[data-testid="${CSS.escape(retryTestId)}"]`)
+                  : null;
+              });
             }}
             aria-disabled={retrying || undefined}
             aria-busy={retrying || undefined}

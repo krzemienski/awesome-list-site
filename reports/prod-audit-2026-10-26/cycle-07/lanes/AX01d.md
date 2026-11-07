@@ -1,0 +1,5 @@
+# Chunk AX01d (row definitions in cycle-07/lanes/AX01.md)
+- C6-AX-006 filter sheet: toggle values, Done, destructive cancel dialogs, at 1440 and 390 (820 sheet open/close already PASS).
+- C6-AX-008 radios: arrow/Home/End/Space on theme, accent and font radios in a SIGNED-OUT context (/settings/theme), plus home-layout and learning-preference radiogroups, at 1440/820/390.
+- C6-AX-010 target sizes: /profile at 820 (signed in via agent-browser cookie, viewport-only), /admin?tab=resources at 390 and 820 (note: the resource checkboxes have a 44px hit area, not a defect), /categories and a resource detail page at 390 and 820.
+- C6-AX-011 contrast in TRUE light mode: switch the site's own light/dark control signed out (not prefers-color-scheme emulation), reload, confirm the html class is light, then measure editorial + geist x at least crimson, violet, lime, amber on /, /categories and a resource detail page. Report the lowest text ratio per combination; anything under 4.5:1 must be confirmed with a screenshot after a reload.

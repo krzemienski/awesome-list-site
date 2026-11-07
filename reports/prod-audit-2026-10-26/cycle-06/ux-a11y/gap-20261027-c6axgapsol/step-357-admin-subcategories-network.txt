@@ -1,0 +1,16 @@
+[50845.2735] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.2871] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.3684] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.4227] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.4363] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.6036] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.6846] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.7385] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.7526] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.9034] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.9842] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.10386] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.10522] GET https://awesome.video/api/admin/subcategories (Fetch)
+[50845.10683] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.11805] GET https://awesome.video/api/admin/subcategories (Fetch) 200
+[50845.11813] GET https://awesome.video/api/admin/subcategories (Fetch) 200

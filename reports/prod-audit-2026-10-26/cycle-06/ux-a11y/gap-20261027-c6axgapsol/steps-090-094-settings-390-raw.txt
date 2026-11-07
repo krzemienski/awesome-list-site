@@ -1,0 +1,76 @@
+✓ Done
+
+- menuitem "Theme settings" [ref=e1]
+- menuitem "Pending approvals" [ref=e2]
+- menuitem "Rejected resources" [ref=e3]
+- menuitem "Sub-Subcats" [ref=e4]
+- menuitem "Journeys" [ref=e5]
+- menuitem "Digests" [ref=e6]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-090-settings-390.png
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#journeys
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,825 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,825 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e36]
+    - link "Admin" [disabled, ref=e37]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings, Journeys section open" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - button "Scroll tabs left" [ref=e13]
+  - tablist "Admin sections" [ref=e14] focusable [tabindex]
+    - tab "Overview" [ref=e16]
+    - tab "Approvals" [ref=e17]
+    - tab "Edits" [ref=e18]
+    - tab "Enrichment" [ref=e19]
+    - tab "Researcher" [ref=e20]
+    - tab "Export" [ref=e21]
+    - tab "Database" [ref=e22]
+    - tab "Resources" [ref=e23]
+    - tab "Categories" [ref=e24]
+    - tab "Subcategories" [ref=e25]
+    - tab "Users" [ref=e26]
+    - tab "GitHub" [ref=e27]
+    - tab "Link Health" [ref=e28]
+    - tab "Audit" [ref=e29]
+    - tab "Research" [ref=e30]
+  - button "Scroll tabs right" [ref=e15]
+  - tabpanel "Journeys" [ref=e12] focusable [tabindex]
+    - button "Steps for Video Streaming Fundamentals" [ref=e31]
+    - button "Steps for Building Your First Streaming Platform" [ref=e32]
+    - button "Steps for FFmpeg Mastery" [ref=e33]
+    - button "Steps for Advanced Live Streaming Architecture" [ref=e34]
+    - button "Steps for DRM & Content Protection" [ref=e35]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-091-journeys-390.png
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+https://awesome.video/admin?status=rejected#journeys
+
+- menuitem "Theme settings" [ref=e1]
+- menuitem "Pending approvals" [ref=e2]
+- menuitem "Rejected resources" [ref=e3]
+- menuitem "Sub-Subcats" [ref=e4]
+- menuitem "Journeys (open)" [ref=e5]
+- menuitem "Digests" [ref=e6]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-092-digests-390.png
+
+✓ Done
+

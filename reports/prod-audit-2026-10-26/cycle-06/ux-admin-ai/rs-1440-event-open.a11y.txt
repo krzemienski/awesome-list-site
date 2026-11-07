@@ -1,0 +1,872 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e7]
+          - link "Browse" [ref=e9]
+          - link "Submit" [ref=e10]
+          - link "About" [ref=e11]
+          - link "Docs ↗" [ref=e12]
+          - link "Admin" [ref=e13]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e8]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e14]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "Researcher" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e15]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e16]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e17]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [selected, ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [ref=e35]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e20]
+          - tabpanel "Researcher" [ref=e18] focusable [tabindex]
+            - generic
+              - generic
+                - region "Research run #64" [ref=e39]
+                  - heading "Research run #64" [level=3, ref=e42]
+                    - StaticText "Research run #64"
+                  - paragraph
+                    - StaticText "All categories · ran for 3:24"
+                  - image
+                  - StaticText "COMPLETED"
+                  - paragraph
+                  - list "Run phases"
+                    - listitem [level=1]
+                      - StaticText "Planning"
+                      - StaticText "12:12:24 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Scouting"
+                      - StaticText "12:12:56 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Verifying"
+                      - StaticText "12:15:30 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Saving"
+                      - StaticText "12:15:39 AM"
+                      - StaticText "(done)"
+                    - listitem [level=1]
+                      - StaticText "Done"
+                      - StaticText "12:15:48 AM"
+                      - StaticText "(current)"
+                  - heading "Scouts 2 started" [level=4, ref=e43]
+                    - StaticText "Scouts"
+                    - StaticText "2 started"
+                  - list "Scouts"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "1"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Scout multi-format packaging engineering blogs"
+                      - paragraph
+                        - StaticText "4 searches · 10 candidates · 81s"
+                    - listitem [level=1]
+                      - StaticText "Scout "
+                      - StaticText "2"
+                      - StaticText "REPORTED"
+                      - paragraph
+                        - StaticText "Scout RTMP/RTSP server engineering blogs"
+                      - paragraph
+                        - StaticText "8 searches · 9 candidates · 138s"
+                  - DescriptionList
+                    - term "Discoveries"
+                    - definition
+                      - StaticText "2 of 2 saved"
+                    - progressbar "Discoveries saved against the target": 100
+                    - term "Turns"
+                    - definition
+                      - StaticText "9 of 40"
+                    - progressbar "Turns used against the cap": 22.5
+                    - term "Spend"
+                    - definition
+                      - StaticText "$1.3245 of $3.00"
+                    - progressbar "Spend against the budget cap": 44.150001525878906
+                  - note
+                    - image
+                    - paragraph
+                      - StaticText "Run finished with 2 saved discoveries. Review them below."
+                  - region "Review discoveries" [ref=e44]
+                    - heading "Review discoveries" [level=4, ref=e47]
+                    - list "Discoveries from this run"
+                      - listitem [level=1]
+                        - StaticText "The Hidden Flaws of SRS: What You Need to Know (SRS Engineering Blog)"
+                        - image
+                        - StaticText "REJECTED"
+                        - image
+                        - StaticText "LINK CHECK FAILED"
+                        - link "https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af" [ref=e90]
+                          - StaticText "https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af"
+                        - paragraph
+                          - StaticText "Candid engineering post from the SRS (Simple Realtime Server) team analyzing the architectural limitations and performance trade-offs of their own RTMP/HLS/WebRTC/SRT media server, including single-process threading constraints and clustering caveats."
+                        - StaticText "INFRASTRUCTURE & DELIVERY"
+                        - StaticText "RTMPRTSPHTTP PROTOCOL SERVERS"
+                        - StaticText "86"
+                        - StaticText "% CONFIDENCE"
+                      - listitem [level=1]
+                        - StaticText "MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)"
+                        - image
+                        - StaticText "APPROVED"
+                        - image
+                        - StaticText "LINK OK"
+                        - link "https://mediamtx.net/" [ref=e91]
+                          - StaticText "https://mediamtx.net/"
+                        - paragraph
+                          - StaticText "Official documentation for MediaMTX, a zero-dependency real-time media server and proxy that publishes, reads and converts between RTSP, RTMP, SRT, HLS and WebRTC on a per-path basis. Covers protocol-specific ingest/egress configuration, recording, authentication and the REST control API."
+                        - StaticText "INFRASTRUCTURE & DELIVERY"
+                        - StaticText "RTMPRTSPHTTP PROTOCOL SERVERS"
+                        - StaticText "92"
+                        - StaticText "% CONFIDENCE"
+                    - button "Done — go to job history" [ref=e48]
+                      - image
+                      - StaticText "Done — go to job history"
+                    - button "Start another run" [ref=e49]
+                      - image
+                      - StaticText "Start another run"
+                  - button "Run details: raw event log and agent graph" [expanded=true, ref=e45]
+                    - StaticText "Run details: raw event log and agent graph"
+                    - image
+                  - tablist [ref=e50] focusable [tabindex]
+                    - tab "Event log" [selected, ref=e52]
+                    - tab "Agent graph" [ref=e53]
+                  - tabpanel "Event log" [ref=e51] focusable [tabindex]
+                    - region "AGENT EVENTS (STRUCTURED)" [ref=e54]
+                      - heading "AGENT EVENTS (STRUCTURED)" [level=3, ref=e92]
+                      - StaticText "66"
+                      - StaticText " event"
+                      - StaticText "s"
+                      - log "Structured agent events for research job 64" [ref=e93] focusable [tabindex]
+                        - list
+                          - listitem [level=1]
+                            - StaticText "12:12:24 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "PHASE"
+                            - StaticText "Phase: planning"
+                            - button "Hide detail for event 0" [expanded=true, ref=e101]
+                              - image
+                            - StaticText "{\n  \"phase\": \"planning\",\n  \"trigger\": \"run_started\",\n  \"previous\": null\n}"
+                          - listitem [level=1]
+                            - StaticText "12:12:33 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "LIFECYCLE"
+                            - StaticText "Run started (model cc/claude-opus-5, maxTurns 40, budget $3)"
+                            - button "Show detail for event 1" [expanded=false, ref=e102]
+                              - image
+                            - StaticText "cc/claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:12:36 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "I'll start by loading my tools and confirming the top gaps."
+                            - button "Show detail for event 2" [expanded=false, ref=e103]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 13,115(⊕13,113)"
+                            - StaticText "out "
+                            - StaticText "1"
+                          - listitem [level=1]
+                            - StaticText "12:12:37 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: ToolSearch"
+                            - button "Show detail for event 3" [expanded=false, ref=e104]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:12:38 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: mcp__research__get_coverage_gaps"
+                            - button "Show detail for event 4" [expanded=false, ref=e105]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 13,594(⊕13,592)"
+                            - StaticText "out "
+                            - StaticText "33"
+                          - listitem [level=1]
+                            - StaticText "12:12:39 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "get_coverage_gaps"
+                            - StaticText "{\"limit\":\"20\"}"
+                          - listitem [level=1]
+                            - StaticText "12:12:39 AM"
+                            - StaticText "GET_COVERAGE_GAPS"
+                            - StaticText "TOOL_RESULT"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "20 gaps"
+                            - StaticText "108"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:12:42 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "(no text)"
+                            - button "Show detail for event 7" [expanded=false, ref=e106]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 17,113(⊕17,111)"
+                            - StaticText "out "
+                            - StaticText "3"
+                          - listitem [level=1]
+                            - StaticText "12:12:43 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "Two gaps, two parallel scouts, biased toward engineering blogs."
+                            - button "Show detail for event 8" [expanded=false, ref=e107]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:12:56 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: Agent"
+                            - button "Show detail for event 9" [expanded=false, ref=e108]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:12:56 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "SCOUT_START"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Scout #1 started: Scout multi-format packaging engineering blogs"
+                            - button "Show detail for event 10" [expanded=false, ref=e109]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:12:56 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "PHASE"
+                            - StaticText "Phase: scouting"
+                            - button "Show detail for event 11" [expanded=false, ref=e110]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:12:56 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Scout multi-format packaging engineering blogs"
+                            - button "Show detail for event 12" [expanded=false, ref=e111]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:04 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 13" [expanded=false, ref=e112]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                            - generic
+                              - StaticText "in 4,596(⊕4,586)"
+                            - StaticText "out "
+                            - StaticText "3"
+                          - listitem [level=1]
+                            - StaticText "12:13:04 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"CMAF packaging engineering blog low latency fMP4 ingest technical\"}"
+                            - button "Show detail for event 14" [expanded=false, ref=e113]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: Agent"
+                            - button "Show detail for event 15" [expanded=false, ref=e114]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "SCOUT_START"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Scout #2 started: Scout RTMP/RTSP server engineering blogs"
+                            - button "Show detail for event 16" [expanded=false, ref=e115]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Scout RTMP/RTSP server engineering blogs"
+                            - button "Show detail for event 17" [expanded=false, ref=e116]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 18" [expanded=false, ref=e117]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"Eyevinn HLS DASH packaging tools multi-format open source\"}"
+                            - button "Show detail for event 19" [expanded=false, ref=e118]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 20" [expanded=false, ref=e119]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"mp4ff Rust video packaging transmuxing multi-format implementation\"}"
+                            - button "Show detail for event 21" [expanded=false, ref=e120]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 22" [expanded=false, ref=e121]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:05 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"origin packager just-in-time packaging CMAF architecture technical specification\"}"
+                            - button "Show detail for event 23" [expanded=false, ref=e122]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:10 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 24" [expanded=false, ref=e123]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                            - generic
+                              - StaticText "in 4,553(⊕4,543)"
+                            - StaticText "out "
+                            - StaticText "3"
+                          - listitem [level=1]
+                            - StaticText "12:13:10 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"RTMP ingest server internals engineering blog architecture scaling\"}"
+                            - button "Show detail for event 25" [expanded=false, ref=e124]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:10 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 26" [expanded=false, ref=e125]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:10 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"mediamtx RTSP RTMP SRT documentation technical architecture\"}"
+                            - button "Show detail for event 27" [expanded=false, ref=e126]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:10 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 28" [expanded=false, ref=e127]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:11 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"SRS simple realtime server engineering blog deep dive architecture\"}"
+                            - button "Show detail for event 29" [expanded=false, ref=e128]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:13:11 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 30" [expanded=false, ref=e129]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:13:11 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"\\\"datarhei restreamer\\\" OR \\\"ant media server\\\" OR \\\"pion webrtc\\\" technical documentation blog\"}"
+                            - button "Show detail for event 31" [expanded=false, ref=e130]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:17 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION_RESULT"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Update from scout"
+                            - button "Show detail for event 32" [expanded=false, ref=e131]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:17 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION_RESULT"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "I've completed 4 targeted searches focusing on CMAF/HLS/DASH packaging engineering content, vendor technical blogs, and lesser-known open-source tools. Consolidating results:\n\n```json\n[\n  {\n    \"url\": \"https://www.forasoft.com/learn/video-streaming/articles-streaming/live-origin-…"
+                            - button "Show detail for event 33" [expanded=false, ref=e132]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:17 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "SCOUT_END"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "Scout #1 completed: 4 searches, 10 candidate URLs"
+                            - button "Show detail for event 34" [expanded=false, ref=e133]
+                              - image
+                            - StaticText "81116"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:14:30 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 35" [expanded=false, ref=e134]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                            - generic
+                              - StaticText "in 9,211(⊕9,203)"
+                            - StaticText "out "
+                            - StaticText "1"
+                          - listitem [level=1]
+                            - StaticText "12:14:30 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"RTMP ingest server internals engineering blog architecture scaling\"}"
+                            - button "Show detail for event 36" [expanded=false, ref=e135]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:30 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 37" [expanded=false, ref=e136]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:14:30 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"mediamtx RTSP RTMP SRT documentation technical architecture\"}"
+                            - button "Show detail for event 38" [expanded=false, ref=e137]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:31 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 39" [expanded=false, ref=e138]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:14:31 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"SRS simple realtime server engineering blog deep dive architecture\"}"
+                            - button "Show detail for event 40" [expanded=false, ref=e139]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:14:31 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: WebSearch"
+                            - button "Show detail for event 41" [expanded=false, ref=e140]
+                              - image
+                            - StaticText "claude-haiku-4-5-20251001"
+                          - listitem [level=1]
+                            - StaticText "12:14:31 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "WebSearch"
+                            - StaticText "{\"query\":\"\\\"datarhei restreamer\\\" OR \\\"ant media server\\\" OR \\\"pion webrtc\\\" technical documentation blog\"}"
+                            - button "Show detail for event 42" [expanded=false, ref=e141]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:15:23 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION_RESULT"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "Update from scout"
+                            - button "Show detail for event 43" [expanded=false, ref=e142]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:15:23 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "DELEGATION_RESULT"
+                            - StaticText "→ "
+                            - StaticText "scout"
+                            - StaticText "```json\n[\n  {\n    \"url\": \"https://mediamtx.net/\",\n    \"title\": \"MediaMTX Documentation\",\n    \"description\": \"Official zero-dependency real-time media server supporting RTSP, RTMP, HLS, WebRTC, and SRT ingest/egress with per-path protocol conversion.\",\n    \"fits_gap\": \"RTSP/RTMP/S…"
+                            - button "Show detail for event 44" [expanded=false, ref=e143]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:15:23 AM"
+                            - StaticText "SCOUT"
+                            - StaticText "SCOUT_END"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "Scout #2 completed: 8 searches, 9 candidate URLs"
+                            - button "Show detail for event 45" [expanded=false, ref=e144]
+                              - image
+                            - StaticText "138140"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:29 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "(no text)"
+                            - button "Show detail for event 46" [expanded=false, ref=e145]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 23,270(↩17,111 ⊕6,157)"
+                            - StaticText "out "
+                            - StaticText "5"
+                          - listitem [level=1]
+                            - StaticText "12:15:29 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "Scouts returned. Checking the two strongest candidates."
+                            - button "Show detail for event 47" [expanded=false, ref=e146]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:15:29 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: mcp__research__check_duplicate"
+                            - button "Show detail for event 48" [expanded=false, ref=e147]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "check_duplicate"
+                            - StaticText "{\"url\":\"https://mediamtx.net/\"}"
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "PHASE"
+                            - StaticText "Phase: verifying"
+                            - button "Show detail for event 50" [expanded=false, ref=e148]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "CHECK_DUPLICATE"
+                            - StaticText "TOOL_RESULT"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "{\"isDuplicate\":false,\"normalizedUrl\":\"mediamtx.net\"}"
+                            - StaticText "97"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: mcp__research__check_duplicate"
+                            - button "Show detail for event 52" [expanded=false, ref=e149]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "check_duplicate"
+                            - StaticText "{\"url\":\"https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af\"}"
+                          - listitem [level=1]
+                            - StaticText "12:15:30 AM"
+                            - StaticText "CHECK_DUPLICATE"
+                            - StaticText "TOOL_RESULT"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "{\"isDuplicate\":false,\"normalizedUrl\":\"blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af\"}"
+                            - StaticText "31"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:33 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "(no text)"
+                            - button "Show detail for event 55" [expanded=false, ref=e150]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 24,009(↩23,268 ⊕739)"
+                            - StaticText "out "
+                            - StaticText "3"
+                          - listitem [level=1]
+                            - StaticText "12:15:39 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: mcp__research__save_discovery"
+                            - button "Show detail for event 56" [expanded=false, ref=e151]
+                              - image
+                            - StaticText "claude-opus-5"
+                          - listitem [level=1]
+                            - StaticText "12:15:39 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "PHASE"
+                            - StaticText "Phase: saving"
+                            - button "Show detail for event 57" [expanded=false, ref=e152]
+                              - image
+                          - listitem [level=1]
+                            - StaticText "12:15:39 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "save_discovery"
+                            - StaticText "{\"url\":\"https://mediamtx.net/\",\"title\":\"MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)\",\"confidence\":\"92\"}"
+                          - listitem [level=1]
+                            - StaticText "12:15:39 AM"
+                            - StaticText "SAVE_DISCOVERY"
+                            - StaticText "TOOL_RESULT"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "{\"saved\":true,\"discoveryId\":2043}"
+                            - StaticText "224"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:45 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "→ tools: mcp__research__save_discovery"
+                            - button "Show detail for event 60" [expanded=false, ref=e153]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 24,762(↩13,592 ⊕11,168)"
+                            - StaticText "out "
+                            - StaticText "25"
+                          - listitem [level=1]
+                            - StaticText "12:15:45 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "TOOL_CALL"
+                            - StaticText "→ "
+                            - StaticText "save_discovery"
+                            - StaticText "{\"url\":\"https://blog.ossrs.io/the-hidden-flaws-of-srs-what-you-need-to-know-b7adcb1541af\",\"title\":\"The Hidden Flaws of SRS: What You Need to Know (SRS Engineering Blog)\",\"confidence\":\"86\"}"
+                          - listitem [level=1]
+                            - StaticText "12:15:46 AM"
+                            - StaticText "SAVE_DISCOVERY"
+                            - StaticText "TOOL_RESULT"
+                            - StaticText "→ "
+                            - StaticText "orchestrator"
+                            - StaticText "{\"saved\":true,\"discoveryId\":2044,\"targetReached\":true,\"note\":\"Discovery target of 2 reached. Do not search or save anything else — end your turn now with a one-line summary.\"}"
+                            - StaticText "207"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:47 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "MESSAGE"
+                            - StaticText "Target reached: saved 2 new resources for the RTMP/RTSP/HTTP Protocol Servers gap — MediaMTX official docs (92) and the SRS engineering blog's \"Hidden Flaws of SRS\" post (86)."
+                            - button "Show detail for event 63" [expanded=false, ref=e154]
+                              - image
+                            - StaticText "claude-opus-5"
+                            - generic
+                              - StaticText "in 25,423(↩24,760 ⊕661)"
+                            - StaticText "out "
+                            - StaticText "2"
+                          - listitem [level=1]
+                            - StaticText "12:15:47 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "RESULT"
+                            - StaticText "Run success — 9 turns, $1.3245"
+                            - button "Show detail for event 64" [expanded=false, ref=e155]
+                              - image
+                            - StaticText "cc/claude-opus-5"
+                            - StaticText "in "
+                            - StaticText "14"
+                            - StaticText "out "
+                            - StaticText "3,938"
+                            - StaticText "$"
+                            - StaticText "1.3245"
+                            - StaticText "195099"
+                            - StaticText "ms"
+                          - listitem [level=1]
+                            - StaticText "12:15:48 AM"
+                            - StaticText "ORCHESTRATOR"
+                            - StaticText "PHASE"
+                            - StaticText "Phase: finishing (completed)"
+                            - button "Show detail for event 65" [expanded=false, ref=e156]
+                              - image
+              - generic
+                - sectionheader
+                  - heading "Researcher jobs" [level=2, ref=e46]
+                  - paragraph
+                    - StaticText "Latest 5 of 69 research runs"
+                - region "Researcher jobs table, scrollable" [ref=e40] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "STATUS" [ref=e94]
+                        - columnheader "PROMPT" [ref=e95]
+                        - columnheader "FOUND" [ref=e96]
+                        - columnheader "APPROVED / REJECTED" [ref=e97]
+                        - columnheader "COST" [ref=e98]
+                        - columnheader "TURNS" [ref=e99]
+                        - columnheader "CREATED" [ref=e100]
+                    - row
+                      - cell "COMPLETED" [ref=e55]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-27) — campaign angle: Academic papers with code. Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"alternatives to shaka-packager open source\" - \"\"live packager\" open source origin \"LL-HLS\" \"DASH\" github\" - \"github \"dash\" \"hls\" packager rust OR go 2025 maintained\" - \"\"open source CMAF packager\" HLS DASH 2024\" - \"Go language \"HLS\" \"DASH\" OR \"CMAF\" OR \"fragmented mp4\" muxer library github\" - \"site:lobste.rs WHIP WHEP RTSP protocol streaming server\" - \"\"RTSP proxy\" OR \"RTSP restreamer\" multi-camera open source camera feed\" - \"Rust RTMP library crate \"rtmp\" streaming server implementation\" - \"\"Show HN\" RTSP server OR RTMP server OR WHIP server open source\" - \"Rust \"ISOBMFF writer\" OR \"fMP4 muxer\" crate OR library github\" - \"site:reddit.com/r/videoengineering packager alternative shaka-packager CMAF HLS DASH\" - \"\"Show HN\" video packager HLS DASH segmenter open source\" - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e56]
+                      - cell "0" [ref=e57]
+                      - cell "0/0" [ref=e58]
+                        - StaticText "0/0"
+                      - cell "$0.4199" [ref=e59]
+                      - cell "10/80" [ref=e60]
+                        - StaticText "10/80"
+                      - cell "Oct 27, 2026" [ref=e61]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e62]
+                      - cell "[QA-audit-1026] smoke: find 1 new open-source video tool" [ref=e63]
+                      - cell "0" [ref=e64]
+                      - cell "0/0" [ref=e65]
+                        - StaticText "0/0"
+                      - cell "$0.3062" [ref=e66]
+                      - cell "3/10" [ref=e67]
+                        - StaticText "3/10"
+                      - cell "Oct 26, 2026" [ref=e68]
+                    - row
+                      - cell "COMPLETED" [ref=e69]
+                      - cell "QA verification run for the production audit on 2026-10-26. This run must not search. Do not delegate to the scout and do not call check_duplicate or get_coverage_gaps. Call save_discovery exactly twice, one after the other, then end your turn with a one-line summary of both tool results. First call: url https://awesome.video/qa-dup-recheck-2026-10-26, title [QA-prod-validation] duplicate re-check probe, description QA probe used to verify the save-time duplicate re-check on production, suggested_category General Tools, confidence 90, reasoning QA verification. Second call: url https://awesome.video/qa-scout-gate-2026-10-26, title [QA-prod-validation] scout gate probe, description QA probe used to verify the save-time scout URL gate on production, suggested_category General Tools, confidence 90, reasoning QA verification." [ref=e70]
+                      - cell "0" [ref=e71]
+                      - cell "0/0" [ref=e72]
+                        - StaticText "0/0"
+                      - cell "$0.1508" [ref=e73]
+                      - cell "1/8" [ref=e74]
+                        - StaticText "1/8"
+                      - cell "Oct 26, 2026" [ref=e75]
+                    - row
+                      - cell "CANCELLED" [ref=e76]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Community finds. Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e77]
+                      - cell "0" [ref=e78]
+                      - cell "0/0" [ref=e79]
+                        - StaticText "0/0"
+                      - cell "$0.2753 lower bound" [ref=e80]
+                        - StaticText "$0.2753"
+                        - StaticText "lower bound"
+                      - cell "3/40" [ref=e81]
+                        - StaticText "3/40"
+                      - cell "Oct 26, 2026" [ref=e82]
+                    - row
+                      - cell "STOPPED AT BUDGET" [ref=e83]
+                      - cell "AUTO-GENERATED RESEARCH BRIEF (2026-10-26) — campaign angle: Curated-list mining. Bias this run toward mining other curated lists: awesome-* repos, roundups, \"top N tools\" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one's official site or repo. TARGET GAPS THIS RUN (most under-served first — rotate through several): - Encoding & Codecs › Multi-format Packaging Tools (13 existing) - Intro & Learning › Encoding & Transcoding Guides (13 existing) - General Tools › DRM (14 existing) - General Tools › Specialized Utility Scripts (14 existing) - Media Tools › Batch Processing & Automation (14 existing) - Encoding & Codecs › Software Transcoding Tools (15 existing) - Infrastructure & Delivery › RTMPRTSPHTTP Protocol Servers (15 existing) - Encoding & Codecs › Real-Time Encoding Solutions (16 existing) RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground: - \"\"datarhei restreamer\" OR \"ant media server\" OR \"pion webrtc\" technical documentation blog\" - \"SRS simple realtime server engineering blog deep dive architecture\" - \"mediamtx RTSP RTMP SRT documentation technical architecture\" - \"RTMP ingest server internals engineering blog architecture scaling\" - \"origin packager just-in-time packaging CMAF architecture technical specification\" - \"mp4ff Rust video packaging transmuxing multi-format implementation\" - \"Eyevinn HLS DASH packaging tools multi-format open source\" - \"CMAF packaging engineering blog low latency fMP4 ingest technical\" - \"bavc qctools github broadcast video QC\" - \"Novage p2p-media-loader github WebRTC HLS DASH\" - \"open source video shot boundary detection tool github 2025\" - \"QCTools broadcast video QC waveform vectorscope open source github\" - \"p2p-media-loader github WebRTC HLS DASH streaming\" - \"MediaInfo alternative open source video metadata extractor\" - \"ID3 timed metadata extraction HLS DASH github\" - \"ISOBMFF mp4 box metadata inspector tool github\" - \"SCTE-35 parser insertion tool site:github.com\" - \"ACES pipeline tooling open source github color space conversion library\" - \"video waveform vectorscope analyzer open source github QC\" - \"video temporal segmentation scene detection paper with code github\" DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (1236), arxiv.org (74), dl.acm.org (29), tech.ebu.ch (13), dashif.org (9), archive.fosdem.org (8), crates.io (7), w3.org (7), developer.apple.com (7), wiki.x266.mov (6), datatracker.ietf.org (6), developers.cloudflare.com (6) VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com, arxiv.org, dl.acm.org, tech.ebu.ch, dashif.org, archive.fosdem.org, crates.io, w3.org Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle." [ref=e84]
+                      - cell "0" [ref=e85]
+                      - cell "0/0" [ref=e86]
+                        - StaticText "0/0"
+                      - cell "$0.3213" [ref=e87]
+                      - cell "3/40" [ref=e88]
+                        - StaticText "3/40"
+                      - cell "Oct 26, 2026" [ref=e89]
+                - button "Show more" [ref=e41]
+              - group
+                - DisclosureTriangle "All pending discoveries & full job history" [expanded=false]
+    - button "Back to top" [ref=e4]
+      - image

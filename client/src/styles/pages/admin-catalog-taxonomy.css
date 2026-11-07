@@ -88,8 +88,10 @@
   font-size: 0.6875rem;
 }
 
+/* AC-12: wide enough for the longest placeholder ("Search sub-subcategories...")
+   beside the search icon and the 44px touch clear button. */
 .admin-taxonomy-search {
-  width: 12.5rem;
+  width: 17rem;
 }
 
 /* Tools closed: the search field leaves the flow and the accessibility
@@ -141,6 +143,10 @@
 
 .admin-taxonomy-table tbody td {
   height: 56px;
+}
+
+.admin-taxonomy-scroll-hint {
+  padding-inline: 1.375rem;
 }
 
 .admin-taxonomy-table tbody tr {
@@ -294,6 +300,39 @@
    same stable 44px hitbox row avoids hover/absolute pointer traps. */
 .admin-taxonomy-delete-action {
   display: inline-flex;
+}
+
+/* A fine hovering pointer above 1024px reads the reason from the title
+   tooltip; touch and narrow layouts show it under the actions. */
+.admin-taxonomy-delete-reason {
+  display: none;
+  margin-top: 0.25rem;
+  color: var(--text-3);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  text-align: end;
+  /* The actions cell is nowrap; wrap the reason to the buttons' width so it
+     never widens the column. */
+  white-space: normal;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 64rem) {
+  .admin-taxonomy-delete-reason {
+    display: block;
+  }
+
+  /* AC-08: the clear-search X is a 44px touch target like the other controls. */
+  .admin-taxonomy-search .admin-taxonomy-search-clear {
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    right: 0;
+    width: 44px;
+  }
+
+  .admin-taxonomy-search input {
+    padding-right: 2.75rem;
+  }
 }
 
 .admin-taxonomy-pagination {

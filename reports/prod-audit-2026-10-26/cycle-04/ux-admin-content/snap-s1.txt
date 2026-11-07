@@ -1,0 +1,220 @@
+uid=246_0 RootWebArea "Admin — Awesome Video" url="https://awesome.video/admin#subcategories"
+  uid=251_0 region "Notifications (F8)"
+    uid=251_1 list
+  uid=251_2 link "Skip to main content" url="https://awesome.video/admin#main"
+  uid=251_4 banner
+    uid=251_5 link "AWESOME.VIDEO home" url="https://awesome.video/"
+    uid=251_8 button "Search 3,825 resources"
+    uid=251_9 navigation "Primary"
+      uid=251_10 link "Browse" url="https://awesome.video/categories"
+      uid=251_12 link "Submit" url="https://awesome.video/submit"
+      uid=251_14 link "About" url="https://awesome.video/about"
+      uid=251_16 link "Docs ↗" url="https://awesome.video/design-system"
+      uid=251_18 link "Admin" url="https://awesome.video/admin"
+    uid=251_20 button "Admin, account menu" expandable haspopup="menu"
+  uid=251_21 main
+    uid=251_22 navigation "Breadcrumb"
+      uid=251_23 link "Home" url="https://awesome.video/"
+      uid=251_25 "Admin"
+    uid=251_26 "Authorized admin area"
+    uid=251_27 "ADMIN CONSOLE · "
+    uid=251_28 "ADMIN USER"
+    uid=251_29 heading "Operations dashboard" level="1"
+    uid=251_30 "Manage the "
+    uid=251_31 "3,825"
+    uid=251_32 " resources, jobs, and contributors that keep the index alive."
+    uid=251_33 button "Settings" expandable haspopup="menu"
+    uid=251_34 button "New entry: add a resource" description="Add a new resource to the catalog"
+    uid=251_35 status atomic live="polite" relevant="additions text"
+    uid=251_36 tablist "Admin sections" orientation="horizontal"
+      uid=251_37 tab "Overview" selectable
+      uid=251_38 tab "Approvals" selectable
+      uid=251_39 tab "Edits" selectable
+      uid=251_40 tab "Enrichment" selectable
+      uid=251_41 tab "Researcher" selectable
+      uid=251_42 tab "Export" selectable
+      uid=251_43 tab "Database" selectable
+      uid=251_44 tab "Resources" selectable
+      uid=251_45 tab "Categories" selectable
+      uid=251_46 tab "Subcategories" selectable selected
+      uid=251_47 tab "Users" selectable
+      uid=251_48 tab "GitHub" selectable
+      uid=251_49 tab "Link Health" selectable
+      uid=251_50 tab "Audit" selectable
+      uid=251_51 tab "Research" selectable
+    uid=251_52 button "Scroll tabs right"
+    uid=252_0 tabpanel "Subcategories"
+      uid=252_1 "Subcategories"
+      uid=252_2 "99 second-level groupings"
+      uid=252_3 button "Search" expandable
+      uid=252_4 button "Add subcategory"
+      uid=252_5 region "Subcategories table, scrollable"
+        uid=252_6 "NAME"
+        uid=252_7 "SLUG"
+        uid=252_8 "PARENT"
+        uid=252_9 "RESOURCES"
+        uid=252_10 "Community Groups"
+        uid=252_11 "community-groups"
+        uid=252_12 "Community & Events"
+        uid=252_13 "59"
+        uid=252_14 button "Edit Community Groups"
+        uid=252_15 button "Delete Community Groups unavailable: 59 resources still assigned" disableable disabled
+        uid=252_16 "Events & Conferences"
+        uid=252_17 "events-conferences"
+        uid=252_18 "Community & Events"
+        uid=252_19 "72"
+        uid=252_20 button "Edit Events & Conferences"
+        uid=252_21 button "Delete Events & Conferences unavailable: 72 resources still assigned" disableable disabled
+        uid=252_22 "Benchmarking & Performance Tools for Codecs"
+        uid=252_23 "benchmarking-performance-tools-for-codecs"
+        uid=252_24 "Encoding & Codecs"
+        uid=252_25 "18"
+        uid=252_26 button "Edit Benchmarking & Performance Tools for Codecs"
+        uid=252_27 button "Delete Benchmarking & Performance Tools for Codecs unavailable: 18 resources still assigned" disableable disabled
+        uid=252_28 "Cloud-Based Encoding Solutions"
+        uid=252_29 "cloud-based-encoding-solutions"
+        uid=252_30 "Encoding & Codecs"
+        uid=252_31 "19"
+        uid=252_32 button "Edit Cloud-Based Encoding Solutions"
+        uid=252_33 button "Delete Cloud-Based Encoding Solutions unavailable: 19 resources still assigned" disableable disabled
+        uid=252_34 "Codecs"
+        uid=252_35 "codecs"
+        uid=252_36 "Encoding & Codecs"
+        uid=252_37 "69"
+        uid=252_38 button "Edit Codecs"
+        uid=252_39 button "Delete Codecs unavailable: 69 resources still assigned" disableable disabled
+        uid=252_40 "Comparative Analysis of Codecs"
+        uid=252_41 "comparative-analysis-of-codecs"
+        uid=252_42 "Encoding & Codecs"
+        uid=252_43 "19"
+        uid=252_44 button "Edit Comparative Analysis of Codecs"
+        uid=252_45 button "Delete Comparative Analysis of Codecs unavailable: 19 resources still assigned" disableable disabled
+        uid=252_46 "Containerization & Packaging Tools"
+        uid=252_47 "containerization-packaging-tools"
+        uid=252_48 "Encoding & Codecs"
+        uid=252_49 "36"
+        uid=252_50 button "Edit Containerization & Packaging Tools"
+        uid=252_51 button "Delete Containerization & Packaging Tools unavailable: 36 resources still assigned" disableable disabled
+        uid=252_52 "Encoding Tools"
+        uid=252_53 "encoding-tools"
+        uid=252_54 "Encoding & Codecs"
+        uid=252_55 "143"
+        uid=252_56 button "Edit Encoding Tools"
+        uid=252_57 button "Delete Encoding Tools unavailable: 143 resources still assigned" disableable disabled
+        uid=252_58 "FFmpeg-Based Tools"
+        uid=252_59 "ffmpeg-based-tools"
+        uid=252_60 "Encoding & Codecs"
+        uid=252_61 "19"
+        uid=252_62 button "Edit FFmpeg-Based Tools"
+        uid=252_63 button "Delete FFmpeg-Based Tools unavailable: 19 resources still assigned" disableable disabled
+        uid=252_64 "Hardware Accelerated Transcoding"
+        uid=252_65 "hardware-accelerated-transcoding"
+        uid=252_66 "Encoding & Codecs"
+        uid=252_67 "25"
+        uid=252_68 button "Edit Hardware Accelerated Transcoding"
+        uid=252_69 button "Delete Hardware Accelerated Transcoding unavailable: 25 resources still assigned" disableable disabled
+        uid=252_70 "Hardware Codecs & Acceleration"
+        uid=252_71 "hardware-codecs-acceleration"
+        uid=252_72 "Encoding & Codecs"
+        uid=252_73 "24"
+        uid=252_74 button "Edit Hardware Codecs & Acceleration"
+        uid=252_75 button "Delete Hardware Codecs & Acceleration unavailable: 24 resources still assigned" disableable disabled
+        uid=252_76 "Multi-format Packaging Tools"
+        uid=252_77 "multi-format-packaging-tools"
+        uid=252_78 "Encoding & Codecs"
+        uid=252_79 "13"
+        uid=252_80 button "Edit Multi-format Packaging Tools"
+        uid=252_81 button "Delete Multi-format Packaging Tools unavailable: 13 resources still assigned" disableable disabled
+        uid=252_82 "Next-Generation Codecs AV1 VVC"
+        uid=252_83 "next-generation-codecs-av1-vvc"
+        uid=252_84 "Encoding & Codecs"
+        uid=252_85 "19"
+        uid=252_86 button "Edit Next-Generation Codecs AV1 VVC"
+        uid=252_87 button "Delete Next-Generation Codecs AV1 VVC unavailable: 19 resources still assigned" disableable disabled
+        uid=252_88 "Open Source Encoder Projects"
+        uid=252_89 "open-source-encoder-projects"
+        uid=252_90 "Encoding & Codecs"
+        uid=252_91 "28"
+        uid=252_92 button "Edit Open Source Encoder Projects"
+        uid=252_93 button "Delete Open Source Encoder Projects unavailable: 28 resources still assigned" disableable disabled
+        uid=252_94 "Real-Time Encoding Solutions"
+        uid=252_95 "real-time-encoding-solutions"
+        uid=252_96 "Encoding & Codecs"
+        uid=252_97 "18"
+        uid=252_98 button "Edit Real-Time Encoding Solutions"
+        uid=252_99 button "Delete Real-Time Encoding Solutions unavailable: 18 resources still assigned" disableable disabled
+        uid=252_100 "Scripting & Automation Tools"
+        uid=252_101 "scripting-automation-tools"
+        uid=252_102 "Encoding & Codecs"
+        uid=252_103 "17"
+        uid=252_104 button "Edit Scripting & Automation Tools"
+        uid=252_105 button "Delete Scripting & Automation Tools unavailable: 17 resources still assigned" disableable disabled
+        uid=252_106 "Software Codecs"
+        uid=252_107 "software-codecs"
+        uid=252_108 "Encoding & Codecs"
+        uid=252_109 "18"
+        uid=252_110 button "Edit Software Codecs"
+        uid=252_111 button "Delete Software Codecs unavailable: 18 resources still assigned" disableable disabled
+        uid=252_112 "Software Transcoding Tools"
+        uid=252_113 "software-transcoding-tools"
+        uid=252_114 "Encoding & Codecs"
+        uid=252_115 "15"
+        uid=252_116 button "Edit Software Transcoding Tools"
+        uid=252_117 button "Delete Software Transcoding Tools unavailable: 15 resources still assigned" disableable disabled
+        uid=252_118 "API Libraries & SDKs"
+        uid=252_119 "api-libraries-sdks"
+        uid=252_120 "General Tools"
+        uid=252_121 "25"
+        uid=252_122 button "Edit API Libraries & SDKs"
+        uid=252_123 button "Delete API Libraries & SDKs unavailable: 25 resources still assigned" disableable disabled
+        uid=252_124 "Build Scripts & Automation"
+        uid=252_125 "build-scripts-automation"
+        uid=252_126 "General Tools"
+        uid=252_127 "33"
+        uid=252_128 button "Edit Build Scripts & Automation"
+        uid=252_129 button "Delete Build Scripts & Automation unavailable: 33 resources still assigned" disableable disabled
+        uid=252_130 "Case Studies & Best Practices in DRM"
+        uid=252_131 "case-studies-best-practices-in-drm"
+        uid=252_132 "General Tools"
+        uid=252_133 "33"
+        uid=252_134 button "Edit Case Studies & Best Practices in DRM"
+        uid=252_135 button "Delete Case Studies & Best Practices in DRM unavailable: 33 resources still assigned" disableable disabled
+        uid=252_136 "Command-line Utilities & Wrappers"
+        uid=252_137 "command-line-utilities-wrappers"
+        uid=252_138 "General Tools"
+        uid=252_139 "21"
+        uid=252_140 button "Edit Command-line Utilities & Wrappers"
+        uid=252_141 button "Delete Command-line Utilities & Wrappers unavailable: 21 resources still assigned" disableable disabled
+        uid=252_142 "Community & Collaboration Platforms"
+        uid=252_143 "community-collaboration-platforms"
+        uid=252_144 "General Tools"
+        uid=252_145 "19"
+        uid=252_146 button "Edit Community & Collaboration Platforms"
+        uid=252_147 button "Delete Community & Collaboration Platforms unavailable: 19 resources still assigned" disableable disabled
+        uid=252_148 "Cross-Platform Media Tools"
+        uid=252_149 "cross-platform-media-tools"
+        uid=252_150 "General Tools"
+        uid=252_151 "23"
+        uid=252_152 button "Edit Cross-Platform Media Tools"
+        uid=252_153 button "Delete Cross-Platform Media Tools unavailable: 23 resources still assigned" disableable disabled
+      uid=252_154 "Rows per page:"
+      uid=252_155 combobox "Items per page" expandable haspopup="listbox" value="24"
+      uid=252_156 navigation "Pagination"
+        uid=252_157 generic disableable disabled
+          uid=252_158 "Previous"
+        uid=252_159 link "Page 1, current page" url="https://awesome.video/admin#subcategories"
+          uid=252_160 "1"
+        uid=252_161 link "Go to page 2" url="https://awesome.video/admin?page=2#subcategories"
+          uid=252_162 "2"
+        uid=252_163 link "Go to page 3" url="https://awesome.video/admin?page=3#subcategories"
+          uid=252_164 "3"
+        uid=252_165 link "Go to page 4" url="https://awesome.video/admin?page=4#subcategories"
+          uid=252_166 "4"
+        uid=252_167 link "Go to page 5" url="https://awesome.video/admin?page=5#subcategories"
+          uid=252_168 "5"
+        uid=252_169 link "Next" url="https://awesome.video/admin?page=2#subcategories"
+        uid=252_171 "Page "
+        uid=252_172 "1"
+        uid=252_173 " of "
+        uid=252_174 "5"
+        uid=252_175 status atomic live="polite" relevant="additions text"

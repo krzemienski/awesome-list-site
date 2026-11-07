@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   trackDigestPreviewItemOpened,
   trackNotificationPreferenceChanges,
@@ -16,8 +15,10 @@ import {
   trackNotificationsResumed,
   trackNotificationsUnsubscribedAll,
 } from "@/lib/analytics-notifications";
-import type { DigestPreview, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
+import type { DigestPreview, NotificationPreferencesPatch, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 // "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
 const CADENCE_LABELS: Record<(typeof DIGEST_CADENCES)[number], string> = {
@@ -49,8 +50,12 @@ const PAUSE_DAYS = 7;
 
 // What a save was for, plus the last server-confirmed preferences it replaces,
 // so analytics compares server state to server state (never unsaved edits).
+// "save" PUTs the whole form; the quick actions PATCH only their own fields, so
+// they never store the time zone the form merely suggests.
 type SaveAction = "save" | "pause" | "resume" | "unsubscribe_all";
-interface SaveRequest { body: NotificationPreferencesUpdate; action: SaveAction; previous: NotificationPreferencesUpdate | null }
+type SaveRequest =
+  | { action: "save"; body: NotificationPreferencesUpdate; previous: NotificationPreferencesUpdate | null }
+  | { action: Exclude<SaveAction, "save">; body: NotificationPreferencesPatch; previous: NotificationPreferencesUpdate | null };
 
 function trackConfirmedSave({ action, previous }: SaveRequest, saved: NotificationPreferencesResponse) {
   if (action === "pause") trackNotificationsPaused(PAUSE_DAYS);
@@ -65,9 +70,9 @@ function trackConfirmedSave({ action, previous }: SaveRequest, saved: Notificati
 
 function Toggle({ checked, onChange, label, description, icon: Icon }: { checked: boolean; onChange: (value: boolean) => void; label: string; description: string; icon: typeof Mail }) {
   return (
-    <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)]">
+    <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--accent)]">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
-      <span aria-hidden="true" className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${checked ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]" : "border-[var(--border-strong)] text-transparent"}`}>
+      <span aria-hidden="true" className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--surface-2)] ${checked ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]" : "border-[var(--border-strong)] text-transparent"}`}>
         <Icon className="h-3.5 w-3.5" />
       </span>
       <span className="min-w-0 flex-1">
@@ -127,8 +132,8 @@ export default function NotificationPreferencesCard() {
 
   const unavailable = queryUnavailableReason(preferencesQuery);
   const saveMutation = useMutation({
-    mutationFn: ({ body }: SaveRequest) =>
-      apiRequest("/api/notification-preferences", { method: "PUT", body: JSON.stringify(body) }),
+    mutationFn: ({ action, body }: SaveRequest) =>
+      apiRequest("/api/notification-preferences", { method: action === "save" ? "PUT" : "PATCH", body: JSON.stringify(body) }),
     onSuccess: (data: NotificationPreferencesResponse, request: SaveRequest) => {
       trackConfirmedSave(request, data);
       queryClient.setQueryData(["/api/notification-preferences"], data);
@@ -138,7 +143,7 @@ export default function NotificationPreferencesCard() {
     },
     onError: (error) => {
       setSavedMessage(null);
-      setRequestError(error instanceof Error ? error.message : "We couldn’t save notification preferences.");
+      setRequestError(describeWriteError(error, { fallback: "We couldn’t save notification preferences.", outcome: NOTHING_CHANGED_OUTCOME }));
     },
   });
 
@@ -151,38 +156,42 @@ export default function NotificationPreferencesCard() {
     if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate, action: SaveAction, message: string, onSaved?: () => void) => {
-    if (!isValidTimezone(nextValues.timezone)) {
+  const save = () => {
+    if (saveMutation.isPending) return;
+    if (!isValidTimezone(values.timezone)) {
       setSavedMessage(null);
       setRequestError(null);
       setTimezoneError("Choose a valid IANA time zone.");
+      setTimeout(() => document.getElementById("digest-timezone")?.focus(), 0);
       return;
     }
     setTimezoneError(null);
-    const parsed = notificationPreferencesUpdateSchema.safeParse(nextValues);
+    const parsed = notificationPreferencesUpdateSchema.safeParse(values);
     if (!parsed.success) {
       setSavedMessage(null);
       setRequestError(parsed.error.issues[0]?.message ?? "Check your notification choices.");
       return;
     }
     setRequestError(null);
-    saveMutation.mutate({ body: parsed.data, action, previous: savedValues }, {
+    saveMutation.mutate({ action: "save", body: parsed.data, previous: savedValues }, {
       onSuccess: () => {
-        setSavedMessage(message);
-        onSaved?.();
+        setSavedMessage("Your choices are saved.");
+        setDirty(false);
       },
     });
   };
-  const save = () => !saveMutation.isPending && saveValues(values, "save", "Your choices are saved.", () => setDirty(false));
-  // Quick actions change only their own fields: they save on top of the last
-  // saved state, and mirror the change into the form without committing
-  // anything else the person has edited but not saved. The confirmation says
-  // only what the action saved, so it never vouches for pending edits.
-  const saveQuickAction = (action: SaveAction, patch: Partial<NotificationPreferencesUpdate>, done: string) => {
+  // Quick actions send only their own fields, and mirror the change into the
+  // form without committing anything else the person has edited but not
+  // saved. The confirmation says only what the action saved, so it never
+  // vouches for pending edits.
+  const saveQuickAction = (action: Exclude<SaveAction, "save">, patch: NotificationPreferencesPatch, done: string) => {
     if (saveMutation.isPending) return; // aria-disabled buttons stay clickable
     setValues((current) => ({ ...current, ...patch }));
+    setRequestError(null);
     const message = dirty ? `${done} Your other changes aren't saved yet — use Save choices.` : done;
-    saveValues({ ...(savedValues ?? values), ...patch }, action, message);
+    saveMutation.mutate({ action, body: patch, previous: savedValues }, {
+      onSuccess: () => setSavedMessage(message),
+    });
   };
   const pause = () => saveQuickAction("pause", { pausedUntil: new Date(Date.now() + PAUSE_DAYS * 86400000).toISOString() }, "Notifications paused.");
   const resume = () => saveQuickAction("resume", { pausedUntil: null }, "Notifications resumed.");
@@ -201,7 +210,7 @@ export default function NotificationPreferencesCard() {
         {unavailable ? (
           <div className="border border-destructive/40 bg-destructive/10 p-4 text-sm" role="alert" data-testid={`notification-preferences-${unavailable}`}>
             <p>{unavailable === "offline" ? "You’re offline. Your notification choices will load when your connection is back." : "We couldn’t load your notification choices."}</p>
-            <Button variant="outline" className="mt-3 min-h-[44px]" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget, () => document.getElementById("notification-settings-title")); void preferencesQuery.refetch(); }}>Try again</Button>
+            <RetryButton className="mt-3" label="Try again" focusTarget={() => document.getElementById("notification-settings-title")} onRetry={() => void preferencesQuery.refetch()} />
           </div>
         ) : preferencesQuery.isLoading || !savedValues ? (
           <div className="space-y-3" aria-busy="true"><div className="skeleton h-16 w-full" /><div className="skeleton h-16 w-full" /><div className="skeleton h-10 w-2/3" /></div>

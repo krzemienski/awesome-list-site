@@ -1,0 +1,623 @@
+{
+  "url": "https://awesome.video/journey/8",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "h1": "FFmpeg Mastery",
+  "stepTitles": [
+    "FFmpeg Fundamentals",
+    "Transcoding & Bitrate Control",
+    "Audio Processing",
+    "Filters and Effects",
+    "Performance & Hardware Acceleration",
+    "Production Workflows"
+  ],
+  "links": [
+    {
+      "text": "Home",
+      "href": "https://awesome.video/",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "Learning Journeys",
+      "href": "https://awesome.video/journeys",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "log in",
+      "href": "https://awesome.video/sign-in?redirect_url=%2Fjourney%2F8",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "VCT (Video Converter & Transcoder)",
+      "href": "https://awesome.video/resource/185310",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://github.com/zbabac/VCT",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Video Encoding 101: A Beginner's Guide to Key Concepts",
+      "href": "https://awesome.video/resource/185372",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://www.forasoft.com/blog/article/video-encoding-streaming-quality",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "FFmpeg Threads Command: How it Affects Quality and Performance",
+      "href": "https://awesome.video/resource/186158",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://streaminglearningcenter.com/blogs/ffmpeg-command-threads-how-it-affects-quality-and-performance.html",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "x264 FFmpeg Options Guide - Linux Encoding",
+      "href": "https://awesome.video/resource/185939",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "audio-loudness-batch-normalize",
+      "href": "https://awesome.video/resource/189237",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://github.com/lxl66566/audio-loudness-batch-normalize",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Audio normalization with ffmpeg using loudnorm (ebur128) filter",
+      "href": "https://awesome.video/resource/185867",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://bytesandbones.wordpress.com/2017/03/16/audio-nomalization-with-ffmpeg-using-loudnorm-ebur128-filter/",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "FFmpeg Wiki: Filtering Guide",
+      "href": "https://awesome.video/resource/186413",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://trac.ffmpeg.org/wiki/FilteringGuide",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "wasmbooth: Video Filter Booth App Written in Rust",
+      "href": "https://awesome.video/resource/185135",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://github.com/mtharrison/wasmbooth",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "FFmpeg 8.0 libplacebo Filter — Full Option Reference",
+      "href": "https://awesome.video/resource/188761",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Video/libplacebo.html",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "FFmpeg 8.0 whisper Filter Documentation",
+      "href": "https://awesome.video/resource/188813",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Audio/whisper.html",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC)",
+      "href": "https://awesome.video/resource/188920",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://developer.nvidia.com/ffmpeg",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL)",
+      "href": "https://awesome.video/resource/188928",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://github.com/OpenVisualCloud/Dockerfiles/blob/master/doc/ffmpeg.md",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "Video: HLS and DASH Multi-Codec Encoding & Packaging",
+      "href": "https://awesome.video/resource/186120",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://thebroadcastknowledge.com/2020/07/10/video-hls-and-dash-multi-codec-encoding-packaging/",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    },
+    {
+      "text": "HLS To DASH",
+      "href": "https://awesome.video/resource/185883",
+      "rel": "",
+      "target": ""
+    },
+    {
+      "text": "",
+      "href": "https://github.com/Eyevinn/hls-to-dash",
+      "rel": "noopener noreferrer",
+      "target": "_blank"
+    }
+  ],
+  "controls": [
+    {
+      "text": "Home",
+      "rect": {
+        "x": 19,
+        "y": 103,
+        "width": 37.703125,
+        "height": 20,
+        "top": 103,
+        "right": 56.703125,
+        "bottom": 123,
+        "left": 19
+      }
+    },
+    {
+      "text": "Learning Journeys",
+      "rect": {
+        "x": 82.703125,
+        "y": 103,
+        "width": 118.078125,
+        "height": 20,
+        "top": 103,
+        "right": 200.78125,
+        "bottom": 123,
+        "left": 82.703125
+      }
+    },
+    {
+      "text": "Back to Journeys",
+      "rect": {
+        "x": 20,
+        "y": 104,
+        "width": 156.375,
+        "height": 44,
+        "top": 104,
+        "right": 176.375,
+        "bottom": 148,
+        "left": 20
+      }
+    },
+    {
+      "text": "log in",
+      "rect": {
+        "x": 132.796875,
+        "y": 614.28125,
+        "width": 35.796875,
+        "height": 22,
+        "top": 614.28125,
+        "right": 168.59375,
+        "bottom": 636.28125,
+        "left": 132.796875
+      }
+    },
+    {
+      "text": "VCT (Video Converter & Transcoder)",
+      "rect": {
+        "x": 106,
+        "y": 997.046875,
+        "width": 146,
+        "height": 56,
+        "top": 997.046875,
+        "right": 252,
+        "bottom": 1053.046875,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 1003.046875,
+        "width": 44,
+        "height": 44,
+        "top": 1003.046875,
+        "right": 300,
+        "bottom": 1047.046875,
+        "left": 256
+      }
+    },
+    {
+      "text": "Video Encoding 101: A Beginner's Guide to Key Concepts",
+      "rect": {
+        "x": 106,
+        "y": 1119.046875,
+        "width": 146,
+        "height": 56,
+        "top": 1119.046875,
+        "right": 252,
+        "bottom": 1175.046875,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 1125.046875,
+        "width": 44,
+        "height": 44,
+        "top": 1125.046875,
+        "right": 300,
+        "bottom": 1169.046875,
+        "left": 256
+      }
+    },
+    {
+      "text": "FFmpeg Threads Command: How it Affects Quality and Performance",
+      "rect": {
+        "x": 106,
+        "y": 1497.8125,
+        "width": 146,
+        "height": 56,
+        "top": 1497.8125,
+        "right": 252,
+        "bottom": 1553.8125,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 1503.8125,
+        "width": 44,
+        "height": 44,
+        "top": 1503.8125,
+        "right": 300,
+        "bottom": 1547.8125,
+        "left": 256
+      }
+    },
+    {
+      "text": "x264 FFmpeg Options Guide - Linux Encoding",
+      "rect": {
+        "x": 106,
+        "y": 1619.8125,
+        "width": 146,
+        "height": 56,
+        "top": 1619.8125,
+        "right": 252,
+        "bottom": 1675.8125,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 1625.8125,
+        "width": 44,
+        "height": 44,
+        "top": 1625.8125,
+        "right": 300,
+        "bottom": 1669.8125,
+        "left": 256
+      }
+    },
+    {
+      "text": "audio-loudness-batch-normalize",
+      "rect": {
+        "x": 106,
+        "y": 1950.390625,
+        "width": 146,
+        "height": 56,
+        "top": 1950.390625,
+        "right": 252,
+        "bottom": 2006.390625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 1956.390625,
+        "width": 44,
+        "height": 44,
+        "top": 1956.390625,
+        "right": 300,
+        "bottom": 2000.390625,
+        "left": 256
+      }
+    },
+    {
+      "text": "Audio normalization with ffmpeg using loudnorm (ebur128) filter",
+      "rect": {
+        "x": 106,
+        "y": 2072.390625,
+        "width": 146,
+        "height": 56,
+        "top": 2072.390625,
+        "right": 252,
+        "bottom": 2128.390625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 2078.390625,
+        "width": 44,
+        "height": 44,
+        "top": 2078.390625,
+        "right": 300,
+        "bottom": 2122.390625,
+        "left": 256
+      }
+    },
+    {
+      "text": "FFmpeg Wiki: Filtering Guide",
+      "rect": {
+        "x": 106,
+        "y": 2194.390625,
+        "width": 146,
+        "height": 56,
+        "top": 2194.390625,
+        "right": 252,
+        "bottom": 2250.390625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 2200.390625,
+        "width": 44,
+        "height": 44,
+        "top": 2200.390625,
+        "right": 300,
+        "bottom": 2244.390625,
+        "left": 256
+      }
+    },
+    {
+      "text": "wasmbooth: Video Filter Booth App Written in Rust",
+      "rect": {
+        "x": 106,
+        "y": 2549.765625,
+        "width": 146,
+        "height": 56,
+        "top": 2549.765625,
+        "right": 252,
+        "bottom": 2605.765625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 2555.765625,
+        "width": 44,
+        "height": 44,
+        "top": 2555.765625,
+        "right": 300,
+        "bottom": 2599.765625,
+        "left": 256
+      }
+    },
+    {
+      "text": "FFmpeg 8.0 libplacebo Filter — Full Option Reference",
+      "rect": {
+        "x": 106,
+        "y": 2671.765625,
+        "width": 146,
+        "height": 56,
+        "top": 2671.765625,
+        "right": 252,
+        "bottom": 2727.765625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 2677.765625,
+        "width": 44,
+        "height": 44,
+        "top": 2677.765625,
+        "right": 300,
+        "bottom": 2721.765625,
+        "left": 256
+      }
+    },
+    {
+      "text": "FFmpeg 8.0 whisper Filter Documentation",
+      "rect": {
+        "x": 106,
+        "y": 2793.765625,
+        "width": 146,
+        "height": 56,
+        "top": 2793.765625,
+        "right": 252,
+        "bottom": 2849.765625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 2799.765625,
+        "width": 44,
+        "height": 44,
+        "top": 2799.765625,
+        "right": 300,
+        "bottom": 2843.765625,
+        "left": 256
+      }
+    },
+    {
+      "text": "NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC)",
+      "rect": {
+        "x": 106,
+        "y": 3172.53125,
+        "width": 146,
+        "height": 56,
+        "top": 3172.53125,
+        "right": 252,
+        "bottom": 3228.53125,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 3178.53125,
+        "width": 44,
+        "height": 44,
+        "top": 3178.53125,
+        "right": 300,
+        "bottom": 3222.53125,
+        "left": 256
+      }
+    },
+    {
+      "text": "Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL)",
+      "rect": {
+        "x": 106,
+        "y": 3294.53125,
+        "width": 146,
+        "height": 56,
+        "top": 3294.53125,
+        "right": 252,
+        "bottom": 3350.53125,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 3300.53125,
+        "width": 44,
+        "height": 44,
+        "top": 3300.53125,
+        "right": 300,
+        "bottom": 3344.53125,
+        "left": 256
+      }
+    },
+    {
+      "text": "Video: HLS and DASH Multi-Codec Encoding & Packaging",
+      "rect": {
+        "x": 106,
+        "y": 3649.90625,
+        "width": 146,
+        "height": 56,
+        "top": 3649.90625,
+        "right": 252,
+        "bottom": 3705.90625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 3655.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3655.90625,
+        "right": 300,
+        "bottom": 3699.90625,
+        "left": 256
+      }
+    },
+    {
+      "text": "HLS To DASH",
+      "rect": {
+        "x": 106,
+        "y": 3771.90625,
+        "width": 146,
+        "height": 44,
+        "top": 3771.90625,
+        "right": 252,
+        "bottom": 3815.90625,
+        "left": 106
+      }
+    },
+    {
+      "text": "",
+      "rect": {
+        "x": 256,
+        "y": 3771.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3771.90625,
+        "right": 300,
+        "bottom": 3815.90625,
+        "left": 256
+      }
+    }
+  ]
+}

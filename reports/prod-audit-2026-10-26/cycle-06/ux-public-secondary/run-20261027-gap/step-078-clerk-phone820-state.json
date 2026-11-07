@@ -1,0 +1,23 @@
+{
+  "url": "https://awesome.video/sign-in",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": true,
+  "phone": [
+    {
+      "rect": {
+        "x": 497.6875,
+        "y": 434.546875,
+        "width": 59.3125,
+        "height": 44,
+        "top": 434.546875,
+        "right": 557,
+        "bottom": 478.546875,
+        "left": 497.6875
+      },
+      "html": "<a class=\"cl-formFieldAction cl-formFieldAction__identifier 🔒️ cl-internal-tidb9f\" data-localization-key=\"signIn.start.actionLink__use_phone\" href=\"\">Use phone</a>"
+    }
+  ]
+}

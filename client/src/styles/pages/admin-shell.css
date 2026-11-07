@@ -39,34 +39,26 @@
    (0,2,0) still win as on the reference. */
 :where(.admin-dashboard .admin-dashboard__actions) > .btn { font-size: 13px; }
 .admin-dashboard .admin-dashboard__actions svg { width: 12px; height: 12px; }
-.admin-dashboard .admin-tab-scroller { padding: 0; margin: 0 0 28px; position: relative; }
+/* The scroll arrows are flex siblings of the strip, not overlays: an overlay
+   put the arrow over the centre of whichever tab straddled the strip's edge,
+   so a click on that tab hit the arrow instead (sweep-4 SH-32). */
+.admin-dashboard .admin-tab-scroller { display: flex; align-items: stretch; padding: 0; margin: 0 0 28px; }
+.admin-dashboard .admin-tab-scroller > .admin-dashboard__tabs { flex: 1 1 auto; min-width: 0; }
 .admin-tab-scroller__edge {
-  position: absolute;
-  inset-block: 0 var(--hairline-w, 1px);
-  z-index: 1;
+  flex: none;
   display: flex;
   align-items: center;
-  width: 48px;
-  padding: 0 6px;
+  justify-content: center;
+  width: 44px;
+  padding: 0;
   border: 0;
+  background: transparent;
   color: var(--text);
   cursor: pointer;
-}
-.admin-tab-scroller__edge--start {
-  left: 0;
-  justify-content: flex-start;
-  background: linear-gradient(to right, var(--bg) 45%, transparent);
-}
-.admin-tab-scroller__edge--end {
-  right: 0;
-  justify-content: flex-end;
-  background: linear-gradient(to left, var(--bg) 45%, transparent);
 }
 /* The strip itself is the canonical `.tabs` / `.tab` (ui/tabs.tsx); only the
    icon size is admin-specific. */
 .admin-dashboard .admin-dashboard__tabs svg { width: 12px; height: 12px; }
-/* Keep revealed/focused triggers clear of the 48px scroll-arrow overlays. */
-.admin-dashboard .admin-dashboard__tabs { scroll-padding-inline: 48px; }
 .admin-dashboard [role="tabpanel"] { margin-top: 0; }
 
 .admin-dashboard__settings-menu {
@@ -127,6 +119,7 @@
 }
 .admin-research-note__open {
   display: block;
+  min-height: 44px;
   border: 0;
   padding: 0;
   color: inherit;
@@ -154,3 +147,13 @@
   color: var(--text-3);
   font-size: 12px;
 }
+
+/* Journeys/Digests open from the Settings menu; the trigger names the open
+   section so the masthead always shows where the admin is. */
+.admin-dashboard .admin-dashboard__actions > .admin-dashboard__settings-trigger--active {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.admin-dashboard__settings-current { margin-left: 4px; font-weight: 600; }
+.admin-dashboard__settings-item-current { margin-left: 4px; color: var(--accent-ink); }

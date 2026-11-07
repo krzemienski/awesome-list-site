@@ -8,6 +8,7 @@ import type {
 } from "@shared/onboarding-values";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 export interface LearningPreferencesRecord extends LearningPreferencesValues {
   id: number;
@@ -134,6 +135,9 @@ export function useLearningPreferences() {
   });
 
   const saveThemeMutation = useMutation({
+    // Theme Settings shows "saved on this device, will be saved to your account
+    // when you reconnect" while paused (A-03), so keep pause-and-resume here.
+    networkMode: "online",
     mutationFn: async (
       theme: ThemePreferencesValues,
     ): Promise<LearningPreferencesResponse> => {
@@ -162,6 +166,8 @@ export function useLearningPreferences() {
     isAuthenticated,
     isLoading: authLoading || query.isLoading,
     isError: query.isError,
+    // A fetch started offline is paused, not failed (sweep NEW-002).
+    unavailableReason: queryUnavailableReason(query),
     error: query.error,
     refetch: query.refetch,
     savePreferences: saveMutation.mutate,

@@ -35,6 +35,7 @@ import {
 import { db } from "../db";
 import { eq, asc } from "drizzle-orm";
 import { stripInternalResourceFields } from "../lib/publicResource";
+import { titleOrderAsc } from "../lib/titleOrder";
 import { getPublicCacheValue } from "../cache/publicCache";
 
 // Hierarchical category structure types
@@ -101,29 +102,16 @@ export class LegacyRepository {
       .select()
       .from(resources)
       .where(eq(resources.status, 'approved'))
-      // Taxonomy listings are sliced both by the crawler renderer and by the
-      // paged public API. A numeric tie-breaker makes those page boundaries
-      // deterministic when two approved resources share a title.
-      .orderBy(asc(resources.title), asc(resources.id));
+      .orderBy(...titleOrderAsc);
 
-    // Dedup by normalized URL (BUG-005). Duplicate rows for the same resource
-    // (same URL, different id/description) inflate category/subcategory counts
-    // and render twice on prod. This is a no-op on clean data (0 URL dupes on
-    // dev) and repairs the rendered tree + counts + sitemap + client on dirty
-    // data. One tree is the single source of truth for all of them.
-    const seenUrls = new Set<string>();
-    const allResources = allResourcesRaw
-      .filter((r) => {
-        const raw = typeof r.url === 'string' ? r.url.trim().toLowerCase() : '';
-        const key = raw.replace(/\/+$/, '');
-        if (!key) return true; // no URL → cannot dedup, keep it
-        if (seenUrls.has(key)) return false;
-        seenUrls.add(key);
-        return true;
-      })
-      // Strip the internal searchTsv vector at the source so the whole tree
-      // (and og-middleware, which shares this builder) never leaks it.
-      .map((r) => stripInternalResourceFields(r));
+    // Every approved row is public and lands in the tree, even when another
+    // approved row shares its URL. Hiding near-duplicate URLs here dropped
+    // approved resources from every listing and nav count while
+    // /api/categories, search and the detail page still counted them.
+    // Duplicate cleanup is a curation decision made on the rows themselves.
+    // Strip the internal searchTsv vector at the source so the whole tree
+    // (and og-middleware, which shares this builder) never leaks it.
+    const allResources = allResourcesRaw.map((r) => stripInternalResourceFields(r));
 
     // Fetch all categories, subcategories, and sub-subcategories
     const allCategories = await db

@@ -11,9 +11,11 @@ import { completedLearningPreferencesSchema } from "@shared/onboarding";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import { useAuth } from "@/hooks/useAuth";
 import LearningPreferencesForm from "@/components/onboarding/learning-preferences-form";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -30,6 +32,7 @@ import NotificationPreferencesCard from "@/components/notifications/Notification
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
 import { useScrollToHash } from "@/lib/nav-history";
 import { trackLearningPreferencesReset, trackLearningPreferencesSaved } from "@/lib/analytics-notifications";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -92,7 +95,7 @@ export default function Settings() {
   const {
     preferences,
     isLoading: preferencesLoading,
-    isError: preferencesError,
+    unavailableReason: preferencesUnavailable,
     refetch: refetchPreferences,
     savePreferencesAsync,
     isSaving,
@@ -102,13 +105,15 @@ export default function Settings() {
   const {
     data: categories,
     isLoading: categoriesLoading,
-    isError: categoriesError,
     refetch: refetchCategories,
+    ...categoriesQuery
   } = useQuery<CategoryOption[]>({
     queryKey: ["/api/categories"],
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   });
+  const categoriesUnavailable = queryUnavailableReason(categoriesQuery);
+  const preferencesLoadUnavailable = preferencesUnavailable ?? categoriesUnavailable;
   // Sections above a deep-linked one change height as they load, so scroll to
   // #learning-preferences / #notification-settings only once they have.
   useScrollToHash(
@@ -151,18 +156,25 @@ export default function Settings() {
     setPendingPreferencesFocus(null);
   });
 
+  // The Home layout radio saves through the same /api/user/preferences query,
+  // so `preferences` gets a new object identity without its learning values
+  // changing. Reset the draft only when the saved values differ from the ones
+  // last applied, so a layout save leaves unsaved edits alone.
+  const appliedPreferencesKey = useRef<string | null>(null);
   useEffect(() => {
-    setValues(
-      preferences
-        ? {
-            preferredCategories: preferences.preferredCategories,
-            skillLevel: preferences.skillLevel,
-            learningGoals: preferences.learningGoals,
-            preferredResourceTypes: preferences.preferredResourceTypes,
-            timeCommitment: preferences.timeCommitment,
-          }
-        : DEFAULT_LEARNING_PREFERENCES,
-    );
+    const saved = preferences
+      ? {
+          preferredCategories: preferences.preferredCategories,
+          skillLevel: preferences.skillLevel,
+          learningGoals: preferences.learningGoals,
+          preferredResourceTypes: preferences.preferredResourceTypes,
+          timeCommitment: preferences.timeCommitment,
+        }
+      : null;
+    const key = JSON.stringify(saved);
+    if (key === appliedPreferencesKey.current) return;
+    appliedPreferencesKey.current = key;
+    setValues(saved ?? DEFAULT_LEARNING_PREFERENCES);
     setShowEmptyPreferencesEditor(Boolean(preferences));
   }, [preferences]);
 
@@ -203,9 +215,7 @@ export default function Settings() {
       });
     } catch (error) {
       setPreferenceRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t save your learning preferences.",
+        describeWriteError(error, { fallback: "We couldn’t save your learning preferences.", outcome: NOTHING_CHANGED_OUTCOME }),
       );
     }
   };
@@ -226,9 +236,7 @@ export default function Settings() {
       });
     } catch (error) {
       setPreferenceRequestError(
-        error instanceof Error
-          ? error.message
-          : "We couldn’t reset your learning preferences.",
+        describeWriteError(error, { fallback: "We couldn’t reset your learning preferences.", outcome: NOTHING_CHANGED_OUTCOME }),
       );
       setPendingPreferencesFocus("reset");
     }
@@ -252,9 +260,9 @@ export default function Settings() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <h1 className="page-title text-2xl">Settings</h1>
+        <h1 className="page-title text-2xl">{staticPageHeads["/settings"].heading}</h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Manage your preferences and account. Pick a section below.
+          {staticPageHeads["/settings"].lead}
         </p>
       </div>
 
@@ -266,6 +274,8 @@ export default function Settings() {
             key={testid}
             href={href}
             data-testid={testid}
+            aria-labelledby={`${testid}-title`}
+            aria-describedby={`${testid}-description`}
           >
             <Card
               hoverable
@@ -321,10 +331,13 @@ export default function Settings() {
                   <div className="skeleton h-5 w-40" />
                   <div className="skeleton h-28" />
                 </div>
-              ) : preferencesError || categoriesError ? (
+              ) : preferencesLoadUnavailable ? (
                 <div className="py-6 text-center" role="alert">
                   <p className="text-sm text-[color:var(--text-2)]">
                     We couldn’t load your learning preferences.
+                    {preferencesUnavailable === "offline" || categoriesUnavailable === "offline"
+                      ? " You’re offline; they will load when your connection returns."
+                      : null}
                   </p>
                   <Button
                     variant="outline"

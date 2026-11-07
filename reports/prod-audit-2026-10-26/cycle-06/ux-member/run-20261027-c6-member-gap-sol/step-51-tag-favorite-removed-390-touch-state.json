@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/tag/hls",
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 124,
+  "active": "<button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 group relative\" data-ds-variant=\"ghost\" aria-disabled=\"true\" aria-busy=\"true\" aria-label=\"Add to favorites: MediaMTX — Zero-Dependency Real-Time Media Server (Official Docs)\" title=\"Add to favorites\" aria-pressed=\"false\" data-testid=\"button-favorite\"><div class=\"flex items-center gap-1.5\"><svg xmlns=\"http:/",
+  "umami": "1",
+  "consent": "denied"
+}

@@ -1,4 +1,5 @@
 import "./lib/zod-jitless";
+import type { ComponentType } from "react";
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
@@ -8,7 +9,8 @@ import { initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
-import { loadFontOverride } from "./lib/font-options";
+import { syncReplitPageviewOptOut } from "./lib/analytics-suppression";
+import { seedResourceBoot } from "./lib/resource-boot";
 
 function afterFirstPaint(callback: () => void): void {
   const scheduleIdle = () => {
@@ -51,15 +53,13 @@ function afterFirstPaint(callback: () => void): void {
 }
 
 // The inline pre-paint boot has already resolved saved-theme precedence and
-// product-profile defaults, and the canonical <link> in index.html carries
-// every family the five systems name, so no per-system font work happens
-// here; only a saved picker override may still need its stylesheet.
-let fontOverrideAtBoot: string | null = null;
-try {
-  fontOverrideAtBoot = localStorage.getItem("ds-font-override");
-} catch {
-  // Storage can be unavailable in hardened/private browsing contexts.
-}
+// product-profile defaults, and every family a design system or the font
+// picker names is self-hosted (client/public/fonts), so no font work happens
+// here.
+
+// Admin sessions and QA paths: quiet Replit's injected page-view tracker
+// before it records this document's first page view (it sends at load).
+syncReplitPageviewOptOut();
 
 // Analytics SDKs are all consent-gated and deferred until the first painted
 // frame. The consent banner invokes these immediately after an explicit grant.
@@ -68,7 +68,6 @@ afterFirstPaint(() => {
   initMixpanel();
   initPosthog();
   initAmplitude();
-  if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
 });
 
 // Force dark theme immediately
@@ -85,25 +84,30 @@ const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : u
 // code-split (and auth guards remain unchanged); this only overlaps chunk
 // transfer with bootstrap on deep links instead of waiting for React.lazy to
 // render the route branch.
+// App.tsx owns the matching React.lazy declarations; both resolve to the same
+// module, so the lazy import reuses the request started here.
+const ROUTE_CHUNKS: [RegExp, () => Promise<unknown>][] = [
+  [/^\/category\/[^/]+$/, () => import("./pages/Category")],
+  [/^\/subcategory\/[^/]+$/, () => import("./pages/Subcategory")],
+  [/^\/sub-subcategory\/[^/]+$/, () => import("./pages/SubSubcategory")],
+  [/^\/resource\/[^/]+$/, () => import("./pages/ResourceDetail")],
+  [/^\/journeys\/?$/, () => import("./pages/Journeys")],
+  [/^\/advanced\/?$/, () => import("./pages/Advanced")],
+  [/^\/submit\/?$/, () => import("./pages/SubmitResource")],
+  [/^\/terms\/?$/, () => import("./pages/Terms")],
+  [/^\/privacy\/?$/, () => import("./pages/Privacy")],
+  [/^\/code-of-conduct\/?$/, () => import("./pages/CodeOfConduct")],
+  [/^\/about\/?$/, () => import("./pages/About")],
+];
+
 function preloadInitialRouteChunk() {
   const pathname = window.location.pathname;
-  let chunk;
-  if (pathname === "/") {
-    chunk = import("./pages/Home");
-  } else if (/^\/category\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/Category");
-  } else if (/^\/subcategory\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/Subcategory");
-  } else if (/^\/sub-subcategory\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/SubSubcategory");
-  } else if (/^\/resource\/[^/]+$/.test(pathname)) {
-    chunk = import("./pages/ResourceDetail");
-  }
   // A speculative preload must never create an unhandled rejection.  The
   // route's React.lazy import still observes the same module-cache failure and
   // renders its existing error/retry surface if the chunk is unavailable.
-  chunk?.catch(() => undefined);
-  return chunk;
+  ROUTE_CHUNKS.find(([pattern]) => pattern.test(pathname))?.[1]().catch(() => undefined);
+  // The home SSR hydration below needs the Home module itself.
+  return pathname === "/" ? import("./pages/Home") : undefined;
 }
 
 const initialRouteChunk = preloadInitialRouteChunk();
@@ -119,6 +123,10 @@ const initialRouteChunk = preloadInitialRouteChunk();
 // React mounts underneath, and the overlay is removed only once the app has
 // real content to show. We still never hydrate this markup (see
 // .agents/memory/spa-crawler-prerender.md).
+// Before the hold below evaluates readiness: a seeded resource page renders
+// finished on its first commit.
+if (!homeSsr) seedResourceBoot(queryClient);
+
 (function holdSsrContent() {
   if (homeSsr) return;
   // The inline pre-boot script in index.html normally builds this overlay
@@ -173,8 +181,13 @@ const initialRouteChunk = preloadInitialRouteChunk();
       unsubscribe();
       window.clearTimeout(timeout);
       window.removeEventListener("popstate", remove);
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
+      // Unwrap only our own wrapper. If another script (e.g. the async
+      // Replit/Umami tracker) patched history after us, its wrapper calls ours;
+      // reassigning the saved original here would silently erase its hook and
+      // drop every SPA pageview after the landing page. Our wrapper then stays
+      // in its chain as a pass-through (remove() is a no-op once disconnected).
+      if (history.pushState === holdPushState) history.pushState = originalPushState;
+      if (history.replaceState === holdReplaceState) history.replaceState = originalReplaceState;
       // Restore the attributes before disposal so cleanup is complete even
       // when a browser retains a detached node for inspection/extensions.
       if (previousAriaHidden === null) overlay.removeAttribute("aria-hidden");
@@ -211,12 +224,16 @@ const initialRouteChunk = preloadInitialRouteChunk();
         } catch {
           // Keep the raw segment. A malformed URL must not strand the hold.
         }
+        // Seeded data is settled before React (or the lazy route chunk) has
+        // rendered anything, so also wait for the page to subscribe: that
+        // happens only once its tree has committed.
         return routeQueries.some(
           (query) =>
             query.queryKey[0] === "/api/resources" &&
             query.queryKey[1] === id &&
             query.queryKey.length === 2 &&
-            query.state.status !== "pending",
+            query.state.status !== "pending" &&
+            query.getObserversCount() > 0,
         );
       }
       return (
@@ -228,26 +245,37 @@ const initialRouteChunk = preloadInitialRouteChunk();
       if (isSettled()) requestAnimationFrame(remove);
     };
     const unsubscribe = queryClient.getQueryCache().subscribe(handoff);
-    const timeout = window.setTimeout(remove, 3000);
+    // Safety net for a page that never settles.  Never uncover an empty root
+    // (a resource deep link renders only once its chunk is in): keep the
+    // prerender up until React has committed something to show instead.
+    const expire = () => {
+      if (rootElement.childElementCount === 0) {
+        timeout = window.setTimeout(expire, 250);
+        return;
+      }
+      remove();
+    };
+    let timeout = window.setTimeout(expire, 3000);
     // Wouter's pushState navigations do not emit popstate. Remove the old
     // visual tree synchronously for both navigation forms, then restore the
-    // native methods during normal handoff/timeout cleanup.
-    // Preserve the exact pre-existing methods so other navigation shims are
-    // restored byte-for-byte when this short-lived hold is disposed.
+    // native methods during normal handoff/timeout cleanup — but only while
+    // our wrapper is still the installed method (see remove()).
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalPushState = history.pushState;
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalReplaceState = history.replaceState;
-    history.pushState = function (data, unused, url) {
+    const holdPushState: History["pushState"] = function (data, unused, url) {
       const result = originalPushState.call(history, data, unused, url);
       remove();
       return result;
     };
-    history.replaceState = function (data, unused, url) {
+    const holdReplaceState: History["replaceState"] = function (data, unused, url) {
       const result = originalReplaceState.call(history, data, unused, url);
       remove();
       return result;
     };
+    history.pushState = holdPushState;
+    history.replaceState = holdReplaceState;
     window.addEventListener("popstate", remove);
     handoff();
   } catch {
@@ -284,6 +312,21 @@ if (homeSsr) {
       </AppProviders>,
     );
   });
+} else if (/^\/resource\/[^/]+$/.test(window.location.pathname)) {
+  // Resource deep links (most search landings) render once their page chunk
+  // is in, so the first commit is the page itself, not the route skeleton it
+  // would replace. The prerender hold stays on screen meanwhile; a failed
+  // chunk falls back to the lazy route and its error/retry surface.
+  const render = (ResourceDetail?: ComponentType) =>
+    createRoot(rootElement).render(
+      <AppProviders queryClient={queryClient}>
+        <App resourceComponent={ResourceDetail} />
+      </AppProviders>,
+    );
+  import("./pages/ResourceDetail").then(
+    ({ default: ResourceDetail }) => render(ResourceDetail),
+    () => render(),
+  );
 } else {
   // Non-SSR routes retain App's lazy Home route and do not load Home here.
   createRoot(rootElement).render(

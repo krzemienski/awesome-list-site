@@ -1,0 +1,12 @@
+# created-rows (ux-member, cycle 4) rev 582bdf67
+- 01:36Z baselines saved in baseline/*.json (prefs, notif prefs, collections [], bookmarks, favorites, journeys, api-keys (1 pre-existing key "__qa_test_578..." NOT mine, untouched), contributions, continue-learning, notifications []).
+- Session: owner cookie injected into isolated context c4-member (page 43) via document.cookie; never signed out.
+- 01:39Z collection 149 "[QA-audit-1026] c4 undo" CREATED (to delete)
+- 01:39Z bookmark on resource 190342 (MediaMTX; NOT in baseline bookmarks) with note "[QA-audit-1026] note keep me", in collection 149 (to delete bookmark at end)
+- 01:41Z MB-04/#82: remove+Undo on /tag/hls from fresh load (390 touch), twice. Toast persisted >11s; Undo restored note, collection 149 membership, original bookmarkedAt. Toast bottom y784 vs back-to-top top y788: no overlap.
+- 01:50Z API key "[QA-audit-1026] c4 key" CREATED via Security tab (secret <REDACTED>, not stored). To revoke via UI; revoked key remains as REVOKED row (cannot be deleted - side effect)
+- 01:52Z API key "[QA-audit-1026] c4 key" REVOKED via UI (alertdialog confirm); remains listed as REVOKED (no delete exists) = irreversible side effect
+- 01:46Z collection 149 PUBLISHED via UI (public read-only link, shareId <redacted>); will unpublish then delete
+- 01:55-02:00Z bulk actions on QA bookmark 190342 only: queue status watch-next, personal tag qa-audit-1026, archive; collection 149 archive/restore/publish/unpublish cycles
+- 01:34Z-02:05Z SECRET EXPOSURE (auditor error, before lead rule): ran bare `cat /tmp/aw-prod-owner.cookieheader` (value printed in transcript) and pasted it into chrome-devtools emulate extraHttpHeaders + evaluate_script document.cookie. extraHttpHeaders cleared 02:05Z. Owner session cookie values (GAESA, av_admin_session) are in this agent transcript; lead may wish to treat as exposed.
+- 02:00Z notification prefs: Pause 7 days then Resume now via UI; read-back identical to baseline except updatedAt (irreversible). Collection 149 + bookmark 190342 DELETED 02:0xZ; collections [] ; bookmarks back to 12 baseline ids; prefs/notif/favorites/journeys identical to baseline (journey lastAccessedAt unchanged this cycle).

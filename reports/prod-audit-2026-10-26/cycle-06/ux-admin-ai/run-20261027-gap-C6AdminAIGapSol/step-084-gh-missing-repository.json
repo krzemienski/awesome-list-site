@@ -1,0 +1,27 @@
+{
+  "status": 422,
+  "body": {
+    "success": false,
+    "outcome": "failed",
+    "imported": 0,
+    "updated": 0,
+    "skipped": 0,
+    "errors": [
+      "Import failed: Repository not found (or not public): krzemienski/qa-audit-missing-repository-1026"
+    ],
+    "totalErrors": 1,
+    "warnings": [],
+    "validationPassed": false,
+    "validationStats": {
+      "totalLines": 0,
+      "totalResources": 0,
+      "totalCategories": 0
+    },
+    "validationErrors": [],
+    "validationWarnings": [],
+    "dryRun": true,
+    "wouldCreateTaxonomy": [],
+    "runError": "Repository not found (or not public): krzemienski/qa-audit-missing-repository-1026",
+    "message": "Dry run of https://github.com/krzemienski/qa-audit-missing-repository-1026 stopped before planning: Repository not found (or not public): krzemienski/qa-audit-missing-repository-1026. Nothing was written."
+  }
+}

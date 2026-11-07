@@ -1,0 +1,232 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e39]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e40]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings, Sub-Subcats section open" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+            - StaticText "Sub-Subcats section open"
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [selected, ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Subcategories" [ref=e17] focusable [tabindex]
+            - article
+              - StaticText "Sub-Subcategories"
+              - StaticText "32 third-level groupings"
+              - button "Search" [expanded=false, ref=e35]
+              - button "Add sub-subcategory" [ref=e36]
+                - image
+                - StaticText "Add sub-subcategory"
+              - region "Sub-Subcategories table, scrollable" [ref=e41] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "NAME" [ref=e108]
+                      - columnheader "SLUG" [ref=e109]
+                      - columnheader "PARENT CATEGORY" [ref=e110]
+                      - columnheader "PARENT SUBCATEGORY" [ref=e111]
+                      - columnheader "RESOURCES" [ref=e112]
+                      - columnheader "ACTIONS" [ref=e113]
+                  - row
+                    - cell "AV1" [ref=e48]
+                    - cell "av1" [ref=e49]
+                    - cell "Encoding & Codecs" [ref=e50]
+                    - cell "Codecs" [ref=e51]
+                    - cell "22" [ref=e52]
+                    - cell "Edit AV1 Delete AV1 unavailable: 22 resources still assigned" [ref=e53]
+                      - button "Edit AV1" [ref=e114]
+                        - StaticText "Edit"
+                      - button "Delete AV1 unavailable: 22 resources still assigned" [disabled, ref=e124]
+                        - image
+                  - row
+                    - cell "Advertising" [ref=e54]
+                    - cell "advertising" [ref=e55]
+                    - cell "Media Tools" [ref=e56]
+                    - cell "Ads & QoE" [ref=e57]
+                    - cell "22" [ref=e58]
+                    - cell "Edit Advertising Delete Advertising unavailable: 22 resources still assigned" [ref=e59]
+                      - button "Edit Advertising" [ref=e115]
+                        - StaticText "Edit"
+                      - button "Delete Advertising unavailable: 22 resources still assigned" [disabled, ref=e125]
+                        - image
+                  - row
+                    - cell "Android" [ref=e60]
+                    - cell "android" [ref=e61]
+                    - cell "Players & Clients" [ref=e62]
+                    - cell "Mobile & Web Players" [ref=e63]
+                    - cell "20" [ref=e64]
+                    - cell "Edit Android Delete Android unavailable: 20 resources still assigned" [ref=e65]
+                      - button "Edit Android" [ref=e116]
+                        - StaticText "Edit"
+                      - button "Delete Android unavailable: 20 resources still assigned" [disabled, ref=e126]
+                        - image
+                  - row
+                    - cell "Audio" [ref=e66]
+                    - cell "audio" [ref=e67]
+                    - cell "Media Tools" [ref=e68]
+                    - cell "Audio & Subtitles" [ref=e69]
+                    - cell "32" [ref=e70]
+                    - cell "Edit Audio Delete Audio unavailable: 32 resources still assigned" [ref=e71]
+                      - button "Edit Audio" [ref=e117]
+                        - StaticText "Edit"
+                      - button "Delete Audio unavailable: 32 resources still assigned" [disabled, ref=e127]
+                        - image
+                  - row
+                    - cell "CDN Integration" [ref=e72]
+                    - cell "cdn-integration" [ref=e73]
+                    - cell "Infrastructure & Delivery" [ref=e74]
+                    - cell "CDN Integration & Distribution" [ref=e75]
+                    - cell "11" [ref=e76]
+                    - cell "Edit CDN Integration Delete CDN Integration unavailable: 11 resources still assigned" [ref=e77]
+                      - button "Edit CDN Integration" [ref=e118]
+                        - StaticText "Edit"
+                      - button "Delete CDN Integration unavailable: 11 resources still assigned" [disabled, ref=e128]
+                        - image
+                  - row
+                    - cell "Chromecast" [ref=e78]
+                    - cell "chromecast" [ref=e79]
+                    - cell "Players & Clients" [ref=e80]
+                    - cell "Smart TV Players" [ref=e81]
+                    - cell "12" [ref=e82]
+                    - cell "Edit Chromecast Delete Chromecast unavailable: 12 resources still assigned" [ref=e83]
+                      - button "Edit Chromecast" [ref=e119]
+                        - StaticText "Edit"
+                      - button "Delete Chromecast unavailable: 12 resources still assigned" [disabled, ref=e129]
+                        - image
+                  - row
+                    - cell "Cloud Platforms" [ref=e84]
+                    - cell "cloud-platforms" [ref=e85]
+                    - cell "Infrastructure & Delivery" [ref=e86]
+                    - cell "Cloud & CDN" [ref=e87]
+                    - cell "14" [ref=e88]
+                    - cell "Edit Cloud Platforms Delete Cloud Platforms unavailable: 14 resources still assigned" [ref=e89]
+                      - button "Edit Cloud Platforms" [ref=e120]
+                        - StaticText "Edit"
+                      - button "Delete Cloud Platforms unavailable: 14 resources still assigned" [disabled, ref=e130]
+                        - image
+                  - row
+                    - cell "Conferences" [ref=e90]
+                    - cell "conferences" [ref=e91]
+                    - cell "Community & Events" [ref=e92]
+                    - cell "Events & Conferences" [ref=e93]
+                    - cell "23" [ref=e94]
+                    - cell "Edit Conferences Delete Conferences unavailable: 23 resources still assigned" [ref=e95]
+                      - button "Edit Conferences" [ref=e121]
+                        - StaticText "Edit"
+                      - button "Delete Conferences unavailable: 23 resources still assigned" [disabled, ref=e131]
+                        - image
+                  - row
+                    - cell "DASH" [ref=e96]
+                    - cell "dash" [ref=e97]
+                    - cell "Protocols & Transport" [ref=e98]
+                    - cell "Adaptive Streaming" [ref=e99]
+                    - cell "49" [ref=e100]
+                    - cell "Edit DASH Delete DASH unavailable: 49 resources still assigned" [ref=e101]
+                      - button "Edit DASH" [ref=e122]
+                        - StaticText "Edit"
+                      - button "Delete DASH unavailable: 49 resources still assigned" [disabled, ref=e132]
+                        - image
+                  - row
+                    - cell "FFmpeg" [ref=e102]
+                    - cell "ffmpeg" [ref=e103]
+                    - cell "Encoding & Codecs" [ref=e104]
+                    - cell "Encoding Tools" [ref=e105]
+                    - cell "65" [ref=e106]
+                    - cell "Edit FFmpeg Delete FFmpeg unavailable: 65 resources still assigned" [ref=e107]
+                      - button "Edit FFmpeg" [ref=e123]
+                        - StaticText "Edit"
+                      - button "Delete FFmpeg unavailable: 65 resources still assigned" [disabled, ref=e133]
+                        - image
+              - StaticText "Rows per page:"
+              - combobox "Items per page" [expanded=false, ref=e37]: 10
+                - generic [ref=e42] clickable [cursor:pointer, onclick]
+                  - StaticText "10"
+              - navigation "Pagination" [ref=e38]
+                - generic [disabled]
+                  - image
+                  - StaticText "Previous"
+                - link "Page 1, current page" [ref=e43]
+                  - StaticText "1"
+                - link "Go to page 2" [ref=e44]
+                  - StaticText "2"
+                - link "Go to page 3" [ref=e45]
+                  - StaticText "3"
+                - link "Go to page 4" [ref=e46]
+                  - StaticText "4"
+                - link "Next" [ref=e47]
+                  - StaticText "Next"
+                  - image
+                - StaticText "Page "
+                - StaticText "1"
+                - StaticText " of "
+                - StaticText "4"
+                - status

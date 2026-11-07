@@ -1,0 +1,210 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "GitHub" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [selected] [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "GitHub" [ref=e117]:
+                - generic [ref=e118]:
+                  - article [ref=e119]:
+                    - generic [ref=e120]:
+                      - generic [ref=e121]:
+                        - img [ref=e123]
+                        - generic [ref=e125]:
+                          - generic [ref=e126]: krzemienski/awesome-video
+                          - paragraph [ref=e127]: master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs
+                        - generic [ref=e129]:
+                          - button "Preview import" [ref=e130] [cursor=pointer]
+                          - button "Pull" [ref=e131] [cursor=pointer]
+                          - button "Sync now" [ref=e132] [cursor=pointer]
+                      - region "Import preview · krzemienski/awesome-video" [ref=e133]:
+                        - heading "Import preview · krzemienski/awesome-video" [level=3] [ref=e134]
+                        - status [ref=e135]: "Dry run at Oct 27, 2026, 03:23 AM. Nothing was written. Pulling now would:"
+                        - generic [ref=e136]:
+                          - generic [ref=e137]:
+                            - term [ref=e138]: Add
+                            - definition [ref=e139]: "36"
+                          - generic [ref=e140]:
+                            - term [ref=e141]: Update
+                            - definition [ref=e142]: "799"
+                          - generic [ref=e143]:
+                            - term [ref=e144]: Skip
+                            - definition [ref=e145]: 1,448
+                          - generic [ref=e146]:
+                            - term [ref=e147]: Fail
+                            - definition [ref=e148]: "0"
+                        - paragraph [ref=e149]: Create no new categories, subcategories or sub-subcategories.
+                        - group [ref=e150]:
+                          - generic "Import warnings (1)" [ref=e151] [cursor=pointer]
+                        - group [ref=e152]:
+                          - generic "README formatting warnings (awesome-lint) (10)" [ref=e153] [cursor=pointer]
+                  - generic [ref=e154]:
+                    - generic [ref=e156]:
+                      - heading "Sync jobs" [level=2] [ref=e157]
+                      - paragraph [ref=e158]: Last 5 import/export operations
+                    - table [ref=e162]:
+                      - rowgroup [ref=e163]:
+                        - row "ID Type Status" [ref=e164]:
+                          - columnheader "ID" [ref=e165]
+                          - columnheader "Type" [ref=e166]
+                          - columnheader "Status" [ref=e167]
+                          - columnheader [ref=e168]
+                      - rowgroup [ref=e169]:
+                        - 'row "Job #49 export Jul 20, 2026, 02:42 PM completed View logs for export Job #49" [ref=e170]':
+                          - 'cell "Job #49" [ref=e171]'
+                          - cell "export Jul 20, 2026, 02:42 PM" [ref=e172]:
+                            - text: export
+                            - generic [ref=e173]: Jul 20, 2026, 02:42 PM
+                          - cell "completed" [ref=e174]:
+                            - generic [ref=e175]: completed
+                          - 'cell "View logs for export Job #49" [ref=e176]':
+                            - 'button "View logs for export Job #49" [ref=e177] [cursor=pointer]': Logs
+                        - 'row "Job #48 export Jul 18, 2026, 03:12 PM completed View logs for export Job #48" [ref=e178]':
+                          - 'cell "Job #48" [ref=e179]'
+                          - cell "export Jul 18, 2026, 03:12 PM" [ref=e180]:
+                            - text: export
+                            - generic [ref=e181]: Jul 18, 2026, 03:12 PM
+                          - cell "completed" [ref=e182]:
+                            - generic [ref=e183]: completed
+                          - 'cell "View logs for export Job #48" [ref=e184]':
+                            - 'button "View logs for export Job #48" [ref=e185] [cursor=pointer]': Logs
+                        - 'row "Job #47 export Jul 18, 2026, 05:30 AM completed View logs for export Job #47" [ref=e186]':
+                          - 'cell "Job #47" [ref=e187]'
+                          - cell "export Jul 18, 2026, 05:30 AM" [ref=e188]:
+                            - text: export
+                            - generic [ref=e189]: Jul 18, 2026, 05:30 AM
+                          - cell "completed" [ref=e190]:
+                            - generic [ref=e191]: completed
+                          - 'cell "View logs for export Job #47" [ref=e192]':
+                            - 'button "View logs for export Job #47" [ref=e193] [cursor=pointer]': Logs
+                        - 'row "Job #46 export Jul 17, 2026, 08:54 AM completed View logs for export Job #46" [ref=e194]':
+                          - 'cell "Job #46" [ref=e195]'
+                          - cell "export Jul 17, 2026, 08:54 AM" [ref=e196]:
+                            - text: export
+                            - generic [ref=e197]: Jul 17, 2026, 08:54 AM
+                          - cell "completed" [ref=e198]:
+                            - generic [ref=e199]: completed
+                          - 'cell "View logs for export Job #46" [ref=e200]':
+                            - 'button "View logs for export Job #46" [ref=e201] [cursor=pointer]': Logs
+                        - 'row "Job #45 export Jul 17, 2026, 08:32 AM failed View logs for export Job #45" [ref=e202]':
+                          - 'cell "Job #45" [ref=e203]'
+                          - cell "export Jul 17, 2026, 08:32 AM" [ref=e204]:
+                            - text: export
+                            - generic [ref=e205]: Jul 17, 2026, 08:32 AM
+                          - cell "failed" [ref=e206]:
+                            - 'generic "Export failed: timeout exceeded when trying to connect" [ref=e207]': failed
+                          - 'cell "View logs for export Job #45" [ref=e208]':
+                            - 'button "View logs for export Job #45" [ref=e209] [cursor=pointer]': Logs
+                  - button "More" [ref=e211] [cursor=pointer]

@@ -1,0 +1,7 @@
+- generic
+  - region "Notifications (F8)" [ref=e1]
+    - list
+  - link "Skip to main content" [ref=e2]
+  - generic
+    - banner
+    - generic

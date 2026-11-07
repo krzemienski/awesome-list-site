@@ -1,0 +1,176 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - generic [ref=e23]:
+        - main [ref=e24]:
+          - generic [ref=e25]:
+            - navigation "Breadcrumb" [ref=e26]:
+              - list [ref=e27]:
+                - listitem [ref=e28]:
+                  - link "Home" [ref=e29] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e30]:
+                  - img [ref=e31]
+                - listitem:
+                  - link "Submit" [disabled]
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - img [ref=e35]
+                - text: SUBMIT A RESOURCE
+              - heading "Add to the index" [level=1] [ref=e36]
+              - paragraph [ref=e37]: Submit a tool, library, paper, or talk. We hand-review every entry before it lands in the catalog.
+              - article [ref=e38]:
+                - generic [ref=e40]:
+                  - group [ref=e41]:
+                    - generic [ref=e42]:
+                      - generic [ref=e43] [cursor=pointer]: Title
+                      - textbox "Title" [ref=e44]:
+                        - /placeholder: e.g. ffmpeg-python
+                        - text: "[QA-audit-1026] gap draft"
+                    - generic [ref=e45]:
+                      - generic [ref=e46] [cursor=pointer]: URL
+                      - textbox "URL" [ref=e47]:
+                        - /placeholder: https://github.com/...
+                        - text: https://example.com/qa-audit-1026-gap
+                    - generic [ref=e48]:
+                      - generic [ref=e49]:
+                        - generic [ref=e50] [cursor=pointer]: Category
+                        - combobox "Category" [ref=e51] [cursor=pointer]:
+                          - generic: Protocols & Transport
+                          - img [ref=e52]
+                        - combobox [ref=e54] [cursor=pointer]
+                      - generic [ref=e55]:
+                        - generic [ref=e56] [cursor=pointer]: Tags
+                        - textbox "Tags" [ref=e57]:
+                          - /placeholder: comma,separated
+                    - generic [ref=e58]:
+                      - generic [ref=e59] [cursor=pointer]: Subcategory (Optional)
+                      - combobox "Subcategory (Optional)" [ref=e60] [cursor=pointer]:
+                        - generic: Adaptive Streaming
+                        - img [ref=e61]
+                      - combobox [ref=e63] [cursor=pointer]
+                    - generic [ref=e64]:
+                      - generic [ref=e65] [cursor=pointer]: Specific Topic (Optional)
+                      - combobox "Specific Topic (Optional)" [active] [ref=e66] [cursor=pointer]:
+                        - generic: HLS
+                        - img [ref=e67]
+                      - combobox [ref=e69] [cursor=pointer]
+                    - generic [ref=e70]:
+                      - generic [ref=e71] [cursor=pointer]: Description
+                      - textbox "Description" [ref=e72]:
+                        - /placeholder: What does this do? Why is it useful?
+                        - text: Run-owned QA audit resource for safe submission and withdrawal verification only.
+                  - generic [ref=e73]:
+                    - button "Cancel" [ref=e74] [cursor=pointer]
+                    - button "Submit for review" [ref=e75] [cursor=pointer]
+        - contentinfo [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - paragraph [ref=e79]: ── INDEX
+              - link "awesome.video home" [ref=e80] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e81]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e83]:
+              - heading "INDEXED" [level=2] [ref=e84]
+              - paragraph [ref=e85]: 3,826
+              - paragraph [ref=e86]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e87]: live
+            - navigation "Explore categories" [ref=e89]:
+              - heading "EXPLORE" [level=2] [ref=e90]
+              - generic [ref=e91]:
+                - link "Community & Events" [ref=e92] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e93]: ◈
+                  - generic [ref=e94]: Community
+                - link "Encoding & Codecs" [ref=e95] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e96]: ◇
+                  - generic [ref=e97]: Encoding
+                - link "General Tools" [ref=e98] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e99]: ◆
+                  - generic [ref=e100]: General
+                - link "Infrastructure & Delivery" [ref=e101] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e102]: ▣
+                  - generic [ref=e103]: Infrastructure
+                - link "Intro & Learning" [ref=e104] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e105]: ▤
+                  - generic [ref=e106]: Intro
+                - link "Media Tools" [ref=e107] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e108]: ▥
+                  - generic [ref=e109]: Media
+                - link "Players & Clients" [ref=e110] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e111]: ▶
+                  - generic [ref=e112]: Players
+                - link "Protocols & Transport" [ref=e113] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e114]: ⟁
+                  - generic [ref=e115]: Protocols
+                - link "Standards & Industry" [ref=e116] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e117]: ◉
+                  - generic [ref=e118]: Standards
+            - generic [ref=e119]:
+              - heading "SOURCE" [level=2] [ref=e120]
+              - link "krzemienski/awesome-video" [ref=e121] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e122]
+                - generic [ref=e124]:
+                  - text: krzemienski
+                  - generic [ref=e125]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e126]: ↗
+              - paragraph [ref=e127]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e128] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e130] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e131]:
+            - generic [ref=e132]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e133]:
+              - link "About" [ref=e134] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e135] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e136] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e137] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e138] [cursor=pointer]
+              - link "Issues ↗" [ref=e139] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e140] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e141]: built with the awesome-list framework

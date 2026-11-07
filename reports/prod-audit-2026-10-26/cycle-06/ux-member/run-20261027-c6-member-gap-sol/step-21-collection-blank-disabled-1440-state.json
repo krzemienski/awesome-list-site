@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks",
+  "width": 1440,
+  "height": 900,
+  "dpr": 1,
+  "coarse": false,
+  "touchPoints": 0,
+  "scrollY": 0,
+  "active": "<input class=\"input min-h-[44px] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed\" id=\"collection-name\" maxlength=\"80\" placeholder=\"e.g. Streaming fundamentals\" value=\"\">",
+  "umami": "1",
+  "consent": "denied"
+}

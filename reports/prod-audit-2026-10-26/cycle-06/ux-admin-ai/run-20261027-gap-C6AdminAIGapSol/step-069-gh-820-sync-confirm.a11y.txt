@@ -1,0 +1,202 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab [selected]:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab:
+                          - img
+                          - text: Research
+                      - button:
+                        - img
+                    - tabpanel:
+                      - generic:
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic: krzemienski/awesome-video
+                                - paragraph: master · last sync Jul 20, 2026, 02:42 PM · 49 sync jobs
+                              - generic:
+                                - generic:
+                                  - button: Preview import
+                                  - button: Pull
+                                  - button: Sync now
+                        - generic:
+                          - generic:
+                            - generic:
+                              - heading [level=2]: Sync jobs
+                              - paragraph: Last 5 import/export operations
+                          - generic:
+                            - generic:
+                              - generic:
+                                - table:
+                                  - rowgroup:
+                                    - row:
+                                      - columnheader: ID
+                                      - columnheader: Type
+                                      - columnheader: Status
+                                      - columnheader
+                                  - rowgroup:
+                                    - row:
+                                      - cell: "Job #49"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 20, 2026, 02:42 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #48"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 18, 2026, 03:12 PM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #47"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 18, 2026, 05:30 AM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #46"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 08:54 AM
+                                      - cell:
+                                        - generic: completed
+                                      - cell:
+                                        - button: Logs
+                                    - row:
+                                      - cell: "Job #45"
+                                      - cell:
+                                        - text: export
+                                        - generic: Jul 17, 2026, 08:32 AM
+                                      - cell:
+                                        - generic: failed
+                                      - cell:
+                                        - button: Logs
+                        - generic:
+                          - button: More
+  - alertdialog "Export to GitHub?" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Export to GitHub?" [level=2] [ref=e4]
+      - paragraph [ref=e5]: This pushes the approved catalog as a commit to krzemienski/awesome-video, rewriting its README resource list.
+    - generic [ref=e6]:
+      - button "Cancel" [active] [ref=e7] [cursor=pointer]
+      - button "Start Export" [ref=e8] [cursor=pointer]

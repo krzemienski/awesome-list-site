@@ -12,6 +12,9 @@
  */
 
 import * as cheerio from 'cheerio';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("research");
 
 // Cache for scraped content (24-hour TTL)
 interface ScrapedContent {
@@ -80,6 +83,8 @@ export class WebResearchService {
   private readonly MAX_CONTENT_LENGTH = 100000; // 100KB text
   private lastRequestTime = 0;
   private readonly MIN_REQUEST_DELAY = 500; // 500ms between requests
+  private lastSearchRequestTime = 0;
+  private readonly SEARCH_REQUEST_DELAY = 6500; // unauthenticated GitHub Search: 10 requests/minute
 
   private constructor() {}
 
@@ -88,6 +93,57 @@ export class WebResearchService {
       WebResearchService.instance = new WebResearchService();
     }
     return WebResearchService.instance;
+  }
+
+  /** Search GitHub's official REST API without depending on the Agent SDK's WebSearch tool. */
+  public async searchPrimarySources(query: string, limit = 10): Promise<WebSearchResult[]> {
+    const q = query.trim();
+    if (!q) throw new Error('query is required');
+    if (q.length > 500) throw new Error('query must be at most 500 characters');
+    const take = Number.isFinite(limit) ? Math.max(1, Math.min(15, Math.floor(limit))) : 10;
+    const now = Date.now();
+    const slot = Math.max(now, this.lastSearchRequestTime + this.SEARCH_REQUEST_DELAY);
+    const waitMs = slot - now;
+    // Reserve the slot before awaiting so parallel scouts cannot wake together.
+    this.lastSearchRequestTime = slot;
+    if (waitMs > 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, waitMs));
+    }
+    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&per_page=${take}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'AwesomeListBot/1.0 (Research; +https://awesome.video)',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      signal: AbortSignal.timeout(this.SCRAPE_TIMEOUT),
+    });
+    if (!response.ok) throw new Error(`search provider returned HTTP ${response.status}`);
+    const payload: unknown = await response.json();
+    if (typeof payload !== 'object' || payload === null) throw new Error('search provider returned a non-object response');
+    const items = 'items' in payload && Array.isArray(payload.items) ? payload.items : [];
+    const results: WebSearchResult[] = [];
+    for (const item of items) {
+      if (results.length >= take) break;
+      if (typeof item !== 'object' || item === null) continue;
+      const link = 'html_url' in item && typeof item.html_url === 'string' ? item.html_url : null;
+      if (!link) continue;
+      try {
+        const parsed = new URL(link);
+        if (parsed.protocol !== 'https:' || parsed.hostname !== 'github.com') continue;
+        const fullName = 'full_name' in item && typeof item.full_name === 'string' ? item.full_name : parsed.toString();
+        const description = 'description' in item && typeof item.description === 'string' ? item.description : '';
+        results.push({
+          url: parsed.toString(),
+          title: fullName,
+          snippet: description,
+          source: 'github-api',
+        });
+      } catch {
+        // Ignore malformed result links rather than failing the whole search.
+      }
+    }
+    return results;
   }
 
   /**
@@ -158,7 +214,7 @@ export class WebResearchService {
 
       return content;
     } catch (error: any) {
-      console.error(`Failed to scrape ${url}:`, error.message);
+      logger.error(`Failed to scrape ${url}:`, error.message);
       return null;
     }
   }

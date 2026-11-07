@@ -1,0 +1,153 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab [selected]:
+                          - img
+                          - text: Research
+                    - tabpanel:
+                      - region:
+                        - generic:
+                          - heading [level=2]: Research workspace
+                          - paragraph: Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.
+                          - generic:
+                            - article:
+                              - generic: NOTE · 01
+                              - button:
+                                - heading [level=3]: Five-pass sustained catalog audit.
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 44s ago
+                            - article:
+                              - generic: NOTE · 02
+                              - button:
+                                - heading [level=3]: Sustained catalog coverage and duplicate-audit run requiring at least 30…
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 9m ago
+                            - article:
+                              - generic: NOTE · 03
+                              - button:
+                                - heading [level=3]: Sustained production research requiring at least 30 minutes and at least 450…
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 34m ago
+                            - article:
+                              - generic: NOTE · 04
+                              - button:
+                                - heading [level=3]: Sustained production research for at least 30 minutes of genuine work.
+                                - generic:
+                                  - generic: 4 candidates
+                                  - generic: 46m ago
+  - dialog "Research note details" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Research note details" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Read-only research note details
+    - status [ref=e6]: Loading research details…
+    - button "Close" [active] [ref=e7] [cursor=pointer]:
+      - img [ref=e8]
+      - generic [ref=e11]: Close

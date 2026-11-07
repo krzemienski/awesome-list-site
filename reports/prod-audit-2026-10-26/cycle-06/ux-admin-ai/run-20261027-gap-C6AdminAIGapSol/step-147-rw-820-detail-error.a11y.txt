@@ -1,0 +1,164 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 3,826 resources
+            - generic: Search
+            - generic: ⌘K
+          - button:
+            - generic:
+              - generic: A
+            - generic: Admin
+            - generic: Admin, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                    - listitem:
+                      - link:
+                        - /url: /admin
+                        - text: Admin
+                    - listitem:
+                      - img
+                - generic: Authorized admin area
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Admin console · Admin User
+                      - heading [level=1]:
+                        - text: Operations
+                        - emphasis: dashboard
+                      - paragraph: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+                    - generic:
+                      - button:
+                        - img
+                        - text: Settings
+                      - button:
+                        - img
+                        - text: New entry
+                  - status
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                      - tablist:
+                        - tab:
+                          - img
+                          - text: Overview
+                        - tab:
+                          - img
+                          - text: Approvals
+                        - tab:
+                          - img
+                          - text: Edits
+                        - tab:
+                          - img
+                          - text: Enrichment
+                        - tab:
+                          - img
+                          - text: Researcher
+                        - tab:
+                          - img
+                          - text: Export
+                        - tab:
+                          - img
+                          - text: Database
+                        - tab:
+                          - img
+                          - text: Resources
+                        - tab:
+                          - img
+                          - text: Categories
+                        - tab:
+                          - img
+                          - text: Subcategories
+                        - tab:
+                          - img
+                          - text: Users
+                        - tab:
+                          - img
+                          - text: GitHub
+                        - tab:
+                          - img
+                          - text: Link Health
+                        - tab:
+                          - img
+                          - text: Audit
+                        - tab [selected]:
+                          - img
+                          - text: Research
+                    - tabpanel:
+                      - region:
+                        - generic:
+                          - heading [level=2]: Research workspace
+                          - paragraph: Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.
+                          - generic:
+                            - article:
+                              - generic: NOTE · 01
+                              - button:
+                                - heading [level=3]: Five-pass sustained catalog audit.
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: Active
+                            - article:
+                              - generic: NOTE · 02
+                              - button:
+                                - heading [level=3]: Five-pass sustained catalog audit.
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 13m ago
+                            - article:
+                              - generic: NOTE · 03
+                              - button:
+                                - heading [level=3]: Sustained catalog coverage and duplicate-audit run requiring at least 30…
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 22m ago
+                            - article:
+                              - generic: NOTE · 04
+                              - button:
+                                - heading [level=3]: Sustained production research requiring at least 30 minutes and at least 450…
+                                - generic:
+                                  - generic: 0 candidates
+                                  - generic: 46m ago
+  - dialog "Research note details" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Research note details" [level=2] [ref=e4]
+      - paragraph [ref=e5]: Read-only research note details
+    - alert [ref=e6]:
+      - img [ref=e7]
+      - paragraph [ref=e9]: Couldn't load research details
+      - generic [ref=e10]:
+        - generic [ref=e11]: Could not reach the server. Please check your connection and try again.
+        - button "Retry" [ref=e12] [cursor=pointer]:
+          - img
+          - text: Retry
+    - button "Close" [active] [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+      - generic [ref=e17]: Close

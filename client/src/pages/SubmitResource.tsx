@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { submitTitle } from "@shared/page-headings";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -44,8 +45,16 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
-import { trackGenerateLead } from "@/lib/analytics";
+import {
+  trackGenerateLead,
+  trackSubmitFormStarted,
+  trackSubmitFormSubmitted,
+  trackSubmitStepCompleted,
+  trackSubmitValidationFailed,
+  type SubmitFormStep,
+} from "@/lib/analytics";
 import { serverConversionHeaders } from "@/lib/mixpanel";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 import "@/styles/pages/submit.css";
@@ -55,6 +64,7 @@ import "@/styles/pages/submit.css";
 // Run21 R4-015/048: rules now come from the SHARED validation module so the
 // two layers can't drift (visible-char titles, 2048-char URL cap).
 import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
+import { apiFetch } from "@/lib/api-fetch";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -202,7 +212,43 @@ export default function SubmitResource() {
     "tags",
   ];
 
+  // Funnel telemetry: each event fires once per page visit. Only field names
+  // and step names leave the page, never what was typed.
+  const funnelSeen = useRef(new Set<string>());
+  const fireOnce = (key: string, send: () => void) => {
+    if (funnelSeen.current.has(key)) return;
+    funnelSeen.current.add(key);
+    send();
+  };
+  const completeStep = (step: SubmitFormStep) =>
+    fireOnce(`step:${step}`, () => trackSubmitStepCompleted(step));
+  const startFunnel = () =>
+    fireOnce("started", () => trackSubmitFormStarted(isAuthenticated));
+
+  // Signed-out visitors cannot type (the fields are disabled), so the sign-in
+  // wall is the first and last step they reach.
+  const signInGateShown = !authLoading && !authFailed && !isAuthenticated;
+  useEffect(() => {
+    if (signInGateShown) completeStep("sign_in_required");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signInGateShown]);
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (!funnelSeen.current.has("started")) return;
+      if (submitResourceSchema.pick({ title: true, url: true, description: true }).safeParse(values).success) {
+        completeStep("details");
+      }
+      if (values.category) completeStep("category");
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
   const onInvalid = (errors: Record<string, unknown>) => {
+    for (const name of FIELD_ORDER) {
+      if (name in errors) trackSubmitValidationFailed(name, "client");
+    }
     const firstBad = FIELD_ORDER.find((name) => name in errors);
     // C4-V3-01: the Select triggers carry field.ref, so setFocus
     // reaches them too; without it setFocus silently did nothing for Category.
@@ -246,7 +292,7 @@ export default function SubmitResource() {
       }
 
       try {
-        const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
+        const response = await apiFetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
         // The public endpoint exposes existence only, not resource details.
         const data = (await response.json()) as {
           exists?: boolean;
@@ -466,7 +512,7 @@ export default function SubmitResource() {
       void queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
       
       // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: scrollBehavior() });
     },
     onError: (error: Error) => {
       // BUG-005 (run19): the server's 400 carries per-field messages in
@@ -487,6 +533,7 @@ export default function SubmitResource() {
         for (const key of formFields) {
           const message = fieldErrors[key];
           if (message) {
+            trackSubmitValidationFailed(key, "server");
             form.setError(key, { type: "server", message }, { shouldFocus: mapped === 0 });
             mapped++;
           }
@@ -514,6 +561,11 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
+    completeStep("review");
+    trackSubmitFormSubmitted(
+      data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean).length : 0,
+      Boolean(data.subcategory),
+    );
     submitMutation.mutate(data);
   };
 
@@ -530,7 +582,8 @@ export default function SubmitResource() {
           SUBMIT A RESOURCE
         </div>
         <h1 className="submit-title">
-          Add to the <span className="serif-italic submit-title-accent">index</span>
+          {submitTitle.lead}{" "}
+          <span className="serif-italic submit-title-accent">{submitTitle.accent}</span>
         </h1>
         <p className="submit-lede">
           Submit a tool, library, paper, or talk. We hand-review every entry before it lands in the catalog.
@@ -575,7 +628,7 @@ export default function SubmitResource() {
           <CardContent className="submit-form-card-content">
             <Form {...form}>
               {authLoading ? (
-                <Alert className="submit-auth-alert" data-testid="alert-auth-loading">
+                <Alert live="polite" className="submit-auth-alert" data-testid="alert-auth-loading">
                   <Loader2 className="submit-alert-icon animate-spin" />
                   <AlertTitle>Verifying sign-in…</AlertTitle>
                   <AlertDescription>
@@ -606,12 +659,12 @@ export default function SubmitResource() {
                   </AlertDescription>
                 </Alert>
               ) : !isAuthenticated ? (
-                <Alert className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
+                <Alert live="off" className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
                   <LogIn className="submit-alert-icon" /> {/* DS-OK: status warn */}
                   <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
-                  <AlertDescription>
+                  <AlertDescription className="leading-7">
                     The form below is read-only. Please{" "}
-                    <a href="/sign-in?redirect_url=%2Fsubmit" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex min-h-6 items-center" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
@@ -627,7 +680,12 @@ export default function SubmitResource() {
               >
                 {/* Fields are disabled for logged-out visitors — they can see the
                     form layout as a preview but cannot fill or submit it (BUG-018). */}
-                <fieldset disabled={!isAuthenticated} className="submit-fields">
+                <fieldset
+                  disabled={!isAuthenticated}
+                  className="submit-fields"
+                  onFocusCapture={startFunnel}
+                  onChangeCapture={startFunnel}
+                >
                   {/* Title Field */}
                   <FormField
                     control={form.control}
@@ -675,7 +733,7 @@ export default function SubmitResource() {
 
                         {/* Duplicate URL Warning */}
                         {duplicateResource && (
-                          <Alert className="submit-inline-alert"> {/* DS-OK: status warn */}
+                          <Alert live="polite" className="submit-inline-alert"> {/* DS-OK: status warn */}
                             <AlertCircle className="submit-alert-icon" /> {/* DS-OK: status warn */}
                             <AlertTitle>Duplicate URL Detected</AlertTitle> {/* DS-OK: status warn */}
                             <AlertDescription>

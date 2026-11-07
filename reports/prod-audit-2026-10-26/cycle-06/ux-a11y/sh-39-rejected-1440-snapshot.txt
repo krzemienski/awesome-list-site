@@ -1,0 +1,613 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e43]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [selected, ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Resources" [ref=e17] focusable [tabindex]
+            - article
+              - heading "Resources (25 of 147)" [level=2, ref=e35]
+                - StaticText "Resources (25 of 147)"
+              - generic
+                - StaticText "Manage every entry in the index · ★ 8 featured on the home page · Filters applied"
+              - textbox "Search…" [ref=e36]
+              - button "Hide filters and tools" [expanded=true, ref=e37]
+                - StaticText "Hide filters and tools"
+              - button "Add" [ref=e38]
+                - image
+                - StaticText "Add"
+              - region "Resource filters and tools" [ref=e39]
+                - generic
+                  - image
+                  - textbox "Search by title or URL..." [ref=e59]
+                - combobox "Filter by category" [expanded=false, ref=e44]: All Categories
+                  - image
+                  - StaticText "All Categories"
+                - combobox "Filter by status" [expanded=false, ref=e45]: Rejected
+                  - generic [ref=e60] clickable [cursor:pointer, onclick]
+                    - StaticText "Rejected"
+                - combobox "Sort resources" [expanded=false, ref=e46]: Newest first
+                  - generic [ref=e61] clickable [cursor:pointer, onclick]
+                    - StaticText "Newest first"
+                - button "★ Featured only" [ref=e47]
+                - button "Search" [ref=e48]
+                  - image
+                - button "Clear filters" [ref=e49]
+                  - image
+              - region "Resources table, scrollable" [ref=e50] focusable [tabindex]
+                - table
+                  - rowgroup
+                    - row
+                      - columnheader "ID Select all resources on this page" [ref=e194]
+                        - StaticText "ID"
+                        - checkbox "Select all resources on this page" [checked=false, ref=e325]
+                      - columnheader "TITLE" [ref=e195]
+                      - columnheader "CATEGORY" [ref=e196]
+                      - columnheader "TAGS" [ref=e197]
+                      - columnheader "FEATURED" [ref=e198]
+                      - columnheader "Actions" [ref=e199]
+                  - row
+                    - cell "188474 Select Valid Title" [ref=e62]
+                      - StaticText "188474"
+                      - checkbox "Select Valid Title" [checked=false, ref=e200]
+                    - cell "Valid Title" [ref=e63]
+                      - StaticText "Valid Title"
+                    - cell "Community & Events" [ref=e64]
+                    - cell
+                    - cell "Feature on the home page: Valid Title" [ref=e65]
+                      - button "Feature on the home page: Valid Title" [ref=e201]
+                        - StaticText "—"
+                    - cell "View Valid Title Edit Valid Title Delete Valid Title" [ref=e66]
+                      - link "View Valid Title" [ref=e202]
+                        - StaticText "View"
+                      - button "Edit Valid Title" [ref=e203]
+                        - StaticText "Edit"
+                      - button "Delete Valid Title" [ref=e204]
+                        - image
+                  - row
+                    - cell "188031 Select Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e67]
+                      - StaticText "188031"
+                      - checkbox "Select Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [checked=false, ref=e205]
+                    - cell "Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e68]
+                      - StaticText "Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I"
+                    - cell "Intro & Learning" [ref=e69]
+                    - cell "FFMPEG TRANSCODING" [ref=e70]
+                      - StaticText "FFMPEG"
+                      - StaticText "TRANSCODING"
+                    - cell "Feature on the home page: Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e71]
+                      - button "Feature on the home page: Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e206]
+                        - StaticText "—"
+                    - cell "View Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I Edit Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I Delete Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e72]
+                      - link "View Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e207]
+                        - StaticText "View"
+                      - button "Edit Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e208]
+                        - StaticText "Edit"
+                      - button "Delete Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I" [ref=e209]
+                        - image
+                  - row
+                    - cell "188030 Select 3 Cases from a Video Expert: Encoding Basics" [ref=e73]
+                      - StaticText "188030"
+                      - checkbox "Select 3 Cases from a Video Expert: Encoding Basics" [checked=false, ref=e210]
+                    - cell "3 Cases from a Video Expert: Encoding Basics" [ref=e74]
+                      - StaticText "3 Cases from a Video Expert: Encoding Basics"
+                    - cell "Intro & Learning" [ref=e75]
+                    - cell "ENCODING TUTORIAL" [ref=e76]
+                      - StaticText "ENCODING"
+                      - StaticText "TUTORIAL"
+                    - cell "Feature on the home page: 3 Cases from a Video Expert: Encoding Basics" [ref=e77]
+                      - button "Feature on the home page: 3 Cases from a Video Expert: Encoding Basics" [ref=e211]
+                        - StaticText "—"
+                    - cell "View 3 Cases from a Video Expert: Encoding Basics Edit 3 Cases from a Video Expert: Encoding Basics Delete 3 Cases from a Video Expert: Encoding Basics" [ref=e78]
+                      - link "View 3 Cases from a Video Expert: Encoding Basics" [ref=e212]
+                        - StaticText "View"
+                      - button "Edit 3 Cases from a Video Expert: Encoding Basics" [ref=e213]
+                        - StaticText "Edit"
+                      - button "Delete 3 Cases from a Video Expert: Encoding Basics" [ref=e214]
+                        - image
+                  - row
+                    - cell "188029 Select Hardware-Assisted Video Transcoding At Dailymotion" [ref=e79]
+                      - StaticText "188029"
+                      - checkbox "Select Hardware-Assisted Video Transcoding At Dailymotion" [checked=false, ref=e215]
+                    - cell "Hardware-Assisted Video Transcoding At Dailymotion" [ref=e80]
+                      - StaticText "Hardware-Assisted Video Transcoding At Dailymotion"
+                    - cell "Encoding & Codecs" [ref=e81]
+                    - cell "TRANSCODING HARDWARE ACCELERATION" [ref=e82]
+                      - StaticText "TRANSCODING"
+                      - StaticText "HARDWARE ACCELERATION"
+                    - cell "Feature on the home page: Hardware-Assisted Video Transcoding At Dailymotion" [ref=e83]
+                      - button "Feature on the home page: Hardware-Assisted Video Transcoding At Dailymotion" [ref=e216]
+                        - StaticText "—"
+                    - cell "View Hardware-Assisted Video Transcoding At Dailymotion Edit Hardware-Assisted Video Transcoding At Dailymotion Delete Hardware-Assisted Video Transcoding At Dailymotion" [ref=e84]
+                      - link "View Hardware-Assisted Video Transcoding At Dailymotion" [ref=e217]
+                        - StaticText "View"
+                      - button "Edit Hardware-Assisted Video Transcoding At Dailymotion" [ref=e218]
+                        - StaticText "Edit"
+                      - button "Delete Hardware-Assisted Video Transcoding At Dailymotion" [ref=e219]
+                        - image
+                  - row
+                    - cell "188028 Select Improving our video encodes for legacy devices" [ref=e85]
+                      - StaticText "188028"
+                      - checkbox "Select Improving our video encodes for legacy devices" [checked=false, ref=e220]
+                    - cell "Improving our video encodes for legacy devices" [ref=e86]
+                      - StaticText "Improving our video encodes for legacy devices"
+                    - cell "Encoding & Codecs" [ref=e87]
+                    - cell "ENCODING LEGACY DEVICES" [ref=e88]
+                      - StaticText "ENCODING"
+                      - StaticText "LEGACY DEVICES"
+                    - cell "Feature on the home page: Improving our video encodes for legacy devices" [ref=e89]
+                      - button "Feature on the home page: Improving our video encodes for legacy devices" [ref=e221]
+                        - StaticText "—"
+                    - cell "View Improving our video encodes for legacy devices Edit Improving our video encodes for legacy devices Delete Improving our video encodes for legacy devices" [ref=e90]
+                      - link "View Improving our video encodes for legacy devices" [ref=e222]
+                        - StaticText "View"
+                      - button "Edit Improving our video encodes for legacy devices" [ref=e223]
+                        - StaticText "Edit"
+                      - button "Delete Improving our video encodes for legacy devices" [ref=e224]
+                        - image
+                  - row
+                    - cell "188027 Select Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e91]
+                      - StaticText "188027"
+                      - checkbox "Select Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [checked=false, ref=e225]
+                    - cell "Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e92]
+                      - StaticText "Inca — Message Tracing and Loss Detection For Streaming Data @Netflix"
+                    - cell "Infrastructure & Delivery" [ref=e93]
+                    - cell "KAFKA STREAMING" [ref=e94]
+                      - StaticText "KAFKA"
+                      - StaticText "STREAMING"
+                    - cell "Feature on the home page: Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e95]
+                      - button "Feature on the home page: Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e226]
+                        - StaticText "—"
+                    - cell "View Inca — Message Tracing and Loss Detection For Streaming Data @Netflix Edit Inca — Message Tracing and Loss Detection For Streaming Data @Netflix Delete Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e96]
+                      - link "View Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e227]
+                        - StaticText "View"
+                      - button "Edit Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e228]
+                        - StaticText "Edit"
+                      - button "Delete Inca — Message Tracing and Loss Detection For Streaming Data @Netflix" [ref=e229]
+                        - image
+                  - row
+                    - cell "187937 Select BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e97]
+                      - StaticText "187937"
+                      - checkbox "Select BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [checked=false, ref=e230]
+                    - cell "BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e98]
+                      - StaticText "BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)"
+                    - cell "Protocols & Transport" [ref=e99]
+                    - cell
+                    - cell "Feature on the home page: BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e100]
+                      - button "Feature on the home page: BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e231]
+                        - StaticText "—"
+                    - cell "View BOLA: Buffer Occupancy based Lyapunov Algorithm (paper) Edit BOLA: Buffer Occupancy based Lyapunov Algorithm (paper) Delete BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e101]
+                      - link "View BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e232]
+                        - StaticText "View"
+                      - button "Edit BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e233]
+                        - StaticText "Edit"
+                      - button "Delete BOLA: Buffer Occupancy based Lyapunov Algorithm (paper)" [ref=e234]
+                        - image
+                  - row
+                    - cell "187909 Select Subtitld" [ref=e102]
+                      - StaticText "187909"
+                      - checkbox "Select Subtitld" [checked=false, ref=e235]
+                    - cell "Subtitld" [ref=e103]
+                      - StaticText "Subtitld"
+                    - cell "Media Tools" [ref=e104]
+                    - cell
+                    - cell "Feature on the home page: Subtitld" [ref=e105]
+                      - button "Feature on the home page: Subtitld" [ref=e236]
+                        - StaticText "—"
+                    - cell "View Subtitld Edit Subtitld Delete Subtitld" [ref=e106]
+                      - link "View Subtitld" [ref=e237]
+                        - StaticText "View"
+                      - button "Edit Subtitld" [ref=e238]
+                        - StaticText "Edit"
+                      - button "Delete Subtitld" [ref=e239]
+                        - image
+                  - row
+                    - cell "187639 Select HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e107]
+                      - StaticText "187639"
+                      - checkbox "Select HESP (High Efficiency Streaming Protocol) Whitepaper" [checked=false, ref=e240]
+                    - cell "HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e108]
+                      - StaticText "HESP (High Efficiency Streaming Protocol) Whitepaper"
+                    - cell "Protocols & Transport" [ref=e109]
+                    - cell
+                    - cell "Feature on the home page: HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e110]
+                      - button "Feature on the home page: HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e241]
+                        - StaticText "—"
+                    - cell "View HESP (High Efficiency Streaming Protocol) Whitepaper Edit HESP (High Efficiency Streaming Protocol) Whitepaper Delete HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e111]
+                      - link "View HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e242]
+                        - StaticText "View"
+                      - button "Edit HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e243]
+                        - StaticText "Edit"
+                      - button "Delete HESP (High Efficiency Streaming Protocol) Whitepaper" [ref=e244]
+                        - image
+                  - row
+                    - cell "187636 Select Haivision SRT Protocol Technical Overview" [ref=e112]
+                      - StaticText "187636"
+                      - checkbox "Select Haivision SRT Protocol Technical Overview" [checked=false, ref=e245]
+                    - cell "Haivision SRT Protocol Technical Overview" [ref=e113]
+                      - StaticText "Haivision SRT Protocol Technical Overview"
+                    - cell "Protocols & Transport" [ref=e114]
+                    - cell
+                    - cell "Feature on the home page: Haivision SRT Protocol Technical Overview" [ref=e115]
+                      - button "Feature on the home page: Haivision SRT Protocol Technical Overview" [ref=e246]
+                        - StaticText "—"
+                    - cell "View Haivision SRT Protocol Technical Overview Edit Haivision SRT Protocol Technical Overview Delete Haivision SRT Protocol Technical Overview" [ref=e116]
+                      - link "View Haivision SRT Protocol Technical Overview" [ref=e247]
+                        - StaticText "View"
+                      - button "Edit Haivision SRT Protocol Technical Overview" [ref=e248]
+                        - StaticText "Edit"
+                      - button "Delete Haivision SRT Protocol Technical Overview" [ref=e249]
+                        - image
+                  - row
+                    - cell "187493 Select Loudness Explained Page | Music Tribe - TC Electronic" [ref=e117]
+                      - StaticText "187493"
+                      - checkbox "Select Loudness Explained Page | Music Tribe - TC Electronic" [checked=false, ref=e250]
+                    - cell "Loudness Explained Page | Music Tribe - TC Electronic" [ref=e118]
+                      - StaticText "Loudness Explained Page | Music Tribe - TC Electronic"
+                    - cell "Media Tools" [ref=e119]
+                    - cell
+                    - cell "Feature on the home page: Loudness Explained Page | Music Tribe - TC Electronic" [ref=e120]
+                      - button "Feature on the home page: Loudness Explained Page | Music Tribe - TC Electronic" [ref=e251]
+                        - StaticText "—"
+                    - cell "View Loudness Explained Page | Music Tribe - TC Electronic Edit Loudness Explained Page | Music Tribe - TC Electronic Delete Loudness Explained Page | Music Tribe - TC Electronic" [ref=e121]
+                      - link "View Loudness Explained Page | Music Tribe - TC Electronic" [ref=e252]
+                        - StaticText "View"
+                      - button "Edit Loudness Explained Page | Music Tribe - TC Electronic" [ref=e253]
+                        - StaticText "Edit"
+                      - button "Delete Loudness Explained Page | Music Tribe - TC Electronic" [ref=e254]
+                        - image
+                  - row
+                    - cell "187324 Select Panopto Certified Video Capture Appliances" [ref=e122]
+                      - StaticText "187324"
+                      - checkbox "Select Panopto Certified Video Capture Appliances" [checked=false, ref=e255]
+                    - cell "Panopto Certified Video Capture Appliances" [ref=e123]
+                      - StaticText "Panopto Certified Video Capture Appliances"
+                    - cell "Players & Clients" [ref=e124]
+                    - cell
+                    - cell "Feature on the home page: Panopto Certified Video Capture Appliances" [ref=e125]
+                      - button "Feature on the home page: Panopto Certified Video Capture Appliances" [ref=e256]
+                        - StaticText "—"
+                    - cell "View Panopto Certified Video Capture Appliances Edit Panopto Certified Video Capture Appliances Delete Panopto Certified Video Capture Appliances" [ref=e126]
+                      - link "View Panopto Certified Video Capture Appliances" [ref=e257]
+                        - StaticText "View"
+                      - button "Edit Panopto Certified Video Capture Appliances" [ref=e258]
+                        - StaticText "Edit"
+                      - button "Delete Panopto Certified Video Capture Appliances" [ref=e259]
+                        - image
+                  - row
+                    - cell "186814 Select mediasoup" [ref=e127]
+                      - StaticText "186814"
+                      - checkbox "Select mediasoup" [checked=false, ref=e260]
+                    - cell "mediasoup" [ref=e128]
+                      - StaticText "mediasoup"
+                    - cell "Infrastructure & Delivery" [ref=e129]
+                    - cell
+                    - cell "Feature on the home page: mediasoup" [ref=e130]
+                      - button "Feature on the home page: mediasoup" [ref=e261]
+                        - StaticText "—"
+                    - cell "View mediasoup Edit mediasoup Delete mediasoup" [ref=e131]
+                      - link "View mediasoup" [ref=e262]
+                        - StaticText "View"
+                      - button "Edit mediasoup" [ref=e263]
+                        - StaticText "Edit"
+                      - button "Delete mediasoup" [ref=e264]
+                        - image
+                  - row
+                    - cell "186812 Select FFmpeg-Python" [ref=e132]
+                      - StaticText "186812"
+                      - checkbox "Select FFmpeg-Python" [checked=false, ref=e265]
+                    - cell "FFmpeg-Python" [ref=e133]
+                      - StaticText "FFmpeg-Python"
+                    - cell "Encoding & Codecs" [ref=e134]
+                    - cell
+                    - cell "Feature on the home page: FFmpeg-Python" [ref=e135]
+                      - button "Feature on the home page: FFmpeg-Python" [ref=e266]
+                        - StaticText "—"
+                    - cell "View FFmpeg-Python Edit FFmpeg-Python Delete FFmpeg-Python" [ref=e136]
+                      - link "View FFmpeg-Python" [ref=e267]
+                        - StaticText "View"
+                      - button "Edit FFmpeg-Python" [ref=e268]
+                        - StaticText "Edit"
+                      - button "Delete FFmpeg-Python" [ref=e269]
+                        - image
+                  - row
+                    - cell "186811 Select Galène" [ref=e137]
+                      - StaticText "186811"
+                      - checkbox "Select Galène" [checked=false, ref=e270]
+                    - cell "Galène" [ref=e138]
+                      - StaticText "Galène"
+                    - cell "Infrastructure & Delivery" [ref=e139]
+                    - cell
+                    - cell "Feature on the home page: Galène" [ref=e140]
+                      - button "Feature on the home page: Galène" [ref=e271]
+                        - StaticText "—"
+                    - cell "View Galène Edit Galène Delete Galène" [ref=e141]
+                      - link "View Galène" [ref=e272]
+                        - StaticText "View"
+                      - button "Edit Galène" [ref=e273]
+                        - StaticText "Edit"
+                      - button "Delete Galène" [ref=e274]
+                        - image
+                  - row
+                    - cell "186672 Select FreeJ" [ref=e142]
+                      - StaticText "186672"
+                      - checkbox "Select FreeJ" [checked=false, ref=e275]
+                    - cell "FreeJ" [ref=e143]
+                      - StaticText "FreeJ"
+                    - cell "Media Tools" [ref=e144]
+                    - cell
+                    - cell "Feature on the home page: FreeJ" [ref=e145]
+                      - button "Feature on the home page: FreeJ" [ref=e276]
+                        - StaticText "—"
+                    - cell "View FreeJ Edit FreeJ Delete FreeJ" [ref=e146]
+                      - link "View FreeJ" [ref=e277]
+                        - StaticText "View"
+                      - button "Edit FreeJ" [ref=e278]
+                        - StaticText "Edit"
+                      - button "Delete FreeJ" [ref=e279]
+                        - image
+                  - row
+                    - cell "186659 Select Medooze Media Server" [ref=e147]
+                      - StaticText "186659"
+                      - checkbox "Select Medooze Media Server" [checked=false, ref=e280]
+                    - cell "Medooze Media Server" [ref=e148]
+                      - StaticText "Medooze Media Server"
+                    - cell "Infrastructure & Delivery" [ref=e149]
+                    - cell
+                    - cell "Feature on the home page: Medooze Media Server" [ref=e150]
+                      - button "Feature on the home page: Medooze Media Server" [ref=e281]
+                        - StaticText "—"
+                    - cell "View Medooze Media Server Edit Medooze Media Server Delete Medooze Media Server" [ref=e151]
+                      - link "View Medooze Media Server" [ref=e282]
+                        - StaticText "View"
+                      - button "Edit Medooze Media Server" [ref=e283]
+                        - StaticText "Edit"
+                      - button "Delete Medooze Media Server" [ref=e284]
+                        - image
+                  - row
+                    - cell "186657 Select Peer5 HLS P2P" [ref=e152]
+                      - StaticText "186657"
+                      - checkbox "Select Peer5 HLS P2P" [checked=false, ref=e285]
+                    - cell "Peer5 HLS P2P" [ref=e153]
+                      - StaticText "Peer5 HLS P2P"
+                    - cell "Protocols & Transport" [ref=e154]
+                    - cell "HLS WEBRTC" [ref=e155]
+                      - StaticText "HLS"
+                      - StaticText "WEBRTC"
+                    - cell "Feature on the home page: Peer5 HLS P2P" [ref=e156]
+                      - button "Feature on the home page: Peer5 HLS P2P" [ref=e286]
+                        - StaticText "—"
+                    - cell "View Peer5 HLS P2P Edit Peer5 HLS P2P Delete Peer5 HLS P2P" [ref=e157]
+                      - link "View Peer5 HLS P2P" [ref=e287]
+                        - StaticText "View"
+                      - button "Edit Peer5 HLS P2P" [ref=e288]
+                        - StaticText "Edit"
+                      - button "Delete Peer5 HLS P2P" [ref=e289]
+                        - image
+                  - row
+                    - cell "186620 Select Deep Video Analytics" [ref=e158]
+                      - StaticText "186620"
+                      - checkbox "Select Deep Video Analytics" [checked=false, ref=e290]
+                    - cell "Deep Video Analytics" [ref=e159]
+                      - StaticText "Deep Video Analytics"
+                    - cell "Media Tools" [ref=e160]
+                    - cell
+                    - cell "Feature on the home page: Deep Video Analytics" [ref=e161]
+                      - button "Feature on the home page: Deep Video Analytics" [ref=e291]
+                        - StaticText "—"
+                    - cell "View Deep Video Analytics Edit Deep Video Analytics Delete Deep Video Analytics" [ref=e162]
+                      - link "View Deep Video Analytics" [ref=e292]
+                        - StaticText "View"
+                      - button "Edit Deep Video Analytics" [ref=e293]
+                        - StaticText "Edit"
+                      - button "Delete Deep Video Analytics" [ref=e294]
+                        - image
+                  - row
+                    - cell "186611 Select RTSP Simple Server" [ref=e163]
+                      - StaticText "186611"
+                      - checkbox "Select RTSP Simple Server" [checked=false, ref=e295]
+                    - cell "RTSP Simple Server" [ref=e164]
+                      - StaticText "RTSP Simple Server"
+                    - cell "Infrastructure & Delivery" [ref=e165]
+                    - cell
+                    - cell "Feature on the home page: RTSP Simple Server" [ref=e166]
+                      - button "Feature on the home page: RTSP Simple Server" [ref=e296]
+                        - StaticText "—"
+                    - cell "View RTSP Simple Server Edit RTSP Simple Server Delete RTSP Simple Server" [ref=e167]
+                      - link "View RTSP Simple Server" [ref=e297]
+                        - StaticText "View"
+                      - button "Edit RTSP Simple Server" [ref=e298]
+                        - StaticText "Edit"
+                      - button "Delete RTSP Simple Server" [ref=e299]
+                        - image
+                  - row
+                    - cell "186594 Select CTVideoPlayerView" [ref=e168]
+                      - StaticText "186594"
+                      - checkbox "Select CTVideoPlayerView" [checked=false, ref=e300]
+                    - cell "CTVideoPlayerView" [ref=e169]
+                      - StaticText "CTVideoPlayerView"
+                    - cell "Players & Clients" [ref=e170]
+                    - cell
+                    - cell "Feature on the home page: CTVideoPlayerView" [ref=e171]
+                      - button "Feature on the home page: CTVideoPlayerView" [ref=e301]
+                        - StaticText "—"
+                    - cell "View CTVideoPlayerView Edit CTVideoPlayerView Delete CTVideoPlayerView" [ref=e172]
+                      - link "View CTVideoPlayerView" [ref=e302]
+                        - StaticText "View"
+                      - button "Edit CTVideoPlayerView" [ref=e303]
+                        - StaticText "Edit"
+                      - button "Delete CTVideoPlayerView" [ref=e304]
+                        - image
+                  - row
+                    - cell "186559 Select BBC Dirac (SMPTE VC-2)" [ref=e173]
+                      - StaticText "186559"
+                      - checkbox "Select BBC Dirac (SMPTE VC-2)" [checked=false, ref=e305]
+                    - cell "BBC Dirac (SMPTE VC-2)" [ref=e174]
+                      - StaticText "BBC Dirac (SMPTE VC-2)"
+                    - cell "Encoding & Codecs" [ref=e175]
+                    - cell
+                    - cell "Feature on the home page: BBC Dirac (SMPTE VC-2)" [ref=e176]
+                      - button "Feature on the home page: BBC Dirac (SMPTE VC-2)" [ref=e306]
+                        - StaticText "—"
+                    - cell "View BBC Dirac (SMPTE VC-2) Edit BBC Dirac (SMPTE VC-2) Delete BBC Dirac (SMPTE VC-2)" [ref=e177]
+                      - link "View BBC Dirac (SMPTE VC-2)" [ref=e307]
+                        - StaticText "View"
+                      - button "Edit BBC Dirac (SMPTE VC-2)" [ref=e308]
+                        - StaticText "Edit"
+                      - button "Delete BBC Dirac (SMPTE VC-2)" [ref=e309]
+                        - image
+                  - row
+                    - cell "186552 Select Open Broadcast Encoder (OBE)" [ref=e178]
+                      - StaticText "186552"
+                      - checkbox "Select Open Broadcast Encoder (OBE)" [checked=false, ref=e310]
+                    - cell "Open Broadcast Encoder (OBE)" [ref=e179]
+                      - StaticText "Open Broadcast Encoder (OBE)"
+                    - cell "Encoding & Codecs" [ref=e180]
+                    - cell
+                    - cell "Feature on the home page: Open Broadcast Encoder (OBE)" [ref=e181]
+                      - button "Feature on the home page: Open Broadcast Encoder (OBE)" [ref=e311]
+                        - StaticText "—"
+                    - cell "View Open Broadcast Encoder (OBE) Edit Open Broadcast Encoder (OBE) Delete Open Broadcast Encoder (OBE)" [ref=e182]
+                      - link "View Open Broadcast Encoder (OBE)" [ref=e312]
+                        - StaticText "View"
+                      - button "Edit Open Broadcast Encoder (OBE)" [ref=e313]
+                        - StaticText "Edit"
+                      - button "Delete Open Broadcast Encoder (OBE)" [ref=e314]
+                        - image
+                  - row
+                    - cell "186551 Select Libav" [ref=e183]
+                      - StaticText "186551"
+                      - checkbox "Select Libav" [checked=false, ref=e315]
+                    - cell "Libav" [ref=e184]
+                      - StaticText "Libav"
+                    - cell "Encoding & Codecs" [ref=e185]
+                    - cell "FFMPEG LIBRARY" [ref=e186]
+                      - StaticText "FFMPEG"
+                      - StaticText "LIBRARY"
+                    - cell "Feature on the home page: Libav" [ref=e187]
+                      - button "Feature on the home page: Libav" [ref=e316]
+                        - StaticText "—"
+                    - cell "View Libav Edit Libav Delete Libav" [ref=e188]
+                      - link "View Libav" [ref=e317]
+                        - StaticText "View"
+                      - button "Edit Libav" [ref=e318]
+                        - StaticText "Edit"
+                      - button "Delete Libav" [ref=e319]
+                        - image
+                  - row
+                    - cell "186550 Select RepairTools (AVI & MKV)" [ref=e189]
+                      - StaticText "186550"
+                      - checkbox "Select RepairTools (AVI & MKV)" [checked=false, ref=e320]
+                    - cell "RepairTools (AVI & MKV)" [ref=e190]
+                      - StaticText "RepairTools (AVI & MKV)"
+                    - cell "Media Tools" [ref=e191]
+                    - cell
+                    - cell "Feature on the home page: RepairTools (AVI & MKV)" [ref=e192]
+                      - button "Feature on the home page: RepairTools (AVI & MKV)" [ref=e321]
+                        - StaticText "—"
+                    - cell "View RepairTools (AVI & MKV) Edit RepairTools (AVI & MKV) Delete RepairTools (AVI & MKV)" [ref=e193]
+                      - link "View RepairTools (AVI & MKV)" [ref=e322]
+                        - StaticText "View"
+                      - button "Edit RepairTools (AVI & MKV)" [ref=e323]
+                        - StaticText "Edit"
+                      - button "Delete RepairTools (AVI & MKV)" [ref=e324]
+                        - image
+              - StaticText "Showing 1 - 25 of 147 resources"
+              - combobox "Rows per page" [expanded=false, ref=e40]: 25 / page
+                - generic [ref=e51] clickable [cursor:pointer, onclick]
+                  - StaticText "25 / page"
+              - navigation "Pagination" [ref=e41]
+                - generic [disabled]
+                  - image
+                  - StaticText "Previous"
+                - link "Page 1, current page" [ref=e52]
+                  - StaticText "1"
+                - link "Go to page 2" [ref=e53]
+                  - StaticText "2"
+                - link "Go to page 3" [ref=e54]
+                  - StaticText "3"
+                - link "Go to page 4" [ref=e55]
+                  - StaticText "4"
+                - link "Go to page 5" [ref=e56]
+                  - StaticText "5"
+                - link "Go to page 6" [ref=e57]
+                  - StaticText "6"
+                - link "Next" [ref=e58]
+                  - StaticText "Next"
+                  - image
+                - StaticText "Page "
+                - StaticText "1"
+                - StaticText " of "
+                - StaticText "6"
+                - status

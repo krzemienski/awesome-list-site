@@ -1,0 +1,979 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer] [href="http://127.0.0.1:5122/search?q=hls#main"]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 1,949 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 1,949 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 1,949 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer] [href="http://127.0.0.1:5122/categories"]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer] [href="http://127.0.0.1:5122/submit"]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer] [href="http://127.0.0.1:5122/about"]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer] [href="http://127.0.0.1:5122/design-system"]:
+            - /url: /design-system
+        - button "Sign in, account menu" [ref=e24] [cursor=pointer]:
+          - img [ref=e26]
+          - generic [ref=e29]: Sign in
+          - generic [ref=e30]: Sign in, account menu
+      - generic [ref=e32]:
+        - main [ref=e33]:
+          - generic [ref=e34]:
+            - navigation "Breadcrumb" [ref=e35]:
+              - list [ref=e36]:
+                - listitem [ref=e37]:
+                  - link "Home" [ref=e38] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+                    - /url: /
+                - listitem [ref=e39]:
+                  - img [ref=e40]
+                - listitem:
+                  - link "Search" [disabled]
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - img [ref=e45]
+                  - generic [ref=e48]:
+                    - heading "Search" [level=1] [ref=e49]
+                    - paragraph [ref=e50]: A precise index of tools, standards, and ideas for video developers.
+                - generic [ref=e51]:
+                  - generic [ref=e52]:
+                    - img [ref=e53]
+                    - textbox "Search resources" [active] [ref=e56]:
+                      - /placeholder: Search resources...
+                      - text: hls
+                  - generic [ref=e57]:
+                    - generic [ref=e58]: Sort
+                    - combobox "Sort results" [ref=e59] [cursor=pointer]:
+                      - generic: Relevance
+                      - img [ref=e60]
+              - generic [ref=e62]:
+                - complementary [ref=e63]:
+                  - generic [ref=e64]:
+                    - generic [ref=e66]:
+                      - paragraph [ref=e67]: Narrow results
+                      - paragraph [ref=e68]: Counts update for this combination.
+                    - group "Category" [ref=e69]:
+                      - generic [ref=e70]: Category
+                      - generic [ref=e71]:
+                        - button "Protocols & Transport, 97 results" [ref=e72] [cursor=pointer]:
+                          - generic [ref=e74]: Protocols & Transport
+                          - generic [ref=e75]: "97"
+                        - button "Players & Clients, 24 results" [ref=e76] [cursor=pointer]:
+                          - generic [ref=e78]: Players & Clients
+                          - generic [ref=e79]: "24"
+                        - button "Infrastructure & Delivery, 21 results" [ref=e80] [cursor=pointer]:
+                          - generic [ref=e82]: Infrastructure & Delivery
+                          - generic [ref=e83]: "21"
+                        - button "Encoding & Codecs, 15 results" [ref=e84] [cursor=pointer]:
+                          - generic [ref=e86]: Encoding & Codecs
+                          - generic [ref=e87]: "15"
+                        - button "Intro & Learning, 13 results" [ref=e88] [cursor=pointer]:
+                          - generic [ref=e90]: Intro & Learning
+                          - generic [ref=e91]: "13"
+                        - button "Media Tools, 9 results" [ref=e92] [cursor=pointer]:
+                          - generic [ref=e94]: Media Tools
+                          - generic [ref=e95]: "9"
+                        - button "General Tools, 5 results" [ref=e96] [cursor=pointer]:
+                          - generic [ref=e98]: General Tools
+                          - generic [ref=e99]: "5"
+                        - button "Standards & Industry, 3 results" [ref=e100] [cursor=pointer]:
+                          - generic [ref=e102]: Standards & Industry
+                          - generic [ref=e103]: "3"
+                        - button "Community & Events, 2 results" [ref=e104] [cursor=pointer]:
+                          - generic [ref=e106]: Community & Events
+                          - generic [ref=e107]: "2"
+                    - group [ref=e108]:
+                      - generic "Subcategory" [ref=e109] [cursor=pointer]:
+                        - img [ref=e110]
+                        - text: Subcategory
+                    - group [ref=e112]:
+                      - generic "Sub-subcategory" [ref=e113] [cursor=pointer]:
+                        - img [ref=e114]
+                        - text: Sub-subcategory
+                    - group [ref=e116]:
+                      - generic "Tags" [ref=e117] [cursor=pointer]:
+                        - img [ref=e118]
+                        - text: Tags
+                - region "Search results" [ref=e120]:
+                  - paragraph [ref=e121]: Page 1 of 8 · showing 1–24 of 189 results for “hls”
+                  - generic [ref=e122]:
+                    - article [ref=e123] [cursor=pointer]:
+                      - generic [ref=e124]:
+                        - generic [ref=e125]:
+                          - generic [ref=e126]: ▣
+                          - generic [ref=e128]:
+                            - 'button "Favorite to your account — sign in required: hlsjs-p2p-engine" [ref=e129]':
+                              - generic [ref=e130]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: hlsjs-p2p-engine" [ref=e131]':
+                              - generic [ref=e132]:
+                                - img
+                        - heading "hlsjs-p2p-engine" [level=2] [ref=e134]:
+                          - link "hlsjs-p2p-engine" [ref=e135] [href="http://127.0.0.1:5122/resource/777"]:
+                            - /url: /resource/777
+                        - paragraph [ref=e136]: hlsjs-p2p-engine enhances video streaming scalability by implementing WebRTC data channels to create a peer-to-peer (P2P) network overlaying existing CDNs or origin servers. Compatible with hls.js, it supports both live and VOD streams over the HLS protocol and integrates seamlessly with popular HTML5 players like video.js, JWPlayer, and Flowplayer. This approach reduces server load and bandwidth costs while improving streaming performance, offering developers an innovative solution for efficient and scalable video delivery.
+                      - generic [ref=e137]:
+                        - generic [ref=e138]:
+                          - link "View details for hlsjs-p2p-engine" [ref=e139] [href="http://127.0.0.1:5122/resource/777"]:
+                            - /url: /resource/777
+                            - generic [ref=e140]:
+                              - img [ref=e141]
+                              - generic [ref=e143]: View Details
+                          - generic [ref=e144]: Infrastructure & Delivery
+                        - generic [ref=e145]:
+                          - link "Open Link hlsjs-p2p-engine (opens in new tab)" [ref=e146] [href="https://cdnbye.github.io/hlsjs-p2p-engine/"]:
+                            - /url: https://cdnbye.github.io/hlsjs-p2p-engine/
+                            - img
+                            - generic [ref=e147]: Open Link
+                            - generic [ref=e148]: hlsjs-p2p-engine (opens in new tab)
+                          - 'button "Suggest an edit: hlsjs-p2p-engine" [ref=e149]':
+                            - img
+                    - article [ref=e150] [cursor=pointer]:
+                      - generic [ref=e151]:
+                        - generic [ref=e152]:
+                          - generic [ref=e153]: ▤
+                          - generic [ref=e155]:
+                            - 'button "Favorite to your account — sign in required: hls.js Low-Latency Playlist Simulator" [ref=e156]':
+                              - generic [ref=e157]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: hls.js Low-Latency Playlist Simulator" [ref=e158]':
+                              - generic [ref=e159]:
+                                - img
+                        - heading "hls.js Low-Latency Playlist Simulator" [level=2] [ref=e161]:
+                          - link "hls.js Low-Latency Playlist Simulator" [ref=e162] [href="http://127.0.0.1:5122/resource/1706"]:
+                            - /url: /resource/1706
+                        - paragraph [ref=e163]: An online demo environment for hls.js where one can input a Low-Latency HLS playlist URL to test playback. Useful for testing LL-HLS streams in a real player implementation and observing buffering and timing behaviors.
+                      - generic [ref=e164]:
+                        - generic [ref=e165]:
+                          - link "View details for hls.js Low-Latency Playlist Simulator" [ref=e166] [href="http://127.0.0.1:5122/resource/1706"]:
+                            - /url: /resource/1706
+                            - generic [ref=e167]:
+                              - img [ref=e168]
+                              - generic [ref=e170]: View Details
+                          - generic [ref=e171]: Intro & Learning
+                        - generic [ref=e172]:
+                          - link "Open Link hls.js Low-Latency Playlist Simulator (opens in new tab)" [ref=e173] [href="https://hls-js.netlify.app/demo/?src=LL-HLS_URL"]:
+                            - /url: https://hls-js.netlify.app/demo/?src=LL-HLS_URL
+                            - img
+                            - generic [ref=e174]: Open Link
+                            - generic [ref=e175]: hls.js Low-Latency Playlist Simulator (opens in new tab)
+                          - 'button "Suggest an edit: hls.js Low-Latency Playlist Simulator" [ref=e176]':
+                            - img
+                    - article [ref=e177] [cursor=pointer]:
+                      - generic [ref=e178]:
+                        - generic [ref=e179]:
+                          - generic [ref=e180]: ⟁
+                          - generic [ref=e182]:
+                            - 'button "Favorite to your account — sign in required: hls-dash-dl" [ref=e183]':
+                              - generic [ref=e184]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: hls-dash-dl" [ref=e185]':
+                              - generic [ref=e186]:
+                                - img
+                        - heading "hls-dash-dl" [level=2] [ref=e188]:
+                          - link "hls-dash-dl" [ref=e189] [href="http://127.0.0.1:5122/resource/292"]:
+                            - /url: /resource/292
+                        - paragraph [ref=e190]: hls-dash-dl is a tool for downloading HLS (.m3u8) and DASH (.mpd) video streams. It supports multiple audio and subtitle tracks, and provides options for quality selection and decryption of encrypted streams.
+                      - generic [ref=e191]:
+                        - generic [ref=e192]:
+                          - link "View details for hls-dash-dl" [ref=e193] [href="http://127.0.0.1:5122/resource/292"]:
+                            - /url: /resource/292
+                            - generic [ref=e194]:
+                              - img [ref=e195]
+                              - generic [ref=e197]: View Details
+                          - generic [ref=e198]: Protocols & Transport
+                        - generic [ref=e199]:
+                          - link "Open Link hls-dash-dl (opens in new tab)" [ref=e200] [href="https://github.com/ssnangua/hls-dash-dl"]:
+                            - /url: https://github.com/ssnangua/hls-dash-dl
+                            - img
+                            - generic [ref=e201]: Open Link
+                            - generic [ref=e202]: hls-dash-dl (opens in new tab)
+                          - 'button "Suggest an edit: hls-dash-dl" [ref=e203]':
+                            - img
+                    - article [ref=e204] [cursor=pointer]:
+                      - generic [ref=e205]:
+                        - generic [ref=e206]:
+                          - generic [ref=e207]: ▣
+                          - generic [ref=e209]:
+                            - 'button "Favorite to your account — sign in required: HTTP Live Streaming (HLS)" [ref=e210]':
+                              - generic [ref=e211]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: HTTP Live Streaming (HLS)" [ref=e212]':
+                              - generic [ref=e213]:
+                                - img
+                        - heading "HTTP Live Streaming (HLS)" [level=2] [ref=e215]:
+                          - link "HTTP Live Streaming (HLS)" [ref=e216] [href="http://127.0.0.1:5122/resource/556"]:
+                            - /url: /resource/556
+                        - paragraph [ref=e217]: HTTP Live Streaming (HLS) is an HTTP-based adaptive bitrate streaming protocol developed by Apple Inc. It allows for the delivery of live and on-demand content by breaking the media into small segments and serving them over HTTP. HLS supports encryption and secure key distribution, providing a simple DRM system. It is widely supported across various devices and platforms, making it a popular choice for streaming media content. HLS enables adaptive bitrate streaming, adjusting the quality of the stream based on network conditions and device capabilities to provide a seamless viewing experience.
+                      - generic [ref=e218]:
+                        - generic [ref=e219]:
+                          - link "View details for HTTP Live Streaming (HLS)" [ref=e220] [href="http://127.0.0.1:5122/resource/556"]:
+                            - /url: /resource/556
+                            - generic [ref=e221]:
+                              - img [ref=e222]
+                              - generic [ref=e224]: View Details
+                          - generic [ref=e225]: Infrastructure & Delivery
+                        - generic [ref=e226]:
+                          - link "Open Link HTTP Live Streaming (HLS) (opens in new tab)" [ref=e227] [href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming"]:
+                            - /url: https://en.wikipedia.org/wiki/HTTP_Live_Streaming
+                            - img
+                            - generic [ref=e228]: Open Link
+                            - generic [ref=e229]: HTTP Live Streaming (HLS) (opens in new tab)
+                          - 'button "Suggest an edit: HTTP Live Streaming (HLS)" [ref=e230]':
+                            - img
+                    - article [ref=e231] [cursor=pointer]:
+                      - generic [ref=e232]:
+                        - generic [ref=e233]:
+                          - generic [ref=e234]: ⟁
+                          - generic [ref=e236]:
+                            - 'button "Favorite to your account — sign in required: Guide to Mobile Video Streaming with HLS" [ref=e237]':
+                              - generic [ref=e238]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Guide to Mobile Video Streaming with HLS" [ref=e239]':
+                              - generic [ref=e240]:
+                                - img
+                        - heading "Guide to Mobile Video Streaming with HLS" [level=2] [ref=e242]:
+                          - link "Guide to Mobile Video Streaming with HLS" [ref=e243] [href="http://127.0.0.1:5122/resource/1102"]:
+                            - /url: /resource/1102
+                        - paragraph [ref=e244]: HTTP Live Streaming, also known as HLS, is the most common format used today for streaming video. If you're building a video streaming application today, you should probably use HLS. Apple created the HLS standard in 2009, and it is the required streaming format for iOS devices. Since then, Android
+                      - generic [ref=e245]:
+                        - generic [ref=e246]:
+                          - link "View details for Guide to Mobile Video Streaming with HLS" [ref=e247] [href="http://127.0.0.1:5122/resource/1102"]:
+                            - /url: /resource/1102
+                            - generic [ref=e248]:
+                              - img [ref=e249]
+                              - generic [ref=e251]: View Details
+                          - generic [ref=e252]: Protocols & Transport
+                        - generic [ref=e253]:
+                          - link "Open Link Guide to Mobile Video Streaming with HLS (opens in new tab)" [ref=e254] [href="https://mux.com/blog/mobile-hls-guide/"]:
+                            - /url: https://mux.com/blog/mobile-hls-guide/
+                            - img
+                            - generic [ref=e255]: Open Link
+                            - generic [ref=e256]: Guide to Mobile Video Streaming with HLS (opens in new tab)
+                          - 'button "Suggest an edit: Guide to Mobile Video Streaming with HLS" [ref=e257]':
+                            - img
+                    - article [ref=e258] [cursor=pointer]:
+                      - generic [ref=e259]:
+                        - generic [ref=e260]:
+                          - generic [ref=e261]: ▤
+                          - generic [ref=e263]:
+                            - 'button "Favorite to your account — sign in required: wasp-hls" [ref=e264]':
+                              - generic [ref=e265]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: wasp-hls" [ref=e266]':
+                              - generic [ref=e267]:
+                                - img
+                        - heading "wasp-hls" [level=2] [ref=e269]:
+                          - link "wasp-hls" [ref=e270] [href="http://127.0.0.1:5122/resource/45"]:
+                            - /url: /resource/45
+                        - paragraph [ref=e271]: wasp-hls is a WebAssembly-based HLS media player written in Rust that runs primarily in a Web Worker. It aims to reduce the impact of heavy UI on playback performance and serves as a proof of concept for in-worker media buffering.
+                      - generic [ref=e272]:
+                        - generic [ref=e273]:
+                          - link "View details for wasp-hls" [ref=e274] [href="http://127.0.0.1:5122/resource/45"]:
+                            - /url: /resource/45
+                            - generic [ref=e275]:
+                              - img [ref=e276]
+                              - generic [ref=e278]: View Details
+                          - generic [ref=e279]: Intro & Learning
+                        - generic [ref=e280]:
+                          - link "Open Link wasp-hls (opens in new tab)" [ref=e281] [href="https://git.histb.com/peaBerberian/wasp-hls"]:
+                            - /url: https://git.histb.com/peaBerberian/wasp-hls
+                            - img
+                            - generic [ref=e282]: Open Link
+                            - generic [ref=e283]: wasp-hls (opens in new tab)
+                          - 'button "Suggest an edit: wasp-hls" [ref=e284]':
+                            - img
+                    - article [ref=e285] [cursor=pointer]:
+                      - generic [ref=e286]:
+                        - generic [ref=e287]:
+                          - generic [ref=e288]: ⟁
+                          - generic [ref=e290]:
+                            - 'button "Favorite to your account — sign in required: HLS | Bento4" [ref=e291]':
+                              - generic [ref=e292]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: HLS | Bento4" [ref=e293]':
+                              - generic [ref=e294]:
+                                - img
+                        - heading "HLS | Bento4" [level=2] [ref=e296]:
+                          - link "HLS | Bento4" [ref=e297] [href="http://127.0.0.1:5122/resource/1088"]:
+                            - /url: /resource/1088
+                        - paragraph [ref=e298]: A tool or resource for hls-tools.
+                      - generic [ref=e299]:
+                        - generic [ref=e300]:
+                          - link "View details for HLS | Bento4" [ref=e301] [href="http://127.0.0.1:5122/resource/1088"]:
+                            - /url: /resource/1088
+                            - generic [ref=e302]:
+                              - img [ref=e303]
+                              - generic [ref=e305]: View Details
+                          - generic [ref=e306]: Protocols & Transport
+                          - generic [ref=e307]: Tools & SDKs
+                        - generic [ref=e308]:
+                          - link "Open Link HLS | Bento4 (opens in new tab)" [ref=e309] [href="https://www.bento4.com/developers/hls/"]:
+                            - /url: https://www.bento4.com/developers/hls/
+                            - img
+                            - generic [ref=e310]: Open Link
+                            - generic [ref=e311]: HLS | Bento4 (opens in new tab)
+                          - 'button "Suggest an edit: HLS | Bento4" [ref=e312]':
+                            - img
+                    - article [ref=e313] [cursor=pointer]:
+                      - generic [ref=e314]:
+                        - generic [ref=e315]:
+                          - generic [ref=e316]: ⟁
+                          - generic [ref=e318]:
+                            - 'button "Favorite to your account — sign in required: Apple HLS Tools" [ref=e319]':
+                              - generic [ref=e320]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Apple HLS Tools" [ref=e321]':
+                              - generic [ref=e322]:
+                                - img
+                        - heading "Apple HLS Tools" [level=2] [ref=e324]:
+                          - link "Apple HLS Tools" [ref=e325] [href="http://127.0.0.1:5122/resource/1551"]:
+                            - /url: /resource/1551
+                        - paragraph [ref=e326]: Apple's HLS Tools assist developers in creating and validating HTTP Live Streaming (HLS) content for Apple devices.
+                      - generic [ref=e327]:
+                        - generic [ref=e328]:
+                          - link "View details for Apple HLS Tools" [ref=e329] [href="http://127.0.0.1:5122/resource/1551"]:
+                            - /url: /resource/1551
+                            - generic [ref=e330]:
+                              - img [ref=e331]
+                              - generic [ref=e333]: View Details
+                          - generic [ref=e334]: Protocols & Transport
+                          - generic [ref=e335]: Tools & SDKs
+                        - generic [ref=e336]:
+                          - link "Open Link Apple HLS Tools (opens in new tab)" [ref=e337] [href="https://developer.apple.com/documentation/http-live-streaming/using-apple-s-http-live-streaming-hls-tools"]:
+                            - /url: https://developer.apple.com/documentation/http-live-streaming/using-apple-s-http-live-streaming-hls-tools
+                            - img
+                            - generic [ref=e338]: Open Link
+                            - generic [ref=e339]: Apple HLS Tools (opens in new tab)
+                          - 'button "Suggest an edit: Apple HLS Tools" [ref=e340]':
+                            - img
+                    - article [ref=e341] [cursor=pointer]:
+                      - generic [ref=e342]:
+                        - generic [ref=e343]:
+                          - generic [ref=e344]: ⟁
+                          - generic [ref=e346]:
+                            - 'button "Favorite to your account — sign in required: Mux HLS Streams" [ref=e347]':
+                              - generic [ref=e348]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Mux HLS Streams" [ref=e349]':
+                              - generic [ref=e350]:
+                                - img
+                        - heading "Mux HLS Streams" [level=2] [ref=e352]:
+                          - link "Mux HLS Streams" [ref=e353] [href="http://127.0.0.1:5122/resource/1554"]:
+                            - /url: /resource/1554
+                        - paragraph [ref=e354]: Mux offers a set of test HLS streams, primarily used by hls.js and hosted by Mux, for testing and development.
+                      - generic [ref=e355]:
+                        - generic [ref=e356]:
+                          - link "View details for Mux HLS Streams" [ref=e357] [href="http://127.0.0.1:5122/resource/1554"]:
+                            - /url: /resource/1554
+                            - generic [ref=e358]:
+                              - img [ref=e359]
+                              - generic [ref=e361]: View Details
+                          - generic [ref=e362]: Protocols & Transport
+                        - generic [ref=e363]:
+                          - link "Open Link Mux HLS Streams (opens in new tab)" [ref=e364] [href="https://test-streams.mux.dev/"]:
+                            - /url: https://test-streams.mux.dev/
+                            - img
+                            - generic [ref=e365]: Open Link
+                            - generic [ref=e366]: Mux HLS Streams (opens in new tab)
+                          - 'button "Suggest an edit: Mux HLS Streams" [ref=e367]':
+                            - img
+                    - article [ref=e368] [cursor=pointer]:
+                      - generic [ref=e369]:
+                        - generic [ref=e370]:
+                          - generic [ref=e371]: ⟁
+                          - generic [ref=e373]:
+                            - 'button "Favorite to your account — sign in required: HLS and Fragmented MP4" [ref=e374]':
+                              - generic [ref=e375]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: HLS and Fragmented MP4" [ref=e376]':
+                              - generic [ref=e377]:
+                                - img
+                        - heading "HLS and Fragmented MP4" [level=2] [ref=e379]:
+                          - link "HLS and Fragmented MP4" [ref=e380] [href="http://127.0.0.1:5122/resource/1010"]:
+                            - /url: /resource/1010
+                        - paragraph [ref=e381]: At WWDC 2016, Apple announced support for fragmented MP4 (fMP4) as an alternative to MPEG-TS, which prior to their announcement was the only supported format. So why use fragmented MP4 files? Well,…
+                      - generic [ref=e382]:
+                        - generic [ref=e383]:
+                          - link "View details for HLS and Fragmented MP4" [ref=e384] [href="http://127.0.0.1:5122/resource/1010"]:
+                            - /url: /resource/1010
+                            - generic [ref=e385]:
+                              - img [ref=e386]
+                              - generic [ref=e388]: View Details
+                          - generic [ref=e389]: Protocols & Transport
+                        - generic [ref=e390]:
+                          - link "Open Link HLS and Fragmented MP4 (opens in new tab)" [ref=e391] [href="https://hlsbook.net/hls-fragmented-mp4/"]:
+                            - /url: https://hlsbook.net/hls-fragmented-mp4/
+                            - img
+                            - generic [ref=e392]: Open Link
+                            - generic [ref=e393]: HLS and Fragmented MP4 (opens in new tab)
+                          - 'button "Suggest an edit: HLS and Fragmented MP4" [ref=e394]':
+                            - img
+                    - article [ref=e395] [cursor=pointer]:
+                      - generic [ref=e396]:
+                        - generic [ref=e397]:
+                          - generic [ref=e398]: ⟁
+                          - generic [ref=e400]:
+                            - 'button "Favorite to your account — sign in required: 515_hls_authoring_update" [ref=e401]':
+                              - generic [ref=e402]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 515_hls_authoring_update" [ref=e403]':
+                              - generic [ref=e404]:
+                                - img
+                        - heading "515_hls_authoring_update" [level=2] [ref=e406]:
+                          - link "515_hls_authoring_update" [ref=e407] [href="http://127.0.0.1:5122/resource/1245"]:
+                            - /url: /resource/1245
+                        - paragraph [ref=e408]: A tool or resource for hls-tools.
+                      - generic [ref=e409]:
+                        - generic [ref=e410]:
+                          - link "View details for 515_hls_authoring_update" [ref=e411] [href="http://127.0.0.1:5122/resource/1245"]:
+                            - /url: /resource/1245
+                            - generic [ref=e412]:
+                              - img [ref=e413]
+                              - generic [ref=e415]: View Details
+                          - generic [ref=e416]: Protocols & Transport
+                          - generic [ref=e417]: Tools & SDKs
+                        - generic [ref=e418]:
+                          - link "Open Link 515_hls_authoring_update (opens in new tab)" [ref=e419] [href="https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf"]:
+                            - /url: https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf
+                            - img
+                            - generic [ref=e420]: Open Link
+                            - generic [ref=e421]: 515_hls_authoring_update (opens in new tab)
+                          - 'button "Suggest an edit: 515_hls_authoring_update" [ref=e422]':
+                            - img
+                    - article [ref=e423] [cursor=pointer]:
+                      - generic [ref=e424]:
+                        - generic [ref=e425]:
+                          - generic [ref=e426]: ⟁
+                          - generic [ref=e428]:
+                            - 'button "Favorite to your account — sign in required: HLS (HTTP Live Streaming)" [ref=e429]':
+                              - generic [ref=e430]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: HLS (HTTP Live Streaming)" [ref=e431]':
+                              - generic [ref=e432]:
+                                - img
+                        - heading "HLS (HTTP Live Streaming)" [level=2] [ref=e434]:
+                          - link "HLS (HTTP Live Streaming)" [ref=e435] [href="http://127.0.0.1:5122/resource/465"]:
+                            - /url: /resource/465
+                        - paragraph [ref=e436]: HLS is a streaming protocol developed by Apple that delivers video content over HTTP. It is widely supported across various devices and platforms, making it a popular choice for delivering live and on-demand video content. HLS supports adaptive bitrate streaming, allowing for dynamic adjustment of video quality based on network conditions.
+                      - generic [ref=e437]:
+                        - generic [ref=e438]:
+                          - link "View details for HLS (HTTP Live Streaming)" [ref=e439] [href="http://127.0.0.1:5122/resource/465"]:
+                            - /url: /resource/465
+                            - generic [ref=e440]:
+                              - img [ref=e441]
+                              - generic [ref=e443]: View Details
+                          - generic [ref=e444]: Protocols & Transport
+                        - generic [ref=e445]:
+                          - link "Open Link HLS (HTTP Live Streaming) (opens in new tab)" [ref=e446] [href="https://developer.apple.com/streaming/"]:
+                            - /url: https://developer.apple.com/streaming/
+                            - img
+                            - generic [ref=e447]: Open Link
+                            - generic [ref=e448]: HLS (HTTP Live Streaming) (opens in new tab)
+                          - 'button "Suggest an edit: HLS (HTTP Live Streaming)" [ref=e449]':
+                            - img
+                    - article [ref=e450] [cursor=pointer]:
+                      - generic [ref=e451]:
+                        - generic [ref=e452]:
+                          - generic [ref=e453]: ⟁
+                          - generic [ref=e455]:
+                            - 'button "Favorite to your account — sign in required: 507_hls_authoring_for_airplay_2." [ref=e456]':
+                              - generic [ref=e457]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 507_hls_authoring_for_airplay_2." [ref=e458]':
+                              - generic [ref=e459]:
+                                - img
+                        - heading "507_hls_authoring_for_airplay_2." [level=2] [ref=e461]:
+                          - link "507_hls_authoring_for_airplay_2." [ref=e462] [href="http://127.0.0.1:5122/resource/1233"]:
+                            - /url: /resource/1233
+                        - paragraph [ref=e463]: A tool or resource for hls-tools.
+                      - generic [ref=e464]:
+                        - generic [ref=e465]:
+                          - link "View details for 507_hls_authoring_for_airplay_2." [ref=e466] [href="http://127.0.0.1:5122/resource/1233"]:
+                            - /url: /resource/1233
+                            - generic [ref=e467]:
+                              - img [ref=e468]
+                              - generic [ref=e470]: View Details
+                          - generic [ref=e471]: Protocols & Transport
+                          - generic [ref=e472]: Tools & SDKs
+                        - generic [ref=e473]:
+                          - link "Open Link 507_hls_authoring_for_airplay_2. (opens in new tab)" [ref=e474] [href="https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf"]:
+                            - /url: https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf
+                            - img
+                            - generic [ref=e475]: Open Link
+                            - generic [ref=e476]: 507_hls_authoring_for_airplay_2. (opens in new tab)
+                          - 'button "Suggest an edit: 507_hls_authoring_for_airplay_2." [ref=e477]':
+                            - img
+                    - article [ref=e478] [cursor=pointer]:
+                      - generic [ref=e479]:
+                        - generic [ref=e480]:
+                          - generic [ref=e481]: ⟁
+                          - generic [ref=e483]:
+                            - 'button "Favorite to your account — sign in required: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [ref=e484]':
+                              - generic [ref=e485]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [ref=e486]':
+                              - generic [ref=e487]:
+                                - img
+                        - heading "Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [level=2] [ref=e489]:
+                          - link "Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [ref=e490] [href="http://127.0.0.1:5122/resource/1235"]:
+                            - /url: /resource/1235
+                        - paragraph [ref=e491]: A tool or resource for hls-tools.
+                      - generic [ref=e492]:
+                        - generic [ref=e493]:
+                          - link "View details for Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [ref=e494] [href="http://127.0.0.1:5122/resource/1235"]:
+                            - /url: /resource/1235
+                            - generic [ref=e495]:
+                              - img [ref=e496]
+                              - generic [ref=e498]: View Details
+                          - generic [ref=e499]: Protocols & Transport
+                          - generic [ref=e500]: Standards
+                        - generic [ref=e501]:
+                          - link "Open Link Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation (opens in new tab)" [ref=e502] [href="https://developer.apple.com/documentation/http_live_streaming/protocol_extension_for_low-latency_hls_preliminary_specification#3291001"]:
+                            - /url: https://developer.apple.com/documentation/http_live_streaming/protocol_extension_for_low-latency_hls_preliminary_specification#3291001
+                            - img
+                            - generic [ref=e503]: Open Link
+                            - generic [ref=e504]: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation (opens in new tab)
+                          - 'button "Suggest an edit: Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation" [ref=e505]':
+                            - img
+                    - article [ref=e506] [cursor=pointer]:
+                      - generic [ref=e507]:
+                        - generic [ref=e508]:
+                          - generic [ref=e509]: ▶
+                          - generic [ref=e511]:
+                            - 'button "Favorite to your account — sign in required: OpenPlayerJS" [ref=e512]':
+                              - generic [ref=e513]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: OpenPlayerJS" [ref=e514]':
+                              - generic [ref=e515]:
+                                - img
+                        - heading "OpenPlayerJS" [level=2] [ref=e517]:
+                          - link "OpenPlayerJS" [ref=e518] [href="http://127.0.0.1:5122/resource/1695"]:
+                            - /url: /resource/1695
+                        - paragraph [ref=e519]: A lightweight open source video and audio player for the web. OpenPlayerJS supports modern streaming formats (HLS via hls.js, DASH via dash.js) and provides a clean UI that is easily customizable, aiming to be an easy-to-integrate solution.
+                      - generic [ref=e520]:
+                        - generic [ref=e521]:
+                          - link "View details for OpenPlayerJS" [ref=e522] [href="http://127.0.0.1:5122/resource/1695"]:
+                            - /url: /resource/1695
+                            - generic [ref=e523]:
+                              - img [ref=e524]
+                              - generic [ref=e526]: View Details
+                          - generic [ref=e527]: Players & Clients
+                        - generic [ref=e528]:
+                          - link "Open Link OpenPlayerJS (opens in new tab)" [ref=e529] [href="https://openplayerjs.io/"]:
+                            - /url: https://openplayerjs.io/
+                            - img
+                            - generic [ref=e530]: Open Link
+                            - generic [ref=e531]: OpenPlayerJS (opens in new tab)
+                          - 'button "Suggest an edit: OpenPlayerJS" [ref=e532]':
+                            - img
+                    - article [ref=e533] [cursor=pointer]:
+                      - generic [ref=e534]:
+                        - generic [ref=e535]:
+                          - generic [ref=e536]: ⟁
+                          - generic [ref=e538]:
+                            - 'button "Favorite to your account — sign in required: Peer5 HLS P2P" [ref=e539]':
+                              - generic [ref=e540]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Peer5 HLS P2P" [ref=e541]':
+                              - generic [ref=e542]:
+                                - img
+                        - heading "Peer5 HLS P2P" [level=2] [ref=e544]:
+                          - link "Peer5 HLS P2P" [ref=e545] [href="http://127.0.0.1:5122/resource/1919"]:
+                            - /url: /resource/1919
+                        - paragraph [ref=e546]: Peer5’s peer-to-peer content delivery solution for HLS streams. It uses WebRTC to distribute video segments among viewers to offload bandwidth from the CDN.
+                      - generic [ref=e547]:
+                        - generic [ref=e548]:
+                          - link "View details for Peer5 HLS P2P" [ref=e549] [href="http://127.0.0.1:5122/resource/1919"]:
+                            - /url: /resource/1919
+                            - generic [ref=e550]:
+                              - img [ref=e551]
+                              - generic [ref=e553]: View Details
+                          - generic [ref=e554]: Protocols & Transport
+                        - generic [ref=e555]:
+                          - link "Open Link Peer5 HLS P2P (opens in new tab)" [ref=e556] [href="https://docs.peer5.com/"]:
+                            - /url: https://docs.peer5.com/
+                            - img
+                            - generic [ref=e557]: Open Link
+                            - generic [ref=e558]: Peer5 HLS P2P (opens in new tab)
+                          - 'button "Suggest an edit: Peer5 HLS P2P" [ref=e559]':
+                            - img
+                    - article [ref=e560] [cursor=pointer]:
+                      - generic [ref=e561]:
+                        - generic [ref=e562]:
+                          - generic [ref=e563]: ⟁
+                          - generic [ref=e565]:
+                            - 'button "Favorite to your account — sign in required: MediaFlow Proxy" [ref=e566]':
+                              - generic [ref=e567]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: MediaFlow Proxy" [ref=e568]':
+                              - generic [ref=e569]:
+                                - img
+                        - heading "MediaFlow Proxy" [level=2] [ref=e571]:
+                          - link "MediaFlow Proxy" [ref=e572] [href="http://127.0.0.1:5122/resource/291"]:
+                            - /url: /resource/291
+                        - paragraph [ref=e573]: MediaFlow Proxy is a high-performance proxy server for streaming media, supporting HTTP(S), HLS, and MPEG-DASH with real-time DRM decryption. It can convert MPEG-DASH DRM-protected streams to decrypted HLS live streams in real-time, making it one of the fastest live decrypter servers available.
+                      - generic [ref=e574]:
+                        - generic [ref=e575]:
+                          - link "View details for MediaFlow Proxy" [ref=e576] [href="http://127.0.0.1:5122/resource/291"]:
+                            - /url: /resource/291
+                            - generic [ref=e577]:
+                              - img [ref=e578]
+                              - generic [ref=e580]: View Details
+                          - generic [ref=e581]: Protocols & Transport
+                        - generic [ref=e582]:
+                          - link "Open Link MediaFlow Proxy (opens in new tab)" [ref=e583] [href="https://github.com/mhdzumair/mediaflow-proxy"]:
+                            - /url: https://github.com/mhdzumair/mediaflow-proxy
+                            - img
+                            - generic [ref=e584]: Open Link
+                            - generic [ref=e585]: MediaFlow Proxy (opens in new tab)
+                          - 'button "Suggest an edit: MediaFlow Proxy" [ref=e586]':
+                            - img
+                    - article [ref=e587] [cursor=pointer]:
+                      - generic [ref=e588]:
+                        - generic [ref=e589]:
+                          - generic [ref=e590]: ⟁
+                          - generic [ref=e592]:
+                            - 'button "Favorite to your account — sign in required: muxinc/hlstools" [ref=e593]':
+                              - generic [ref=e594]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: muxinc/hlstools" [ref=e595]':
+                              - generic [ref=e596]:
+                                - img
+                        - heading "muxinc/hlstools" [level=2] [ref=e598]:
+                          - link "muxinc/hlstools" [ref=e599] [href="http://127.0.0.1:5122/resource/894"]:
+                            - /url: /resource/894
+                        - paragraph [ref=e600]: A tool or resource for hls-tools.
+                      - generic [ref=e601]:
+                        - generic [ref=e602]:
+                          - link "View details for muxinc/hlstools" [ref=e603] [href="http://127.0.0.1:5122/resource/894"]:
+                            - /url: /resource/894
+                            - generic [ref=e604]:
+                              - img [ref=e605]
+                              - generic [ref=e607]: View Details
+                          - generic [ref=e608]: Protocols & Transport
+                          - generic [ref=e609]: Tools & SDKs
+                        - generic [ref=e610]:
+                          - link "Open Link muxinc/hlstools (opens in new tab)" [ref=e611] [href="https://github.com/muxinc/hlstools"]:
+                            - /url: https://github.com/muxinc/hlstools
+                            - img
+                            - generic [ref=e612]: Open Link
+                            - generic [ref=e613]: muxinc/hlstools (opens in new tab)
+                          - 'button "Suggest an edit: muxinc/hlstools" [ref=e614]':
+                            - img
+                    - article [ref=e615] [cursor=pointer]:
+                      - generic [ref=e616]:
+                        - generic [ref=e617]:
+                          - generic [ref=e618]: ▶
+                          - generic [ref=e620]:
+                            - 'button "Favorite to your account — sign in required: Eyevinn/ott-multiview" [ref=e621]':
+                              - generic [ref=e622]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Eyevinn/ott-multiview" [ref=e623]':
+                              - generic [ref=e624]:
+                                - img
+                        - heading "Eyevinn/ott-multiview" [level=2] [ref=e626]:
+                          - link "Eyevinn/ott-multiview" [ref=e627] [href="http://127.0.0.1:5122/resource/1142"]:
+                            - /url: /resource/1142
+                        - paragraph [ref=e628]: This is a web based multiview screen for HLS and MPEG-DASH streams based on hls.js and Shaka Player. - Eyevinn/ott-multiview
+                      - generic [ref=e629]:
+                        - generic [ref=e630]:
+                          - link "View details for Eyevinn/ott-multiview" [ref=e631] [href="http://127.0.0.1:5122/resource/1142"]:
+                            - /url: /resource/1142
+                            - generic [ref=e632]:
+                              - img [ref=e633]
+                              - generic [ref=e635]: View Details
+                          - generic [ref=e636]: Players & Clients
+                        - generic [ref=e637]:
+                          - link "Open Link Eyevinn/ott-multiview (opens in new tab)" [ref=e638] [href="https://github.com/Eyevinn/ott-multiview"]:
+                            - /url: https://github.com/Eyevinn/ott-multiview
+                            - img
+                            - generic [ref=e639]: Open Link
+                            - generic [ref=e640]: Eyevinn/ott-multiview (opens in new tab)
+                          - 'button "Suggest an edit: Eyevinn/ott-multiview" [ref=e641]':
+                            - img
+                    - article [ref=e642] [cursor=pointer]:
+                      - generic [ref=e643]:
+                        - generic [ref=e644]:
+                          - generic [ref=e645]: ▣
+                          - generic [ref=e647]:
+                            - 'button "Favorite to your account — sign in required: P2P CDN SDK for JavaScript" [ref=e648]':
+                              - generic [ref=e649]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: P2P CDN SDK for JavaScript" [ref=e650]':
+                              - generic [ref=e651]:
+                                - img
+                        - heading "P2P CDN SDK for JavaScript" [level=2] [ref=e653]:
+                          - link "P2P CDN SDK for JavaScript" [ref=e654] [href="http://127.0.0.1:5122/resource/49"]:
+                            - /url: /resource/49
+                        - paragraph [ref=e655]: A free JavaScript SDK that reduces video streaming costs by up to 90% and improves scalability by 6x using WebRTC-based peer-to-peer technology. It supports major players like Hls.js, Shaka Player, and Video.js, and both HLS and DASH streaming protocols.
+                      - generic [ref=e656]:
+                        - generic [ref=e657]:
+                          - link "View details for P2P CDN SDK for JavaScript" [ref=e658] [href="http://127.0.0.1:5122/resource/49"]:
+                            - /url: /resource/49
+                            - generic [ref=e659]:
+                              - img [ref=e660]
+                              - generic [ref=e662]: View Details
+                          - generic [ref=e663]: Infrastructure & Delivery
+                        - generic [ref=e664]:
+                          - link "Open Link P2P CDN SDK for JavaScript (opens in new tab)" [ref=e665] [href="https://github.com/vadootvpeer/p2p-cdn-sdk-javascript"]:
+                            - /url: https://github.com/vadootvpeer/p2p-cdn-sdk-javascript
+                            - img
+                            - generic [ref=e666]: Open Link
+                            - generic [ref=e667]: P2P CDN SDK for JavaScript (opens in new tab)
+                          - 'button "Suggest an edit: P2P CDN SDK for JavaScript" [ref=e668]':
+                            - img
+                    - article [ref=e669] [cursor=pointer]:
+                      - generic [ref=e670]:
+                        - generic [ref=e671]:
+                          - generic [ref=e672]: ⟁
+                          - generic [ref=e674]:
+                            - 'button "Favorite to your account — sign in required: videojs/videojs-contrib-hls" [ref=e675]':
+                              - generic [ref=e676]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: videojs/videojs-contrib-hls" [ref=e677]':
+                              - generic [ref=e678]:
+                                - img
+                        - heading "videojs/videojs-contrib-hls" [level=2] [ref=e680]:
+                          - link "videojs/videojs-contrib-hls" [ref=e681] [href="http://127.0.0.1:5122/resource/260"]:
+                            - /url: /resource/260
+                        - paragraph [ref=e682]: An HLS library for video.js that enables HLS playback in environments where it's not natively supported. It integrates seamlessly with video.js, providing features like adaptive bitrate selection, AES-128 segment encryption, and support for multiple audio tracks.
+                      - generic [ref=e683]:
+                        - generic [ref=e684]:
+                          - link "View details for videojs/videojs-contrib-hls" [ref=e685] [href="http://127.0.0.1:5122/resource/260"]:
+                            - /url: /resource/260
+                            - generic [ref=e686]:
+                              - img [ref=e687]
+                              - generic [ref=e689]: View Details
+                          - generic [ref=e690]: Protocols & Transport
+                        - generic [ref=e691]:
+                          - link "Open Link videojs/videojs-contrib-hls (opens in new tab)" [ref=e692] [href="https://github.com/videojs/videojs-contrib-hls"]:
+                            - /url: https://github.com/videojs/videojs-contrib-hls
+                            - img
+                            - generic [ref=e693]: Open Link
+                            - generic [ref=e694]: videojs/videojs-contrib-hls (opens in new tab)
+                          - 'button "Suggest an edit: videojs/videojs-contrib-hls" [ref=e695]':
+                            - img
+                    - article [ref=e696] [cursor=pointer]:
+                      - generic [ref=e697]:
+                        - generic [ref=e698]:
+                          - generic [ref=e699]: ⟁
+                          - generic [ref=e701]:
+                            - 'button "Favorite to your account — sign in required: moorthy-g/adaptive-streaming" [ref=e702]':
+                              - generic [ref=e703]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: moorthy-g/adaptive-streaming" [ref=e704]':
+                              - generic [ref=e705]:
+                                - img
+                        - heading "moorthy-g/adaptive-streaming" [level=2] [ref=e707]:
+                          - link "moorthy-g/adaptive-streaming" [ref=e708] [href="http://127.0.0.1:5122/resource/464"]:
+                            - /url: /resource/464
+                        - paragraph [ref=e709]: A comprehensive overview and experimental project focusing on adaptive streaming technologies, specifically HLS and DASH. It covers content generation, playback across various browsers, and includes a Node.js module for creating multi-bitrate DASH and HLS content.
+                      - generic [ref=e710]:
+                        - generic [ref=e711]:
+                          - link "View details for moorthy-g/adaptive-streaming" [ref=e712] [href="http://127.0.0.1:5122/resource/464"]:
+                            - /url: /resource/464
+                            - generic [ref=e713]:
+                              - img [ref=e714]
+                              - generic [ref=e716]: View Details
+                          - generic [ref=e717]: Protocols & Transport
+                        - generic [ref=e718]:
+                          - link "Open Link moorthy-g/adaptive-streaming (opens in new tab)" [ref=e719] [href="https://github.com/moorthy-g/adaptive-streaming"]:
+                            - /url: https://github.com/moorthy-g/adaptive-streaming
+                            - img
+                            - generic [ref=e720]: Open Link
+                            - generic [ref=e721]: moorthy-g/adaptive-streaming (opens in new tab)
+                          - 'button "Suggest an edit: moorthy-g/adaptive-streaming" [ref=e722]':
+                            - img
+                    - article [ref=e723] [cursor=pointer]:
+                      - generic [ref=e724]:
+                        - generic [ref=e725]:
+                          - generic [ref=e726]: ⟁
+                          - generic [ref=e728]:
+                            - 'button "Favorite to your account — sign in required: python-ffmpeg-video-streaming" [ref=e729]':
+                              - generic [ref=e730]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: python-ffmpeg-video-streaming" [ref=e731]':
+                              - generic [ref=e732]:
+                                - img
+                        - heading "python-ffmpeg-video-streaming" [level=2] [ref=e734]:
+                          - link "python-ffmpeg-video-streaming" [ref=e735] [href="http://127.0.0.1:5122/resource/186"]:
+                            - /url: /resource/186
+                        - paragraph [ref=e736]: This Python package leverages FFmpeg to package media content for online streaming, supporting both DASH and HLS formats. It offers functionalities to implement DRM for HLS packaging and provides options to handle files from and to cloud storage. This tool is valuable for developers looking to integrate FFmpeg-based streaming solutions into their Python applications.
+                      - generic [ref=e737]:
+                        - generic [ref=e738]:
+                          - link "View details for python-ffmpeg-video-streaming" [ref=e739] [href="http://127.0.0.1:5122/resource/186"]:
+                            - /url: /resource/186
+                            - generic [ref=e740]:
+                              - img [ref=e741]
+                              - generic [ref=e743]: View Details
+                          - generic [ref=e744]: Protocols & Transport
+                        - generic [ref=e745]:
+                          - link "Open Link python-ffmpeg-video-streaming (opens in new tab)" [ref=e746] [href="https://github.com/quasarstream/python-ffmpeg-video-streaming"]:
+                            - /url: https://github.com/quasarstream/python-ffmpeg-video-streaming
+                            - img
+                            - generic [ref=e747]: Open Link
+                            - generic [ref=e748]: python-ffmpeg-video-streaming (opens in new tab)
+                          - 'button "Suggest an edit: python-ffmpeg-video-streaming" [ref=e749]':
+                            - img
+                    - article [ref=e750] [cursor=pointer]:
+                      - generic [ref=e751]:
+                        - generic [ref=e752]:
+                          - generic [ref=e753]: ⟁
+                          - generic [ref=e755]:
+                            - 'button "Favorite to your account — sign in required: 510_validating_http_live_streams." [ref=e756]':
+                              - generic [ref=e757]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 510_validating_http_live_streams." [ref=e758]':
+                              - generic [ref=e759]:
+                                - img
+                        - heading "510_validating_http_live_streams." [level=2] [ref=e761]:
+                          - link "510_validating_http_live_streams." [ref=e762] [href="http://127.0.0.1:5122/resource/1232"]:
+                            - /url: /resource/1232
+                        - paragraph [ref=e763]: A tool or resource for hls-tools.
+                      - generic [ref=e764]:
+                        - generic [ref=e765]:
+                          - link "View details for 510_validating_http_live_streams." [ref=e766] [href="http://127.0.0.1:5122/resource/1232"]:
+                            - /url: /resource/1232
+                            - generic [ref=e767]:
+                              - img [ref=e768]
+                              - generic [ref=e770]: View Details
+                          - generic [ref=e771]: Protocols & Transport
+                          - generic [ref=e772]: Tools & SDKs
+                        - generic [ref=e773]:
+                          - link "Open Link 510_validating_http_live_streams. (opens in new tab)" [ref=e774] [href="https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf"]:
+                            - /url: https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf
+                            - img
+                            - generic [ref=e775]: Open Link
+                            - generic [ref=e776]: 510_validating_http_live_streams. (opens in new tab)
+                          - 'button "Suggest an edit: 510_validating_http_live_streams." [ref=e777]':
+                            - img
+                  - navigation "Pagination" [ref=e778]:
+                    - generic [ref=e779]:
+                      - generic:
+                        - img
+                        - text: Previous
+                      - link "Page 1, current page" [ref=e780] [cursor=pointer] [href="http://127.0.0.1:5122/search?q=hls"]:
+                        - /url: /search?q=hls
+                        - text: "1"
+                      - link "Go to page 2" [ref=e781] [cursor=pointer] [href="http://127.0.0.1:5122/search?q=hls&page=2"]:
+                        - /url: /search?q=hls&page=2
+                        - text: "2"
+                      - generic [ref=e782]: …
+                      - link "Go to page 8" [ref=e783] [cursor=pointer] [href="http://127.0.0.1:5122/search?q=hls&page=8"]:
+                        - /url: /search?q=hls&page=8
+                        - text: "8"
+                      - link "Next" [ref=e784] [cursor=pointer] [href="http://127.0.0.1:5122/search?q=hls&page=2"]:
+                        - /url: /search?q=hls&page=2
+                        - text: Next
+                        - img
+                    - generic [ref=e785]:
+                      - generic [ref=e786]: Page 1 of 8
+                      - generic [ref=e787]:
+                        - generic [ref=e788] [cursor=pointer]: Go to page
+                        - textbox "Page number, 1 to 8" [ref=e789]: "1"
+                        - generic [ref=e790]: / 8
+                    - status [ref=e791]
+        - contentinfo [ref=e792]:
+          - generic [ref=e793]:
+            - generic [ref=e794]:
+              - paragraph [ref=e795]: ── INDEX
+              - link "awesome.video home" [ref=e796] [cursor=pointer] [href="http://127.0.0.1:5122/"]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e797]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e799]:
+              - heading "INDEXED" [level=2] [ref=e800]
+              - paragraph [ref=e801]: 1,949
+              - paragraph [ref=e802]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e803]: live
+            - navigation "Explore categories" [ref=e805]:
+              - heading "EXPLORE" [level=2] [ref=e806]
+              - generic [ref=e807]:
+                - link "Community & Events" [ref=e808] [cursor=pointer] [href="http://127.0.0.1:5122/category/community-events"]:
+                  - /url: /category/community-events
+                  - generic [ref=e809]: ◈
+                  - generic [ref=e810]: Community
+                - link "Encoding & Codecs" [ref=e811] [cursor=pointer] [href="http://127.0.0.1:5122/category/encoding-codecs"]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e812]: ◇
+                  - generic [ref=e813]: Encoding
+                - link "General Tools" [ref=e814] [cursor=pointer] [href="http://127.0.0.1:5122/category/general-tools"]:
+                  - /url: /category/general-tools
+                  - generic [ref=e815]: ◆
+                  - generic [ref=e816]: General
+                - link "Infrastructure & Delivery" [ref=e817] [cursor=pointer] [href="http://127.0.0.1:5122/category/infrastructure-delivery"]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e818]: ▣
+                  - generic [ref=e819]: Infrastructure
+                - link "Intro & Learning" [ref=e820] [cursor=pointer] [href="http://127.0.0.1:5122/category/intro-learning"]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e821]: ▤
+                  - generic [ref=e822]: Intro
+                - link "Media Tools" [ref=e823] [cursor=pointer] [href="http://127.0.0.1:5122/category/media-tools"]:
+                  - /url: /category/media-tools
+                  - generic [ref=e824]: ▥
+                  - generic [ref=e825]: Media
+                - link "Players & Clients" [ref=e826] [cursor=pointer] [href="http://127.0.0.1:5122/category/players-clients"]:
+                  - /url: /category/players-clients
+                  - generic [ref=e827]: ▶
+                  - generic [ref=e828]: Players
+                - link "Protocols & Transport" [ref=e829] [cursor=pointer] [href="http://127.0.0.1:5122/category/protocols-transport"]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e830]: ⟁
+                  - generic [ref=e831]: Protocols
+                - link "Standards & Industry" [ref=e832] [cursor=pointer] [href="http://127.0.0.1:5122/category/standards-industry"]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e833]: ◉
+                  - generic [ref=e834]: Standards
+            - generic [ref=e835]:
+              - heading "SOURCE" [level=2] [ref=e836]
+              - link "krzemienski/awesome-video" [ref=e837] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video"]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e838]
+                - generic [ref=e840]:
+                  - text: krzemienski
+                  - generic [ref=e841]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e842]: ↗
+              - paragraph [ref=e843]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e844] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md"]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+          - generic [ref=e845]:
+            - generic [ref=e846]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e847]:
+              - link "About" [ref=e848] [cursor=pointer] [href="http://127.0.0.1:5122/about"]:
+                - /url: /about
+              - link "Terms" [ref=e849] [cursor=pointer] [href="http://127.0.0.1:5122/terms"]:
+                - /url: /terms
+              - link "Privacy" [ref=e850] [cursor=pointer] [href="http://127.0.0.1:5122/privacy"]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e851] [cursor=pointer] [href="http://127.0.0.1:5122/code-of-conduct"]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - link "Issues ↗" [ref=e852] [cursor=pointer] [href="https://github.com/krzemienski/awesome-video/issues"]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e853] [cursor=pointer] [href="http://127.0.0.1:5122/sitemap.xml"]:
+                - /url: /sitemap.xml
+            - generic [ref=e854]: built with the awesome-list framework

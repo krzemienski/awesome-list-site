@@ -70,6 +70,19 @@ export interface ResourceFacetCount {
   count: number;
 }
 
+/** Every facet group a listing can count; also the accepted `?facets=` names. */
+export const RESOURCE_FACET_KINDS = [
+  "categories",
+  "subcategories",
+  "subSubcategories",
+  "tags",
+  "providers",
+  "formats",
+  "skillLevels",
+] as const;
+
+export type ResourceFacetKind = (typeof RESOURCE_FACET_KINDS)[number];
+
 export interface ResourceSearchFacets {
   categories: ResourceFacetCount[];
   subcategories: ResourceFacetCount[];

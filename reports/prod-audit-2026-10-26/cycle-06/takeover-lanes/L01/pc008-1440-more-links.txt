@@ -1,0 +1,24 @@
+✓ Done
+✓ Done
+✓ Done
+/submit -> "{\"url\":\"/submit\",\"open\":[false],\"ac\":\"Submit Resource\"}"
+✓ Done
+✓ Done
+✓ Done
+/journeys -> "{\"url\":\"/journeys\",\"open\":[false],\"ac\":\"Learning Journeys\"}"
+✓ Done
+✓ Done
+✓ Done
+/advanced -> "{\"url\":\"/advanced\",\"open\":[false],\"ac\":\"Advanced\"}"
+✓ Done
+✓ Done
+✓ Done
+/settings/theme -> "{\"url\":\"/settings/theme\",\"open\":[false],\"ac\":\"Theme\"}"
+✓ Done
+✓ Done
+✓ Done
+/?context=account -> "{\"url\":\"/?context=account\",\"open\":[false]}"
+✓ Done
+✓ Done
+✓ Done
+/about -> "{\"url\":\"/about\",\"open\":[false],\"ac\":\"About\"}"

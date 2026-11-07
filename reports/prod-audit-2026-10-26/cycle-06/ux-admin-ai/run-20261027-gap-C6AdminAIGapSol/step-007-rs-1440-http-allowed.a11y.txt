@@ -1,0 +1,326 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - navigation "Breadcrumb" [ref=e34]:
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - link "Home" [ref=e37] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e38]:
+                - img [ref=e39]
+              - listitem [ref=e41]:
+                - link "Admin" [ref=e42] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e43]:
+                - img [ref=e44]
+              - listitem:
+                - link "Researcher" [disabled]
+          - generic [ref=e46]: Authorized admin area
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e53]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e54]:
+                  - text: Operations
+                  - emphasis [ref=e55]: dashboard
+                - paragraph [ref=e56]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e57]:
+                - button "Settings" [ref=e58] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e59] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e60]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - tablist "Admin sections" [ref=e63]:
+                  - tab "Overview" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Overview
+                  - tab "Approvals" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                    - text: Approvals
+                  - tab "Edits" [ref=e73] [cursor=pointer]:
+                    - img [ref=e74]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e75] [cursor=pointer]:
+                    - img [ref=e76]
+                    - text: Enrichment
+                  - tab "Researcher" [selected] [ref=e78] [cursor=pointer]:
+                    - img [ref=e79]
+                    - text: Researcher
+                  - tab "Export" [ref=e81] [cursor=pointer]:
+                    - img [ref=e82]
+                    - text: Export
+                  - tab "Database" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Database
+                  - tab "Resources" [ref=e89] [cursor=pointer]:
+                    - img [ref=e90]
+                    - text: Resources
+                  - tab "Categories" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e94] [cursor=pointer]:
+                    - img [ref=e95]
+                    - text: Subcategories
+                  - tab "Users" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Users
+                  - tab "GitHub" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                    - text: Link Health
+                  - tab "Audit" [ref=e109] [cursor=pointer]:
+                    - img [ref=e110]
+                    - text: Audit
+                  - tab "Research" [ref=e111] [cursor=pointer]:
+                    - img [ref=e112]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115]
+              - tabpanel "Researcher" [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e122]:
+                      - heading "Run a research task" [level=3] [ref=e123]
+                      - paragraph [ref=e124]: "Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here."
+                      - generic [ref=e125]:
+                        - region "Brief" [ref=e126]:
+                          - generic [ref=e127]:
+                            - generic [ref=e128]: "1"
+                            - heading "Brief" [level=4] [ref=e129]
+                            - generic [ref=e130]: 41 characters
+                          - generic [ref=e131]:
+                            - radiogroup "Research brief" [ref=e132]:
+                              - generic [ref=e133] [cursor=pointer]:
+                                - radio "Auto-generate at launch A gap-aware brief built from the catalog and past runs." [ref=e134]
+                                - generic [ref=e135]:
+                                  - generic [ref=e136]: Auto-generate at launch
+                                  - generic [ref=e137]: A gap-aware brief built from the catalog and past runs.
+                              - generic [ref=e138] [cursor=pointer]:
+                                - radio "Write my own Describe what to search for, or start from a generated brief." [checked] [ref=e139]:
+                                  - img [ref=e141]
+                                - generic [ref=e143]:
+                                  - generic [ref=e144]: Write my own
+                                  - generic [ref=e145]: Describe what to search for, or start from a generated brief.
+                            - generic [ref=e146]:
+                              - generic [ref=e147]:
+                                - generic [ref=e148] [cursor=pointer]: Research brief
+                                - button "Start from a generated brief" [ref=e149] [cursor=pointer]:
+                                  - img
+                                  - text: Start from a generated brief
+                              - textbox "Research brief" [ref=e150]:
+                                - /placeholder: e.g. Find open-source AV1 encoders not yet in the index
+                                - text: Gap-closure read-only draft, not launched
+                              - paragraph [ref=e151]: 41 characters
+                        - region "Focus" [ref=e152]:
+                          - generic [ref=e153]:
+                            - generic [ref=e154]: "2"
+                            - heading "Focus" [level=4] [ref=e155]
+                            - generic [ref=e156]: All categories
+                          - combobox "Category focus" [ref=e158] [cursor=pointer]:
+                            - generic: All categories
+                            - img [ref=e159]
+                        - region "Limits" [ref=e161]:
+                          - generic [ref=e162]:
+                            - generic [ref=e163]: "3"
+                            - heading "Limits" [level=4] [ref=e164]
+                            - generic [ref=e165]: stop after 1 · no budget cap · no turn cap
+                          - generic [ref=e166]:
+                            - generic [ref=e167]:
+                              - generic [ref=e168]:
+                                - text: Stop after (discoveries)
+                                - spinbutton "Stop after (discoveries)" [ref=e169]: "1"
+                                - paragraph [ref=e170]: Stops after 1 new discovery.
+                              - generic [ref=e171]:
+                                - text: Budget cap (USD)
+                                - spinbutton "Budget cap (USD)" [ref=e172]
+                                - paragraph [ref=e173]: No cap — the run spends until it stops or you cancel it.
+                              - generic [ref=e174]:
+                                - text: Max turns
+                                - spinbutton "Max turns" [ref=e175]
+                                - paragraph [ref=e176]: No turn cap.
+                            - paragraph [ref=e177]: Past runs cost $0.15–$41.78. Discoveries are deduplicated against the 3,826 catalog resources.
+                        - region "Endpoint & model" [ref=e178]:
+                          - generic [ref=e179]:
+                            - generic [ref=e180]: "4"
+                            - heading "Endpoint & model" [level=4] [ref=e181]
+                            - generic [ref=e183]: 4 overrides
+                          - generic [ref=e184]:
+                            - button "Override endpoint or models (optional)" [expanded] [ref=e185] [cursor=pointer]:
+                              - text: Override endpoint or models (optional)
+                              - img
+                            - generic [ref=e186]:
+                              - generic [ref=e187]:
+                                - text: Orchestrator model
+                                - textbox "Orchestrator model" [ref=e188]:
+                                  - /placeholder: Blank = ANTHROPIC_MODEL
+                                  - text: audit/preview-orchestrator
+                              - generic [ref=e189]:
+                                - text: Scout model
+                                - textbox "Scout model" [ref=e190]:
+                                  - /placeholder: Blank = haiku tier
+                                  - text: audit/preview-scout
+                              - generic [ref=e191]:
+                                - text: Base URL
+                                - textbox "Base URL" [ref=e192]:
+                                  - /placeholder: Blank = ANTHROPIC_BASE_URL
+                                  - text: http://example.com/v1
+                                - paragraph [ref=e193]: A custom endpoint needs its own token below.
+                              - generic [ref=e194]:
+                                - text: Auth token
+                                - textbox "Auth token" [ref=e195]:
+                                  - /placeholder: Required with a base URL
+                                  - text: ••••••••••••••••••••••••
+                                - paragraph [ref=e196]: Encrypted at rest; only the last 4 characters are shown afterwards.
+                              - generic [ref=e197] [cursor=pointer]:
+                                - checkbox "Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it." [checked] [active] [ref=e198]:
+                                  - generic:
+                                    - img
+                                - generic [ref=e199]: Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.
+                        - region "About to run on" [ref=e200]:
+                          - generic [ref=e201]:
+                            - generic [ref=e202]: "5"
+                            - heading "About to run on" [level=4] [ref=e203]
+                          - generic [ref=e204]:
+                            - generic [ref=e206]:
+                              - generic [ref=e207]:
+                                - generic [ref=e208]:
+                                  - term [ref=e209]:
+                                    - text: Endpoint
+                                    - generic [ref=e210]: Override
+                                  - definition [ref=e211]:
+                                    - text: example.com
+                                    - generic [ref=e212]: · http
+                                - generic [ref=e213]:
+                                  - term [ref=e214]:
+                                    - text: Credential
+                                    - generic [ref=e215]: Override
+                                  - definition [ref=e216]: override token
+                                - generic [ref=e217]:
+                                  - term [ref=e218]:
+                                    - text: Orchestrator model
+                                    - generic [ref=e219]: Override
+                                  - definition [ref=e220]: audit/preview-orchestrator
+                                - generic [ref=e221]:
+                                  - term [ref=e222]:
+                                    - text: Scout model
+                                    - generic [ref=e223]: Override
+                                  - definition [ref=e224]:
+                                    - text: unresolved
+                                    - generic [ref=e225]: · override
+                              - alert [ref=e226]:
+                                - img [ref=e227]
+                                - list [ref=e230]:
+                                  - listitem [ref=e231]: The custom base URL uses plain http://, so the auth token would travel unencrypted to example.com. Confirm the insecure endpoint first.
+                                  - listitem [ref=e232]: "Scout model \"audit/preview-scout\" cannot be guaranteed: the Agent SDK can swap a subagent model id for its own default, so the scout only runs on a tier alias (haiku, sonnet, opus, fable) whose ANTHROPIC_DEFAULT_<TIER>_MODEL is set, the id one of those variables maps to, or the orchestrator model."
+                            - generic [ref=e233]:
+                              - button "Launch research run" [disabled]:
+                                - img
+                                - text: Launch research run
+                              - paragraph [ref=e234]: Launch is blocked until the configuration issue above is fixed.
+                    - generic [ref=e235]:
+                      - generic [ref=e237]:
+                        - heading "Researcher jobs" [level=2] [ref=e238]
+                        - paragraph [ref=e239]: Latest 5 of 74 research runs
+                      - generic [ref=e240]:
+                        - region "Researcher jobs table, scrollable" [ref=e241]:
+                          - table [ref=e242]:
+                            - rowgroup [ref=e243]:
+                              - row "Status Prompt Found Approved / Rejected Cost Turns Created" [ref=e244]:
+                                - columnheader "Status" [ref=e245]
+                                - columnheader "Prompt" [ref=e246]
+                                - columnheader "Found" [ref=e247]
+                                - columnheader "Approved / Rejected" [ref=e248]
+                                - columnheader "Cost" [ref=e249]
+                                - columnheader "Turns" [ref=e250]
+                                - columnheader "Created" [ref=e251]
+                            - rowgroup [ref=e252]:
+                              - row [ref=e253]:
+                                - cell "completed" [ref=e254]:
+                                  - generic [ref=e255]: completed
+                                - cell [ref=e256]
+                                - cell "0" [ref=e257]
+                                - cell "0/0" [ref=e258]
+                                - cell "$0.5650" [ref=e259]
+                                - cell "13/600" [ref=e260]
+                                - cell "Oct 27, 2026" [ref=e261]
+                              - row [ref=e262]:
+                                - cell "completed" [ref=e263]:
+                                  - generic [ref=e264]: completed
+                                - cell [ref=e265]
+                                - cell "4" [ref=e266]
+                                - cell "1/0" [ref=e267]
+                                - cell "$5.4603" [ref=e268]
+                                - cell "155/200" [ref=e269]
+                                - cell "Oct 27, 2026" [ref=e270]
+                              - row [ref=e271]:
+                                - cell "failed" [ref=e272]:
+                                  - generic [ref=e273]: failed
+                                - cell [ref=e274]
+                                - cell "0" [ref=e275]
+                                - cell "0/0" [ref=e276]
+                                - cell "$0.0000" [ref=e277]
+                                - cell "1/200" [ref=e278]
+                                - cell "Oct 27, 2026" [ref=e279]
+                              - 'row "completed Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch. 9 0/0 $3.3100 41/200 Oct 27, 2026" [ref=e280]':
+                                - cell "completed" [ref=e281]:
+                                  - generic [ref=e282]: completed
+                                - 'cell "Extended thorough research: find up to 10 real, actively maintained open-source video engineering tools or durable technical resources missing from awesome.video. Work across neural compression, real-time encoding, browser players, WebRTC diagnostics, streaming observability, FFmpeg automation, quality metrics, low-latency delivery, codec benchmarks, video test fixtures, live infrastructure and developer learning. Make at least 150 distinct web searches and critically evaluate at least 50 candidate official project pages, repositories, standards documents or technical papers. Verify every candidate URL before saving and save only genuine discoveries with accurate metadata. Continue this work for at least 30 minutes before finalizing unless 10 valid discoveries have been saved; do not stop after the first empty search batch." [ref=e283]'
+                                - cell "9" [ref=e284]
+                                - cell "0/0" [ref=e285]
+                                - cell "$3.3100" [ref=e286]
+                                - cell "41/200" [ref=e287]
+                                - cell "Oct 27, 2026" [ref=e288]
+                              - row [ref=e289]:
+                                - cell "completed" [ref=e290]:
+                                  - generic [ref=e291]: completed
+                                - 'cell "Thorough production research: find up to 10 real, currently maintained open-source video engineering tools or technical resources that are not already in awesome.video. Cover at least these 12 areas: neural video compression, real-time encoding, browser video players, WebRTC diagnostics, streaming observability, FFmpeg automation, video quality metrics, low-latency delivery, codec benchmarks, video testing fixtures, live-streaming infrastructure, and developer-focused video learning. Use official project pages, repositories, standards documents or durable technical papers, not listicles or marketing pages. Make at least 40 distinct web searches across those areas and verify each candidate URL before saving. Save only genuine discoveries with accurate title, URL, description and category. Do not end before completing that broad search effort unless 10 discoveries have been saved." [ref=e292]'
+                                - cell "0" [ref=e293]
+                                - cell "0/0" [ref=e294]
+                                - cell "$1.1166" [ref=e295]
+                                - cell "18/80" [ref=e296]
+                                - cell "Oct 27, 2026" [ref=e297]
+                        - button "Show more" [ref=e299] [cursor=pointer]
+                  - group [ref=e300]:
+                    - generic "All pending discoveries & full job history" [ref=e301] [cursor=pointer]
+    - button "Back to top" [ref=e302] [cursor=pointer]:
+      - img

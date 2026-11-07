@@ -1,0 +1,931 @@
+{
+  "url": "https://awesome.video/journey/8",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": -6,
+  "active": "<h1 class=\"page-title journey-detail-card__title\" data-route-focus=\"\" tabindex=\"-1\">FFmpeg Mastery</h1>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 508.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 688.703125,
+        "bottom": 51.5,
+        "left": 508.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 702.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 790,
+        "bottom": 51.5,
+        "left": 702.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Learning Journeys",
+      "role": "A",
+      "href": "/journeys",
+      "rect": {
+        "x": 112.234375,
+        "y": 107,
+        "width": 123.59375,
+        "height": 20,
+        "top": 107,
+        "right": 235.828125,
+        "bottom": 127,
+        "left": 112.234375
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Back to Journeys",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 40,
+        "y": 108,
+        "width": 157.8125,
+        "height": 44,
+        "top": 108,
+        "right": 197.8125,
+        "bottom": 152,
+        "left": 40
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] journey-detail__back",
+      "disabled": false
+    },
+    {
+      "name": "log in",
+      "role": "A",
+      "href": "/sign-in?redirect_url=%2Fjourney%2F8",
+      "rect": {
+        "x": 153.984375,
+        "y": 505.890625,
+        "width": 36.34375,
+        "height": 21,
+        "top": 505.890625,
+        "right": 190.328125,
+        "bottom": 526.890625,
+        "left": 153.984375
+      },
+      "class": "underline font-medium py-0.5"
+    },
+    {
+      "name": "VCT (Video Converter & Transcoder)",
+      "role": "A",
+      "href": "/resource/185310",
+      "rect": {
+        "x": 138,
+        "y": 775.984375,
+        "width": 530,
+        "height": 44,
+        "top": 775.984375,
+        "right": 668,
+        "bottom": 819.984375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open VCT (Video Converter & Transcoder) on its source site (new tab)",
+      "role": "A",
+      "href": "https://github.com/zbabac/VCT",
+      "rect": {
+        "x": 672,
+        "y": 775.984375,
+        "width": 44,
+        "height": 44,
+        "top": 775.984375,
+        "right": 716,
+        "bottom": 819.984375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Video Encoding 101: A Beginner's Guide to Key Concepts",
+      "role": "A",
+      "href": "/resource/185372",
+      "rect": {
+        "x": 138,
+        "y": 921.984375,
+        "width": 530,
+        "height": 44,
+        "top": 921.984375,
+        "right": 668,
+        "bottom": 965.984375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Video Encoding 101: A Beginner's Guide to Key Concepts on its source site (new tab)",
+      "role": "A",
+      "href": "https://www.forasoft.com/blog/article/video-encoding-streaming-quality",
+      "rect": {
+        "x": 672,
+        "y": 921.984375,
+        "width": 44,
+        "height": 44,
+        "top": 921.984375,
+        "right": 716,
+        "bottom": 965.984375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "FFmpeg Threads Command: How it Affects Quality and Performance",
+      "role": "A",
+      "href": "/resource/186158",
+      "rect": {
+        "x": 138,
+        "y": 1230.96875,
+        "width": 530,
+        "height": 44,
+        "top": 1230.96875,
+        "right": 668,
+        "bottom": 1274.96875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open FFmpeg Threads Command: How it Affects Quality and Performance on its source site (new tab)",
+      "role": "A",
+      "href": "https://streaminglearningcenter.com/blogs/ffmpeg-command-threads-how-it-affects-quality-and-performance.html",
+      "rect": {
+        "x": 672,
+        "y": 1230.96875,
+        "width": 44,
+        "height": 44,
+        "top": 1230.96875,
+        "right": 716,
+        "bottom": 1274.96875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "x264 FFmpeg Options Guide - Linux Encoding",
+      "role": "A",
+      "href": "/resource/185939",
+      "rect": {
+        "x": 138,
+        "y": 1340.96875,
+        "width": 530,
+        "height": 44,
+        "top": 1340.96875,
+        "right": 668,
+        "bottom": 1384.96875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open x264 FFmpeg Options Guide - Linux Encoding on its source site (new tab)",
+      "role": "A",
+      "href": "https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping",
+      "rect": {
+        "x": 672,
+        "y": 1340.96875,
+        "width": 44,
+        "height": 44,
+        "top": 1340.96875,
+        "right": 716,
+        "bottom": 1384.96875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "audio-loudness-batch-normalize",
+      "role": "A",
+      "href": "/resource/189237",
+      "rect": {
+        "x": 138,
+        "y": 1613.953125,
+        "width": 530,
+        "height": 44,
+        "top": 1613.953125,
+        "right": 668,
+        "bottom": 1657.953125,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open audio-loudness-batch-normalize on its source site (new tab)",
+      "role": "A",
+      "href": "https://github.com/lxl66566/audio-loudness-batch-normalize",
+      "rect": {
+        "x": 672,
+        "y": 1613.953125,
+        "width": 44,
+        "height": 44,
+        "top": 1613.953125,
+        "right": 716,
+        "bottom": 1657.953125,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Audio normalization with ffmpeg using loudnorm (ebur128) filter",
+      "role": "A",
+      "href": "/resource/185867",
+      "rect": {
+        "x": 138,
+        "y": 1723.953125,
+        "width": 530,
+        "height": 44,
+        "top": 1723.953125,
+        "right": 668,
+        "bottom": 1767.953125,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Audio normalization with ffmpeg using loudnorm (ebur128) filter on its source site (new tab)",
+      "role": "A",
+      "href": "https://bytesandbones.wordpress.com/2017/03/16/audio-nomalization-with-ffmpeg-using-loudnorm-ebur128-filter/",
+      "rect": {
+        "x": 672,
+        "y": 1723.953125,
+        "width": 44,
+        "height": 44,
+        "top": 1723.953125,
+        "right": 716,
+        "bottom": 1767.953125,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "FFmpeg Wiki: Filtering Guide",
+      "role": "A",
+      "href": "/resource/186413",
+      "rect": {
+        "x": 138,
+        "y": 1833.953125,
+        "width": 530,
+        "height": 44,
+        "top": 1833.953125,
+        "right": 668,
+        "bottom": 1877.953125,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open FFmpeg Wiki: Filtering Guide on its source site (new tab)",
+      "role": "A",
+      "href": "https://trac.ffmpeg.org/wiki/FilteringGuide",
+      "rect": {
+        "x": 672,
+        "y": 1833.953125,
+        "width": 44,
+        "height": 44,
+        "top": 1833.953125,
+        "right": 716,
+        "bottom": 1877.953125,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "wasmbooth: Video Filter Booth App Written in Rust",
+      "role": "A",
+      "href": "/resource/185135",
+      "rect": {
+        "x": 138,
+        "y": 2106.9375,
+        "width": 530,
+        "height": 44,
+        "top": 2106.9375,
+        "right": 668,
+        "bottom": 2150.9375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open wasmbooth: Video Filter Booth App Written in Rust on its source site (new tab)",
+      "role": "A",
+      "href": "https://github.com/mtharrison/wasmbooth",
+      "rect": {
+        "x": 672,
+        "y": 2106.9375,
+        "width": 44,
+        "height": 44,
+        "top": 2106.9375,
+        "right": 716,
+        "bottom": 2150.9375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "FFmpeg 8.0 libplacebo Filter — Full Option Reference",
+      "role": "A",
+      "href": "/resource/188761",
+      "rect": {
+        "x": 138,
+        "y": 2252.9375,
+        "width": 530,
+        "height": 44,
+        "top": 2252.9375,
+        "right": 668,
+        "bottom": 2296.9375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open FFmpeg 8.0 libplacebo Filter — Full Option Reference on its source site (new tab)",
+      "role": "A",
+      "href": "https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Video/libplacebo.html",
+      "rect": {
+        "x": 672,
+        "y": 2252.9375,
+        "width": 44,
+        "height": 44,
+        "top": 2252.9375,
+        "right": 716,
+        "bottom": 2296.9375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "FFmpeg 8.0 whisper Filter Documentation",
+      "role": "A",
+      "href": "/resource/188813",
+      "rect": {
+        "x": 138,
+        "y": 2362.9375,
+        "width": 530,
+        "height": 44,
+        "top": 2362.9375,
+        "right": 668,
+        "bottom": 2406.9375,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open FFmpeg 8.0 whisper Filter Documentation on its source site (new tab)",
+      "role": "A",
+      "href": "https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Audio/whisper.html",
+      "rect": {
+        "x": 672,
+        "y": 2362.9375,
+        "width": 44,
+        "height": 44,
+        "top": 2362.9375,
+        "right": 716,
+        "bottom": 2406.9375,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC)",
+      "role": "A",
+      "href": "/resource/188920",
+      "rect": {
+        "x": 138,
+        "y": 2635.921875,
+        "width": 530,
+        "height": 44,
+        "top": 2635.921875,
+        "right": 668,
+        "bottom": 2679.921875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC) on its source site (new tab)",
+      "role": "A",
+      "href": "https://developer.nvidia.com/ffmpeg",
+      "rect": {
+        "x": 672,
+        "y": 2635.921875,
+        "width": 44,
+        "height": 44,
+        "top": 2635.921875,
+        "right": 716,
+        "bottom": 2679.921875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL)",
+      "role": "A",
+      "href": "/resource/188928",
+      "rect": {
+        "x": 138,
+        "y": 2745.921875,
+        "width": 530,
+        "height": 44,
+        "top": 2745.921875,
+        "right": 668,
+        "bottom": 2789.921875,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL) on its source site (new tab)",
+      "role": "A",
+      "href": "https://github.com/OpenVisualCloud/Dockerfiles/blob/master/doc/ffmpeg.md",
+      "rect": {
+        "x": 672,
+        "y": 2745.921875,
+        "width": 44,
+        "height": 44,
+        "top": 2745.921875,
+        "right": 716,
+        "bottom": 2789.921875,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "Video: HLS and DASH Multi-Codec Encoding & Packaging",
+      "role": "A",
+      "href": "/resource/186120",
+      "rect": {
+        "x": 138,
+        "y": 3018.90625,
+        "width": 530,
+        "height": 44,
+        "top": 3018.90625,
+        "right": 668,
+        "bottom": 3062.90625,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open Video: HLS and DASH Multi-Codec Encoding & Packaging on its source site (new tab)",
+      "role": "A",
+      "href": "https://thebroadcastknowledge.com/2020/07/10/video-hls-and-dash-multi-codec-encoding-packaging/",
+      "rect": {
+        "x": 672,
+        "y": 3018.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3018.90625,
+        "right": 716,
+        "bottom": 3062.90625,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "HLS To DASH",
+      "role": "A",
+      "href": "/resource/185883",
+      "rect": {
+        "x": 138,
+        "y": 3110.90625,
+        "width": 530,
+        "height": 44,
+        "top": 3110.90625,
+        "right": 668,
+        "bottom": 3154.90625,
+        "left": 138
+      },
+      "class": "journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
+    },
+    {
+      "name": "Open HLS To DASH on its source site (new tab)",
+      "role": "A",
+      "href": "https://github.com/Eyevinn/hls-to-dash",
+      "rect": {
+        "x": 672,
+        "y": 3110.90625,
+        "width": 44,
+        "height": 44,
+        "top": 3110.90625,
+        "right": 716,
+        "bottom": 3154.90625,
+        "left": 672
+      },
+      "class": "journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 3427.90625,
+        "width": 195.046875,
+        "height": 44,
+        "top": 3427.90625,
+        "right": 235.046875,
+        "bottom": 3471.90625,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 288.65625,
+        "y": 3604.6875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3604.6875,
+        "right": 505.328125,
+        "bottom": 3648.6875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 288.65625,
+        "y": 3633.5,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3633.5,
+        "right": 505.328125,
+        "bottom": 3677.5,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3662.3125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3662.3125,
+        "right": 505.328125,
+        "bottom": 3706.3125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 288.65625,
+        "y": 3691.125,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3691.125,
+        "right": 505.328125,
+        "bottom": 3735.125,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 288.65625,
+        "y": 3719.9375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3719.9375,
+        "right": 505.328125,
+        "bottom": 3763.9375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 288.65625,
+        "y": 3748.75,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3748.75,
+        "right": 505.328125,
+        "bottom": 3792.75,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 288.65625,
+        "y": 3777.5625,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3777.5625,
+        "right": 505.328125,
+        "bottom": 3821.5625,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 288.65625,
+        "y": 3806.375,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3806.375,
+        "right": 505.328125,
+        "bottom": 3850.375,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 288.65625,
+        "y": 3835.1875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3835.1875,
+        "right": 505.328125,
+        "bottom": 3879.1875,
+        "left": 288.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 537.328125,
+        "y": 3616.28125,
+        "width": 216.671875,
+        "height": 60.375,
+        "top": 3616.28125,
+        "right": 754,
+        "bottom": 3676.65625,
+        "left": 537.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 615.6875,
+        "y": 3688.65625,
+        "width": 73,
+        "height": 24,
+        "top": 3688.65625,
+        "right": 688.6875,
+        "bottom": 3712.65625,
+        "left": 615.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 537.328125,
+        "y": 3743.046875,
+        "width": 216.671875,
+        "height": 44,
+        "top": 3743.046875,
+        "right": 754,
+        "bottom": 3787.046875,
+        "left": 537.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 3960.59375,
+        "width": 44,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 84,
+        "bottom": 4004.59375,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 3960.59375,
+        "width": 44,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 142,
+        "bottom": 4004.59375,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 3960.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 204.515625,
+        "bottom": 4004.59375,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 3960.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 267.03125,
+        "bottom": 4004.59375,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 3960.59375,
+        "width": 103.953125,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 384.984375,
+        "bottom": 4004.59375,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 3960.59375,
+        "width": 55.46875,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 454.453125,
+        "bottom": 4004.59375,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 3960.59375,
+        "width": 48.515625,
+        "height": 44,
+        "top": 3960.59375,
+        "right": 516.96875,
+        "bottom": 4004.59375,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

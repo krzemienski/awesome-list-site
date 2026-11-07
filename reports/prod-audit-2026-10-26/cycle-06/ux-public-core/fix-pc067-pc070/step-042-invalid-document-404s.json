@@ -1,0 +1,10 @@
+{
+  "nonnumeric": {
+    "status": 404,
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=abc"
+  },
+  "unknown": {
+    "status": 404,
+    "url": "http://127.0.0.1:5067/category/no-such-category-c6-taxonomy"
+  }
+}

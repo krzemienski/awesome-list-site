@@ -1,0 +1,37 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "touch": false
+  },
+  "order": [
+    {
+      "name": "View details for Xuggler",
+      "test": "link-view-details-1865"
+    },
+    {
+      "name": "Show 2 more tags",
+      "test": "button-more-tags-1865"
+    },
+    {
+      "name": "Open LinkXuggler (opens in new tab)",
+      "test": "button-visit-1865"
+    },
+    {
+      "name": "Suggest an edit: Xuggler",
+      "test": "button-suggest-edit-1865"
+    },
+    {
+      "name": "Favorite to your account — sign in required: Xuggler",
+      "test": "button-favorite"
+    },
+    {
+      "name": "Bookmark on this device — no sign-in required: Xuggler",
+      "test": "button-bookmark"
+    },
+    {
+      "name": "Xuggler",
+      "test": "link-resource-title-1865"
+    }
+  ]
+}

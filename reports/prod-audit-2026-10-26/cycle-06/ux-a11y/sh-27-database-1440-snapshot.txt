@@ -1,0 +1,139 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e35]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e36]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [selected, ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Database" [ref=e17] focusable [tabindex]
+            - generic
+              - article
+                - StaticText "TABLES"
+                - StaticText "41"
+              - article
+                - StaticText "ROWS"
+                - StaticText "72,140"
+              - article
+                - StaticText "DISK"
+                - StaticText "65 MB"
+              - article
+                - StaticText "MIGRATIONS"
+                - StaticText "34"
+                - StaticText "0 pending"
+              - group
+                - DisclosureTriangle "Database seeding" [expanded=false]
+              - generic
+                - sectionheader
+                  - heading "Key tables" [level=2, ref=e37]
+                  - paragraph
+                    - StaticText "6 key tables of 41 in the primary PostgreSQL database"
+                - region "Key tables, scrollable" [ref=e38] focusable [tabindex]
+                  - table
+                    - rowgroup
+                      - row
+                        - columnheader "NAME" [ref=e63]
+                        - columnheader "ROWS" [ref=e64]
+                        - columnheader "SIZE" [ref=e65]
+                        - columnheader "NEWEST ROW" [ref=e66]
+                    - row
+                      - cell "resources" [ref=e39]
+                      - cell "4,017" [ref=e40]
+                      - cell "28 MB" [ref=e41]
+                      - cell "5h ago" [ref=e42]
+                    - row
+                      - cell "categories" [ref=e43]
+                      - cell "9" [ref=e44]
+                      - cell "96 KB" [ref=e45]
+                      - cell "69d ago" [ref=e46]
+                    - row
+                      - cell "subcategories" [ref=e47]
+                      - cell "99" [ref=e48]
+                      - cell "88 KB" [ref=e49]
+                      - cell "69d ago" [ref=e50]
+                    - row
+                      - cell "users" [ref=e51]
+                      - cell "133" [ref=e52]
+                      - cell "128 KB" [ref=e53]
+                      - cell "19h ago" [ref=e54]
+                    - row
+                      - cell "resource_audit_log" [ref=e55]
+                      - cell "16,829" [ref=e56]
+                      - cell "4.4 MB" [ref=e57]
+                      - cell "2h ago" [ref=e58]
+                    - row
+                      - cell "enrichment_jobs" [ref=e59]
+                      - cell "33" [ref=e60]
+                      - cell "160 KB" [ref=e61]
+                      - cell "25h ago" [ref=e62]

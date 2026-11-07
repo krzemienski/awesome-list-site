@@ -1,0 +1,14 @@
+[7155.443] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.1188] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.1202] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.1206] DELETE https://awesome.video/api/collections/152 (Fetch) 200
+[7155.1208] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.1211] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2249] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2268] POST https://awesome.video/api/collections (Fetch) 201
+[7155.2270] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2272] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2279] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2280] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2284] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200
+[7155.2285] GET https://awesome.video/api/collections?includeArchived=true (Fetch) 200

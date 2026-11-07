@@ -30,6 +30,9 @@
 import { db as dbInstance } from "../db";
 import { eq, and, desc } from "drizzle-orm";
 import { userFavorites, resources, type Resource } from "@shared/schema";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("favorites");
 
 /**
  * Repository for user favorite operations
@@ -100,7 +103,7 @@ export class FavoriteRepository {
    * @example
    * const favorites = await favoriteRepo.getUserFavorites('user-123');
    * favorites.forEach(fav => {
-   *   console.log(`${fav.title} favorited at ${fav.favoritedAt}`);
+   *   logger.info(`${fav.title} favorited at ${fav.favoritedAt}`);
    * });
    */
   async getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>> {

@@ -1,0 +1,214 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,826 resources" [ref=e6]
+          - StaticText "Search 3,826 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e51]
+              - listitem [level=1]
+                - link "Settings" [disabled, ref=e52]
+          - link "Back" [ref=e9]
+            - image
+            - StaticText "Back"
+          - heading "Settings" [level=1, ref=e10]
+          - paragraph
+            - StaticText "Manage your preferences and account. Pick a section below."
+          - link [ref=e11]
+            - article
+              - image
+              - heading "Appearance" [level=2, ref=e44]
+              - image
+              - paragraph
+                - StaticText "Switch design system, accent color, and font."
+          - link [ref=e12]
+            - article
+              - image
+              - heading "Account" [level=2, ref=e45]
+              - image
+              - paragraph
+                - StaticText "View your profile, submissions, favorites, and progress."
+          - link [ref=e13]
+            - article
+              - image
+              - heading "Security" [level=2, ref=e46]
+              - image
+              - paragraph
+                - StaticText "Change your password from the Security tab on your profile."
+          - link [ref=e14]
+            - article
+              - image
+              - heading "Bookmarks" [level=2, ref=e47]
+              - image
+              - paragraph
+                - StaticText "Review the resources you've saved for later."
+          - link [ref=e15]
+            - article
+              - image
+              - heading "Recommendations" [level=2, ref=e48]
+              - image
+              - paragraph
+                - StaticText "Personalized resource suggestions based on your interests."
+          - region "Home layout" [ref=e16]
+            - article
+              - StaticText "Home layout"
+              - StaticText "Choose the default view you see on the Home page."
+              - group "Home layout" [disabled]
+                - Legend
+                  - StaticText "Home layout"
+                - paragraph
+                  - StaticText "Choose how the home page opens for you."
+                - radiogroup "Home layout" [disabled, ref=e53] focusable [tabindex]
+                  - LabelText [ref=e72] clickable [cursor:pointer]
+                    - radio "Index The full catalog, organized for browsing." [checked=false, disabled, ref=e94]
+                  - LabelText [ref=e73] clickable [cursor:pointer]
+                    - radio "Curated A focused home feed with recent and featured picks." [checked=true, disabled, ref=e95]
+                - status
+                  - StaticText "Saving your home layout…"
+          - region "Learning preferences" [ref=e17]
+            - article
+              - generic
+                - image
+                - StaticText "Learning preferences"
+              - StaticText "Review the same profile used by optional onboarding. These values shape only surfaces explicitly labeled personalized and are not sent to analytics."
+              - group "Skill level"
+                - Legend
+                  - StaticText "Skill level"
+                - paragraph
+                  - StaticText "Choose the closest match. You can change this at any time."
+                - radiogroup [ref=e54] focusable [tabindex]
+                  - LabelText [ref=e74] clickable [cursor:pointer]
+                    - radio "Beginner I’m building a foundation in video technology." [checked=true, ref=e96]
+                  - LabelText [ref=e75] clickable [cursor:pointer]
+                    - radio "Intermediate I know the basics and want to go deeper." [checked=false, ref=e97]
+                  - LabelText [ref=e76] clickable [cursor:pointer]
+                    - radio "Advanced I work with video systems and want specialist material." [checked=false, ref=e98]
+              - group "Topics"
+                - Legend
+                  - StaticText "Topics"
+                - paragraph
+                  - StaticText "These choices come directly from the current Awesome Video taxonomy. Choose one or more."
+              - group "Learning goals"
+                - Legend
+                  - StaticText "Learning goals"
+                - paragraph
+                  - StaticText "Pick every goal that matters right now."
+                - LabelText [ref=e55] clickable [cursor:pointer]
+                  - checkbox "Learn the fundamentals" [checked=true, ref=e77]
+                  - StaticText "Learn the fundamentals"
+                - LabelText [ref=e56] clickable [cursor:pointer]
+                  - checkbox "Build video applications" [checked=false, ref=e78]
+                  - StaticText "Build video applications"
+                - LabelText [ref=e57] clickable [cursor:pointer]
+                  - checkbox "Improve streaming experiences" [checked=false, ref=e79]
+                  - StaticText "Improve streaming experiences"
+                - LabelText [ref=e58] clickable [cursor:pointer]
+                  - checkbox "Optimize encoding and quality" [checked=false, ref=e80]
+                  - StaticText "Optimize encoding and quality"
+                - LabelText [ref=e59] clickable [cursor:pointer]
+                  - checkbox "Operate video infrastructure" [checked=false, ref=e81]
+                  - StaticText "Operate video infrastructure"
+                - LabelText [ref=e60] clickable [cursor:pointer]
+                  - checkbox "Keep up with standards and tools" [checked=false, ref=e82]
+                  - StaticText "Keep up with standards and tools"
+              - group "Preferred formats"
+                - Legend
+                  - StaticText "Preferred formats"
+                - paragraph
+                  - StaticText "Choose at least one format. These map to the catalog’s curated resource formats."
+                - LabelText [ref=e61] clickable [cursor:pointer]
+                  - checkbox "Videos" [checked=true, ref=e83]
+                  - StaticText "Videos"
+                - LabelText [ref=e62] clickable [cursor:pointer]
+                  - checkbox "Courses" [checked=false, ref=e84]
+                  - StaticText "Courses"
+                - LabelText [ref=e63] clickable [cursor:pointer]
+                  - checkbox "Articles" [checked=false, ref=e85]
+                  - StaticText "Articles"
+                - LabelText [ref=e64] clickable [cursor:pointer]
+                  - checkbox "Books" [checked=false, ref=e86]
+                  - StaticText "Books"
+                - LabelText [ref=e65] clickable [cursor:pointer]
+                  - checkbox "Specifications" [checked=false, ref=e87]
+                  - StaticText "Specifications"
+                - LabelText [ref=e66] clickable [cursor:pointer]
+                  - checkbox "Hands-on tools" [checked=false, ref=e88]
+                  - StaticText "Hands-on tools"
+                - LabelText [ref=e67] clickable [cursor:pointer]
+                  - checkbox "Libraries and SDKs" [checked=false, ref=e89]
+                  - StaticText "Libraries and SDKs"
+                - LabelText [ref=e68] clickable [cursor:pointer]
+                  - checkbox "Community resources" [checked=false, ref=e90]
+                  - StaticText "Community resources"
+              - group "Available time"
+                - Legend
+                  - StaticText "Available time"
+                - paragraph
+                  - StaticText "This helps us favor resources that fit your learning rhythm."
+                - radiogroup [ref=e69] focusable [tabindex]
+                  - LabelText [ref=e91] clickable [cursor:pointer]
+                    - radio "A little most days" [checked=false, ref=e99]
+                  - LabelText [ref=e92] clickable [cursor:pointer]
+                    - radio "One focused session each week" [checked=false, ref=e100]
+                  - LabelText [ref=e93] clickable [cursor:pointer]
+                    - radio "Whenever time allows" [checked=true, ref=e101]
+                - heading "What changes after you save" [level=3, ref=e70]
+              - button "Reset preferences" [expanded=false, ref=e49]
+              - button "Save learning preferences" [ref=e50]
+          - region "Notifications" [ref=e18]
+            - article
+              - generic
+              - StaticText "Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in."
+              - alert
+                - button "Try again" [ref=e71]
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e19]
+          - paragraph
+          - heading "INDEXED" [level=2, ref=e20]
+          - paragraph
+          - paragraph
+          - navigation "Explore categories" [ref=e21]
+            - heading "EXPLORE" [level=2, ref=e26]
+            - link "Community & Events" [ref=e27]
+            - link "Encoding & Codecs" [ref=e28]
+            - link "General Tools" [ref=e29]
+            - link "Infrastructure & Delivery" [ref=e30]
+            - link "Intro & Learning" [ref=e31]
+            - link "Media Tools" [ref=e32]
+            - link "Players & Clients" [ref=e33]
+            - link "Protocols & Transport" [ref=e34]
+            - link "Standards & Industry" [ref=e35]
+          - heading "SOURCE" [level=2, ref=e22]
+          - link "krzemienski/ awesome-video" [ref=e23]
+          - paragraph
+            - link "PRs welcome" [ref=e36]
+          - button "Contact maintainers" [ref=e24]
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e25]
+            - link "About" [ref=e37]
+            - link "Terms" [ref=e38]
+            - link "Privacy" [ref=e39]
+            - link "Code of Conduct" [ref=e40]
+            - button "Cookie settings" [ref=e41]
+            - link "Issues ↗" [ref=e42]
+            - link "Sitemap" [ref=e43]

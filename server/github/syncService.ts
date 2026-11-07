@@ -38,7 +38,7 @@
 
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
-import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription } from "./importHygiene";
+import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription, TAXONOMY_PATH_SEPARATOR } from "./importHygiene";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 import { ResourceRepository } from "../repositories/ResourceRepository";
@@ -47,6 +47,10 @@ import { GithubSyncRepository } from "../repositories/GithubSyncRepository";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
+import { createLogger } from "../lib/logger";
+import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
+
+const logger = createLogger("github-sync");
 
 interface SyncOptions {
   dryRun?: boolean;
@@ -55,6 +59,11 @@ interface SyncOptions {
   branchName?: string;
   /** Skip the pre-push broken-link gate (export link check). Default: run it. */
   skipLinkCheck?: boolean;
+  /**
+   * Queue row that owns this run. Stamped into the export's history row so
+   * the admin panel can tie a commit to exactly one run (never by timestamp).
+   */
+  queueId?: number;
 }
 
 interface ImportResult {
@@ -62,6 +71,7 @@ interface ImportResult {
   updated: number;
   skipped: number;
   errors: string[];
+  /** Notes about the import plan (taxonomy merges, repeat listings, concurrent writes); lint findings live in validationErrors. */
   warnings: string[];
   validationPassed: boolean;
   validationErrors: Array<{
@@ -76,8 +86,12 @@ interface ImportResult {
     totalCategories: number;
   };
   resources: Resource[];
+  /** Taxonomy nodes a dry run would create; always empty for a real import. */
+  wouldCreateTaxonomy: PlannedTaxonomyNode[];
   /** Branch the README was read from; unset if the fetch never succeeded. */
   branch?: string;
+  /** Why the whole run stopped (unreadable repo or README), as opposed to per-item errors. */
+  runError?: string;
 }
 
 interface ExportResult {
@@ -90,10 +104,166 @@ interface ExportResult {
   branch?: string;
 }
 
-interface ConflictResolution {
-  action: 'skip' | 'update' | 'create';
-  resource: Partial<Resource>;
-  reason: string;
+/**
+ * Columns a GitHub import owns. The rest of a row (status, facets,
+ * enrichment metadata such as tags) is curation an import never overwrites.
+ */
+type ImportedFields = Pick<Resource, 'url' | 'title' | 'description' | 'category' | 'subcategory' | 'subSubcategory'>;
+
+/** What the catalog holds per row: enough to match an item and plan its update. */
+type CatalogRow = Pick<Resource, 'id' | 'metadata'> & ImportedFields;
+
+type ConflictResolution =
+  | { action: 'create'; resource: Partial<Resource> }
+  /** `changes` holds only the fields whose stored value would change; never empty. */
+  | { action: 'update'; existing: CatalogRow; changes: Partial<ImportedFields> }
+  | { action: 'skip'; reason: string };
+
+/**
+ * The imported fields an update would change on `existing`, under the
+ * import's merge rules. Comparing these effective values instead of the raw
+ * README ones is what makes a re-Pull of an unchanged README write nothing
+ * (#64).
+ *
+ * - url, title: the README value. The README is authoritative for links, so a
+ *   row matched only by its normalized URL takes the README form (http to
+ *   https, a trailing slash).
+ * - description: the README text only when it is longer. The stored text is
+ *   usually an enriched rewrite.
+ * - taxonomy: the parser emits a complete heading path, so a level the README
+ *   leaves out means there is no such level. A stored deeper level survives
+ *   only while every level above it is unchanged. When the README moves the
+ *   item to another category or subcategory, the lower levels take the README
+ *   value, null included.
+ * - Under an unchanged parent, a level the README leaves out keeps its stored
+ *   value. Enrichment (promoteEnrichmentSuggestions) and the admin resource
+ *   editor place rows deeper than their README heading, and clearing that
+ *   placement would undo the curation and make every re-Pull an update again.
+ *   The cost: when a README deletes a `####` heading but keeps its parent,
+ *   its rows stay at that level until an admin moves them.
+ */
+function importChanges(existing: CatalogRow, incoming: Partial<Resource>): Partial<ImportedFields> {
+  const category = incoming.category ?? existing.category;
+  const categoryKept = category === existing.category;
+  const subcategory = categoryKept
+    ? incoming.subcategory ?? existing.subcategory
+    : incoming.subcategory ?? null;
+  const subSubcategory = categoryKept && subcategory === existing.subcategory
+    ? incoming.subSubcategory ?? existing.subSubcategory
+    : incoming.subSubcategory ?? null;
+  const next: ImportedFields = {
+    url: incoming.url ?? existing.url,
+    title: incoming.title ?? existing.title,
+    description: (incoming.description?.length ?? 0) > existing.description.length
+      ? incoming.description!
+      : existing.description,
+    category,
+    subcategory,
+    subSubcategory,
+  };
+  return Object.fromEntries(
+    (Object.keys(next) as (keyof ImportedFields)[])
+      .filter(field => next[field] !== existing[field])
+      .map(field => [field, next[field]]),
+  );
+}
+
+function taxonomyPath(resource: Partial<Resource>): string {
+  return [resource.category, resource.subcategory, resource.subSubcategory].filter(Boolean).join(TAXONOMY_PATH_SEPARATOR);
+}
+
+/** The metadata keys that point a row at its taxonomy nodes; null where the row has no such level or node. */
+function taxonomyIds(ids: HierarchyResolution | undefined) {
+  return {
+    categoryId: ids?.categoryId ?? null,
+    subcategoryId: ids?.subcategoryId ?? null,
+    subSubcategoryId: ids?.subSubcategoryId ?? null,
+  };
+}
+
+interface CatalogEntry {
+  resource: CatalogRow;
+  urlKey: string;
+  /** Empty when the title or domain normalizes to nothing (never matches). */
+  titleDomainKey: string;
+}
+
+function toCatalogEntry(resource: CatalogRow): CatalogEntry {
+  const titleKey = normalizeTitleForDedup(resource.title);
+  const domainKey = domainOf(resource.url);
+  return {
+    resource,
+    urlKey: normalizeUrlForDedup(resource.url),
+    titleDomainKey: titleKey && domainKey ? `${titleKey}|${domainKey}` : '',
+  };
+}
+
+/**
+ * The whole catalog loaded once per import (any status, so a pending copy
+ * also blocks re-import), keyed the way
+ * checkConflict matches. Entries keep listResources' newest-first order and
+ * each key maps to its first entry, the row a linear `.find` would return.
+ */
+class ImportCatalog {
+  private entries: CatalogEntry[];
+  private byExactUrl = new Map<string, CatalogRow>();
+  private byUrl = new Map<string, CatalogRow>();
+  private byTitleDomain = new Map<string, CatalogRow>();
+
+  constructor(resources: CatalogRow[]) {
+    this.entries = resources.map(toCatalogEntry);
+    for (const entry of this.entries) {
+      if (!this.byExactUrl.has(entry.resource.url)) this.byExactUrl.set(entry.resource.url, entry.resource);
+      if (!this.byUrl.has(entry.urlKey)) this.byUrl.set(entry.urlKey, entry.resource);
+      if (entry.titleDomainKey && !this.byTitleDomain.has(entry.titleDomainKey)) {
+        this.byTitleDomain.set(entry.titleDomainKey, entry.resource);
+      }
+    }
+  }
+
+  /**
+   * The row stored under exactly this URL wins over a row that only
+   * normalizes to it. The catalog can hold both forms (`https://ffmpeg.org`
+   * and `https://ffmpeg.org/`); matching the other form made the update
+   * write this URL onto it, which `resources_url_unique` rejects (AI-18).
+   */
+  findByUrl(url: string): CatalogRow | undefined {
+    return this.byExactUrl.get(url) ?? this.byUrl.get(normalizeUrlForDedup(url));
+  }
+
+  findByTitleDomain(title: string, url: string): CatalogRow | undefined {
+    const titleKey = normalizeTitleForDedup(title);
+    const domainKey = domainOf(url);
+    return titleKey && domainKey ? this.byTitleDomain.get(`${titleKey}|${domainKey}`) : undefined;
+  }
+
+  /**
+   * A row this run wrote, so later items see it as they did when each one
+   * re-read the table. A new row sorts first (newest); an updated row keeps
+   * its place, and every key it left or joined resolves again.
+   */
+  record(row: CatalogRow): void {
+    const next = toCatalogEntry(row);
+    const index = this.entries.findIndex(e => e.resource.id === row.id);
+    const previous = index >= 0 ? this.entries[index] : undefined;
+    if (previous) this.entries[index] = next;
+    else this.entries.unshift(next);
+    for (const key of new Set([previous?.resource.url, next.resource.url])) {
+      if (key !== undefined) this.resolve(this.byExactUrl, key, e => e.resource.url);
+    }
+    for (const key of new Set([previous?.urlKey, next.urlKey])) {
+      if (key !== undefined) this.resolve(this.byUrl, key, e => e.urlKey);
+    }
+    for (const key of new Set([previous?.titleDomainKey, next.titleDomainKey])) {
+      if (key) this.resolve(this.byTitleDomain, key, e => e.titleDomainKey);
+    }
+  }
+
+  private resolve(index: Map<string, CatalogRow>, key: string, keyOf: (e: CatalogEntry) => string): void {
+    const first = this.entries.find(e => keyOf(e) === key);
+    if (first) index.set(key, first.resource);
+    else index.delete(key);
+  }
 }
 
 /**
@@ -114,7 +284,7 @@ function generateSlug(name: string): string {
  * Pick the taxonomy node an imported heading belongs to.
  *
  * Imported headings pass through normalizeCategory(), which keeps only
- * letters, digits, spaces, "&" and "-". Two headings whose slugs collide
+ * letters, digits, spaces, "&", "/" and "-". Two headings whose slugs collide
  * therefore differ only in case or punctuation ("Audio & Video" vs
  * "Audio-Video", or an exported "__qa_ Cat A" re-imported as "qa Cat A"), so
  * they name the SAME node. Resolution order is deterministic:
@@ -133,14 +303,60 @@ function pickNode<T extends { name: string; slug: string }>(
     ?? rows.find(r => r.name.toLowerCase() === lower);
 }
 
+type HierarchyLevel = 'category' | 'subcategory' | 'sub-subcategory';
+
 /**
  * A hierarchy level that was merged into an existing node with a different
  * spelling. Reported as an import warning so the rename is visible.
  */
 interface HierarchyMerge {
-  level: 'category' | 'subcategory' | 'sub-subcategory';
+  level: HierarchyLevel;
   imported: string;
   existing: string;
+}
+
+/** A taxonomy node a dry-run import would create; `parent` is its path ("Cat > Sub"). */
+interface PlannedTaxonomyNode {
+  level: HierarchyLevel;
+  name: string;
+  slug: string;
+  parent?: string;
+}
+
+/**
+ * IDs (unset for nodes a dry run would create) and canonical names for each
+ * level of one imported heading path.
+ */
+interface HierarchyResolution {
+  categoryId?: number;
+  subcategoryId?: number;
+  subSubcategoryId?: number;
+  category: string;
+  subcategory?: string;
+  subSubcategory?: string;
+  merges: HierarchyMerge[];
+}
+
+// Existing-node lookups shared by the writing and the dry-run resolvers.
+async function findCategoryNode(categoryRepo: CategoryRepository, name: string) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getCategoryByName(name))
+    ?? (slug ? await categoryRepo.getCategoryBySlug(slug) : undefined)
+    ?? pickNode(await categoryRepo.listCategories(), name, slug);
+}
+
+async function findSubcategoryNode(categoryRepo: CategoryRepository, name: string, parentId: number) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getSubcategoryByName(name, parentId))
+    ?? (slug ? await categoryRepo.getSubcategoryBySlug(slug, parentId) : undefined)
+    ?? pickNode(await categoryRepo.listSubcategories(parentId), name, slug);
+}
+
+async function findSubSubcategoryNode(categoryRepo: CategoryRepository, name: string, parentId: number) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getSubSubcategoryByName(name, parentId))
+    ?? (slug ? await categoryRepo.getSubSubcategoryBySlug(slug, parentId) : undefined)
+    ?? pickNode(await categoryRepo.listSubSubcategories(parentId), name, slug);
 }
 
 /**
@@ -156,15 +372,7 @@ async function ensureCategoryHierarchy(
   categoryName: string,
   subcategoryName?: string,
   subSubcategoryName?: string
-): Promise<{
-  categoryId: number;
-  subcategoryId?: number;
-  subSubcategoryId?: number;
-  category: string;
-  subcategory?: string;
-  subSubcategory?: string;
-  merges: HierarchyMerge[];
-}> {
+): Promise<HierarchyResolution> {
   const merges: HierarchyMerge[] = [];
   const noteMerge = (level: HierarchyMerge['level'], imported: string, existing: string) => {
     if (imported !== existing) merges.push({ level, imported, existing });
@@ -172,10 +380,7 @@ async function ensureCategoryHierarchy(
 
   // 1. Ensure category exists
   const categorySlug = generateSlug(categoryName);
-  const findCategory = async () =>
-    (await categoryRepo.getCategoryByName(categoryName))
-    ?? (categorySlug ? await categoryRepo.getCategoryBySlug(categorySlug) : undefined)
-    ?? pickNode(await categoryRepo.listCategories(), categoryName, categorySlug);
+  const findCategory = () => findCategoryNode(categoryRepo, categoryName);
   let category = await findCategory();
   if (!category) {
     try {
@@ -183,7 +388,7 @@ async function ensureCategoryHierarchy(
         name: categoryName,
         slug: categorySlug,
       });
-      console.log(`  Created category: ${categoryName}`);
+      logger.info(`  Created category: ${categoryName}`);
     } catch (e: any) {
       // May already exist due to race condition, try to fetch again
       category = await findCategory();
@@ -199,10 +404,7 @@ async function ensureCategoryHierarchy(
   if (subcategoryName) {
     const parentId = category.id;
     const subSlug = generateSlug(subcategoryName);
-    const findSubcategory = async () =>
-      (await categoryRepo.getSubcategoryByName(subcategoryName, parentId))
-      ?? (subSlug ? await categoryRepo.getSubcategoryBySlug(subSlug, parentId) : undefined)
-      ?? pickNode(await categoryRepo.listSubcategories(parentId), subcategoryName, subSlug);
+    const findSubcategory = () => findSubcategoryNode(categoryRepo, subcategoryName, parentId);
     subcategory = await findSubcategory();
     if (!subcategory) {
       try {
@@ -211,7 +413,7 @@ async function ensureCategoryHierarchy(
           slug: subSlug,
           categoryId: parentId,
         });
-        console.log(`  Created subcategory: ${subcategoryName} under ${category.name}`);
+        logger.info(`  Created subcategory: ${subcategoryName} under ${category.name}`);
       } catch (e: any) {
         // May already exist due to race condition
         subcategory = await findSubcategory();
@@ -228,10 +430,7 @@ async function ensureCategoryHierarchy(
   if (subSubcategoryName && subcategory) {
     const parentId = subcategory.id;
     const subSubSlug = generateSlug(subSubcategoryName);
-    const findSubSubcategory = async () =>
-      (await categoryRepo.getSubSubcategoryByName(subSubcategoryName, parentId))
-      ?? (subSubSlug ? await categoryRepo.getSubSubcategoryBySlug(subSubSlug, parentId) : undefined)
-      ?? pickNode(await categoryRepo.listSubSubcategories(parentId), subSubcategoryName, subSubSlug);
+    const findSubSubcategory = () => findSubSubcategoryNode(categoryRepo, subSubcategoryName, parentId);
     subSubcategory = await findSubSubcategory();
     if (!subSubcategory) {
       try {
@@ -240,7 +439,7 @@ async function ensureCategoryHierarchy(
           slug: subSubSlug,
           subcategoryId: parentId,
         });
-        console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategory.name}`);
+        logger.info(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategory.name}`);
       } catch (e: any) {
         // May already exist due to race condition
         subSubcategory = await findSubSubcategory();
@@ -252,6 +451,61 @@ async function ensureCategoryHierarchy(
     noteMerge('sub-subcategory', subSubcategoryName, subSubcategory.name);
   }
 
+  return {
+    categoryId: category.id,
+    subcategoryId: subcategory?.id,
+    subSubcategoryId: subSubcategory?.id,
+    category: category.name,
+    subcategory: subcategory?.name,
+    subSubcategory: subSubcategory?.name,
+    merges,
+  };
+}
+
+/**
+ * Dry-run counterpart of ensureCategoryHierarchy: resolves each level against
+ * existing rows read-only and never writes. A missing level (and every level
+ * under it) is appended to `plan`, and later headings resolve against those
+ * planned nodes the way a real import resolves against rows it just inserted,
+ * so a dry run reports the same canonical names, merges and creations.
+ */
+async function planCategoryHierarchy(
+  categoryRepo: CategoryRepository,
+  plan: PlannedTaxonomyNode[],
+  categoryName: string,
+  subcategoryName?: string,
+  subSubcategoryName?: string
+): Promise<HierarchyResolution> {
+  if (!categoryName?.trim()) throw new Error('Empty category heading');
+  const steps: {
+    level: HierarchyLevel;
+    name: string | undefined;
+    find: (name: string, parentId?: number) => Promise<{ id: number; name: string } | undefined>;
+  }[] = [
+    { level: 'category', name: categoryName, find: (name) => findCategoryNode(categoryRepo, name) },
+    { level: 'subcategory', name: subcategoryName, find: (name, parentId) => findSubcategoryNode(categoryRepo, name, parentId!) },
+    { level: 'sub-subcategory', name: subSubcategoryName, find: (name, parentId) => findSubSubcategoryNode(categoryRepo, name, parentId!) },
+  ];
+  const merges: HierarchyMerge[] = [];
+  const resolved: { id?: number; name: string }[] = [];
+  for (const [depth, step] of steps.entries()) {
+    if (!step.name) break;
+    const parent = resolved[depth - 1];
+    const parentPath = resolved.map(n => n.name).join(' > ') || undefined;
+    // A planned parent has no row yet, so nothing can exist under it.
+    const existing = depth > 0 && parent.id === undefined ? undefined : await step.find(step.name, parent?.id);
+    const slug = generateSlug(step.name);
+    let node: { name: string } | undefined = existing
+      ?? pickNode(plan.filter(p => p.level === step.level && p.parent === parentPath), step.name, slug);
+    if (!node) {
+      const planned: PlannedTaxonomyNode = { level: step.level, name: step.name, slug, parent: parentPath };
+      plan.push(planned);
+      node = planned;
+    }
+    if (node.name !== step.name) merges.push({ level: step.level, imported: step.name, existing: node.name });
+    resolved.push({ id: existing?.id, name: node.name });
+  }
+  const [category, subcategory, subSubcategory] = resolved;
   return {
     categoryId: category.id,
     subcategoryId: subcategory?.id,
@@ -308,17 +562,19 @@ export class GitHubSyncService {
         totalResources: 0,
         totalCategories: 0
       },
-      resources: []
+      resources: [],
+      wouldCreateTaxonomy: []
     };
+    logger.info('Import started', { repo: repoUrl, dryRun: !!options.dryRun });
 
     try {
       // Fetch README content
-      console.log(`Fetching README from ${repoUrl}...`);
+      logger.info(`Fetching README from ${repoUrl}...`);
       const { content: readmeContent, branch: readmeBranch } = await this.client.fetchFile(repoUrl, 'README.md');
       result.branch = readmeBranch;
       
       // STEP 1: Validate with awesome-lint BEFORE importing
-      console.log('Validating awesome list with awesome-lint...');
+      logger.info('Validating awesome list with awesome-lint...');
       const validationResult = validateAwesomeList(readmeContent);
       
       // Store validation results
@@ -338,37 +594,32 @@ export class GitHubSyncService {
           severity: 'warning' as const
         }))
       ];
-      
-      // Add warnings to result
-      result.warnings = validationResult.warnings.map(w => 
-        `Line ${w.line}: [${w.rule}] ${w.message}`
-      );
-      
+
       // Log validation results
-      console.log(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
-      console.log(`  - Lines: ${validationResult.stats.totalLines}`);
-      console.log(`  - Resources detected: ${validationResult.stats.totalResources}`);
-      console.log(`  - Categories detected: ${validationResult.stats.totalCategories}`);
-      console.log(`  - Errors: ${validationResult.errors.length}`);
-      console.log(`  - Warnings: ${validationResult.warnings.length}`);
+      logger.info(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
+      logger.info(`  - Lines: ${validationResult.stats.totalLines}`);
+      logger.info(`  - Resources detected: ${validationResult.stats.totalResources}`);
+      logger.info(`  - Categories detected: ${validationResult.stats.totalCategories}`);
+      logger.info(`  - Errors: ${validationResult.errors.length}`);
+      logger.info(`  - Warnings: ${validationResult.warnings.length}`);
       
       // Validation is informational during import - do NOT block
       // External repos may not conform to our strict formatting rules
       if (!validationResult.valid) {
-        console.log(`⚠ Validation found ${validationResult.errors.length} formatting issues - proceeding with import anyway`);
-        console.log(`  (Validation is enforced on export, not import)`);
+        logger.info(`⚠ Validation found ${validationResult.errors.length} formatting issues - proceeding with import anyway`);
+        logger.info(`  (Validation is enforced on export, not import)`);
       }
       
       if (validationResult.warnings.length > 0) {
-        console.log(`⚠ Proceeding with ${validationResult.warnings.length} warnings`);
+        logger.info(`⚠ Proceeding with ${validationResult.warnings.length} warnings`);
       }
       
       // STEP 2: Parse the awesome list
-      console.log('Parsing awesome list content...');
+      logger.info('Parsing awesome list content...');
       const parsedList = await parseAwesomeList(readmeContent);
       const dbResources = convertToDbResources(parsedList);
       
-      console.log(`Found ${dbResources.length} resources in the awesome list`);
+      logger.info(`Found ${dbResources.length} resources in the awesome list`);
       
       // Run21 R4-036: identical boilerplate descriptions on different
       // resources ("Defines the file format and structure" x3) read as
@@ -389,7 +640,7 @@ export class GitHubSyncService {
       }
       
       // STEP 3: Build and ensure category hierarchy exists in database
-      console.log('Ensuring category hierarchy exists in database...');
+      logger.info('Ensuring category hierarchy exists in database...');
       const uniqueHierarchies = new Map<string, { category: string; subcategory?: string; subSubcategory?: string }>();
       
       for (const resource of dbResources) {
@@ -403,10 +654,11 @@ export class GitHubSyncService {
         }
       }
       
-      console.log(`Found ${uniqueHierarchies.size} unique category hierarchies`);
+      logger.info(`Found ${uniqueHierarchies.size} unique category hierarchies`);
       
-      // Create all category hierarchies
-      const hierarchyIds = new Map<string, Awaited<ReturnType<typeof ensureCategoryHierarchy>>>();
+      // Create all category hierarchies (a dry run only plans them)
+      const hierarchyIds = new Map<string, HierarchyResolution>();
+      const plannedTaxonomy: PlannedTaxonomyNode[] = [];
       // Hierarchies that could not be resolved. Items under them are refused
       // in STEP 4 (one item error each) instead of being written with
       // category text that names no taxonomy row (orphan resources desync
@@ -414,29 +666,58 @@ export class GitHubSyncService {
       const failedHierarchies = new Map<string, string>();
       for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
-          const ids = await ensureCategoryHierarchy(
-            this.categoryRepo,
-            hierarchy.category,
-            hierarchy.subcategory,
-            hierarchy.subSubcategory
-          );
+          const ids = options.dryRun
+            ? await planCategoryHierarchy(
+              this.categoryRepo,
+              plannedTaxonomy,
+              hierarchy.category,
+              hierarchy.subcategory,
+              hierarchy.subSubcategory
+            )
+            : await ensureCategoryHierarchy(
+              this.categoryRepo,
+              hierarchy.category,
+              hierarchy.subcategory,
+              hierarchy.subSubcategory
+            );
           hierarchyIds.set(key, ids);
           for (const m of ids.merges) {
             const note = `Imported ${m.level} "${m.imported}" merged into existing ${m.level} "${m.existing}" (same slug or name)`;
             if (result.warnings.includes(note)) continue;
-            console.log(`  ${note}`);
+            logger.info(`  ${note}`);
             result.warnings.push(note);
           }
         } catch (error: any) {
-          console.error(`Error creating hierarchy for ${key}: ${error.message}`);
+          logger.error(`Error creating hierarchy for ${key}: ${error.message}`);
           failedHierarchies.set(key, error instanceof Error ? error.message : String(error));
         }
       }
       
-      console.log('Category hierarchy setup complete');
+      result.wouldCreateTaxonomy = plannedTaxonomy;
+
+      logger.info('Category hierarchy setup complete');
       
-      // STEP 4: Process each resource
+      // STEP 4: Process each resource. The catalog is read once: reading every
+      // row per item timed the request out on a catalog of a few thousand.
+      const catalog = new ImportCatalog(
+        (await this.resourceRepo.listResources({ limit: 100000 })).resources
+      );
+      // A link the README lists under two headings would otherwise move
+      // between them twice per Pull and never settle; its first listing wins.
+      const firstListing = new Map<string, string>();
+      // A dry run records the rows it would write under ids no real row has,
+      // so later items match them exactly as the real run does.
+      let plannedId = 0;
       for (const resource of dbResources) {
+        const urlKey = normalizeUrlForDedup(resource.url ?? '');
+        const listedUnder = firstListing.get(urlKey);
+        if (listedUnder !== undefined) {
+          const note = `"${resource.title}" is listed again under "${taxonomyPath(resource)}"; kept its first listing under "${listedUnder}"`;
+          logger.info(`- Skipped: ${note}`);
+          result.warnings.push(note);
+          result.skipped++;
+          continue;
+        }
         try {
           // Get hierarchy IDs for this resource
           const hierarchyKey = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
@@ -444,7 +725,7 @@ export class GitHubSyncService {
           const hierarchyFailure = failedHierarchies.get(hierarchyKey);
           if (hierarchyFailure !== undefined) {
             const errorMsg = `Error processing ${resource.title}: Category hierarchy error: ${hierarchyFailure}`;
-            console.error(errorMsg);
+            logger.error(errorMsg);
             result.errors.push(errorMsg);
             continue;
           }
@@ -456,8 +737,11 @@ export class GitHubSyncService {
             resource.subcategory = hierarchyId.subcategory ?? resource.subcategory;
             resource.subSubcategory = hierarchyId.subSubcategory ?? resource.subSubcategory;
           }
-          
-          const conflict = await this.checkConflict(resource);
+          // Recorded only once the item has a usable heading, so a later
+          // listing still imports when the first one's hierarchy failed.
+          firstListing.set(urlKey, taxonomyPath(resource));
+
+          const conflict = this.checkConflict(resource, catalog);
           
           switch (conflict.action) {
             case 'create':
@@ -478,6 +762,7 @@ export class GitHubSyncService {
                   status: 'approved',
                   githubSynced: true
                 } as InsertResource);
+                catalog.record(created);
                 result.resources.push(created);
                 
                 // Log the import
@@ -488,32 +773,50 @@ export class GitHubSyncService {
                   { source: repoUrl },
                   `Imported from GitHub: ${repoUrl}`
                 );
+              } else {
+                catalog.record({
+                  id: --plannedId,
+                  url: resource.url!,
+                  metadata: null,
+                  title: resource.title!,
+                  description: resource.description ?? '',
+                  category: resource.category!,
+                  subcategory: resource.subcategory ?? null,
+                  subSubcategory: resource.subSubcategory ?? null,
+                });
               }
               result.imported++;
-              console.log(`✓ Imported: ${resource.title}`);
+              logger.info(`✓ Imported: ${resource.title}`);
               break;
               
-            case 'update':
-              if (!options.dryRun && conflict.resource.id) {
-                // Update hierarchy IDs in metadata for consistency
-                const existingMetadata = (conflict.resource.metadata as Record<string, any>) || {};
-                const updatedMetadata = {
-                  ...existingMetadata,
-                  categoryId: hierarchyId?.categoryId,
-                  subcategoryId: hierarchyId?.subcategoryId,
-                  subSubcategoryId: hierarchyId?.subSubcategoryId,
-                  lastUpdatedFrom: repoUrl,
-                  lastUpdatedAt: new Date().toISOString(),
-                };
-                
+            case 'update': {
+              const changedFields = Object.keys(conflict.changes).join(', ');
+              if (!options.dryRun) {
+                // The ids name the path the row ends up on, which keeps a
+                // stored deeper level the README path lacks.
+                const after = { ...conflict.existing, ...conflict.changes };
+                const ids = taxonomyPath(after) === taxonomyPath(resource)
+                  ? hierarchyId
+                  : await planCategoryHierarchy(
+                    this.categoryRepo, [], after.category,
+                    after.subcategory ?? undefined, after.subSubcategory ?? undefined,
+                  );
+                // Merged into the stored metadata by the UPDATE itself, so
+                // enrichment keys (tags, ogImage) written since the catalog
+                // was read survive.
                 const updated = await this.resourceRepo.updateResource(
-                  conflict.resource.id,
+                  conflict.existing.id,
+                  conflict.changes,
+                  false,
                   {
-                    ...conflict.resource,
-                    metadata: updatedMetadata
-                  } as Partial<InsertResource>,
-                  false
+                    mergeMetadata: {
+                      ...taxonomyIds(ids),
+                      lastUpdatedFrom: repoUrl,
+                      lastUpdatedAt: new Date().toISOString(),
+                    },
+                  },
                 );
+                catalog.record(updated);
                 result.resources.push(updated);
                 
                 // Log the update
@@ -522,22 +825,34 @@ export class GitHubSyncService {
                   'updated',
                   undefined,
                   { source: repoUrl },
-                  `Updated from GitHub: ${conflict.reason}`
+                  `Updated from GitHub: ${changedFields}`
                 );
+              } else {
+                catalog.record({ ...conflict.existing, ...conflict.changes });
               }
               result.updated++;
-              console.log(`↻ Updated: ${resource.title} - ${conflict.reason}`);
+              logger.info(`↻ Updated: ${resource.title} - ${changedFields}`);
               break;
+            }
               
             case 'skip':
               result.skipped++;
-              console.log(`- Skipped: ${resource.title} - ${conflict.reason}`);
+              logger.info(`- Skipped: ${resource.title} - ${conflict.reason}`);
               break;
           }
-        } catch (error: any) {
-          const errorMsg = `Error processing ${resource.title}: ${error.message}`;
+        } catch (error: unknown) {
+          // The catalog was read before the loop, so another writer can take
+          // this URL in between. The row that holds it stays as it is.
+          if (isUniqueViolation(error, "resources_url")) {
+            const warning = `Skipped ${resource.title}: URL already held by another row (concurrent write)`;
+            result.skipped++;
+            result.warnings.push(warning);
+            logger.warn(warning);
+            continue;
+          }
+          const errorMsg = `Error processing ${resource.title}: ${describeDbError(error)}`;
           result.errors.push(errorMsg);
-          console.error(errorMsg);
+          logger.error(errorMsg);
         }
       }
       
@@ -547,6 +862,18 @@ export class GitHubSyncService {
       const importOutcome = result.errors.length === 0
         ? 'completed'
         : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+      logger[importOutcome === 'failed' ? 'error' : importOutcome === 'partial' ? 'warn' : 'info'](
+        'Import finished',
+        {
+          repo: repoUrl,
+          outcome: importOutcome,
+          imported: result.imported,
+          updated: result.updated,
+          skipped: result.skipped,
+          errors: result.errors.length,
+          ...(result.errors[0] ? { firstError: result.errors[0] } : {}),
+        },
+      );
 
       // Add to sync queue for tracking
       if (!options.dryRun) {
@@ -581,6 +908,7 @@ export class GitHubSyncService {
               skipped: result.skipped,
               errors: result.errors.length,
               warnings: result.warnings.length,
+              validationErrors: result.validationErrors.length,
               validationPassed: result.validationPassed,
               resources: result.resources.map(r => ({ id: r.id, title: r.title, url: r.url })),
             },
@@ -590,14 +918,16 @@ export class GitHubSyncService {
             },
           });
         } catch (historyErr: any) {
-          console.error('Failed to write github_sync_history row (non-fatal):', historyErr?.message || historyErr);
+          logger.error('Failed to write github_sync_history row (non-fatal):', historyErr);
         }
       }
 
     } catch (error: any) {
-      const errorMsg = `Import failed: ${error.message}`;
+      const reason = error instanceof Error ? error.message : String(error);
+      const errorMsg = `Import failed: ${reason}`;
       result.errors.push(errorMsg);
-      console.error(errorMsg);
+      result.runError = reason;
+      logger.error('Import failed', { repo: repoUrl, reason: error.message }, error);
       
       // Log failed import
       if (!options.dryRun) {
@@ -621,7 +951,7 @@ export class GitHubSyncService {
             metadata: { outcome: 'failed' },
           });
         } catch (historyErr: any) {
-          console.error('Failed to write github_sync_history failed row (non-fatal):', historyErr?.message || historyErr);
+          logger.error('Failed to write github_sync_history failed row (non-fatal):', historyErr);
         }
       }
     }
@@ -645,9 +975,9 @@ export class GitHubSyncService {
     try {
       const { data: repoInfo } = await octokit.repos.get({ owner, repo });
       defaultBranch = repoInfo.default_branch;
-      console.log(`Repository default branch: ${defaultBranch}`);
+      logger.info(`Repository default branch: ${defaultBranch}`);
     } catch (error: any) {
-      console.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
+      logger.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
       repoFetchError = error;
     }
 
@@ -686,14 +1016,14 @@ export class GitHubSyncService {
             repo,
             ref: `heads/${branch}`
           });
-          console.log(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+          logger.info(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
           return branch;
         } catch (error: any) {
           const status = error.status || 'unknown';
           const isTransient = status === 503 || status === 500 || status === 'unknown';
           const shouldRetry = isDefaultBranch && attempt < maxAttempts && isTransient;
           
-          console.warn(
+          logger.warn(
             `Branch '${branch}' not accessible (attempt ${attempt}/${maxAttempts}): ` +
             `${error.message} (HTTP ${status})${shouldRetry ? ' - retrying...' : ''}`
           );
@@ -753,6 +1083,11 @@ export class GitHubSyncService {
       exported: 0,
       errors: []
     };
+    logger.info('Export started', {
+      repo: repoUrl,
+      dryRun: !!options.dryRun,
+      ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+    });
 
     try {
       // Get fresh Octokit client with Replit GitHub connection
@@ -780,7 +1115,7 @@ export class GitHubSyncService {
         throw new Error('No approved resources to export');
       }
 
-      console.log(`Exporting ${currentResources.length} approved resources...`);
+      logger.info(`Exporting ${currentResources.length} approved resources...`);
 
       // Get last sync history to calculate diff
       const lastSync = await this.syncRepo.getLastSyncHistory(repoUrl, 'export');
@@ -789,7 +1124,7 @@ export class GitHubSyncService {
       // Calculate diff: added, updated, removed
       const { added, updated, removed } = this.calculateDiff(lastSnapshot, currentResources);
 
-      console.log(`Diff: ${added} added, ${updated} updated, ${removed} removed`);
+      logger.info(`Diff: ${added} added, ${updated} updated, ${removed} removed`);
 
       // Generate smart commit message
       const commitMessage = lastSync 
@@ -810,7 +1145,7 @@ export class GitHubSyncService {
       const contributingContent = generateContributingMd(this.websiteUrl, repoUrl);
 
       // Validate with awesome-lint BEFORE pushing to GitHub
-      console.log('Validating generated markdown with awesome-lint...');
+      logger.info('Validating generated markdown with awesome-lint...');
       const validationResult = validateAwesomeList(readmeContent);
       
       if (!validationResult.valid) {
@@ -823,7 +1158,7 @@ export class GitHubSyncService {
         );
       }
       
-      console.log(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
+      logger.info(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
 
       // Export link gate: check the EXACT README we are about to push for
       // confirmed-broken links, BEFORE any GitHub write. Repository/export
@@ -833,11 +1168,11 @@ export class GitHubSyncService {
       // Opt out via options.skipLinkCheck or EXPORT_LINK_CHECK=off.
       if (!options.skipLinkCheck && process.env.EXPORT_LINK_CHECK !== 'off') {
         const { runExportLinkGate } = await import('../validation/exportLinkGate');
-        console.log('[export-link-check] scanning generated README for confirmed-broken links...');
+        logger.info('[export-link-check] scanning generated README for confirmed-broken links...');
         const gate = await runExportLinkGate(readmeContent, {
           onProgress: (checked, total) => {
             if (checked % 200 === 0 || checked === total) {
-              console.log(`[export-link-check] first pass ${checked}/${total}`);
+              logger.info(`[export-link-check] first pass ${checked}/${total}`);
             }
           },
         });
@@ -852,16 +1187,16 @@ export class GitHubSyncService {
             `This check is separate from the Link Health dashboard.`
           );
         }
-        console.log(`[export-link-check] ✓ passed — ${gate.checked} links checked, ${gate.skipped} allowlisted, 0 confirmed broken`);
+        logger.info(`[export-link-check] ✓ passed — ${gate.checked} links checked, ${gate.skipped} allowlisted, 0 confirmed broken`);
       } else {
-        console.log('[export-link-check] skipped (disabled by option or EXPORT_LINK_CHECK=off)');
+        logger.info('[export-link-check] skipped (disabled by option or EXPORT_LINK_CHECK=off)');
       }
 
       if (options.dryRun) {
-        console.log('Dry run - would update:');
-        console.log('- README.md');
-        console.log('- CONTRIBUTING.md');
-        console.log(`Commit message: ${commitMessage}`);
+        logger.info('Dry run - would update:');
+        logger.info('- README.md');
+        logger.info('- CONTRIBUTING.md');
+        logger.info(`Commit message: ${commitMessage}`);
         result.exported = currentResources.length;
         return result;
       }
@@ -943,7 +1278,15 @@ export class GitHubSyncService {
       result.commitUrl = newCommit.html_url;
       result.exported = currentResources.length;
 
-      console.log(`✓ Committed changes: ${newCommit.sha}`);
+      logger.info('Export committed', {
+        repo: repoUrl,
+        commit: newCommit.sha,
+        resources: currentResources.length,
+        added,
+        updated,
+        removed,
+        ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+      });
 
       // Update resources as synced (single bulk UPDATE — a per-resource
       // Promise.all here exhausted the pg pool on large exports)
@@ -973,7 +1316,8 @@ export class GitHubSyncService {
           }))
         } as any,
         metadata: {
-          diff: { added, updated, removed }
+          diff: { added, updated, removed },
+          ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
         } as any
       });
 
@@ -1014,7 +1358,11 @@ export class GitHubSyncService {
       }
       
       result.errors.push(errorMsg);
-      console.error('GitHub export error:', errorMsg);
+      logger.error('Export failed', {
+        repo: repoUrl,
+        reason: errorMsg,
+        ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+      });
       // Queue-row failure status is recorded by the caller (route or queue
       // processor) via updateGithubSyncStatus on the row it created — no
       // duplicate terminal row is inserted here.
@@ -1072,16 +1420,16 @@ export class GitHubSyncService {
    * Process the GitHub sync queue
    */
   async processQueue(): Promise<void> {
-    console.log('Processing GitHub sync queue...');
+    logger.info('Processing GitHub sync queue...');
     
     const queueItems = await this.syncRepo.getGithubSyncQueue('pending');
     
     if (queueItems.length === 0) {
-      console.log('No pending items in sync queue');
+      logger.info('No pending items in sync queue');
       return;
     }
 
-    console.log(`Found ${queueItems.length} pending items in queue`);
+    logger.info(`Found ${queueItems.length} pending items in queue`);
 
     for (const item of queueItems) {
       this.activeQueueIds.add(item.id);
@@ -1124,12 +1472,16 @@ export class GitHubSyncService {
         } else if (item.action === 'export') {
           const result = await this.exportToGitHub(item.repositoryUrl, {
             dryRun: false,
-            createPullRequest: true
+            createPullRequest: true,
+            queueId: item.id,
           });
 
+          // commitSha is set as soon as the commit lands, so a failure in the
+          // bookkeeping after it still records which commit this run made.
           const metadata = {
             exported: result.exported,
-            errors: result.errors.length
+            errors: result.errors.length,
+            ...(result.commitSha ? { commitSha: result.commitSha, commitUrl: result.commitUrl } : {}),
           };
 
           if (result.errors.length === 0) {
@@ -1145,7 +1497,7 @@ export class GitHubSyncService {
           }
         }
       } catch (error: any) {
-        console.error(`Error processing queue item ${item.id}:`, error);
+        logger.error(`Error processing queue item ${item.id}:`, error);
         await this.syncRepo.updateGithubSyncStatus(
           item.id,
           'failed',
@@ -1156,7 +1508,7 @@ export class GitHubSyncService {
       }
     }
 
-    console.log('Queue processing completed');
+    logger.info('Queue processing completed');
   }
 
   // Run15 BUG-011 (architect review): expose live-owned queue row ids for the
@@ -1183,86 +1535,33 @@ export class GitHubSyncService {
   /**
    * Check for conflicts with existing resources
    */
-  private async checkConflict(resource: Partial<Resource>): Promise<ConflictResolution> {
+  private checkConflict(resource: Partial<Resource>, catalog: ImportCatalog): ConflictResolution {
     // Run3 audit R3-24: the old check compared EXACT URLs over only the first
     // 1,000 approved rows — short-links (link.medium.com) and rows past the
     // cap slipped through and were re-imported as duplicates. Now we compare
-    // normalized URLs over the whole catalog (any status, so a pending copy
-    // also blocks re-import) and fall back to a title+domain match.
-    const existingResources = await this.resourceRepo.listResources({
-      limit: 100000,
-    });
-
-    const targetUrlKey = normalizeUrlForDedup(resource.url || '');
-    let existing = existingResources.resources.find(
-      r => normalizeUrlForDedup(r.url) === targetUrlKey
-    );
+    // normalized URLs over the whole catalog and fall back to a title+domain
+    // match.
+    const existing = catalog.findByUrl(resource.url ?? '');
 
     if (!existing) {
       // Same normalized title + same root domain = same item behind a
       // different URL shape (tracking params, short-links, mirrors).
-      const titleKey = normalizeTitleForDedup(resource.title || '');
-      const domainKey = domainOf(resource.url || '');
-      if (titleKey && domainKey) {
-        existing = existingResources.resources.find(
-          r => normalizeTitleForDedup(r.title) === titleKey && domainOf(r.url) === domainKey
-        );
-        if (existing) {
-          return {
-            action: 'skip',
-            resource: existing,
-            reason: `Duplicate of #${existing.id} (same title + domain, different URL form)`
-          };
-        }
+      const duplicate = catalog.findByTitleDomain(resource.title ?? '', resource.url ?? '');
+      if (duplicate) {
+        // A dry run's planned rows have no real id (see plannedId).
+        const original = duplicate.id > 0 ? `#${duplicate.id}` : `"${duplicate.title}" (new in this run)`;
+        return {
+          action: 'skip',
+          reason: `Duplicate of ${original} (same title + domain, different URL form)`
+        };
       }
+      return { action: 'create', resource };
     }
 
-    if (!existing) {
-      return {
-        action: 'create',
-        resource,
-        reason: 'New resource'
-      };
-    }
-
-    // Check if there are differences
-    // The parser leaves absent levels undefined while stored rows hold null;
-    // compare nullishly or every unchanged re-import is miscounted as an
-    // update (and rewrites updated_at plus an audit row per resource).
-    const differs = (a: unknown, b: unknown) => (a ?? null) !== (b ?? null);
-    const hasChanges =
-      differs(existing.title, resource.title) ||
-      differs(existing.description, resource.description) ||
-      differs(existing.category, resource.category) ||
-      differs(existing.subcategory, resource.subcategory) ||
-      differs(existing.subSubcategory, resource.subSubcategory);
-
-    if (hasChanges) {
-      // Merge descriptions if different
-      let mergedDescription = existing.description;
-      if (resource.description && resource.description !== existing.description) {
-        // Use the longer description or combine them
-        if ((resource.description?.length || 0) > (existing.description?.length || 0)) {
-          mergedDescription = resource.description;
-        }
-      }
-
-      return {
-        action: 'update',
-        resource: {
-          ...resource,
-          id: existing.id,
-          description: mergedDescription
-        },
-        reason: 'Updated content'
-      };
-    }
-
-    return {
-      action: 'skip',
-      resource: existing,
-      reason: 'No changes detected'
-    };
+    const changes = importChanges(existing, resource);
+    return Object.keys(changes).length > 0
+      ? { action: 'update', existing, changes }
+      : { action: 'skip', reason: 'No changes detected' };
   }
 
   /**

@@ -31,12 +31,22 @@ import {
   NotebookPen
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
+import { bookmarkAriaLabel } from "@/lib/a11y-labels";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
+import ResourceOnwardPaths from "@/components/resource/ResourceOnwardPaths";
+import ResourceTopNextSteps, { TOP_RELATED_LIMIT, TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
-import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
+import {
+  trackSelectContent,
+  trackShare,
+  trackResourceFavorite,
+  trackResourceClick,
+  trackRelatedResourceOpened,
+  trackResourceNextStepClicked,
+} from "@/lib/analytics";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -48,7 +58,7 @@ import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
-import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
+import type { RemovedBookmark } from "@/lib/bookmarkRestore";
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -60,7 +70,11 @@ import {
 } from "@shared/resourceFacets";
 import { tagLandingPath } from "@shared/tagNormalize";
 import type { ResourceKind } from "@shared/resourceKinds";
+import { findCachedResource } from "@/lib/cached-resource";
 import "@/styles/pages/resource.css";
+
+// GET /api/resources/:id/related returns five matches unless asked for more.
+const RELATED_PLACEHOLDER_ROWS = 5;
 
 // Match resource cards: fetch the editor and form dependencies only on demand.
 const SuggestEditDialog = lazy(() =>
@@ -88,6 +102,20 @@ function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: Rea
   ) : <>{props.fallback}</>;
 }
 
+// Name where the button goes ("View on GitHub", "Open on dashif.org") so a
+// visitor knows what they get before leaving the site.
+function visitLabel(url: string): string {
+  let host: string;
+  try {
+    host = new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "Open resource";
+  }
+  if (host === "github.com") return "View on GitHub";
+  if (host === "gitlab.com") return "View on GitLab";
+  return host ? `Open on ${host}` : "Open resource";
+}
+
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, isAuthenticated, isAuthPending } = useAuth();
@@ -105,7 +133,15 @@ export default function ResourceDetail() {
   const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
     queryFn: () => apiRequest(`/api/resources/${id}`, { method: "GET" }),
-    enabled: validId
+    enabled: validId,
+    // In-app visits render from the list the link was in while the detail
+    // request runs (direct visits arrive seeded from the server document).
+    placeholderData: () =>
+      validId
+        ? (findCachedResource(queryClient, Number(id), ['/api/resources', id]) as
+            | (Resource & { resolvedKind?: ResourceKind; featured?: boolean })
+            | undefined)
+        : undefined,
   });
   const { data: resource, isLoading, error } = resourceQuery;
   const resourceMissing = !validId || (error instanceof ApiError && error.status === 404);
@@ -171,7 +207,9 @@ export default function ResourceDetail() {
   const relatedQuery = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
     queryFn: () => apiRequest(`/api/resources/${id}/related`, { method: "GET" }),
-    enabled: !!resource
+    // Fetched alongside the resource, not after it: the endpoint answers a
+    // missing or hidden id with an empty list.
+    enabled: validId
   });
   const relatedResources = relatedQuery.data;
 
@@ -196,7 +234,6 @@ export default function ResourceDetail() {
   const originalCollectionIdsRef = useRef<number[]>([]);
   const desiredCollectionIdsRef = useRef<number[]>([]);
   const saveModeRef = useRef<"add" | "edit">("add");
-  const removedBookmarkRef = useRef<RemovedBookmark | undefined>(undefined);
   const { data: collections = [], isLoading: collectionsLoading } =
     useQuery<BookmarkCollection[]>({
       queryKey: ["/api/collections?includeArchived=true"],
@@ -244,62 +281,18 @@ export default function ResourceDetail() {
     resourceId: id || '',
     isActive: isBookmarked,
     onOptimistic: (next) => {
-      // Snapshot before the flip drops the row from the cache, so Undo can
-      // put back its collections and queue state, not just the bookmark.
-      if (!next) removedBookmarkRef.current = bookmarkedEntry;
       // Guests: saved state re-derives from the guest store — don't seed the
       // disabled authed list cache with guest flips.
       if (isAuthenticated) flipCachedList('/api/bookmarks', next);
     },
     onSuccess: (_data, vars, showToast) => {
-      if (vars.remove) {
-        // Run17 BUG-013: removal is instant — offer a one-click Undo instead
-        // of a confirm dialog.
-        const removed = removedBookmarkRef.current;
-        showToast({
-          title: "Removed from bookmarks",
-          description: "Resource removed from your bookmarks",
-          action: (
-            <ToastAction
-              altText="Undo bookmark removal"
-              onClick={() => void (async () => {
-                try {
-                  const { partial } = await restoreRemovedBookmark(id || '', removed);
-                  showToast(
-                    partial
-                      ? {
-                          title: "Bookmark restored",
-                          description: "Some collections or queue settings couldn't be restored.",
-                          variant: "destructive",
-                        }
-                      : { description: "Bookmark restored", duration: 2000 },
-                  );
-                } catch {
-                  toast({
-                    title: "Error",
-                    description: "Couldn't restore the bookmark. Please try again.",
-                    variant: "destructive",
-                  });
-                }
-              })()}
-              data-testid="button-undo-bookmark-removal"
-            >
-              Undo
-            </ToastAction>
-          ),
-        });
-      } else if (saveModeRef.current === "edit") {
-        showToast({
-          title: "Notes saved",
-          description: "Your bookmark notes were updated"
-        });
-      } else {
-        showToast({
-          title: "Added to bookmarks",
-          description: "Resource saved to your bookmarks"
-        });
-      }
+      // The removed toast and its Undo come from useBookmarkToggle.
       if (!vars.remove) {
+        showToast(
+          saveModeRef.current === "edit"
+            ? { title: "Notes saved", description: "Your bookmark notes were updated" }
+            : { title: "Added to bookmarks", description: "Resource saved to your bookmarks" },
+        );
         const original = new Set(originalCollectionIdsRef.current);
         const desired = new Set(desiredCollectionIdsRef.current);
         const additions = Array.from(desired).filter((collectionId) => !original.has(collectionId));
@@ -566,18 +559,36 @@ export default function ResourceDetail() {
   // intercepted for SPA navigation (after tracking); modified clicks
   // (cmd/ctrl/shift/middle) fall through to native anchor behavior so
   // open-in-new-tab works.
-  const handleRelatedResourceClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    relatedResource: Resource,
-  ) => {
-    trackInteraction.mutate({
-      resourceId: relatedResource.id.toString(),
-      interactionType: "click",
-      metadata: { source: "related-resources", fromResourceId: id }
-    });
+  const followRelatedLink = (e: React.MouseEvent<HTMLAnchorElement>, relatedResourceId: number) => {
+    // Interaction history is per member; guests would only collect a 401.
+    if (user?.id) {
+      trackInteraction.mutate({
+        resourceId: relatedResourceId.toString(),
+        interactionType: "click",
+        metadata: { source: "related-resources", fromResourceId: id }
+      });
+    }
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
-    setLocation(`/resource/${relatedResource.id}`);
+    setLocation(`/resource/${relatedResourceId}`);
+  };
+
+  const handleRelatedResourceClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    relatedResource: { id: number; score?: number },
+    position: number,
+  ) => {
+    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score);
+    followRelatedLink(e, relatedResource.id);
+  };
+
+  const handleTopRelatedClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    relatedResource: { id: number },
+    position: number,
+  ) => {
+    trackResourceNextStepClicked(TOP_SURFACE, id, { kind: "related", targetId: relatedResource.id, position });
+    followRelatedLink(e, relatedResource.id);
   };
 
   const metadata = resource?.metadata as Record<string, any> | undefined;
@@ -608,9 +619,29 @@ export default function ResourceDetail() {
     }));
   const allUnclassified = classificationRows.length === 0;
 
+  // The closest shelf to this resource: visitors who land here from search
+  // want its neighbours first, the whole category second.
+  const narrowestCollection = resource?.subSubcategory && taxonomySlugs.subSubcategory
+    ? { name: resource.subSubcategory, href: `/sub-subcategory/${taxonomySlugs.subSubcategory}` }
+    : resource?.subcategory && taxonomySlugs.subcategory
+      ? { name: resource.subcategory, href: `/subcategory/${taxonomySlugs.subcategory}` }
+      : null;
+
   const filteredRelatedResources = (relatedResources?.similar ?? [])
     .slice(0, 6)
     .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
+
+  // Shared tags first, then the server's score (same category / keywords).
+  const ownTags = new Set((tags ?? []).map((tag) => tag.toLowerCase()));
+  const sharedTagCount = (candidate: Resource) =>
+    ((candidate.metadata as { tags?: string[] } | null)?.tags ?? []).filter((tag) => ownTags.has(tag.toLowerCase())).length;
+  const topRelated = [...filteredRelatedResources].sort(
+    (a, b) => sharedTagCount(b) - sharedTagCount(a) || (b.score ?? 0) - (a.score ?? 0),
+  );
+
+  // The top "More like this" rail already shows the first few; the Related
+  // Resources card lists only the rest so the two never repeat each other.
+  const lowerRelated = topRelated.slice(TOP_RELATED_LIMIT);
 
   // The shared not-found page owns the 404 head, h1 and dead-link telemetry.
   if (resourceMissing) {
@@ -696,9 +727,16 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.category
                 ? (
-                  <Link href={`/category/${taxonomySlugs.category}`} className="chip" data-testid="badge-category">
-                    <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
-                    <span className="resource-detail-chip-label">{resource.category}</span>
+                  <Link
+                    href={`/category/${taxonomySlugs.category}`}
+                    className="resource-detail-chip-link"
+                    data-testid="badge-category"
+                    onClick={() => trackResourceNextStepClicked(TOP_SURFACE, id, { kind: "category", categorySlug: taxonomySlugs.category! })}
+                  >
+                    <span className="chip">
+                      <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
+                      <span className="resource-detail-chip-label">{resource.category}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -732,8 +770,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subcategory
                 ? (
-                  <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -747,8 +787,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subSubcategory
                 ? (
-                  <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -761,6 +803,12 @@ export default function ResourceDetail() {
         </div>
       </div>
 
+      <ResourceTopNextSteps
+        related={topRelated}
+        loading={relatedQuery.isLoading}
+        onRelatedClick={handleTopRelatedClick}
+      />
+
       <section className="resource-detail-description">
         <h2 className="eyebrow">DESCRIPTION</h2>
         <p data-testid="text-description">
@@ -772,13 +820,15 @@ export default function ResourceDetail() {
           <Button asChild>
             <a href={resource.url} target="_blank" rel="noopener noreferrer"
               onClick={handleVisitResource} data-testid="button-visit">
-              Open resource <ExternalLink size={14} aria-hidden="true" />
+              {visitLabel(resource.url)} <ExternalLink size={14} aria-hidden="true" />
             </a>
           </Button>
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
               prompt sign-in instead of hiding the affordance. */}
+          {/* Pressed state is painted by the aria-pressed rule in resource.css
+              (accent ink on an accent wash), so the variant stays outline. */}
           <Button
-            variant={isFavorite ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleFavoriteClick}
             aria-disabled={favorite.isPending}
@@ -786,14 +836,20 @@ export default function ResourceDetail() {
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
             aria-pressed={isFavorite}
+            aria-label={
+              isFavorite
+                ? (isAuthenticated ? "Remove from favorites" : "Remove from account favorites — sign in required")
+                : (isAuthenticated ? "Add to favorites" : "Favorite to your account — sign in required")
+            }
           >
             {/* BUG-050 (run19): labels stay visible at every width — icon-only
                 buttons at 375px were mystery meat for sighted mobile users. */}
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
             <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
+            {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· account</span>}
           </Button>
           <Button
-            variant={isBookmarked ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleBookmarkClick}
             aria-disabled={bookmark.isPending}
@@ -801,10 +857,11 @@ export default function ResourceDetail() {
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}
-            aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            aria-label={bookmarkAriaLabel(isBookmarked, isAuthenticated, resource.title)}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· this device</span>}
           </Button>
           <Button 
             variant="outline" 
@@ -883,6 +940,130 @@ export default function ResourceDetail() {
         }
         collectionsLoading={collectionsLoading}
       />
+
+      <ResourceOnwardPaths
+        resourceId={resource.id}
+        narrowestCollection={narrowestCollection}
+        category={resource.category && taxonomySlugs.category
+          ? { name: resource.category, href: `/category/${taxonomySlugs.category}` }
+          : null}
+        pendingCollectionRows={awesomeListTree ? 0 : Number(Boolean(resource.category)) + Number(Boolean(resource.subcategory))}
+        tags={tags ?? []}
+      />
+
+      {/* Related resources sit directly under the actions: resource pages are
+          the main search entry point, and when this list was below the details
+          it started a full screen down, so most visitors never saw a next step.
+          BUG-011: always render it — an explicit empty state when the related
+          endpoint returns no matches, never a missing section. */}
+      <section className="resource-detail-related" aria-labelledby="related-resources-heading">
+        <Card>
+          <CardHeader>
+            <h2
+              id="related-resources-heading"
+              className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2"
+            >
+              <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
+              Related Resources
+            </h2>
+            <CardDescription>
+              Resources you might find interesting
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {relatedQuery.isLoading && (
+              <>
+                <p role="status" className="sr-only">Loading related resources…</p>
+                {/* Same markup and line boxes as a loaded row (title + match
+                    badge, description, reasons) so the card is already at its
+                    loaded height and nothing below it moves when the list lands.
+                    */}
+                {Array.from({ length: RELATED_PLACEHOLDER_ROWS }, (_, index) => (
+                  <div
+                    key={index}
+                    aria-hidden="true"
+                    className="resource-detail-related-item block p-3 border border-border min-h-[44px]"
+                    data-testid="related-placeholder"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-sm line-clamp-1 flex-1 min-w-0">
+                        <Skeleton className="inline-block w-2/3 max-w-full">{"\u00a0"}</Skeleton>
+                      </span>
+                      <Badge variant="secondary" className="text-xs flex-shrink-0 invisible hidden sm:inline-flex">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        00% match
+                      </Badge>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0 invisible" />
+                    </div>
+                    <p className="text-xs line-clamp-1 mt-1">
+                      <Skeleton className="inline-block w-5/6 max-w-full">{"\u00a0"}</Skeleton>
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      <Skeleton className="resource-detail-related-reason inline-block text-xs px-2 py-0.5 w-24">{"\u00a0"}</Skeleton>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {relatedQuery.isError && (
+              <div role="alert">
+                <p>Related resources are temporarily unavailable.</p>
+                <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
+              </div>
+            )}
+            {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length > 0 && lowerRelated.length === 0 && (
+              <p className="text-sm text-muted-foreground" data-testid="related-all-above">
+                The closest matches are listed under More like this, above.
+              </p>
+            )}
+            {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
+              <p
+                className="text-sm text-muted-foreground"
+                data-testid="related-empty-state"
+              >
+                No related resources yet. Try this resource&apos;s collection or tags under Keep exploring.
+              </p>
+            )}
+            {lowerRelated.map((related, index) => (
+              <a
+                key={related.id}
+                href={`/resource/${related.id}`}
+                className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+                onClick={(e) => handleRelatedResourceClick(e, related, index + 1)}
+                data-testid={`related-resource-${related.id}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-sm line-clamp-2 sm:line-clamp-1 flex-1 min-w-0">
+                    {related.title}
+                  </span>
+                  {related.score !== undefined && (
+                    <Badge variant="secondary" className="text-xs flex-shrink-0 hidden sm:inline-flex">
+                      <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
+                      {related.score}% match
+                    </Badge>
+                  )}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-hidden="true" />
+                </div>
+                {related.description && (
+                  <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                    {related.description}
+                  </p>
+                )}
+                {related.reasons && related.reasons.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <span className="sr-only">Why recommended:</span>
+                    {related.reasons.slice(0, 2).map((reason, reasonIndex) => (
+                      <span key={reasonIndex} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
+                        {reason}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </a>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
 
       <div className="resource-detail-body">
         <div>
@@ -1026,13 +1207,6 @@ export default function ResourceDetail() {
                 </a>
               </div>
 
-              {(!tags || tags.length === 0) && (
-                <div data-seo-section="resource-tags">
-                  <h2 className="eyebrow">Tags</h2>
-                  <div />
-                </div>
-              )}
-
               {tags && tags.length > 0 && (
                 <>
                   <Separator />
@@ -1041,10 +1215,10 @@ export default function ResourceDetail() {
                       <Tag className="h-4 w-4 text-[color:var(--text-3)]" />
                       Tags
                     </h2>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-x-2">
                       {tags.map((tag, index) => (
                         <span className="resource-detail-chip-wrap" key={index}>
-                          <Link href={tagLandingPath(tag)}>
+                          <Link href={tagLandingPath(tag)} className="resource-detail-chip-link">
                             <span
                               className="chip mono"
                               data-testid={`tag-link-${index}`}
@@ -1103,124 +1277,30 @@ export default function ResourceDetail() {
           </Card>
         </div>
 
-        <div className="resource-detail-related">
-          {/* BUG-034 (run19): the "Quick Actions" card was removed — it held a
-              single "Visit Resource" button duplicating the header CTA, so the
-              page offered the same P0 action twice. The header button is now
-              the one and only Visit control. */}
-
-          {/* BUG-011: always render the Related section. When the related
-              endpoint returns no matches, show an explicit empty state instead
-              of dropping the whole card (which read as a broken/missing section
-              in the QA audit). */}
-          <Card>
+        {scrapedTitle && (
+          <Card className="bg-[var(--surface-2)]">
             <CardHeader>
-              {/* F018: a real heading (CardTitle renders a div) so the section
-                  shows up in the document outline / screen-reader rotor. */}
-              <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
-                Related Resources
-              </h2>
-              <CardDescription>
-                Resources you might find interesting
-              </CardDescription>
+              <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
+                <ImageIcon className="h-4 w-4" />
+                Page Metadata
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {relatedQuery.isLoading && <p role="status">Loading related resources…</p>}
-              {relatedQuery.isError && (
-                <div role="alert">
-                  <p>Related resources are temporarily unavailable.</p>
-                  <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
+            <CardContent className="space-y-2 text-sm">
+              {scrapedTitle && scrapedTitle !== resource.title && (
+                <div>
+                  <span className="text-muted-foreground">Title:</span>
+                  <p className="text-foreground">{scrapedTitle}</p>
                 </div>
               )}
-              {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  data-testid="related-empty-state"
-                >
-                  No related resources yet. Explore more in this category below.
-                </p>
+              {metadata?.twitterCard && (
+                <div>
+                  <span className="text-muted-foreground">Twitter Card:</span>
+                  <p className="text-foreground">{metadata.twitterCard}</p>
+                </div>
               )}
-              {filteredRelatedResources.map((related) => (
-                  <a
-                    key={related.id}
-                    href={`/resource/${related.id}`}
-                    className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
-                    onClick={(e) => handleRelatedResourceClick(e, related)}
-                    data-testid={`related-resource-${related.id}`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm line-clamp-1 flex-1">
-                        {related.title}
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    {related.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                        {related.description}
-                      </p>
-                    )}
-                    {related.score !== undefined && (
-                      <div className="mt-2">
-                        <Badge variant="secondary" className="text-xs">
-                          <TrendingUp className="h-3 w-3 mr-1" />
-                          {related.score}% match
-                        </Badge>
-                      </div>
-                    )}
-                    {related.reasons && related.reasons.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        <div className="text-xs text-muted-foreground">Why recommended:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {related.reasons.slice(0, 2).map((reason, index) => (
-                            <span key={index} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
-                              {reason}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </a>
-                ))}
-                {resource.category && taxonomySlugs.category && (
-                  /* Run16 BUG-057: the inline wouter <Link> wrapping a Button
-                     produced a 20px-tall anchor box (< 24px WCAG 2.5.8).
-                     asChild makes the anchor itself the ≥44px button. */
-                  <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
-                    <Link href={`/category/${taxonomySlugs.category}`} data-testid="link-view-all-category">
-                      View all in {resource.category}
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-          {scrapedTitle && (
-            <Card className="bg-[var(--surface-2)]">
-              <CardHeader>
-                <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
-                  <ImageIcon className="h-4 w-4" />
-                  Page Metadata
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                {scrapedTitle && scrapedTitle !== resource.title && (
-                  <div>
-                    <span className="text-muted-foreground">Title:</span>
-                    <p className="text-foreground">{scrapedTitle}</p>
-                  </div>
-                )}
-                {metadata?.twitterCard && (
-                  <div>
-                    <span className="text-muted-foreground">Twitter Card:</span>
-                    <p className="text-foreground">{metadata.twitterCard}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {suggestEditOpen && (

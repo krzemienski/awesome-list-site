@@ -1,6 +1,9 @@
 import type { Request, RequestHandler } from "express";
 import { storage } from "../storage";
 import { asyncHandler } from "./asyncHandler";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("api-auth");
 
 /**
  * API Key Authentication Middleware
@@ -74,7 +77,7 @@ async function resolveApiKey(req: Request, authHeader: string): Promise<ApiKeyRe
 
   // Update lastUsedAt timestamp in background (don't await to avoid blocking)
   storage.updateApiKeyLastUsed(apiKey.id).catch((err: any) => {
-    console.error("Failed to update API key lastUsedAt:", err);
+    logger.error("Failed to update API key lastUsedAt:", err);
   });
 
   return { ok: true };
@@ -91,7 +94,7 @@ export const requireApiKey: RequestHandler = asyncHandler(async function require
     if (!result.ok) return res.status(401).set("Cache-Control", "no-store").json({ message: result.message });
     return next();
   } catch (error) {
-    console.error("API key authentication error:", error);
+    logger.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
 });
@@ -110,7 +113,7 @@ export const optionalApiKey: RequestHandler = asyncHandler(async function option
     if (!result.ok) return res.status(401).set("Cache-Control", "no-store").json({ message: result.message });
     return next();
   } catch (error) {
-    console.error("API key authentication error:", error);
+    logger.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
 });

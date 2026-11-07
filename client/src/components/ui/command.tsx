@@ -1,6 +1,6 @@
 import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
-import { Command as CommandPrimitive } from "cmdk"
+import { Command as CommandPrimitive, useCommandState } from "cmdk"
 import { Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -33,27 +33,57 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
   )
 }
 
+const SELECTED_ITEM = '[cmdk-item][aria-selected="true"]'
+
+/**
+ * cmdk 1.1.1 derives `selectedItemId` from the DOM inside a layout callback
+ * that, for the initial auto-select, runs in the same pass that registers the
+ * items, before the row has re-rendered with aria-selected="true". The id stays
+ * undefined until the first arrow key, so the highlighted row is never
+ * announced. Mirror the selected row's id onto the combobox input after
+ * every render that can change the selection.
+ */
+function useSyncActiveDescendant(input: React.RefObject<HTMLInputElement>) {
+  const value = useCommandState((state) => state.value)
+  const search = useCommandState((state) => state.search)
+  const count = useCommandState((state) => state.filtered.count)
+
+  React.useLayoutEffect(() => {
+    const el = input.current
+    if (!el) return
+    const id = el.closest("[cmdk-root]")?.querySelector(SELECTED_ITEM)?.id
+    if (id) el.setAttribute("aria-activedescendant", id)
+    else el.removeAttribute("aria-activedescendant")
+  }, [input, value, search, count])
+}
+
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { trailing?: React.ReactNode }
->(({ className, trailing, ...props }, ref) => (
-  <div
-    className="flex items-center border-b px-3"
-    // eslint-disable-next-line react/no-unknown-property -- cmdk's documented styling hook attribute
-    cmdk-input-wrapper=""
-  >
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        "flex h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
-      {...props}
-    />
-    {trailing}
-  </div>
-))
+>(({ className, trailing, ...props }, ref) => {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement, [])
+  useSyncActiveDescendant(inputRef)
+
+  return (
+    <div
+      className="flex items-center border-b px-3"
+      // eslint-disable-next-line react/no-unknown-property -- cmdk's documented styling hook attribute
+      cmdk-input-wrapper=""
+    >
+      <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+      <CommandPrimitive.Input
+        ref={inputRef}
+        className={cn(
+          "flex h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        {...props}
+      />
+      {trailing}
+    </div>
+  )
+})
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 

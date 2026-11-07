@@ -2,15 +2,62 @@
 export const missingPageSeo = {
   title: "Page Not Found",
   description: "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+  heading: "Page Not Found",
+  lead: "We couldn't find the page you're looking for. The page may have been moved or doesn't exist.",
 };
-/** /search is noindex; both passes still render the same title/description. */
+/**
+ * The h1 and lead line each page hydrates to for a signed-out visitor with no
+ * device saves, which is what a crawler is. The server prerender and the page
+ * both read this table.
+ */
+export const staticPageHeads = {
+  "/bookmarks": {
+    heading: "Nothing saved on this device",
+    lead: "Tap the bookmark icon on any resource to save it — no account needed. Sign in to keep your saves across devices.",
+  },
+  "/recommendations": {
+    heading: "Recommended Resources",
+    lead: "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals.",
+  },
+  "/continue-learning": {
+    heading: "Your progress lives with your account",
+    lead: "Sign in to resume your journeys, pick up at your next step, and revisit resources you've opened.",
+  },
+  "/settings": {
+    heading: "Settings",
+    lead: "Manage your preferences and account. Pick a section below.",
+  },
+  "/settings/theme": {
+    heading: "Theme Settings",
+    lead: "Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.",
+  },
+  "/design-system": {
+    heading: "Design System",
+    lead: "The living anatomy of the runtime design system: two visual languages × ten accents sharing one component contract. Every value below is read live from the active stylesheet — switch a system or accent and watch the whole catalog re-derive.",
+  },
+} as const satisfies Record<string, { heading: string; lead: string }>;
+export type StaticPageHeadPath = keyof typeof staticPageHeads;
+/** /search is noindex; both passes still render the same title, h1 and description. */
 export const searchPageSeo = {
+  heading: "Search",
   description: "Search curated video development tools, libraries, players, codecs, and learning resources.",
   titleCore: (normalizedQuery: string) => (normalizedQuery ? `Search: ${normalizedQuery}` : "Search"),
 };
 export const bookmarksPageSeo = {
   title: "Bookmarks",
   description: "Your saved video development resources on Awesome Video.",
+};
+/** The signed-out page is what the server prerenders, so both passes use this description. */
+export const continueLearningPageSeo = {
+  title: "Continue Learning",
+  description: "Sign in to resume your learning activity on Awesome Video.",
+};
+export const publicCollectionSeo = {
+  titleCore: (name: string) => `${name} — Shared collection`,
+  description: (count: number) =>
+    `A read-only collection of ${count} curated video development ${
+      count === 1 ? "resource" : "resources"
+    } shared on Awesome Video.`,
 };
 // Keyword-optimized, GEO-friendly SEO title/description templates shared VERBATIM
 // between the server SEO authority (server/og-middleware.ts) and the client
@@ -24,7 +71,8 @@ export const bookmarksPageSeo = {
 // truthful as the directory grows. Titles deliberately carry NO count, so title
 // parity can never drift even if the two count sources momentarily disagree.
 
-import { tagDisplayName } from "./tagNormalize";
+import { normalizeTagFilter, tagDisplayName } from "./tagNormalize";
+import { THEME_ACCENT_VALUES, THEME_SYSTEM_VALUES } from "./onboarding-values";
 
 const SITE_NAME = "Awesome Video";
 
@@ -34,6 +82,9 @@ const SITE_NAME = "Awesome Video";
 // SAME functions at emission time, so the crawl-pass HTML and the hydrated DOM
 // always show the identical, budget-fitting string (two-pass parity).
 const SEO_TITLE_MAX = 60;
+// Branded titles may run longer than a bare title so the brand suffix is never
+// the first thing dropped (BUG-024).
+const SEO_BRANDED_TITLE_MAX = 80;
 const SEO_DESCRIPTION_MAX = 160;
 
 // Word-boundary truncation: cut at the budget, back up to the last full word,
@@ -117,8 +168,8 @@ const JOURNEY_SUFFIX = " — Learning Journey";
 
 export function clampSeoTitle(title: string): string {
   const t = (title || "").trim();
-  if (t.length <= SEO_TITLE_MAX) return t;
   if (t.endsWith(BRAND_SUFFIX)) {
+    if (t.length <= SEO_BRANDED_TITLE_MAX) return t;
     const core = t.slice(0, -BRAND_SUFFIX.length);
     const budget = SEO_TITLE_MAX - BRAND_SUFFIX.length;
     if (core.endsWith(JOURNEY_SUFFIX)) {
@@ -126,14 +177,13 @@ export function clampSeoTitle(title: string): string {
       if (bare.length <= budget) return bare + BRAND_SUFFIX;
       return clampAtWord(bare, budget) + BRAND_SUFFIX;
     }
-    // Audit cycle-01 F004: the 43-char post-suffix core budget truncates
-    // BEFORE the words that distinguish sibling resources (9 URLs collided
-    // into 3 identical SERP titles, corpus-proven). When the core alone
-    // overflows that budget, boilerplate yields before content: drop the
-    // brand suffix entirely and give the core the full SERP budget — the
-    // same philosophy as the JOURNEY_SUFFIX rule above.
-    if (core.length > budget) return clampAtWord(core, SEO_TITLE_MAX);
-    return clampAtWord(core, budget) + BRAND_SUFFIX;
+    // BUG-024 (C18): every branded title keeps its brand. The old rule
+    // (audit cycle-01 F004) dropped the suffix from long cores, so sibling
+    // resources disagreed ("X" vs "X — Awesome Video"). Long cores now borrow
+    // up to SEO_BRANDED_TITLE_MAX total, and the clamp still keeps the words
+    // that distinguish siblings.
+    const brandedBudget = SEO_BRANDED_TITLE_MAX - BRAND_SUFFIX.length;
+    return clampAtWord(core, brandedBudget) + BRAND_SUFFIX;
   }
   return clampAtWord(t, SEO_TITLE_MAX);
 }
@@ -204,16 +254,27 @@ export function ogImagePath(routePath: string): string {
 }
 
 // Home ----------------------------------------------------------------------
-// Kept ≤60 chars for a 4-digit count so the SERP shows the full title.
-export function homeSeoTitle(resourceCount: number): string {
-  return `${SITE_NAME} — ${resourceCount}+ Curated Video & Streaming Resources`;
+// BUG-029 (C18): counts use the same thousands grouping as the UI ("4,102"),
+// done by hand so the server and every browser locale print identical text.
+function groupedCount(n: number): string {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// ?tags= filters put the active tag names in the title (BUG-029); `tags` are
+// canonical slugs, so the server and client render the same branded casing.
+export function homeSeoTitle(resourceCount: number, tags: readonly string[] = []): string {
+  if (tags.length > 0) {
+    const names = tags.map((t) => tagDisplayNameBranded(normalizeTagFilter(t))).join(" + ");
+    return `${names} Video Resources — ${SITE_NAME}`;
+  }
+  return `${SITE_NAME} — ${groupedCount(resourceCount)}+ Curated Video & Streaming Resources`;
 }
 
 export function homeSeoDescription(
   resourceCount: number,
   categoryCount: number,
 ): string {
-  return `Discover ${resourceCount}+ curated video development resources — codecs, players, encoders, and streaming tools — across ${categoryCount} categories on ${SITE_NAME}.`;
+  return `Discover ${groupedCount(resourceCount)}+ curated video development resources — codecs, players, encoders, and streaming tools — across ${categoryCount} categories on ${SITE_NAME}.`;
 }
 
 // Categories ----------------------------------------------------------------
@@ -277,48 +338,9 @@ function tagSeoTitleCore(name: string): string {
   return `${name} Video Resources & Tools`;
 }
 
-// tagDisplayName() blindly Title-Cases (or UPPER-cases known acronyms), which
-// corrupts real brand capitalisation (ffmpeg -> "FFMPEG", webassembly ->
-// "Webassembly"). This curated map restores the canonical casing for brands
-// whose display form is neither plain Title Case nor an all-caps acronym.
-// Keyed by the normalized tag slug (lowercase, hyphenated). Lives HERE — the
-// shared two-pass parity home — so the client H1/title (TagLanding.tsx) and
-// the server og:title (og-middleware.ts) stay byte-identical by construction.
-const TAG_BRAND_CASING: Record<string, string> = {
-  ffmpeg: "FFmpeg",
-  webassembly: "WebAssembly",
-  webgl: "WebGL",
-  webgpu: "WebGPU",
-  webrtc: "WebRTC",
-  webvtt: "WebVTT",
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  nodejs: "Node.js",
-  "node-js": "Node.js",
-  graphql: "GraphQL",
-  postgresql: "PostgreSQL",
-  mysql: "MySQL",
-  openai: "OpenAI",
-  youtube: "YouTube",
-  gstreamer: "GStreamer",
-  libvpx: "libvpx",
-  libav: "libav",
-  macos: "macOS",
-  ios: "iOS",
-  tvos: "tvOS",
-  ipados: "iPadOS",
-  dashjs: "dash.js",
-  "dash-js": "dash.js",
-  hlsjs: "hls.js",
-  "hls-js": "hls.js",
-  videojs: "Video.js",
-  "video-js": "Video.js",
-};
-
-/** Branded, casing-correct display name for a tag slug (see TAG_BRAND_CASING). */
-export function tagDisplayNameBranded(slug: string): string {
-  return TAG_BRAND_CASING[slug] ?? tagDisplayName(slug);
-}
+// Branded tag names live with tagDisplayName() in tagNormalize.ts (the one
+// display-name source for the client h1/title, SSR title and related-tag chips).
+export const tagDisplayNameBranded = tagDisplayName;
 
 // The fixed "X Video Resources & Tools" template duplicated the word "Video"
 // for tags that already contain it ("Video Streaming Video Resources"). Drop
@@ -333,27 +355,12 @@ export function tagSeoDescription(name: string, count: number): string {
 }
 
 // Taxonomy listings ----------------------------------------------------------
-// Child listing titles need enough parent context to describe the search intent
-// but must remain within the 44-char core budget left by the brand suffix.
-const CATEGORY_INTENT_NOUNS: Record<string, string> = {
-  "intro-learning": "courses & guides",
-  "community-events": "communities & events",
-  "protocols-transport": "specs & tools",
-  "standards-industry": "specs & docs",
-};
-
-export function subcategorySeoTitleCore(
-  name: string,
-  categoryName?: string | null,
-  categorySlug?: string | null,
-): string {
-  const intent = (categorySlug && CATEGORY_INTENT_NOUNS[categorySlug]) || "tools & guides";
-  const parent = categoryName ? `${name} — ${categoryName} ${intent}` : `${name} ${intent}`;
-  if (parent.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length) return parent;
-  // F211: the bare "<name> <intent>" fallback read as a broken phrase
-  // ("Community Groups communities & events"); fall back to the same
-  // "child – parent" form the sub-subcategory titles use.
-  return categoryName ? withParentContext(name, categoryName) : name;
+// BUG-042 (C18): one template for every subcategory page — the bare name. The
+// old parent-context variants ("X — Parent tools & guides", "X – Parent", "X")
+// were chosen by length, so sibling pages used different shapes. Subcategory
+// names are unique across the catalog, so the name alone stays distinguishing.
+export function subcategorySeoTitleCore(name: string): string {
+  return name;
 }
 
 export function subcategorySeoDescription(
@@ -418,6 +425,15 @@ export const signInSeoDescription =
   `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`;
 export const signUpSeoDescription =
   `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`;
+/** The h1 each auth page hydrates to (Clerk localization, the owner form). */
+export const authPageHeadings = {
+  signIn: "Welcome back",
+  signUp: "Create your account",
+  adminSignIn: "Admin sign-in",
+} as const;
+
+export const designSystemSeoDescription =
+  `The ${SITE_NAME} design system — ${THEME_SYSTEM_VALUES.length} systems × ${THEME_ACCENT_VALUES.length} accents, live tokens, type scale, and core components.`;
 
 export const submitSeoTitle = `Submit a Resource — ${SITE_NAME}`;
 export const submitSeoDescription =

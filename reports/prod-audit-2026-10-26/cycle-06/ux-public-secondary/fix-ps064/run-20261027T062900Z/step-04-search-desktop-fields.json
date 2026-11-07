@@ -1,0 +1,46 @@
+{
+  "activeId": "",
+  "duplicateIds": [],
+  "fields": [
+    {
+      "id": "search-resources",
+      "label": "Search resources",
+      "name": "search-resources",
+      "role": null,
+      "tag": "INPUT",
+      "type": "text",
+      "value": "ffmpeg"
+    },
+    {
+      "id": "search-sort-results",
+      "label": "Sort results",
+      "name": null,
+      "role": "combobox",
+      "tag": "BUTTON",
+      "type": "button",
+      "value": ""
+    },
+    {
+      "id": "search-filter-tags-:rc:-desktop",
+      "label": "Search tags",
+      "name": "search-filter-tags-desktop",
+      "role": null,
+      "tag": "INPUT",
+      "type": "text",
+      "value": "ffmpeg"
+    },
+    {
+      "id": "input-search-page-jump",
+      "label": "Page number, 1 to 8",
+      "name": null,
+      "role": null,
+      "tag": "INPUT",
+      "type": "text",
+      "value": "1"
+    }
+  ],
+  "missingFieldIdentity": [],
+  "resultCount": "Page 1 of 8 · showing 1–24 of 183 results for “ffmpeg”",
+  "url": "http://127.0.0.1:5064/search?q=ffmpeg&sort=name-asc&tags=ffmpeg",
+  "width": 1440
+}

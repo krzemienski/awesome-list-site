@@ -1,0 +1,741 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - generic [ref=e27]:
+        - main [ref=e28]:
+          - generic [ref=e29]:
+            - navigation "Breadcrumb" [ref=e30]:
+              - list [ref=e31]:
+                - listitem [ref=e32]:
+                  - link "Home" [ref=e33] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e34]:
+                  - img [ref=e35]
+                - listitem:
+                  - link "Bookmarks" [disabled]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e39]: // Learning library
+                - generic [ref=e40]:
+                  - generic [ref=e41]:
+                    - generic [ref=e42]:
+                      - img [ref=e43]
+                      - heading "Saved, then finished." [active] [level=1] [ref=e45]:
+                        - text: Saved, then
+                        - emphasis [ref=e46]: finished.
+                    - paragraph [ref=e47]: Turn bookmarks into a queue you can actually work through.
+                  - button "New collection" [ref=e48] [cursor=pointer]:
+                    - img
+                    - text: New collection
+              - region "Library summary" [ref=e49]:
+                - button "12 Active" [ref=e50] [cursor=pointer]:
+                  - generic [ref=e51]: "12"
+                  - text: Active
+                - button "12 Saved" [ref=e52] [cursor=pointer]:
+                  - generic [ref=e53]: "12"
+                  - text: Saved
+                - button "0 Watch next" [ref=e54] [cursor=pointer]:
+                  - generic [ref=e55]: "0"
+                  - text: Watch next
+                - button "0 In progress" [ref=e56] [cursor=pointer]:
+                  - generic [ref=e57]: "0"
+                  - text: In progress
+                - button "0 Done" [ref=e58] [cursor=pointer]:
+                  - generic [ref=e59]: "0"
+                  - text: Done
+                - button "0 Archived" [ref=e60] [cursor=pointer]:
+                  - generic [ref=e61]: "0"
+                  - text: Archived
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65] [cursor=pointer]: Collection
+                  - combobox "Collection" [ref=e66] [cursor=pointer]:
+                    - generic: All saved (12)
+                    - img [ref=e67]
+                - region "Library filters" [ref=e69]:
+                  - generic [ref=e70]:
+                    - generic [ref=e71] [cursor=pointer]: Queue status
+                    - combobox "Queue status" [ref=e72] [cursor=pointer]:
+                      - generic: All statuses
+                      - img [ref=e73]
+                  - generic [ref=e75]:
+                    - generic [ref=e76] [cursor=pointer]: Visibility
+                    - combobox "Visibility" [ref=e77] [cursor=pointer]:
+                      - generic: Active bookmarks
+                      - img [ref=e78]
+                  - generic [ref=e80]:
+                    - generic [ref=e81] [cursor=pointer]: Sort
+                    - combobox "Sort" [ref=e82] [cursor=pointer]:
+                      - generic: Newest saved
+                      - img [ref=e83]
+                - region "Bulk bookmark actions" [ref=e85]:
+                  - generic [ref=e86]:
+                    - generic [ref=e87] [cursor=pointer]:
+                      - checkbox "Select all visible bookmarks" [ref=e88]
+                      - text: Select all shown
+                    - paragraph [ref=e89]: 0 bookmarks selected
+                - generic [ref=e90]:
+                  - article [ref=e91]:
+                    - generic [ref=e92]:
+                      - generic [ref=e93] [cursor=pointer]:
+                        - 'checkbox "Select 2025 NAB Show: CineCentral" [ref=e94]'
+                        - generic [ref=e95]: "Select 2025 NAB Show: CineCentral"
+                      - 'combobox "Queue status for 2025 NAB Show: CineCentral" [ref=e96] [cursor=pointer]':
+                        - generic: Saved
+                        - img [ref=e97]
+                      - 'button "Note: 2025 NAB Show: CineCentral" [ref=e99] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: 2025 NAB Show: CineCentral" [ref=e100] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e101] [cursor=pointer]:
+                      - generic [ref=e102]:
+                        - generic [ref=e103]:
+                          - generic [ref=e104]: ◈
+                          - generic [ref=e106]:
+                            - 'button "Add to favorites: 2025 NAB Show: CineCentral" [ref=e107]':
+                              - generic [ref=e108]:
+                                - img
+                            - 'button "Remove bookmark: 2025 NAB Show: CineCentral" [pressed] [ref=e109]':
+                              - generic [ref=e110]:
+                                - img
+                        - 'heading "2025 NAB Show: CineCentral" [level=2] [ref=e112]':
+                          - 'link "2025 NAB Show: CineCentral" [ref=e113]':
+                            - /url: /resource/184751
+                        - paragraph [ref=e114]: The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production.
+                      - generic [ref=e115]:
+                        - generic [ref=e116]:
+                          - 'link "View details for 2025 NAB Show: CineCentral" [ref=e117]':
+                            - /url: /resource/184751
+                            - generic [ref=e118]:
+                              - img [ref=e119]
+                              - generic [ref=e121]: View Details
+                          - generic [ref=e122]: Community & Events
+                          - generic [ref=e123]: Events
+                        - generic [ref=e124]:
+                          - 'link "Open Link 2025 NAB Show: CineCentral (opens in new tab)" [ref=e125]':
+                            - /url: https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique
+                            - img
+                            - generic [ref=e126]: Open Link
+                            - generic [ref=e127]: "2025 NAB Show: CineCentral (opens in new tab)"
+                          - 'button "Suggest an edit: 2025 NAB Show: CineCentral" [ref=e128]':
+                            - img
+                  - article [ref=e129]:
+                    - generic [ref=e130]:
+                      - generic [ref=e131] [cursor=pointer]:
+                        - checkbox "Select Transcoding Performance Trial" [ref=e132]
+                        - generic [ref=e133]: Select Transcoding Performance Trial
+                      - combobox "Queue status for Transcoding Performance Trial" [ref=e134] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e135]
+                      - 'button "Note: Transcoding Performance Trial" [ref=e137] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: Transcoding Performance Trial" [ref=e138] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e139] [cursor=pointer]:
+                      - generic [ref=e140]:
+                        - generic [ref=e141]:
+                          - generic [ref=e142]: ◇
+                          - generic [ref=e144]:
+                            - 'button "Add to favorites: Transcoding Performance Trial" [ref=e145]':
+                              - generic [ref=e146]:
+                                - img
+                            - 'button "Remove bookmark: Transcoding Performance Trial" [pressed] [ref=e147]':
+                              - generic [ref=e148]:
+                                - img
+                        - heading "Transcoding Performance Trial" [level=2] [ref=e150]:
+                          - link "Transcoding Performance Trial" [ref=e151]:
+                            - /url: /resource/186231
+                        - paragraph [ref=e152]: Runs FFmpeg transcoding processes simultaneously and measures CPU performance
+                      - generic [ref=e153]:
+                        - generic [ref=e154]:
+                          - link "View details for Transcoding Performance Trial" [ref=e155]:
+                            - /url: /resource/186231
+                            - generic [ref=e156]:
+                              - img [ref=e157]
+                              - generic [ref=e159]: View Details
+                          - generic [ref=e160]: Encoding & Codecs
+                          - generic [ref=e161]: Tools & SDKs
+                        - generic [ref=e162]:
+                          - link "Open Link Transcoding Performance Trial (opens in new tab)" [ref=e163]:
+                            - /url: https://github.com/2501world/transcoding-performance-trial
+                            - img
+                            - generic [ref=e164]: Open Link
+                            - generic [ref=e165]: Transcoding Performance Trial (opens in new tab)
+                          - 'button "Suggest an edit: Transcoding Performance Trial" [ref=e166]':
+                            - img
+                  - article [ref=e167]:
+                    - generic [ref=e168]:
+                      - generic [ref=e169] [cursor=pointer]:
+                        - checkbox "Select 3DLUT Creator" [ref=e170]
+                        - generic [ref=e171]: Select 3DLUT Creator
+                      - combobox "Queue status for 3DLUT Creator" [ref=e172] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e173]
+                      - 'button "Note: 3DLUT Creator" [ref=e175] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: 3DLUT Creator" [ref=e176] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e177] [cursor=pointer]:
+                      - generic [ref=e178]:
+                        - generic [ref=e179]:
+                          - generic [ref=e180]: ▥
+                          - generic [ref=e182]:
+                            - 'button "Add to favorites: 3DLUT Creator" [ref=e183]':
+                              - generic [ref=e184]:
+                                - img
+                            - 'button "Remove bookmark: 3DLUT Creator" [pressed] [ref=e185]':
+                              - generic [ref=e186]:
+                                - img
+                        - heading "3DLUT Creator" [level=2] [ref=e188]:
+                          - link "3DLUT Creator" [ref=e189]:
+                            - /url: /resource/186477
+                        - paragraph [ref=e190]: A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors.
+                      - generic [ref=e191]:
+                        - generic [ref=e192]:
+                          - link "View details for 3DLUT Creator" [ref=e193]:
+                            - /url: /resource/186477
+                            - generic [ref=e194]:
+                              - img [ref=e195]
+                              - generic [ref=e197]: View Details
+                          - generic [ref=e198]: Media Tools
+                          - generic [ref=e199]: Tools & SDKs
+                        - generic [ref=e200]:
+                          - link "Open Link 3DLUT Creator (opens in new tab)" [ref=e201]:
+                            - /url: https://3dlutcreator.com/
+                            - img
+                            - generic [ref=e202]: Open Link
+                            - generic [ref=e203]: 3DLUT Creator (opens in new tab)
+                          - 'button "Suggest an edit: 3DLUT Creator" [ref=e204]':
+                            - img
+                  - article [ref=e205]:
+                    - generic [ref=e206]:
+                      - generic [ref=e207] [cursor=pointer]:
+                        - checkbox "Select AVPlayer" [ref=e208]
+                        - generic [ref=e209]: Select AVPlayer
+                      - combobox "Queue status for AVPlayer" [ref=e210] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e211]
+                      - 'button "Note: AVPlayer" [ref=e213] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: AVPlayer" [ref=e214] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e215] [cursor=pointer]:
+                      - generic [ref=e216]:
+                        - generic [ref=e217]:
+                          - generic [ref=e218]: ▶
+                          - generic [ref=e220]:
+                            - 'button "Add to favorites: AVPlayer" [ref=e221]':
+                              - generic [ref=e222]:
+                                - img
+                            - 'button "Remove bookmark: AVPlayer" [pressed] [ref=e223]':
+                              - generic [ref=e224]:
+                                - img
+                        - heading "AVPlayer" [level=2] [ref=e226]:
+                          - link "AVPlayer" [ref=e227]:
+                            - /url: /resource/184763
+                        - paragraph [ref=e228]: AVPlayer is Apple's framework for playing and streaming audio and video content on iOS and macOS. It supports a variety of formats and provides developers with a powerful API to control playback, manage buffering, and handle interruptions, making it a fundamental tool for media playback in iOS applications.
+                      - generic [ref=e229]:
+                        - generic [ref=e230]:
+                          - link "View details for AVPlayer" [ref=e231]:
+                            - /url: /resource/184763
+                            - generic [ref=e232]:
+                              - img [ref=e233]
+                              - generic [ref=e235]: View Details
+                          - generic [ref=e236]: Players & Clients
+                          - generic [ref=e237]: Libraries
+                        - generic [ref=e238]:
+                          - link "Open Link AVPlayer (opens in new tab)" [ref=e239]:
+                            - /url: https://developer.apple.com/documentation/avfoundation/avplayer
+                            - img
+                            - generic [ref=e240]: Open Link
+                            - generic [ref=e241]: AVPlayer (opens in new tab)
+                          - 'button "Suggest an edit: AVPlayer" [ref=e242]':
+                            - img
+                  - article [ref=e243]:
+                    - generic [ref=e244]:
+                      - generic [ref=e245] [cursor=pointer]:
+                        - checkbox "Select Able Player" [ref=e246]
+                        - generic [ref=e247]: Select Able Player
+                      - combobox "Queue status for Able Player" [ref=e248] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e249]
+                      - 'button "Note: Able Player" [ref=e251] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: Able Player" [ref=e252] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e253] [cursor=pointer]:
+                      - generic [ref=e254]:
+                        - generic [ref=e255]:
+                          - generic [ref=e256]: ▶
+                          - generic [ref=e258]:
+                            - 'button "Add to favorites: Able Player" [ref=e259]':
+                              - generic [ref=e260]:
+                                - img
+                            - 'button "Remove bookmark: Able Player" [pressed] [ref=e261]':
+                              - generic [ref=e262]:
+                                - img
+                        - heading "Able Player" [level=2] [ref=e264]:
+                          - link "Able Player" [ref=e265]:
+                            - /url: /resource/186609
+                        - paragraph [ref=e266]: A fully accessible, cross-browser HTML5 media player library that supports captions, audio descriptions, and sign language tracks, designed to be inclusive for users with disabilities.
+                      - generic [ref=e267]:
+                        - generic [ref=e268]:
+                          - link "View details for Able Player" [ref=e269]:
+                            - /url: /resource/186609
+                            - generic [ref=e270]:
+                              - img [ref=e271]
+                              - generic [ref=e273]: View Details
+                          - generic [ref=e274]: Players & Clients
+                          - generic [ref=e275]: Libraries
+                        - generic [ref=e276]:
+                          - link "Open Link Able Player (opens in new tab)" [ref=e277]:
+                            - /url: https://ableplayer.github.io/ableplayer
+                            - img
+                            - generic [ref=e278]: Open Link
+                            - generic [ref=e279]: Able Player (opens in new tab)
+                          - 'button "Suggest an edit: Able Player" [ref=e280]':
+                            - img
+                  - article [ref=e281]:
+                    - generic [ref=e282]:
+                      - generic [ref=e283] [cursor=pointer]:
+                        - checkbox "Select About Frame Rates or Why 29.97?" [ref=e284]
+                        - generic [ref=e285]: Select About Frame Rates or Why 29.97?
+                      - combobox "Queue status for About Frame Rates or Why 29.97?" [ref=e286] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e287]
+                      - 'button "Note: About Frame Rates or Why 29.97?" [ref=e289] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: About Frame Rates or Why 29.97?" [ref=e290] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e291] [cursor=pointer]:
+                      - generic [ref=e292]:
+                        - generic [ref=e293]:
+                          - generic [ref=e294]: ▤
+                          - generic [ref=e296]:
+                            - 'button "Add to favorites: About Frame Rates or Why 29.97?" [ref=e297]':
+                              - generic [ref=e298]:
+                                - img
+                            - 'button "Remove bookmark: About Frame Rates or Why 29.97?" [pressed] [ref=e299]':
+                              - generic [ref=e300]:
+                                - img
+                        - heading "About Frame Rates or Why 29.97?" [level=2] [ref=e302]:
+                          - link "About Frame Rates or Why 29.97?" [ref=e303]:
+                            - /url: /resource/186212
+                        - paragraph [ref=e304]: I recently remembered this popular post from my old blog. Since that blog no longer exists, I thought I would repost it here. Since I wrote this post about a decade ago, many others of done a much better job describing this in detail. I highly recommend the following two videos by Alec Watson fro
+                      - generic [ref=e305]:
+                        - generic [ref=e306]:
+                          - link "View details for About Frame Rates or Why 29.97?" [ref=e307]:
+                            - /url: /resource/186212
+                            - generic [ref=e308]:
+                              - img [ref=e309]
+                              - generic [ref=e311]: View Details
+                          - generic [ref=e312]: Intro & Learning
+                        - generic [ref=e313]:
+                          - link "Open Link About Frame Rates or Why 29.97? (opens in new tab)" [ref=e314]:
+                            - /url: https://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html
+                            - img
+                            - generic [ref=e315]: Open Link
+                            - generic [ref=e316]: About Frame Rates or Why 29.97? (opens in new tab)
+                          - 'button "Suggest an edit: About Frame Rates or Why 29.97?" [ref=e317]':
+                            - img
+                  - article [ref=e318]:
+                    - generic [ref=e319]:
+                      - generic [ref=e320] [cursor=pointer]:
+                        - checkbox "Select AWS Media Services" [ref=e321]
+                        - generic [ref=e322]: Select AWS Media Services
+                      - combobox "Queue status for AWS Media Services" [ref=e323] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e324]
+                      - 'button "Note: AWS Media Services" [ref=e326] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: AWS Media Services" [ref=e327] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e328] [cursor=pointer]:
+                      - generic [ref=e329]:
+                        - generic [ref=e330]:
+                          - generic [ref=e331]: ▣
+                          - generic [ref=e333]:
+                            - 'button "Add to favorites: AWS Media Services" [ref=e334]':
+                              - generic [ref=e335]:
+                                - img
+                            - 'button "Remove bookmark: AWS Media Services" [pressed] [ref=e336]':
+                              - generic [ref=e337]:
+                                - img
+                        - heading "AWS Media Services" [level=2] [ref=e339]:
+                          - link "AWS Media Services" [ref=e340]:
+                            - /url: /resource/184789
+                        - paragraph [ref=e341]: AWS Media Services offer a suite of cloud-based services that enable the creation, transformation, and delivery of digital content. These services include AWS Elemental MediaConnect for live video transport, AWS Elemental MediaConvert for file-based video transcoding, and AWS Elemental MediaLive for live video processing. They provide scalable and flexible solutions for video streaming and encoding, allowing developers to build and adapt video workflows quickly without the overhead of managing physical infrastructure.
+                      - generic [ref=e342]:
+                        - generic [ref=e343]:
+                          - link "View details for AWS Media Services" [ref=e344]:
+                            - /url: /resource/184789
+                            - generic [ref=e345]:
+                              - img [ref=e346]
+                              - generic [ref=e348]: View Details
+                          - generic [ref=e349]: Infrastructure & Delivery
+                          - generic [ref=e350]: Tools & SDKs
+                        - generic [ref=e351]:
+                          - link "Open Link AWS Media Services (opens in new tab)" [ref=e352]:
+                            - /url: https://aws.amazon.com/media-services/
+                            - img
+                            - generic [ref=e353]: Open Link
+                            - generic [ref=e354]: AWS Media Services (opens in new tab)
+                          - 'button "Suggest an edit: AWS Media Services" [ref=e355]':
+                            - img
+                  - article [ref=e356]:
+                    - generic [ref=e357]:
+                      - generic [ref=e358] [cursor=pointer]:
+                        - checkbox "Select A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e359]
+                        - generic [ref=e360]: Select A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App
+                      - combobox "Queue status for A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e361] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e362]
+                      - 'button "Note: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e364] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e365] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e366] [cursor=pointer]:
+                      - generic [ref=e367]:
+                        - generic [ref=e368]:
+                          - generic [ref=e369]: ▤
+                          - generic [ref=e371]:
+                            - 'button "Add to favorites: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e372]':
+                              - generic [ref=e373]:
+                                - img
+                            - 'button "Remove bookmark: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [pressed] [ref=e374]':
+                              - generic [ref=e375]:
+                                - img
+                        - heading "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [level=2] [ref=e377]:
+                          - link "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e378]:
+                            - /url: /resource/184838
+                        - paragraph [ref=e379]: An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks.
+                      - generic [ref=e380]:
+                        - generic [ref=e381]:
+                          - link "View details for A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e382]:
+                            - /url: /resource/184838
+                            - generic [ref=e383]:
+                              - img [ref=e384]
+                              - generic [ref=e386]: View Details
+                          - generic [ref=e387]: Intro & Learning
+                        - generic [ref=e388]:
+                          - link "Open Link A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)" [ref=e389]:
+                            - /url: https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+                            - img
+                            - generic [ref=e390]: Open Link
+                            - generic [ref=e391]: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)
+                          - 'button "Suggest an edit: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e392]':
+                            - img
+                  - article [ref=e393]:
+                    - generic [ref=e394]:
+                      - generic [ref=e395] [cursor=pointer]:
+                        - checkbox "Select M3U8Parser" [ref=e396]
+                        - generic [ref=e397]: Select M3U8Parser
+                      - combobox "Queue status for M3U8Parser" [ref=e398] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e399]
+                      - 'button "Note: M3U8Parser" [ref=e401] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: M3U8Parser" [ref=e402] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e403] [cursor=pointer]:
+                      - generic [ref=e404]:
+                        - generic [ref=e405]:
+                          - generic [ref=e406]: ⟁
+                          - generic [ref=e408]:
+                            - 'button "Add to favorites: M3U8Parser" [ref=e409]':
+                              - generic [ref=e410]:
+                                - img
+                            - 'button "Remove bookmark: M3U8Parser" [pressed] [ref=e411]':
+                              - generic [ref=e412]:
+                                - img
+                        - heading "M3U8Parser" [level=2] [ref=e414]:
+                          - link "M3U8Parser" [ref=e415]:
+                            - /url: /resource/185574
+                        - paragraph [ref=e416]: A light weight M3U8 parser. Support X-Key & X-Session-Key.
+                      - generic [ref=e417]:
+                        - generic [ref=e418]:
+                          - link "View details for M3U8Parser" [ref=e419]:
+                            - /url: /resource/185574
+                            - generic [ref=e420]:
+                              - img [ref=e421]
+                              - generic [ref=e423]: View Details
+                          - generic [ref=e424]: Protocols & Transport
+                          - generic [ref=e425]: Libraries
+                        - generic [ref=e426]:
+                          - link "Open Link M3U8Parser (opens in new tab)" [ref=e427]:
+                            - /url: https://github.com/M3U8Kit/M3U8Parser
+                            - img
+                            - generic [ref=e428]: Open Link
+                            - generic [ref=e429]: M3U8Parser (opens in new tab)
+                          - 'button "Suggest an edit: M3U8Parser" [ref=e430]':
+                            - img
+                  - article [ref=e431]:
+                    - generic [ref=e432]:
+                      - generic [ref=e433] [cursor=pointer]:
+                        - checkbox "Select ABR Video Player" [ref=e434]
+                        - generic [ref=e435]: Select ABR Video Player
+                      - combobox "Queue status for ABR Video Player" [ref=e436] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e437]
+                      - 'button "Note: ABR Video Player" [ref=e439] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: ABR Video Player" [ref=e440] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e441] [cursor=pointer]:
+                      - generic [ref=e442]:
+                        - generic [ref=e443]:
+                          - generic [ref=e444]: ⟁
+                          - generic [ref=e446]:
+                            - 'button "Add to favorites: ABR Video Player" [ref=e447]':
+                              - generic [ref=e448]:
+                                - img
+                            - 'button "Remove bookmark: ABR Video Player" [pressed] [ref=e449]':
+                              - generic [ref=e450]:
+                                - img
+                        - heading "ABR Video Player" [level=2] [ref=e452]:
+                          - link "ABR Video Player" [ref=e453]:
+                            - /url: /resource/187911
+                        - paragraph [ref=e454]: Sophisticated web-based video player implementing advanced ABR algorithms including BOLA (Buffer Occupancy based Lyapunov Algorithm) and bandwidth-based strategies. Features MSE-based streaming, dual EWMA bandwidth estimation, and intelligent quality switching.
+                      - generic [ref=e455]:
+                        - generic [ref=e456]:
+                          - link "View details for ABR Video Player" [ref=e457]:
+                            - /url: /resource/187911
+                            - generic [ref=e458]:
+                              - img [ref=e459]
+                              - generic [ref=e461]: View Details
+                          - generic [ref=e462]: Protocols & Transport
+                          - generic [ref=e463]: Tools & SDKs
+                        - generic [ref=e464]:
+                          - link "Open Link ABR Video Player (opens in new tab)" [ref=e465]:
+                            - /url: https://github.com/LennartPaduch/abr-video-player
+                            - img
+                            - generic [ref=e466]: Open Link
+                            - generic [ref=e467]: ABR Video Player (opens in new tab)
+                          - 'button "Suggest an edit: ABR Video Player" [ref=e468]':
+                            - img
+                  - article [ref=e469]:
+                    - generic [ref=e470]:
+                      - generic [ref=e471] [cursor=pointer]:
+                        - 'checkbox "Select 3 Cases from a Video Expert: Encoding Basics" [ref=e472]'
+                        - generic [ref=e473]: "Select 3 Cases from a Video Expert: Encoding Basics"
+                      - 'combobox "Queue status for 3 Cases from a Video Expert: Encoding Basics" [ref=e474] [cursor=pointer]':
+                        - generic: Saved
+                        - img [ref=e475]
+                      - 'button "Note: 3 Cases from a Video Expert: Encoding Basics" [ref=e477] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: 3 Cases from a Video Expert: Encoding Basics" [ref=e478] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e479] [cursor=pointer]:
+                      - generic [ref=e480]:
+                        - generic [ref=e481]:
+                          - generic [ref=e482]: ▤
+                          - generic [ref=e484]:
+                            - 'button "Add to favorites: 3 Cases from a Video Expert: Encoding Basics" [ref=e485]':
+                              - generic [ref=e486]:
+                                - img
+                            - 'button "Remove bookmark: 3 Cases from a Video Expert: Encoding Basics" [pressed] [ref=e487]':
+                              - generic [ref=e488]:
+                                - img
+                        - 'heading "3 Cases from a Video Expert: Encoding Basics" [level=2] [ref=e490]':
+                          - 'link "3 Cases from a Video Expert: Encoding Basics" [ref=e491]':
+                            - /url: /resource/186145
+                        - paragraph [ref=e492]: Vicuesoft blog article explaining fundamental video encoding concepts through practical case studies.
+                      - generic [ref=e493]:
+                        - generic [ref=e494]:
+                          - 'link "View details for 3 Cases from a Video Expert: Encoding Basics" [ref=e495]':
+                            - /url: /resource/186145
+                            - generic [ref=e496]:
+                              - img [ref=e497]
+                              - generic [ref=e499]: View Details
+                          - generic [ref=e500]: Intro & Learning
+                        - generic [ref=e501]:
+                          - 'link "Open Link 3 Cases from a Video Expert: Encoding Basics (opens in new tab)" [ref=e502]':
+                            - /url: https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8
+                            - img
+                            - generic [ref=e503]: Open Link
+                            - generic [ref=e504]: "3 Cases from a Video Expert: Encoding Basics (opens in new tab)"
+                          - 'button "Suggest an edit: 3 Cases from a Video Expert: Encoding Basics" [ref=e505]':
+                            - img
+                  - article [ref=e506]:
+                    - generic [ref=e507]:
+                      - generic [ref=e508] [cursor=pointer]:
+                        - checkbox "Select AMD Advanced Media Acceleration (AMA) SDK" [ref=e509]
+                        - generic [ref=e510]: Select AMD Advanced Media Acceleration (AMA) SDK
+                      - combobox "Queue status for AMD Advanced Media Acceleration (AMA) SDK" [ref=e511] [cursor=pointer]:
+                        - generic: Saved
+                        - img [ref=e512]
+                      - 'button "Note: AMD Advanced Media Acceleration (AMA) SDK" [ref=e514] [cursor=pointer]':
+                        - img
+                        - text: Note
+                      - 'button "Archive: AMD Advanced Media Acceleration (AMA) SDK" [ref=e515] [cursor=pointer]':
+                        - img
+                        - text: Archive
+                    - article [ref=e516] [cursor=pointer]:
+                      - generic [ref=e517]:
+                        - generic [ref=e518]:
+                          - generic [ref=e519]: ◇
+                          - generic [ref=e521]:
+                            - 'button "Add to favorites: AMD Advanced Media Acceleration (AMA) SDK" [ref=e522]':
+                              - generic [ref=e523]:
+                                - img
+                            - 'button "Remove bookmark: AMD Advanced Media Acceleration (AMA) SDK" [pressed] [ref=e524]':
+                              - generic [ref=e525]:
+                                - img
+                        - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=2] [ref=e527]:
+                          - link "AMD Advanced Media Acceleration (AMA) SDK" [ref=e528]:
+                            - /url: /resource/184847
+                        - paragraph [ref=e529]: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.
+                      - generic [ref=e530]:
+                        - generic [ref=e531]:
+                          - link "View details for AMD Advanced Media Acceleration (AMA) SDK" [ref=e532]:
+                            - /url: /resource/184847
+                            - generic [ref=e533]:
+                              - img [ref=e534]
+                              - generic [ref=e536]: View Details
+                          - generic [ref=e537]: Encoding & Codecs
+                          - generic [ref=e538]: Libraries
+                        - generic [ref=e539]:
+                          - link "Open Link AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)" [ref=e540]:
+                            - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                            - img
+                            - generic [ref=e541]: Open Link
+                            - generic [ref=e542]: AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)
+                          - 'button "Suggest an edit: AMD Advanced Media Acceleration (AMA) SDK" [ref=e543]':
+                            - img
+        - contentinfo [ref=e544]:
+          - generic [ref=e545]:
+            - generic [ref=e546]:
+              - paragraph [ref=e547]: ── INDEX
+              - link "awesome.video home" [ref=e548] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e549]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e551]:
+              - heading "INDEXED" [level=2] [ref=e552]
+              - paragraph [ref=e553]: 3,826
+              - paragraph [ref=e554]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e555]: live
+            - navigation "Explore categories" [ref=e557]:
+              - heading "EXPLORE" [level=2] [ref=e558]
+              - generic [ref=e559]:
+                - link "Community & Events" [ref=e560] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e561]: ◈
+                  - generic [ref=e562]: Community
+                - link "Encoding & Codecs" [ref=e563] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e564]: ◇
+                  - generic [ref=e565]: Encoding
+                - link "General Tools" [ref=e566] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e567]: ◆
+                  - generic [ref=e568]: General
+                - link "Infrastructure & Delivery" [ref=e569] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e570]: ▣
+                  - generic [ref=e571]: Infrastructure
+                - link "Intro & Learning" [ref=e572] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e573]: ▤
+                  - generic [ref=e574]: Intro
+                - link "Media Tools" [ref=e575] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e576]: ▥
+                  - generic [ref=e577]: Media
+                - link "Players & Clients" [ref=e578] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e579]: ▶
+                  - generic [ref=e580]: Players
+                - link "Protocols & Transport" [ref=e581] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e582]: ⟁
+                  - generic [ref=e583]: Protocols
+                - link "Standards & Industry" [ref=e584] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e585]: ◉
+                  - generic [ref=e586]: Standards
+            - generic [ref=e587]:
+              - heading "SOURCE" [level=2] [ref=e588]
+              - link "krzemienski/awesome-video" [ref=e589] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e590]
+                - generic [ref=e592]:
+                  - text: krzemienski
+                  - generic [ref=e593]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e594]: ↗
+              - paragraph [ref=e595]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e596] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e598] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e599]:
+            - generic [ref=e600]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e601]:
+              - link "About" [ref=e602] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e603] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e604] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e605] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e606] [cursor=pointer]
+              - link "Issues ↗" [ref=e607] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e608] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e609]: built with the awesome-list framework

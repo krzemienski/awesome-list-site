@@ -1,0 +1,1306 @@
+{
+  "url": "https://awesome.video/advanced?tab=export",
+  "viewport": [
+    390,
+    844
+  ],
+  "coarse": true,
+  "reduced": true,
+  "overflow": 0,
+  "focus": "<button type=\"button\" aria-pressed=\"true\" aria-label=\"Select PDF export format\" class=\"discovery-tools-format-option\" data-testid=\"button-format-pdf\"><article class=\"card text-card-foreground discovery-tools-format-card discovery-tools-format-card--selected\"><div class=\"p-[var(--profile-panel-padding)] pt-0 discovery-tools-format-card-content\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-file mx-auto mb-1 h-6 w-6\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"></path><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"></path></svg><div class=\"font-medium text-sm\">PDF</div><div class=\"text-xs text-muted-foreground\">Professional</div></div></article></button>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "href": "#main",
+      "role": "A",
+      "rect": {
+        "x": 8,
+        "y": -781,
+        "width": 156.875,
+        "height": 44,
+        "top": -781,
+        "right": 164.875,
+        "bottom": -737,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 14,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 58,
+        "bottom": 49.5,
+        "left": 14
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 72,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 116,
+        "bottom": 49.5,
+        "left": 72
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,826 resources",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 274,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 318,
+        "bottom": 49.5,
+        "left": 274
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in, account menu",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 332,
+        "y": 5.5,
+        "width": 44,
+        "height": 44,
+        "top": 5.5,
+        "right": 376,
+        "bottom": 49.5,
+        "left": 332
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 19,
+        "y": -578,
+        "width": 37.703125,
+        "height": 20,
+        "top": -578,
+        "right": 56.703125,
+        "bottom": -558,
+        "left": 19
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "Explorer",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 20,
+        "y": -467.703125,
+        "width": 155,
+        "height": 44,
+        "top": -467.703125,
+        "right": 175,
+        "bottom": -423.703125,
+        "left": 20
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Metrics",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 175,
+        "y": -467.703125,
+        "width": 155,
+        "height": 44,
+        "top": -467.703125,
+        "right": 330,
+        "bottom": -423.703125,
+        "left": 175
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Export",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 20,
+        "y": -423.703125,
+        "width": 310,
+        "height": 44,
+        "top": -423.703125,
+        "right": 330,
+        "bottom": -379.703125,
+        "left": 20
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 active discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "AI Recommendations",
+      "href": null,
+      "role": "tab",
+      "rect": {
+        "x": 20,
+        "y": -379.703125,
+        "width": 310,
+        "height": 44,
+        "top": -379.703125,
+        "right": 330,
+        "bottom": -335.703125,
+        "left": 20
+      },
+      "class": "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50 discovery-tools-tab",
+      "disabled": false
+    },
+    {
+      "name": "Select Markdown export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": -146.640625,
+        "width": 260,
+        "height": 114,
+        "top": -146.640625,
+        "right": 305,
+        "bottom": -32.640625,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "Select JSON export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": -8.640625,
+        "width": 260,
+        "height": 114,
+        "top": -8.640625,
+        "right": 305,
+        "bottom": 105.359375,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "Select CSV export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 129.359375,
+        "width": 260,
+        "height": 114,
+        "top": 129.359375,
+        "right": 305,
+        "bottom": 243.359375,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "Select PDF export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 267.359375,
+        "width": 260,
+        "height": 114,
+        "top": 267.359375,
+        "right": 305,
+        "bottom": 381.359375,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "Select HTML export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 405.359375,
+        "width": 260,
+        "height": 114,
+        "top": 405.359375,
+        "right": 305,
+        "bottom": 519.359375,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "Select YAML export format",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 543.359375,
+        "width": 260,
+        "height": 114,
+        "top": 543.359375,
+        "right": 305,
+        "bottom": 657.359375,
+        "left": 45
+      },
+      "class": "discovery-tools-format-option",
+      "disabled": false
+    },
+    {
+      "name": "PDF\nProfessional PDF document for sharing",
+      "href": null,
+      "role": "combobox",
+      "rect": {
+        "x": 45,
+        "y": 874.15625,
+        "width": 260,
+        "height": 74.140625,
+        "top": 874.15625,
+        "right": 305,
+        "bottom": 948.296875,
+        "left": 45
+      },
+      "class": "select flex min-h-[44px] items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1007.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1007.09375,
+        "right": 69,
+        "bottom": 1031.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1051.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1051.09375,
+        "right": 69,
+        "bottom": 1075.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1095.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1095.09375,
+        "right": 69,
+        "bottom": 1119.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1139.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1139.09375,
+        "right": 69,
+        "bottom": 1163.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": "Select All",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 135,
+        "y": 1197.09375,
+        "width": 84.3125,
+        "height": 44,
+        "top": 1197.09375,
+        "right": 219.3125,
+        "bottom": 1241.09375,
+        "left": 135
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3",
+      "disabled": false
+    },
+    {
+      "name": "Clear All",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 227.3125,
+        "y": 1197.09375,
+        "width": 77.6875,
+        "height": 44,
+        "top": 1197.09375,
+        "right": 305,
+        "bottom": 1241.09375,
+        "left": 227.3125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1263.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1263.09375,
+        "right": 69,
+        "bottom": 1287.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 178,
+        "y": 1263.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1263.09375,
+        "right": 202,
+        "bottom": 1287.09375,
+        "left": 178
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1315.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1315.09375,
+        "right": 69,
+        "bottom": 1339.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 178,
+        "y": 1315.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1315.09375,
+        "right": 202,
+        "bottom": 1339.09375,
+        "left": 178
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1375.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1375.09375,
+        "right": 69,
+        "bottom": 1399.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 178,
+        "y": 1375.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1375.09375,
+        "right": 202,
+        "bottom": 1399.09375,
+        "left": 178
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1435.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1435.09375,
+        "right": 69,
+        "bottom": 1459.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 178,
+        "y": 1435.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1435.09375,
+        "right": 202,
+        "bottom": 1459.09375,
+        "left": 178
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 45,
+        "y": 1495.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1495.09375,
+        "right": 69,
+        "bottom": 1519.09375,
+        "left": 45
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": null,
+      "href": null,
+      "role": "checkbox",
+      "rect": {
+        "x": 178,
+        "y": 1495.09375,
+        "width": 24,
+        "height": 24,
+        "top": 1495.09375,
+        "right": 202,
+        "bottom": 1519.09375,
+        "left": 178
+      },
+      "class": "peer shrink-0 max-lg:relative max-lg:after:absolute max-lg:after:left-1/2 max-lg:after:top-1/2 max-lg:after:h-11 max-lg:after:w-11 max-lg:after:-translate-x-1/2 max-lg:after:-translate-y-1/2 max-lg:after:content-[''] border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-6 w-6",
+      "disabled": false
+    },
+    {
+      "name": "Export 3,826 Resources",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 45,
+        "y": 1594.09375,
+        "width": 260,
+        "height": 48,
+        "top": 1594.09375,
+        "right": 305,
+        "bottom": 1642.09375,
+        "left": 45
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 primary min-h-[48px] px-8 w-full",
+      "disabled": false
+    },
+    {
+      "name": "Browse All Resources",
+      "href": "/categories",
+      "role": "A",
+      "rect": {
+        "x": 45,
+        "y": 1837.15625,
+        "width": 260,
+        "height": 44,
+        "top": 1837.15625,
+        "right": 305,
+        "bottom": 1881.15625,
+        "left": 45
+      },
+      "class": "discovery-tools-cta-primary"
+    },
+    {
+      "name": "Explore Categories",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 45,
+        "y": 1889.15625,
+        "width": 260,
+        "height": 44,
+        "top": 1889.15625,
+        "right": 305,
+        "bottom": 1933.15625,
+        "left": 45
+      },
+      "class": "discovery-tools-cta-secondary"
+    },
+    {
+      "name": "awesome.video home",
+      "href": "/",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 2126.65625,
+        "width": 191.421875,
+        "height": 44,
+        "top": 2126.65625,
+        "right": 211.421875,
+        "bottom": 2170.65625,
+        "left": 20
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2316.625,
+        "width": 143,
+        "height": 44,
+        "top": 2316.625,
+        "right": 330,
+        "bottom": 2360.625,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2345.4375,
+        "width": 143,
+        "height": 44,
+        "top": 2345.4375,
+        "right": 330,
+        "bottom": 2389.4375,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2374.25,
+        "width": 143,
+        "height": 44,
+        "top": 2374.25,
+        "right": 330,
+        "bottom": 2418.25,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2403.0625,
+        "width": 143,
+        "height": 44,
+        "top": 2403.0625,
+        "right": 330,
+        "bottom": 2447.0625,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2431.875,
+        "width": 143,
+        "height": 44,
+        "top": 2431.875,
+        "right": 330,
+        "bottom": 2475.875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2460.6875,
+        "width": 143,
+        "height": 44,
+        "top": 2460.6875,
+        "right": 330,
+        "bottom": 2504.6875,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2489.5,
+        "width": 143,
+        "height": 44,
+        "top": 2489.5,
+        "right": 330,
+        "bottom": 2533.5,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2518.3125,
+        "width": 143,
+        "height": 44,
+        "top": 2518.3125,
+        "right": 330,
+        "bottom": 2562.3125,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "role": "A",
+      "rect": {
+        "x": 187,
+        "y": 2547.125,
+        "width": 143,
+        "height": 44,
+        "top": 2547.125,
+        "right": 330,
+        "bottom": 2591.125,
+        "left": 187
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 2645.03125,
+        "width": 258.734375,
+        "height": 44,
+        "top": 2645.03125,
+        "right": 278.734375,
+        "bottom": 2689.03125,
+        "left": 20
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "role": "A",
+      "rect": {
+        "x": 93.71875,
+        "y": 2701.03125,
+        "width": 71.25,
+        "height": 24,
+        "top": 2701.03125,
+        "right": 164.96875,
+        "bottom": 2725.03125,
+        "left": 93.71875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 2755.421875,
+        "width": 310,
+        "height": 44,
+        "top": 2755.421875,
+        "right": 330,
+        "bottom": 2799.421875,
+        "left": 20
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "role": "A",
+      "rect": {
+        "x": 20,
+        "y": 2876.421875,
+        "width": 44,
+        "height": 44,
+        "top": 2876.421875,
+        "right": 64,
+        "bottom": 2920.421875,
+        "left": 20
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "role": "A",
+      "rect": {
+        "x": 78,
+        "y": 2876.421875,
+        "width": 44,
+        "height": 44,
+        "top": 2876.421875,
+        "right": 122,
+        "bottom": 2920.421875,
+        "left": 78
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "role": "A",
+      "rect": {
+        "x": 136,
+        "y": 2876.421875,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2876.421875,
+        "right": 184.515625,
+        "bottom": 2920.421875,
+        "left": 136
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "role": "A",
+      "rect": {
+        "x": 198.515625,
+        "y": 2876.421875,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2876.421875,
+        "right": 247.03125,
+        "bottom": 2920.421875,
+        "left": 198.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 20,
+        "y": 2920.421875,
+        "width": 103.953125,
+        "height": 44,
+        "top": 2920.421875,
+        "right": 123.953125,
+        "bottom": 2964.421875,
+        "left": 20
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "role": "A",
+      "rect": {
+        "x": 137.953125,
+        "y": 2920.421875,
+        "width": 55.46875,
+        "height": 44,
+        "top": 2920.421875,
+        "right": 193.421875,
+        "bottom": 2964.421875,
+        "left": 137.953125
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "role": "A",
+      "rect": {
+        "x": 207.421875,
+        "y": 2920.421875,
+        "width": 48.515625,
+        "height": 44,
+        "top": 2920.421875,
+        "right": 255.9375,
+        "bottom": 2964.421875,
+        "left": 207.421875
+      },
+      "class": ""
+    },
+    {
+      "name": "Back to top",
+      "href": null,
+      "role": "BUTTON",
+      "rect": {
+        "x": 334,
+        "y": 788,
+        "width": 44,
+        "height": 44,
+        "top": 788,
+        "right": 378,
+        "bottom": 832,
+        "left": 334
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]",
+      "disabled": false
+    }
+  ],
+  "network": [
+    {
+      "url": "https://awesome.video/ds/design-system.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/ds/design-system.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/index-0OZjaKaA.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-CMCJ-qQ8.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/jsx-runtime-D7j2mC9N.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-C7-6WTLg.js",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/index-B_SxKCHI.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://i.replit.com/script.js",
+      "status": 0,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list/nav",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/awesome-list",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "status": 0,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/site.webmanifest",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQublWII.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYbSB4Zh.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-sans-DyCgjsAz.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/assets/category-glyphs-mono-D0YFCcQg.otf",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/favicon.svg",
+      "status": 200,
+      "type": "other"
+    },
+    {
+      "url": "https://awesome.video/assets/Advanced-FUe5A6rH.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/page-headings-DjR-ExUC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tabs-D1zzd93y.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/card-C9l-HiOW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/badge-BB9W4DTj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chip-button-Cj4pYKU5.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/select-BAYwpY7z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chevron-down-CKn1UZst.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/checkbox-DShje5lu.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/collapsible-Bui8YgbC.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/url-filter-state-hUMXr8Zj.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tags-D5fI2uuo.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/folder-DNdETg_z.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/filter-BaEjNb1k.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/tag-loQr9huG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/external-link-COJv9Evn.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/progress-DGcD0s24.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/users-CEk8-QMW.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/folder-tree-CwppIlrT.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/trending-up-DWWVMpda.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/circle-check-big-oJSX82cd.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/file-text-BYi6ry2B.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/ai-recommendations-panel-Bm9QdUIL.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/alert-DSm2PGKH.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/analytics-recommendations-bJi1ylMk.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/thumbs-up-BogcikQA.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/sparkles-B2EKOUQy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/circle-alert-Cw300bgL.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/wifi-off-BlBoDENM.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/query-availability-BAylRIbq.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/chart-column-CU_OOeFN.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/discovery-tools-Cl7Wg0ka.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+      "status": 200,
+      "type": "css"
+    },
+    {
+      "url": "https://awesome.video/api/config",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/api/auth/user",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-dialog-D87UHJzI.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/form-DfoWbiAy.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/label-CmJlH1sG.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/dialog-B-0wLFhb.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/textarea-Dz1fhyHR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/loader-circle-oP5qqTkR.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/schemas-DRquIvQw.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-fcBxsx-3.css",
+      "status": 200,
+      "type": "link"
+    },
+    {
+      "url": "https://awesome.video/assets/contact-footer-CV7-9In8.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/assets/mail-D6yJi0kF.js",
+      "status": 200,
+      "type": "script"
+    },
+    {
+      "url": "https://awesome.video/api/tags",
+      "status": 200,
+      "type": "fetch"
+    },
+    {
+      "url": "https://awesome.video/favicon.ico",
+      "status": 200,
+      "type": "other"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+"{\"dlg\":true,\"links\":[[\"Home\",\"/\",null,44],[\"Submit\",\"/submit\",null,44],[\"About\",\"/about\",\"page\",44],[\"Admin\",\"/admin\",null,44],[\"Docs ↗\",\"https://github.com/krzemienski/awesome-video/tree/master/docs\",null,44],[\"Home dashboard\",\"/?context=account\",null,44]]}"
+820 drawer Admin -> "{\"p\":\"/admin\",\"dlg\":false,\"h1\":\"Operations dashboard\"}"

@@ -1,0 +1,12 @@
+CAT MISMATCH accordion-cat-community-events 3129 129
+CAT MISMATCH accordion-cat-encoding-codecs 3580 580
+SS MISMATCH av1 122 22
+SS MISMATCH vp9 919 19
+CAT MISMATCH accordion-cat-infrastructure-delivery 3353 353
+CAT MISMATCH accordion-cat-intro-learning 3297 297
+CAT MISMATCH accordion-cat-media-tools 3704 704
+CAT MISMATCH accordion-cat-players-clients 3447 447
+CAT MISMATCH accordion-cat-protocols-transport 3467 467
+CAT MISMATCH accordion-cat-standards-industry 3335 335
+checked 159 mismatches 10
+sum cat totals dom 27826

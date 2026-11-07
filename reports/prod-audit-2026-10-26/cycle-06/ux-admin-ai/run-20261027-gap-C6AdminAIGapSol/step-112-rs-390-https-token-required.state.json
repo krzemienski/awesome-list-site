@@ -1,0 +1,40 @@
+{
+  "url": "https://awesome.video/admin/researcher",
+  "environment": {
+    "width": 390,
+    "height": 844,
+    "dpr": 1,
+    "scrollX": 0,
+    "scrollY": 1900,
+    "scrollWidth": 384,
+    "online": true,
+    "touch": 0,
+    "coarse": false,
+    "reduce": false,
+    "focus": {
+      "tag": "INPUT",
+      "name": ""
+    },
+    "blockedWrites": []
+  },
+  "console": {
+    "entries": [],
+    "nextSeq": 0,
+    "dropped": 0
+  },
+  "errors": {
+    "entries": [],
+    "nextSeq": 0,
+    "dropped": 0
+  },
+  "requests": [
+    {
+      "id": "request-1",
+      "method": "GET",
+      "url": "https://awesome.video/api/admin/stats",
+      "status": 200,
+      "durationMs": 418,
+      "referer": "https://awesome.video/"
+    }
+  ]
+}

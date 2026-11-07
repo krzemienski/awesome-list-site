@@ -1,0 +1,307 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem:
+                  - link "Advanced Search" [disabled]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - img [ref=e42]
+                  - heading "Advanced Features" [level=1] [ref=e44]
+                - paragraph [ref=e45]: Discover powerful tools for exploring, analyzing, and sharing awesome list data
+              - generic [ref=e46]:
+                - tablist [ref=e47]:
+                  - tab "Explorer" [ref=e48] [cursor=pointer]:
+                    - img [ref=e49]
+                    - text: Explorer
+                  - tab "Metrics" [selected] [ref=e52] [cursor=pointer]:
+                    - img [ref=e53]
+                    - text: Metrics
+                  - tab "Export" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - text: Export
+                  - tab "AI Recommendations" [ref=e59] [cursor=pointer]:
+                    - img [ref=e60]
+                    - generic [ref=e62]: AI Recommendations
+                - tabpanel "Metrics" [ref=e63]:
+                  - article [ref=e65]:
+                    - generic [ref=e66]:
+                      - generic [ref=e67]:
+                        - img [ref=e68]
+                        - text: Community Metrics
+                      - generic [ref=e73]: Catalog size, weekly growth, and each category's share of the catalog
+                    - generic [ref=e75]:
+                      - tablist [ref=e76]:
+                        - tab "Overview" [ref=e77] [cursor=pointer]
+                        - tab "Categories" [active] [selected] [ref=e78] [cursor=pointer]
+                      - tabpanel "Categories" [ref=e79]:
+                        - generic [ref=e80]:
+                          - article [ref=e81]:
+                            - generic [ref=e82]:
+                              - generic [ref=e83]:
+                                - generic [ref=e84]:
+                                  - heading "Media Tools" [level=3] [ref=e85]
+                                  - paragraph [ref=e86]: 704 resources
+                                - generic [ref=e87]:
+                                  - generic [ref=e88]: 18%
+                                  - generic [ref=e89]: of catalog
+                              - generic [ref=e91]:
+                                - generic [ref=e92]:
+                                  - generic [ref=e93]: Growth Rate
+                                  - generic [ref=e94]: +0%
+                                - progressbar [ref=e95]
+                                - paragraph [ref=e97]: Share of this category's resources added in the last 30 days
+                          - article [ref=e98]:
+                            - generic [ref=e99]:
+                              - generic [ref=e100]:
+                                - generic [ref=e101]:
+                                  - heading "Encoding & Codecs" [level=3] [ref=e102]
+                                  - paragraph [ref=e103]: 579 resources
+                                - generic [ref=e104]:
+                                  - generic [ref=e105]: 15%
+                                  - generic [ref=e106]: of catalog
+                              - generic [ref=e108]:
+                                - generic [ref=e109]:
+                                  - generic [ref=e110]: Growth Rate
+                                  - generic [ref=e111]: +0%
+                                - progressbar [ref=e112]
+                                - paragraph [ref=e114]: Share of this category's resources added in the last 30 days
+                          - article [ref=e115]:
+                            - generic [ref=e116]:
+                              - generic [ref=e117]:
+                                - generic [ref=e118]:
+                                  - heading "General Tools" [level=3] [ref=e119]
+                                  - paragraph [ref=e120]: 514 resources
+                                - generic [ref=e121]:
+                                  - generic [ref=e122]: 13%
+                                  - generic [ref=e123]: of catalog
+                              - generic [ref=e125]:
+                                - generic [ref=e126]:
+                                  - generic [ref=e127]: Growth Rate
+                                  - generic [ref=e128]: +0%
+                                - progressbar [ref=e129]
+                                - paragraph [ref=e131]: Share of this category's resources added in the last 30 days
+                          - article [ref=e132]:
+                            - generic [ref=e133]:
+                              - generic [ref=e134]:
+                                - generic [ref=e135]:
+                                  - heading "Protocols & Transport" [level=3] [ref=e136]
+                                  - paragraph [ref=e137]: 467 resources
+                                - generic [ref=e138]:
+                                  - generic [ref=e139]: 12%
+                                  - generic [ref=e140]: of catalog
+                              - generic [ref=e142]:
+                                - generic [ref=e143]:
+                                  - generic [ref=e144]: Growth Rate
+                                  - generic [ref=e145]: +0%
+                                - progressbar [ref=e146]
+                                - paragraph [ref=e148]: Share of this category's resources added in the last 30 days
+                          - article [ref=e149]:
+                            - generic [ref=e150]:
+                              - generic [ref=e151]:
+                                - generic [ref=e152]:
+                                  - heading "Players & Clients" [level=3] [ref=e153]
+                                  - paragraph [ref=e154]: 447 resources
+                                - generic [ref=e155]:
+                                  - generic [ref=e156]: 12%
+                                  - generic [ref=e157]: of catalog
+                              - generic [ref=e159]:
+                                - generic [ref=e160]:
+                                  - generic [ref=e161]: Growth Rate
+                                  - generic [ref=e162]: +0%
+                                - progressbar [ref=e163]
+                                - paragraph [ref=e165]: Share of this category's resources added in the last 30 days
+                          - article [ref=e166]:
+                            - generic [ref=e167]:
+                              - generic [ref=e168]:
+                                - generic [ref=e169]:
+                                  - heading "Infrastructure & Delivery" [level=3] [ref=e170]
+                                  - paragraph [ref=e171]: 353 resources
+                                - generic [ref=e172]:
+                                  - generic [ref=e173]: 9%
+                                  - generic [ref=e174]: of catalog
+                              - generic [ref=e176]:
+                                - generic [ref=e177]:
+                                  - generic [ref=e178]: Growth Rate
+                                  - generic [ref=e179]: +0%
+                                - progressbar [ref=e180]
+                                - paragraph [ref=e182]: Share of this category's resources added in the last 30 days
+                          - article [ref=e183]:
+                            - generic [ref=e184]:
+                              - generic [ref=e185]:
+                                - generic [ref=e186]:
+                                  - heading "Standards & Industry" [level=3] [ref=e187]
+                                  - paragraph [ref=e188]: 335 resources
+                                - generic [ref=e189]:
+                                  - generic [ref=e190]: 9%
+                                  - generic [ref=e191]: of catalog
+                              - generic [ref=e193]:
+                                - generic [ref=e194]:
+                                  - generic [ref=e195]: Growth Rate
+                                  - generic [ref=e196]: +0%
+                                - progressbar [ref=e197]
+                                - paragraph [ref=e199]: Share of this category's resources added in the last 30 days
+                          - article [ref=e200]:
+                            - generic [ref=e201]:
+                              - generic [ref=e202]:
+                                - generic [ref=e203]:
+                                  - heading "Intro & Learning" [level=3] [ref=e204]
+                                  - paragraph [ref=e205]: 297 resources
+                                - generic [ref=e206]:
+                                  - generic [ref=e207]: 8%
+                                  - generic [ref=e208]: of catalog
+                              - generic [ref=e210]:
+                                - generic [ref=e211]:
+                                  - generic [ref=e212]: Growth Rate
+                                  - generic [ref=e213]: +0%
+                                - progressbar [ref=e214]
+                                - paragraph [ref=e216]: Share of this category's resources added in the last 30 days
+                          - article [ref=e217]:
+                            - generic [ref=e218]:
+                              - generic [ref=e219]:
+                                - generic [ref=e220]:
+                                  - heading "Community & Events" [level=3] [ref=e221]
+                                  - paragraph [ref=e222]: 129 resources
+                                - generic [ref=e223]:
+                                  - generic [ref=e224]: 3%
+                                  - generic [ref=e225]: of catalog
+                              - generic [ref=e227]:
+                                - generic [ref=e228]:
+                                  - generic [ref=e229]: Growth Rate
+                                  - generic [ref=e230]: +0%
+                                - progressbar [ref=e231]
+                                - paragraph [ref=e233]: Share of this category's resources added in the last 30 days
+              - article [ref=e234]:
+                - generic [ref=e235]:
+                  - heading "Explore More Features" [level=2] [ref=e236]
+                  - paragraph [ref=e237]: These advanced features help you discover, analyze, and share awesome list data more effectively
+                  - generic [ref=e238]:
+                    - link "Browse All Resources" [ref=e239] [cursor=pointer]:
+                      - /url: /categories
+                    - link "Explore Categories" [ref=e240] [cursor=pointer]:
+                      - /url: /category/community-events
+        - contentinfo [ref=e241]:
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - paragraph [ref=e244]: ── INDEX
+              - link "awesome.video home" [ref=e245] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e246]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e248]:
+              - heading "INDEXED" [level=2] [ref=e249]
+              - paragraph [ref=e250]: 3,825
+              - paragraph [ref=e251]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e252]: live
+            - navigation "Explore categories" [ref=e254]:
+              - heading "EXPLORE" [level=2] [ref=e255]
+              - generic [ref=e256]:
+                - link "Community & Events" [ref=e257] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e258]: ◈
+                  - generic [ref=e259]: Community
+                - link "Encoding & Codecs" [ref=e260] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e261]: ◇
+                  - generic [ref=e262]: Encoding
+                - link "General Tools" [ref=e263] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e264]: ◆
+                  - generic [ref=e265]: General
+                - link "Infrastructure & Delivery" [ref=e266] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e267]: ▣
+                  - generic [ref=e268]: Infrastructure
+                - link "Intro & Learning" [ref=e269] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e270]: ▤
+                  - generic [ref=e271]: Intro
+                - link "Media Tools" [ref=e272] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e273]: ▥
+                  - generic [ref=e274]: Media
+                - link "Players & Clients" [ref=e275] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e276]: ▶
+                  - generic [ref=e277]: Players
+                - link "Protocols & Transport" [ref=e278] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e279]: ⟁
+                  - generic [ref=e280]: Protocols
+                - link "Standards & Industry" [ref=e281] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e282]: ◉
+                  - generic [ref=e283]: Standards
+            - generic [ref=e284]:
+              - heading "SOURCE" [level=2] [ref=e285]
+              - link "krzemienski/awesome-video" [ref=e286] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e287]
+                - generic [ref=e289]:
+                  - text: krzemienski
+                  - generic [ref=e290]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e291]: ↗
+              - paragraph [ref=e292]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e293] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e295] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e296]:
+            - generic [ref=e297]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e298]:
+              - link "About" [ref=e299] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e300] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e301] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e302] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e303] [cursor=pointer]
+              - link "Issues ↗" [ref=e304] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e305] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e306]: built with the awesome-list framework

@@ -1,6 +1,9 @@
 import { db } from "../db";
 import { agentEvents, type AgentEvent } from "@shared/schema";
 import { and, asc, eq, gt } from "drizzle-orm";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("ai-agent");
 
 /**
  * Structured, persisted logging for the Claude Agent SDK multi-agent runs
@@ -27,7 +30,11 @@ export type AgentEventType =
   | "delegation"
   | "delegation_result"
   | "result"
-  | "error";
+  | "error"
+  // Researcher progress contract (shared/researcherContract.ts).
+  | "phase"
+  | "scout_start"
+  | "scout_end";
 
 export interface EmitInput {
   actor: string;
@@ -111,7 +118,7 @@ export class AgentEventEmitter {
         try { this.afterEmitHook(e); } catch { /* hook must never break the run */ }
       }
     } catch (err: any) {
-      console.error(
+      logger.error(
         `[agentEvents:${this.jobType}:${this.jobId}] emit failed (seq ${seq}, ${e.eventType}):`,
         err?.message || err,
       );

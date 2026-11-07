@@ -1,0 +1,17 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - generic
+      - generic
+        - main
+          - tabpanel "Researcher" [ref=e5] focusable [tabindex]
+            - generic
+              - generic
+                - region "Research run #70" [ref=e6]
+                  - paragraph
+  - alertdialog "Cancel research run #70?"
+    - heading "Cancel research run #70?" [level=2, ref=e2]
+      - StaticText "Cancel research run #70?"
+    - paragraph
+      - StaticText "The run stops now. Discoveries it already saved stay in the review list, and the API cost spent so far is not refunded. This cannot be undone."
+    - button "Keep running" [ref=e3]
+    - button "Cancel run" [ref=e4]

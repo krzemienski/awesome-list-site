@@ -1,0 +1,9 @@
+uid=346_0 RootWebArea "Video Encoding & Codecs: AV1… — Page 7 — Awesome Video" url="https://awesome.video/category/encoding-codecs?page=7"
+  uid=346_98 main
+    uid=346_169 generic "Resources (579)"
+      uid=346_588 navigation "Pagination"
+        uid=346_609 status atomic live="polite" relevant="additions text"
+  uid=352_0 listbox orientation="vertical"
+    uid=352_1 option "Default" focusable focused selected
+    uid=352_2 option "Name A-Z"
+    uid=352_3 option "Name Z-A"

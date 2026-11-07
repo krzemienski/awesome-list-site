@@ -1,0 +1,141 @@
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Done
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-331-settings-walk-820.png
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,826 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e5]
+  - link "AWESOME.VIDEO home" [ref=e6]
+  - button "Search 3,826 resources" [ref=e7]
+  - button "Admin, account menu" [expanded=false, ref=e8]
+  - navigation "Breadcrumb" [ref=e9]
+    - link "Home" [ref=e59]
+    - link "Settings" [disabled, ref=e60]
+  - link "Back" [ref=e10]
+  - heading "Settings" [level=1, ref=e11]
+  - link [ref=e12]
+    - heading "Appearance" [level=2, ref=e45]
+  - link [ref=e13]
+    - heading "Account" [level=2, ref=e46]
+  - link [ref=e14]
+    - heading "Security" [level=2, ref=e47]
+  - link [ref=e15]
+    - heading "Bookmarks" [level=2, ref=e48]
+  - link [ref=e16]
+    - heading "Recommendations" [level=2, ref=e49]
+  - region "Home layout" [ref=e17]
+    - radiogroup "Home layout" [ref=e61] focusable [tabindex]
+  - region "Learning preferences" [ref=e18]
+    - radiogroup "BeginnerI’m building a foundation in video technology.IntermediateI know the basics and want to go d" [ref=e62] focusable [tabindex]
+    - LabelText "Community & Events" [ref=e63] clickable [cursor:pointer]
+    - LabelText "Encoding & Codecs" [ref=e64] clickable [cursor:pointer]
+    - LabelText "General Tools" [ref=e65] clickable [cursor:pointer]
+    - LabelText "Infrastructure & Delivery" [ref=e66] clickable [cursor:pointer]
+    - LabelText "Intro & Learning" [ref=e67] clickable [cursor:pointer]
+    - LabelText "Media Tools" [ref=e68] clickable [cursor:pointer]
+    - LabelText "Players & Clients" [ref=e69] clickable [cursor:pointer]
+    - LabelText "Protocols & Transport" [ref=e70] clickable [cursor:pointer]
+    - LabelText "Standards & Industry" [ref=e71] clickable [cursor:pointer]
+    - LabelText "Learn the fundamentals" [ref=e72] clickable [cursor:pointer]
+    - LabelText "Build video applications" [ref=e73] clickable [cursor:pointer]
+    - LabelText "Improve streaming experiences" [ref=e74] clickable [cursor:pointer]
+    - LabelText "Optimize encoding and quality" [ref=e75] clickable [cursor:pointer]
+    - LabelText "Operate video infrastructure" [ref=e76] clickable [cursor:pointer]
+    - LabelText "Keep up with standards and tools" [ref=e77] clickable [cursor:pointer]
+    - LabelText "Videos" [ref=e78] clickable [cursor:pointer]
+    - LabelText "Courses" [ref=e79] clickable [cursor:pointer]
+    - LabelText "Articles" [ref=e80] clickable [cursor:pointer]
+    - LabelText "Books" [ref=e81] clickable [cursor:pointer]
+    - LabelText "Specifications" [ref=e82] clickable [cursor:pointer]
+    - LabelText "Hands-on tools" [ref=e83] clickable [cursor:pointer]
+    - LabelText "Libraries and SDKs" [ref=e84] clickable [cursor:pointer]
+    - LabelText "Community resources" [ref=e85] clickable [cursor:pointer]
+    - radiogroup "A little most daysOne focused session each weekWhenever time allows" [ref=e86] focusable [tabindex]
+    - heading "What changes after you save" [level=3, ref=e87]
+    - button "Reset preferences" [expanded=false, ref=e50]
+    - button "Save learning preferences" [ref=e51]
+  - region "Notifications" [ref=e19]
+    - LabelText "Email digestA considered digest, never a stream.Off" [ref=e52] clickable [cursor:pointer]
+    - LabelText "In-app updatesA small inbox inside your account.Off" [ref=e53] clickable [cursor:pointer]
+    - region "Digest sections" [ref=e54]
+    - LabelText "Cadence" [ref=e94] clickable [cursor:pointer]
+    - combobox "Cadence" [expanded=false, ref=e95]: Weekly
+    - LabelText "Time zone" [ref=e96] clickable [cursor:pointer]
+    - textbox "Time zone" [ref=e97]: America/New_York
+    - button "Pause for 7 days" [ref=e55]
+    - button "Unsubscribe all" [disabled, ref=e56]
+    - button "Save choices" [ref=e57]
+    - region "Preview" [ref=e58]
+  - link "awesome.video home" [ref=e20]
+  - heading "INDEXED" [level=2, ref=e21]
+  - navigation "Explore categories" [ref=e22]
+    - heading "EXPLORE" [level=2, ref=e27]
+    - link "Community & Events" [ref=e28]
+    - link "Encoding & Codecs" [ref=e29]
+    - link "General Tools" [ref=e30]
+    - link "Infrastructure & Delivery" [ref=e31]
+    - link "Intro & Learning" [ref=e32]
+    - link "Media Tools" [ref=e33]
+    - link "Players & Clients" [ref=e34]
+    - link "Protocols & Transport" [ref=e35]
+    - link "Standards & Industry" [ref=e36]
+  - heading "SOURCE" [level=2, ref=e23]
+  - link "krzemienski/ awesome-video" [ref=e24]
+  - link "PRs welcome" [ref=e37]
+  - button "Contact maintainers" [ref=e25]
+  - navigation "Site policies" [ref=e26]
+    - link "About" [ref=e38]
+    - link "Terms" [ref=e39]
+    - link "Privacy" [ref=e40]
+    - link "Code of Conduct" [ref=e41]
+    - button "Cookie settings" [ref=e42]
+    - link "Issues ↗" [ref=e43]
+    - link "Sitemap" [ref=e44]
+  - button "Back to top" [ref=e4]

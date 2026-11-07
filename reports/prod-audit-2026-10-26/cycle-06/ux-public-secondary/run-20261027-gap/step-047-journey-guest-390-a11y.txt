@@ -1,0 +1,352 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,825 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,825 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem [ref=e39]:
+                  - link "Learning Journeys" [ref=e40] [cursor=pointer]:
+                    - /url: /journeys
+                - listitem [ref=e41]:
+                  - img [ref=e42]
+                - listitem:
+                  - link "FFmpeg Mastery" [disabled]
+            - generic [ref=e44]:
+              - button "Back to Journeys" [ref=e45] [cursor=pointer]:
+                - img
+                - text: Back to Journeys
+              - article [ref=e46]:
+                - generic [ref=e47]:
+                  - generic [ref=e48]:
+                    - img [ref=e49]
+                    - generic [ref=e52]:
+                      - img [ref=e53]
+                      - text: intermediate
+                  - heading "FFmpeg Mastery" [active] [level=1] [ref=e56]
+                  - generic [ref=e57]: "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+                - generic [ref=e58]:
+                  - generic [ref=e59]:
+                    - generic [ref=e60]:
+                      - img [ref=e61]
+                      - text: 12-15 hours
+                    - generic [ref=e64]: Encoding & Codecs
+                    - generic [ref=e65]: 6 steps
+                  - note [ref=e66]:
+                    - img [ref=e67]
+                    - generic [ref=e69]:
+                      - text: Please
+                      - link "log in" [ref=e70] [cursor=pointer]:
+                        - /url: /sign-in?redirect_url=%2Fjourney%2F8
+                      - text: to start this journey and track your progress.
+              - generic [ref=e71]:
+                - heading "Learning Path" [level=2] [ref=e72]
+                - article [ref=e73]:
+                  - generic [ref=e75]:
+                    - generic [ref=e76]: "1"
+                    - generic [ref=e77]:
+                      - generic [ref=e79]:
+                        - heading "FFmpeg Fundamentals" [level=3] [ref=e80]
+                        - paragraph [ref=e81]: Learn how FFmpeg structures inputs, outputs, streams and global options. Get comfortable reading and writing one-line commands.
+                      - generic [ref=e82]:
+                        - generic [ref=e83]:
+                          - generic [ref=e84]:
+                            - link "VCT (Video Converter & Transcoder)" [ref=e85] [cursor=pointer]:
+                              - /url: /resource/185310
+                              - img [ref=e86]
+                              - generic "VCT (Video Converter & Transcoder)" [ref=e88]
+                            - link "Open VCT (Video Converter & Transcoder) on its source site (new tab)" [ref=e89] [cursor=pointer]:
+                              - /url: https://github.com/zbabac/VCT
+                              - img [ref=e90]
+                          - paragraph [ref=e94]: VCT is a frontend for FFmpeg that allows users to set options, drag multiple files, transcode between formats (e.g., MKV to MP4), manually edit FFmpeg commands, record network streams, and manage batch processing. It's particularly useful for developers needing a versatile tool for video conversion and transcoding tasks.
+                        - generic [ref=e95]:
+                          - generic [ref=e96]:
+                            - 'link "Video Encoding 101: A Beginner''s Guide to Key Concepts" [ref=e97] [cursor=pointer]':
+                              - /url: /resource/185372
+                              - img [ref=e98]
+                              - 'generic "Video Encoding 101: A Beginner''s Guide to Key Concepts" [ref=e100]'
+                            - 'link "Open Video Encoding 101: A Beginner''s Guide to Key Concepts on its source site (new tab)" [ref=e101] [cursor=pointer]':
+                              - /url: https://www.forasoft.com/blog/article/video-encoding-streaming-quality
+                              - img [ref=e102]
+                          - paragraph [ref=e106]: An introductory guide that explains the fundamental concepts of video encoding, including compression techniques, color encoding, and the differences between various encoding approaches. It's a valuable resource for beginners seeking to understand the basics of video encoding.
+                - article [ref=e107]:
+                  - generic [ref=e109]:
+                    - generic [ref=e110]: "2"
+                    - generic [ref=e111]:
+                      - generic [ref=e113]:
+                        - heading "Transcoding & Bitrate Control" [level=3] [ref=e114]
+                        - paragraph [ref=e115]: Practice CRF, two-pass and ABR encoding with x264/x265. Understand how rate-control modes affect quality and file size.
+                      - generic [ref=e116]:
+                        - generic [ref=e117]:
+                          - generic [ref=e118]:
+                            - 'link "FFmpeg Threads Command: How it Affects Quality and Performance" [ref=e119] [cursor=pointer]':
+                              - /url: /resource/186158
+                              - img [ref=e120]
+                              - 'generic "FFmpeg Threads Command: How it Affects Quality and Performance" [ref=e122]'
+                            - 'link "Open FFmpeg Threads Command: How it Affects Quality and Performance on its source site (new tab)" [ref=e123] [cursor=pointer]':
+                              - /url: https://streaminglearningcenter.com/blogs/ffmpeg-command-threads-how-it-affects-quality-and-performance.html
+                              - img [ref=e124]
+                          - paragraph [ref=e128]: So, I received an email from an acquaintance that read, “I was curious if there is actually any benefit to a “threads=” type custom command in x264.
+                        - generic [ref=e129]:
+                          - generic [ref=e130]:
+                            - link "x264 FFmpeg Options Guide - Linux Encoding" [ref=e131] [cursor=pointer]:
+                              - /url: /resource/185939
+                              - img [ref=e132]
+                              - generic "x264 FFmpeg Options Guide - Linux Encoding" [ref=e134]
+                            - link "Open x264 FFmpeg Options Guide - Linux Encoding on its source site (new tab)" [ref=e135] [cursor=pointer]:
+                              - /url: https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+                              - img [ref=e136]
+                          - paragraph [ref=e140]: Reference guide mapping x264 encoder options to FFmpeg parameters for video encoding on Linux systems.
+                - article [ref=e141]:
+                  - generic [ref=e143]:
+                    - generic [ref=e144]: "3"
+                    - generic [ref=e145]:
+                      - generic [ref=e147]:
+                        - heading "Audio Processing" [level=3] [ref=e148]
+                        - paragraph [ref=e149]: Resample, remix, normalize and re-encode audio tracks. Handle multi-track inputs and language metadata correctly.
+                      - generic [ref=e150]:
+                        - generic [ref=e151]:
+                          - generic [ref=e152]:
+                            - link "audio-loudness-batch-normalize" [ref=e153] [cursor=pointer]:
+                              - /url: /resource/189237
+                              - img [ref=e154]
+                              - generic "audio-loudness-batch-normalize" [ref=e156]
+                            - link "Open audio-loudness-batch-normalize on its source site (new tab)" [ref=e157] [cursor=pointer]:
+                              - /url: https://github.com/lxl66566/audio-loudness-batch-normalize
+                              - img [ref=e158]
+                          - paragraph [ref=e162]: Rust CLI for batch EBU R128 loudness normalization, fast alternative to ffmpeg loudnorm scripting.
+                        - generic [ref=e163]:
+                          - generic [ref=e164]:
+                            - link "Audio normalization with ffmpeg using loudnorm (ebur128) filter" [ref=e165] [cursor=pointer]:
+                              - /url: /resource/185867
+                              - img [ref=e166]
+                              - generic "Audio normalization with ffmpeg using loudnorm (ebur128) filter" [ref=e168]
+                            - link "Open Audio normalization with ffmpeg using loudnorm (ebur128) filter on its source site (new tab)" [ref=e169] [cursor=pointer]:
+                              - /url: https://bytesandbones.wordpress.com/2017/03/16/audio-nomalization-with-ffmpeg-using-loudnorm-ebur128-filter/
+                              - img [ref=e170]
+                          - paragraph [ref=e174]: Tutorial on using FFmpeg's loudnorm filter based on EBU R128 standards to normalize and adjust audio levels in media files.
+                        - generic [ref=e175]:
+                          - generic [ref=e176]:
+                            - 'link "FFmpeg Wiki: Filtering Guide" [ref=e177] [cursor=pointer]':
+                              - /url: /resource/186413
+                              - img [ref=e178]
+                              - 'generic "FFmpeg Wiki: Filtering Guide" [ref=e180]'
+                            - 'link "Open FFmpeg Wiki: Filtering Guide on its source site (new tab)" [ref=e181] [cursor=pointer]':
+                              - /url: https://trac.ffmpeg.org/wiki/FilteringGuide
+                              - img [ref=e182]
+                          - paragraph [ref=e186]: Documentation on using FFmpeg’s filtering system, demonstrating how to chain video filters (scale, crop, overlay, etc.) and audio filters for processing media with examples.
+                - article [ref=e187]:
+                  - generic [ref=e189]:
+                    - generic [ref=e190]: "4"
+                    - generic [ref=e191]:
+                      - generic [ref=e193]:
+                        - heading "Filters and Effects" [level=3] [ref=e194]
+                        - paragraph [ref=e195]: Compose filtergraphs for scaling, cropping, overlaying, deinterlacing and color conversion using filter_complex.
+                      - generic [ref=e196]:
+                        - generic [ref=e197]:
+                          - generic [ref=e198]:
+                            - 'link "wasmbooth: Video Filter Booth App Written in Rust" [ref=e199] [cursor=pointer]':
+                              - /url: /resource/185135
+                              - img [ref=e200]
+                              - 'generic "wasmbooth: Video Filter Booth App Written in Rust" [ref=e202]'
+                            - 'link "Open wasmbooth: Video Filter Booth App Written in Rust on its source site (new tab)" [ref=e203] [cursor=pointer]':
+                              - /url: https://github.com/mtharrison/wasmbooth
+                              - img [ref=e204]
+                          - paragraph [ref=e208]: wasmbooth is a video effect booth application written in Rust and WebAssembly. It streams webcam input into an offscreen video element, processes each frame with selected filters, and displays the output on a visible canvas. The project serves as a learning resource for integrating Rust with WebAssembly for video processing.
+                        - generic [ref=e209]:
+                          - generic [ref=e210]:
+                            - link "FFmpeg 8.0 libplacebo Filter — Full Option Reference" [ref=e211] [cursor=pointer]:
+                              - /url: /resource/188761
+                              - img [ref=e212]
+                              - generic "FFmpeg 8.0 libplacebo Filter — Full Option Reference" [ref=e214]
+                            - link "Open FFmpeg 8.0 libplacebo Filter — Full Option Reference on its source site (new tab)" [ref=e215] [cursor=pointer]:
+                              - /url: https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Video/libplacebo.html
+                              - img [ref=e216]
+                          - paragraph [ref=e220]: Complete searchable option reference for FFmpeg's libplacebo filter, including the frame-analysis compute shader path for static-HDR10 and untagged sources.
+                        - generic [ref=e221]:
+                          - generic [ref=e222]:
+                            - link "FFmpeg 8.0 whisper Filter Documentation" [ref=e223] [cursor=pointer]:
+                              - /url: /resource/188813
+                              - img [ref=e224]
+                              - generic "FFmpeg 8.0 whisper Filter Documentation" [ref=e226]
+                            - link "Open FFmpeg 8.0 whisper Filter Documentation on its source site (new tab)" [ref=e227] [cursor=pointer]:
+                              - /url: https://ayosec.github.io/ffmpeg-filters-docs/8.0/Filters/Audio/whisper.html
+                              - img [ref=e228]
+                          - paragraph [ref=e232]: "Reference for FFmpeg 8.0's built-in Whisper ASR filter: model selection, VAD, queueing, and SRT/JSON transcript output destinations."
+                - article [ref=e233]:
+                  - generic [ref=e235]:
+                    - generic [ref=e236]: "5"
+                    - generic [ref=e237]:
+                      - generic [ref=e239]:
+                        - heading "Performance & Hardware Acceleration" [level=3] [ref=e240]
+                        - paragraph [ref=e241]: Speed up encodes with NVENC, QSV and VAAPI. Learn when hardware acceleration helps and when it hurts quality.
+                      - generic [ref=e242]:
+                        - generic [ref=e243]:
+                          - generic [ref=e244]:
+                            - link "NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC)" [ref=e245] [cursor=pointer]:
+                              - /url: /resource/188920
+                              - img [ref=e246]
+                              - generic "NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC)" [ref=e248]
+                            - link "Open NVIDIA — FFmpeg hardware acceleration (NVENC/NVDEC) on its source site (new tab)" [ref=e249] [cursor=pointer]:
+                              - /url: https://developer.nvidia.com/ffmpeg
+                              - img [ref=e250]
+                          - paragraph [ref=e254]: Official NVIDIA page on integrating FFmpeg with the Video Codec SDK, covering NVENC encode and NVDEC/CUVID decode build paths and supported filters.
+                        - generic [ref=e255]:
+                          - generic [ref=e256]:
+                            - link "Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL)" [ref=e257] [cursor=pointer]:
+                              - /url: /resource/188928
+                              - img [ref=e258]
+                              - generic "Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL)" [ref=e260]
+                            - link "Open Open Visual Cloud Dockerfiles — FFmpeg images (VAAPI/QSV/oneVPL) on its source site (new tab)" [ref=e261] [cursor=pointer]:
+                              - /url: https://github.com/OpenVisualCloud/Dockerfiles/blob/master/doc/ffmpeg.md
+                              - img [ref=e262]
+                          - paragraph [ref=e266]: Intel's maintained Dockerfiles for FFmpeg with VAAPI, Media SDK/oneVPL and Flex Series GPU acceleration, plus docs on running hardware transcode in containers.
+                - article [ref=e267]:
+                  - generic [ref=e269]:
+                    - generic [ref=e270]: "6"
+                    - generic [ref=e271]:
+                      - generic [ref=e273]:
+                        - heading "Production Workflows" [level=3] [ref=e274]
+                        - paragraph [ref=e275]: "Build repeatable FFmpeg pipelines: HLS/DASH packaging, thumbnail generation, sprite sheets and batch automation."
+                      - generic [ref=e276]:
+                        - generic [ref=e277]:
+                          - generic [ref=e278]:
+                            - 'link "Video: HLS and DASH Multi-Codec Encoding & Packaging" [ref=e279] [cursor=pointer]':
+                              - /url: /resource/186120
+                              - img [ref=e280]
+                              - 'generic "Video: HLS and DASH Multi-Codec Encoding & Packaging" [ref=e282]'
+                            - 'link "Open Video: HLS and DASH Multi-Codec Encoding & Packaging on its source site (new tab)" [ref=e283] [cursor=pointer]':
+                              - /url: https://thebroadcastknowledge.com/2020/07/10/video-hls-and-dash-multi-codec-encoding-packaging/
+                              - img [ref=e284]
+                          - paragraph [ref=e288]: Free educational webinars, videos and other resources focused on the Broadcast Industry
+                        - generic [ref=e289]:
+                          - generic [ref=e290]:
+                            - link "HLS To DASH" [ref=e291] [cursor=pointer]:
+                              - /url: /resource/185883
+                              - img [ref=e292]
+                              - generic "HLS To DASH" [ref=e294]
+                            - link "Open HLS To DASH on its source site (new tab)" [ref=e295] [cursor=pointer]:
+                              - /url: https://github.com/Eyevinn/hls-to-dash
+                              - img [ref=e296]
+                          - paragraph [ref=e300]: Open source packager and tools to rewrap live HLS to live MPEG DASH
+        - contentinfo [ref=e301]:
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - paragraph [ref=e304]: ── INDEX
+              - link "awesome.video home" [ref=e305] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e306]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e308]:
+              - heading "INDEXED" [level=2] [ref=e309]
+              - paragraph [ref=e310]: 3,825
+              - paragraph [ref=e311]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e312]: live
+            - navigation "Explore categories" [ref=e314]:
+              - heading "EXPLORE" [level=2] [ref=e315]
+              - generic [ref=e316]:
+                - link "Community & Events" [ref=e317] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e318]: ◈
+                  - generic [ref=e319]: Community
+                - link "Encoding & Codecs" [ref=e320] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e321]: ◇
+                  - generic [ref=e322]: Encoding
+                - link "General Tools" [ref=e323] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e324]: ◆
+                  - generic [ref=e325]: General
+                - link "Infrastructure & Delivery" [ref=e326] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e327]: ▣
+                  - generic [ref=e328]: Infrastructure
+                - link "Intro & Learning" [ref=e329] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e330]: ▤
+                  - generic [ref=e331]: Intro
+                - link "Media Tools" [ref=e332] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e333]: ▥
+                  - generic [ref=e334]: Media
+                - link "Players & Clients" [ref=e335] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e336]: ▶
+                  - generic [ref=e337]: Players
+                - link "Protocols & Transport" [ref=e338] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e339]: ⟁
+                  - generic [ref=e340]: Protocols
+                - link "Standards & Industry" [ref=e341] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e342]: ◉
+                  - generic [ref=e343]: Standards
+            - generic [ref=e344]:
+              - heading "SOURCE" [level=2] [ref=e345]
+              - link "krzemienski/awesome-video" [ref=e346] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e347]
+                - generic [ref=e349]:
+                  - text: krzemienski
+                  - generic [ref=e350]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e351]: ↗
+              - paragraph [ref=e352]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e353] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e355] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e356]:
+            - generic [ref=e357]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e358]:
+              - link "About" [ref=e359] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e360] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e361] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e362] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e363] [cursor=pointer]
+              - link "Issues ↗" [ref=e364] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e365] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e366]: built with the awesome-list framework

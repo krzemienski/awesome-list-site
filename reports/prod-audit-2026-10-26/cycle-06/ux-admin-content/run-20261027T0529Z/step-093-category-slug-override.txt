@@ -1,0 +1,8 @@
+- heading "Create Category" [level=2, ref=e2]
+- LabelText "Name *" [ref=e7] clickable [cursor:pointer]
+- textbox "Name *" [ref=e8]: [QA-audit-1026] Cáfé c6qa-audit-1026-c6-category
+- LabelText "Slug *" [ref=e3] clickable [cursor:pointer]
+- textbox "Slug *" [ref=e4]: qa-audit-1026-c6-category
+- button "Cancel" [ref=e5]
+- button "Create" [ref=e6]
+- button "Close" [ref=e1]

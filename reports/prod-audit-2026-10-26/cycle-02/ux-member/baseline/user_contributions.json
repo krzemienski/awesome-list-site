@@ -1,0 +1,206 @@
+{
+ "definitions": {
+  "acceptedContributions": "Resource submissions and edit suggestions that moderators approved.",
+  "publicResources": "Currently public resources you submitted or improved with an approved edit. Each resource is counted once.",
+  "recordedViews": "Distinct signed-in accounts with a recorded resource detail view across those currently public resources. Each account is counted once."
+ },
+ "items": [
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-08-04T03:31:08.912Z",
+   "changes": [
+    {
+     "field": "title",
+     "new": "QAEIR4 <script>alert(1)</script>",
+     "old": ""
+    }
+   ],
+   "id": 15,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "Leftover QA test submission: proposed title is an XSS probe string (QAEIR4 <script>alert(1)</script>) with no legitimate content. Rejected during production admin-queue cleanup.",
+   "status": "rejected",
+   "submittedAt": "2026-07-19T06:35:40.456Z",
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-08-04T03:30:45.968Z",
+   "changes": [
+    {
+     "field": "title",
+     "new": "\u200b\u200b\u200b",
+     "old": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+    }
+   ],
+   "id": 14,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "Legacy invisible-characters-only edit: proposed title contains only zero-width characters (U+200B) and no visible content. Flagged by the admin audit (BUG-012); rejected during production cleanup.",
+   "status": "rejected",
+   "submittedAt": "2026-07-19T06:28:21.097Z",
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-08-04T03:30:45.676Z",
+   "changes": [
+    {
+     "field": "title",
+     "new": "\u200b\u200b\u200b",
+     "old": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+    }
+   ],
+   "id": 13,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "Legacy invisible-characters-only edit: proposed title contains only zero-width characters (U+200B) and no visible content. Flagged by the admin audit (BUG-012); rejected during production cleanup.",
+   "status": "rejected",
+   "submittedAt": "2026-07-19T06:27:21.840Z",
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-29T20:26:42.685Z",
+   "changes": [
+    {
+     "field": "description",
+     "new": "A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding. [QA-DAILY edit probe 2026-07-19]",
+     "old": "A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding."
+    }
+   ],
+   "id": 12,
+   "kind": "edit",
+   "publicResource": {
+    "id": 184847,
+    "path": "/resource/184847",
+    "title": "AMD Advanced Media Acceleration (AMA) SDK"
+   },
+   "rejectionReason": null,
+   "status": "approved",
+   "submittedAt": "2026-07-19T01:41:39.042Z",
+   "title": "AMD Advanced Media Acceleration (AMA) SDK"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-21T08:13:02.945Z",
+   "changes": [],
+   "id": 25,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "__qa6_ R4-016 boundary probe cleanup (2048-char URL edit)",
+   "status": "rejected",
+   "submittedAt": "2026-07-21T08:11:54.471Z",
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-21T08:00:42.906Z",
+   "changes": [],
+   "id": 24,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA6 verification cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-21T07:13:50.998Z",
+   "title": "MediaMTX"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-21T07:15:00.104Z",
+   "changes": [],
+   "id": 23,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "__qa6 cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-21T07:12:49.840Z",
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-20T18:24:37.033Z",
+   "changes": [],
+   "id": 22,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA5 self-cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-20T18:24:36.535Z",
+   "title": "avm (AOM Video Model) \u2014 AV2 reference codec"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-20T18:24:36.032Z",
+   "changes": [],
+   "id": 21,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA5 self-cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-20T18:24:35.524Z",
+   "title": "avm (AOM Video Model) \u2014 AV2 reference codec"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-20T18:24:35.013Z",
+   "changes": [],
+   "id": 20,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA5 self-cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-20T18:24:34.494Z",
+   "title": "avm (AOM Video Model) \u2014 AV2 reference codec"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-20T18:24:33.981Z",
+   "changes": [],
+   "id": 19,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA5 self-cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-20T18:24:33.471Z",
+   "title": "avm (AOM Video Model) \u2014 AV2 reference codec"
+  },
+  {
+   "canWithdraw": false,
+   "changedAt": "2026-07-20T18:24:32.760Z",
+   "changes": [],
+   "id": 18,
+   "kind": "edit",
+   "publicResource": null,
+   "rejectionReason": "QA5 self-cleanup",
+   "status": "rejected",
+   "submittedAt": "2026-07-20T18:24:32.248Z",
+   "title": "avm (AOM Video Model) \u2014 AV2 reference codec"
+  }
+ ],
+ "pagination": {
+  "limit": 12,
+  "page": 1,
+  "requestedPage": 1,
+  "total": 21,
+  "totalPages": 2
+ },
+ "statusCounts": {
+  "approved": 3,
+  "pending": 0,
+  "rejected": 18,
+  "superseded": 0,
+  "withdrawn": 0
+ },
+ "summary": {
+  "acceptedContributions": 3,
+  "approved": 3,
+  "pending": 0,
+  "publicResources": 2,
+  "recordedViews": 3,
+  "rejected": 18,
+  "superseded": 0,
+  "total": 21,
+  "withdrawn": 0
+ }
+}

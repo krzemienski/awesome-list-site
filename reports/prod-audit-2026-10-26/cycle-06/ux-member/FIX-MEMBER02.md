@@ -1,0 +1,7 @@
+Fix C6-MEMBER-02 in awesome-list-site. Work in an isolated /tmp clone from current origin/main on branch fix/c6-member02-card-targets. Never edit stale main checkout or merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-member/findings.md and MB-080 evidence. On /tag/hls resource cards, View details, Open Link, Show more tags and tag pills measure below 44px in at least one dimension; title link is 41.6px. Bring every interactive action on the shared resource card to at least 44×44 CSS px while preserving layout, text, focus and responsive behavior. Reuse existing 44px action/target patterns and check the same shared card on Home, Search and Taxonomy as well as Tag. Scope target sizing only, no accessible-name or behavior changes.
+
+Run tsc --noEmit and npm run build unpiped. Drive real local Tag and representative shared-card pages at 1440, 820 touch and 390 touch: measure every visible action, verify no overlap/horizontal overflow, keyboard/focus and link activation. Save screenshots, accessibility snapshots, geometry and console/network evidence under reports/prod-audit-2026-10-26/cycle-06/ux-member/fix-member02/. No test files/mocks/validation harnesses.
+
+Commit conventional fix, push branch, open non-draft PR and return PR/head SHA, files, checks, evidence and UNVERIFIED items. Never merge.

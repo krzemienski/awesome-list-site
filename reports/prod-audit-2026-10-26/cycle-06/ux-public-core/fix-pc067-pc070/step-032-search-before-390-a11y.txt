@@ -1,0 +1,1002 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Close filters" [expanded] [active] [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Close filters
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - img [ref=e26]
+          - textbox "Search in Encoding & Codecs" [ref=e29]:
+            - /placeholder: Search in Encoding & Codecs...
+            - text: ffmpeg
+        - combobox "Limit Encoding & Codecs by subcategory" [ref=e30] [cursor=pointer]:
+          - option "All subcategories" [selected]
+          - option "Uncategorized (120)"
+          - option "Codecs (27)"
+          - option "Codecs › AV1 (5)"
+          - option "Codecs › HEVC (10)"
+          - option "Codecs › VP9 (1)"
+          - option "Encoding Tools (225)"
+          - option "Encoding Tools › FFMPEG (65)"
+        - combobox "Limit by resource kind" [ref=e31] [cursor=pointer]:
+          - option "All resource kinds" [selected]
+          - option "Tools"
+          - option "Libraries"
+          - option "Standards"
+          - option "Events"
+          - option "Protocols"
+          - option "Other"
+        - combobox "Sort resources" [ref=e33] [cursor=pointer]:
+          - generic: Name Z-A
+          - img [ref=e34]
+        - generic "View mode" [ref=e36]:
+          - generic [ref=e37]: View
+          - radiogroup [ref=e38]:
+            - radio "Grid view" [checked] [ref=e39] [cursor=pointer]:
+              - img
+            - radio "List view" [ref=e40] [cursor=pointer]:
+              - img
+            - radio "Compact view" [ref=e41] [cursor=pointer]:
+              - img
+      - region "Subcategories" [ref=e42]:
+        - heading "Subcategories" [level=2] [ref=e43]
+        - generic [ref=e44]:
+          - link "Codecs 27" [ref=e45] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e46]: Codecs
+            - generic [ref=e47]: "27"
+          - link "Encoding Tools 225" [ref=e48] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e49]: Encoding Tools
+            - generic [ref=e50]: "225"
+          - button "Uncategorized 120" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: Uncategorized
+            - generic [ref=e53]: "120"
+      - generic [ref=e54]:
+        - button "Filters" [ref=e57] [cursor=pointer]:
+          - img
+          - text: Filters
+        - generic "Resources (142)" [ref=e59]:
+          - heading "Resources (142)" [level=2] [ref=e61]
+          - generic [ref=e62]:
+            - article [ref=e63] [cursor=pointer]:
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: ◇
+                  - generic [ref=e67]:
+                    - link "View details for zolinux/MediaArchiver" [ref=e68]:
+                      - /url: /resource/1431
+                      - img [ref=e70]
+                      - generic [ref=e72]: View Details
+                    - button "Show 1 more tag" [ref=e73]: +1 more
+                    - generic [ref=e74]:
+                      - link "Open Link zolinux/MediaArchiver (opens in new tab)" [ref=e75]:
+                        - /url: https://github.com/zolinux/MediaArchiver
+                        - img
+                        - generic [ref=e76]: Open Link
+                        - generic [ref=e77]: zolinux/MediaArchiver (opens in new tab)
+                      - 'button "Suggest an edit: zolinux/MediaArchiver" [ref=e78]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: zolinux/MediaArchiver" [ref=e81]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: zolinux/MediaArchiver" [ref=e83]':
+                    - img
+                - heading "zolinux/MediaArchiver" [level=2] [ref=e86]:
+                  - link "zolinux/MediaArchiver" [ref=e87]:
+                    - /url: /resource/1431
+                - paragraph [ref=e88]: Transcode video files using FFMPEG and python3.
+              - generic [ref=e90]:
+                - generic [ref=e91]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e92]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e93]: "#ffmpeg"
+                - link "Filter by tag transcoding" [ref=e94]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e95]: "#transcoding"
+                - link "Filter by tag python" [ref=e96]:
+                  - /url: /tag/python
+                  - generic [ref=e97]: "#python"
+            - article [ref=e98] [cursor=pointer]:
+              - generic [ref=e99]:
+                - generic [ref=e100]:
+                  - generic [ref=e101]: ◇
+                  - generic [ref=e102]:
+                    - link "View details for Xuggler" [ref=e103]:
+                      - /url: /resource/1865
+                      - img [ref=e105]
+                      - generic [ref=e107]: View Details
+                    - button "Show 2 more tags" [ref=e108]: +2 more
+                    - generic [ref=e109]:
+                      - link "Open Link Xuggler (opens in new tab)" [ref=e110]:
+                        - /url: https://github.com/artclarke/xuggle-xuggler
+                        - img
+                        - generic [ref=e111]: Open Link
+                        - generic [ref=e112]: Xuggler (opens in new tab)
+                      - 'button "Suggest an edit: Xuggler" [ref=e113]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Xuggler" [ref=e116]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Xuggler" [ref=e118]':
+                    - img
+                - heading "Xuggler" [level=2] [ref=e121]:
+                  - link "Xuggler" [ref=e122]:
+                    - /url: /resource/1865
+                - paragraph [ref=e123]: An open source Java library (now discontinued) that wrapped FFmpeg functionality, enabling Java developers to decode, encode, and stream video.
+              - generic [ref=e125]:
+                - generic [ref=e126]: Encoding & Codecs
+                - generic [ref=e127]: Libraries
+                - link "Filter by tag java" [ref=e128]:
+                  - /url: /tag/java
+                  - generic [ref=e129]: "#java"
+                - link "Filter by tag ffmpeg" [ref=e130]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e131]: "#ffmpeg"
+                - link "Filter by tag encoding" [ref=e132]:
+                  - /url: /tag/encoding
+                  - generic [ref=e133]: "#encoding"
+            - article [ref=e134] [cursor=pointer]:
+              - generic [ref=e135]:
+                - generic [ref=e136]:
+                  - generic [ref=e137]: ◇
+                  - generic [ref=e138]:
+                    - link "View details for XMedia Recode" [ref=e139]:
+                      - /url: /resource/1775
+                      - img [ref=e141]
+                      - generic [ref=e143]: View Details
+                    - button "Show 2 more tags" [ref=e144]: +2 more
+                    - generic [ref=e145]:
+                      - link "Open Link XMedia Recode (opens in new tab)" [ref=e146]:
+                        - /url: https://www.xmedia-recode.de/en/
+                        - img
+                        - generic [ref=e147]: Open Link
+                        - generic [ref=e148]: XMedia Recode (opens in new tab)
+                      - 'button "Suggest an edit: XMedia Recode" [ref=e149]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: XMedia Recode" [ref=e152]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: XMedia Recode" [ref=e154]':
+                    - img
+                - heading "XMedia Recode" [level=2] [ref=e157]:
+                  - link "XMedia Recode" [ref=e158]:
+                    - /url: /resource/1775
+                - paragraph [ref=e159]: A free Windows tool for converting media files to various formats. It supports a broad array of codecs (built on FFmpeg) and provides fine control over encoding settings.
+              - generic [ref=e161]:
+                - generic [ref=e162]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e163]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e164]: "#ffmpeg"
+                - link "Filter by tag media conversion" [ref=e165]:
+                  - /url: /tag/media-conversion
+                  - generic [ref=e166]: "#media conversion"
+                - link "Filter by tag encoding" [ref=e167]:
+                  - /url: /tag/encoding
+                  - generic [ref=e168]: "#encoding"
+            - article [ref=e169] [cursor=pointer]:
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]: ◇
+                  - generic [ref=e173]:
+                    - link "View details for Xabe.FFmpeg" [ref=e174]:
+                      - /url: /resource/1781
+                      - img [ref=e176]
+                      - generic [ref=e178]: View Details
+                    - button "Show 3 more tags" [ref=e179]: +3 more
+                    - generic [ref=e180]:
+                      - link "Open Link Xabe.FFmpeg (opens in new tab)" [ref=e181]:
+                        - /url: https://github.com/tomaszzmuda/Xabe.FFmpeg
+                        - img
+                        - generic [ref=e182]: Open Link
+                        - generic [ref=e183]: Xabe.FFmpeg (opens in new tab)
+                      - 'button "Suggest an edit: Xabe.FFmpeg" [ref=e184]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Xabe.FFmpeg" [ref=e187]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Xabe.FFmpeg" [ref=e189]':
+                    - img
+                - heading "Xabe.FFmpeg" [level=2] [ref=e192]:
+                  - link "Xabe.FFmpeg" [ref=e193]:
+                    - /url: /resource/1781
+                - paragraph [ref=e194]: A .NET Standard wrapper for FFmpeg, enabling developers to compose and execute FFmpeg commands in C# with a fluent interface.
+              - generic [ref=e196]:
+                - generic [ref=e197]: Encoding & Codecs
+                - generic [ref=e198]: Libraries
+                - link "Filter by tag ffmpeg" [ref=e199]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e200]: "#ffmpeg"
+                - link "Filter by tag .NET" [ref=e201]:
+                  - /url: /tag/.net
+                  - generic [ref=e202]: "#.NET"
+                - link "Filter by tag encoding" [ref=e203]:
+                  - /url: /tag/encoding
+                  - generic [ref=e204]: "#encoding"
+            - article [ref=e205] [cursor=pointer]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]: ◇
+                  - generic [ref=e209]:
+                    - link "View details for x264 FFmpeg Options Guide - Linux Encoding" [ref=e210]:
+                      - /url: /resource/1201
+                      - img [ref=e212]
+                      - generic [ref=e214]: View Details
+                    - button "Show 2 more tags" [ref=e215]: +2 more
+                    - generic [ref=e216]:
+                      - link "Open Link x264 FFmpeg Options Guide - Linux Encoding (opens in new tab)" [ref=e217]:
+                        - /url: https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+                        - img
+                        - generic [ref=e218]: Open Link
+                        - generic [ref=e219]: x264 FFmpeg Options Guide - Linux Encoding (opens in new tab)
+                      - 'button "Suggest an edit: x264 FFmpeg Options Guide - Linux Encoding" [ref=e220]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e223]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding" [ref=e225]':
+                    - img
+                - heading "x264 FFmpeg Options Guide - Linux Encoding" [level=2] [ref=e228]:
+                  - link "x264 FFmpeg Options Guide - Linux Encoding" [ref=e229]:
+                    - /url: /resource/1201
+                - paragraph [ref=e230]: A tool or resource for encoding-transcoding-guides.
+              - generic [ref=e232]:
+                - generic [ref=e233]: Encoding & Codecs
+                - link "Filter by tag encoding" [ref=e234]:
+                  - /url: /tag/encoding
+                  - generic [ref=e235]: "#encoding"
+                - link "Filter by tag linux" [ref=e236]:
+                  - /url: /tag/linux
+                  - generic [ref=e237]: "#linux"
+                - link "Filter by tag x264" [ref=e238]:
+                  - /url: /tag/x264
+                  - generic [ref=e239]: "#x264"
+            - article [ref=e240] [cursor=pointer]:
+              - generic [ref=e241]:
+                - generic [ref=e242]:
+                  - generic [ref=e243]: ◇
+                  - generic [ref=e244]:
+                    - link "View details for WritingMinds/ffmpeg-android-java" [ref=e245]:
+                      - /url: /resource/859
+                      - img [ref=e247]
+                      - generic [ref=e249]: View Details
+                    - button "Show 2 more tags" [ref=e250]: +2 more
+                    - generic [ref=e251]:
+                      - link "Open Link WritingMinds/ffmpeg-android-java (opens in new tab)" [ref=e252]:
+                        - /url: https://github.com/WritingMinds/ffmpeg-android-java
+                        - img
+                        - generic [ref=e253]: Open Link
+                        - generic [ref=e254]: WritingMinds/ffmpeg-android-java (opens in new tab)
+                      - 'button "Suggest an edit: WritingMinds/ffmpeg-android-java" [ref=e255]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: WritingMinds/ffmpeg-android-java" [ref=e258]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: WritingMinds/ffmpeg-android-java" [ref=e260]':
+                    - img
+                - heading "WritingMinds/ffmpeg-android-java" [level=2] [ref=e263]:
+                  - link "WritingMinds/ffmpeg-android-java" [ref=e264]:
+                    - /url: /resource/859
+                - paragraph [ref=e265]: Android java library for FFmpeg binary compiled using https://github.com/writingminds/ffmpeg-android - WritingMinds/ffmpeg-android-java
+              - generic [ref=e267]:
+                - generic [ref=e268]: Encoding & Codecs
+                - generic [ref=e269]: Libraries
+                - link "Filter by tag ffmpeg" [ref=e270]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e271]: "#ffmpeg"
+                - link "Filter by tag android" [ref=e272]:
+                  - /url: /tag/android
+                  - generic [ref=e273]: "#android"
+                - link "Filter by tag encoding" [ref=e274]:
+                  - /url: /tag/encoding
+                  - generic [ref=e275]: "#encoding"
+            - article [ref=e276] [cursor=pointer]:
+              - generic [ref=e277]:
+                - generic [ref=e278]:
+                  - generic [ref=e279]: ◇
+                  - generic [ref=e280]:
+                    - link "View details for WinFF" [ref=e281]:
+                      - /url: /resource/1799
+                      - img [ref=e283]
+                      - generic [ref=e285]: View Details
+                    - button "Show 1 more tag" [ref=e286]: +1 more
+                    - generic [ref=e287]:
+                      - link "Open Link WinFF (opens in new tab)" [ref=e288]:
+                        - /url: https://winff.org/
+                        - img
+                        - generic [ref=e289]: Open Link
+                        - generic [ref=e290]: WinFF (opens in new tab)
+                      - 'button "Suggest an edit: WinFF" [ref=e291]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: WinFF" [ref=e294]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: WinFF" [ref=e296]':
+                    - img
+                - heading "WinFF" [level=2] [ref=e299]:
+                  - link "WinFF" [ref=e300]:
+                    - /url: /resource/1799
+                - paragraph [ref=e301]: A graphical user interface for FFmpeg that runs on Windows and Linux. WinFF makes it easy to convert multiple media files by providing presets and a batch-processing interface.
+              - generic [ref=e303]:
+                - generic [ref=e304]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e305]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e306]: "#ffmpeg"
+                - link "Filter by tag media conversion" [ref=e307]:
+                  - /url: /tag/media-conversion
+                  - generic [ref=e308]: "#media conversion"
+                - link "Filter by tag batch processing" [ref=e309]:
+                  - /url: /tag/batch-processing
+                  - generic [ref=e310]: "#batch processing"
+            - article [ref=e311] [cursor=pointer]:
+              - generic [ref=e312]:
+                - generic [ref=e313]:
+                  - generic [ref=e314]: ◇
+                  - generic [ref=e315]:
+                    - link "View details for Vrecord" [ref=e316]:
+                      - /url: /resource/1817
+                      - img [ref=e318]
+                      - generic [ref=e320]: View Details
+                    - button "Show 2 more tags" [ref=e321]: +2 more
+                    - generic [ref=e322]:
+                      - link "Open Link Vrecord (opens in new tab)" [ref=e323]:
+                        - /url: https://github.com/amiaopensource/vrecord
+                        - img
+                        - generic [ref=e324]: Open Link
+                        - generic [ref=e325]: Vrecord (opens in new tab)
+                      - 'button "Suggest an edit: Vrecord" [ref=e326]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Vrecord" [ref=e329]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Vrecord" [ref=e331]':
+                    - img
+                - heading "Vrecord" [level=2] [ref=e334]:
+                  - link "Vrecord" [ref=e335]:
+                    - /url: /resource/1817
+                - paragraph [ref=e336]: An open source tool for capturing analog video (VHS, Beta, etc.) to digital formats using Blackmagic or AJA capture cards. Vrecord provides a scriptable FFmpeg-based workflow for archivists with features like live histogram and QA metrics.
+              - generic [ref=e338]:
+                - generic [ref=e339]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e340]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e341]: "#ffmpeg"
+                - link "Filter by tag video-capture" [ref=e342]:
+                  - /url: /tag/video-capture
+                  - generic [ref=e343]: "#video-capture"
+                - link "Filter by tag archival" [ref=e344]:
+                  - /url: /tag/archival
+                  - generic [ref=e345]: "#archival"
+            - article [ref=e346] [cursor=pointer]:
+              - generic [ref=e347]:
+                - generic [ref=e348]:
+                  - generic [ref=e349]: ◇
+                  - generic [ref=e350]:
+                    - link "View details for VLC Live Transcoding Guide" [ref=e351]:
+                      - /url: /resource/708
+                      - img [ref=e353]
+                      - generic [ref=e355]: View Details
+                    - button "Show 2 more tags" [ref=e356]: +2 more
+                    - generic [ref=e357]:
+                      - link "Open Link VLC Live Transcoding Guide (opens in new tab)" [ref=e358]:
+                        - /url: https://gist.github.com/teocci/a7eae1b60ec018b64bdd13bb7a3499e0
+                        - img
+                        - generic [ref=e359]: Open Link
+                        - generic [ref=e360]: VLC Live Transcoding Guide (opens in new tab)
+                      - 'button "Suggest an edit: VLC Live Transcoding Guide" [ref=e361]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VLC Live Transcoding Guide" [ref=e364]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VLC Live Transcoding Guide" [ref=e366]':
+                    - img
+                - heading "VLC Live Transcoding Guide" [level=2] [ref=e369]:
+                  - link "VLC Live Transcoding Guide" [ref=e370]:
+                    - /url: /resource/708
+                - paragraph [ref=e371]: A comprehensive guide detailing various methods for live transcoding using VLC and FFmpeg. It includes examples for creating TCP video streaming connections, streaming recorded video files, and sending VLC output to stdout.
+              - generic [ref=e373]:
+                - generic [ref=e374]: Encoding & Codecs
+                - link "Filter by tag VLC" [ref=e375]:
+                  - /url: /tag/vlc
+                  - generic [ref=e376]: "#VLC"
+                - link "Filter by tag live transcoding" [ref=e377]:
+                  - /url: /tag/live-transcoding
+                  - generic [ref=e378]: "#live transcoding"
+                - link "Filter by tag FFmpeg" [ref=e379]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e380]: "#FFmpeg"
+            - article [ref=e381] [cursor=pointer]:
+              - generic [ref=e382]:
+                - generic [ref=e383]:
+                  - generic [ref=e384]: ◇
+                  - generic [ref=e385]:
+                    - link "View details for Vilsol/Transcoder" [ref=e386]:
+                      - /url: /resource/1464
+                      - img [ref=e388]
+                      - generic [ref=e390]: View Details
+                    - button "Show 2 more tags" [ref=e391]: +2 more
+                    - generic [ref=e392]:
+                      - link "Open Link Vilsol/Transcoder (opens in new tab)" [ref=e393]:
+                        - /url: https://github.com/Vilsol/Transcoder
+                        - img
+                        - generic [ref=e394]: Open Link
+                        - generic [ref=e395]: Vilsol/Transcoder (opens in new tab)
+                      - 'button "Suggest an edit: Vilsol/Transcoder" [ref=e396]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Vilsol/Transcoder" [ref=e399]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Vilsol/Transcoder" [ref=e401]':
+                    - img
+                - heading "Vilsol/Transcoder" [level=2] [ref=e404]:
+                  - link "Vilsol/Transcoder" [ref=e405]:
+                    - /url: /resource/1464
+                - paragraph [ref=e406]: Docker container to transcode videos in mounted volume to H265 using FFMPEG - Vilsol/Transcoder
+              - generic [ref=e408]:
+                - generic [ref=e409]: Encoding & Codecs
+                - link "Filter by tag docker" [ref=e410]:
+                  - /url: /tag/docker
+                  - generic [ref=e411]: "#docker"
+                - link "Filter by tag ffmpeg" [ref=e412]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e413]: "#ffmpeg"
+                - link "Filter by tag transcoding" [ref=e414]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e415]: "#transcoding"
+            - article [ref=e416] [cursor=pointer]:
+              - generic [ref=e417]:
+                - generic [ref=e418]:
+                  - generic [ref=e419]: ◇
+                  - generic [ref=e420]:
+                    - link "View details for videomorph-dev/videomorph" [ref=e421]:
+                      - /url: /resource/1326
+                      - img [ref=e423]
+                      - generic [ref=e425]: View Details
+                    - button "Show 2 more tags" [ref=e426]: +2 more
+                    - generic [ref=e427]:
+                      - link "Open Link videomorph-dev/videomorph (opens in new tab)" [ref=e428]:
+                        - /url: https://github.com/videomorph-dev/videomorph
+                        - img
+                        - generic [ref=e429]: Open Link
+                        - generic [ref=e430]: videomorph-dev/videomorph (opens in new tab)
+                      - 'button "Suggest an edit: videomorph-dev/videomorph" [ref=e431]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: videomorph-dev/videomorph" [ref=e434]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: videomorph-dev/videomorph" [ref=e436]':
+                    - img
+                - heading "videomorph-dev/videomorph" [level=2] [ref=e439]:
+                  - link "videomorph-dev/videomorph" [ref=e440]:
+                    - /url: /resource/1326
+                - paragraph [ref=e441]: A user-friendly Video Converter based on FFMPEG and writen in Python/PyQt5. - videomorph-dev/videomorph
+              - generic [ref=e443]:
+                - generic [ref=e444]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e445]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e446]: "#ffmpeg"
+                - link "Filter by tag python" [ref=e447]:
+                  - /url: /tag/python
+                  - generic [ref=e448]: "#python"
+                - link "Filter by tag video-converter" [ref=e449]:
+                  - /url: /tag/video-converter
+                  - generic [ref=e450]: "#video-converter"
+            - article [ref=e451] [cursor=pointer]:
+              - generic [ref=e452]:
+                - generic [ref=e453]:
+                  - generic [ref=e454]: ◇
+                  - generic [ref=e455]:
+                    - link "View details for videojs-record ffmpeg.wasm Plugin" [ref=e456]:
+                      - /url: /resource/560
+                      - img [ref=e458]
+                      - generic [ref=e460]: View Details
+                    - button "Show 2 more tags" [ref=e461]: +2 more
+                    - generic [ref=e462]:
+                      - link "Open Link videojs-record ffmpeg.wasm Plugin (opens in new tab)" [ref=e463]:
+                        - /url: https://github.com/collab-project/videojs-record/blob/master/docs/plugins/ffmpeg.wasm.md
+                        - img
+                        - generic [ref=e464]: Open Link
+                        - generic [ref=e465]: videojs-record ffmpeg.wasm Plugin (opens in new tab)
+                      - 'button "Suggest an edit: videojs-record ffmpeg.wasm Plugin" [ref=e466]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: videojs-record ffmpeg.wasm Plugin" [ref=e469]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: videojs-record ffmpeg.wasm Plugin" [ref=e471]':
+                    - img
+                - heading "videojs-record ffmpeg.wasm Plugin" [level=2] [ref=e474]:
+                  - link "videojs-record ffmpeg.wasm Plugin" [ref=e475]:
+                    - /url: /resource/560
+                - paragraph [ref=e476]: The ffmpeg.wasm plugin for videojs-record allows developers to run FFmpeg directly in the browser using WebAssembly. This enables on-the-fly transcoding of recorded media without the need for server-side processing. It's particularly useful for applications requiring real-time video manipulation and supports various FFmpeg options for customized encoding.
+              - generic [ref=e478]:
+                - generic [ref=e479]: Encoding & Codecs
+                - link "Filter by tag FFmpeg" [ref=e480]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e481]: "#FFmpeg"
+                - link "Filter by tag WebAssembly" [ref=e482]:
+                  - /url: /tag/webassembly
+                  - generic [ref=e483]: "#WebAssembly"
+                - link "Filter by tag video.js" [ref=e484]:
+                  - /url: /tag/video.js
+                  - generic [ref=e485]: "#video.js"
+            - article [ref=e486] [cursor=pointer]:
+              - generic [ref=e487]:
+                - generic [ref=e488]:
+                  - generic [ref=e489]: ◇
+                  - generic [ref=e490]:
+                    - link "View details for Video Transcoding Scripts" [ref=e491]:
+                      - /url: /resource/706
+                      - img [ref=e493]
+                      - generic [ref=e495]: View Details
+                    - button "Show 2 more tags" [ref=e496]: +2 more
+                    - generic [ref=e497]:
+                      - link "Open Link Video Transcoding Scripts (opens in new tab)" [ref=e498]:
+                        - /url: https://github.com/lisamelton/video-transcoding-scripts
+                        - img
+                        - generic [ref=e499]: Open Link
+                        - generic [ref=e500]: Video Transcoding Scripts (opens in new tab)
+                      - 'button "Suggest an edit: Video Transcoding Scripts" [ref=e501]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Video Transcoding Scripts" [ref=e504]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Video Transcoding Scripts" [ref=e506]':
+                    - img
+                - heading "Video Transcoding Scripts" [level=2] [ref=e509]:
+                  - link "Video Transcoding Scripts" [ref=e510]:
+                    - /url: /resource/706
+                - paragraph [ref=e511]: A collection of Bash scripts designed to transcode, inspect, and convert videos using tools like HandBrake, MKVToolNix, MPlayer, FFmpeg, and MP4v2. These scripts serve as intelligent wrappers around these tools, facilitating efficient video processing.
+              - generic [ref=e513]:
+                - generic [ref=e514]: Encoding & Codecs
+                - link "Filter by tag video transcoding" [ref=e515]:
+                  - /url: /tag/video-transcoding
+                  - generic [ref=e516]: "#video transcoding"
+                - link "Filter by tag Bash scripts" [ref=e517]:
+                  - /url: /tag/bash-script
+                  - generic [ref=e518]: "#Bash scripts"
+                - link "Filter by tag FFmpeg" [ref=e519]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e520]: "#FFmpeg"
+            - article [ref=e521] [cursor=pointer]:
+              - generic [ref=e522]:
+                - generic [ref=e523]:
+                  - generic [ref=e524]: ◇
+                  - generic [ref=e525]:
+                    - link "View details for VidCutter" [ref=e526]:
+                      - /url: /resource/1834
+                      - img [ref=e528]
+                      - generic [ref=e530]: View Details
+                    - button "Show 2 more tags" [ref=e531]: +2 more
+                    - generic [ref=e532]:
+                      - link "Open Link VidCutter (opens in new tab)" [ref=e533]:
+                        - /url: https://github.com/ozmartian/vidcutter
+                        - img
+                        - generic [ref=e534]: Open Link
+                        - generic [ref=e535]: VidCutter (opens in new tab)
+                      - 'button "Suggest an edit: VidCutter" [ref=e536]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VidCutter" [ref=e539]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VidCutter" [ref=e541]':
+                    - img
+                - heading "VidCutter" [level=2] [ref=e544]:
+                  - link "VidCutter" [ref=e545]:
+                    - /url: /resource/1834
+                - paragraph [ref=e546]: An open source cross-platform tool for fast video trimming and joining. VidCutter focuses on doing simple cuts without re-encoding, using intelligent scene detection and supporting many formats via FFmpeg.
+              - generic [ref=e548]:
+                - generic [ref=e549]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e550]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e551]: "#ffmpeg"
+                - link "Filter by tag video-editing" [ref=e552]:
+                  - /url: /tag/video-editing
+                  - generic [ref=e553]: "#video-editing"
+                - link "Filter by tag cross-platform" [ref=e554]:
+                  - /url: /tag/cross-platform
+                  - generic [ref=e555]: "#cross-platform"
+            - article [ref=e556] [cursor=pointer]:
+              - generic [ref=e557]:
+                - generic [ref=e558]:
+                  - generic [ref=e559]: ◇
+                  - generic [ref=e560]:
+                    - link "View details for vid.stab" [ref=e561]:
+                      - /url: /resource/1892
+                      - img [ref=e563]
+                      - generic [ref=e565]: View Details
+                    - button "Show 1 more tag" [ref=e566]: +1 more
+                    - generic [ref=e567]:
+                      - link "Open Link vid.stab (opens in new tab)" [ref=e568]:
+                        - /url: https://github.com/georgmartius/vid.stab
+                        - img
+                        - generic [ref=e569]: Open Link
+                        - generic [ref=e570]: vid.stab (opens in new tab)
+                      - 'button "Suggest an edit: vid.stab" [ref=e571]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: vid.stab" [ref=e574]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: vid.stab" [ref=e576]':
+                    - img
+                - heading "vid.stab" [level=2] [ref=e579]:
+                  - link "vid.stab" [ref=e580]:
+                    - /url: /resource/1892
+                - paragraph [ref=e581]: An open source video stabilization library, used with FFmpeg to stabilize shaky footage by analyzing and smoothing camera motion.
+              - generic [ref=e583]:
+                - generic [ref=e584]: Encoding & Codecs
+                - generic [ref=e585]: Libraries
+                - link "Filter by tag stabilization" [ref=e586]:
+                  - /url: /tag/stabilization
+                  - generic [ref=e587]: "#stabilization"
+                - link "Filter by tag ffmpeg" [ref=e588]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e589]: "#ffmpeg"
+                - link "Filter by tag video-processing" [ref=e590]:
+                  - /url: /tag/video-processing
+                  - generic [ref=e591]: "#video-processing"
+            - article [ref=e592] [cursor=pointer]:
+              - generic [ref=e593]:
+                - generic [ref=e594]:
+                  - generic [ref=e595]: ◇
+                  - generic [ref=e596]:
+                    - link "View details for VCT - Video Converter & Transcoder" [ref=e597]:
+                      - /url: /resource/728
+                      - img [ref=e599]
+                      - generic [ref=e601]: View Details
+                    - button "Show 2 more tags" [ref=e602]: +2 more
+                    - generic [ref=e603]:
+                      - link "Open Link VCT - Video Converter & Transcoder (opens in new tab)" [ref=e604]:
+                        - /url: https://sourceforge.net/projects/videoconvertertranscoder/
+                        - img
+                        - generic [ref=e605]: Open Link
+                        - generic [ref=e606]: VCT - Video Converter & Transcoder (opens in new tab)
+                      - 'button "Suggest an edit: VCT - Video Converter & Transcoder" [ref=e607]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VCT - Video Converter & Transcoder" [ref=e610]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VCT - Video Converter & Transcoder" [ref=e612]':
+                    - img
+                - heading "VCT - Video Converter & Transcoder" [level=2] [ref=e615]:
+                  - link "VCT - Video Converter & Transcoder" [ref=e616]:
+                    - /url: /resource/728
+                - paragraph [ref=e617]: VCT is an open-source video/audio converter GUI based on FFmpeg. It works natively for Windows and Linux, allowing batch conversion of audio/video collections to H.264 or H.265 HEVC formats, with features like video rotation, resizing, and audio extraction.
+              - generic [ref=e619]:
+                - generic [ref=e620]: Encoding & Codecs
+                - link "Filter by tag video conversion" [ref=e621]:
+                  - /url: /tag/video-conversion
+                  - generic [ref=e622]: "#video conversion"
+                - link "Filter by tag transcoding" [ref=e623]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e624]: "#transcoding"
+                - link "Filter by tag FFmpeg GUI" [ref=e625]:
+                  - /url: /tag/ffmpeg-gui
+                  - generic [ref=e626]: "#FFmpeg GUI"
+            - article [ref=e627] [cursor=pointer]:
+              - generic [ref=e628]:
+                - generic [ref=e629]:
+                  - generic [ref=e630]: ◇
+                  - generic [ref=e631]:
+                    - link "View details for VCT (Video Converter & Transcoder)" [ref=e632]:
+                      - /url: /resource/572
+                      - img [ref=e634]
+                      - generic [ref=e636]: View Details
+                    - button "Show 2 more tags" [ref=e637]: +2 more
+                    - generic [ref=e638]:
+                      - link "Open Link VCT (Video Converter & Transcoder) (opens in new tab)" [ref=e639]:
+                        - /url: https://github.com/zbabac/VCT
+                        - img
+                        - generic [ref=e640]: Open Link
+                        - generic [ref=e641]: VCT (Video Converter & Transcoder) (opens in new tab)
+                      - 'button "Suggest an edit: VCT (Video Converter & Transcoder)" [ref=e642]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VCT (Video Converter & Transcoder)" [ref=e645]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VCT (Video Converter & Transcoder)" [ref=e647]':
+                    - img
+                - heading "VCT (Video Converter & Transcoder)" [level=2] [ref=e650]:
+                  - link "VCT (Video Converter & Transcoder)" [ref=e651]:
+                    - /url: /resource/572
+                - paragraph [ref=e652]: VCT is a frontend for FFmpeg that allows users to set options, drag multiple files, transcode between formats (e.g., MKV to MP4), manually edit FFmpeg commands, record network streams, and manage batch processing. It's particularly useful for developers needing a versatile tool for video conversion and transcoding tasks.
+              - generic [ref=e654]:
+                - generic [ref=e655]: Encoding & Codecs
+                - link "Filter by tag video conversion" [ref=e656]:
+                  - /url: /tag/video-conversion
+                  - generic [ref=e657]: "#video conversion"
+                - link "Filter by tag transcoding" [ref=e658]:
+                  - /url: /tag/transcoding
+                  - generic [ref=e659]: "#transcoding"
+                - link "Filter by tag FFmpeg frontend" [ref=e660]:
+                  - /url: /tag/ffmpeg-frontend
+                  - generic [ref=e661]: "#FFmpeg frontend"
+            - article [ref=e662] [cursor=pointer]:
+              - generic [ref=e663]:
+                - generic [ref=e664]:
+                  - generic [ref=e665]: ◇
+                  - generic [ref=e666]:
+                    - link "View details for VCDP/FFmpeg-patch" [ref=e667]:
+                      - /url: /resource/1375
+                      - img [ref=e669]
+                      - generic [ref=e671]: View Details
+                    - button "Show 2 more tags" [ref=e672]: +2 more
+                    - generic [ref=e673]:
+                      - link "Open Link VCDP/FFmpeg-patch (opens in new tab)" [ref=e674]:
+                        - /url: https://github.com/VCDP/FFmpeg-patch
+                        - img
+                        - generic [ref=e675]: Open Link
+                        - generic [ref=e676]: VCDP/FFmpeg-patch (opens in new tab)
+                      - 'button "Suggest an edit: VCDP/FFmpeg-patch" [ref=e677]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: VCDP/FFmpeg-patch" [ref=e680]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: VCDP/FFmpeg-patch" [ref=e682]':
+                    - img
+                - heading "VCDP/FFmpeg-patch" [level=2] [ref=e685]:
+                  - link "VCDP/FFmpeg-patch" [ref=e686]:
+                    - /url: /resource/1375
+                - paragraph [ref=e687]: This repository contains a collection of FFmpeg* patches and samples to enable CNN model based video analytics capabilities (such as object detection, classification, recognition) in FFmpeg* framew...
+              - generic [ref=e689]:
+                - generic [ref=e690]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e691]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e692]: "#ffmpeg"
+                - link "Filter by tag video-analytics" [ref=e693]:
+                  - /url: /tag/video-analytics
+                  - generic [ref=e694]: "#video-analytics"
+                - link "Filter by tag cnn" [ref=e695]:
+                  - /url: /tag/cnn
+                  - generic [ref=e696]: "#cnn"
+            - article [ref=e697] [cursor=pointer]:
+              - generic [ref=e698]:
+                - generic [ref=e699]:
+                  - generic [ref=e700]: ◇
+                  - generic [ref=e701]:
+                    - link "View details for Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e702]:
+                      - /url: /resource/1286
+                      - img [ref=e704]
+                      - generic [ref=e706]: View Details
+                    - button "Show 2 more tags" [ref=e707]: +2 more
+                    - generic [ref=e708]:
+                      - link "Open Link Use of Look-Up Tables (LUTs) in FFmpeg (opens in new tab)" [ref=e709]:
+                        - /url: https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_Use_of_LUTs_FFmpeg.pdf
+                        - img
+                        - generic [ref=e710]: Open Link
+                        - generic [ref=e711]: Use of Look-Up Tables (LUTs) in FFmpeg (opens in new tab)
+                      - 'button "Suggest an edit: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e712]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e715]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e717]':
+                    - img
+                - heading "Use of Look-Up Tables (LUTs) in FFmpeg" [level=2] [ref=e720]:
+                  - link "Use of Look-Up Tables (LUTs) in FFmpeg" [ref=e721]:
+                    - /url: /resource/1286
+                - paragraph [ref=e722]: How to use luts with ffmpeg for converting between differnt hdr encodes
+              - generic [ref=e724]:
+                - generic [ref=e725]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e726]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e727]: "#ffmpeg"
+                - link "Filter by tag lut" [ref=e728]:
+                  - /url: /tag/lut
+                  - generic [ref=e729]: "#lut"
+                - link "Filter by tag hdr" [ref=e730]:
+                  - /url: /tag/hdr
+                  - generic [ref=e731]: "#hdr"
+            - article [ref=e732] [cursor=pointer]:
+              - generic [ref=e733]:
+                - generic [ref=e734]:
+                  - generic [ref=e735]: ◇
+                  - generic [ref=e736]:
+                    - link "View details for unosquare/ffmediaelement" [ref=e737]:
+                      - /url: /resource/867
+                      - img [ref=e739]
+                      - generic [ref=e741]: View Details
+                    - button "Show 2 more tags" [ref=e742]: +2 more
+                    - generic [ref=e743]:
+                      - link "Open Link unosquare/ffmediaelement (opens in new tab)" [ref=e744]:
+                        - /url: https://github.com/unosquare/ffmediaelement
+                        - img
+                        - generic [ref=e745]: Open Link
+                        - generic [ref=e746]: unosquare/ffmediaelement (opens in new tab)
+                      - 'button "Suggest an edit: unosquare/ffmediaelement" [ref=e747]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: unosquare/ffmediaelement" [ref=e750]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: unosquare/ffmediaelement" [ref=e752]':
+                    - img
+                - heading "unosquare/ffmediaelement" [level=2] [ref=e755]:
+                  - link "unosquare/ffmediaelement" [ref=e756]:
+                    - /url: /resource/867
+                - paragraph [ref=e757]: "FFME: The Advanced WPF MediaElement (based on FFmpeg) - unosquare/ffmediaelement"
+              - generic [ref=e759]:
+                - generic [ref=e760]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e761]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e762]: "#ffmpeg"
+                - link "Filter by tag wpf" [ref=e763]:
+                  - /url: /tag/wpf
+                  - generic [ref=e764]: "#wpf"
+                - link "Filter by tag media-element" [ref=e765]:
+                  - /url: /tag/media-element
+                  - generic [ref=e766]: "#media-element"
+            - article [ref=e767] [cursor=pointer]:
+              - generic [ref=e768]:
+                - generic [ref=e769]:
+                  - generic [ref=e770]: ◇
+                  - generic [ref=e771]:
+                    - link "View details for transitive-bullshit/awesome-ffmpeg" [ref=e772]:
+                      - /url: /resource/831
+                      - img [ref=e774]
+                      - generic [ref=e776]: View Details
+                    - button "Show 1 more tag" [ref=e777]: +1 more
+                    - generic [ref=e778]:
+                      - link "Open Link transitive-bullshit/awesome-ffmpeg (opens in new tab)" [ref=e779]:
+                        - /url: https://github.com/transitive-bullshit/awesome-ffmpeg
+                        - img
+                        - generic [ref=e780]: Open Link
+                        - generic [ref=e781]: transitive-bullshit/awesome-ffmpeg (opens in new tab)
+                      - 'button "Suggest an edit: transitive-bullshit/awesome-ffmpeg" [ref=e782]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: transitive-bullshit/awesome-ffmpeg" [ref=e785]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: transitive-bullshit/awesome-ffmpeg" [ref=e787]':
+                    - img
+                - heading "transitive-bullshit/awesome-ffmpeg" [level=2] [ref=e790]:
+                  - link "transitive-bullshit/awesome-ffmpeg" [ref=e791]:
+                    - /url: /resource/831
+                - paragraph [ref=e792]: 👻 A curated list of awesome FFmpeg resources.
+              - generic [ref=e794]:
+                - generic [ref=e795]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e796]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e797]: "#ffmpeg"
+                - link "Filter by tag resources" [ref=e798]:
+                  - /url: /tag/resource
+                  - generic [ref=e799]: "#resources"
+                - link "Filter by tag video-tools" [ref=e800]:
+                  - /url: /tag/video-tool
+                  - generic [ref=e801]: "#video-tools"
+            - article [ref=e802] [cursor=pointer]:
+              - generic [ref=e803]:
+                - generic [ref=e804]:
+                  - generic [ref=e805]: ◇
+                  - generic [ref=e806]:
+                    - 'link "View details for This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e807]':
+                      - /url: /resource/1373
+                      - img [ref=e809]
+                      - generic [ref=e811]: View Details
+                    - button "Show 2 more tags" [ref=e812]: +2 more
+                    - 'link "Open Link This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed. (opens in new tab)" [ref=e814]':
+                      - /url: https://gist.github.com/SeanMollet/0eed16e80630ab67532890a9d42132af
+                      - img
+                      - generic [ref=e815]: Open Link
+                      - generic [ref=e816]: "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed. (opens in new tab)"
+                    - 'button "Suggest an edit: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e817]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e820]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e822]':
+                    - img
+                - 'heading "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [level=2] [ref=e825]':
+                  - 'link "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed." [ref=e826]':
+                    - /url: /resource/1373
+                - paragraph [ref=e827]: "This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed. ..."
+              - generic [ref=e829]:
+                - generic [ref=e830]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e831]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e832]: "#ffmpeg"
+                - link "Filter by tag encoding" [ref=e833]:
+                  - /url: /tag/encoding
+                  - generic [ref=e834]: "#encoding"
+                - link "Filter by tag intel" [ref=e835]:
+                  - /url: /tag/intel
+                  - generic [ref=e836]: "#intel"
+            - article [ref=e837] [cursor=pointer]:
+              - generic [ref=e838]:
+                - generic [ref=e839]:
+                  - generic [ref=e840]: ◇
+                  - generic [ref=e841]:
+                    - link "View details for tanersener/mobile-ffmpeg" [ref=e842]:
+                      - /url: /resource/1099
+                      - img [ref=e844]
+                      - generic [ref=e846]: View Details
+                    - button "Show 2 more tags" [ref=e847]: +2 more
+                    - generic [ref=e848]:
+                      - link "Open Link tanersener/mobile-ffmpeg (opens in new tab)" [ref=e849]:
+                        - /url: https://github.com/tanersener/mobile-ffmpeg
+                        - img
+                        - generic [ref=e850]: Open Link
+                        - generic [ref=e851]: tanersener/mobile-ffmpeg (opens in new tab)
+                      - 'button "Suggest an edit: tanersener/mobile-ffmpeg" [ref=e852]':
+                        - img
+                  - 'button "Favorite to your account — sign in required: tanersener/mobile-ffmpeg" [ref=e855]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: tanersener/mobile-ffmpeg" [ref=e857]':
+                    - img
+                - heading "tanersener/mobile-ffmpeg" [level=2] [ref=e860]:
+                  - link "tanersener/mobile-ffmpeg" [ref=e861]:
+                    - /url: /resource/1099
+                - paragraph [ref=e862]: FFmpeg for Android, iOS and tvOS.
+              - generic [ref=e864]:
+                - generic [ref=e865]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e866]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e867]: "#ffmpeg"
+                - link "Filter by tag mobile" [ref=e868]:
+                  - /url: /tag/mobile
+                  - generic [ref=e869]: "#mobile"
+                - link "Filter by tag encoding" [ref=e870]:
+                  - /url: /tag/encoding
+                  - generic [ref=e871]: "#encoding"
+            - article [ref=e872] [cursor=pointer]:
+              - generic [ref=e873]:
+                - generic [ref=e874]:
+                  - generic [ref=e875]: ◇
+                  - generic [ref=e876]:
+                    - 'link "View details for sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e877]':
+                      - /url: /resource/1492
+                      - img [ref=e879]
+                      - generic [ref=e881]: View Details
+                    - button "Show 2 more tags" [ref=e882]: +2 more
+                    - 'link "Open Link sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment. (opens in new tab)" [ref=e884]':
+                      - /url: https://github.com/sunhailin-Leo/AutoConfigShellScript
+                      - img
+                      - generic [ref=e885]: Open Link
+                      - generic [ref=e886]: "sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment. (opens in new tab)"
+                    - 'button "Suggest an edit: sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e887]':
+                      - img
+                  - 'button "Favorite to your account — sign in required: sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e890]':
+                    - img
+                  - 'button "Bookmark on this device — no sign-in required: sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e892]':
+                    - img
+                - 'heading "sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [level=2] [ref=e895]':
+                  - 'link "sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment." [ref=e896]':
+                    - /url: /resource/1492
+                - paragraph [ref=e897]: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment. - sunhailin-Leo/AutoConfigShellScript
+              - generic [ref=e899]:
+                - generic [ref=e900]: Encoding & Codecs
+                - link "Filter by tag ffmpeg" [ref=e901]:
+                  - /url: /tag/ffmpeg
+                  - generic [ref=e902]: "#ffmpeg"
+                - link "Filter by tag python" [ref=e903]:
+                  - /url: /tag/python
+                  - generic [ref=e904]: "#python"
+                - link "Filter by tag configuration" [ref=e905]:
+                  - /url: /tag/configuration
+                  - generic [ref=e906]: "#configuration"
+          - navigation "Pagination" [ref=e908]:
+            - generic [ref=e909]:
+              - img
+              - text: Previous
+              - link "Page 1, current page" [ref=e910] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc
+                - text: "1"
+              - link "Go to page 2" [ref=e911] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=2
+                - text: "2"
+              - link "Go to page 3" [ref=e912] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=3
+                - text: "3"
+              - link "Go to page 4" [ref=e913] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=4
+                - text: "4"
+              - link "Go to page 5" [ref=e914] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=5
+                - text: "5"
+              - link "Go to page 6" [ref=e915] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=6
+                - text: "6"
+              - link "Next" [ref=e916] [cursor=pointer]:
+                - /url: /category/encoding-codecs?search=ffmpeg&sortBy=name-desc&page=2
+                - text: Next
+                - img
+            - generic [ref=e918]: Page 1 of 6
+            - status [ref=e919]

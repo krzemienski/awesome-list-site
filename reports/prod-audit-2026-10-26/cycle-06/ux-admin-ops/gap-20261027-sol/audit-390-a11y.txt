@@ -1,0 +1,449 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Admin, account menu" [ref=e18] [cursor=pointer]:
+          - generic [ref=e20]: A
+          - generic [ref=e21]: Admin, account menu
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - navigation "Breadcrumb" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "Home" [ref=e29] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e30]:
+                - img [ref=e31]
+              - listitem:
+                - link "Admin" [disabled]
+          - generic [ref=e33]: Authorized admin area
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e40]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e41]:
+                  - text: Operations
+                  - emphasis [ref=e42]: dashboard
+                - paragraph [ref=e43]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e44]:
+                - button "Settings" [ref=e45] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e46] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e47]
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - button "Scroll tabs left" [ref=e50] [cursor=pointer]:
+                  - img [ref=e51]
+                - tablist "Admin sections" [ref=e53]:
+                  - tab "Overview" [ref=e54] [cursor=pointer]:
+                    - img [ref=e55]
+                    - text: Overview
+                  - tab "Approvals" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Approvals
+                  - tab "Edits" [ref=e63] [cursor=pointer]:
+                    - img [ref=e64]
+                    - text: Edits
+                  - tab "Enrichment" [ref=e65] [cursor=pointer]:
+                    - img [ref=e66]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e68] [cursor=pointer]:
+                    - img [ref=e69]
+                    - text: Researcher
+                  - tab "Export" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Export
+                  - tab "Database" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Database
+                  - tab "Resources" [ref=e79] [cursor=pointer]:
+                    - img [ref=e80]
+                    - text: Resources
+                  - tab "Categories" [ref=e82] [cursor=pointer]:
+                    - img [ref=e83]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e84] [cursor=pointer]:
+                    - img [ref=e85]
+                    - text: Subcategories
+                  - tab "Users" [ref=e86] [cursor=pointer]:
+                    - img [ref=e87]
+                    - text: Users
+                  - tab "GitHub" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e96] [cursor=pointer]:
+                    - img [ref=e97]
+                    - text: Link Health
+                  - tab "Audit" [selected] [ref=e99] [cursor=pointer]:
+                    - img [ref=e100]
+                    - text: Audit
+                  - tab "Research" [ref=e101] [cursor=pointer]:
+                    - img [ref=e102]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e104] [cursor=pointer]:
+                  - img [ref=e105]
+              - tabpanel "Audit" [ref=e107]:
+                - generic [ref=e108]:
+                  - generic [ref=e109]:
+                    - generic [ref=e110]:
+                      - generic [ref=e111]:
+                        - heading "Audit log" [level=2] [ref=e112]
+                        - paragraph [ref=e113]: Append-only · 25 events per page
+                      - button "Hide tools" [expanded] [ref=e115] [cursor=pointer]
+                    - generic [ref=e117]:
+                      - generic [ref=e118]:
+                        - generic [ref=e120]:
+                          - img [ref=e121]
+                          - spinbutton [ref=e124]
+                        - combobox "Rows to show" [ref=e125] [cursor=pointer]:
+                          - generic: 25 rows
+                          - img [ref=e126]
+                        - combobox [ref=e128] [cursor=pointer]
+                        - button "Search" [ref=e129] [cursor=pointer]:
+                          - img
+                        - button "Refresh" [ref=e130] [cursor=pointer]:
+                          - img
+                        - status [ref=e131]: Updated 3:30:19 AM
+                      - generic [ref=e132]:
+                        - paragraph [ref=e133]: Swipe the table sideways to see all columns.
+                        - region "Audit log table, scrollable" [ref=e135]:
+                          - table [ref=e136]:
+                            - rowgroup [ref=e137]:
+                              - row "ID Actor Action Target Status When" [ref=e138]:
+                                - columnheader "ID" [ref=e139]
+                                - columnheader "Actor" [ref=e140]
+                                - columnheader "Action" [ref=e141]
+                                - columnheader "Target" [ref=e142]
+                                - columnheader "Status" [ref=e143]
+                                - columnheader "When" [ref=e144]
+                            - rowgroup [ref=e145]:
+                              - row "View details for audit entry 27568" [ref=e146] [cursor=pointer]:
+                                - cell "TX#27568 View details for audit entry 27568" [ref=e147]:
+                                  - generic [ref=e148]: TX#27568
+                                  - button "View details for audit entry 27568" [ref=e149]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e150]
+                                - cell "rejected" [ref=e151]
+                                - cell "#190360" [ref=e152]
+                                - cell "rejected" [ref=e153]:
+                                  - generic [ref=e154]: rejected
+                                - cell "15m ago" [ref=e155]
+                              - row "View details for audit entry 27567" [ref=e156] [cursor=pointer]:
+                                - cell "TX#27567 View details for audit entry 27567" [ref=e157]:
+                                  - generic [ref=e158]: TX#27567
+                                  - button "View details for audit entry 27567" [ref=e159]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e160]
+                                - cell "pending" [ref=e161]
+                                - cell "[QA-audit-1026] gap resource" [ref=e162]
+                                - cell "pending" [ref=e163]:
+                                  - generic [ref=e164]: pending
+                                - cell "16m ago" [ref=e165]
+                              - row "View details for audit entry 27566" [ref=e166] [cursor=pointer]:
+                                - cell "TX#27566 View details for audit entry 27566" [ref=e167]:
+                                  - generic [ref=e168]: TX#27566
+                                  - button "View details for audit entry 27566" [ref=e169]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e170]
+                                - cell "updated" [ref=e171]
+                                - cell "[QA-audit-1026] gap resource" [ref=e172]
+                                - cell "completed" [ref=e173]:
+                                  - generic [ref=e174]: completed
+                                - cell "19m ago" [ref=e175]
+                              - row "View details for audit entry 27565" [ref=e176] [cursor=pointer]:
+                                - cell "TX#27565 View details for audit entry 27565" [ref=e177]:
+                                  - generic [ref=e178]: TX#27565
+                                  - button "View details for audit entry 27565" [ref=e179]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e180]
+                                - cell "approved" [ref=e181]
+                                - cell "#190360" [ref=e182]
+                                - cell "approved" [ref=e183]:
+                                  - generic [ref=e184]: approved
+                                - cell "19m ago" [ref=e185]
+                              - row "View details for audit entry 27564" [ref=e186] [cursor=pointer]:
+                                - cell "TX#27564 View details for audit entry 27564" [ref=e187]:
+                                  - generic [ref=e188]: TX#27564
+                                  - button "View details for audit entry 27564" [ref=e189]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e190]
+                                - cell "created" [ref=e191]
+                                - cell "[QA-audit-1026] gap resource" [ref=e192]
+                                - cell "completed" [ref=e193]:
+                                  - generic [ref=e194]: completed
+                                - cell "20m ago" [ref=e195]
+                              - row "View details for audit entry 27563" [ref=e196] [cursor=pointer]:
+                                - cell "TX#27563 View details for audit entry 27563" [ref=e197]:
+                                  - generic [ref=e198]: TX#27563
+                                  - button "View details for audit entry 27563" [ref=e199]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e200]
+                                - cell "sub subcategory updated" [ref=e201]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC A tablet" [ref=e202]'
+                                - cell "completed" [ref=e203]:
+                                  - generic [ref=e204]: completed
+                                - cell "23m ago" [ref=e205]
+                              - row "View details for audit entry 27562" [ref=e206] [cursor=pointer]:
+                                - cell "TX#27562 View details for audit entry 27562" [ref=e207]:
+                                  - generic [ref=e208]: TX#27562
+                                  - button "View details for audit entry 27562" [ref=e209]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e210]
+                                - cell "sub subcategory updated" [ref=e211]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC A edited" [ref=e212]'
+                                - cell "completed" [ref=e213]:
+                                  - generic [ref=e214]: completed
+                                - cell "23m ago" [ref=e215]
+                              - row "View details for audit entry 27561" [ref=e216] [cursor=pointer]:
+                                - cell "TX#27561 View details for audit entry 27561" [ref=e217]:
+                                  - generic [ref=e218]: TX#27561
+                                  - button "View details for audit entry 27561" [ref=e219]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e220]
+                                - cell "subcategory updated" [ref=e221]
+                                - 'cell "Updated subcategory: [QA-audit-1026] gap SC A tablet" [ref=e222]'
+                                - cell "completed" [ref=e223]:
+                                  - generic [ref=e224]: completed
+                                - cell "24m ago" [ref=e225]
+                              - row "View details for audit entry 27560" [ref=e226] [cursor=pointer]:
+                                - cell "TX#27560 View details for audit entry 27560" [ref=e227]:
+                                  - generic [ref=e228]: TX#27560
+                                  - button "View details for audit entry 27560" [ref=e229]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e230]
+                                - cell "subcategory updated" [ref=e231]
+                                - 'cell "Updated subcategory: [QA-audit-1026] gap SC A" [ref=e232]'
+                                - cell "completed" [ref=e233]:
+                                  - generic [ref=e234]: completed
+                                - cell "24m ago" [ref=e235]
+                              - row "View details for audit entry 27559" [ref=e236] [cursor=pointer]:
+                                - cell "TX#27559 View details for audit entry 27559" [ref=e237]:
+                                  - generic [ref=e238]: TX#27559
+                                  - button "View details for audit entry 27559" [ref=e239]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e240]
+                                - cell "category updated" [ref=e241]
+                                - 'cell "Updated category: [QA-audit-1026] Cáfé gap A tablet" [ref=e242]'
+                                - cell "completed" [ref=e243]:
+                                  - generic [ref=e244]: completed
+                                - cell "24m ago" [ref=e245]
+                              - row "View details for audit entry 27558" [ref=e246] [cursor=pointer]:
+                                - cell "TX#27558 View details for audit entry 27558" [ref=e247]:
+                                  - generic [ref=e248]: TX#27558
+                                  - button "View details for audit entry 27558" [ref=e249]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e250]
+                                - cell "category updated" [ref=e251]
+                                - 'cell "Updated category: [QA-audit-1026] Cáfé gap A" [ref=e252]'
+                                - cell "completed" [ref=e253]:
+                                  - generic [ref=e254]: completed
+                                - cell "25m ago" [ref=e255]
+                              - row "View details for audit entry 27557" [ref=e256] [cursor=pointer]:
+                                - cell "TX#27557 View details for audit entry 27557" [ref=e257]:
+                                  - generic [ref=e258]: TX#27557
+                                  - button "View details for audit entry 27557" [ref=e259]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e260]
+                                - cell "journey step group deleted" [ref=e261]
+                                - 'cell "Journey: Video Streaming Fundamentals" [ref=e262]'
+                                - cell "completed" [ref=e263]:
+                                  - generic [ref=e264]: completed
+                                - cell "26m ago" [ref=e265]
+                              - row "View details for audit entry 27556" [ref=e266] [cursor=pointer]:
+                                - cell "TX#27556 View details for audit entry 27556" [ref=e267]:
+                                  - generic [ref=e268]: TX#27556
+                                  - button "View details for audit entry 27556" [ref=e269]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e270]
+                                - cell "journey step group updated" [ref=e271]
+                                - 'cell "Journey: Video Streaming Fundamentals" [ref=e272]'
+                                - cell "completed" [ref=e273]:
+                                  - generic [ref=e274]: completed
+                                - cell "26m ago" [ref=e275]
+                              - row "View details for audit entry 27555" [ref=e276] [cursor=pointer]:
+                                - cell "TX#27555 View details for audit entry 27555" [ref=e277]:
+                                  - generic [ref=e278]: TX#27555
+                                  - button "View details for audit entry 27555" [ref=e279]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e280]
+                                - cell "journey step group updated" [ref=e281]
+                                - 'cell "Journey: Video Streaming Fundamentals" [ref=e282]'
+                                - cell "completed" [ref=e283]:
+                                  - generic [ref=e284]: completed
+                                - cell "28m ago" [ref=e285]
+                              - row "View details for audit entry 27554" [ref=e286] [cursor=pointer]:
+                                - cell "TX#27554 View details for audit entry 27554" [ref=e287]:
+                                  - generic [ref=e288]: TX#27554
+                                  - button "View details for audit entry 27554" [ref=e289]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e290]
+                                - cell "journey step group updated" [ref=e291]
+                                - 'cell "Journey: Video Streaming Fundamentals" [ref=e292]'
+                                - cell "completed" [ref=e293]:
+                                  - generic [ref=e294]: completed
+                                - cell "32m ago" [ref=e295]
+                              - row "View details for audit entry 27553" [ref=e296] [cursor=pointer]:
+                                - cell "TX#27553 View details for audit entry 27553" [ref=e297]:
+                                  - generic [ref=e298]: TX#27553
+                                  - button "View details for audit entry 27553" [ref=e299]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e300]
+                                - cell "approved" [ref=e301]
+                                - cell "#190359" [ref=e302]
+                                - cell "approved" [ref=e303]:
+                                  - generic [ref=e304]: approved
+                                - cell "33m ago" [ref=e305]
+                              - row "View details for audit entry 27552" [ref=e306] [cursor=pointer]:
+                                - cell "TX#27552 View details for audit entry 27552" [ref=e307]:
+                                  - generic [ref=e308]: TX#27552
+                                  - button "View details for audit entry 27552" [ref=e309]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e310]
+                                - cell "journey step created" [ref=e311]
+                                - 'cell "Journey: Video Streaming Fundamentals" [ref=e312]'
+                                - cell "completed" [ref=e313]:
+                                  - generic [ref=e314]: completed
+                                - cell "34m ago" [ref=e315]
+                              - row "View details for audit entry 27551" [ref=e316] [cursor=pointer]:
+                                - cell "TX#27551 View details for audit entry 27551" [ref=e317]:
+                                  - generic [ref=e318]: TX#27551
+                                  - button "View details for audit entry 27551" [ref=e319]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e320]
+                                - cell "sub subcategory updated" [ref=e321]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC" [ref=e322]'
+                                - cell "completed" [ref=e323]:
+                                  - generic [ref=e324]: completed
+                                - cell "37m ago" [ref=e325]
+                              - row "View details for audit entry 27550" [ref=e326] [cursor=pointer]:
+                                - cell "TX#27550 View details for audit entry 27550" [ref=e327]:
+                                  - generic [ref=e328]: TX#27550
+                                  - button "View details for audit entry 27550" [ref=e329]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e330]
+                                - cell "sub subcategory updated" [ref=e331]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC A" [ref=e332]'
+                                - cell "completed" [ref=e333]:
+                                  - generic [ref=e334]: completed
+                                - cell "38m ago" [ref=e335]
+                              - row "View details for audit entry 27549" [ref=e336] [cursor=pointer]:
+                                - cell "TX#27549 View details for audit entry 27549" [ref=e337]:
+                                  - generic [ref=e338]: TX#27549
+                                  - button "View details for audit entry 27549" [ref=e339]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e340]
+                                - cell "sub subcategory updated" [ref=e341]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC A" [ref=e342]'
+                                - cell "completed" [ref=e343]:
+                                  - generic [ref=e344]: completed
+                                - cell "38m ago" [ref=e345]
+                              - row "View details for audit entry 27548" [ref=e346] [cursor=pointer]:
+                                - cell "TX#27548 View details for audit entry 27548" [ref=e347]:
+                                  - generic [ref=e348]: TX#27548
+                                  - button "View details for audit entry 27548" [ref=e349]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e350]
+                                - cell "sub subcategory updated" [ref=e351]
+                                - 'cell "Updated sub-subcategory: [QA-audit-1026] gap SSC A" [ref=e352]'
+                                - cell "completed" [ref=e353]:
+                                  - generic [ref=e354]: completed
+                                - cell "39m ago" [ref=e355]
+                              - row "View details for audit entry 27547" [ref=e356] [cursor=pointer]:
+                                - cell "TX#27547 View details for audit entry 27547" [ref=e357]:
+                                  - generic [ref=e358]: TX#27547
+                                  - button "View details for audit entry 27547" [ref=e359]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e360]
+                                - cell "sub subcategory created" [ref=e361]
+                                - 'cell "Created sub-subcategory: [QA-audit-1026] gap SSC A under [QA-audit-1026] gap SC A" [ref=e362]'
+                                - cell "completed" [ref=e363]:
+                                  - generic [ref=e364]: completed
+                                - cell "40m ago" [ref=e365]
+                              - row "View details for audit entry 27546" [ref=e366] [cursor=pointer]:
+                                - cell "TX#27546 View details for audit entry 27546" [ref=e367]:
+                                  - generic [ref=e368]: TX#27546
+                                  - button "View details for audit entry 27546" [ref=e369]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e370]
+                                - cell "subcategory created" [ref=e371]
+                                - 'cell "Created subcategory: [QA-audit-1026] gap SC A under [QA-audit-1026] Cáfé gap A" [ref=e372]'
+                                - cell "completed" [ref=e373]:
+                                  - generic [ref=e374]: completed
+                                - cell "41m ago" [ref=e375]
+                              - row "View details for audit entry 27545" [ref=e376] [cursor=pointer]:
+                                - cell "TX#27545 View details for audit entry 27545" [ref=e377]:
+                                  - generic [ref=e378]: TX#27545
+                                  - button "View details for audit entry 27545" [ref=e379]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e380]
+                                - cell "category created" [ref=e381]
+                                - 'cell "Created category: [QA-audit-1026] Cáfé gap A" [ref=e382]'
+                                - cell "completed" [ref=e383]:
+                                  - generic [ref=e384]: completed
+                                - cell "42m ago" [ref=e385]
+                              - row "View details for audit entry 27544" [ref=e386] [cursor=pointer]:
+                                - cell "TX#27544 View details for audit entry 27544" [ref=e387]:
+                                  - generic [ref=e388]: TX#27544
+                                  - button "View details for audit entry 27544" [ref=e389]:
+                                    - img
+                                - cell "a•••@example.com" [ref=e390]
+                                - cell "deleted" [ref=e391]
+                                - cell "[QA-audit-1026] c6 admin content resource" [ref=e392]
+                                - cell "completed" [ref=e393]:
+                                  - generic [ref=e394]: completed
+                                - cell "1h ago" [ref=e395]
+                      - generic [ref=e396]:
+                        - paragraph [ref=e397]: 1–25 of 16,898 entries
+                        - generic [ref=e398]:
+                          - button "Previous" [disabled]
+                          - button "Next" [ref=e399] [cursor=pointer]
+                  - generic [ref=e401]:
+                    - generic [ref=e403]:
+                      - heading "Contact submissions" [level=2] [ref=e404]
+                      - paragraph [ref=e405]: Private inbox · 1 message
+                    - generic [ref=e406]:
+                      - generic [ref=e407]:
+                        - paragraph [ref=e408]: Swipe the table sideways to see all columns.
+                        - region "Contact submissions table, scrollable" [ref=e410]:
+                          - table [ref=e411]:
+                            - rowgroup [ref=e412]:
+                              - row "Name Reply-to Subject Received" [ref=e413]:
+                                - columnheader "Name" [ref=e414]
+                                - columnheader "Reply-to" [ref=e415]
+                                - columnheader "Subject" [ref=e416]
+                                - columnheader "Received" [ref=e417]
+                            - rowgroup [ref=e418]:
+                              - row "View contact submission from QA 698" [active] [ref=e419] [cursor=pointer]:
+                                - cell "QA 698" [ref=e420]
+                                - cell "Reply-to email q•••@awesome.video" [ref=e421]: q•••@awesome.video
+                                - cell "QA 698 analytics check" [ref=e422]
+                                - cell "Oct 23, 2026, 06:00 PM" [ref=e423]
+                      - generic [ref=e424]:
+                        - paragraph [ref=e425]: 1–1 of 1 submissions
+                        - generic [ref=e426]:
+                          - button "Previous contact submissions page" [disabled]:
+                            - img
+                            - text: Previous
+                          - button "Next contact submissions page" [disabled]:
+                            - text: Next
+                            - img
+    - button "Back to top" [ref=e427] [cursor=pointer]:
+      - img

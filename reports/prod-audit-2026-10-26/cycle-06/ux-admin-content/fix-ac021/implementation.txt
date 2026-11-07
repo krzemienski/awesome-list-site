@@ -1,0 +1,14 @@
+AC-21 parent field feedback
+Base: 520d6778369bc7ce495204cfcacc7e0533f941cc
+Branch: fix/c6-ac021-parent-field-feedback
+Isolated clone: /tmp/c6-ac021-parent-feedback-20261027
+
+Reported reproduction (accepted as ground truth; not rerun): open /admin#subcategories, Add subcategory, submit empty Create. Parent Category appears only in an alert; focus lands on create-name; parent combobox lacks aria-invalid/aria-describedby. Original evidence read: reports/prod-audit-2026-10-26/cycle-06/ux-admin-content/run-20261027T0529Z/step-132-subcategory-create-empty-ac20.txt and step-132-subcategory-create-empty-ac20-1440.png in the audit checkout.
+
+Confirmed cause: GenericCrudManager dialogFieldNames excludes parents, so showMissingFields maps them to banner-only errors and showFieldErrors chooses Name first. renderParentSelect has no field-error ARIA or associated inline feedback; handleParentChange clears only the banner.
+
+Scoped change: include parent field names before Name/Slug in the existing error/focus list; reuse fieldErrorProps and inline-error markup for parent triggers; preserve empty-options hints in aria-describedby; clear the selected parent's field error when corrected. Following Main's disabled-parent review, focus skips missing/disabled elements and disabled-parent inline feedback has role=alert. Existing required-field predicates, payloads, duplicate handling, cascading resets, analytics and primitive styles remain unchanged.
+
+Browser authorization amendment from Main: do not reuse production cookies or SESSION_SECRET locally; do not alter/bypass auth. No approved local owner-session artifact exists. Complete scoped code, typecheck/build and open a non-draft PR; explicitly mark local admin browser proof BLOCKED/UNVERIFIED. No login, credential creation, auth bypass, production session import, merge or deploy is authorized. A fresh local random SESSION_SECRET is used for the signed-out runtime only.
+
+Required admin proof remains UNVERIFIED at 1440x900, 820x1180 touch and 390x844 touch: empty create parent focus/invalid/description; missing-parent edit equivalent; parent-present Name-before-Slug ordering; correction clears parent error; real authenticated console/network evidence. Ordinary populated Subcategory edit has no clear-parent option; the shared Sub-Subcategories edit path can reach a missing child parent by changing Parent Category, but this remains source inference, not browser proof.

@@ -1,0 +1,5 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":true,"isLandscape":false,"width":820,"height":1180}
+Emulating color scheme: dark
+## Console messages
+Showing 1-1 of 1 (Page 1 of 1).
+msgid=87 [error] Failed to load resource: net::ERR_INTERNET_DISCONNECTED (0 args) [2 times]

@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-10-27T08:38:23.435Z",
+  "width": 1440,
+  "results": [
+    {
+      "source": "Tag View details keyboard",
+      "url": "http://127.0.0.1:5122/resource/1923",
+      "h1": "Nimble Streamer",
+      "active": "text-resource-title"
+    },
+    {
+      "source": "Search title pointer",
+      "url": "http://127.0.0.1:5122/resource/777",
+      "h1": "hlsjs-p2p-engine",
+      "active": "text-resource-title"
+    },
+    {
+      "source": "Taxonomy View details keyboard",
+      "url": "http://127.0.0.1:5122/resource/812",
+      "h1": "Ad Creative Signaling in DASH and HLS",
+      "active": "text-resource-title"
+    }
+  ]
+}

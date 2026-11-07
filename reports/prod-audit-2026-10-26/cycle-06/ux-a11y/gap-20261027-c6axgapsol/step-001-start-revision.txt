@@ -1,0 +1,4 @@
+Fresh production read at run start: GET https://awesome.video/api/version
+{"revision":"520d6778369bc7ce495204cfcacc7e0533f941cc"}
+Run actor C6A11yGapSol. New isolated public context c6axgap-public-20261027; separate agent-browser owner session c6axgap-owner-20261027. No source edits or report edits.
+Owner import first attempted before a page existed: CDP Network.setCookies Invalid cookie fields. Opened target origin, imported through cookies set --curl file without displaying cookie, then opened /admin. No login or sign-out.

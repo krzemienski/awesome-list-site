@@ -1,0 +1,566 @@
+RootWebArea	Video Encoding & Codecs: AV1… — Page 16 — Awesome Video
+generic	
+generic	
+region	Notifications (F8)
+link	Skip to main content
+generic	
+list	
+StaticText	Skip to main content
+banner	
+generic	
+InlineTextBox	Skip to main content
+link	AWESOME.VIDEO home
+button	Search 1,949 resources
+navigation	Primary
+button	Sign in, account menu
+generic	
+main	
+contentinfo	
+StaticText	AWESOME.VIDEO
+StaticText	 home
+StaticText	Search 1,949 resources
+link	Browse
+link	Submit
+link	About
+link	Docs ↗
+StaticText	Sign in
+StaticText	, account menu
+navigation	Sidebar
+navigation	Breadcrumb
+link	Browse
+sectionheader	
+region	Subcategories
+generic	Resources (372)
+StaticText	── INDEX
+link	awesome.video home
+paragraph	
+heading	INDEXED
+paragraph	
+paragraph	
+navigation	Explore categories
+heading	SOURCE
+link	krzemienski/ awesome-video
+paragraph	
+StaticText	© 
+StaticText	2026
+StaticText	 
+StaticText	awesome.video
+StaticText	 · content CC0, code MIT
+navigation	Site policies
+StaticText	built with the awesome-list framework
+InlineTextBox	AWESOME.VIDEO
+InlineTextBox	 home
+InlineTextBox	Search 1,949 resources
+StaticText	Browse
+StaticText	Submit
+StaticText	About
+StaticText	Docs ↗
+InlineTextBox	Sign in
+InlineTextBox	, account menu
+link	Home
+generic	
+button	Collapse sidebar
+button	Community & Events 91 resources
+button	Encoding & Codecs 372 resources
+generic	
+button	General Tools 95 resources
+button	Infrastructure & Delivery 183 resources
+button	Intro & Learning 227 resources
+button	Media Tools 304 resources
+button	Players & Clients 263 resources
+button	Protocols & Transport 242 resources
+button	Standards & Industry 172 resources
+StaticText	1,949 indexed
+StaticText	 · live
+link	Source: krzemienski/awesome-video
+group	
+list	
+StaticText	Browse
+generic	
+heading	Encoding & Codecs
+region	About this collection
+generic	
+heading	Subcategories
+link	Codecs 27
+link	Encoding Tools 225
+button	Uncategorized 120
+heading	Resources (372)
+status	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+article	
+navigation	Pagination
+InlineTextBox	── INDEX
+StaticText	awesome.video
+StaticText	A curated collection of awesome video resources, tools, and technologies for developers and content creators
+StaticText	INDEXED
+StaticText	1,949
+StaticText	9
+StaticText	 categories
+LineBreak	
+
+StaticText	18
+StaticText	 subcategories
+LineBreak	
+
+generic	
+heading	EXPLORE
+link	Community & Events
+link	Encoding & Codecs
+link	General Tools
+link	Infrastructure & Delivery
+link	Intro & Learning
+link	Media Tools
+link	Players & Clients
+link	Protocols & Transport
+link	Standards & Industry
+StaticText	SOURCE
+StaticText	krzemienski
+StaticText	/
+StaticText	awesome-video
+StaticText	Open-source.
+link	PRs welcome
+StaticText	.
+LineBreak	
+
+StaticText	Indexed automatically from 
+StaticText	README.md
+StaticText	.
+InlineTextBox	© 
+InlineTextBox	2026
+InlineTextBox	 
+InlineTextBox	awesome.video
+InlineTextBox	 · content CC0, code MIT
+link	About
+link	Terms
+link	Privacy
+link	Code of Conduct
+link	Issues ↗
+link	Sitemap
+InlineTextBox	built with the awesome-list framework
+InlineTextBox	Browse
+InlineTextBox	Submit
+InlineTextBox	About
+InlineTextBox	Docs ↗
+image	
+StaticText	Home
+StaticText	CATEGORIES
+StaticText	 
+StaticText	· 9
+generic	
+generic	91 resources
+image	
+generic	
+generic	372 resources
+image	
+link	All in Encoding & Codecs →
+generic	
+generic	
+link	Uncategorized 120 resources
+generic	
+generic	95 resources
+image	
+generic	
+generic	183 resources
+image	
+generic	
+generic	227 resources
+image	
+generic	
+generic	304 resources
+image	
+generic	
+generic	263 resources
+image	
+generic	
+generic	242 resources
+image	
+generic	
+generic	172 resources
+image	
+InlineTextBox	1,949 indexed
+InlineTextBox	 · live
+DisclosureTriangle	More navigation
+listitem	
+listitem	
+InlineTextBox	Browse
+StaticText	CATEGORY · 
+StaticText	ENCODING & CODECS
+StaticText	Encoding & Codecs
+heading	About this collection
+paragraph	
+StaticText	372
+StaticText	 
+StaticText	RESOURCES
+StaticText	2
+StaticText	 
+StaticText	SUBCATEGORIES
+button	Filters & view
+StaticText	Subcategories
+StaticText	Codecs
+StaticText	27
+StaticText	Encoding Tools
+StaticText	225
+StaticText	Uncategorized
+StaticText	120
+StaticText	Resources (372)
+StaticText	Page 999 is not available; showing page 16 instead.
+button	Dismiss
+heading	realeyes-media/alpine-bento-ffmpeg
+link	Open in new tab
+generic	
+heading	sambios/ffmpeg_transcoder
+link	Open in new tab
+generic	
+heading	serverlesspub/ffmpeg-aws-lambda-layer
+link	Open in new tab
+generic	
+heading	slhck/ffmpeg-bitrate-stats
+link	Open in new tab
+generic	
+heading	slhck/ffmpeg-debug-qp
+link	Open in new tab
+generic	
+heading	SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+link	Open in new tab
+generic	
+heading	This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.
+link	Open in new tab
+generic	
+heading	transitive-bullshit/awesome-ffmpeg
+link	Open in new tab
+generic	
+heading	Use of Look-Up Tables (LUTs) in FFmpeg
+link	Open in new tab
+generic	
+heading	VCDP/FFmpeg-patch
+link	Open in new tab
+generic	
+heading	x264 FFmpeg Options Guide - Linux Encoding
+link	Open in new tab
+generic	
+heading	Xabe.FFmpeg
+link	Open in new tab
+generic	
+link	Previous
+link	Go to page 1
+link	Go to page 15
+link	Page 16, current page
+generic	
+StaticText	Page 
+StaticText	16
+StaticText	 of 
+StaticText	16
+LabelText	
+textbox	Page number, 1 to 16
+status	
+InlineTextBox	awesome.video
+InlineTextBox	A curated collection of awesome video 
+InlineTextBox	resources, tools, and technologies for 
+InlineTextBox	developers and content creators
+InlineTextBox	INDEXED
+InlineTextBox	1,949
+InlineTextBox	9
+InlineTextBox	 categories
+InlineTextBox	
+
+InlineTextBox	18
+InlineTextBox	 subcategories
+InlineTextBox	
+
+StaticText	live
+StaticText	EXPLORE
+InlineTextBox	SOURCE
+InlineTextBox	krzemienski
+InlineTextBox	/
+InlineTextBox	awesome-video
+InlineTextBox	Open-source.
+StaticText	PRs welcome
+InlineTextBox	.
+InlineTextBox	
+
+InlineTextBox	Indexed automatically from 
+InlineTextBox	README.md
+InlineTextBox	.
+StaticText	About
+StaticText	Terms
+StaticText	Privacy
+StaticText	Conduct
+StaticText	Issues ↗
+StaticText	Sitemap
+InlineTextBox	Home
+InlineTextBox	CATEGORIES
+InlineTextBox	 
+InlineTextBox	· 9
+StaticText	Community & Events
+StaticText	91
+StaticText	Encoding & Codecs
+StaticText	372
+StaticText	All in 
+StaticText	Encoding & Codecs
+StaticText	 →
+link	Codecs 27 resources
+button	Expand 3 nested groups in Codecs
+link	Encoding Tools 225 resources
+button	Expand 1 nested group in Encoding Tools
+generic	
+generic	120 resources
+StaticText	General Tools
+StaticText	95
+StaticText	Infrastructure & Delivery
+StaticText	183
+StaticText	Intro & Learning
+StaticText	227
+StaticText	Media Tools
+StaticText	304
+StaticText	Players & Clients
+StaticText	263
+StaticText	Protocols & Transport
+StaticText	242
+StaticText	Standards & Industry
+StaticText	172
+generic	
+link	Home
+link	Encoding & Codecs
+InlineTextBox	CATEGORY · 
+InlineTextBox	ENCODING & CODECS
+InlineTextBox	Encoding & Codecs
+StaticText	About this collection
+StaticText	Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+InlineTextBox	372
+InlineTextBox	 
+InlineTextBox	RESOURCES
+InlineTextBox	2
+InlineTextBox	 
+InlineTextBox	SUBCATEGORIES
+StaticText	Filters & view
+InlineTextBox	Subcategories
+InlineTextBox	Codecs
+InlineTextBox	27
+InlineTextBox	Encoding Tools
+InlineTextBox	225
+InlineTextBox	Uncategorized
+InlineTextBox	120
+InlineTextBox	Resources (372)
+InlineTextBox	Page 999 is not available; showing page 16 instead.
+StaticText	Dismiss
+link	realeyes-media/alpine-bento-ffmpeg
+image	
+button	Favorite to your account — sign in required: realeyes-media/alpine-bento-ffmpeg
+button	Bookmark on this device — no sign-in required: realeyes-media/alpine-bento-ffmpeg
+link	sambios/ffmpeg_transcoder
+image	
+button	Favorite to your account — sign in required: sambios/ffmpeg_transcoder
+button	Bookmark on this device — no sign-in required: sambios/ffmpeg_transcoder
+link	serverlesspub/ffmpeg-aws-lambda-layer
+image	
+button	Favorite to your account — sign in required: serverlesspub/ffmpeg-aws-lambda-layer
+button	Bookmark on this device — no sign-in required: serverlesspub/ffmpeg-aws-lambda-layer
+link	slhck/ffmpeg-bitrate-stats
+image	
+button	Favorite to your account — sign in required: slhck/ffmpeg-bitrate-stats
+button	Bookmark on this device — no sign-in required: slhck/ffmpeg-bitrate-stats
+link	slhck/ffmpeg-debug-qp
+image	
+button	Favorite to your account — sign in required: slhck/ffmpeg-debug-qp
+button	Bookmark on this device — no sign-in required: slhck/ffmpeg-debug-qp
+link	SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+image	
+button	Favorite to your account — sign in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+button	Bookmark on this device — no sign-in required: SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+link	This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.
+image	
+button	Favorite to your account — sign in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.
+button	Bookmark on this device — no sign-in required: This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.
+link	transitive-bullshit/awesome-ffmpeg
+image	
+button	Favorite to your account — sign in required: transitive-bullshit/awesome-ffmpeg
+button	Bookmark on this device — no sign-in required: transitive-bullshit/awesome-ffmpeg
+link	Use of Look-Up Tables (LUTs) in FFmpeg
+image	
+button	Favorite to your account — sign in required: Use of Look-Up Tables (LUTs) in FFmpeg
+button	Bookmark on this device — no sign-in required: Use of Look-Up Tables (LUTs) in FFmpeg
+link	VCDP/FFmpeg-patch
+image	
+button	Favorite to your account — sign in required: VCDP/FFmpeg-patch
+button	Bookmark on this device — no sign-in required: VCDP/FFmpeg-patch
+link	x264 FFmpeg Options Guide - Linux Encoding
+image	
+button	Favorite to your account — sign in required: x264 FFmpeg Options Guide - Linux Encoding
+button	Bookmark on this device — no sign-in required: x264 FFmpeg Options Guide - Linux Encoding
+link	Xabe.FFmpeg
+image	
+button	Favorite to your account — sign in required: Xabe.FFmpeg
+button	Bookmark on this device — no sign-in required: Xabe.FFmpeg
+image	
+StaticText	Previous
+StaticText	1
+StaticText	15
+StaticText	16
+StaticText	Next
+image	
+InlineTextBox	Page 
+InlineTextBox	16
+InlineTextBox	 of 
+InlineTextBox	16
+StaticText	Go to page
+generic	
+InlineTextBox	live
+InlineTextBox	EXPLORE
+InlineTextBox	PRs welcome
+InlineTextBox	About
+InlineTextBox	Terms
+InlineTextBox	Privacy
+InlineTextBox	Conduct
+InlineTextBox	Issues ↗
+InlineTextBox	Sitemap
+InlineTextBox	Community & Events
+InlineTextBox	91
+InlineTextBox	Encoding & Codecs
+InlineTextBox	372
+InlineTextBox	All in 
+InlineTextBox	Encoding & Codecs
+InlineTextBox	 →
+StaticText	Codecs
+generic	27 resources
+image	
+StaticText	Encoding Tools
+generic	225 resources
+image	
+StaticText	Uncategorized
+StaticText	120
+InlineTextBox	General Tools
+InlineTextBox	95
+InlineTextBox	Infrastructure & Delivery
+InlineTextBox	Infrastructure & Deli
+InlineTextBox	…
+InlineTextBox	183
+InlineTextBox	Intro & Learning
+InlineTextBox	227
+InlineTextBox	Media Tools
+InlineTextBox	304
+InlineTextBox	Players & Clients
+InlineTextBox	263
+InlineTextBox	Protocols & Transport
+InlineTextBox	242
+InlineTextBox	Standards & Industry
+InlineTextBox	172
+StaticText	Home
+StaticText	Encoding & Codecs
+InlineTextBox	About this collection
+InlineTextBox	Encoding & Codecs brings together 372 curated resources from across the video 
+InlineTextBox	technology landscape. Notable topics include Codecs and Encoding Tools.
+InlineTextBox	Filters & view
+InlineTextBox	Dismiss
+StaticText	realeyes-media/alpine-bento-ffmpeg
+image	
+image	
+StaticText	sambios/ffmpeg_transcoder
+image	
+image	
+StaticText	serverlesspub/ffmpeg-aws-lambda-layer
+image	
+image	
+StaticText	slhck/ffmpeg-bitrate-stats
+image	
+image	
+StaticText	slhck/ffmpeg-debug-qp
+image	
+image	
+StaticText	SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+image	
+image	
+StaticText	This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.
+image	
+image	
+StaticText	transitive-bullshit/awesome-ffmpeg
+image	
+image	
+StaticText	Use of Look-Up Tables (LUTs) in FFmpeg
+image	
+image	
+StaticText	VCDP/FFmpeg-patch
+image	
+image	
+StaticText	x264 FFmpeg Options Guide - Linux Encoding
+image	
+image	
+StaticText	Xabe.FFmpeg
+image	
+image	
+InlineTextBox	Previous
+InlineTextBox	1
+InlineTextBox	15
+InlineTextBox	16
+InlineTextBox	Next
+InlineTextBox	Go to page
+StaticText	16
+InlineTextBox	Codecs
+StaticText	27
+InlineTextBox	Encoding Tools
+StaticText	225
+InlineTextBox	Uncategorized
+InlineTextBox	120
+InlineTextBox	Home
+InlineTextBox	Encoding & Codecs
+InlineTextBox	realeyes-
+InlineTextBox	media/alpine-
+InlineTextBox	…
+InlineTextBox	bento-ffmpeg
+InlineTextBox	sambios/ffmpeg_tr
+InlineTextBox	anscoder
+InlineTextBox	serverlesspub/ffm
+InlineTextBox	peg-aws-lambda-
+InlineTextBox	peg-aws-lambda
+InlineTextBox	…
+InlineTextBox	layer
+InlineTextBox	slhck/ffmpeg-
+InlineTextBox	bitrate-stats
+InlineTextBox	slhck/ffmpeg-
+InlineTextBox	debug-qp
+InlineTextBox	SmurfManX/ffmpe
+InlineTextBox	g-nvidia-adaptive-
+InlineTextBox	g-nvidia-adaptiv
+InlineTextBox	…
+InlineTextBox	vod-transcoder
+InlineTextBox	This gist will 
+InlineTextBox	generate an Intel 
+InlineTextBox	…
+InlineTextBox	QSV-enabled 
+InlineTextBox	FFmpeg build using 
+InlineTextBox	the open source 
+InlineTextBox	Intel Media SDK. 
+InlineTextBox	Testbed used: 
+InlineTextBox	Ubuntu 18.04LTS. 
+InlineTextBox	A fallback is also 
+InlineTextBox	provided for the 
+InlineTextBox	intel vaapi driver 
+InlineTextBox	where needed.
+InlineTextBox	transitive-
+InlineTextBox	bullshit/awesome-
+InlineTextBox	bullshit/awesome
+InlineTextBox	…
+InlineTextBox	ffmpeg
+InlineTextBox	Use of Look-Up 
+InlineTextBox	Tables (LUTs) in 
+InlineTextBox	…
+InlineTextBox	FFmpeg
+InlineTextBox	VCDP/FFmpeg-
+InlineTextBox	patch
+InlineTextBox	x264 FFmpeg 
+InlineTextBox	Options Guide - 
+InlineTextBox	…
+InlineTextBox	Linux Encoding
+InlineTextBox	Xabe.FFmpeg
+InlineTextBox	16
+InlineTextBox	27
+InlineTextBox	225

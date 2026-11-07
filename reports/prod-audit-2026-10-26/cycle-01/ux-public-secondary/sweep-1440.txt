@@ -1,0 +1,40 @@
+== /about
+"{\"w\":1440,\"url\":\"/about\",\"status\":\"About — Awesome Video\",\"h1\":[\"A field journal for video engineers\"],\"canon\":\"https://awesome.video/about\",\"robots\":\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\",\"ogurl\":\"https://awesome.video/about\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /terms
+"{\"w\":1440,\"url\":\"/terms\",\"status\":\"Terms of Use — Awesome Video\",\"h1\":[\"Terms of Use\"],\"canon\":\"https://awesome.video/terms\",\"robots\":\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\",\"ogurl\":\"https://awesome.video/terms\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /privacy
+"{\"w\":1440,\"url\":\"/privacy\",\"status\":\"Privacy Policy — Awesome Video\",\"h1\":[\"Privacy Policy\"],\"canon\":\"https://awesome.video/privacy\",\"robots\":\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\",\"ogurl\":\"https://awesome.video/privacy\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /code-of-conduct
+"{\"w\":1440,\"url\":\"/code-of-conduct\",\"status\":\"Code of Conduct — Awesome Video\",\"h1\":[\"Code of Conduct\"],\"canon\":\"https://awesome.video/code-of-conduct\",\"robots\":\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\",\"ogurl\":\"https://awesome.video/code-of-conduct\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /design-system
+"{\"w\":1440,\"url\":\"/design-system\",\"status\":\"Design System — Awesome Video\",\"h1\":[\"Design System\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /settings/theme
+"{\"w\":1440,\"url\":\"/settings/theme\",\"status\":\"Theme Settings — Awesome Video\",\"h1\":[\"Theme Settings\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /sign-in
+"{\"w\":1440,\"url\":\"/sign-in\",\"status\":\"Sign In — Awesome Video\",\"h1\":[\"Welcome back\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /sign-up
+"{\"w\":1440,\"url\":\"/sign-up\",\"status\":\"Create an Account — Awesome Video\",\"h1\":[\"Create your account\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /sign-in?admin
+"{\"w\":1440,\"url\":\"/sign-in?admin\",\"status\":\"Sign In — Awesome Video\",\"h1\":[\"Admin sign-in\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /bookmarks
+"{\"w\":1440,\"url\":\"/bookmarks\",\"status\":\"Bookmarks — Awesome Video\",\"h1\":[\"Nothing saved on this device\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /recommendations
+"{\"w\":1440,\"url\":\"/recommendations\",\"status\":\"Personalized Recommendations — Awesome Video\",\"h1\":[\"Recommended Resources\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /continue-learning
+"{\"w\":1440,\"url\":\"/continue-learning\",\"status\":\"Continue Learning — Awesome Video\",\"h1\":[\"Your progress lives with your account\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /notifications
+"{\"w\":1440,\"url\":\"/sign-in?redirect_url=%2Fnotifications\",\"status\":\"Sign In — Awesome Video\",\"h1\":[\"Welcome back\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":null,\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /submit
+"{\"w\":1440,\"url\":\"/submit\",\"status\":\"Submit a Resource — Awesome Video\",\"h1\":[\"Add to the index\"],\"canon\":\"https://awesome.video/submit\",\"robots\":\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\",\"ogurl\":\"https://awesome.video/submit\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /no-such-page
+"{\"w\":1440,\"url\":\"/no-such-page\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /category/nope
+"{\"w\":1440,\"url\":\"/category/nope\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /tag/zzqxv-nope
+"{\"w\":1440,\"url\":\"/tag/zzqxv-nope\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /resource/999999999
+"{\"w\":1440,\"url\":\"/resource/999999999\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /journey/999999
+"{\"w\":1440,\"url\":\"/journey/999999\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"
+== /collection/nope
+"{\"w\":1440,\"url\":\"/collection/nope\",\"status\":\"Page Not Found — Awesome Video\",\"h1\":[\"Page Not Found\"],\"canon\":null,\"robots\":\"noindex, nofollow\",\"ogurl\":\"https://awesome.video/\",\"hold\":false,\"sw\":1434,\"offenders\":[],\"small\":[]}"

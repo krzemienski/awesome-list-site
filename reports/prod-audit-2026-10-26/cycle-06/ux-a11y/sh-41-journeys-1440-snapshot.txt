@@ -1,0 +1,130 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e40]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e41]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings, Journeys section open" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+            - StaticText "Journeys section open"
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [ref=e20]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e21]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e22]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e23]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e24]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e25]
+                - StaticText "Export"
+              - tab "Database" [ref=e26]
+                - StaticText "Database"
+              - tab "Resources" [ref=e27]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e28]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e29]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e30]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e31]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e32]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e33]
+                - StaticText "Audit"
+              - tab "Research" [ref=e34]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Journeys" [ref=e17] focusable [tabindex]
+            - article
+              - image
+              - StaticText "Learning Journeys"
+              - StaticText "Edit the steps shown on each learning journey. Changes go live immediately."
+              - StaticText "Video Streaming Fundamentals"
+              - StaticText "INTRO & LEARNING"
+              - StaticText "6"
+              - StaticText " STEPS"
+              - paragraph
+                - StaticText "Learn how video actually gets from a camera to a screen: containers vs. codecs, adaptive bitrate streaming, HLS and DASH basics, and the playback pipeline. By the end you will read encoding ladders and manifest files with confidence."
+              - button "Steps for Video Streaming Fundamentals" [ref=e35]
+                - image
+                - StaticText "Steps"
+              - StaticText "Building Your First Streaming Platform"
+              - StaticText "INFRASTRUCTURE & DELIVERY"
+              - StaticText "6"
+              - StaticText " STEPS"
+              - paragraph
+                - StaticText "Assemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of managed versus self-hosted infrastructure."
+              - button "Steps for Building Your First Streaming Platform" [ref=e36]
+                - image
+                - StaticText "Steps"
+              - StaticText "FFmpeg Mastery"
+              - StaticText "ENCODING & CODECS"
+              - StaticText "6"
+              - StaticText " STEPS"
+              - paragraph
+                - StaticText "Go deep on FFmpeg as a production tool: filter graphs, hardware acceleration, x264/x265/AV1 rate-control tuning, audio pipelines, and scripted batch workflows. Learn to debug problem files with ffprobe and build repeatable encoding recipes."
+              - button "Steps for FFmpeg Mastery" [ref=e37]
+                - image
+                - StaticText "Steps"
+              - StaticText "Advanced Live Streaming Architecture"
+              - StaticText "PROTOCOLS & TRANSPORT"
+              - StaticText "6"
+              - StaticText " STEPS"
+              - paragraph
+                - StaticText "Design live systems that hold up at scale: low-latency HLS and WebRTC, SRT contribution links, redundant ingest, failover origins, and real-time monitoring. Focuses on protocol tradeoffs and architecture patterns used by large live platforms."
+              - button "Steps for Advanced Live Streaming Architecture" [ref=e38]
+                - image
+                - StaticText "Steps"
+              - StaticText "DRM & Content Protection"
+              - StaticText "GENERAL TOOLS"
+              - StaticText "6"
+              - StaticText " STEPS"
+              - paragraph
+                - StaticText "Protect premium content end to end: how Widevine, FairPlay, and PlayReady actually work, CENC packaging, license servers, key rotation, and forensic watermarking, plus the practical tradeoffs between security and playback reach."
+              - button "Steps for DRM & Content Protection" [ref=e39]
+                - image
+                - StaticText "Steps"

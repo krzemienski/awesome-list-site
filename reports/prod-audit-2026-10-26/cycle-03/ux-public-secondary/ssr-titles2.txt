@@ -1,0 +1,13 @@
+/advanced -> Advanced — Awesome Video
+/about -> About — Awesome Video
+/recommendations -> Personalized Recommendations — Awesome Video
+/sign-in -> Sign In — Awesome Video
+/sign-up -> Create an Account — Awesome Video
+/settings/theme -> Theme Settings — Awesome Video
+/privacy -> Privacy Policy — Awesome Video
+/terms -> Terms of Use — Awesome Video
+/bookmarks -> Bookmarks — Awesome Video
+/submit -> Submit a Resource — Awesome Video
+/category/encoding-codecs -> Video Encoding &amp; Codecs: AV1, HEVC, H.264 — Awesome Video
+/code-of-conduct -> Code of Conduct — Awesome Video
+/journey/8 -> FFmpeg Mastery — Awesome Video

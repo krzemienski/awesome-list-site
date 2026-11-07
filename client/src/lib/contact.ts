@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { retryOptionalChunks } from "@/lib/lazy-optional";
 export { preferredContactDestination } from "@shared/contact-destination";
 
 const CONTACT_VARIANTS = ["a", "b", "c", "d", "e"] as const;
@@ -62,10 +63,23 @@ export function useContactConfig(enabled = contactVariant !== null) {
     // Contact configuration is client-only. It is intentionally not part of
     // the bounded anonymous Home SSR payload.
     enabled: enabled && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000,
+    // Process config: only a redeploy changes it, and a redeploy reloads the page.
+    staleTime: Infinity,
   });
 }
 
+const PENDING_OPEN_TTL_MS = 10_000;
+let contactOpenRequestedAt = 0;
+
+/** True once, when a recent open request found no dialog host listening. */
+export function takePendingContactOpen() {
+  const pending = Date.now() - contactOpenRequestedAt < PENDING_OPEN_TTL_MS;
+  contactOpenRequestedAt = 0;
+  return pending;
+}
+
 export function openContactForm() {
+  contactOpenRequestedAt = Date.now();
+  retryOptionalChunks();
   window.dispatchEvent(new CustomEvent("awesome:open-contact-form"));
 }

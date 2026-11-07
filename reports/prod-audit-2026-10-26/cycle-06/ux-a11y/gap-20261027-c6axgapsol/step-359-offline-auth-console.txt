@@ -1,0 +1,22 @@
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] Route render error: {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] [ErrorPage] {stack: "TypeError: Could not load resources from /api/awes…awesome.video/assets/index-0OZjaKaA.js:49:142897)", message: "Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).", cause: TypeError: Failed to fetch
+    at Dr (https://awesome.video/assets/index-0OZjaKaA.js:9:126958)
+    …}
+[error] {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}
+[error] Route render error: {stack: "Error: Unable to preload CSS for /assets/discovery…://awesome.video/assets/index-0OZjaKaA.js:2:2379)", message: "Unable to preload CSS for /assets/discovery-tools-Cl7Wg0ka.css"}

@@ -6,7 +6,10 @@
  */
 
 import type { ResourceKind } from "@shared/resourceKinds";
+import { isRealCategory } from "@shared/catalog-counts";
+import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
 import { apiRequest, catalogRequestCache } from "@/lib/queryClient";
+import { apiFetch } from "./api-fetch";
 
 /**
  * Fetch the awesome-list payload with a per-attempt timeout and one retry.
@@ -20,7 +23,7 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { signal: controller.signal, credentials: 'same-origin', cache: catalogRequestCache() });
+    return await apiFetch(url, { signal: controller.signal, credentials: 'same-origin', cache: catalogRequestCache() });
   } finally {
     clearTimeout(timer);
   }
@@ -78,7 +81,12 @@ export async function fetchStaticAwesomeList(): Promise<any> {
           : err instanceof Error
             ? err.message
             : String(err);
-        throw new Error(`Could not load resources from ${url} — ${why} (attempt ${attempt}/${AWESOME_LIST_MAX_ATTEMPTS}).`);
+        const message = `Could not load resources from ${url} — ${why} (attempt ${attempt}/${AWESOME_LIST_MAX_ATTEMPTS}).`;
+        // A connection-level failure (fetch rejected or timed out) stays a
+        // TypeError so ErrorPage's network-failure auto-retry recognises it;
+        // HTTP and parse errors stay plain Errors and are not retried.
+        if (isAbort || err instanceof TypeError) throw new TypeError(message, { cause: err });
+        throw new Error(message);
       }
       await new Promise((r) => setTimeout(r, 500 * attempt));
     }
@@ -92,46 +100,17 @@ export async function fetchStaticAwesomeList(): Promise<any> {
  * slug resolution. Pages that don't render resource listings use this ~few-KB
  * payload instead of the ~2.7MB corpus.
  */
-export interface AwesomeListNavNode {
-  name: string;
-  slug?: string;
-  resourceCount: number;
-  /** Run23 R-06: first direct resource's blurb so Home cards render nav-only. */
-  teaser?: { title: string; description: string };
-  subcategories?: AwesomeListNavNode[];
-  subSubcategories?: AwesomeListNavNode[];
-}
-
-export interface AwesomeListNav {
-  title?: string;
-  totalResources: number;
-  categories: AwesomeListNavNode[];
-}
-
-const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
-
-export function isRealCategory(name: string): boolean {
-  return (
-    name !== "Table of contents" &&
-    !name.startsWith("List of") &&
-    !EXCLUDED_CATEGORY_NAMES.includes(name)
-  );
-}
-
-export function navTotalCount(node: AwesomeListNavNode): number {
-  let total = node.resourceCount ?? 0;
-  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
-  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
-  return total;
-}
+/** The nav tree contract lives in shared/catalog-nav.ts with its one producer. */
+export type AwesomeListNavNode = CatalogNavNode;
+export type AwesomeListNav = CatalogNav;
 
 // C8-V1-01: the taxonomy the public site shows (Home, About, /categories,
 // sidebar): real categories holding resources, with empty subcategories and
 // sub-subcategories pruned. Counts shown to visitors derive from this tree.
 export function visibleNavCategories(
-  categories: AwesomeListNavNode[] | undefined,
-): AwesomeListNavNode[] {
-  const nonEmpty = (node: AwesomeListNavNode) => navTotalCount(node) > 0;
+  categories: CatalogNavCategory[] | undefined,
+): CatalogNavCategory[] {
+  const nonEmpty = (node: AwesomeListNavNode) => node.totalResourceCount > 0;
   return (categories ?? [])
     .filter((cat) => isRealCategory(cat.name) && nonEmpty(cat))
     .map((cat) => ({
@@ -145,6 +124,7 @@ export function visibleNavCategories(
       subSubcategories: (cat.subSubcategories ?? []).filter(nonEmpty),
     }));
 }
+
 
 /**
  * Routes whose CONTENT needs the full corpus (resource listings / client-side
@@ -176,6 +156,7 @@ export interface AwesomeListListing {
   totalAll: number;
   generalCount: number;
   scopeIntro: string;
+  scopeIntroTagged: string;
   scope: {
     ignoredSubcategory: boolean;
     ignoredSubSubcategory: boolean;

@@ -1,0 +1,201 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 3,826 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 3,826 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+          - link "Admin" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+        - button "Admin, account menu" [ref=e25] [cursor=pointer]:
+          - generic [ref=e27]: A
+          - generic [ref=e28]: Admin
+          - generic [ref=e29]: Admin, account menu
+      - generic [ref=e31]:
+        - main [ref=e32]:
+          - generic [ref=e33]:
+            - navigation "Breadcrumb" [ref=e34]:
+              - list [ref=e35]:
+                - listitem [ref=e36]:
+                  - link "Home" [ref=e37] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e38]:
+                  - img [ref=e39]
+                - listitem:
+                  - link "Bookmarks" [disabled]
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: // Learning library
+                - generic [ref=e44]:
+                  - generic [ref=e45]:
+                    - generic [ref=e46]:
+                      - img [ref=e47]
+                      - heading "Saved, then finished." [level=1] [ref=e49]:
+                        - text: Saved, then
+                        - emphasis [ref=e50]: finished.
+                    - paragraph [ref=e51]: Turn bookmarks into a queue you can actually work through.
+                  - button "New collection" [ref=e52] [cursor=pointer]:
+                    - img
+                    - text: New collection
+              - region "Library summary" [ref=e53]:
+                - button "12 Active" [ref=e54] [cursor=pointer]:
+                  - generic [ref=e55]: "12"
+                  - text: Active
+                - button "12 Saved" [ref=e56] [cursor=pointer]:
+                  - generic [ref=e57]: "12"
+                  - text: Saved
+                - button "0 Watch next" [active] [ref=e58] [cursor=pointer]:
+                  - generic [ref=e59]: "0"
+                  - text: Watch next
+                - button "0 In progress" [ref=e60] [cursor=pointer]:
+                  - generic [ref=e61]: "0"
+                  - text: In progress
+                - button "0 Done" [ref=e62] [cursor=pointer]:
+                  - generic [ref=e63]: "0"
+                  - text: Done
+                - button "0 Archived" [ref=e64] [cursor=pointer]:
+                  - generic [ref=e65]: "0"
+                  - text: Archived
+              - generic [ref=e66]:
+                - complementary "Bookmark collections" [ref=e67]:
+                  - button "All saved 12" [pressed] [ref=e69] [cursor=pointer]:
+                    - generic [ref=e70]:
+                      - img [ref=e71]
+                      - text: All saved
+                    - generic [ref=e73]: "12"
+                - generic [ref=e74]:
+                  - region "Library filters" [ref=e75]:
+                    - generic [ref=e76]:
+                      - generic [ref=e77] [cursor=pointer]: Queue status
+                      - combobox "Queue status" [ref=e78] [cursor=pointer]:
+                        - generic: Watch next
+                        - img [ref=e79]
+                    - generic [ref=e81]:
+                      - generic [ref=e82] [cursor=pointer]: Visibility
+                      - combobox "Visibility" [ref=e83] [cursor=pointer]:
+                        - generic: Active bookmarks
+                        - img [ref=e84]
+                    - generic [ref=e86]:
+                      - generic [ref=e87] [cursor=pointer]: Sort
+                      - combobox "Sort" [ref=e88] [cursor=pointer]:
+                        - generic: Newest saved
+                        - img [ref=e89]
+                  - generic [ref=e92]:
+                    - paragraph [ref=e93]: ── NO MATCHES
+                    - heading "Nothing matches this view" [level=2] [ref=e94]
+                    - generic [ref=e95]: Try another collection, status, or archive filter.
+                    - button "Clear filters" [ref=e97] [cursor=pointer]
+        - contentinfo [ref=e98]:
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - paragraph [ref=e101]: ── INDEX
+              - link "awesome.video home" [ref=e102] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e103]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e105]:
+              - heading "INDEXED" [level=2] [ref=e106]
+              - paragraph [ref=e107]: 3,826
+              - paragraph [ref=e108]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e109]: live
+            - navigation "Explore categories" [ref=e111]:
+              - heading "EXPLORE" [level=2] [ref=e112]
+              - generic [ref=e113]:
+                - link "Community & Events" [ref=e114] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e115]: ◈
+                  - generic [ref=e116]: Community
+                - link "Encoding & Codecs" [ref=e117] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e118]: ◇
+                  - generic [ref=e119]: Encoding
+                - link "General Tools" [ref=e120] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e121]: ◆
+                  - generic [ref=e122]: General
+                - link "Infrastructure & Delivery" [ref=e123] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e124]: ▣
+                  - generic [ref=e125]: Infrastructure
+                - link "Intro & Learning" [ref=e126] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e127]: ▤
+                  - generic [ref=e128]: Intro
+                - link "Media Tools" [ref=e129] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e130]: ▥
+                  - generic [ref=e131]: Media
+                - link "Players & Clients" [ref=e132] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e133]: ▶
+                  - generic [ref=e134]: Players
+                - link "Protocols & Transport" [ref=e135] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e136]: ⟁
+                  - generic [ref=e137]: Protocols
+                - link "Standards & Industry" [ref=e138] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e139]: ◉
+                  - generic [ref=e140]: Standards
+            - generic [ref=e141]:
+              - heading "SOURCE" [level=2] [ref=e142]
+              - link "krzemienski/awesome-video" [ref=e143] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e144]
+                - generic [ref=e146]:
+                  - text: krzemienski
+                  - generic [ref=e147]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e148]: ↗
+              - paragraph [ref=e149]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e150] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e152] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e153]:
+            - generic [ref=e154]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e155]:
+              - link "About" [ref=e156] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e157] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e158] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e159] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e160] [cursor=pointer]
+              - link "Issues ↗" [ref=e161] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e162] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e163]: built with the awesome-list framework

@@ -1,0 +1,1 @@
+"{\"url\":\"https://awesome.video/search?q=ffmpeg&category=Encoding+%26+Codecs\",\"pressed\":\"true\",\"live\":[{\"role\":\"status\",\"live\":\"polite\",\"text\":\"\"},{\"role\":null,\"live\":\"polite\",\"text\":\"1 filter applied.\"}],\"footer\":[{\"x\":24,\"y\":1124,\"width\":311,\"height\":44,\"top\":1124,\"right\":335,\"bottom\":1168,\"left\":24}]}"

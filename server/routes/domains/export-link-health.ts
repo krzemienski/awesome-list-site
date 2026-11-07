@@ -68,8 +68,9 @@ import {
   resourceKindSchema,
   type ResourceKind,
 } from "@shared/resourceKinds";
-import { taxonomyScopeIntro } from "@shared/seo-content-templates";
+import { taxonomyScopeIntro, type TaxonomyIntroInput } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
+import { describeTaxonomyPlan } from "@shared/github-import";
 import { db, runInTransaction } from "../../db";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
@@ -84,7 +85,6 @@ import {
 } from "../../http-cache-policy";
 import {
   LISTING_PAGE_SIZE,
-  countNodeResources,
   findCategory,
   findSubcategory,
   findSubSubcategory,
@@ -93,6 +93,8 @@ import {
   type ListingLevel,
 } from "../../seo-content";
 import { normalizeTagFilter } from "@shared/tagNormalize";
+import { corpusTotalCount } from "@shared/catalog-counts";
+import { loadCatalogNavPayload } from "../../home-ssr-data";
 import { resolveResourceKind } from "../../lib/resourceKinds";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
@@ -118,6 +120,9 @@ import type {
   LegacyRepository,
 } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("admin-ops");
 /**
  * Explicit dependency context for the export/link-health/GitHub-sync routes
  * and the public awesome-list/discovery routes. Everything the handlers need —
@@ -198,7 +203,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(result);
     } catch (error) {
-      console.error('Error configuring GitHub repository:', error);
+      logger.error('Error configuring GitHub repository:', error);
       res.status(500).json({ message: 'Failed to configure GitHub repository' });
     }
   }));
@@ -219,6 +224,10 @@ export function registerExportLinkHealthRoutes(
         return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
       }
       
+      if ((options as { dryRun?: unknown }).dryRun) {
+        return res.status(400).json({ message: 'Dry runs are not queued. Use POST /api/admin/import-github with dryRun: true, which returns the plan synchronously.' });
+      }
+
       // Add to queue for processing
       // The branch is recorded once the sync has resolved it; the column's
       // 'main' default would otherwise mislabel repos on another branch.
@@ -237,7 +246,7 @@ export function registerExportLinkHealthRoutes(
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
           const result = await syncService.importFromGitHub(repositoryUrl, options, { queueRowOwnedByCaller: true });
-          console.log('GitHub import completed:', result);
+          logger.info('GitHub import completed:', result);
           const completed = result.errors.length === 0 || result.imported > 0 || result.updated > 0;
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
@@ -254,7 +263,7 @@ export function registerExportLinkHealthRoutes(
             result.branch,
           );
         } catch (error) {
-          console.error('GitHub import failed:', error);
+          logger.error('GitHub import failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             'failed',
@@ -270,7 +279,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting GitHub import:', error);
+      logger.error('Error starting GitHub import:', error);
       if (queueItemId !== undefined) {
         await githubSyncRepo.updateGithubSyncStatus(
           queueItemId,
@@ -325,20 +334,30 @@ export function registerExportLinkHealthRoutes(
       await startHeavyWork('github-sync', () => syncService.runOwnedQueueItem(queueItem.id, async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
-          const result = await syncService.exportToGitHub(repositoryUrl, options);
+          const result = await syncService.exportToGitHub(repositoryUrl, { ...options, queueId: queueItem.id });
           if (result.errors.length > 0) {
-            console.error('GitHub export failed:', result.errors);
-            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '), undefined, result.branch);
+            logger.error('GitHub export failed:', result.errors);
+            // A failure after the commit landed keeps that commit's identity on
+            // this run's row, so the panel can say the commit is on GitHub.
+            await githubSyncRepo.updateGithubSyncStatus(
+              queueItem.id,
+              'failed',
+              result.errors.join('; '),
+              result.commitSha
+                ? { exported: result.exported, commitSha: result.commitSha, commitUrl: result.commitUrl }
+                : undefined,
+              result.branch,
+            );
             return;
           }
-          console.log('GitHub export completed:', result);
+          logger.info('GitHub export completed:', result);
           await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'completed', undefined, {
             exported: result.exported,
             commitSha: result.commitSha,
             commitUrl: result.commitUrl
           }, result.branch);
         } catch (error) {
-          console.error('GitHub export failed:', error);
+          logger.error('GitHub export failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             'failed',
@@ -354,7 +373,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting GitHub export:', error);
+      logger.error('Error starting GitHub export:', error);
       if (queueItemId !== undefined) {
         await githubSyncRepo.updateGithubSyncStatus(
           queueItemId,
@@ -367,10 +386,71 @@ export function registerExportLinkHealthRoutes(
   }));
   
   // GET /api/github/sync-status - Check sync queue status
+  // Which queue run a history row belongs to. Identity first: exports stamp
+  // their queue id into the history row and their commit SHA into the queue
+  // row (also when bookkeeping after the commit fails). Timestamps alone do
+  // not identify a run: a second export can be queued while the first runs,
+  // so overlapping windows would hand the first run's commit to the second.
+  // Legacy history rows (written before the queue id was stamped) are
+  // attributed only when exactly ONE same-repo, same-direction queue run was
+  // executing when the row was written; ambiguous overlaps match nothing.
+  const RUN_SLACK_MS = 5_000;
+  type RunWindow = {
+    id: number;
+    repositoryUrl: string;
+    action: string;
+    metadata: unknown;
+    createdAt: Date | string | null;
+    processedAt: Date | string | null;
+  };
+  type HistoryRef = {
+    repositoryUrl: string;
+    direction: string;
+    commitSha: string | null;
+    metadata: unknown;
+    createdAt: Date | string | null;
+  };
+  const executingAt = (at: number, q: RunWindow): boolean => {
+    if (!q.createdAt) return false;
+    const start = new Date(q.createdAt).getTime() - RUN_SLACK_MS;
+    const end = new Date(q.processedAt ?? q.createdAt).getTime() + RUN_SLACK_MS;
+    return at >= start && at <= end;
+  };
+  const historyBelongsToRun = (h: HistoryRef, q: RunWindow, allRuns: RunWindow[]): boolean => {
+    if (h.repositoryUrl !== q.repositoryUrl || h.direction !== q.action) return false;
+    const stampedQueueId = (h.metadata as Record<string, unknown> | null)?.queueId;
+    if (typeof stampedQueueId === 'number') return stampedQueueId === q.id;
+    const runSha = (q.metadata as Record<string, unknown> | null)?.commitSha;
+    if (typeof runSha === 'string' && runSha && h.commitSha) return runSha === h.commitSha;
+    if (!h.createdAt) return false;
+    const at = new Date(h.createdAt).getTime();
+    const executing = allRuns.filter(r =>
+      r.repositoryUrl === h.repositoryUrl && r.action === h.direction && executingAt(at, r));
+    return executing.length === 1 && executing[0].id === q.id;
+  };
+
   app.get('/api/github/sync-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const status = req.query.status as string;
       const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
+      // A failed export whose commit DID land on GitHub (only the bookkeeping
+      // after the commit failed) is not a failed export: report it as
+      // completed with the original error kept as a note, so the panel never
+      // tells admins an export failed when its commit is on GitHub.
+      const hasFailedExport = queueItems.some(q => q.status === 'failed' && q.action === 'export');
+      const commitSummaries = hasFailedExport ? await githubSyncRepo.getRecentCommitSummaries(50) : [];
+      // Legacy attribution must see every run, not just the status-filtered page.
+      const allRuns = hasFailedExport && status ? await githubSyncRepo.getGithubSyncQueue() : queueItems;
+      const landedCommitFor = (q: typeof queueItems[number]): string | null => {
+        if (q.status !== 'failed' || q.action !== 'export') return null;
+        const md = (q.metadata ?? {}) as Record<string, any>;
+        if (typeof md.commitSha === 'string' && md.commitSha) return md.commitSha;
+        const match = commitSummaries.find(h =>
+          !!h.commitSha &&
+          (h.metadata as Record<string, unknown> | null)?.outcome !== 'failed' &&
+          historyBelongsToRun(h, q, allRuns));
+        return match?.commitSha ?? null;
+      };
 
       // Run23 NB-038: the queue list used to ship every row's full
       // resourceIds array (thousands of ids per export row) + raw metadata —
@@ -384,13 +464,18 @@ export function registerExportLinkHealthRoutes(
           const md = (q.metadata ?? {}) as Record<string, any>;
           const count = (v: unknown): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
           const errorMessages: string[] = Array.isArray(md.errorMessages) ? md.errorMessages.map(String) : [];
+          const landedCommit = landedCommitFor(q);
           return {
           id: q.id,
           repositoryUrl: q.repositoryUrl,
           branch: q.branch,
           action: q.action,
-          status: md.outcome === 'partial' ? 'partial' : q.status,
-          errorMessage: q.errorMessage ?? (errorMessages.length ? errorMessages.join('; ') : null),
+          status: landedCommit ? 'completed' : md.outcome === 'partial' ? 'partial' : q.status,
+          committedDespiteError: landedCommit ? true : undefined,
+          commitSha: landedCommit ?? undefined,
+          errorMessage: landedCommit
+            ? `Commit ${landedCommit.slice(0, 7)} landed on GitHub; only the bookkeeping after the commit failed${q.errorMessage ? ` (${q.errorMessage})` : ''}.`
+            : q.errorMessage ?? (errorMessages.length ? errorMessages.join('; ') : null),
           importResult: q.action === 'import' && q.status !== 'pending' && q.status !== 'processing'
             ? {
                 imported: count(md.imported),
@@ -408,7 +493,7 @@ export function registerExportLinkHealthRoutes(
         })
       });
     } catch (error) {
-      console.error('Error fetching sync status:', error);
+      logger.error('Error fetching sync status:', error);
       res.status(500).json({ message: 'Failed to fetch sync status' });
     }
   }));
@@ -426,7 +511,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(item);
     } catch (error) {
-      console.error('Error fetching sync item:', error);
+      logger.error('Error fetching sync item:', error);
       res.status(500).json({ message: 'Failed to fetch sync item' });
     }
   }));
@@ -439,7 +524,7 @@ export function registerExportLinkHealthRoutes(
       // long-lived deployments), so the panel showed "no syncs" despite
       // completed runs. Merge terminal queue rows into the history shape,
       // skipping any queue row that has a matching canonical history row
-      // (same repo + direction within 10 min) to avoid double-counting runs
+      // (see historyBelongsToRun) to avoid double-counting runs
       // recorded in BOTH tables.
       const [history, queueItems] = await Promise.all([
         githubSyncRepo.getSyncHistory(),
@@ -447,14 +532,9 @@ export function registerExportLinkHealthRoutes(
       ]);
 
       const unwrap = (v: any): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
-      const TEN_MIN = 10 * 60 * 1000;
       const fromQueue = queueItems
         .filter(q => q.status === 'completed' || q.status === 'failed')
-        .filter(q => !history.some(h =>
-          h.repositoryUrl === q.repositoryUrl &&
-          h.direction === q.action &&
-          Math.abs(new Date(h.createdAt!).getTime() - new Date((q.processedAt ?? q.createdAt)!).getTime()) < TEN_MIN
-        ))
+        .filter(q => !history.some(h => historyBelongsToRun(h, q, queueItems)))
         .map(q => {
           const md = (q.metadata ?? {}) as Record<string, any>;
           const added = md.diff?.added ?? unwrap(md.imported);
@@ -470,12 +550,18 @@ export function registerExportLinkHealthRoutes(
             // ADM-03/04: carry the outcome so the UI can badge failed/orphaned
             // rows honestly instead of rendering every row as a success.
             // F13: a partial import stays partial in history too.
-            status: md.outcome === 'partial' ? 'partial' : q.status,
+            // An export whose commit landed is not a failed export, even
+            // when the bookkeeping after the commit failed.
+            status: q.status === 'failed' && q.action === 'export' && md.commitSha
+              ? 'completed'
+              : md.outcome === 'partial' ? 'partial' : q.status,
             commitSha: md.commitSha ?? null,
             // A failure reason is not a commit message; the panel labels
             // errorMessage as "Error".
             commitMessage: md.commitMessage ?? null,
-            errorMessage: q.status === 'failed'
+            errorMessage: q.status === 'failed' && q.action === 'export' && md.commitSha
+              ? null
+              : q.status === 'failed'
               ? (q.errorMessage || 'Sync failed')
               : md.outcome === 'partial'
                 ? (Array.isArray(md.errorMessages) ? md.errorMessages.join('; ') : (q.errorMessage || null))
@@ -506,9 +592,12 @@ export function registerExportLinkHealthRoutes(
         // badged like the Recent Sync Jobs section, not shown as successes.
         const outcome = (h.metadata as any)?.outcome;
         const status = outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed';
+        // A run that has a queue row goes by that job's id, the one Recent
+        // Sync Jobs shows; only a run with no queue row keeps its own id.
+        const job = queueItems.find(q => historyBelongsToRun(h, q, queueItems));
         return {
           id: h.id,
-          label: `Run #${h.id}`,
+          label: job ? `Job #${job.id}` : `Run #${h.id}`,
           repositoryUrl: h.repositoryUrl,
           direction: h.direction,
           status,
@@ -530,7 +619,7 @@ export function registerExportLinkHealthRoutes(
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
       ));
     } catch (error) {
-      console.error('Error fetching sync history:', error);
+      logger.error('Error fetching sync history:', error);
       res.status(500).json({ message: 'Failed to fetch sync history' });
     }
   }));
@@ -541,7 +630,7 @@ export function registerExportLinkHealthRoutes(
       // Acquire bounded heavy-work capacity before acknowledging the job.
       await startHeavyWork('github-sync', async () => {
         await syncService.processQueue();
-        console.log('GitHub sync queue processing completed');
+        logger.info('GitHub sync queue processing completed');
       });
       
       res.json({
@@ -549,7 +638,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting queue processing:', error);
+      logger.error('Error starting queue processing:', error);
       sendOperationalFailure(res, error, 'Failed to start queue processing');
     }
   }));
@@ -596,7 +685,7 @@ export function registerExportLinkHealthRoutes(
       
       res.send(markdown);
     } catch (error) {
-      console.error('Error generating awesome list export:', error);
+      logger.error('Error generating awesome list export:', error);
       sendOperationalFailure(res, error, 'Failed to generate awesome list export');
     }
   }));
@@ -637,7 +726,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Content-Disposition', `attachment; filename="resources-export-${new Date().toISOString().slice(0, 10)}.csv"`);
       res.send(lines.join('\r\n') + '\r\n');
     } catch (error) {
-      console.error('Error generating CSV export:', error);
+      logger.error('Error generating CSV export:', error);
       sendOperationalFailure(res, error, 'Failed to generate CSV export');
     }
   }));
@@ -728,7 +817,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Content-Disposition', `attachment; filename="awesome-video-categories-${new Date().toISOString().slice(0, 10)}.opml"`);
       res.send(body);
     } catch (error) {
-      console.error('Error generating OPML export:', error);
+      logger.error('Error generating OPML export:', error);
       sendOperationalFailure(res, error, 'Failed to generate OPML export');
     }
   }));
@@ -886,7 +975,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(exportData);
     } catch (error) {
-      console.error('Error generating JSON export:', error);
+      logger.error('Error generating JSON export:', error);
       sendOperationalFailure(res, error, 'Failed to generate JSON export');
     }
   }));
@@ -957,7 +1046,7 @@ export function registerExportLinkHealthRoutes(
         backups: backups.map(summarizeBackup),
       });
     } catch (error) {
-      console.error('Error listing database backups:', error);
+      logger.error('Error listing database backups:', error);
       sendBackupFailure(res, error, 'Failed to list database backups');
     }
   }));
@@ -985,7 +1074,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Cache-Control', 'no-store');
       res.status(201).json(summarizeBackup(manifest));
     } catch (error) {
-      console.error('Error creating database backup:', error);
+      logger.error('Error creating database backup:', error);
       sendBackupFailure(res, error, 'Failed to create database backup');
     }
   }));
@@ -1032,7 +1121,7 @@ export function registerExportLinkHealthRoutes(
         report: formatValidationReport(validationResult)
       });
     } catch (error) {
-      console.error('Error validating awesome list:', error);
+      logger.error('Error validating awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to validate awesome list');
     }
   }));
@@ -1055,7 +1144,7 @@ export function registerExportLinkHealthRoutes(
         res.status(409).json({ success: false, started: false, message: error.message, job, scope: 'stored-approved-resource-urls' });
       }
     } catch (error) {
-      console.error('Error starting export link check:', error);
+      logger.error('Error starting export link check:', error);
       sendOperationalFailure(res, error, 'Failed to start link check');
     }
   }));
@@ -1073,7 +1162,7 @@ export function registerExportLinkHealthRoutes(
         lastUpdated: validationResults?.lastUpdated ?? null,
       });
     } catch (error) {
-      console.error('Error fetching validation status:', error);
+      logger.error('Error fetching validation status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch validation status');
     }
   }));
@@ -1087,7 +1176,7 @@ export function registerExportLinkHealthRoutes(
       const job = await linkHealthService.getLatestJob();
       res.json({ success: true, job: job || null });
     } catch (error) {
-      console.error('Error fetching link health status:', error);
+      logger.error('Error fetching link health status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health status');
     }
   }));
@@ -1099,7 +1188,7 @@ export function registerExportLinkHealthRoutes(
       const job = await linkHealthService.startCheck();
       res.json({ success: true, job });
     } catch (error: any) {
-      console.error('Error starting link health check:', error);
+      logger.error('Error starting link health check:', error);
       if (error.message?.includes('already running')) {
         return res.status(409).json({ success: false, message: error.message });
       }
@@ -1127,7 +1216,7 @@ export function registerExportLinkHealthRoutes(
       }
       res.json({ success: true, job });
     } catch (error) {
-      console.error('Error cancelling link health job:', error);
+      logger.error('Error cancelling link health job:', error);
       sendOperationalFailure(res, error, 'Failed to cancel link health job');
     }
   }));
@@ -1139,7 +1228,7 @@ export function registerExportLinkHealthRoutes(
       const history = await linkHealthService.getJobHistory();
       res.json({ success: true, jobs: history });
     } catch (error) {
-      console.error('Error fetching link health history:', error);
+      logger.error('Error fetching link health history:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health history');
     }
   }));
@@ -1152,7 +1241,7 @@ export function registerExportLinkHealthRoutes(
       const brokenLinks = await linkHealthService.getBrokenLinks(filter);
       res.json({ success: true, checks: brokenLinks });
     } catch (error) {
-      console.error('Error fetching broken links:', error);
+      logger.error('Error fetching broken links:', error);
       sendOperationalFailure(res, error, 'Failed to fetch broken links');
     }
   }));
@@ -1164,7 +1253,7 @@ export function registerExportLinkHealthRoutes(
   // - Manual admin intervention when needed
   app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
-      console.log('Starting manual database seeding...');
+      logger.info('Starting manual database seeding...');
       
       // Get options from request body
       const { clearExisting = false } = req.body;
@@ -1190,7 +1279,7 @@ export function registerExportLinkHealthRoutes(
         totalErrors: result.errors.length
       });
     } catch (error: any) {
-      console.error('Error seeding database:', error);
+      logger.error('Error seeding database:', error);
       if (error instanceof SeedAbortedError) {
         // Nothing was committed; the message says why and that the catalog
         // is unchanged, so the admin sees the real reason.
@@ -1218,7 +1307,7 @@ export function registerExportLinkHealthRoutes(
         return res.status(400).json({ message: 'Repository URL is required' });
       }
 
-      console.log(`Starting GitHub import from: ${repoUrl}`);
+      logger.info(`Starting GitHub import from: ${repoUrl}`);
       
       // Use the sync service to import
       const result = await runHeavyWork(
@@ -1226,7 +1315,7 @@ export function registerExportLinkHealthRoutes(
         () => syncService.importFromGitHub(repoUrl, { dryRun, strictMode }),
       );
       
-      console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      logger.info(`GitHub import ${dryRun ? 'dry run ' : ''}completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
       
       // F13: awesome-lint is informational on import (syncService never
       // blocks on it), so a lint-invalid list may already have written rows.
@@ -1237,6 +1326,7 @@ export function registerExportLinkHealthRoutes(
       const outcome = result.errors.length === 0
         ? 'completed'
         : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+      const taxonomyPlan = describeTaxonomyPlan(result.wouldCreateTaxonomy);
       res.status(outcome === 'failed' ? 422 : 200).json({
         success: outcome === 'completed',
         outcome,
@@ -1250,12 +1340,22 @@ export function registerExportLinkHealthRoutes(
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-        message: outcome === 'completed'
-          ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
-          : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
+        dryRun: Boolean(dryRun),
+        wouldCreateTaxonomy: result.wouldCreateTaxonomy,
+        // Set when the run stopped before it could plan every item (the
+        // README could not be read or parsed); the counts are then not a plan.
+        runError: result.runError ?? null,
+        // A dry run writes nothing, so its counts are what an import would do.
+        message: dryRun && result.runError
+          ? `Dry run of ${repoUrl} stopped before planning: ${result.runError}. Nothing was written.`
+          : dryRun
+          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}${taxonomyPlan ? ` and create ${taxonomyPlan}` : ''}. Nothing was written.`
+          : outcome === 'completed'
+            ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
+            : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
       });
     } catch (error: any) {
-      console.error('Error importing from GitHub:', error);
+      logger.error('Error importing from GitHub:', error);
       if (
         error instanceof ServiceUnavailableError ||
         isDatabaseUnavailableError(error)
@@ -1297,7 +1397,7 @@ export function registerExportLinkHealthRoutes(
         coveragePct: approvedTotal > 0 ? Math.round((tagged / approvedTotal) * 1000) / 10 : 0,
       });
     } catch (error) {
-      console.error('Error computing tag coverage:', error);
+      logger.error('Error computing tag coverage:', error);
       res.status(500).json({ message: 'Failed to compute tag coverage' });
     }
   }));
@@ -1332,7 +1432,7 @@ export function registerExportLinkHealthRoutes(
       });
       res.json({ backfilled, remainingNull: (remaining.rows as any[])[0].n });
     } catch (error) {
-      console.error('Error backfilling approved_at:', error);
+      logger.error('Error backfilling approved_at:', error);
       res.status(500).json({ message: 'Failed to backfill approved_at' });
     }
   }));
@@ -1390,7 +1490,7 @@ export function registerExportLinkHealthRoutes(
       if (resourcesUpdated > 0) invalidatePublicCache('resource-mutation');
       res.json({ variantFamiliesFound: variantFamilies, pluralMerges, resourcesUpdated });
     } catch (error) {
-      console.error('Error canonicalizing tags:', error);
+      logger.error('Error canonicalizing tags:', error);
       res.status(500).json({ message: 'Failed to canonicalize tags' });
     }
   }));
@@ -1526,7 +1626,7 @@ export function registerAwesomeListDiscoveryRoutes(
             // keeps `resources` in its original position, so cached and
             // uncached bodies are byte-identical for the same filter set.
             const body = JSON.stringify({ ...data, resources: filteredResources });
-            console.log(
+            logger.info(
               `📊 /api/awesome-list rebuild [${variantKey}]: ${filteredResources.length} resources, ${data.categories.length} categories`,
             );
             return {
@@ -1547,7 +1647,7 @@ export function registerAwesomeListDiscoveryRoutes(
       // deliberately not server-cached (unbounded key space).
       const data = await legacyRepo.getAwesomeListFromDatabase();
       if (!data?.resources?.length) {
-        console.warn('⚠️ No resources in database - database may need seeding');
+        logger.warn('⚠️ No resources in database - database may need seeding');
         return res.status(500).json({ message: 'No awesome list data available' });
       }
 
@@ -1560,7 +1660,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.category === categoryTitle
         );
-        console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
       }
 
       if (subcategory) {
@@ -1569,7 +1669,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.subcategory === subcategoryTitle
         );
-        console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
       }
 
       if (subSubcategory) {
@@ -1578,7 +1678,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.subSubcategory === subSubcategoryTitle
         );
-        console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
       }
 
       // Return filtered data
@@ -1587,12 +1687,12 @@ export function registerAwesomeListDiscoveryRoutes(
         resources: filteredResources
       };
       
-      console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
+      logger.info(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', UNCACHED_CATALOG_CACHE_CONTROL);
       res.json(filteredData);
     } catch (error) {
-      console.error('Error processing awesome list:', error);
+      logger.error('Error processing awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to process awesome list');
     }
   }));
@@ -1605,67 +1705,9 @@ export function registerAwesomeListDiscoveryRoutes(
   // render resource listings never download the corpus at all.
   app.get("/api/awesome-list/nav", resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
-      // Run23 R-06: each category carries a tiny teaser (first direct
-      // resource's title/description) so the Home grid renders card blurbs
-      // from the nav tree alone — without downloading the full corpus.
-      const payload = await getPublicCacheValue({
-        namespace: 'catalog-nav',
-        key: 'complete',
-        ttlMs: 60_000,
-        load: async () => {
-          // Keep the source read inside the derived cache loader so generation
-          // invalidation covers both the tree read and this projection.
-          const data = await legacyRepo.getAwesomeListFromDatabase();
-          if (!data?.categories?.length) {
-            throw new Error('No awesome list data available');
-          }
-          const nav = {
-            title: data.title,
-            totalResources: (data.resources || []).length,
-            categories: (data.categories || []).map((cat: any) => ({
-          name: cat.name,
-          slug: cat.slug,
-          resourceCount: (cat.resources || []).length,
-          teaser: (() => {
-            // Run25 C-03: categories with no DIRECT resources (e.g. Community
-            // & Events — everything lives in subcategories) got no teaser, so
-            // their Home card was the only one missing a "Featured:" line.
-            // Fall back to the first subcategory (then sub-subcategory)
-            // resource in tree order.
-            const first =
-              cat.resources?.[0] ??
-              (cat.subcategories || [])
-                .flatMap((sub: any) => [
-                  ...(sub.resources || []),
-                  ...(sub.subSubcategories || []).flatMap((ss: any) => ss.resources || []),
-                ])
-                .find(Boolean);
-            return first
-              ? {
-                  title: String(first.title || ''),
-                  description: String(first.description || '').slice(0, 200),
-                }
-              : undefined;
-          })(),
-          subcategories: (cat.subcategories || []).map((sub: any) => ({
-            name: sub.name,
-            slug: sub.slug,
-            resourceCount: (sub.resources || []).length,
-            subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
-              name: ss.name,
-              slug: ss.slug,
-              resourceCount: (ss.resources || []).length,
-            })),
-          })),
-            })),
-          };
-          const body = JSON.stringify(nav);
-          return {
-            body,
-            etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"',
-          };
-        },
-      });
+      // The same cached tree Home SSR renders (HomeNavRepository, the only nav
+      // producer), so a client cache seeded by either one holds one shape.
+      const payload = await loadCatalogNavPayload();
       res.set('ETag', payload.etag);
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
@@ -1674,7 +1716,7 @@ export function registerAwesomeListDiscoveryRoutes(
       }
       return res.type('application/json').send(payload.body);
     } catch (error) {
-      console.error('Error building awesome-list nav:', error);
+      logger.error('Error building awesome-list nav:', error);
       sendOperationalFailure(res, error, 'Failed to build navigation tree');
     }
   }));
@@ -1739,8 +1781,9 @@ export function registerAwesomeListDiscoveryRoutes(
       const kindMatches = (item: any): boolean =>
         requestedKind === undefined ||
         resolveResourceKind(item).kind === requestedKind;
-      const allResources = flattenListingResources(match.node, level as ListingLevel)
-        .filter(kindMatches);
+      const unfilteredResources = flattenListingResources(match.node, level as ListingLevel);
+      const unfilteredCount = unfilteredResources.length;
+      const allResources = unfilteredResources.filter(kindMatches);
       const requestedSubcategory =
         typeof req.query.subcategory === "string" ? req.query.subcategory : undefined;
       const requestedSubSubcategory =
@@ -1751,16 +1794,7 @@ export function registerAwesomeListDiscoveryRoutes(
           .filter(kindMatches)
           .map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
       );
-      const countNodeResourcesForKind = (node: any): number => {
-        let total = (node?.resources ?? []).filter(kindMatches).length;
-        for (const sub of node?.subcategories ?? []) {
-          total += countNodeResourcesForKind(sub);
-        }
-        for (const subSub of node?.subSubcategories ?? []) {
-          total += countNodeResourcesForKind(subSub);
-        }
-        return total;
-      };
+      const countNodeResourcesForKind = (node: any): number => corpusTotalCount(node, kindMatches);
 
       const children =
         level === "category"
@@ -1805,10 +1839,10 @@ export function registerAwesomeListDiscoveryRoutes(
       const total = scoped.length;
       const totalPages = Math.max(1, Math.ceil(total / LISTING_PAGE_SIZE));
       const start = (parsedPage - 1) * LISTING_PAGE_SIZE;
-      const scopeIntro = taxonomyScopeIntro({
+      const scopeIntroInput: TaxonomyIntroInput = {
         name: match.name,
         level,
-        totalResources: allResources.length,
+        totalResources: unfilteredCount,
         parentNames:
           level === "category"
             ? []
@@ -1816,11 +1850,21 @@ export function registerAwesomeListDiscoveryRoutes(
                 match.category?.name,
                 level === "sub-subcategory" ? match.subcategory?.name : undefined,
               ].filter((name): name is string => Boolean(name)),
-        childNames: children
-          .filter((child: any) => child.count > 0)
+        // The intro describes the whole scope (like totalResources), not the
+        // kind-filtered view, so ?kind= cannot drop children or formats.
+        childNames: (
+          level === "category"
+            ? match.node.subcategories ?? []
+            : level === "subcategory"
+              ? match.node.subSubcategories ?? []
+              : []
+        )
+          .filter((child: any) => corpusTotalCount(child) > 0)
           .map((child: any) => child.name),
-        formats: allResources.map((resource: any) => resource.resourceFormat),
-      });
+        formats: unfilteredResources.map((resource: any) => resource.resourceFormat),
+      };
+      const scopeIntro = taxonomyScopeIntro(scopeIntroInput);
+      const scopeIntroTagged = taxonomyScopeIntro({ ...scopeIntroInput, tagFiltered: true });
       const body = JSON.stringify({
         level,
         node: { name: match.name, slug },
@@ -1834,9 +1878,10 @@ export function registerAwesomeListDiscoveryRoutes(
         pageSize: LISTING_PAGE_SIZE,
         total,
         totalPages,
-        totalAll: allResources.length,
+        totalAll: unfilteredCount,
         generalCount: directResources.size,
         scopeIntro,
+        scopeIntroTagged,
         scope: { ignoredSubcategory, ignoredSubSubcategory, generalIgnored },
         children,
         tags,
@@ -1848,7 +1893,7 @@ export function registerAwesomeListDiscoveryRoutes(
       if (req.headers["if-none-match"] === etag) return res.status(304).end();
       return res.type("application/json").send(body);
     } catch (error) {
-      console.error("Error building awesome-list listing:", error);
+      logger.error("Error building awesome-list listing:", error);
       sendOperationalFailure(res, error, "Failed to build taxonomy listing");
     }
   }));
@@ -1865,7 +1910,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const result = await fetchAwesomeLists(page, perPage);
       res.json(result);
     } catch (error) {
-      console.error('Error fetching awesome lists from GitHub:', error);
+      logger.error('Error fetching awesome lists from GitHub:', error);
       res.status(500).json({ message: 'Failed to fetch awesome lists' });
     }
   }));
@@ -1886,7 +1931,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const result = await searchAwesomeLists(query, page);
       res.json(result);
     } catch (error) {
-      console.error('Error searching awesome lists:', error);
+      logger.error('Error searching awesome lists:', error);
       res.status(500).json({ message: 'Failed to search awesome lists' });
     }
   }));

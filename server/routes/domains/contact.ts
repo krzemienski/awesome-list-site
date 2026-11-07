@@ -38,6 +38,9 @@ import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("contact");
 
 export interface ContactRoutesContext {
   isAuthenticated: RequestHandler;
@@ -144,7 +147,7 @@ function sendDatabaseFailure(
   fallbackMessage: string,
 ): void {
   const databaseUnavailable = isDatabaseUnavailableError(error);
-  console.error(`[contact] ${logLabel}`, { databaseUnavailable });
+  logger.error(`[contact] ${logLabel}`, { databaseUnavailable });
   if (databaseUnavailable) {
     res.status(503).set("Retry-After", "1")
       .json({ message: "Contact service is temporarily unavailable" });
@@ -157,7 +160,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
   const { isAuthenticated, isAdmin, contactRepo } = ctx;
 
   if (config.contact.enabled && !isFormReady()) {
-    console.error(
+    logger.error(
       "[contact] CONTACT_ENABLED=true but neither CONTACT_IP_HASH_SECRET nor SESSION_SECRET (used to derive the key) is at least 16 characters; " +
         "POST /api/contact answers 503 and /api/config reports the form unavailable until it is set.",
     );
@@ -166,7 +169,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
   app.get("/api/config", (_req, res) => {
     // Pure function of process config: safe to cache briefly at the edge and
     // in the browser; a redeploy is the only thing that changes it.
-    res.set("Cache-Control", "public, max-age=300");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
     const sourceRepository = configuredSourceRepository();
     res.json({
       site: {
@@ -201,7 +204,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
       // nothing is stored. The limiter above has already counted the hit, so
       // a flood of trapped submissions still throttles.
       if (isHoneypotTriggered(input)) {
-        console.warn("[contact] honeypot triggered; submission discarded", {
+        logger.warn("[contact] honeypot triggered; submission discarded", {
           ipHashPrefix: ipHash.slice(0, 12),
         });
         return res.json({ id: randomUUID(), status: "received" });

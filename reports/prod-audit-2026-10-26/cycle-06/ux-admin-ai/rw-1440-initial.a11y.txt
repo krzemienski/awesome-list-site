@@ -1,0 +1,119 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e5]
+          - StaticText "Search 3,825 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [ref=e37]
+              - listitem [level=1]
+                - link "Research" [disabled, ref=e38]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e18]
+            - tablist "Admin sections" [ref=e19] focusable [tabindex]
+              - tab "Overview" [ref=e21]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e22]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e23]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e24]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e25]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e26]
+                - StaticText "Export"
+              - tab "Database" [ref=e27]
+                - StaticText "Database"
+              - tab "Resources" [ref=e28]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e29]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e30]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e31]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e32]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e33]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e34]
+                - StaticText "Audit"
+              - tab "Research" [selected, ref=e35]
+                - StaticText "Research"
+          - tabpanel "Research" [ref=e17] focusable [tabindex]
+            - region "Research workspace" [ref=e20]
+              - generic
+                - heading "Research workspace" [level=2, ref=e39]
+                - paragraph
+                  - StaticText "Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher."
+                - article [ref=e40] clickable [cursor:pointer]
+                  - generic
+                    - StaticText "NOTE · 01"
+                  - button "Extended thorough research: find up to 10 real, actively maintained open-source… 9 candidates 14s ago" [ref=e44]
+                    - heading "Extended thorough research: find up to 10 real, actively maintained open-source…" [level=3, ref=e48]
+                    - StaticText "9"
+                    - StaticText " candidates"
+                    - StaticText "14s ago"
+                - article [ref=e41] clickable [cursor:pointer]
+                  - generic
+                    - StaticText "NOTE · 02"
+                  - button "Thorough production research: find up to 10 real, currently maintained… 0 candidates 12m ago" [ref=e45]
+                    - heading "Thorough production research: find up to 10 real, currently maintained…" [level=3, ref=e49]
+                    - StaticText "0"
+                    - StaticText " candidates"
+                    - StaticText "12m ago"
+                - article [ref=e42] clickable [cursor:pointer]
+                  - generic
+                    - StaticText "NOTE · 03"
+                  - button "Academic papers with code 0 candidates 23m ago" [ref=e46]
+                    - heading "Academic papers with code" [level=3, ref=e50]
+                    - StaticText "0"
+                    - StaticText " candidates"
+                    - StaticText "23m ago"
+                - article [ref=e43] clickable [cursor:pointer]
+                  - generic
+                    - StaticText "NOTE · 04"
+                  - button "[QA-audit-1026] smoke: find 1 new open-source video tool 0 candidates 20h ago" [ref=e47]
+                    - heading "[QA-audit-1026] smoke: find 1 new open-source video tool" [level=3, ref=e51]
+                    - StaticText "0"
+                    - StaticText " candidates"
+                    - StaticText "20h ago"

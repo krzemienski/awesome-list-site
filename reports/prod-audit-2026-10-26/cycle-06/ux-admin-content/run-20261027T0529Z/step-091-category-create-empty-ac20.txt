@@ -1,0 +1,27 @@
+- generic
+  - dialog "Create Category"
+    - form
+      - heading "Create Category" [level=2, ref=e2]
+      - paragraph
+        - StaticText "Add a new category to organize your resources."
+      - LabelText [ref=e3] clickable [cursor:pointer]
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e4]
+      - paragraph
+        - StaticText "Name is required"
+      - LabelText [ref=e5] clickable [cursor:pointer]
+        - StaticText "Slug *"
+      - textbox "Slug *" [ref=e6]
+      - paragraph
+        - StaticText "Slug is required"
+      - paragraph
+        - StaticText "Auto-generated from name. Edit if needed."
+      - button "Cancel" [ref=e7]
+        - image
+        - StaticText "Cancel"
+      - button "Create" [ref=e8]
+        - image
+        - StaticText "Create"
+    - button "Close" [ref=e1]
+      - image
+      - StaticText "Close"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,11 @@ import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
+import { baseUrlSyntaxError, insecureHttpRefusal, plainHttpHost } from "@shared/validation";
+import { Checkbox } from "@/components/ui/checkbox";
 import "./queues-agent.css";
+import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 const CANONICAL_JOB_ROWS = 6;
 
@@ -87,11 +91,13 @@ const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]';
 
 /**
  * Mean of the per-job cost the enrichment agent records
- * (metadata.agent.estimatedCostUsd) over the jobs that carry one; "—" until
- * a job has reported a cost. Same arithmetic as the parity reference binding.
+ * (metadata.agent.estimatedCostUsd) over the jobs that carry one and
+ * processed at least one resource (a no-op run costs $0 and would drag the
+ * mean down, as in costPerResource); "—" until such a job exists.
  */
 function averageBatchCost(jobs: EnrichmentJob[]): string {
   const costs = jobs
+    .filter((job) => Number(job.processedResources) > 0)
     .map((job) => {
       const metadata = job.metadata as { agent?: { estimatedCostUsd?: unknown } } | null | undefined;
       return Number(metadata?.agent?.estimatedCostUsd);
@@ -132,12 +138,14 @@ export default function BatchEnrichmentPanel() {
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
   // C6-V5A-02: the field's own text, so it can be emptied; the number is derived.
   const [batchSizeText, setBatchSizeText] = useState("10");
-  const parsedBatchSize = parseInt(batchSizeText, 10);
-  const batchSize = Number.isNaN(parsedBatchSize) ? 0 : parsedBatchSize;
+  // Number, not parseInt: "2.5" must stay 2.5 so the integer rule rejects it
+  // instead of silently becoming 2.
+  const batchSize = batchSizeText.trim() === "" ? 0 : Number(batchSizeText);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [authToken, setAuthToken] = useState("");
+  const [confirmInsecureHttp, setConfirmInsecureHttp] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   // R2-H04 companion: cancel-job confirmation via AlertDialog, not confirm().
@@ -153,7 +161,23 @@ export default function BatchEnrichmentPanel() {
   // min/max attributes never validated anything (999 sat there silently until
   // Start was clicked).
   const batchSizeInvalid = !Number.isInteger(batchSize) || batchSize < 1 || batchSize > 50;
+  // Same rules /api/enrichment/start applies, checked before the paid-job
+  // dialog can open (the server adds its DNS check on top).
+  const baseUrlError = baseUrl.trim() ? baseUrlSyntaxError(baseUrl) : null;
+  const authTokenMissing = !!baseUrl.trim() && !baseUrlError && !authToken.trim();
+  const insecureHttpUnconfirmed = !!insecureHttpRefusal(baseUrl, confirmInsecureHttp);
+  const startConfigInvalid = batchSizeInvalid || !!baseUrlError || authTokenMissing || insecureHttpUnconfirmed;
+  const insecureHost = plainHttpHost(baseUrl);
+  const customHost = baseUrl.trim() && !baseUrlError ? new URL(baseUrl.trim()).host : null;
+  const startHost = customHost ?? aiDefaults.config?.baseUrlHost ?? null;
 
+  const jobsQuery = useQuery<JobsResponse>({
+    queryKey: ['/api/enrichment/jobs'],
+    refetchInterval: isPolling ? 3000 : false,
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true
+  });
   const {
     data: jobsData,
     error: jobsError,
@@ -161,13 +185,9 @@ export default function BatchEnrichmentPanel() {
     isLoading,
     isFetching: jobsIsFetching,
     refetch: refetchJobs,
-  } = useQuery<JobsResponse>({
-    queryKey: ['/api/enrichment/jobs'],
-    refetchInterval: isPolling ? 3000 : false,
-    // R5-037: refresh admin data when the operator returns to the tab.
-    staleTime: 30_000,
-    refetchOnWindowFocus: true
-  });
+  } = jobsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const jobsUnavailable = queryUnavailableReason(jobsQuery);
 
   // Run23 NB-046: surface how much of the approved catalog actually has tags.
   // The July bulk import left over half the corpus untagged and there was no
@@ -197,7 +217,7 @@ export default function BatchEnrichmentPanel() {
     // hit the LIST endpoint, leaving selectedJobData.job undefined (stats +
     // config would all render defaults).
     queryFn: async () => {
-      const res = await fetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch enrichment job ${selectedJobId}: ${res.status}`);
       return res.json();
     },
@@ -211,6 +231,7 @@ export default function BatchEnrichmentPanel() {
       model?: string;
       baseUrl?: string;
       authToken?: string;
+      allowInsecureHttp?: true;
     }) => {
       return await apiRequest('/api/enrichment/start', {
         method: 'POST',
@@ -250,6 +271,9 @@ export default function BatchEnrichmentPanel() {
   });
 
   const jobs = jobsData?.jobs || [];
+  // Until the list arrives, or when it failed with nothing cached, the tiles
+  // have no jobs to describe; an empty list would read as idle and zero.
+  const jobsUnknownNote = isLoading ? "Loading…" : jobsUnavailable && !jobsData ? "unavailable" : null;
   const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
@@ -286,14 +310,7 @@ export default function BatchEnrichmentPanel() {
       });
       return;
     }
-    if (batchSize < 1 || batchSize > 50) {
-      toast({
-        title: "Invalid batch size",
-        description: "Batch size must be between 1 and 50.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (startConfigInvalid) return;
     // Run23 NB-040: explicit confirmation before starting a paid AI job.
     setConfirmStart(true);
   };
@@ -306,10 +323,16 @@ export default function BatchEnrichmentPanel() {
       model: model.trim() || undefined,
       baseUrl: baseUrl.trim() || undefined,
       authToken: authToken.trim() || undefined,
+      allowInsecureHttp: insecureHost && confirmInsecureHttp ? true : undefined,
     });
   };
 
-  const handleViewDetails = (jobId: number) => {
+  // The details dialog is opened from state, so Radix has no trigger to
+  // return focus to; remember the button that opened it instead.
+  const detailsTriggerRef = useRef<HTMLElement | null>(null);
+
+  const handleViewDetails = (jobId: number, trigger: HTMLElement) => {
+    detailsTriggerRef.current = trigger;
     setSelectedJobId(jobId);
     setIsDetailsModalOpen(true);
   };
@@ -417,23 +440,38 @@ export default function BatchEnrichmentPanel() {
       <div className="queues-agent__canonical">
         <div className="queues-agent__stat-strip">
           {(() => {
-            const lastCompleted = jobs.find((job) => job.status === "completed");
+            // The most recently finished job that enriched anything, whatever
+            // its end state: a cancelled run still wrote the resources it
+            // reached, while a "completed" run with nothing to do enriched
+            // nothing. Jobs arrive newest-created first, which is not the
+            // order they finished in.
+            let lastEnriching: EnrichmentJob | undefined;
+            for (const job of jobs) {
+              if (!job.completedAt || (job.successfulResources ?? 0) === 0) continue;
+              if (!lastEnriching?.completedAt || new Date(job.completedAt) > new Date(lastEnriching.completedAt)) {
+                lastEnriching = job;
+              }
+            }
+            const enrichedCount = lastEnriching?.successfulResources ?? 0;
             return (
               <Stat
                 className="queues-agent__stat"
                 label="Last enriched"
-                value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
-                sub={jobsIsError && !jobsData ? "unavailable" : lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+                value={formatRelativeAgo(lastEnriching?.completedAt ?? null)}
+                sub={jobsUnknownNote
+                  ?? (lastEnriching
+                    ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status}`}`
+                    : "No recent batch enriched resources")}
               />
             );
           })()}
           <Stat
             className="queues-agent__stat"
             label="Queue"
-            value={jobsIsError && !jobsData ? "—" : jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
-            sub={jobsIsError && !jobsData ? "unavailable" : hasActiveJob ? "active" : "idle"}
+            value={jobsUnknownNote ? "—" : jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={jobsUnknownNote ?? (hasActiveJob ? "active" : "idle")}
           />
-          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
+          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub={jobsUnknownNote ?? "per batch"} />
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -442,7 +480,7 @@ export default function BatchEnrichmentPanel() {
             <Button
               className="btn primary"
               onClick={handleStartEnrichment}
-              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || startConfigInvalid}
               data-testid="button-start-enrichment-canonical"
             >
               {/* The frozen Run job action carries the bolt glyph. */}
@@ -456,6 +494,7 @@ export default function BatchEnrichmentPanel() {
             tabIndex={0}
             role="region"
             aria-label="Enrichment jobs table, scrollable"
+            aria-busy={isLoading}
           >
             <table className="table">
               <thead>
@@ -473,7 +512,8 @@ export default function BatchEnrichmentPanel() {
                     <td className="actions">
                       <button
                         className="btn ghost"
-                        onClick={() => handleViewDetails(job.id)}
+                        onClick={(e) => handleViewDetails(job.id, e.currentTarget)}
+                        aria-label={`View logs for job #${job.id}`}
                         data-testid={`button-view-job-${job.id}-canonical`}
                       >
                         Logs
@@ -483,10 +523,11 @@ export default function BatchEnrichmentPanel() {
                 ))}
               </tbody>
             </table>
-            {jobsIsError ? (
+            {jobsUnavailable ? (
               <AdminLoadError
                 subject="enrichment jobs"
                 error={jobsError}
+                offline={jobsUnavailable === "offline"}
                 note={jobsData ? "The rows above may be out of date." : undefined}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsIsFetching}
@@ -494,7 +535,12 @@ export default function BatchEnrichmentPanel() {
                 testId="error-enrichment-jobs-canonical"
                 retryTestId="button-retry-enrichment-jobs-canonical"
               />
-            ) : !isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
+            ) : isLoading ? (
+              <p className="queues-agent__empty" role="status" data-testid="status-enrichment-jobs-loading">
+                <RefreshCw className="mr-2 inline h-4 w-4 animate-spin" aria-hidden="true" />
+                Loading jobs…
+              </p>
+            ) : jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
           {jobs.length > CANONICAL_JOB_ROWS ? (
             <div className="queues-agent__table-more">
@@ -588,7 +634,7 @@ export default function BatchEnrichmentPanel() {
                   className="text-xs font-medium text-destructive"
                   data-testid="error-batch-size"
                 >
-                  Batch size must be between 1 and 50.
+                  Batch size must be a whole number between 1 and 50.
                 </p>
               )}
             </div>
@@ -611,6 +657,11 @@ export default function BatchEnrichmentPanel() {
               </span>
               {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
+            {!showAdvanced && (!!baseUrlError || authTokenMissing || insecureHttpUnconfirmed) && (
+              <p role="alert" className="border-t px-3 py-2 text-xs font-medium text-destructive" data-testid="error-enrich-endpoint-collapsed">
+                The custom endpoint needs fixing before a job can start. Open this section to fix it.
+              </p>
+            )}
             {showAdvanced && (
               <div id="advanced-enrichment-region" className="space-y-3 border-t px-3 py-3">
                 <div className="space-y-2">
@@ -634,13 +685,20 @@ export default function BatchEnrichmentPanel() {
                   <Input
                     id="enrich-baseurl"
                     value={baseUrl}
-                    onChange={(e) => setBaseUrl(e.target.value)}
+                    onChange={(e) => { setBaseUrl(e.target.value); setConfirmInsecureHttp(false); }}
                     placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                     className="font-mono text-xs"
                     disabled={hasActiveJob}
+                    aria-invalid={!!baseUrlError}
+                    aria-describedby={baseUrlError ? "enrich-baseurl-error enrich-baseurl-help" : "enrich-baseurl-help"}
                     data-testid="input-enrich-baseurl"
                   />
-                  <p className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
+                  <p id="enrich-baseurl-help" className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
+                  {baseUrlError && (
+                    <p id="enrich-baseurl-error" role="alert" className="text-xs font-medium text-destructive" data-testid="error-enrich-baseurl">
+                      {baseUrlError}.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="enrich-token" className="flex items-center gap-1.5">
@@ -655,10 +713,24 @@ export default function BatchEnrichmentPanel() {
                     className="font-mono text-xs"
                     autoComplete="off"
                     disabled={hasActiveJob}
+                    aria-invalid={authTokenMissing}
+                    aria-describedby={authTokenMissing ? "enrich-token-error enrich-token-help" : "enrich-token-help"}
                     data-testid="input-enrich-token"
                   />
-                  <p className="text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                  <p id="enrich-token-help" className="text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                  {authTokenMissing && (
+                    <p id="enrich-token-error" role="alert" className="text-xs font-medium text-destructive" data-testid="error-enrich-token">
+                      A custom base URL needs an auth token. The platform key is never sent to a custom endpoint.
+                    </p>
+                  )}
                 </div>
+                {insecureHost && (
+                  <Label htmlFor="enrich-confirm-insecure-http" className="flex min-h-6 max-lg:min-h-11 cursor-pointer items-start gap-2 py-1 font-normal">
+                    <Checkbox id="enrich-confirm-insecure-http" checked={confirmInsecureHttp} disabled={hasActiveJob}
+                      onCheckedChange={(v) => setConfirmInsecureHttp(v === true)} data-testid="checkbox-enrich-confirm-insecure-http" />
+                    <span className="text-xs">Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.</span>
+                  </Label>
+                )}
               </div>
             )}
           </div>
@@ -668,7 +740,7 @@ export default function BatchEnrichmentPanel() {
           <div className="flex items-center justify-between">
             <Button
               onClick={handleStartEnrichment}
-              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || startConfigInvalid}
              
               data-testid="button-start-enrichment"
             >
@@ -686,14 +758,14 @@ export default function BatchEnrichmentPanel() {
             </Button>
             
             {hasActiveJob ? (
-              <Alert className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
+              <Alert live="off" className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   A job is currently running. Please wait for it to complete.
                 </AlertDescription>
               </Alert>
             ) : !activeJobStateKnown && (
-              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" role={jobsIsError ? "alert" : undefined}>
+              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" live={jobsIsError ? "assertive" : "off"}>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {jobsIsError
@@ -818,10 +890,11 @@ export default function BatchEnrichmentPanel() {
             <div className="flex items-center justify-center py-8">
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : jobsIsError ? (
+          ) : jobsUnavailable ? (
             <AdminLoadError
               subject="enrichment jobs"
               error={jobsError}
+              offline={jobsUnavailable === "offline"}
               onRetry={() => { void refetchJobs(); }}
               retrying={jobsIsFetching}
               className="queues-agent__inline-error"
@@ -829,7 +902,7 @@ export default function BatchEnrichmentPanel() {
               retryTestId="button-retry-enrichment-jobs"
             />
           ) : jobs.length === 0 ? (
-            <Alert>
+            <Alert live="off">
               <Info className="h-4 w-4" />
               <AlertDescription>
                 No enrichment jobs found. Start your first job above.
@@ -839,7 +912,13 @@ export default function BatchEnrichmentPanel() {
             // R5-004 (run24): plain two-axis overflow-auto scroller — the
             // Radix ScrollArea viewport clipped horizontal overflow, making
             // Processed/Success Rate/Actions unreachable at ≤768px.
-            <div className="max-h-[400px] overflow-auto" data-testid="scroller-enrichment-jobs-table">
+            <div
+              className="queues-agent__jobs-scroll max-h-[400px] overflow-auto"
+              tabIndex={0}
+              role="region"
+              aria-label="Job history table, scrollable"
+              data-testid="scroller-enrichment-jobs-table"
+            >
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -955,9 +1034,10 @@ export default function BatchEnrichmentPanel() {
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
-                          onClick={() => handleViewDetails(job.id)}
+                          onClick={(e) => handleViewDetails(job.id, e.currentTarget)}
                           variant="ghost"
                           size="sm"
+                          aria-label={`View details for job #${job.id}`}
                           data-testid={`button-view-details-${job.id}`}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -982,7 +1062,14 @@ export default function BatchEnrichmentPanel() {
       </Card>
 
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
-        <DialogContent className="queues-agent__dialog max-w-3xl max-h-[80vh]">
+        <DialogContent
+          className="queues-agent__dialog max-w-3xl max-h-[80vh]"
+          onCloseAutoFocus={(event) => {
+            if (!detailsTriggerRef.current?.isConnected) return;
+            event.preventDefault();
+            detailsTriggerRef.current.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
@@ -1180,7 +1267,7 @@ export default function BatchEnrichmentPanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {cancelMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(cancelMutation.error, { outcome: "The job may still be running. Refresh the job list, then try again." })}</AlertDescription>
             </Alert>
@@ -1209,7 +1296,9 @@ export default function BatchEnrichmentPanel() {
             <AlertDialogTitle>Start enrichment job?</AlertDialogTitle>
             <AlertDialogDescription>
               This starts a Claude AI enrichment run over {filter === 'unenriched' ? 'unenriched' : 'all'} resources
-              in batches of {batchSize}. The job runs in the background and incurs real API cost.
+              in batches of {batchSize} on {startHost ?? "the server's configured endpoint"}{customHost ? " (custom endpoint)" : ""}.
+              The job runs in the background and incurs real API cost.
+              {insecureHost && ` The auth token goes to ${insecureHost} over plain http, unencrypted.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-1 text-center text-sm sm:text-left" data-testid="text-enrichment-scope">
@@ -1236,7 +1325,7 @@ export default function BatchEnrichmentPanel() {
             )}
           </div>
           {startMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
             </Alert>

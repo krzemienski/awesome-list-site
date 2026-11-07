@@ -1,22 +1,25 @@
 import {
   useEffect,
+  useCallback,
   useLayoutEffect,
-  useRef,
   useState,
   lazy,
   Suspense,
   Component,
+  type ComponentProps,
   type ComponentType,
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
 import { discoveryRedirect } from "@shared/discovery-params";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
-import { useQuery } from "@tanstack/react-query";
-import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { noteLocationChange, useRouteFocus, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
+import { pendingRouteTitle } from "./lib/pending-route-title";
 import { useAnalytics } from "./hooks/use-analytics";
+import { trackSiteError } from "./lib/analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { hasClerkSessionHint, requestClerk, routeNeedsClerk, useClerkBridge } from "./lib/clerk-bridge";
 import {
@@ -29,67 +32,114 @@ import SEOHead from "@/components/layout/SEOHead";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { focusPageHeading } from "@/hooks/focus-handoff";
 // Static, not lazy: a corpus failure while offline must render this page
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
+import { useHeldError } from "@/hooks/useHeldError";
+import { isChunkLoadError } from "@/lib/chunk-load-error";
+import {
+  clearPendingPalette,
+  focusPaletteOpener,
+  loadSearchDialog,
+  stopPalettePrehydrationCapture,
+} from "@/lib/search-dialog-loader";
+
+/**
+ * React.lazy caches a rejected import for the life of the lazy object, so a
+ * route chunk that failed while offline would rethrow the same error on every
+ * re-render. Each route registers a reset here; RouteErrorBoundary calls
+ * retryFailedRouteImports() once the server is reachable again, and the next
+ * render imports the chunk afresh without a document reload. Resets are only
+ * triggered by that explicit recovery, never by a render, so a chunk that keeps
+ * failing cannot spin a retry loop.
+ */
+const routeImportResets = new Set<() => void>();
+
+function retryFailedRouteImports(): void {
+  routeImportResets.forEach((reset) => reset());
+}
+
+function lazyRoute<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  let rejected = false;
+  const create = () =>
+    lazy(() =>
+      factory().catch((error: unknown) => {
+        rejected = true;
+        throw error;
+      }),
+    );
+  let Inner = create();
+  routeImportResets.add(() => {
+    if (!rejected) return;
+    rejected = false;
+    Inner = create();
+  });
+  return function LazyRoute(props: ComponentProps<T>) {
+    return <Inner {...props} />;
+  };
+}
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
 // provider and the shell remain eager.
-const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
-const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
-const NotFound = lazy(() => import("@/pages/not-found"));
-const LazyHomeRoute = lazy(() => import("@/pages/Home"));
+const AdminGuard = lazyRoute(() => import("@/components/auth/AdminGuard"));
+const AuthGuard = lazyRoute(() => import("@/components/auth/AuthGuard"));
+const NotFound = lazyRoute(() => import("@/pages/not-found"));
+const LazyHomeRoute = lazyRoute(() => import("@/pages/Home"));
 // Backlog X-03: the Clerk SDK is not part of the anonymous entry. Auth pages
 // are route chunks, and the Clerk runtime mounts only once requested.
-const SignInPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignInPage })));
-const SignUpPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignUpPage })));
-const Logout = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.Logout })));
-const ClerkRuntime = lazy(() => import("@/components/auth/ClerkRuntime"));
+const SignInPage = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignInPage })));
+const SignUpPage = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignUpPage })));
+const Logout = lazyRoute(() => import("@/pages/AuthPages").then((m) => ({ default: m.Logout })));
+const ClerkRuntime = lazyRoute(() => import("@/components/auth/ClerkRuntime"));
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
 // chunk that regular visitors never download.
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminDashboard = lazyRoute(() => import("@/pages/AdminDashboard"));
 
 // Task 301: every page loads behind the shared Suspense +
 // RouteErrorBoundary below, so visitors do not parse route-specific
 // dependencies or role-gated code before they can use the shell. Home is also
 // a route chunk now; its anonymous SSR markup remains available immediately
 // while the browser hydrates that chunk only on the landing route.
-const Category = lazy(() => import("@/pages/Category"));
-const Subcategory = lazy(() => import("@/pages/Subcategory"));
-const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
-const TagLanding = lazy(() => import("@/pages/TagLanding"));
-const ResourceDetail = lazy(() => import("@/pages/ResourceDetail"));
-const Categories = lazy(() => import("@/pages/Categories"));
-const About = lazy(() => import("@/pages/About"));
-const Advanced = lazy(() => import("@/pages/Advanced"));
-const Profile = lazy(() => import("@/pages/Profile"));
-const Contributions = lazy(() => import("@/pages/Contributions"));
+const Category = lazyRoute(() => import("@/pages/Category"));
+const Subcategory = lazyRoute(() => import("@/pages/Subcategory"));
+const SubSubcategory = lazyRoute(() => import("@/pages/SubSubcategory"));
+const TagLanding = lazyRoute(() => import("@/pages/TagLanding"));
+const ResourceDetail = lazyRoute(() => import("@/pages/ResourceDetail"));
+const Categories = lazyRoute(() => import("@/pages/Categories"));
+const About = lazyRoute(() => import("@/pages/About"));
+const Advanced = lazyRoute(() => import("@/pages/Advanced"));
+const Profile = lazyRoute(() => import("@/pages/Profile"));
+const Contributions = lazyRoute(() => import("@/pages/Contributions"));
 
-const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
-const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
-const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
-const Journeys = lazy(() => import("@/pages/Journeys"));
-const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
+const BookmarksGate = lazyRoute(() => import("@/pages/BookmarksGate"));
+const PublicCollection = lazyRoute(() => import("@/pages/PublicCollection"));
+const SubmitResource = lazyRoute(() => import("@/pages/SubmitResource"));
+const Journeys = lazyRoute(() => import("@/pages/Journeys"));
+const JourneyDetail = lazyRoute(() => import("@/pages/JourneyDetail"));
 
-const ContinueLearning = lazy(() => import("@/pages/ContinueLearning"));
-const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
-const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
-const Recommendations = lazy(() => import("@/pages/Recommendations"));
-const Search = lazy(() => import("@/pages/Search"));
-const Settings = lazy(() => import("@/pages/Settings"));
-const Notifications = lazy(() => import("@/pages/Notifications"));
-const Onboarding = lazy(() => import("@/pages/Onboarding"));
-const Terms = lazy(() => import("@/pages/Terms"));
-const Privacy = lazy(() => import("@/pages/Privacy"));
-const CodeOfConduct = lazy(() => import("@/pages/CodeOfConduct"));
-const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
+const ContinueLearning = lazyRoute(() => import("@/pages/ContinueLearning"));
+const ThemeSettings = lazyRoute(() => import("@/pages/ThemeSettings"));
+const DesignSystemShowcase = lazyRoute(() => import("@/pages/DesignSystemShowcase"));
+const Recommendations = lazyRoute(() => import("@/pages/Recommendations"));
+const Search = lazyRoute(() => import("@/pages/Search"));
+const Settings = lazyRoute(() => import("@/pages/Settings"));
+const Notifications = lazyRoute(() => import("@/pages/Notifications"));
+const Onboarding = lazyRoute(() => import("@/pages/Onboarding"));
+const Terms = lazyRoute(() => import("@/pages/Terms"));
+const Privacy = lazyRoute(() => import("@/pages/Privacy"));
+const CodeOfConduct = lazyRoute(() => import("@/pages/CodeOfConduct"));
+const SearchDialog = lazyRoute(loadSearchDialog);
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
+  const queryClient = useQueryClient();
+  const pendingTitle =
+    typeof window === "undefined" ? undefined : pendingRouteTitle(queryClient, window.location.pathname);
   return (
     <div className="space-y-6" data-testid="route-chunk-skeleton" role="status" aria-busy="true" aria-label="Loading page">
       {/* BUG-031 (run22): while a lazy chunk loads, the head must already
@@ -97,12 +147,12 @@ function RouteFallback() {
           never linger on the previous route's metadata. The destination page
           replaces this with its real head in the same render that swaps the
           skeleton out. */}
-      <SEOHead />
-      <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
-      <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
+      {pendingTitle ? <SEOHead title={pendingTitle} loading /> : <SEOHead />}
+      <Skeleton className="h-8 w-2/3 max-w-md" />
+      <Skeleton className="h-4 w-1/2 max-w-sm" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
+          <Skeleton key={i} className="h-36" />
         ))}
       </div>
     </div>
@@ -110,22 +160,83 @@ function RouteFallback() {
 }
 
 /** Search-palette Suspense fallback. It occupies the same modal layer as the
- * eventual palette, so opening search on a cold cache has a truthful visible
- * loading state instead of an inert click or a blank page. */
-function SearchDialogFallback() {
+ * eventual palette and owns a real input, so keys typed while the chunk loads
+ * are kept in `value` and handed to SearchDialog as its initial query instead
+ * of landing on the inert page behind. Escape closes it. Enter is ignored
+ * until the palette has loaded: there are no results to open yet, and sending
+ * an unfinished query to /search would navigate away from what the person is
+ * still typing. */
+function SearchDialogFallback({
+  value,
+  onChange,
+  onClose,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape" || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k")) {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [onClose]);
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-4 pt-[15vh]"
-      role="status"
+      role="dialog"
+      aria-modal="true"
       aria-busy="true"
-      aria-label="Loading search"
+      aria-label="Search resources, categories, and pages"
       data-testid="search-dialog-skeleton"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
       <div className="w-full max-w-lg border border-border bg-background p-5 shadow-2xl">
-        <div className="mb-4 h-5 w-32 animate-pulse bg-muted" />
-        <div className="h-11 w-full animate-pulse bg-muted" />
+        <Skeleton className="mb-4 h-5 w-32" />
+        <input
+          type="text"
+          autoFocus
+          aria-label="Search"
+          placeholder="Search resources…"
+          autoComplete="off"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault();
+          }}
+          className="flex h-11 w-full border border-border bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground"
+        />
       </div>
     </div>
+  );
+}
+
+/** Mounted only while the palette is open. `draft` lives above the Suspense
+ * boundary so what was typed into the fallback survives the swap to the real
+ * palette; unmounting on close resets it. */
+function SearchPalette({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
+  const [draft, setDraft] = useState(() => window.__awvPendingPalette?.draft ?? "");
+  useEffect(() => clearPendingPalette, []);
+  // Captured during this render, before the fallback's autofocused input exists.
+  const [opener] = useState<HTMLElement | null>(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
+  const closeFallback = useCallback(() => {
+    setIsOpen(false);
+    // The fallback unmounts with the palette; restore after that commit.
+    queueMicrotask(() => focusPaletteOpener(opener));
+  }, [setIsOpen, opener]);
+  return (
+    <Suspense fallback={<SearchDialogFallback value={draft} onChange={setDraft} onClose={closeFallback} />}>
+      <SearchDialog isOpen setIsOpen={setIsOpen} initialQuery={draft} opener={opener} />
+    </Suspense>
   );
 }
 
@@ -136,15 +247,28 @@ function SearchDialogFallback() {
 // chunk manifest); if that still fails, the visitor gets an in-app retry
 // card. Vite caches the rejected import promise, so recovery must be a full
 // reload — a soft re-render would replay the same rejection.
-// C8-V2-01: Vite rejects a route import with "Unable to preload CSS for …"
-// when the route's stylesheet can't load (offline, rotated hash) — the same
-// failure as a missing script chunk.
-const CHUNK_ERROR_RE =
-  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
+const CONNECTIVITY_PROBE_TIMEOUT_MS = 3000;
+/** Delays between reachability probes after a failed one; then the card waits for a click or `online`. */
+const CONNECTIVITY_PROBE_BACKOFF_MS = [1000, 2000, 4000, 8000];
+
+/** Any HTTP answer from our own server means a reload can load a document. */
+async function isServerReachable(): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), CONNECTIVITY_PROBE_TIMEOUT_MS);
+  try {
+    await fetch("/api/health", { cache: "no-store", signal: controller.signal });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
 // C10-V2-01: a keyboard user who was on the route error card when it reloads
 // the page lands on the recovered page's h1, not <body>.
 const ROUTE_RETRY_FOCUS_FLAG = "route-retry-focus-heading";
+const CARD_RETRY_FOCUS_WINDOW_MS = 10_000;
 
 function restoreRouteRetryFocus(): void {
   let pending = false;
@@ -155,6 +279,11 @@ function restoreRouteRetryFocus(): void {
     return;
   }
   if (!pending) return;
+  focusRecoveredHeading();
+}
+
+/** Wait for the recovered route's h1, then focus it unless focus already moved. */
+function focusRecoveredHeading(): void {
   const startedAt = Date.now();
   const tick = () => {
     if (document.activeElement && document.activeElement !== document.body) return;
@@ -166,10 +295,6 @@ function restoreRouteRetryFocus(): void {
 
 if (typeof window !== "undefined") restoreRouteRetryFocus();
 
-function isChunkLoadError(error: unknown): boolean {
-  return error instanceof Error && CHUNK_ERROR_RE.test(`${error.name}: ${error.message}`);
-}
-
 interface RouteErrorBoundaryProps {
   location: string;
   children: ReactNode;
@@ -177,20 +302,31 @@ interface RouteErrorBoundaryProps {
 
 interface RouteErrorBoundaryState {
   error: Error | null;
-  // R5-018 (run24): set when a retry is attempted while still offline so the
-  // card can say so instead of silently doing nothing (or dying in a reload).
-  stillOffline: boolean;
+  // R5-018 (run24): set when a retry could not reload so the card says why
+  // instead of silently doing nothing (or dying in a reload). "offline" is the
+  // browser reporting no network; "unreachable" is a browser that believes it
+  // is online but whose /api/health probe failed (server down, DNS, captive
+  // portal).
+  retryBlocked: "offline" | "unreachable" | null;
+  // The route chunk failed while the browser was offline. Once the server
+  // answers again the import is retried in place and the card never claims the
+  // site was updated.
+  failedOffline: boolean;
 }
 
 class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
-  state: RouteErrorBoundaryState = { error: null, stillOffline: false };
+  state: RouteErrorBoundaryState = { error: null, retryBlocked: null, failedOffline: false };
 
   static getDerivedStateFromError(error: Error): Partial<RouteErrorBoundaryState> {
     return { error };
   }
 
   componentDidCatch(error: Error) {
+    if (navigator.onLine !== false) {
+      trackSiteError(isChunkLoadError(error) ? "chunk_load_failed" : "route_crash");
+    }
     if (isChunkLoadError(error)) {
+      if (navigator.onLine === false) this.setState({ failedOffline: true });
       // One-shot auto-reload guarded by a TIMESTAMP, not a boolean flag.
       // A boolean cleared on "clean render" loops forever: the boundary
       // renders error-free while Suspense is still fetching the chunk, so
@@ -211,7 +347,11 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         const lastHref = sep === -1 ? "" : raw.slice(sep + 1);
         recentlyReloaded =
           Date.now() - last < 60_000 && lastHref === window.location.href;
-        if (!recentlyReloaded) {
+        // Only a real reload attempt consumes the guard. An offline failure
+        // never reloads, so stamping it there made the in-place retry after
+        // reconnect find the guard already spent and show the "site was
+        // updated" card instead of reloading (sweep C6-PC-062).
+        if (!recentlyReloaded && navigator.onLine !== false) {
           sessionStorage.setItem(
             CHUNK_RELOAD_FLAG,
             `${Date.now()}|${window.location.href}`,
@@ -227,6 +367,13 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       // the whole app session. Offline chunk failures fall through to the
       // in-app retry card, which keeps the shell (and in-memory state) alive.
       if (!recentlyReloaded && navigator.onLine !== false) {
+        if (Date.now() - this.cardRetryFocusAt < CARD_RETRY_FOCUS_WINDOW_MS) {
+          try {
+            sessionStorage.setItem(ROUTE_RETRY_FOCUS_FLAG, "1");
+          } catch {
+            // ignore
+          }
+        }
         window.location.reload();
         return;
       }
@@ -240,27 +387,72 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     if (this.state.error && isChunkLoadError(this.state.error)) this.handleRetry();
   };
 
+  private probeTimer: number | undefined;
+  private probeAttempts = 0;
+  // When an in-place retry started from the focused error card. The retried
+  // import can fail again right after the card unmounts (focus is already on
+  // <body> by then), and the boundary then reloads the document; this is how
+  // that reload still knows to focus the recovered heading.
+  private cardRetryFocusAt = 0;
+
   componentDidMount() {
     window.addEventListener("online", this.handleOnline);
   }
 
   componentWillUnmount() {
     window.removeEventListener("online", this.handleOnline);
+    window.clearTimeout(this.probeTimer);
   }
 
   componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
-      this.setState({ error: null, stillOffline: false });
+      window.clearTimeout(this.probeTimer);
+      this.setState({ error: null, retryBlocked: null, failedOffline: false });
     }
   }
 
   handleRetry = () => {
+    this.probeAttempts = 0;
+    void this.reloadWhenReachable();
+  };
+
+  // The `online` event often fires before the network is usable, and a reload
+  // into a dead network lands on the browser's error page where nothing can
+  // retry. Reload only once the server answers; until then keep this page and
+  // probe again on a short backoff.
+  private reloadWhenReachable = async () => {
+    window.clearTimeout(this.probeTimer);
     // R5-018 (run24): while offline a reload would land on the browser's
     // error page and kill the app session — surface an inline "still offline"
     // notice instead and keep the card (and app state) alive.
     if (navigator.onLine === false) {
-      this.setState({ stillOffline: true });
+      this.setState({ retryBlocked: "offline" });
+      return;
+    }
+    if (!(await isServerReachable())) {
+      if (!this.state.error) return;
+      this.setState({ retryBlocked: "unreachable" });
+      const delay = CONNECTIVITY_PROBE_BACKOFF_MS[this.probeAttempts++];
+      if (delay !== undefined) {
+        this.probeTimer = window.setTimeout(() => void this.reloadWhenReachable(), delay);
+      }
+      return;
+    }
+    if (!this.state.error) return;
+    // A chunk that failed offline was never stale: retry the import in place
+    // (keeps app state, no document reload, so the 60s reload guard is not
+    // consumed). If it fails again online, componentDidCatch applies that guard.
+    if (this.state.failedOffline) {
+      // The error card held focus; once it unmounts focus falls to <body>, so
+      // hand it to the recovered page's heading as the reload path does.
+      const cardHadFocus = Boolean(
+        document.activeElement?.closest("[data-testid='route-error-boundary']"),
+      );
+      if (cardHadFocus) this.cardRetryFocusAt = Date.now();
+      retryFailedRouteImports();
+      this.setState({ error: null, retryBlocked: null, failedOffline: false });
+      if (cardHadFocus) focusRecoveredHeading();
       return;
     }
     // Stamp (not clear) the guard: this click IS a reload attempt, so if the
@@ -282,7 +474,17 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   };
 
   render() {
-    const { error } = this.state;
+    const { error, retryBlocked } = this.state;
+    const retryBlockedNote = retryBlocked && (
+      <p
+        className="max-w-md text-sm font-medium text-[var(--accent-ink)]"
+        data-testid={retryBlocked === "offline" ? "text-still-offline" : "text-server-unreachable"}
+      >
+        {retryBlocked === "offline"
+          ? "Still offline — reconnect and try again."
+          : "Can't reach the server right now. Try again in a moment."}
+      </p>
+    );
     if (!error) {
       // Do NOT clear the reload timestamp here: error-free renders happen
       // while Suspense is still fetching the chunk, so clearing on "clean
@@ -294,7 +496,9 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     if (isChunkLoadError(error)) {
       // R5-018 (run24): offline chunk failures get connection-specific copy;
       // online ones keep the deploy-rotation explanation.
-      const offline = navigator.onLine === false;
+      const offline = navigator.onLine === false || this.state.retryBlocked === "offline";
+      const unreachable = !offline && this.state.retryBlocked === "unreachable";
+      const reconnected = this.state.failedOffline && !offline && !unreachable;
       return (
         <div
           className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
@@ -302,27 +506,30 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
           data-testid="route-error-boundary"
         >
           <h1 className="display-h text-xl">
-            {offline ? "Couldn't load this page — you appear to be offline" : "This page failed to load"}
+            {offline
+              ? "Couldn't load this page — you appear to be offline"
+              : reconnected
+                ? "Reconnected — loading this page"
+                : unreachable
+                ? "Couldn't load this page — the server isn't responding"
+                : "This page failed to load"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
             {offline
               ? "Check your connection, then retry. The rest of the app is still available."
-              : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
+              : reconnected
+                ? "Your connection is back. This page will load in a moment."
+                : unreachable
+                ? "Your connection looks fine, but the site isn't answering. The rest of the app is still available."
+                : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
           </p>
-          {this.state.stillOffline && (
-            <p
-              className="max-w-md text-sm font-medium text-[var(--accent-ink)]"
-              data-testid="text-still-offline"
-            >
-              Still offline — reconnect and try again.
-            </p>
-          )}
+          {retryBlockedNote}
           <Button
             type="button"
             onClick={this.handleRetry}
             data-testid="button-route-retry"
           >
-            {offline ? "Retry" : "Reload page"}
+            {offline || reconnected ? "Retry" : "Reload page"}
           </Button>
         </div>
       );
@@ -338,6 +545,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         <p className="max-w-md text-sm text-muted-foreground">
           The rest of the site still works. You can retry this page or head back home.
         </p>
+        {retryBlockedNote}
         <div className="flex gap-3">
           <Button
             type="button"
@@ -365,6 +573,7 @@ import {
   needsCorpusRoute,
   type AwesomeListNav,
 } from "@/lib/static-data";
+import { RetryButton } from "@/components/layout/StatePanel";
 
 type HomeRouteProps = {
   nav?: AwesomeListNav;
@@ -445,7 +654,13 @@ function ClerkHost() {
   );
 }
 
-function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) {
+function Router({
+  homeComponent: Home,
+  resourceComponent: ResourcePage,
+}: {
+  homeComponent: HomeRouteComponent;
+  resourceComponent: ComponentType;
+}) {
   // Analytics tracking is consent-gated internally, but the hook itself stays
   // in the eager graph. Deferring it only relocates bytes: Router mounts it on
   // every route immediately, so visitors would still fetch this chunk on
@@ -461,6 +676,9 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     logout,
     logoutError,
   } = useAuth();
+  // Refetching an errored query with no data resets its error to null, which
+  // would unmount the banner (and its focused Retry) until the retry fails.
+  const [authRetrying, setAuthRetrying] = useState(false);
   const [location] = useLocation();
   // A signed-in visitor needs Clerk for token refresh and sign-out.
   useEffect(() => {
@@ -486,11 +704,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     setIsOpen: (open: boolean) => void;
   }) => (
     <RouteErrorBoundary location={location}>
-      {isOpen ? (
-        <Suspense fallback={<SearchDialogFallback />}>
-          <SearchDialog isOpen setIsOpen={setIsOpen} />
-        </Suspense>
-      ) : null}
+      {isOpen ? <SearchPalette setIsOpen={setIsOpen} /> : null}
     </RouteErrorBoundary>
   );
 
@@ -500,9 +714,18 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     noteLocationChange();
   }, [location]);
 
+  // MainLayout hands the capture off when it mounts. App mounting is the
+  // backstop for any render path that returns before MainLayout, so the
+  // pre-hydration listener never outlives the app's first commit.
+  useEffect(() => {
+    stopPalettePrehydrationCapture();
+  }, []);
+
   // Run17 BUG-052: Back/Forward return to the saved scroll position instead
   // of the top; forward navigations still start at the top.
   useScrollRestoration(location, search);
+  // PG-01: announce in-app navigations by focusing the new page's h1.
+  useRouteFocus(location);
 
   // Run22 BUG-008: the chrome (sidebar/header) renders from a ~few-KB nav
   // tree; the 2.7MB corpus is only fetched on routes whose CONTENT needs it
@@ -526,7 +749,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   // one server-paged tree slice and opt into this query themselves only after
   // an in-page search, tag filter, or alternate sort is active.
   const corpusNeeded = needsCorpusRoute(location);
-  const { error } = useQuery({
+  const { error: corpusError, isFetching: corpusFetching, refetch } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
@@ -541,12 +764,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
    * now lives in SearchDialog so the hint resolves to the dialog that
    * MainLayout actually renders. */
 
+  const error = useHeldError(corpusError, corpusFetching, "awesome-list-data");
+
   if (error) {
     return (
       <div className="page">
         <div className="grain" aria-hidden="true" />
         <RouteErrorBoundary location={location}>
-          <ErrorPage error={error} />
+          <ErrorPage error={error} retrying={corpusFetching} onRetry={() => void refetch()} />
         </RouteErrorBoundary>
       </div>
     );
@@ -590,22 +815,23 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           query params (e.g. an HTML-shaped ?q= or ?tags=), say so explicitly
           instead of silently rendering the unfiltered page. */}
       <ScrubbedParamsNotice />
-      {authError ? (
+      {authError || authRetrying ? (
         <div
           className="mb-4 flex flex-wrap items-center gap-3 border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm"
           role="alert"
           data-testid="banner-auth-error"
         >
           <span>We couldn't verify your sign-in status. You can keep browsing as a guest.</span>
-          <Button
-            type="button"
+          <RetryButton
             variant="link"
             className="underline underline-offset-2"
-            onClick={() => void refetchAuth()}
-            data-testid="button-auth-retry"
-          >
-            Retry
-          </Button>
+            busy={authRetrying}
+            onRetry={() => {
+              setAuthRetrying(true);
+              void refetchAuth().finally(() => setAuthRetrying(false));
+            }}
+            testId="button-auth-retry"
+          />
         </div>
       ) : null}
       <RouteErrorBoundary location={location}>
@@ -680,7 +906,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/subsubcategory/:slug">
           {(params) => <Redirect to={discoveryRedirect(`/sub-subcategory/${params.slug}`, search)} replace />}
         </Route>
-        <Route path="/resource/:id" component={ResourceDetail} />
+        <Route path="/resource/:id" component={ResourcePage} />
         <Route path="/about" component={About} />
         <Route path="/terms" component={Terms} />
         <Route path="/privacy" component={Privacy} />
@@ -749,8 +975,15 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
 export function App({
   homeComponent = HomeRoute,
+  resourceComponent = ResourceDetail,
 }: {
   homeComponent?: HomeRouteComponent;
+  /**
+   * The already-loaded resource page on a direct visit (main.tsx), so the
+   * first commit is the finished page rather than the route skeleton that the
+   * page then replaces — a full-height layout shift under the prerender hold.
+   */
+  resourceComponent?: ComponentType;
 } = {}) {
   // R4-057: the server (og-middleware) injects a full crawl-time meta set into
   // <head>; after hydration react-helmet renders its own tags (marked with
@@ -807,10 +1040,11 @@ export function App({
           BUG-054 (run26): rendered AFTER the router so the layout's
           "Skip to main content" link is the document's FIRST tab stop
           (run22 had it first in DOM, which put 3 banner controls ahead of
-          the skip link on every fresh visit). The banner stays fixed at the
-          bottom visually and remains keyboard-reachable after the page
-          content, with Escape still dismissing it for the session. */}
-      <Router homeComponent={homeComponent} />
+          the skip link on every fresh visit). It is a sticky bottom row at
+          every width, so its controls come after the page content both on
+          screen and in focus order, and Escape still dismisses it for the
+          session. */}
+      <Router homeComponent={homeComponent} resourceComponent={resourceComponent} />
       <ConsentBanner />
       <ClerkHost />
     </AccountThemePreferenceBridge>

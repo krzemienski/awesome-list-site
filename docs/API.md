@@ -149,7 +149,9 @@ email/password login endpoint was removed.
 | GET | `/api/auth/user` | Always `200`; `{ user: null, isAuthenticated: false }` when anonymous |
 | GET | `/api/auth/me` | Deprecated current-user alias (401 when anonymous) |
 | GET | `/api/auth/status` | Deprecated lightweight auth probe |
-| POST | `/api/auth/logout-all` | Revoke all active Clerk sessions for the caller |
+| POST | `/api/auth/logout-all` | Revoke all active Clerk sessions for the caller, or every owner password session |
+| POST | `/api/auth/admin-login` | Owner password sign-in (`OWNER_PASSWORD`); sets the owner session cookie |
+| POST | `/api/auth/admin-logout` | End every owner password session and clear the cookie; `200` without one |
 
 > Sign-in, sign-out, and session management go through Clerk's hosted flow;
 > check `/api/docs` and `server/routes/domains/auth-user.ts` for the current
@@ -189,7 +191,7 @@ The exact parameter list, enums and bounds are in `/api/openapi.json`
 | `tags` / `tag` | ✓ | – | 1–10 comma-separated or repeated values |
 | `provider`, `format`, `skillLevel`, `kind` | ✓ | – | Controlled values, case-insensitive; unknown → `400 invalid_<param>` with `allowed` |
 | `sort` | ✓ | – | `relevance`, `name-asc`, `name-desc`, `newest`, `oldest`; unknown → `400 invalid_sort` |
-| `facets` | ✓ | – | `true` adds facet counts |
+| `facets` | ✓ | – | `true` adds all facet counts; `categories` adds the category facet only |
 | `page`, `limit` (1–100), `offset`, `cursor` | ✓ | – | `cursor` aliases `offset`; out-of-range → `400` |
 | `limit`, `offset` | – | ✓ | `limit` defaults to 100 and is clamped to 1–200; non-numeric → `400` |
 
@@ -288,7 +290,7 @@ unknown kind is `400 invalid_kind` with the allowed values.
 | POST/DELETE | `/api/collections/:collectionId/items/:resourceId` | Manage collection membership |
 | POST/DELETE | `/api/collections/:collectionId/publish` | Publish or unpublish a collection |
 | PATCH/POST | `/api/bookmarks/:resourceId/state`, `/api/bookmarks/bulk` | Bookmark queue/bulk actions |
-| GET/PUT | `/api/notification-preferences` | Reminder/digest preferences |
+| GET/PUT/PATCH | `/api/notification-preferences` | Reminder/digest preferences (PUT saves the whole form; PATCH changes only the fields sent) |
 | GET/PATCH/POST | `/api/notifications`, `/api/notifications/:id/read`, `/api/notifications/read-all` | Notification inbox |
 | GET | `/api/digests/preview` | Preview the caller's next digest |
 | GET | `/api/user/progress` | Learning progress |
@@ -336,7 +338,7 @@ and `server/routes/domains/` for the complete set):
 | PATCH | `/api/admin/resources/:id/featured` — body `{ "featured": boolean }`, toggles `metadata.featured` (audit-logged) |
 | POST | `/api/admin/resources/:id/approve` \| `/reject` \| `/unapprove` |
 | POST | `/api/admin/resources/bulk/approve` \| `/reject` \| `/delete` |
-| GET | `/api/admin/resource-edits` |
+| GET | `/api/admin/resource-edits` (pending) \| `/recent` (last 10 resolved) |
 | POST | `/api/admin/resource-edits/:id/approve` \| `/reject` |
 
 **Taxonomy** (`categories`, `subcategories`, `sub-subcategories`)

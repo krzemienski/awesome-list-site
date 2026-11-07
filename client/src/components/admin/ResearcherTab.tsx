@@ -1,16 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,34 +14,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { ResearchLaunchGuide, type ResearchLaunchGuideHandle } from "@/components/admin/ResearchLaunchGuide";
+import { ResearchRunView } from "@/components/admin/ResearchRunView";
+import { CancelResearchRunDialog } from "@/components/admin/CancelResearchRunDialog";
+import { ResearchRunConfigSummary } from "@/components/admin/ResearchRunConfigSummary";
+import {
+  BAD_TEXT,
+  COST_BASIS_NOTE,
+  type CheapestSavingRun,
+  OK_SOLID_BUTTON,
+  OK_TEXT,
+  formatCost,
+  getDiscoveryStatusBadge,
+  getStatusBadge,
+  getVerificationBadges,
+  humanizeJobError,
+  isActiveJobStatus,
+} from "@/components/admin/researchDisplay";
+import { useDiscoveryReview } from "@/components/admin/useDiscoveryReview";
 import {
   Search,
-  Play,
   XCircle,
   RefreshCw,
-  CheckCircle2,
   AlertCircle,
   Clock,
-  DollarSign,
   Eye,
   ThumbsUp,
   ThumbsDown,
-  Brain,
   ExternalLink,
-  Activity,
-  Zap,
-  Settings2,
-  ChevronDown,
-  ChevronRight,
-  Cpu,
-  Server,
-  KeyRound,
-  Wand2,
-  Star,
-  Archive,
 } from "lucide-react";
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { focusElement } from "@/hooks/focus-handoff";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -55,18 +55,19 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
+import "./research-run.css";
 import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
+import { apiFetch } from "@/lib/api-fetch";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
-const INFO_STATUS_BADGE = "bg-[var(--status-info)]/20 text-[var(--status-info)] border-[var(--status-info)]/30"; // DS-OK: cyan info (DS chart/info constant)
-const OK_STATUS_BADGE = "bg-[var(--status-ok)]/20 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
-const WARN_OUTLINE = "border-[var(--status-warn)]/30 text-[var(--status-warn)]"; // DS-OK: status warn
-const OK_OUTLINE = "text-xs shrink-0 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
-const WARN_TEXT = "text-[var(--status-warn)]"; // DS-OK: status warn
-const INFO_BORDER = "border-[var(--status-info)]/20"; // DS-OK: cyan info (DS chart/info constant)
-const OK_SOLID_BUTTON = "bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90"; // DS-OK: status ok
-const OK_TEXT = "text-[var(--status-ok)]"; // DS-OK: status ok
-const BAD_TEXT = "text-[var(--status-bad)]"; // DS-OK: status bad
 const CANONICAL_JOB_ROWS = 5;
+
+/** The fields this tab reads from the shared awesome-list catalog snapshot. */
+interface CatalogSnapshot {
+  categories?: { name?: string; title?: string }[];
+  resources?: unknown[];
+}
 
 /**
  * Agent roles use the global DS status/info constants. Related role variants
@@ -94,162 +95,45 @@ const AGENT_ROLE_TEXT_STYLES: Record<string, string> = {
   assistant: "text-[var(--status-info)]/80", // DS-OK: cyan info (DS chart/info constant)
 };
 
-function getStatusBadge(status: string) {
-  const statusClass =
-    status === "completed" || status === "approved"
-      ? "queues-agent__status--ok"
-      : status === "failed" || status === "rejected"
-        ? "queues-agent__status--bad"
-        : status === "processing" || status === "pending" || status === "pending_review" || status === "budget_stopped"
-          ? "queues-agent__status--warn"
-          : "queues-agent__status--muted";
-  switch (status) {
-    case "processing":
-      return <Badge variant="default" className={`queues-agent__status ${statusClass} ${INFO_STATUS_BADGE}`}><Activity className="w-3 h-3 mr-1 animate-pulse" />Running</Badge>;
-    case "completed":
-      return <Badge variant="default" className={`queues-agent__status ${statusClass} ${OK_STATUS_BADGE}`}><CheckCircle2 className="w-3 h-3 mr-1" />Completed</Badge>;
-    case "failed":
-      return <Badge variant="destructive" className={`queues-agent__status ${statusClass}`}><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
-    case "cancelled":
-      return <Badge variant="outline" className={`queues-agent__status ${statusClass}`}><XCircle className="w-3 h-3 mr-1" />Cancelled</Badge>;
-    case "budget_stopped":
-      // The run spent its configured USD cap — not a crash, not a normal finish.
-      return <Badge variant="outline" className={`queues-agent__status ${statusClass} ${WARN_OUTLINE}`}><AlertCircle className="w-3 h-3 mr-1" />Stopped at budget</Badge>;
-    default:
-      return <Badge variant="outline" className={`queues-agent__status ${statusClass}`}><Clock className="w-3 h-3 mr-1" />{status}</Badge>;
-  }
-}
-
-// Run16 BUG-026: raw SDK failures like "Claude Code process exited with code 1"
-// are meaningless to an admin. Map known patterns to a plain-language
-// explanation while keeping the raw text for debugging.
-function humanizeJobError(msg: string): string {
-  if (/exited with code \d+/i.test(msg) || /process exited/i.test(msg)) {
-    return `The research agent crashed before finishing. This is usually transient — try launching the job again; if it keeps happening, try setting explicit budget/turn limits. (Technical detail: ${msg})`;
-  }
-  if (/abort/i.test(msg)) {
-    return `The job was stopped before it could finish. (Technical detail: ${msg})`;
-  }
-  return msg;
-}
-
-// NB-033 (run18): one cost formatter — always $X.XXXX (4 decimals) so the cost
-// column/detail never mixes $0.00 / $0.0000 / $12.3801 representations.
-function formatCost(value: string | number | null | undefined): string {
-  return `$${Number(value ?? 0).toFixed(4)}`;
-}
-
 // Cancelling a job that the server failed to stop: it may still be running.
 const CANCEL_OUTCOME = "The job may still be running. Refresh the job list, then try again.";
 
-function getDiscoveryStatusBadge(status: string) {
-  switch (status) {
-    case "pending_review":
-      return <Badge variant="outline" className={`queues-agent__status queues-agent__status--warn ${WARN_OUTLINE}`}><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
-    case "approved":
-      return <Badge variant="default" className={`queues-agent__status queues-agent__status--ok ${OK_STATUS_BADGE}`}><ThumbsUp className="w-3 h-3 mr-1" />Approved</Badge>;
-    case "rejected":
-      return <Badge variant="destructive" className="queues-agent__status queues-agent__status--bad"><ThumbsDown className="w-3 h-3 mr-1" />Rejected</Badge>;
-    default:
-      return <Badge variant="outline" className="queues-agent__status queues-agent__status--muted">{status}</Badge>;
-  }
+/** Job id from a ?jobId= deep link (the Research workspace's "Review candidates"). */
+function jobIdFromUrl(): number | null {
+  if (typeof window === "undefined") return null;
+  const value = Number(new URLSearchParams(window.location.search).get("jobId"));
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
 }
 
-/**
- * WS3 (July 30, 2026): verification badges from the async post-save verifier.
- * Shows liveness (dead link / verified) and GitHub repo signals (stars,
- * archived). No badge at all = verification still pending or predates WS3.
- */
-function getVerificationBadges(d: ResearchDiscovery) {
-  const v = d.verification;
-  if (!v) return null;
-  const badges: JSX.Element[] = [];
-  if (v.liveness === "dead") {
-    badges.push(
-      <Badge key="dead" variant="destructive" className="text-xs shrink-0" title={v.suspicion || v.error || undefined} data-testid={`badge-verification-dead-${d.id}`}>
-        <XCircle className="w-3 h-3 mr-1" />{v.suspicion ? "Suspicious link" : "Link check failed"}
-      </Badge>
-    );
-  } else if (v.liveness === "ok") {
-    badges.push(
-      <Badge key="ok" variant="outline" className={OK_OUTLINE} data-testid={`badge-verification-ok-${d.id}`}>
-        <CheckCircle2 className="w-3 h-3 mr-1" />Link OK
-      </Badge>
-    );
-  }
-  if (v.github && !v.github.unavailable) {
-    if (typeof v.github.stars === "number") {
-      badges.push(
-        <Badge key="stars" variant="secondary" className="text-xs shrink-0" title={v.github.pushedAt ? `Last push ${new Date(v.github.pushedAt).toLocaleDateString()}` : undefined}>
-          <Star className="w-3 h-3 mr-1" />{v.github.stars.toLocaleString()}
-        </Badge>
-      );
-    }
-    if (v.github.archived) {
-      badges.push(
-        <Badge key="archived" variant="outline" className={`text-xs shrink-0 ${WARN_OUTLINE}`}>
-          <Archive className="w-3 h-3 mr-1" />Archived repo
-        </Badge>
-      );
-    }
-  }
-  return badges.length > 0 ? badges : null;
-}
-
-export type ResearcherInitialTab = "launch" | "review" | "history";
+export type ResearcherInitialTab = "review" | "history";
 
 interface ResearcherTabProps {
   initialTab?: ResearcherInitialTab;
 }
 
-export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabProps) {
+export default function ResearcherTab({ initialTab = "review" }: ResearcherTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const aiDefaults = useAiDefaults();
   const defaultOrchestratorModel = aiDefaults.flowModel("researchOrchestrator");
   const defaultScoutModel = aiDefaults.flowModel("researchScout");
-  const defaultBaseUrl = aiDefaults.config?.baseUrl;
 
-  // WS1 (July 30, 2026): empty by default — an empty prompt tells the server
-  // to auto-generate a gap-aware, history-aware brief at launch. The
-  // "Auto-generate brief" button previews the same brief for editing.
-  const [prompt, setPrompt] = useState("");
-  const [categoryFocus, setCategoryFocus] = useState("");
-  // Blank = unlimited (owner request July 24, 2026): budget and turns are
-  // unbounded by default; entering a number opts INTO a cap.
-  // BUG-045 (run25): default to a sane spending cap instead of UNLIMITED —
-  // the operator can clear the field deliberately if they want no cap.
-  const [maxBudget, setMaxBudget] = useState("1.00");
-  // R4-052: keep the raw input string (like maxBudget) instead of a number so
-  // typing "5.5" or "0" is never silently rewritten — validation feedback is
-  // shown instead (see the hint below the field + handleLaunch).
-  const [maxTurns, setMaxTurns] = useState("15");
-  // Stop condition: end the run automatically after N NEW saved discoveries.
-  // Raw string like maxTurns so typing is never silently rewritten.
-  const [targetDiscoveries, setTargetDiscoveries] = useState("");
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [model, setModel] = useState("");
-  // Explicit scout (subagent) model. Blank = auto: default scout model on the
-  // platform endpoint, or the orchestrator model when a custom model is set.
-  const [scoutModel, setScoutModel] = useState("");
-  const [baseUrl, setBaseUrl] = useState("");
-  const [authToken, setAuthToken] = useState("");
-  const [selectedJobId, setSelectedJobId] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const value = Number(new URLSearchParams(window.location.search).get('jobId'));
-    return Number.isSafeInteger(value) && value > 0 ? value : null;
-  });
-  const [showJobDetails, setShowJobDetails] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const value = Number(new URLSearchParams(window.location.search).get('jobId'));
-    return Number.isSafeInteger(value) && value > 0;
-  });
-  const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
+  // The guided view follows one run: the one just launched, the active run
+  // found on load, or a ?jobId= deep link. Null shows the launch steps.
+  const [followJobId, setFollowJobId] = useState<number | null>(jobIdFromUrl);
+  const [focusRunOnMount, setFocusRunOnMount] = useState(false);
+  const autoFollowed = useRef(followJobId !== null);
+  const guideRef = useRef<ResearchLaunchGuideHandle>(null);
+  const [historyJobId, setHistoryJobId] = useState<number | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyTab, setHistoryTab] = useState<string>(initialTab);
+  const historyRegionRef = useRef<HTMLElement>(null);
+  const historyRowRef = useRef<HTMLTableRowElement>(null);
+
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+  const [showJobDetails, setShowJobDetails] = useState(false);
+  const review = useDiscoveryReview();
   const [confirmApproveAll, setConfirmApproveAll] = useState(false);
-  // Run23 NB-040: launching a paid research job needs an explicit confirmation
-  // step (same AlertDialog pattern as GitHub import/export).
-  const [confirmLaunch, setConfirmLaunch] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -259,17 +143,10 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   // 20 (server caps at 200). Key stays prefixed by '/api/researcher/jobs' so
   // existing prefix invalidations keep working.
   const [jobsLimit, setJobsLimit] = useState(20);
-  const {
-    data: jobsData,
-    error: jobsError,
-    isError: jobsIsError,
-    isLoading: jobsLoading,
-    isFetching: jobsFetching,
-    refetch: refetchJobs,
-  } = useQuery<{ jobs: ResearchJob[]; total: number }>({
+  const jobsQuery = useQuery<{ jobs: ResearchJob[]; total: number; cheapestSavingRun: CheapestSavingRun | null }>({
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, await res.text());
       return res.json();
     },
@@ -281,6 +158,16 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // the button mounted while the next window loads, so focus stays on it.
     placeholderData: keepPreviousData,
   });
+  const {
+    data: jobsData,
+    error: jobsError,
+    isError: jobsIsError,
+    isLoading: jobsLoading,
+    isFetching: jobsFetching,
+    refetch: refetchJobs,
+  } = jobsQuery;
+  // A fetch started offline is paused, not failed (sweep NEW-002).
+  const jobsUnavailable = queryUnavailableReason(jobsQuery);
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
   const [showAllJobs, setShowAllJobs] = useState(false);
@@ -310,6 +197,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     .filter((c) => Number.isFinite(c) && c > 0);
   const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
   const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
+  // Server-side over the whole history: the listed window holds only the latest runs.
+  const cheapestSavingRun = jobsData?.cheapestSavingRun ?? null;
 
   const {
     data: selectedJob,
@@ -324,7 +213,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // hit the LIST endpoint instead of /jobs/:id, leaving the popover bound
     // to an array (everything undefined → "No log entries" forever).
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${selectedJobId}: ${res.status}`);
       return res.json();
     },
@@ -336,6 +225,22 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       return false;
     },
   });
+
+  // A deep-linked run can be older than the paginated list, even at its limit.
+  // Reuse the run view's cached detail without growing the compact jobs window.
+  const historyJobQuery = useQuery<ResearchJob>({
+    queryKey: ['/api/researcher/jobs', historyJobId],
+    enabled: historyJobId !== null && !jobs?.some((job) => job.id === historyJobId),
+    queryFn: async () => {
+      const res = await apiFetch(`/api/researcher/jobs/${historyJobId}`, { credentials: 'include' });
+      if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${historyJobId}: ${res.status}`);
+      return res.json();
+    },
+  });
+  const extraHistoryJob = historyJobQuery.data?.id === historyJobId && !jobs?.some((job) => job.id === historyJobId)
+    ? historyJobQuery.data
+    : null;
+  const historyJobs = extraHistoryJob ? [extraHistoryJob, ...(jobs ?? [])] : (jobs ?? []);
 
   const {
     data: pendingDiscoveries,
@@ -359,153 +264,30 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     queryKey: ['/api/researcher/discoveries', selectedJobId ? `?jobId=${selectedJobId}` : ''],
     enabled: !!selectedJobId && showJobDetails,
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/discoveries?jobId=${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/discoveries?jobId=${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, 'Failed to fetch');
       return res.json();
     },
   });
 
   // R4-033 (run21): same cache entry as App.tsx — no second catalog download.
-  const { data: categoriesData } = useQuery<any>({
+  const { data: categoriesData } = useQuery<CatalogSnapshot>({
     queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
+    queryFn: () => fetchStaticAwesomeList() as Promise<CatalogSnapshot>,
     staleTime: 1000 * 60 * 60,
   });
 
-  const categoryNames = categoriesData?.categories
-    ? categoriesData.categories.map((c: any) => c.name || c.title)
-    : [];
+  const categoryNames: string[] = (categoriesData?.categories ?? [])
+    .map((c) => c.name ?? c.title ?? "")
+    .filter((name) => name !== "");
 
-  const startMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest('/api/researcher/start', {
-        method: 'POST',
-        body: JSON.stringify({
-          prompt,
-          categoryFocus: categoryFocus && categoryFocus !== 'all' ? categoryFocus : undefined,
-          // R5-021 made the server require real number types; sending the raw
-          // input string here made every launch 400 with a budget error even
-          // when a valid budget was set. Blank = unlimited => omit the field.
-          maxBudgetUsd: maxBudget.trim() === "" ? undefined : Number(maxBudget),
-          maxTurns: maxTurns.trim() === "" ? undefined : Number(maxTurns),
-          targetDiscoveries: targetDiscoveries.trim() === "" ? undefined : Number(targetDiscoveries),
-          model: model.trim() || undefined,
-          scoutModel: scoutModel.trim() || undefined,
-          baseUrl: baseUrl.trim() || undefined,
-          authToken: authToken.trim() || undefined,
-        }),
-      });
-    },
-    onSuccess: (data: any) => {
-      setConfirmLaunch(false);
-      setIsPolling(true);
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      // Auto-open the live log so the admin can see exactly what's happening.
-      if (data?.jobId) {
-        setSelectedJobId(data.jobId);
-        setShowJobDetails(true);
-      }
-      setAuthToken("");
-      toast({ title: `Research job #${data?.jobId ?? ''} started`, description: "Live log opened — streaming updates every 2s." });
-    },
-    // The confirmation dialog stays mounted on failure so its inline error
-    // remains visible and the operator can retry without a toast remount.
-  });
-
-  // Run16 BUG-008: the launch button used to fire even while the native
-  // number inputs were flagged invalid (budget $0 jobs got created). Block
-  // submission client-side, mirroring the server's min-$0.25 / 5–100 ranges
-  // (Run20: no upper budget cap per user request).
-  const handleLaunch = () => {
-    if (!activeJobStateKnown) {
-      toast({
-        title: jobsIsError ? "Unable to check active jobs" : "Checking active jobs",
-        description: jobsIsError
-          ? "Retry Job History before starting a paid research job."
-          : "Please wait until the current job status is known.",
-        variant: jobsIsError ? "destructive" : undefined,
-      });
-      return;
-    }
-    // R4-051: the min-length rule used to only manifest as a disabled button
-    // with no explanation — clicking a short prompt now yields explicit feedback
-    // (a hint under the field covers the before-submit case).
-    // WS1: an EMPTY prompt is valid — the server auto-generates the brief.
-    const trimmedPrompt = prompt.trim();
-    if (trimmedPrompt.length > 0 && trimmedPrompt.length < 10) {
-      toast({
-        title: "Prompt too short",
-        description: "Write at least 10 characters, or clear the field to auto-generate a brief.",
-        variant: "destructive",
-      });
-      return;
-    }
-    // Blank = unlimited (no cap). A provided value must still be a sane
-    // positive number so garbage can't silently start a run.
-    if (maxBudget.trim() !== "") {
-      const budget = Number(maxBudget);
-      if (!Number.isFinite(budget) || budget <= 0) {
-        toast({
-          title: "Invalid budget",
-          description: "Budget must be a positive number, or leave blank for unlimited.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    // R4-052: reject non-integer turns with a message instead of silently
-    // coercing them (5.5 → 5).
-    if (maxTurns.trim() !== "") {
-      const turns = Number(maxTurns);
-      if (!Number.isInteger(turns) || turns <= 0) {
-        toast({
-          title: "Invalid max turns",
-          description: "Max turns must be a positive whole number, or leave blank for unlimited.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    if (targetDiscoveries.trim() !== "") {
-      const target = Number(targetDiscoveries);
-      if (!Number.isInteger(target) || target <= 0 || target > 1000) {
-        toast({
-          title: "Invalid discovery target",
-          description: "Stop-after must be a whole number from 1 to 1000, or leave blank for no target.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    // Run23 NB-040: don't fire the job from the raw click — open an explicit
-    // confirmation dialog first.
-    setConfirmLaunch(true);
-  };
-
-  // WS1: preview the server-generated brief into the textarea for editing.
-  const briefMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/researcher/brief', { credentials: 'include' });
-      if (!res.ok) throw new ApiError(res.status, await res.text());
-      return res.json();
-    },
-    onSuccess: (data: any) => {
-      if (data?.brief) {
-        setPrompt(data.brief);
-        toast({ title: "Brief generated", description: data.angle ? `Campaign angle: ${data.angle}. Edit freely before launching.` : "Edit freely before launching." });
-      }
-    },
-    onError: (error: any) => {
-      toast({ title: "Failed to generate brief", description: describeWriteError(error, { outcome: "No brief was generated. Please try again." }), variant: "destructive" });
-    },
-  });
-
+  const [jobToCancel, setJobToCancel] = useState<number | null>(null);
   const cancelMutation = useMutation({
     mutationFn: async (jobId: number) => {
       return await apiRequest(`/api/researcher/jobs/${jobId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
+      setJobToCancel(null);
       void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Job cancelled" });
     },
@@ -544,38 +326,6 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // remains visible and the operator can retry without a toast remount.
   });
 
-  const approveMutation = useMutation({
-    mutationFn: async (discoveryId: number) => {
-      return await apiRequest(`/api/researcher/discoveries/${discoveryId}/approve`, { method: 'POST' });
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
-      toast({ title: "Resource approved", description: "Discovery added to the database." });
-    },
-    onError: (error: any) => {
-      toast({ title: "Failed to approve", description: describeWriteError(error), variant: "destructive" });
-    },
-  });
-
-  const rejectMutation = useMutation({
-    mutationFn: async ({ id, reason }: { id: number; reason?: string }) => {
-      return await apiRequest(`/api/researcher/discoveries/${id}/reject`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      });
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
-      setRejectDialogId(null);
-      setRejectReason("");
-      toast({ title: "Discovery rejected" });
-    },
-    // The rejection dialog stays mounted on failure so its inline error remains
-    // visible and the operator can retry without a toast remount.
-  });
-
   const activeJobs = jobs?.filter(j => j.status === 'processing' || j.status === 'pending') || [];
 
   useEffect(() => {
@@ -585,10 +335,62 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     }
   }, [activeJobs.length, isPolling]);
 
+  const activeJob = jobs?.find((j) => isActiveJobStatus(j.status)) ?? null;
+
+  // Landing on the tab while a run is going follows it (once per visit).
+  useEffect(() => {
+    if (autoFollowed.current || !activeJobStateKnown) return;
+    autoFollowed.current = true;
+    if (activeJob) setFollowJobId(activeJob.id);
+  }, [activeJobStateKnown, activeJob]);
+
+  // ?jobId= names the run being followed, so the live view can be shared or
+  // reloaded; following none drops it. replaceState keeps Back unchanged.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.pathname.startsWith("/admin")) return;
+    const linked = followJobId === null ? null : String(followJobId);
+    if (url.searchParams.get("jobId") === linked) return;
+    if (linked === null) url.searchParams.delete("jobId");
+    else url.searchParams.set("jobId", linked);
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+  }, [followJobId]);
+
+  // Leaving the run view removes the focused button. Commit that change inside
+  // the click and move focus straight away: a deferred (rAF) focus never runs
+  // in a tab that is not producing frames, and focus stays on <body>.
+  const relaunchHigherCap = () => {
+    flushSync(() => setFollowJobId(null));
+    guideRef.current?.focusBudget();
+  };
+
+  const startNewRun = () => {
+    flushSync(() => setFollowJobId(null));
+    guideRef.current?.focusStart();
+  };
+
+  const showHistory = (jobId: number) => {
+    flushSync(() => {
+      setHistoryJobId(jobId);
+      setHistoryOpen(true);
+      setHistoryTab("history");
+      setFollowJobId(null);
+    });
+    (historyRowRef.current ?? historyRegionRef.current)?.scrollIntoView({ block: "center" });
+    focusElement(historyRegionRef.current, { preventScroll: true });
+  };
+
   return (
     <div className="queues-agent queues-agent--research">
-      {cancelMutation.isError && (
-        <Alert variant="destructive" role="alert">
+      <CancelResearchRunDialog
+        jobId={jobToCancel}
+        pending={cancelMutation.isPending}
+        error={cancelMutation.isError ? cancelMutation.error : null}
+        onConfirm={(id) => cancelMutation.mutate(id)}
+        onDismiss={() => setJobToCancel(null)}
+      />
+      {cancelMutation.isError && jobToCancel === null && (
+        <Alert variant="destructive">
           <AlertCircle className="w-4 h-4" />
           <AlertDescription>
             Could not cancel job #{cancelMutation.variables}: {describeWriteError(cancelMutation.error, { outcome: CANCEL_OUTCOME })}
@@ -600,55 +402,39 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
         </Alert>
       )}
       <div className="queues-agent__canonical">
-        <section className="card queues-agent__research-form">
-          <h3>Run a research task</h3>
-          <p>The agent will scour the web for new resources matching your prompt.</p>
-          <div className="queues-agent__research-fields">
-            <div className="field">
-              <label htmlFor="canonical-research-prompt">Prompt</label>
-              <textarea
-                id="canonical-research-prompt"
-                className="textarea"
-                value={prompt}
-                onChange={(event) => setPrompt(event.target.value)}
-                placeholder="e.g. Find 5 new open-source AV1 encoders not yet in the index"
+        <section className="card queues-agent__research-form research-guided" data-testid="research-guided">
+          <div hidden={followJobId !== null}>
+            <div className="research-guided">
+              <h3>Run a research task</h3>
+              <p className="text-sm text-muted-foreground">Five steps: what to look for, where, how far to go, which endpoint, then launch. You can follow the run live and review what it finds right here.</p>
+              <ResearchLaunchGuide
+                ref={guideRef}
+                categoryNames={categoryNames}
+                activeStateKnown={activeJobStateKnown}
+                activeStateError={jobsUnavailable !== null}
+                activeJobId={activeJob?.id ?? null}
+                onFollow={(id) => { setFocusRunOnMount(true); setFollowJobId(id); }}
+                onLaunched={(id) => {
+                  setFocusRunOnMount(true);
+                  setFollowJobId(id);
+                  setIsPolling(true);
+                }}
+                costRange={costMin !== null && costMax !== null ? { min: costMin, max: costMax } : null}
+                cheapestSavingRun={cheapestSavingRun}
+                catalogSize={categoriesData?.resources?.length ?? null}
               />
             </div>
-            <div className="queues-agent__research-limits">
-              <div className="field">
-                <label htmlFor="canonical-max-turns">Max turns</label>
-                <input
-                  id="canonical-max-turns"
-                  className="input"
-                  value={maxTurns}
-                  onChange={(event) => setMaxTurns(event.target.value)}
-                  placeholder="15"
-                  inputMode="numeric"
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="canonical-budget">Budget</label>
-                <input
-                  id="canonical-budget"
-                  className="input"
-                  value={`$${maxBudget}`}
-                  onChange={(event) => setMaxBudget(event.target.value.replace(/^\$/, ""))}
-                  inputMode="decimal"
-                />
-              </div>
-            </div>
-            <div className="queues-agent__research-actions">
-              <Button
-                type="button"
-                className="btn primary"
-                onClick={handleLaunch}
-                disabled={!activeJobStateKnown || activeJobs.length > 0 || startMutation.isPending}
-                data-testid="button-launch-researcher-canonical"
-              >
-                Run job
-              </Button>
-            </div>
           </div>
+          {followJobId !== null && (
+            <ResearchRunView
+              key={followJobId}
+              jobId={followJobId}
+              focusOnMount={focusRunOnMount}
+              onStartNew={startNewRun}
+              onRelaunchHigherCap={relaunchHigherCap}
+              onShowHistory={() => showHistory(followJobId)}
+            />
+          )}
         </section>
         <TableShell
           title="Researcher jobs"
@@ -669,22 +455,28 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               </thead>
               <tbody>
                 {visibleJobs.map((job) => (
-                  <tr key={job.id}>
+                  <tr key={job.id} aria-current={job.id === historyJobId ? "true" : undefined} className={job.id === historyJobId ? "bg-muted/50" : undefined}>
                     <td><StatusChip status={job.status} /></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
-                    <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
+                    <td className="mono queues-agent__cell-mono">
+                      {formatCost(job.estimatedCostUsd)}
+                      {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
+                        <span className="block text-[10px] text-muted-foreground">{COST_BASIS_NOTE[job.costBasis]}</span>
+                      )}
+                    </td>
                     <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns ?? "∞"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {jobsIsError ? (
+            {jobsUnavailable ? (
               <AdminLoadError
                 subject="research jobs"
                 error={jobsError}
+                offline={jobsUnavailable === "offline"}
                 note={jobs ? "The rows above may be out of date." : undefined}
                 onRetry={() => { void refetchJobs(); }}
                 retrying={jobsFetching}
@@ -705,6 +497,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
                   setShowAllJobs(true);
                 }}
+                aria-label={showAllJobs ? `Load more (${jobs.length} of ${jobsTotal}) in the Researcher jobs table` : undefined}
                 data-testid="button-show-more-research-jobs"
               >
                 {showAllJobs ? `Load more (${jobs.length} of ${jobsTotal})` : "Show more"}
@@ -713,13 +506,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           ) : null}
         </TableShell>
       </div>
-      <details className="queues-agent__more">
-        <summary className="btn ghost">Advanced research controls &amp; discoveries</summary>
-      <Tabs defaultValue={initialTab} className="w-full queues-agent__tabs">
+      <details className="queues-agent__more" open={historyOpen} onToggle={(event) => setHistoryOpen(event.currentTarget.open)}>
+        <summary className="btn ghost">All pending discoveries &amp; full job history</summary>
+      <Tabs value={historyTab} onValueChange={setHistoryTab} className="w-full queues-agent__tabs">
         {/* Run16 BUG-030: wrap at narrow widths — the fixed inline-flex bar
             was 465px wide and pushed "Job History" off-screen at 375px. */}
         <TabsList className="mb-4 flex flex-wrap h-auto w-full justify-start gap-1">
-          <TabsTrigger value="launch"><Brain className="w-4 h-4 mr-1" />Launch Research</TabsTrigger>
           <TabsTrigger value="review">
             <Search className="w-4 h-4 mr-1" />Review Discoveries
             {pendingDiscoveries && pendingDiscoveries.length > 0 && (
@@ -728,416 +520,6 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           </TabsTrigger>
           <TabsTrigger value="history"><Clock className="w-4 h-4 mr-1" />Job History</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="launch">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="queues-agent__control-shell">
-              <CardHeader>
-                <CardTitle className="queues-agent__section-title flex items-center gap-2"><Brain className="w-5 h-5 text-primary" />New Research Job</CardTitle>
-                <CardDescription className="queues-agent__section-description">Configure and launch an AI researcher to discover new video streaming resources</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <Label htmlFor="prompt">Research Prompt</Label>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-xs"
-                      // C5-V5A-02: aria-disabled (not disabled) keeps keyboard
-                      // focus on the button while the brief generates.
-                      onClick={() => { if (!briefMutation.isPending) briefMutation.mutate(); }}
-                      aria-disabled={briefMutation.isPending}
-                      aria-busy={briefMutation.isPending}
-                      data-testid="button-generate-brief"
-                    >
-                      {briefMutation.isPending
-                        ? <><RefreshCw className="w-3 h-3 mr-1 animate-spin" />Generating…</>
-                        : <><Wand2 className="w-3 h-3 mr-1" />Auto-generate brief</>}
-                    </Button>
-                  </div>
-                  <Textarea
-                    id="prompt"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Leave empty to auto-generate a gap-aware brief at launch, or describe what to search for..."
-                    className="mt-1 min-h-[100px]"
-                  />
-                  {/* R4-051: surface the ≥10-char rule up front instead of only
-                      as a mysteriously disabled Launch button. WS1: empty is
-                      valid (server auto-generates the brief). */}
-                  <p
-                    className={`text-xs mt-1 ${prompt.trim().length > 0 && prompt.trim().length < 10 ? WARN_TEXT : "text-muted-foreground"}`}
-                    data-testid="text-prompt-hint"
-                  >
-                    {prompt.trim().length === 0
-                      ? "Empty = a gap-aware brief is auto-generated at launch."
-                      : prompt.trim().length < 10
-                        ? `At least 10 characters required (${prompt.trim().length}/10) — or clear the field to auto-generate.`
-                        : `${prompt.trim().length} characters`}
-                  </p>
-                </div>
-
-                <div>
-                  <Label>Category Focus (Optional)</Label>
-                  <Select value={categoryFocus} onValueChange={setCategoryFocus}>
-                    <SelectTrigger className="mt-1" aria-label="Category focus">
-                      <SelectValue placeholder="All categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All categories</SelectItem>
-                      {categoryNames.map((name: string) => (
-                        <SelectItem key={name} value={name}>{name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="budget">Budget (USD)</Label>
-                    <div className="flex items-center gap-1 mt-1">
-                      <DollarSign className="w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="budget"
-                        type="number"
-                        step="0.25"
-                        min="0"
-                        placeholder="Unlimited"
-                        value={maxBudget}
-                        onChange={(e) => setMaxBudget(e.target.value)}
-                      />
-                    </div>
-                    {(() => {
-                      if (maxBudget.trim() === "") {
-                        return (
-                          <p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
-                            Unlimited budget — no discovery cap
-                          </p>
-                        );
-                      }
-                      const b = Number(maxBudget);
-                      if (!Number.isFinite(b) || b <= 0) return null;
-                      const cap = Math.max(10, Math.min(1000, Math.round(b * 5)));
-                      return (
-                        <p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
-                          Up to {cap} discoveries this run{cap === 1000 ? " (maximum per run)" : ""}
-                        </p>
-                      );
-                    })()}
-                  </div>
-                  <div>
-                    <Label htmlFor="turns">Max Turns</Label>
-                    <Input
-                      id="turns"
-                      type="number"
-                      min={1}
-                      step={1}
-                      placeholder="Unlimited"
-                      value={maxTurns}
-                      /* R4-052: store the raw text; do NOT silently coerce. */
-                      onChange={(e) => setMaxTurns(e.target.value)}
-                      className="mt-1"
-                    />
-                    {(() => {
-                      if (maxTurns.trim() === "") {
-                        return (
-                          <p className="text-xs mt-1 text-muted-foreground" data-testid="text-turns-hint">
-                            Unlimited turns
-                          </p>
-                        );
-                      }
-                      const t = Number(maxTurns);
-                      const invalid = !Number.isInteger(t) || t <= 0;
-                      return (
-                        <p
-                          className={`text-xs mt-1 ${invalid ? WARN_TEXT : "text-muted-foreground"}`}
-                          data-testid="text-turns-hint"
-                        >
-                          {invalid
-                            ? "Enter a positive whole number, or leave blank for unlimited."
-                            : "Positive whole number (blank = unlimited)."}
-                        </p>
-                      );
-                    })()}
-                  </div>
-                  <div>
-                    <Label htmlFor="target-discoveries">Stop After (discoveries)</Label>
-                    <Input
-                      id="target-discoveries"
-                      type="number"
-                      min={1}
-                      max={1000}
-                      step={1}
-                      placeholder="No target"
-                      value={targetDiscoveries}
-                      onChange={(e) => setTargetDiscoveries(e.target.value)}
-                      className="mt-1"
-                      data-testid="input-target-discoveries"
-                    />
-                    {(() => {
-                      if (targetDiscoveries.trim() === "") {
-                        return (
-                          <p className="text-xs mt-1 text-muted-foreground" data-testid="text-target-hint">
-                            No target — runs until budget/turns end
-                          </p>
-                        );
-                      }
-                      const t = Number(targetDiscoveries);
-                      const invalid = !Number.isInteger(t) || t <= 0 || t > 1000;
-                      return (
-                        <p
-                          className={`text-xs mt-1 ${invalid ? WARN_TEXT : "text-muted-foreground"}`}
-                          data-testid="text-target-hint"
-                        >
-                          {invalid
-                            ? "Enter a whole number from 1 to 1000, or leave blank for no target."
-                            : `Run stops automatically after ${t} new ${t === 1 ? "discovery" : "discoveries"}.`}
-                        </p>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                <div className="rounded-md border">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setShowAdvanced(v => !v)}
-                    className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
-                    aria-expanded={showAdvanced}
-                    aria-controls="advanced-researcher-region"
-                    data-testid="button-toggle-advanced-researcher"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Settings2 className="w-4 h-4 text-muted-foreground" />
-                      Custom Model &amp; Endpoint (optional)
-                    </span>
-                    {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </Button>
-                  {showAdvanced && (
-                    <div id="advanced-researcher-region" className="space-y-3 border-t px-3 py-3">
-                      <div>
-                        <Label htmlFor="research-model" className="flex items-center gap-1.5">
-                          <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model
-                        </Label>
-                        <Input
-                          id="research-model"
-                          value={model}
-                          onChange={(e) => setModel(e.target.value)}
-                          placeholder={defaultOrchestratorModel ? `${defaultOrchestratorModel} (default)` : "Default model"}
-                          className="mt-1 font-mono text-xs"
-                          data-testid="input-research-model"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="research-scout-model" className="flex items-center gap-1.5">
-                          <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Scout Model
-                        </Label>
-                        <Input
-                          id="research-scout-model"
-                          value={scoutModel}
-                          onChange={(e) => setScoutModel(e.target.value)}
-                          placeholder={defaultScoutModel ? `Auto (${defaultScoutModel})` : "Auto (recommended)"}
-                          className="mt-1 font-mono text-xs"
-                          data-testid="input-research-scout-model"
-                        />
-                        <p className="mt-1 text-[11px] text-muted-foreground">
-                          Model for the search scout subagents. Blank = auto: a cheaper Claude scout on the platform endpoint, or the same model as above when a custom model is set. With a custom endpoint, a non-Claude scout model only works if it matches the model above.
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="research-baseurl" className="flex items-center gap-1.5">
-                          <Server className="w-3.5 h-3.5 text-muted-foreground" />Base URL
-                        </Label>
-                        <Input
-                          id="research-baseurl"
-                          value={baseUrl}
-                          onChange={(e) => setBaseUrl(e.target.value)}
-                          placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
-                          className="mt-1 font-mono text-xs"
-                          data-testid="input-research-baseurl"
-                        />
-                        <p className="mt-1 text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
-                      </div>
-                      <div>
-                        <Label htmlFor="research-token" className="flex items-center gap-1.5">
-                          <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />Auth Token
-                        </Label>
-                        <Input
-                          id="research-token"
-                          type="password"
-                          value={authToken}
-                          onChange={(e) => setAuthToken(e.target.value)}
-                          placeholder="Required if a base URL is set (blank = server default credentials)"
-                          className="mt-1 font-mono text-xs"
-                          autoComplete="off"
-                          data-testid="input-research-token"
-                        />
-                        <p className="mt-1 text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <Alert>
-                  <Zap className="w-4 h-4" />
-                  <AlertDescription>
-                    {/* C3-V5A-05: name the model this launch will actually use
-                        (custom override, else the server's resolved default). */}
-                    {model.trim() || defaultOrchestratorModel
-                      ? <>Uses <span className="font-mono" data-testid="text-research-launch-model">{model.trim() || defaultOrchestratorModel}</span>{model.trim() ? "" : " (server default)"}.</>
-                      : "Uses the server's default research model."}{" "}
-                    {costMin !== null && costMax !== null
-                      ? `Your past jobs have cost $${costMin.toFixed(2)}–$${costMax.toFixed(2)} depending on scope and duration (see Job History below).`
-                      : "Cost depends on scope and duration — check Job History after your first run."}{" "}
-                    Jobs without a Max Budget run until you cancel them, so set a cap for a hard stop. The researcher automatically deduplicates against {categoriesData?.resources?.length ? `the ${categoriesData.resources.length.toLocaleString()} existing resources` : 'the existing catalog'}.
-                  </AlertDescription>
-                </Alert>
-
-                {/* R4-051: NB-022 — don't hard-disable on the min-length rule
-                    (that's the "silently disabled" bug). Only the one-shot
-                    pending state disables; short prompts get a toast on click. */}
-                <Button
-                  onClick={handleLaunch}
-                  disabled={startMutation.isPending || !activeJobStateKnown}
-                  className="w-full"
-                >
-                  {startMutation.isPending ? (
-                    <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Starting...</>
-                  ) : (
-                    <><Play className="w-4 h-4 mr-2" />Launch Researcher</>
-                  )}
-                </Button>
-
-                {/* Run23 NB-040: explicit confirmation before starting a paid job. */}
-                <AlertDialog open={confirmLaunch} onOpenChange={(open) => { if (!open && !startMutation.isPending) setConfirmLaunch(false); }}>
-                  <AlertDialogContent className="queues-agent__dialog">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Launch research job?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}.{targetDiscoveries.trim() !== "" ? ` It will stop automatically after ${targetDiscoveries} new ${Number(targetDiscoveries) === 1 ? "discovery" : "discoveries"}.` : ""} The job runs in the background and incurs real API cost{maxBudget.trim() === "" && targetDiscoveries.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    {startMutation.isError && (
-                      <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
-                        <AlertCircle className="w-4 h-4" />
-                        <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
-                      </Alert>
-                    )}
-                    <AlertDialogFooter>
-                      <AlertDialogCancel data-testid="button-cancel-launch" disabled={startMutation.isPending}>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        data-testid="button-confirm-launch"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          if (!activeJobStateKnown) return;
-                          startMutation.mutate();
-                        }}
-                        disabled={startMutation.isPending || !activeJobStateKnown}
-                      >
-                        {startMutation.isPending ? "Launching…" : "Launch"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardContent>
-            </Card>
-
-            <Card className="queues-agent__active-shell">
-              <CardHeader>
-                <CardTitle className="queues-agent__section-title flex items-center gap-2"><Activity className="w-5 h-5 text-primary" />Active Jobs</CardTitle>
-                <CardDescription className="queues-agent__section-description">Currently running research jobs</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {jobsLoading ? (
-                  <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Checking for active research jobs…
-                  </div>
-                ) : jobsIsError ? (
-                  <AdminLoadError
-                    subject="research jobs"
-                    error={jobsError}
-                    onRetry={() => { void refetchJobs(); }}
-                    retrying={jobsFetching}
-                    className="queues-agent__inline-error"
-                    testId="error-research-jobs"
-                    retryTestId="button-retry-research-jobs"
-                  />
-                ) : activeJobs.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">No active research jobs</p>
-                ) : (
-                  <div className="space-y-3">
-                    {activeJobs.map(job => {
-                      // Run16 BUG-027: the list endpoint now ships only the
-                      // latest log entry (agentLogLast) instead of the full
-                      // agentLog; fall back to the old shape defensively.
-                      const log = (job.agentLog as Array<{ role: string; content: string; timestamp: string }> | null) || [];
-                      const last = ((job as any).agentLogLast as { role: string; content: string; timestamp: string } | null) ?? log[log.length - 1];
-                      return (
-                        <Card key={job.id} className={INFO_BORDER}>
-                          <CardContent className="p-4 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium">Job #{job.id}</span>
-                              {getStatusBadge(job.status)}
-                            </div>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{job.prompt}</p>
-                            <div className="grid grid-cols-3 gap-2 text-xs">
-                              <div>
-                                <span className="text-muted-foreground">Found:</span>{' '}
-                                <span className="font-medium">{job.totalDiscoveries || 0}</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Turns:</span>{' '}
-                                <span className="font-medium">{job.turnsUsed || 0}/{job.maxTurns ?? '∞'}</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Cost:</span>{' '}
-                                <span className="font-medium">${job.estimatedCostUsd || '0.00'}</span>
-                              </div>
-                            </div>
-                            {job.maxTurns && (
-                              <Progress value={((job.turnsUsed || 0) / job.maxTurns) * 100} className="h-1" />
-                            )}
-                            {last && (
-                              <div
-                                className="text-[10px] font-mono p-2 rounded border bg-muted/30 line-clamp-2"
-                                title={last.content}
-                              >
-                                <Badge variant="outline" className="h-4 text-[9px] mr-1.5 align-middle">{last.role}</Badge>
-                                {last.content}
-                              </div>
-                            )}
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
-                                data-testid={`button-research-details-${job.id}`}
-                              >
-                                <Eye className="w-3 h-3 mr-1" />Live Log
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => cancelMutation.mutate(job.id)}
-                                disabled={cancelMutation.isPending}
-                              >
-                                <XCircle className="w-3 h-3 mr-1" />Cancel
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         <TabsContent value="review">
           <Card className="queues-agent__table-shell" data-testid="research-review-panel">
@@ -1179,7 +561,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   {approveAllMutation.isError && (
-                    <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+                    <Alert variant="destructive" className="queues-agent__inline-error">
                       <AlertCircle className="w-4 h-4" />
                       <AlertDescription>{describeWriteError(approveAllMutation.error, { outcome: "Some discoveries may already be approved. Refresh the list, then try again." })}</AlertDescription>
                     </Alert>
@@ -1236,12 +618,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         <TableRow key={d.id} data-testid={`row-research-discovery-${d.id}`}>
                           <TableCell className="max-w-[320px]">
                             <div className="min-w-0">
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-medium line-clamp-1 break-words" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                                 {getVerificationBadges(d)}
                               </div>
                               <a href={d.url} target="_blank" rel="noopener noreferrer"
-                                className="mt-1 flex min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
+                                className="mt-1 flex min-h-6 max-lg:min-h-11 min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
                                 <span className="truncate">{sanitizeDisplay(d.url)}</span><ExternalLink className="h-3 w-3 shrink-0" />
                               </a>
                               {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={sanitizeDisplay(d.description)}>{sanitizeDisplay(d.description)}</p>}
@@ -1260,10 +642,10 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                           <TableCell className="text-right">
                             {d.status === "pending_review" ? (
                               <div className="flex justify-end gap-1">
-                                <Button size="sm" variant="default" className={OK_SOLID_BUTTON} onClick={() => approveMutation.mutate(d.id)} disabled={approveMutation.isPending}>
+                                <Button size="sm" variant="default" className={OK_SOLID_BUTTON} onClick={() => review.requestApprove(d)} disabled={review.approve.isPending}>
                                   <ThumbsUp className="h-3 w-3 mr-1" />Approve
                                 </Button>
-                                <Button size="sm" variant="destructive" onClick={() => setRejectDialogId(d.id)}>
+                                <Button size="sm" variant="destructive" onClick={() => review.requestReject(d.id)}>
                                   <ThumbsDown className="h-3 w-3 mr-1" />Reject
                                 </Button>
                               </div>
@@ -1280,10 +662,17 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
         </TabsContent>
 
         <TabsContent value="history">
-          <Card className="queues-agent__table-shell">
+          <Card
+            ref={historyRegionRef}
+            role="region"
+            aria-label={historyJobId === null ? "Research job history" : `Research job history, selected run #${historyJobId}`}
+            tabIndex={-1}
+            className="queues-agent__table-shell focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+          >
             <CardHeader className="queues-agent__table-heading">
               <CardTitle className="queues-agent__table-title">Research Job History</CardTitle>
               <CardDescription className="queues-agent__table-description" data-testid="text-job-history-range">
+                {extraHistoryJob && `Selected job #${extraHistoryJob.id} is shown above the latest jobs. `}
                 {/* Run23 NB-039: say when the list is truncated instead of
                     silently capping at the latest 20. */}
                 {jobs && jobsTotal > jobs.length
@@ -1292,6 +681,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               </CardDescription>
             </CardHeader>
             <CardContent className="queues-agent__table-body">
+              {historyJobQuery.isError && !historyJobs.some((job) => job.id === historyJobId) && (
+                <AdminLoadError
+                  subject={`selected job #${historyJobId}`}
+                  error={historyJobQuery.error}
+                  onRetry={() => { void historyJobQuery.refetch(); }}
+                  retrying={historyJobQuery.isFetching}
+                  className="queues-agent__inline-error"
+                />
+              )}
               {jobsLoading ? (
                 /* Run16 BUG-077: skeleton rows instead of a bare text node. */
                 <div className="space-y-3 py-2" aria-label="Loading research jobs">
@@ -1299,17 +697,18 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     <Skeleton key={i} className="h-10 w-full" />
                   ))}
                 </div>
-              ) : jobsIsError ? (
+              ) : jobsUnavailable ? (
                 <AdminLoadError
                   subject="research jobs"
                   error={jobsError}
+                  offline={jobsUnavailable === "offline"}
                   onRetry={() => { void refetchJobs(); }}
                   retrying={jobsFetching}
                   className="queues-agent__inline-error"
                   testId="error-research-jobs"
                   retryTestId="button-retry-research-jobs"
                 />
-              ) : !jobs || jobs.length === 0 ? (
+              ) : historyJobs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No research jobs yet</p>
               ) : (
                 <Table>
@@ -1330,8 +729,13 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {jobs.map(job => ([
-                        <TableRow key={`${job.id}-main`}>
+                    {historyJobs.flatMap(job => ([
+                        <TableRow
+                          key={`${job.id}-main`}
+                          ref={job.id === historyJobId ? historyRowRef : undefined}
+                          aria-current={job.id === historyJobId ? "true" : undefined}
+                          data-state={job.id === historyJobId ? "selected" : undefined}
+                        >
                           <TableCell className="font-medium">#{job.id}</TableCell>
                           <TableCell>{getStatusBadge(job.status)}</TableCell>
                           <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>
@@ -1380,7 +784,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                             {job.status === 'cancelled' && (!job.estimatedCostUsd || Number(job.estimatedCostUsd) === 0) ? (
                               <span className="text-muted-foreground">—</span>
                             ) : (
-                              formatCost(job.estimatedCostUsd)
+                              <>
+                                {formatCost(job.estimatedCostUsd)}
+                                {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
+                                  <span className="block text-[10px] text-muted-foreground whitespace-nowrap">{COST_BASIS_NOTE[job.costBasis]}</span>
+                                )}
+                              </>
                             )}
                           </TableCell>
                           {/* NB-032 (run18): turnsUsed accumulates across
@@ -1425,7 +834,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                                   size="sm"
                                   variant="ghost"
                                   className="text-destructive"
-                                  onClick={() => cancelMutation.mutate(job.id)}
+                                  onClick={() => { cancelMutation.reset(); setJobToCancel(job.id); }}
                                   disabled={cancelMutation.isPending}
                                   aria-label={`Cancel job #${job.id}`}
                                 >
@@ -1438,7 +847,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         (job.status === 'failed' || (job.status === 'completed' && (job.totalDiscoveries || 0) === 0)) && job.errorMessage ? (
                           <TableRow key={`${job.id}-error`}>
                             <TableCell colSpan={9} className="p-0">
-                              <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
+                              <Alert variant="destructive" live="off" className="rounded-none border-x-0 border-t-0">
                                 <AlertCircle className="w-4 h-4" />
                                 <AlertDescription className="text-xs break-all">
                                   Job #{job.id}: {humanizeJobError(job.errorMessage)}
@@ -1458,6 +867,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     variant="outline"
                     size="sm"
                     onClick={() => setJobsLimit((l) => Math.min(l + 20, 200))}
+                    aria-label={`Load more (${jobs.length} of ${jobsTotal}) in Job History`}
                     data-testid="button-load-more-jobs"
                   >
                     Load more ({jobs.length} of {jobsTotal})
@@ -1473,7 +883,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
         <DialogContent className="queues-agent__dialog max-w-4xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              Research Job #{selectedJob?.id}
+              Research Job #{selectedJob?.id ?? selectedJobId}
               {selectedJob && getStatusBadge(selectedJob.status)}
               {selectedJob?.isActive && (
                 <Badge variant="outline" className="text-[10px]">
@@ -1516,7 +926,9 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 <div className="text-center p-2 border rounded">
                   {/* NB-033 (run18): same 4-decimal formatter as the table. */}
                   <div className="text-lg font-bold">{formatCost(selectedJob.estimatedCostUsd)}</div>
-                  <div className="text-xs text-muted-foreground">Cost</div>
+                  <div className="text-xs text-muted-foreground" data-testid="text-research-cost-basis">
+                    Cost{selectedJob.costBasis && COST_BASIS_NOTE[selectedJob.costBasis] ? ` (${COST_BASIS_NOTE[selectedJob.costBasis]})` : ""}
+                  </div>
                 </div>
               </div>
 
@@ -1532,6 +944,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 </div>
               )}
 
+              {selectedJob.resolvedConfig ? (
+                <div className="space-y-3">
+                  <ResearchRunConfigSummary config={selectedJob.resolvedConfig} testId="research-job-config" />
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Discovery Target</Label>
+                    <p className="text-xs font-mono mt-1">{selectedJob.targetDiscoveries != null ? `Stop after ${selectedJob.targetDiscoveries}` : 'None'}</p>
+                  </div>
+                </div>
+              ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label className="text-xs text-muted-foreground">Model</Label>
@@ -1554,9 +975,10 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   <p className="text-xs font-mono mt-1">{selectedJob.authTokenLast4 ? `••••${selectedJob.authTokenLast4}` : 'Platform key'}</p>
                 </div>
               </div>
+              )}
 
               {selectedJob.errorMessage && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" live="off">
                   <AlertCircle className="w-4 h-4" />
                   {/* NB-018 (run18): long unbroken tokens/URLs in agent errors
                       blew the banner to ~1,786px inside the dialog — force the
@@ -1644,26 +1066,26 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     {jobDiscoveries.map(d => (
                       <div key={d.id} className="flex items-center justify-between border rounded p-2 text-sm">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium line-clamp-1 break-words min-w-0" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                             {getDiscoveryStatusBadge(d.status)}
                             {getVerificationBadges(d)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline truncate block">
-                            {sanitizeDisplay(d.url)}
+                            className="flex min-h-6 max-lg:min-h-11 items-center text-xs text-primary hover:underline">
+                            <span className="min-w-0 truncate">{sanitizeDisplay(d.url)}</span>
                           </a>
                         </div>
                         {d.status === 'pending_review' && (
                           <div className="flex gap-1 ml-2">
                             <Button size="sm" variant="ghost" className={`${OK_TEXT} h-7`}
                               aria-label={`Approve discovery: ${sanitizeDisplay(d.title)}`}
-                              onClick={() => approveMutation.mutate(d.id)}>
+                              onClick={() => review.requestApprove(d)}>
                               <ThumbsUp className="w-3 h-3" />
                             </Button>
                             <Button size="sm" variant="ghost" className={`${BAD_TEXT} h-7`}
                               aria-label={`Reject discovery: ${sanitizeDisplay(d.title)}`}
-                              onClick={() => setRejectDialogId(d.id)}>
+                              onClick={() => review.requestReject(d.id)}>
                               <ThumbsDown className="w-3 h-3" />
                             </Button>
                           </div>
@@ -1690,43 +1112,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       </Dialog>
       </details>
 
-      <Dialog open={!!rejectDialogId} onOpenChange={(open) => { if (!open && !rejectMutation.isPending) { setRejectDialogId(null); setRejectReason(""); } }}>
-        <DialogContent className="queues-agent__dialog">
-          <DialogHeader>
-            <DialogTitle>Reject Discovery</DialogTitle>
-            <DialogDescription>
-              Mark this discovered resource as rejected. Optionally include a reason for the audit trail.
-            </DialogDescription>
-          </DialogHeader>
-          {rejectMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{describeWriteError(rejectMutation.error)}</AlertDescription>
-            </Alert>
-          )}
-          <div className="space-y-3">
-            <div>
-              <Label>Reason (optional)</Label>
-              <Textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Why is this resource being rejected?"
-                className="mt-1"
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setRejectDialogId(null)} disabled={rejectMutation.isPending}>Cancel</Button>
-              <Button
-                variant="destructive"
-                onClick={() => rejectDialogId && rejectMutation.mutate({ id: rejectDialogId, reason: rejectReason || undefined })}
-                disabled={rejectMutation.isPending}
-              >
-                Reject
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {review.approveDialog}
+      {review.rejectDialog}
     </div>
   );
 }

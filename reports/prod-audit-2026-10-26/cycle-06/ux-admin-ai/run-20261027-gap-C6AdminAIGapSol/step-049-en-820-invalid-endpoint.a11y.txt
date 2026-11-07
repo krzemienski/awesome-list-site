@@ -1,0 +1,771 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 3,826 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Admin, account menu" [ref=e21] [cursor=pointer]:
+          - generic [ref=e23]: A
+          - generic [ref=e24]: Admin
+          - generic [ref=e25]: Admin, account menu
+      - main [ref=e28]:
+        - generic [ref=e29]:
+          - navigation "Breadcrumb" [ref=e30]:
+            - list [ref=e31]:
+              - listitem [ref=e32]:
+                - link "Home" [ref=e33] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e34]:
+                - img [ref=e35]
+              - listitem [ref=e37]:
+                - link "Admin" [ref=e38] [cursor=pointer]:
+                  - /url: /admin
+              - listitem [ref=e39]:
+                - img [ref=e40]
+              - listitem:
+                - link "Enrichment" [disabled]
+          - generic [ref=e42]: Authorized admin area
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e49]: Admin console · Admin User
+                - heading "Operations dashboard" [level=1] [ref=e50]:
+                  - text: Operations
+                  - emphasis [ref=e51]: dashboard
+                - paragraph [ref=e52]: Manage the 3,826 resources, jobs, and contributors that keep the index alive.
+              - generic [ref=e53]:
+                - button "Settings" [ref=e54] [cursor=pointer]:
+                  - img
+                  - text: Settings
+                - 'button "New entry: add a resource" [ref=e55] [cursor=pointer]':
+                  - img
+                  - text: New entry
+            - status [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - tablist "Admin sections" [ref=e59]:
+                  - tab "Overview" [ref=e60] [cursor=pointer]:
+                    - img [ref=e61]
+                    - text: Overview
+                  - tab "Approvals" [ref=e66] [cursor=pointer]:
+                    - img [ref=e67]
+                    - text: Approvals
+                  - tab "Edits" [ref=e69] [cursor=pointer]:
+                    - img [ref=e70]
+                    - text: Edits
+                  - tab "Enrichment" [selected] [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                    - text: Enrichment
+                  - tab "Researcher" [ref=e74] [cursor=pointer]:
+                    - img [ref=e75]
+                    - text: Researcher
+                  - tab "Export" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78]
+                    - text: Export
+                  - tab "Database" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                    - text: Database
+                  - tab "Resources" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                    - text: Resources
+                  - tab "Categories" [ref=e88] [cursor=pointer]:
+                    - img [ref=e89]
+                    - text: Categories
+                  - tab "Subcategories" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                    - text: Subcategories
+                  - tab "Users" [ref=e92] [cursor=pointer]:
+                    - img [ref=e93]
+                    - text: Users
+                  - tab "GitHub" [ref=e98] [cursor=pointer]:
+                    - img [ref=e99]
+                    - text: GitHub
+                  - tab "Link Health" [ref=e102] [cursor=pointer]:
+                    - img [ref=e103]
+                    - text: Link Health
+                  - tab "Audit" [ref=e105] [cursor=pointer]:
+                    - img [ref=e106]
+                    - text: Audit
+                  - tab "Research" [ref=e107] [cursor=pointer]:
+                    - img [ref=e108]
+                    - text: Research
+                - button "Scroll tabs right" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+              - tabpanel "Enrichment" [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]:
+                    - generic [ref=e116]:
+                      - article [ref=e117]:
+                        - generic [ref=e118]: Last enriched
+                        - generic [ref=e119]: 27h ago
+                        - generic [ref=e120]: "batch #34 · 10 resources · cancelled"
+                      - article [ref=e121]:
+                        - generic [ref=e122]: Queue
+                        - generic [ref=e123]: "0"
+                        - generic [ref=e124]: idle
+                      - article [ref=e125]:
+                        - generic [ref=e126]: Avg cost
+                        - generic [ref=e127]: $0.03
+                        - generic [ref=e128]: per batch
+                    - generic [ref=e129]:
+                      - generic [ref=e130]:
+                        - generic [ref=e131]:
+                          - heading "Enrichment jobs" [level=2] [ref=e132]
+                          - paragraph [ref=e133]: LLM-driven metadata enhancement
+                        - generic [ref=e134]:
+                          - button "Run job" [disabled]:
+                            - img
+                            - text: Run job
+                      - generic [ref=e135]:
+                        - region "Enrichment jobs table, scrollable" [ref=e136]:
+                          - table [ref=e137]:
+                            - rowgroup [ref=e138]:
+                              - row "Job Status Started Completed Actions" [ref=e139]:
+                                - columnheader "Job" [ref=e140]
+                                - columnheader "Status" [ref=e141]
+                                - columnheader "Started" [ref=e142]
+                                - columnheader "Completed" [ref=e143]
+                                - columnheader "Actions" [ref=e144]:
+                                  - generic [ref=e145]: Actions
+                            - rowgroup [ref=e146]:
+                              - 'row "#34 cancelled 10/26/2026, 12:33:50 AM 10/26/2026, 12:34:47 AM View logs for job #34" [ref=e147]':
+                                - cell "#34" [ref=e148]
+                                - cell "cancelled" [ref=e149]:
+                                  - generic [ref=e150]: cancelled
+                                - cell "10/26/2026, 12:33:50 AM" [ref=e151]
+                                - cell "10/26/2026, 12:34:47 AM" [ref=e152]
+                                - 'cell "View logs for job #34" [ref=e153]':
+                                  - 'button "View logs for job #34" [ref=e154] [cursor=pointer]': Logs
+                              - 'row "#33 cancelled 10/26/2026, 12:30:14 AM 10/26/2026, 12:33:13 AM View logs for job #33" [ref=e155]':
+                                - cell "#33" [ref=e156]
+                                - cell "cancelled" [ref=e157]:
+                                  - generic [ref=e158]: cancelled
+                                - cell "10/26/2026, 12:30:14 AM" [ref=e159]
+                                - cell "10/26/2026, 12:33:13 AM" [ref=e160]
+                                - 'cell "View logs for job #33" [ref=e161]':
+                                  - 'button "View logs for job #33" [ref=e162] [cursor=pointer]': Logs
+                              - 'row "#32 completed 7/16/2026, 9:45:33 PM 7/16/2026, 9:45:33 PM View logs for job #32" [ref=e163]':
+                                - cell "#32" [ref=e164]
+                                - cell "completed" [ref=e165]:
+                                  - generic [ref=e166]: completed
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e167]
+                                - cell "7/16/2026, 9:45:33 PM" [ref=e168]
+                                - 'cell "View logs for job #32" [ref=e169]':
+                                  - 'button "View logs for job #32" [ref=e170] [cursor=pointer]': Logs
+                              - 'row "#31 completed 7/16/2026, 9:45:32 PM 7/16/2026, 9:45:32 PM View logs for job #31" [ref=e171]':
+                                - cell "#31" [ref=e172]
+                                - cell "completed" [ref=e173]:
+                                  - generic [ref=e174]: completed
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e175]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e176]
+                                - 'cell "View logs for job #31" [ref=e177]':
+                                  - 'button "View logs for job #31" [ref=e178] [cursor=pointer]': Logs
+                              - 'row "#30 completed 7/16/2026, 9:45:31 PM 7/16/2026, 9:45:32 PM View logs for job #30" [ref=e179]':
+                                - cell "#30" [ref=e180]
+                                - cell "completed" [ref=e181]:
+                                  - generic [ref=e182]: completed
+                                - cell "7/16/2026, 9:45:31 PM" [ref=e183]
+                                - cell "7/16/2026, 9:45:32 PM" [ref=e184]
+                                - 'cell "View logs for job #30" [ref=e185]':
+                                  - 'button "View logs for job #30" [ref=e186] [cursor=pointer]': Logs
+                              - 'row "#29 completed 7/16/2026, 9:41:27 PM 7/16/2026, 9:41:27 PM View logs for job #29" [ref=e187]':
+                                - cell "#29" [ref=e188]
+                                - cell "completed" [ref=e189]:
+                                  - generic [ref=e190]: completed
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e191]
+                                - cell "7/16/2026, 9:41:27 PM" [ref=e192]
+                                - 'cell "View logs for job #29" [ref=e193]':
+                                  - 'button "View logs for job #29" [ref=e194] [cursor=pointer]': Logs
+                        - button "Show all 33 jobs" [ref=e196] [cursor=pointer]
+                  - group [ref=e197]:
+                    - generic "Job controls & monitoring" [ref=e198] [cursor=pointer]
+                    - article [ref=e199]:
+                      - generic [ref=e200]:
+                        - generic [ref=e201]:
+                          - img [ref=e202]
+                          - text: Job Control
+                        - generic [ref=e204]: Configure and start a new batch enrichment job
+                      - generic [ref=e205]:
+                        - paragraph [ref=e206]: "Tag coverage: 1,089 of 3,826 approved resources have tags (28.5%). Run an enrichment job with the \"Unenriched Only\" filter to close the 2,737-resource gap."
+                        - generic [ref=e207]:
+                          - generic [ref=e208]:
+                            - text: Filter
+                            - combobox "Filter" [ref=e209] [cursor=pointer]:
+                              - generic: Unenriched Only
+                              - img [ref=e210]
+                            - paragraph [ref=e212]: Choose which resources to enrich
+                          - generic [ref=e213]:
+                            - text: Batch Size
+                            - spinbutton "Batch Size" [ref=e214]: "10"
+                            - paragraph [ref=e215]: Resources per batch (1-50)
+                        - generic [ref=e216]:
+                          - button "Custom Model & Endpoint (optional)" [expanded] [ref=e217] [cursor=pointer]:
+                            - generic [ref=e218]:
+                              - img
+                              - text: Custom Model & Endpoint (optional)
+                            - img
+                          - generic [ref=e219]:
+                            - generic [ref=e220]:
+                              - generic [ref=e221] [cursor=pointer]:
+                                - img [ref=e222]
+                                - text: Model
+                              - textbox "Model" [ref=e225]:
+                                - /placeholder: cc/claude-haiku-4-5-20251001 (default)
+                                - text: audit-preview-model
+                            - generic [ref=e226]:
+                              - generic [ref=e227] [cursor=pointer]:
+                                - img [ref=e228]
+                                - text: Base URL
+                              - textbox "Base URL" [active] [invalid] [ref=e231]:
+                                - /placeholder: https://router.hack.ski (default)
+                                - text: invalid
+                              - paragraph [ref=e232]: http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.
+                              - alert [ref=e233]: Base URL is not a valid URL.
+                            - generic [ref=e234]:
+                              - generic [ref=e235] [cursor=pointer]:
+                                - img [ref=e236]
+                                - text: Auth Token
+                              - textbox "Auth Token" [ref=e239]:
+                                - /placeholder: Required if a base URL is set (blank = server default credentials)
+                              - paragraph [ref=e240]: Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.
+                        - generic [ref=e241]:
+                          - button "Start Enrichment" [disabled]:
+                            - img
+                            - text: Start Enrichment
+                    - article [ref=e242]:
+                      - generic [ref=e243]:
+                        - generic [ref=e244]:
+                          - generic [ref=e245]:
+                            - img [ref=e246]
+                            - text: Job History
+                          - generic [ref=e249]: 33 total jobs
+                        - generic [ref=e250]: Complete history of all enrichment jobs
+                      - region "Job history table, scrollable" [ref=e252]:
+                        - table [ref=e254]:
+                          - rowgroup [ref=e255]:
+                            - row "ID Status Started Ended Processed Success Rate Actions" [ref=e256]:
+                              - columnheader "ID" [ref=e257]
+                              - columnheader "Status" [ref=e258]
+                              - columnheader "Started" [ref=e259]
+                              - columnheader "Ended" [ref=e260]
+                              - columnheader "Processed" [ref=e261]
+                              - columnheader "Success Rate" [ref=e262]
+                              - columnheader "Actions" [ref=e263]
+                          - rowgroup [ref=e264]:
+                            - 'row "#34 cancelled Oct 26, 2026, 12:33 AM Oct 26, 2026, 12:34 AM 10 / 2746 10/10 ok (100%) View details for job #34" [ref=e265]':
+                              - cell "#34" [ref=e266]
+                              - cell "cancelled" [ref=e267]:
+                                - generic [ref=e268]: cancelled
+                              - cell "Oct 26, 2026, 12:33 AM" [ref=e269]
+                              - cell "Oct 26, 2026, 12:34 AM" [ref=e270]
+                              - cell "10 / 2746" [ref=e271]
+                              - cell "10/10 ok (100%)" [ref=e272]:
+                                - generic [ref=e273]: 10/10 ok (100%)
+                              - 'cell "View details for job #34" [ref=e274]':
+                                - 'button "View details for job #34" [ref=e275] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#33 cancelled Oct 26, 2026, 12:30 AM Oct 26, 2026, 12:33 AM 30 / 2776 30/30 ok (100%) View details for job #33" [ref=e276]':
+                              - cell "#33" [ref=e277]
+                              - cell "cancelled" [ref=e278]:
+                                - generic [ref=e279]: cancelled
+                              - cell "Oct 26, 2026, 12:30 AM" [ref=e280]
+                              - cell "Oct 26, 2026, 12:33 AM" [ref=e281]
+                              - cell "30 / 2776" [ref=e282]
+                              - cell "30/30 ok (100%)" [ref=e283]:
+                                - generic [ref=e284]: 30/30 ok (100%)
+                              - 'cell "View details for job #33" [ref=e285]':
+                                - 'button "View details for job #33" [ref=e286] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#32 completed Jul 16, 2026, 09:45 PM Jul 16, 2026, 09:45 PM Nothing to process N/A View details for job #32" [ref=e287]':
+                              - cell "#32" [ref=e288]
+                              - cell "completed" [ref=e289]:
+                                - generic [ref=e290]:
+                                  - img [ref=e291]
+                                  - text: completed
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e294]
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e295]
+                              - cell "Nothing to process" [ref=e296]
+                              - cell "N/A" [ref=e297]:
+                                - generic [ref=e298]: N/A
+                              - 'cell "View details for job #32" [ref=e299]':
+                                - 'button "View details for job #32" [ref=e300] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#31 completed Jul 16, 2026, 09:45 PM Jul 16, 2026, 09:45 PM Nothing to process N/A View details for job #31" [ref=e301]':
+                              - cell "#31" [ref=e302]
+                              - cell "completed" [ref=e303]:
+                                - generic [ref=e304]:
+                                  - img [ref=e305]
+                                  - text: completed
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e308]
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e309]
+                              - cell "Nothing to process" [ref=e310]
+                              - cell "N/A" [ref=e311]:
+                                - generic [ref=e312]: N/A
+                              - 'cell "View details for job #31" [ref=e313]':
+                                - 'button "View details for job #31" [ref=e314] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#30 completed Jul 16, 2026, 09:45 PM Jul 16, 2026, 09:45 PM Nothing to process N/A View details for job #30" [ref=e315]':
+                              - cell "#30" [ref=e316]
+                              - cell "completed" [ref=e317]:
+                                - generic [ref=e318]:
+                                  - img [ref=e319]
+                                  - text: completed
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e322]
+                              - cell "Jul 16, 2026, 09:45 PM" [ref=e323]
+                              - cell "Nothing to process" [ref=e324]
+                              - cell "N/A" [ref=e325]:
+                                - generic [ref=e326]: N/A
+                              - 'cell "View details for job #30" [ref=e327]':
+                                - 'button "View details for job #30" [ref=e328] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#29 completed Jul 16, 2026, 09:41 PM Jul 16, 2026, 09:41 PM Nothing to process N/A View details for job #29" [ref=e329]':
+                              - cell "#29" [ref=e330]
+                              - cell "completed" [ref=e331]:
+                                - generic [ref=e332]:
+                                  - img [ref=e333]
+                                  - text: completed
+                              - cell "Jul 16, 2026, 09:41 PM" [ref=e336]
+                              - cell "Jul 16, 2026, 09:41 PM" [ref=e337]
+                              - cell "Nothing to process" [ref=e338]
+                              - cell "N/A" [ref=e339]:
+                                - generic [ref=e340]: N/A
+                              - 'cell "View details for job #29" [ref=e341]':
+                                - 'button "View details for job #29" [ref=e342] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#28 completed Jul 7, 2026, 12:54 PM Jul 7, 2026, 12:54 PM 1 / 1 1 skipped View details for job #28" [ref=e343]':
+                              - cell "#28" [ref=e344]
+                              - cell "completed" [ref=e345]:
+                                - generic [ref=e346]:
+                                  - img [ref=e347]
+                                  - text: completed
+                              - cell "Jul 7, 2026, 12:54 PM" [ref=e350]
+                              - cell "Jul 7, 2026, 12:54 PM" [ref=e351]
+                              - cell "1 / 1" [ref=e352]
+                              - cell "1 skipped" [ref=e353]:
+                                - generic [ref=e354]: 1 skipped
+                              - 'cell "View details for job #28" [ref=e355]':
+                                - 'button "View details for job #28" [ref=e356] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#27 completed Jul 7, 2026, 12:53 PM Jul 7, 2026, 12:53 PM 1 / 1 1 skipped View details for job #27" [ref=e357]':
+                              - cell "#27" [ref=e358]
+                              - cell "completed" [ref=e359]:
+                                - generic [ref=e360]:
+                                  - img [ref=e361]
+                                  - text: completed
+                              - cell "Jul 7, 2026, 12:53 PM" [ref=e364]
+                              - cell "Jul 7, 2026, 12:53 PM" [ref=e365]
+                              - cell "1 / 1" [ref=e366]
+                              - cell "1 skipped" [ref=e367]:
+                                - generic [ref=e368]: 1 skipped
+                              - 'cell "View details for job #27" [ref=e369]':
+                                - 'button "View details for job #27" [ref=e370] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#26 completed Jul 6, 2026, 01:30 PM Jul 6, 2026, 01:30 PM 1 / 1 1 skipped View details for job #26" [ref=e371]':
+                              - cell "#26" [ref=e372]
+                              - cell "completed" [ref=e373]:
+                                - generic [ref=e374]:
+                                  - img [ref=e375]
+                                  - text: completed
+                              - cell "Jul 6, 2026, 01:30 PM" [ref=e378]
+                              - cell "Jul 6, 2026, 01:30 PM" [ref=e379]
+                              - cell "1 / 1" [ref=e380]
+                              - cell "1 skipped" [ref=e381]:
+                                - generic [ref=e382]: 1 skipped
+                              - 'cell "View details for job #26" [ref=e383]':
+                                - 'button "View details for job #26" [ref=e384] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#25 completed Jul 5, 2026, 10:57 PM Jul 5, 2026, 10:57 PM 1 / 1 1 skipped View details for job #25" [ref=e385]':
+                              - cell "#25" [ref=e386]
+                              - cell "completed" [ref=e387]:
+                                - generic [ref=e388]:
+                                  - img [ref=e389]
+                                  - text: completed
+                              - cell "Jul 5, 2026, 10:57 PM" [ref=e392]
+                              - cell "Jul 5, 2026, 10:57 PM" [ref=e393]
+                              - cell "1 / 1" [ref=e394]
+                              - cell "1 skipped" [ref=e395]:
+                                - generic [ref=e396]: 1 skipped
+                              - 'cell "View details for job #25" [ref=e397]':
+                                - 'button "View details for job #25" [ref=e398] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#24 failed ended in error after 10/10 succeeded Jun 26, 2026, 08:21 AM Jun 26, 2026, 08:54 AM 10 / 2364 10/10 ok (100%) View details for job #24" [ref=e399]':
+                              - cell "#24" [ref=e400]
+                              - cell "failed ended in error after 10/10 succeeded" [ref=e401]:
+                                - generic [ref=e402]:
+                                  - img [ref=e403]
+                                  - text: failed
+                                - generic [ref=e405]: ended in error after 10/10 succeeded
+                              - cell "Jun 26, 2026, 08:21 AM" [ref=e406]
+                              - cell "Jun 26, 2026, 08:54 AM" [ref=e407]
+                              - cell "10 / 2364" [ref=e408]
+                              - cell "10/10 ok (100%)" [ref=e409]:
+                                - generic [ref=e410]: 10/10 ok (100%)
+                              - 'cell "View details for job #24" [ref=e411]':
+                                - 'button "View details for job #24" [ref=e412] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#23 completed Jun 25, 2026, 05:57 PM Jun 25, 2026, 05:57 PM 1 / 1 1 skipped View details for job #23" [ref=e413]':
+                              - cell "#23" [ref=e414]
+                              - cell "completed" [ref=e415]:
+                                - generic [ref=e416]:
+                                  - img [ref=e417]
+                                  - text: completed
+                              - cell "Jun 25, 2026, 05:57 PM" [ref=e420]
+                              - cell "Jun 25, 2026, 05:57 PM" [ref=e421]
+                              - cell "1 / 1" [ref=e422]
+                              - cell "1 skipped" [ref=e423]:
+                                - generic [ref=e424]: 1 skipped
+                              - 'cell "View details for job #23" [ref=e425]':
+                                - 'button "View details for job #23" [ref=e426] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#22 completed Jun 3, 2026, 01:17 AM Jun 3, 2026, 01:17 AM 1 / 1 1 skipped View details for job #22" [ref=e427]':
+                              - cell "#22" [ref=e428]
+                              - cell "completed" [ref=e429]:
+                                - generic [ref=e430]:
+                                  - img [ref=e431]
+                                  - text: completed
+                              - cell "Jun 3, 2026, 01:17 AM" [ref=e434]
+                              - cell "Jun 3, 2026, 01:17 AM" [ref=e435]
+                              - cell "1 / 1" [ref=e436]
+                              - cell "1 skipped" [ref=e437]:
+                                - generic [ref=e438]: 1 skipped
+                              - 'cell "View details for job #22" [ref=e439]':
+                                - 'button "View details for job #22" [ref=e440] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#21 completed Feb 11, 2026, 11:38 PM Feb 11, 2026, 11:38 PM 1 / 1 1 skipped View details for job #21" [ref=e441]':
+                              - cell "#21" [ref=e442]
+                              - cell "completed" [ref=e443]:
+                                - generic [ref=e444]:
+                                  - img [ref=e445]
+                                  - text: completed
+                              - cell "Feb 11, 2026, 11:38 PM" [ref=e448]
+                              - cell "Feb 11, 2026, 11:38 PM" [ref=e449]
+                              - cell "1 / 1" [ref=e450]
+                              - cell "1 skipped" [ref=e451]:
+                                - generic [ref=e452]: 1 skipped
+                              - 'cell "View details for job #21" [ref=e453]':
+                                - 'button "View details for job #21" [ref=e454] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#20 completed Feb 11, 2026, 11:20 PM Feb 11, 2026, 11:20 PM 9 / 9 8/9 ok (89%) View details for job #20" [ref=e455]':
+                              - cell "#20" [ref=e456]
+                              - cell "completed" [ref=e457]:
+                                - generic [ref=e458]:
+                                  - img [ref=e459]
+                                  - text: completed
+                              - cell "Feb 11, 2026, 11:20 PM" [ref=e462]
+                              - cell "Feb 11, 2026, 11:20 PM" [ref=e463]
+                              - cell "9 / 9" [ref=e464]
+                              - cell "8/9 ok (89%)" [ref=e465]:
+                                - generic [ref=e466]: 8/9 ok (89%)
+                              - 'cell "View details for job #20" [ref=e467]':
+                                - 'button "View details for job #20" [ref=e468] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#19 cancelled Feb 11, 2026, 11:19 PM Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped 11 / 19 10/11 ok (91%) View details for job #19" [ref=e469]':
+                              - cell "#19" [ref=e470]
+                              - cell "cancelled" [ref=e471]:
+                                - generic [ref=e472]: cancelled
+                              - cell "Feb 11, 2026, 11:19 PM" [ref=e473]
+                              - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e474]:
+                                - text: Mar 22, 2026, 10:45 PM
+                                - generic [ref=e475]: end recorded at cleanup, not when processing stopped
+                              - cell "11 / 19" [ref=e476]
+                              - cell "10/11 ok (91%)" [ref=e477]:
+                                - generic [ref=e478]: 10/11 ok (91%)
+                              - 'cell "View details for job #19" [ref=e479]':
+                                - 'button "View details for job #19" [ref=e480] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#18 cancelled Feb 11, 2026, 11:17 PM Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped 14 / 32 13/14 ok (93%) View details for job #18" [ref=e481]':
+                              - cell "#18" [ref=e482]
+                              - cell "cancelled" [ref=e483]:
+                                - generic [ref=e484]: cancelled
+                              - cell "Feb 11, 2026, 11:17 PM" [ref=e485]
+                              - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e486]:
+                                - text: Mar 22, 2026, 10:45 PM
+                                - generic [ref=e487]: end recorded at cleanup, not when processing stopped
+                              - cell "14 / 32" [ref=e488]
+                              - cell "13/14 ok (93%)" [ref=e489]:
+                                - generic [ref=e490]: 13/14 ok (93%)
+                              - 'cell "View details for job #18" [ref=e491]':
+                                - 'button "View details for job #18" [ref=e492] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#17 completed Dec 1, 2025, 01:43 AM Dec 1, 2025, 01:45 AM 31 / 31 31/31 ok (100%) View details for job #17" [ref=e493]':
+                              - cell "#17" [ref=e494]
+                              - cell "completed" [ref=e495]:
+                                - generic [ref=e496]:
+                                  - img [ref=e497]
+                                  - text: completed
+                              - cell "Dec 1, 2025, 01:43 AM" [ref=e500]
+                              - cell "Dec 1, 2025, 01:45 AM" [ref=e501]
+                              - cell "31 / 31" [ref=e502]
+                              - cell "31/31 ok (100%)" [ref=e503]:
+                                - generic [ref=e504]: 31/31 ok (100%)
+                              - 'cell "View details for job #17" [ref=e505]':
+                                - 'button "View details for job #17" [ref=e506] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#16 completed Nov 19, 2025, 12:57 AM Nov 19, 2025, 12:57 AM 3 / 3 2/3 ok (67%) View details for job #16" [ref=e507]':
+                              - cell "#16" [ref=e508]
+                              - cell "completed" [ref=e509]:
+                                - generic [ref=e510]:
+                                  - img [ref=e511]
+                                  - text: completed
+                              - cell "Nov 19, 2025, 12:57 AM" [ref=e514]
+                              - cell "Nov 19, 2025, 12:57 AM" [ref=e515]
+                              - cell "3 / 3" [ref=e516]
+                              - cell "2/3 ok (67%)" [ref=e517]:
+                                - generic [ref=e518]: 2/3 ok (67%)
+                              - 'cell "View details for job #16" [ref=e519]':
+                                - 'button "View details for job #16" [ref=e520] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#15 completed Nov 19, 2025, 12:57 AM Nov 19, 2025, 12:57 AM 4 / 4 3/4 ok (75%) View details for job #15" [ref=e521]':
+                              - cell "#15" [ref=e522]
+                              - cell "completed" [ref=e523]:
+                                - generic [ref=e524]:
+                                  - img [ref=e525]
+                                  - text: completed
+                              - cell "Nov 19, 2025, 12:57 AM" [ref=e528]
+                              - cell "Nov 19, 2025, 12:57 AM" [ref=e529]
+                              - cell "4 / 4" [ref=e530]
+                              - cell "3/4 ok (75%)" [ref=e531]:
+                                - generic [ref=e532]: 3/4 ok (75%)
+                              - 'cell "View details for job #15" [ref=e533]':
+                                - 'button "View details for job #15" [ref=e534] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#14 completed Nov 18, 2025, 08:05 PM Nov 18, 2025, 08:05 PM 1 / 1 1 skipped View details for job #14" [ref=e535]':
+                              - cell "#14" [ref=e536]
+                              - cell "completed" [ref=e537]:
+                                - generic [ref=e538]:
+                                  - img [ref=e539]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 08:05 PM" [ref=e542]
+                              - cell "Nov 18, 2025, 08:05 PM" [ref=e543]
+                              - cell "1 / 1" [ref=e544]
+                              - cell "1 skipped" [ref=e545]:
+                                - generic [ref=e546]: 1 skipped
+                              - 'cell "View details for job #14" [ref=e547]':
+                                - 'button "View details for job #14" [ref=e548] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#13 completed Nov 18, 2025, 08:04 PM Nov 18, 2025, 08:04 PM 1 / 1 1 skipped View details for job #13" [ref=e549]':
+                              - cell "#13" [ref=e550]
+                              - cell "completed" [ref=e551]:
+                                - generic [ref=e552]:
+                                  - img [ref=e553]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 08:04 PM" [ref=e556]
+                              - cell "Nov 18, 2025, 08:04 PM" [ref=e557]
+                              - cell "1 / 1" [ref=e558]
+                              - cell "1 skipped" [ref=e559]:
+                                - generic [ref=e560]: 1 skipped
+                              - 'cell "View details for job #13" [ref=e561]':
+                                - 'button "View details for job #13" [ref=e562] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#12 completed Nov 18, 2025, 08:04 PM Nov 18, 2025, 08:04 PM 1 / 1 1 skipped View details for job #12" [ref=e563]':
+                              - cell "#12" [ref=e564]
+                              - cell "completed" [ref=e565]:
+                                - generic [ref=e566]:
+                                  - img [ref=e567]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 08:04 PM" [ref=e570]
+                              - cell "Nov 18, 2025, 08:04 PM" [ref=e571]
+                              - cell "1 / 1" [ref=e572]
+                              - cell "1 skipped" [ref=e573]:
+                                - generic [ref=e574]: 1 skipped
+                              - 'cell "View details for job #12" [ref=e575]':
+                                - 'button "View details for job #12" [ref=e576] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#11 completed Nov 18, 2025, 07:54 PM Nov 18, 2025, 07:54 PM 1 / 1 1 skipped View details for job #11" [ref=e577]':
+                              - cell "#11" [ref=e578]
+                              - cell "completed" [ref=e579]:
+                                - generic [ref=e580]:
+                                  - img [ref=e581]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 07:54 PM" [ref=e584]
+                              - cell "Nov 18, 2025, 07:54 PM" [ref=e585]
+                              - cell "1 / 1" [ref=e586]
+                              - cell "1 skipped" [ref=e587]:
+                                - generic [ref=e588]: 1 skipped
+                              - 'cell "View details for job #11" [ref=e589]':
+                                - 'button "View details for job #11" [ref=e590] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#10 completed Nov 18, 2025, 07:52 PM Nov 18, 2025, 07:52 PM 1 / 1 1 skipped View details for job #10" [ref=e591]':
+                              - cell "#10" [ref=e592]
+                              - cell "completed" [ref=e593]:
+                                - generic [ref=e594]:
+                                  - img [ref=e595]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 07:52 PM" [ref=e598]
+                              - cell "Nov 18, 2025, 07:52 PM" [ref=e599]
+                              - cell "1 / 1" [ref=e600]
+                              - cell "1 skipped" [ref=e601]:
+                                - generic [ref=e602]: 1 skipped
+                              - 'cell "View details for job #10" [ref=e603]':
+                                - 'button "View details for job #10" [ref=e604] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#8 cancelled Nov 18, 2025, 07:22 PM Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped 78 / 2192 78/78 ok (100%) View details for job #8" [ref=e605]':
+                              - cell "#8" [ref=e606]
+                              - cell "cancelled" [ref=e607]:
+                                - generic [ref=e608]: cancelled
+                              - cell "Nov 18, 2025, 07:22 PM" [ref=e609]
+                              - cell "Mar 22, 2026, 10:45 PM end recorded at cleanup, not when processing stopped" [ref=e610]:
+                                - text: Mar 22, 2026, 10:45 PM
+                                - generic [ref=e611]: end recorded at cleanup, not when processing stopped
+                              - cell "78 / 2192" [ref=e612]
+                              - cell "78/78 ok (100%)" [ref=e613]:
+                                - generic [ref=e614]: 78/78 ok (100%)
+                              - 'cell "View details for job #8" [ref=e615]':
+                                - 'button "View details for job #8" [ref=e616] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#7 failed ended in error after 8/8 succeeded Nov 18, 2025, 07:15 PM May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped 8 / 2192 8/8 ok (100%) View details for job #7" [ref=e617]':
+                              - cell "#7" [ref=e618]
+                              - cell "failed ended in error after 8/8 succeeded" [ref=e619]:
+                                - generic [ref=e620]:
+                                  - img [ref=e621]
+                                  - text: failed
+                                - generic [ref=e623]: ended in error after 8/8 succeeded
+                              - cell "Nov 18, 2025, 07:15 PM" [ref=e624]
+                              - cell "May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped" [ref=e625]:
+                                - text: May 20, 2026, 06:47 AM
+                                - generic [ref=e626]: end recorded at cleanup, not when processing stopped
+                              - cell "8 / 2192" [ref=e627]
+                              - cell "8/8 ok (100%)" [ref=e628]:
+                                - generic [ref=e629]: 8/8 ok (100%)
+                              - 'cell "View details for job #7" [ref=e630]':
+                                - 'button "View details for job #7" [ref=e631] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#6 completed Nov 18, 2025, 07:14 PM Nov 18, 2025, 07:14 PM 1 / 1 1 skipped View details for job #6" [ref=e632]':
+                              - cell "#6" [ref=e633]
+                              - cell "completed" [ref=e634]:
+                                - generic [ref=e635]:
+                                  - img [ref=e636]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 07:14 PM" [ref=e639]
+                              - cell "Nov 18, 2025, 07:14 PM" [ref=e640]
+                              - cell "1 / 1" [ref=e641]
+                              - cell "1 skipped" [ref=e642]:
+                                - generic [ref=e643]: 1 skipped
+                              - 'cell "View details for job #6" [ref=e644]':
+                                - 'button "View details for job #6" [ref=e645] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#5 completed Nov 18, 2025, 06:50 PM Nov 18, 2025, 06:50 PM 1 / 1 1 skipped View details for job #5" [ref=e646]':
+                              - cell "#5" [ref=e647]
+                              - cell "completed" [ref=e648]:
+                                - generic [ref=e649]:
+                                  - img [ref=e650]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 06:50 PM" [ref=e653]
+                              - cell "Nov 18, 2025, 06:50 PM" [ref=e654]
+                              - cell "1 / 1" [ref=e655]
+                              - cell "1 skipped" [ref=e656]:
+                                - generic [ref=e657]: 1 skipped
+                              - 'cell "View details for job #5" [ref=e658]':
+                                - 'button "View details for job #5" [ref=e659] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#4 completed Nov 18, 2025, 06:46 PM Nov 18, 2025, 06:46 PM 1 / 1 1 skipped View details for job #4" [ref=e660]':
+                              - cell "#4" [ref=e661]
+                              - cell "completed" [ref=e662]:
+                                - generic [ref=e663]:
+                                  - img [ref=e664]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 06:46 PM" [ref=e667]
+                              - cell "Nov 18, 2025, 06:46 PM" [ref=e668]
+                              - cell "1 / 1" [ref=e669]
+                              - cell "1 skipped" [ref=e670]:
+                                - generic [ref=e671]: 1 skipped
+                              - 'cell "View details for job #4" [ref=e672]':
+                                - 'button "View details for job #4" [ref=e673] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#3 completed Nov 18, 2025, 06:38 PM Nov 18, 2025, 06:38 PM 1 / 1 1/1 ok (100%) View details for job #3" [ref=e674]':
+                              - cell "#3" [ref=e675]
+                              - cell "completed" [ref=e676]:
+                                - generic [ref=e677]:
+                                  - img [ref=e678]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 06:38 PM" [ref=e681]
+                              - cell "Nov 18, 2025, 06:38 PM" [ref=e682]
+                              - cell "1 / 1" [ref=e683]
+                              - cell "1/1 ok (100%)" [ref=e684]:
+                                - generic [ref=e685]: 1/1 ok (100%)
+                              - 'cell "View details for job #3" [ref=e686]':
+                                - 'button "View details for job #3" [ref=e687] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#2 completed Nov 18, 2025, 06:27 PM Nov 18, 2025, 06:27 PM 1 / 1 1/1 ok (100%) View details for job #2" [ref=e688]':
+                              - cell "#2" [ref=e689]
+                              - cell "completed" [ref=e690]:
+                                - generic [ref=e691]:
+                                  - img [ref=e692]
+                                  - text: completed
+                              - cell "Nov 18, 2025, 06:27 PM" [ref=e695]
+                              - cell "Nov 18, 2025, 06:27 PM" [ref=e696]
+                              - cell "1 / 1" [ref=e697]
+                              - cell "1/1 ok (100%)" [ref=e698]:
+                                - generic [ref=e699]: 1/1 ok (100%)
+                              - 'cell "View details for job #2" [ref=e700]':
+                                - 'button "View details for job #2" [ref=e701] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                            - 'row "#1 failed ended in error after 31/49 succeeded Nov 18, 2025, 06:25 PM May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped 32 / 32 31/32 ok (97%) View details for job #1" [ref=e702]':
+                              - cell "#1" [ref=e703]
+                              - cell "failed ended in error after 31/49 succeeded" [ref=e704]:
+                                - generic [ref=e705]:
+                                  - img [ref=e706]
+                                  - text: failed
+                                - generic [ref=e708]: ended in error after 31/49 succeeded
+                              - cell "Nov 18, 2025, 06:25 PM" [ref=e709]
+                              - cell "May 20, 2026, 06:47 AM end recorded at cleanup, not when processing stopped" [ref=e710]:
+                                - text: May 20, 2026, 06:47 AM
+                                - generic [ref=e711]: end recorded at cleanup, not when processing stopped
+                              - cell "32 / 32" [ref=e712]
+                              - cell "31/32 ok (97%)" [ref=e713]:
+                                - generic [ref=e714]: 31/32 ok (97%)
+                              - 'cell "View details for job #1" [ref=e715]':
+                                - 'button "View details for job #1" [ref=e716] [cursor=pointer]':
+                                  - img
+                                  - text: View Details
+                        - paragraph [ref=e717]: Processed = resources attempted out of the job's target. Success rate = successful ÷ processed (not ÷ target). A job marked failed with successes means the run stopped on an error after those resources were enriched — open View Details for the error.
+    - button "Back to top" [ref=e718] [cursor=pointer]:
+      - img

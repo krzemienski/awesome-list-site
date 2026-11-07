@@ -1,0 +1,1202 @@
+[
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/analytics-collections.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+    "status": 200,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/assets/fonts/category-glyphs-sans.otf",
+    "status": 304,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/bookmarkRestore.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/dialog.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/textarea.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/label.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/checkbox.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-label.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/resources?page=1&limit=24&facets=true&search=video",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/advanced?tab=explorer",
+    "status": 200,
+    "resourceType": "document"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@vite/client",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/ds/design-system.css",
+    "status": 304,
+    "resourceType": "stylesheet"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/ds/design-system.js",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/main.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/awesome-list/nav",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/awesome-list",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+    "status": 200,
+    "resourceType": "stylesheet"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@react-refresh",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/site.webmanifest",
+    "status": 304,
+    "resourceType": "manifest"
+  },
+  {
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+    "status": 200,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+    "status": 200,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+    "status": 200,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/zod-jitless.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/react-dom_client.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/App.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/index.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/queryClient.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/app-providers.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/analytics.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/mixpanel.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/posthog.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/amplitude.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/analytics-suppression.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/font-options.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/resource-boot.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-IAOU3V6T.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-QKQ6FTX6.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-CPLMSN6F.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-IBKPSO55.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/react.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/wouter.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/discovery-params.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/theme-provider.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@tanstack_react-query.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/nav-history.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/useAuth.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/not-found-suggestion.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/pending-route-title.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-analytics.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/crossTabSync.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/clerk-bridge.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/design-system.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/MainLayout.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/SEOHead.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/consent-banner.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/scrubbed-params-notice.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/button.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/focus-handoff.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/pages/ErrorPage.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/useHeldError.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/static-data.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-6ZKT35DD.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-PYSFQSYS.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/apiError.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/api-fetch.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/tooltip.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/toaster.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/home-boot.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/vite/dist/client/env.mjs",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/acquisition.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/page-param.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/tagNormalize.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/searchNormalize.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/resourceFacets-core.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/safeStorage.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-toast.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-learning-preferences.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/toast.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/cached-resource.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/nav-lookup.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/web-vitals.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/lucide-react.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/AppSidebar.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/AppHeader.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/PageBreadcrumb.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/sidebar.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/shell/layout.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/search-palette.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/AppFooter.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/contact.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/scroll-behavior.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/react-helmet.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/seo-templates.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/onboarding-values.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-P23IFBYX.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-app-bottom-inset.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/pages/system-overlays.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/StatePanel.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-slot.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/class-variance-authority.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/utils.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-RX72IABX.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-J5KL5NB3.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-MWDRR7KX.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-YS4Z4NUB.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-XRF6OPVB.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-I7KSRBHK.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-BCVANODD.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-GWQIU6CX.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-YI7OTWML.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-J6V3O263.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-SAEKBASD.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-RVJSWZT7.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-ZN5LYP57.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-QGEZXAW4.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-toast.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-VNZTFCPX.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/skeleton.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/layout/new/category-glyphs.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/shell/sidebar.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/shell/drawer.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/guestBookmarks.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/avatar.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/dropdown-menu.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/shell/header.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/breadcrumb.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-mobile.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/input.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/separator.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/sheet.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-YQEZMHBC.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-66TKTVKB.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/shell/footer.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/contact-destination.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/pages/system.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/clsx.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/tailwind-merge.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/category-glyph.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-JRLUQ7GM.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-3RJ2FRH4.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-separator.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/pages/Advanced.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>",
+    "status": 200,
+    "resourceType": "image"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/config",
+    "status": 200,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/auth/user",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/page-headings.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/tabs.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/card.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/category-explorer.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/community-metrics.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/export-tools.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/ai-recommendations-panel.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/url-filter-state.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/query-availability.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/styles/pages/discovery-tools.css",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/assets/fonts/category-glyphs-sans.otf",
+    "status": 304,
+    "resourceType": "font"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/badge.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/chip-button.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/select.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/checkbox.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/collapsible.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/tags.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/alert.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/recommendation-feedback.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ai/RecommendationCard.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/useAIRecommendations.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/useRecommendationFeedback.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/hooks/use-user-profile.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/analytics-recommendations.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/components/ui/progress.tsx",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-select.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/src/lib/recommendation-cache.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/shared/recommendations.ts",
+    "status": 304,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/@radix-ui_react-progress.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/@fs/private/tmp/awesome-list-site-c6-ps064-20261027/node_modules/.vite/deps/chunk-TRMO7BGP.js?v=2700bfd8",
+    "status": 200,
+    "resourceType": "script"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/api/tags",
+    "status": 304,
+    "resourceType": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  },
+  {
+    "method": "GET",
+    "url": "http://127.0.0.1:5064/favicon.svg",
+    "status": 304,
+    "resourceType": "other"
+  }
+]

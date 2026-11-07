@@ -1,0 +1,12 @@
+{
+  "url": "https://awesome.video/bookmarks",
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "coarse": true,
+  "touchPoints": 1,
+  "scrollY": 0,
+  "active": "<h1 class=\"display-h system-state-title\" data-route-focus=\"\" tabindex=\"-1\">You’re offline</h1>",
+  "umami": "1",
+  "consent": "denied"
+}

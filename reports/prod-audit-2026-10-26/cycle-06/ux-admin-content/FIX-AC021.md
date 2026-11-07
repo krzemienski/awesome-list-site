@@ -1,0 +1,7 @@
+Fix C6-AC-021 in awesome-list-site. Work in an isolated /tmp clone from origin/main 520d6778369bc7ce495204cfcacc7e0533f941cc on branch fix/c6-ac021-parent-field-feedback. Never edit the stale main checkout and never merge/deploy.
+
+Read reports/prod-audit-2026-10-26/cycle-06/ux-admin-content/findings.md and the cited step-132 evidence. Empty Create Subcategory currently focuses Name while Parent Category only has a banner. Apply the existing AC-20 field-error pattern to the parent combobox on both create and edit missing-field paths: first invalid field receives focus, parent gets aria-invalid and aria-describedby pointing to associated inline Parent Category feedback. Preserve existing name/slug ordering when parent is present, validation rules, server duplicate handling, form behavior and analytics. Reuse GenericCrudManager patterns; no unrelated changes.
+
+Run tsc --noEmit and npm run build with unpiped exits. Drive the real local admin UI with the existing authorized owner session at 1440, 820 touch and 390 touch: empty create must focus/mark/describe parent; empty edit equivalent; when parent is present name remains first; correcting parent clears its error; no row needs to be created. Save screenshots and accessibility snapshots under reports/prod-audit-2026-10-26/cycle-06/ux-admin-content/fix-ac021/. No test files or validation scripts/harnesses.
+
+Commit a conventional fix, push HEAD to fix/c6-ac021-parent-field-feedback, open a non-draft PR to main and return PR/head SHA, changed files, checks, evidence and UNVERIFIED items. Never merge.

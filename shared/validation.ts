@@ -156,6 +156,68 @@ export function isPlausiblePublicUrl(raw: string): boolean {
   }
 }
 
+/**
+ * Reserved documentation/test hosts (RFC 2606/6761: example.com/.net/.org,
+ * *.example, *.test, *.invalid, *.localhost). They never point at a real
+ * resource; QA probes use them, so the live site refuses them on submit to
+ * keep leftover test entries out of the moderation queue.
+ */
+export function isReservedTestHost(raw: string): boolean {
+  try {
+    const host = new URL(raw).hostname.toLowerCase().replace(/\.$/, "");
+    if (/(^|\.)example\.(com|net|org)$/.test(host)) return true;
+    return /\.(example|test|invalid|localhost)$/.test(host) || host === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+export const RESERVED_TEST_HOST_MESSAGE =
+  "This URL uses a reserved test domain (such as example.com), so it can't be added to the live catalog. Use the resource's real address.";
+
+/**
+ * Syntax rules for a custom Anthropic-compatible base URL, shared by the
+ * admin forms and the server. The server adds its DNS/private-address check
+ * on top. Returns the user-facing error, or null when the URL is acceptable.
+ */
+export function baseUrlSyntaxError(raw: string): string | null {
+  let u: URL;
+  try {
+    u = new URL(raw.trim());
+  } catch {
+    return "Base URL is not a valid URL";
+  }
+  if (u.protocol !== "https:" && u.protocol !== "http:") return "Base URL must use http:// or https://";
+  if (!u.hostname) return "Base URL must include a host";
+  if (u.username || u.password) return "Base URL must not contain credentials";
+  // The SDK appends /v1/messages to the base URL, so a query or fragment
+  // never works; refusing it also keeps a ?key= out of job rows and logs.
+  if (u.search || u.hash) return "Base URL must not contain a query string or fragment";
+  return null;
+}
+
+/** Host of a plain-http custom base URL, or null when the URL is not plain http. */
+export function plainHttpHost(raw: string | null | undefined): string | null {
+  try {
+    const u = new URL((raw ?? "").trim());
+    return u.protocol === "http:" && u.host ? u.host : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A custom base URL over plain http sends the run's auth token unencrypted,
+ * so the admin has to confirm it (allowInsecureHttp). Shared by the
+ * Researcher and Enrichment forms and their start routes. Returns the
+ * refusal, or null when nothing needs confirming.
+ */
+export function insecureHttpRefusal(baseUrl: string | null | undefined, confirmed: boolean): string | null {
+  const host = plainHttpHost(baseUrl);
+  if (!host || confirmed) return null;
+  return `The custom base URL uses plain http://, so the auth token would travel unencrypted to ${host}. Confirm the insecure endpoint first.`;
+}
+
 // ---------------------------------------------------------------------------
 // GitHub repository identifiers (BUG-042 run25)
 // ---------------------------------------------------------------------------

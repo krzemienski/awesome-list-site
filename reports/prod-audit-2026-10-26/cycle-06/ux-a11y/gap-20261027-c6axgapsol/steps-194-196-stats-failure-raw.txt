@@ -1,0 +1,270 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,827 resources" [ref=e5]
+          - StaticText "Search 3,827 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+          - link "Admin" [ref=e12]
+            - StaticText "Admin"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e13]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e42]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e43]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e14]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 0 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e15]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e16]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - tablist "Admin sections" [ref=e18] focusable [tabindex]
+              - tab "Overview" [selected, ref=e24]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e25]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e26]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e27]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e28]
+                - StaticText "Researcher"
+              - tab "Export" [ref=e29]
+                - StaticText "Export"
+              - tab "Database" [ref=e30]
+                - StaticText "Database"
+              - tab "Resources" [ref=e31]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e32]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e33]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e34]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e35]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e36]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e37]
+                - StaticText "Audit"
+              - tab "Research" [ref=e38]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e19]
+          - tabpanel "Overview" [ref=e17] focusable [tabindex]
+            - button "RESOURCES 0 across — categories" [ref=e20]
+              - StaticText "RESOURCES"
+              - StaticText "0"
+              - StaticText "across — categories"
+            - button "SUBCATEGORIES —" [ref=e21]
+              - StaticText "SUBCATEGORIES"
+              - StaticText "—"
+            - button "ACTIVE USERS —" [ref=e22]
+              - StaticText "ACTIVE USERS"
+              - StaticText "—"
+            - button "PENDING APPROVALS —" [ref=e23]
+              - StaticText "PENDING APPROVALS"
+              - StaticText "—"
+            - generic
+              - heading "Recent activity" [level=2, ref=e39]
+              - paragraph
+                - StaticText "Latest 6 events"
+              - paragraph
+                - StaticText "Loading activity…"
+            - generic
+              - heading "System health" [level=2, ref=e40]
+              - paragraph
+                - StaticText "Checking current readiness"
+              - image "Database: unknown"
+              - StaticText "Database"
+              - StaticText "checking…"
+              - image "GitHub sync: unknown"
+              - StaticText "GitHub sync"
+              - StaticText "checking…"
+              - image "Link checker: unknown"
+              - StaticText "Link checker"
+              - StaticText "checking…"
+              - image "Enrichment queue: unknown"
+              - StaticText "Enrichment queue"
+              - StaticText "checking…"
+              - image "Researcher API: unknown"
+              - StaticText "Researcher API"
+              - StaticText "checking…"
+            - generic
+              - heading "Top categories" [level=2, ref=e41]
+              - paragraph
+                - StaticText "By resource count"
+              - paragraph
+                - StaticText "Loading categories…"
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-194-stats-failure-1440.png
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,827 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,827 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [selected, ref=e19]
+    - tab "Approvals" [ref=e20]
+    - tab "Edits" [ref=e21]
+    - tab "Enrichment" [ref=e22]
+    - tab "Researcher" [ref=e23]
+    - tab "Export" [ref=e24]
+    - tab "Database" [ref=e25]
+    - tab "Resources" [ref=e26]
+    - tab "Categories" [ref=e27]
+    - tab "Subcategories" [ref=e28]
+    - tab "Users" [ref=e29]
+    - tab "GitHub" [ref=e30]
+    - tab "Link Health" [ref=e31]
+    - tab "Audit" [ref=e32]
+    - tab "Research" [ref=e33]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Overview" [ref=e12] focusable [tabindex]
+    - button "RESOURCES 0 across — categories" [ref=e15]
+    - button "SUBCATEGORIES —" [ref=e16]
+    - button "ACTIVE USERS —" [ref=e17]
+    - button "PENDING APPROVALS —" [ref=e18]
+    - heading "Recent activity" [level=2, ref=e34]
+    - heading "System health" [level=2, ref=e35]
+    - heading "Top categories" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-195-stats-failure-820.png
+
+✓ Done
+
+- generic "Skip to main contentToggle sidebaravAWESOME.VIDEOAWESOME.VIDEO homeSearch 3,827 resourcesSearch 3,82" [ref=e1] clickable [onclick]
+  - region "Notifications (F8)" [ref=e2]
+  - link "Skip to main content" [ref=e3]
+  - button "Toggle sidebar" [ref=e4]
+  - link "AWESOME.VIDEO home" [ref=e5]
+  - button "Search 3,827 resources" [ref=e6]
+  - button "Admin, account menu" [expanded=false, ref=e7]
+  - navigation "Breadcrumb" [ref=e8]
+    - link "Home" [ref=e37]
+    - link "Admin" [disabled, ref=e38]
+  - heading "Operations dashboard" [level=1, ref=e9]
+  - button "Settings" [expanded=false, ref=e10]
+  - button "New entry: add a resource" [ref=e11]
+  - tablist "Admin sections" [ref=e13] focusable [tabindex]
+    - tab "Overview" [selected, ref=e19]
+    - tab "Approvals" [ref=e20]
+    - tab "Edits" [ref=e21]
+    - tab "Enrichment" [ref=e22]
+    - tab "Researcher" [ref=e23]
+    - tab "Export" [ref=e24]
+    - tab "Database" [ref=e25]
+    - tab "Resources" [ref=e26]
+    - tab "Categories" [ref=e27]
+    - tab "Subcategories" [ref=e28]
+    - tab "Users" [ref=e29]
+    - tab "GitHub" [ref=e30]
+    - tab "Link Health" [ref=e31]
+    - tab "Audit" [ref=e32]
+    - tab "Research" [ref=e33]
+  - button "Scroll tabs right" [ref=e14]
+  - tabpanel "Overview" [ref=e12] focusable [tabindex]
+    - button "RESOURCES 0 across — categories" [ref=e15]
+    - button "SUBCATEGORIES —" [ref=e16]
+    - button "ACTIVE USERS —" [ref=e17]
+    - button "PENDING APPROVALS —" [ref=e18]
+    - heading "Recent activity" [level=2, ref=e34]
+    - heading "System health" [level=2, ref=e35]
+    - heading "Top categories" [level=2, ref=e36]
+
+✓ Screenshot saved to reports/prod-audit-2026-10-26/cycle-06/ux-a11y/gap-20261027-c6axgapsol/step-196-stats-failure-390.png
+
+[14106.1695] GET https://awesome.video/api/admin/stats (Fetch) 200
+[14106.1696] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.10] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.182] GET https://awesome.video/api/config (Fetch) 200
+[50845.183] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.194] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.194] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.245] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.246] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.247] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.248] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.248] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.249] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.250] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.252] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.253] GET https://awesome.video/api/admin/users?page=1&limit=100 (Fetch) 200
+[50845.254] GET https://awesome.video/api/categories (Fetch) 200
+[50845.255] GET https://awesome.video/api/subcategories (Fetch) 200
+[50845.256] GET https://awesome.video/api/admin/audit-logs?limit=6&offset=0 (Fetch) 200
+[50845.257] GET https://awesome.video/api/admin/operations/health (Fetch) 200
+[50845.258] GET https://awesome.video/api/health/ai (Fetch) 200
+[50845.259] GET https://awesome.video/api/github/sync-status (Fetch) 200
+[50845.260] GET https://awesome.video/api/github/sync-history (Fetch) 200
+[50845.261] GET https://awesome.video/api/admin/link-health/status (Fetch) 200
+[50845.262] GET https://awesome.video/api/admin/link-health/history (Fetch) 200
+[50845.263] GET https://awesome.video/api/enrichment/jobs?limit=100 (Fetch) 200
+[50845.264] GET https://awesome.video/api/categories (Fetch) 200
+[50845.265] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.266] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.268] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.269] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.270] GET https://awesome.video/api/admin/users?page=2&limit=100 (Fetch) 200
+[50845.271] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.272] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.273] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.274] GET https://awesome.video/api/admin/stats (Fetch) 200
+[50845.275] GET https://awesome.video/api/admin/pending-resources (Fetch) 200
+[50845.285] GET https://awesome.video/api/awesome-list/nav (Fetch) 200
+[50845.347] GET https://awesome.video/api/config (Fetch) 200
+[50845.348] GET https://awesome.video/api/auth/user (Fetch) 200
+[50845.356] GET https://awesome.video/api/home (Fetch) 200
+[50845.357] GET https://awesome.video/api/resources/kinds/counts (Fetch) 200
+[50845.360] GET https://awesome.video/api/notifications?limit=50 (Fetch) 200
+[50845.361] GET https://awesome.video/api/user/preferences (Fetch) 200
+[50845.364] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js (Script)
+[50845.364] GET https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6.41.0/dist/clerk.browser.js (Script) 200
+[50845.365] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js (Script)
+[50845.365] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui.browser.js (Script) 200
+[50845.366] GET https://awesome.video/api/__clerk/v1/environment?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.367] GET https://awesome.video/api/__clerk/v1/client?__clerk_api_version=2026-08-20&_clerk_js_version=6.41.0 (Fetch) 200
+[50845.369] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/framework_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.370] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/ui-common_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.371] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/vendors_ui_8f3fa6_1.42.0.js (Script) 200
+[50845.373] GET https://awesome.video/api/__clerk/npm/@clerk/ui@1.42.0/dist/subscriptionDetails_ui_8f3fa6_1.42.0.js (Script) 200
+
+
+✓ Done

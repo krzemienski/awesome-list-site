@@ -1,0 +1,145 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - button "Toggle sidebar" [ref=e4]
+          - StaticText "Toggle sidebar"
+        - link "AWESOME.VIDEO home" [ref=e5]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 3,825 resources" [ref=e6]
+          - StaticText "Search 3,825 resources"
+        - button "Admin, account menu" [expanded=false, ref=e7]
+          - StaticText "Admin"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e8]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e36]
+              - listitem [level=1]
+                - link "Admin" [disabled, ref=e37]
+          - StaticText "Authorized admin area"
+          - StaticText "ADMIN CONSOLE · "
+          - StaticText "ADMIN USER"
+          - heading "Operations dashboard" [level=1, ref=e9]
+            - StaticText "Operations "
+            - emphasis
+              - StaticText "dashboard"
+          - paragraph
+            - StaticText "Manage the 3,825 resources, jobs, and contributors that keep the index alive."
+          - button "Settings" [expanded=false, ref=e10]
+            - image
+            - StaticText "Settings"
+          - button "New entry: add a resource" [ref=e11]
+            - image
+            - StaticText "New entry"
+          - status
+          - generic
+            - button "Scroll tabs left" [ref=e13]
+            - tablist "Admin sections" [ref=e14] focusable [tabindex]
+              - tab "Overview" [ref=e16]
+                - StaticText "Overview"
+              - tab "Approvals" [ref=e17]
+                - StaticText "Approvals"
+              - tab "Edits" [ref=e18]
+                - StaticText "Edits"
+              - tab "Enrichment" [ref=e19]
+                - StaticText "Enrichment"
+              - tab "Researcher" [ref=e20]
+                - StaticText "Researcher"
+              - tab "Export" [selected, ref=e21]
+                - StaticText "Export"
+              - tab "Database" [ref=e22]
+                - StaticText "Database"
+              - tab "Resources" [ref=e23]
+                - StaticText "Resources"
+              - tab "Categories" [ref=e24]
+                - StaticText "Categories"
+              - tab "Subcategories" [ref=e25]
+                - StaticText "Subcategories"
+              - tab "Users" [ref=e26]
+                - StaticText "Users"
+              - tab "GitHub" [ref=e27]
+                - StaticText "GitHub"
+              - tab "Link Health" [ref=e28]
+                - StaticText "Link Health"
+              - tab "Audit" [ref=e29]
+                - StaticText "Audit"
+              - tab "Research" [ref=e30]
+                - StaticText "Research"
+            - button "Scroll tabs right" [ref=e15]
+          - tabpanel "Export" [ref=e12] focusable [tabindex]
+            - generic
+              - group
+                - DisclosureTriangle "Validation controls" [expanded=false]
+              - region "Export link check" [ref=e31]
+                - heading "Link check #8 COMPLETED" [level=2, ref=e38]
+                  - StaticText "Link check #8"
+                  - StaticText "COMPLETED"
+                - paragraph
+                  - StaticText "Checks the stored URL of every approved resource — the same URLs the exports write."
+                - status
+                  - StaticText "Scan #8 completed Aug 4, 2026, 08:18 PM. At scan time: 3,809 healthy, 12 broken, 0 redirects, 0 timeouts, 2 suspect of 3,823."
+                - paragraph
+                  - StaticText "These are the counts saved when the scan finished. Link Health shows the same scan's problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed."
+                - link "Open Link Health for problem links" [ref=e39]
+              - article [ref=e32] clickable [cursor:pointer]
+                - heading "JSON Snapshot" [level=3, ref=e40]
+                - paragraph
+                  - StaticText "Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state. For a restorable copy, use Full database backup below."
+                - button "Download" [ref=e41]
+              - article [ref=e33] clickable [cursor:pointer]
+                - heading "CSV (resources)" [level=3, ref=e42]
+                - paragraph
+                  - StaticText "Flat resource table for spreadsheet workflows."
+                - button "Download" [ref=e43]
+              - article [ref=e34] clickable [cursor:pointer]
+                - heading "README.md" [level=3, ref=e44]
+                - paragraph
+                  - StaticText "Awesome-list flavored Markdown for the GitHub repo."
+                - button "Generate" [ref=e45]
+              - article [ref=e35] clickable [cursor:pointer]
+                - heading "OPML (categories)" [level=3, ref=e46]
+                - paragraph
+                  - StaticText "Hierarchical export for feed readers."
+                - button "Download" [ref=e47]
+              - group
+                - DisclosureTriangle "Export history & validation results" [expanded=false]
+              - generic
+                - sectionheader
+                  - heading "Full database backup" [level=2, ref=e48]
+                  - paragraph
+                    - StaticText "Restorable copy of the whole database, kept in private storage."
+                  - button "Create backup" [ref=e49]
+                - paragraph
+                  - strong
+                    - StaticText "Covers:"
+                  - StaticText " every table and row in the application database, with its primary keys, foreign-key relationships, unique and check constraints, indexes, sequence positions, extensions and the migration journal. That includes user accounts and their Clerk sign-in links, favorites, bookmarks and collections, journeys and progress, submissions and suggested edits, the audit log, AI enrichment and research jobs and their discoveries, notification preferences, API keys and sessions."
+                - paragraph
+                  - strong
+                    - StaticText "Not covered:"
+                  - StaticText " Clerk sign-in credentials (passwords, social logins, MFA), which Clerk holds outside this database, and the hosting platform's own "
+                  - code
+                    - StaticText "_system"
+                  - StaticText " schema."
+                - paragraph
+                  - strong
+                    - StaticText "Storage:"
+                  - StaticText " this project's private App Storage (production backups only). Backups contain personal data, so they are never downloaded to the browser."
+                - paragraph
+                  - strong
+                    - StaticText "Restore:"
+                  - StaticText " into a new, empty database with "
+                  - code
+                    - StaticText "npm run db:backup -- restore <backup id>"
+                  - StaticText " (runbook: "
+                  - code
+                    - StaticText "docs/DATABASE-BACKUP.md"
+                  - StaticText "). The restore checks the archive's SHA-256, then compares every table's row count, every sequence and the schema with the backup's record."
+                - paragraph
+                  - StaticText "No production backups yet."

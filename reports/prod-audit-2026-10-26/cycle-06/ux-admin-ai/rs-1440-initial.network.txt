@@ -1,0 +1,3 @@
+[5406.504] GET https://awesome.video/api/researcher/config (Fetch) 200
+[5406.505] GET https://awesome.video/api/researcher/jobs?limit=20 (Fetch) 200
+[5406.506] GET https://awesome.video/api/researcher/discoveries (Fetch) 200

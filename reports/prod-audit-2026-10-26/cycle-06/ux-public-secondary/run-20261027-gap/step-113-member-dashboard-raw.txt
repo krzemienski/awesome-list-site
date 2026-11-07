@@ -1,0 +1,1 @@
+Read-only dashboard observed at 1440x900, 820x1180, 390x844; active 4, completed 1; Resume POST not clicked; member session returned to owner.

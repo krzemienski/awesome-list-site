@@ -1,0 +1,3 @@
+  - region "Notifications (F8)" [ref=e2]
+  - tabpanel "Export" [ref=e17] focusable [tabindex]
+    - region "Export link check" [ref=e35]

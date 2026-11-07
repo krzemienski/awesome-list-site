@@ -39,6 +39,7 @@ import {
 } from "@/lib/query-availability";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
+import { humanizeApiError } from "@/lib/apiError";
 import {
   User,
   Heart,
@@ -148,7 +149,7 @@ function UnavailableNotice({
   onRetry: () => void;
 }) {
   return (
-    <Alert variant={reason === "error" ? "destructive" : "default"} data-testid={`profile-${reason}`}>
+    <Alert variant={reason === "error" ? "destructive" : "default"} live={reason === "error" ? "assertive" : "polite"} data-testid={`profile-${reason}`}>
       <AlertTitle>
         {reason === "offline" ? "You’re offline" : `Couldn’t load your ${subject}`}
       </AlertTitle>
@@ -196,21 +197,25 @@ export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-011: inline validation message (empty save is rejected, not
   // silently fallen back to the email local-part).
   const [nameError, setNameError] = useState<string | null>(null);
+  const namesEmpty = !editFirstName.trim() && !editLastName.trim();
+  const firstNameInvisible = editFirstName !== "" && !hasVisibleChars(editFirstName);
+  const lastNameInvisible = editLastName !== "" && !hasVisibleChars(editLastName);
+  const firstNameInvalid = !!nameError && (namesEmpty || firstNameInvisible);
+  const lastNameInvalid = !!nameError && (namesEmpty || lastNameInvisible);
   // The dialog has no DialogTrigger, so Radix can't return focus on close.
   const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
   const openNameDialog = () => {
-    // Best-effort prefill from the combined display name.
-    const parts = (user?.name || "").trim().split(/\s+/);
-    setEditFirstName(parts[0] === user?.email?.split("@")[0] ? "" : parts[0] || "");
-    setEditLastName(parts.slice(1).join(" "));
+    setEditFirstName(user?.firstName ?? "");
+    setEditLastName(user?.lastName ?? "");
     setNameError(null);
     setNameDialogOpen(true);
   };
 
   const handleSaveName = () => {
-    if (!editFirstName.trim() && !editLastName.trim()) {
+    if (namesEmpty) {
       setNameError("Enter at least a first or last name.");
+      setTimeout(() => document.getElementById("edit-first-name")?.focus(), 0);
       return;
     }
     // Run21 R4-049/077: a zero-width-only name would render as an invisible
@@ -220,11 +225,11 @@ export default function Profile({ user }: ProfileProps) {
     // whitespace-only field is non-empty input with no visible characters
     // and used to silently clear the stored name under a success toast.
     // Only a genuinely empty field means "clear this name".
-    if (
-      (editFirstName !== "" && !hasVisibleChars(editFirstName)) ||
-      (editLastName !== "" && !hasVisibleChars(editLastName))
-    ) {
+    if (firstNameInvisible || lastNameInvisible) {
       setNameError("Name must contain visible characters.");
+      setTimeout(() => {
+        document.getElementById(firstNameInvisible ? "edit-first-name" : "edit-last-name")?.focus();
+      }, 0);
       return;
     }
     setNameError(null);
@@ -247,10 +252,10 @@ export default function Profile({ user }: ProfileProps) {
       setNameDialogOpen(false);
       toast({ title: "Name updated", description: "Your display name has been saved." });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({
         title: "Couldn't update name",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        description: humanizeApiError(err, "Please try again."),
         variant: "destructive",
       });
     },
@@ -259,6 +264,7 @@ export default function Profile({ user }: ProfileProps) {
   // Run22 BUG-020: private account/data-deletion request channel — no public
   // GitHub issue (and no personal data exposure) required.
   const [deletionDialogOpen, setDeletionDialogOpen] = useState(false);
+  const [deletionError, setDeletionError] = useState<string | null>(null);
 
   const requestDeletionMutation = useMutation({
     mutationFn: async () => {
@@ -274,13 +280,9 @@ export default function Profile({ user }: ProfileProps) {
           "A maintainer will process your request privately. You can withdraw it any time before it's processed.",
       });
     },
-    onError: (err: any) => {
-      setDeletionDialogOpen(false);
-      toast({
-        title: "Couldn't submit deletion request",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
-        variant: "destructive",
-      });
+    onError: (err: Error) => {
+      const message = humanizeApiError(err, "Please try again.");
+      setDeletionError(/[.!?]$/.test(message) ? message : `${message}.`);
     },
   });
 
@@ -296,10 +298,10 @@ export default function Profile({ user }: ProfileProps) {
         description: "Your account will not be deleted.",
       });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({
         title: "Couldn't withdraw request",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        description: humanizeApiError(err, "Please try again."),
         variant: "destructive",
       });
     },
@@ -710,7 +712,7 @@ export default function Profile({ user }: ProfileProps) {
                             <h4 className="font-medium truncate">
                               <Link
                                 href={`/resource/${favorite.id}`}
-                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 hover:underline"
+                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 max-lg:min-h-11 max-lg:leading-11 hover:underline"
                                 data-testid={`link-favorite-${favorite.id}`}
                               >
                                 {favorite.title}
@@ -809,7 +811,7 @@ export default function Profile({ user }: ProfileProps) {
                             <h4 className="font-medium truncate">
                               <Link
                                 href={`/resource/${bookmark.id}`}
-                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 hover:underline"
+                                className="inline-block max-w-full truncate align-middle min-h-[32px] leading-8 max-lg:min-h-11 max-lg:leading-11 hover:underline"
                                 data-testid={`link-bookmark-${bookmark.id}`}
                               >
                                 {bookmark.title}
@@ -979,6 +981,7 @@ export default function Profile({ user }: ProfileProps) {
                       variant="destructive"
                       onClick={() => {
                         trackAccountDeletionDialogOpened();
+                        setDeletionError(null);
                         setDeletionDialogOpen(true);
                       }}
                       data-testid="button-request-deletion"
@@ -991,7 +994,13 @@ export default function Profile({ user }: ProfileProps) {
             </Card>
           </div>
 
-          <AlertDialog open={deletionDialogOpen} onOpenChange={setDeletionDialogOpen}>
+          <AlertDialog
+            open={deletionDialogOpen}
+            onOpenChange={(open) => {
+              if (!open && requestDeletionMutation.isPending) return;
+              setDeletionDialogOpen(open);
+            }}
+          >
             <AlertDialogContent data-testid="dialog-deletion-confirm">
               <AlertDialogHeader>
                 <AlertDialogTitle>Request account deletion?</AlertDialogTitle>
@@ -1001,12 +1010,28 @@ export default function Profile({ user }: ProfileProps) {
                   the request any time before it's completed.
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              {deletionError && (
+                <Alert variant="destructive" data-testid="alert-deletion-error">
+                  <AlertTitle>Couldn&apos;t submit deletion request</AlertTitle>
+                  <AlertDescription>{deletionError} Your account is unchanged.</AlertDescription>
+                </Alert>
+              )}
               <AlertDialogFooter>
-                <AlertDialogCancel data-testid="button-deletion-cancel">
+                <AlertDialogCancel
+                  disabled={requestDeletionMutation.isPending}
+                  data-testid="button-deletion-cancel"
+                >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => requestDeletionMutation.mutate()}
+                  onClick={(event) => {
+                    // Keep the dialog open until the server answers so a failure
+                    // is shown in place instead of disappearing with the dialog.
+                    event.preventDefault();
+                    if (requestDeletionMutation.isPending) return;
+                    setDeletionError(null);
+                    requestDeletionMutation.mutate();
+                  }}
                   aria-disabled={requestDeletionMutation.isPending}
                   data-testid="button-deletion-confirm"
                 >
@@ -1052,8 +1077,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editFirstName}
                 maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
-                aria-invalid={!!nameError}
-                aria-describedby={nameError ? "edit-name-error" : undefined}
+                aria-invalid={firstNameInvalid}
+                aria-describedby={firstNameInvalid ? "edit-name-error" : undefined}
                 data-testid="input-first-name"
               />
             </div>
@@ -1064,8 +1089,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editLastName}
                 maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
-                aria-invalid={!!nameError}
-                aria-describedby={nameError ? "edit-name-error" : undefined}
+                aria-invalid={lastNameInvalid}
+                aria-describedby={lastNameInvalid ? "edit-name-error" : undefined}
                 data-testid="input-last-name"
               />
             </div>

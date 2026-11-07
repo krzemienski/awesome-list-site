@@ -1,0 +1,434 @@
+{
+  "url": "https://awesome.video/sign-in?redirect_url=%2Fcontinue-learning",
+  "viewport": [
+    820,
+    1180
+  ],
+  "coarse": false,
+  "reduced": true,
+  "overflow": 0,
+  "active": "<body>\n    <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.\n         (A prior \"noscript\" match in this file was only a comment.) -->\n    <noscript>\n      <div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);\">\n        <p style=\"font-size:20px;font-weight:700;margin:0 0 12px;\">Awesome Video</p>\n        <p style=\"margin:0 0 8px;\">This app requires JavaScript to browse thousands of curated video development resources.</p>\n        <p style=\"margin:0;\">Please enable JavaScript, or view the source list at\n          <a href=\"https://github.com/krzemienski/awesome-video\" style=\"color:var(--accent);\">github.com/krzemienski/awesome-video</a>.</p>\n      </div>\n    </noscript>\n    <div id=\"home-layout-boot-skeleton\" aria-hidden=\"true\">\n      <div style=\"max-width:960px;margin:0 auto\">\n        <div style=\"height:2rem;width:55%;background:var(--surface-2);margin-bottom:1rem\"></div>\n        <div style=\"height:1rem;width:80%;background:var(--surface-2);margin-bottom:2rem\"></div>\n        <div style=\"height:12rem;background:var(--surface-2);margin-bottom:1rem\"></div>\n      </div>\n    </div>\n    <div id=\"root\"><div role=\"region\" aria-label=\"Notifications (F8)\" tabindex=\"-1\" style=\"pointer-events: none;\"><ol tabindex=\"-1\" class=\"system-toast-viewport fixed bottom-[var(--app-bottom-inset,0px)] top-auto z-[100] flex max-h-screen w-full flex-col p-4 sm:bottom-[var(--app-bottom-inset,0px)] sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]\"></ol></div><div class=\"group/sidebar-wrapper flex w-full has-[[data-variant=inset]]:bg-sidebar overflow-x-clip flex-col flex-1 min-h-[auto] [--header-height:56px] min-[768px]:[--header-height:60px]\" style=\"--sidebar-width: var(--shell-sidebar-w, 280px); --sidebar-width-tablet: var(--shell-sidebar-w-tablet, 240px); --sidebar-width-icon: var(--shell-rail-w, 56px);\"><a href=\"#main\" class=\"skip-link\">Skip to main content</a><div class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\"><div class=\"grain\" aria-hidden=\"true\"></div><header class=\"app-canonical-header\"><span class=\"header-menu-control\"><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn\" data-ds-variant=\"ghost\" data-sidebar=\"trigger\" data-testid=\"mobile-drawer-trigger\" aria-label=\"Toggle sidebar\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-panel-left\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"></rect><path d=\"M9 3v18\"></path></svg><span class=\"sr-only\">Toggle sidebar</span></button><svg class=\"header-menu-icon\" aria-hidden=\"true\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><path d=\"M2 4 H14 M2 8 H14 M2 12 H14\"></path></svg></span><a data-testid=\"header-brand\" href=\"/\" class=\"header-brand\"><span class=\"header-logo\" aria-hidden=\"true\" data-testid=\"brand-mark\">av</span><span class=\"header-wordmark\" aria-hidden=\"true\">AWESOME.VIDEO</span><span class=\"sr-only\">AWESOME.VIDEO home</span></a><div class=\"header-spacer\"></div><button type=\"button\" class=\"header-search-trigger\"><svg aria-hidden=\"true\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"7\" cy=\"7\" r=\"5\"></circle><path d=\"M11 11 L14 14\"></path></svg><span class=\"sr-only\">Search 3,825 resources</span><span class=\"header-search-label\" aria-hidden=\"true\">Search <span>3,825 resources…</span></span><span class=\"kbd hide-mobile\" aria-hidden=\"true\">⌘K</span></button><nav class=\"header-nav hide-tablet\" aria-label=\"Primary\"><a href=\"/categories\" class=\"nav-link\">Browse</a><a href=\"/submit\" class=\"nav-link\">Submit</a><a href=\"/about\" class=\"nav-link\">About</a><a class=\"nav-link\" href=\"/design-system\" target=\"_blank\" rel=\"noopener noreferrer\">Docs ↗</a></nav><button type=\"button\" class=\"user-pill\" id=\"radix-:r0:\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\"><span class=\"header-avatar\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-log-in\" aria-hidden=\"true\"><path d=\"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4\"></path><polyline points=\"10 17 15 12 10 7\"></polyline><line x1=\"15\" x2=\"3\" y1=\"12\" y2=\"12\"></line></svg></span><span class=\"header-account-name hide-mobile\" aria-hidden=\"true\">Sign in</span><span class=\"sr-only\">Sign in, account menu</span></button></header><div class=\"app-shell-row\" data-browse-sidebar=\"false\"><div class=\"av-sidebar-shell group peer shrink-0 text-sidebar-foreground\" data-state=\"expanded\" data-collapsible=\"\" data-variant=\"sidebar\" data-side=\"left\"><div data-sidebar=\"sidebar\" role=\"navigation\" aria-label=\"Sidebar\" class=\"flex h-full w-full flex-col\"><div data-sidebar=\"header\" class=\"flex flex-col gap-2 av-sidebar-drawer-header border-b p-0\"><a href=\"/\" class=\"flex min-h-7 items-center gap-[10px] px-0 py-0 no-underline\"><span class=\"av-sidebar-drawer-logo\" aria-hidden=\"true\">av</span><span class=\"av-sidebar-drawer-wordmark\">AWESOME.VIDEO<span class=\"sr-only\"> home, </span><span class=\"sr-only\" data-testid=\"sidebar-resource-count\">3,825 resources</span></span></a></div><div data-sidebar=\"content\" class=\"flex min-h-0 flex-1 flex-col overflow-auto group-data-[collapsible=icon]:overflow-hidden gap-0\"><div class=\"av-sidebar-expanded-navigation\"><div><div class=\"av-sidebar-home-navigation\"><a href=\"/\" data-testid=\"nav-home\" class=\"sub-item touch-manipulation min-h-[44px] no-underline w-full\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-house size-[13px] shrink-0\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"></path><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path></svg><span class=\"break-words\">Home</span></span></a></div><div class=\"av-sidebar-categories-heading\"><div class=\"font-mono uppercase\" style=\"font-size: 9.5px; letter-spacing: 1.8px; font-weight: 700; color: var(--text-3);\">CATEGORIES · 9</div><button type=\"button\" data-testid=\"sidebar-compact-navigation\" aria-label=\"Collapse sidebar\" title=\"Collapse sidebar\" class=\"btn icon av-sidebar-collapse-toggle\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg></button></div></div><div class=\"av-sidebar-category-list av-sidebar-tree-scroll\"><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-community-events\" data-state=\"closed\" title=\"Community &amp; Events\" aria-expanded=\"false\" aria-controls=\"accordion-body-community-events-:r5:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-community-events\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">◈</span><span class=\"min-w-0 break-words\" title=\"Community &amp; Events\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Community &amp; Events</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"129 resources\" aria-label=\"129 resources\" style=\"font-size: 12px; color: var(--text-3);\">129</span><span data-testid=\"toggle-cat-community-events\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-community-events-:r5:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-encoding-codecs\" data-state=\"closed\" title=\"Encoding &amp; Codecs\" aria-expanded=\"false\" aria-controls=\"accordion-body-encoding-codecs-:r6:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-encoding-codecs\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">◇</span><span class=\"min-w-0 break-words\" title=\"Encoding &amp; Codecs\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Encoding &amp; Codecs</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"579 resources\" aria-label=\"579 resources\" style=\"font-size: 12px; color: var(--text-3);\">579</span><span data-testid=\"toggle-cat-encoding-codecs\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-encoding-codecs-:r6:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-general-tools\" data-state=\"closed\" title=\"General Tools\" aria-expanded=\"false\" aria-controls=\"accordion-body-general-tools-:r7:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-general-tools\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">◆</span><span class=\"min-w-0 break-words\" title=\"General Tools\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">General Tools</span></span><span class=\"av-sidebar-category-meta\"><span class=\"font-mono tabular-nums\" title=\"514 resources\" aria-label=\"514 resources\" style=\"font-size: 12px; color: var(--text-3);\">514</span><span data-testid=\"toggle-cat-general-tools\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-general-tools-:r7:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-infrastructure-delivery\" data-state=\"closed\" title=\"Infrastructure &amp; Delivery\" aria-expanded=\"false\" aria-controls=\"accordion-body-infrastructure-delivery-:r8:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-infrastructure-delivery\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">▣</span><span class=\"min-w-0 break-words\" title=\"Infrastructure &amp; Delivery\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Infrastructure &amp; Delivery</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"353 resources\" aria-label=\"353 resources\" style=\"font-size: 12px; color: var(--text-3);\">353</span><span data-testid=\"toggle-cat-infrastructure-delivery\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-infrastructure-delivery-:r8:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-intro-learning\" data-state=\"closed\" title=\"Intro &amp; Learning\" aria-expanded=\"false\" aria-controls=\"accordion-body-intro-learning-:r9:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-intro-learning\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">▤</span><span class=\"min-w-0 break-words\" title=\"Intro &amp; Learning\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Intro &amp; Learning</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"297 resources\" aria-label=\"297 resources\" style=\"font-size: 12px; color: var(--text-3);\">297</span><span data-testid=\"toggle-cat-intro-learning\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-intro-learning-:r9:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-media-tools\" data-state=\"closed\" title=\"Media Tools\" aria-expanded=\"false\" aria-controls=\"accordion-body-media-tools-:ra:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-media-tools\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">▥</span><span class=\"min-w-0 break-words\" title=\"Media Tools\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Media Tools</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"704 resources\" aria-label=\"704 resources\" style=\"font-size: 12px; color: var(--text-3);\">704</span><span data-testid=\"toggle-cat-media-tools\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-media-tools-:ra:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-players-clients\" data-state=\"closed\" title=\"Players &amp; Clients\" aria-expanded=\"false\" aria-controls=\"accordion-body-players-clients-:rb:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-players-clients\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">▶</span><span class=\"min-w-0 break-words\" title=\"Players &amp; Clients\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Players &amp; Clients</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"447 resources\" aria-label=\"447 resources\" style=\"font-size: 12px; color: var(--text-3);\">447</span><span data-testid=\"toggle-cat-players-clients\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-players-clients-:rb:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-protocols-transport\" data-state=\"closed\" title=\"Protocols &amp; Transport\" aria-expanded=\"false\" aria-controls=\"accordion-body-protocols-transport-:rc:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-protocols-transport\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">⟁</span><span class=\"min-w-0 break-words\" title=\"Protocols &amp; Transport\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Protocols &amp; Transport</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"467 resources\" aria-label=\"467 resources\" style=\"font-size: 12px; color: var(--text-3);\">467</span><span data-testid=\"toggle-cat-protocols-transport\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-protocols-transport-:rc:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div><div class=\"accordion-item\"><button type=\"button\" class=\"accordion-header\" data-testid=\"accordion-cat-standards-industry\" data-state=\"closed\" title=\"Standards &amp; Industry\" aria-expanded=\"false\" aria-controls=\"accordion-body-standards-industry-:rd:\"><span class=\"av-sidebar-category-label\" data-testid=\"row-cat-standards-industry\"><span class=\"av-sidebar-category-glyph flex items-center justify-center shrink-0\" aria-hidden=\"true\" style=\"width: 24px; height: 24px; border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2);\">◉</span><span class=\"min-w-0 break-words\" title=\"Standards &amp; Industry\" style=\"font-size: 13px; font-weight: 500; color: var(--text-2);\">Standards &amp; Industry</span></span><span class=\"av-sidebar-category-meta\"><span class=\"av-sidebar-l3-indicator\" title=\"Contains nested subcategories\" aria-hidden=\"true\">L3</span><span class=\"font-mono tabular-nums\" title=\"335 resources\" aria-label=\"335 resources\" style=\"font-size: 12px; color: var(--text-3);\">335</span><span data-testid=\"toggle-cat-standards-industry\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-[10px] shrink-0 chevron-rotate\"><path d=\"m9 18 6-6-6-6\"></path></svg></span></span></button><div id=\"accordion-body-standards-industry-:rd:\" class=\"accordion-body\" inert=\"\" style=\"max-height: 0px;\"></div></div></div><div data-sidebar=\"footer\" class=\"flex flex-col gap-2 p-2 av-sidebar-compact-footer\"><div class=\"av-sidebar-compact-footer-status\"><span class=\"live-dot\" aria-hidden=\"true\"></span><span class=\"av-sidebar-compact-footer-copy\" data-status=\"count\" data-testid=\"sidebar-resource-count\">3,825 indexed<span class=\"av-sidebar-compact-footer-live\"> · live</span></span><div class=\"av-sidebar-compact-footer-links\"><a target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Source: krzemienski/awesome-video\" title=\"Source: krzemienski/awesome-video\" href=\"https://github.com/krzemienski/awesome-video\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z\"></path></svg></a></div><details class=\"av-sidebar-more-navigation av-sidebar-footer-more\"><summary class=\"flex min-h-[44px] cursor-pointer items-center px-3 text-xs font-medium text-[var(--text-2)]\" aria-label=\"More navigation\" title=\"More navigation\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-ellipsis size-4\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"></circle><circle cx=\"19\" cy=\"12\" r=\"1\"></circle><circle cx=\"5\" cy=\"12\" r=\"1\"></circle></svg></summary><ul data-sidebar=\"menu\" class=\"flex w-full min-w-0 flex-col gap-1 px-2 pb-2\"><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/submit\" data-testid=\"nav-submit-resource\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus size-[14px] shrink-0\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg><span class=\"break-words\">Submit Resource</span></span></a></li><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/journeys\" data-testid=\"nav-learning-journeys\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-book-open size-[14px] shrink-0\"><path d=\"M12 7v14\"></path><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"></path></svg><span class=\"break-words\">Learning Journeys</span></span></a></li><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/advanced\" data-testid=\"nav-advanced\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-zap size-[14px] shrink-0\"><path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"></path></svg><span class=\"break-words\">Advanced</span></span></a></li><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/settings/theme\" data-testid=\"nav-theme\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-palette size-[14px] shrink-0\"><circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"></circle><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\"></path></svg><span class=\"break-words\">Theme</span></span></a></li><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/?context=account\" data-testid=\"nav-home-dashboard\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-house size-[14px] shrink-0\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"></path><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path></svg><span class=\"break-words\">Home dashboard</span></span></a></li><li data-sidebar=\"menu-item\" class=\"group/menu-item relative\"><a href=\"/about\" data-testid=\"nav-about\" class=\"peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&amp;&gt;span:last-child]:truncate [&amp;&gt;svg]:size-4 [&amp;&gt;svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm min-h-[44px] sub-item touch-manipulation min-h-[44px] no-underline w-full\" data-sidebar=\"menu-button\" data-size=\"default\"><span class=\"flex min-w-0 items-center gap-[10px]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info size-[14px] shrink-0\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg><span class=\"break-words\">About</span></span></a></li></ul></details></div></div></div></div></div></div><div class=\"app-shell-column\"><main id=\"main\" data-product-profile=\"public-discovery\" tabindex=\"-1\" class=\"app-shell-main focus:outline-none\"><div class=\"page-content-wrap\" data-admin=\"false\"><nav aria-label=\"Breadcrumb\" class=\"sr-only\" data-testid=\"page-breadcrumb\"><ol class=\"flex items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5 min-w-0 flex-nowrap overflow-hidden\"><li class=\"inline-flex items-center gap-1.5\"><a class=\"transition-colors hover:text-foreground\" href=\"/\" title=\"Home\" tabindex=\"-1\" data-testid=\"link-breadcrumb-home\">Home</a></li><li role=\"presentation\" aria-hidden=\"true\" class=\"[&amp;&gt;svg]:w-3.5 [&amp;&gt;svg]:h-3.5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right\"><path d=\"m9 18 6-6-6-6\"></path></svg></li><li class=\"inline-flex items-center gap-1.5 min-w-0\"><span role=\"link\" aria-disabled=\"true\" aria-current=\"page\" class=\"font-normal text-foreground block truncate\" title=\"Sign in\" data-testid=\"breadcrumb-mobile-current\">Sign in</span></li></ol></nav><div class=\"flex justify-center py-10\" data-testid=\"page-sign-in\"><div class=\"contents\" data-clerk-slot=\"\"><p class=\"text-sm text-muted-foreground\" role=\"status\">Checking your sign-in status…</p></div></div></div></main><footer class=\"app-footer\" data-testid=\"site-footer\"><div class=\"app-footer-grid\"><div class=\"app-footer-identity\"><p class=\"eyebrow app-footer-eyebrow\">── INDEX</p><a data-testid=\"footer-home\" aria-label=\"awesome.video home\" href=\"/\" class=\"display-h app-footer-name\">awesome.video</a><p class=\"app-footer-tagline\">A curated collection of awesome video resources, tools, and technologies for developers and content creators</p><div class=\"shimmer-line app-footer-shimmer\" aria-hidden=\"true\"></div></div><div><h2 class=\"app-footer-heading\">INDEXED</h2><p class=\"display-h app-footer-total\">3,825</p><p class=\"app-footer-stats\">9 categories<br>99 subcategories<br><span class=\"app-footer-live\"><span class=\"live-dot\" aria-hidden=\"true\"></span> live</span></p></div><nav aria-label=\"Explore categories\"><h2 class=\"app-footer-heading\">EXPLORE</h2><div class=\"app-footer-explore\"><a aria-label=\"Community &amp; Events\" href=\"/category/community-events\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◈</span><span aria-hidden=\"true\">Community</span></a><a aria-label=\"Encoding &amp; Codecs\" href=\"/category/encoding-codecs\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◇</span><span aria-hidden=\"true\">Encoding</span></a><a aria-label=\"General Tools\" href=\"/category/general-tools\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◆</span><span aria-hidden=\"true\">General</span></a><a aria-label=\"Infrastructure &amp; Delivery\" href=\"/category/infrastructure-delivery\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▣</span><span aria-hidden=\"true\">Infrastructure</span></a><a aria-label=\"Intro &amp; Learning\" href=\"/category/intro-learning\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▤</span><span aria-hidden=\"true\">Intro</span></a><a aria-label=\"Media Tools\" href=\"/category/media-tools\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▥</span><span aria-hidden=\"true\">Media</span></a><a aria-label=\"Players &amp; Clients\" href=\"/category/players-clients\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">▶</span><span aria-hidden=\"true\">Players</span></a><a aria-label=\"Protocols &amp; Transport\" href=\"/category/protocols-transport\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">⟁</span><span aria-hidden=\"true\">Protocols</span></a><a aria-label=\"Standards &amp; Industry\" href=\"/category/standards-industry\"><span class=\"app-footer-glyph\" aria-hidden=\"true\">◉</span><span aria-hidden=\"true\">Standards</span></a></div></nav><div><h2 class=\"app-footer-heading\">SOURCE</h2><a class=\"app-footer-repo\" href=\"https://github.com/krzemienski/awesome-video\" target=\"_blank\" rel=\"noopener noreferrer\" data-testid=\"footer-github\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z\"></path></svg><span class=\"app-footer-repo-label\">krzemienski<span>/<wbr>awesome-video</span></span><span class=\"app-footer-repo-arrow\" aria-hidden=\"true\">↗</span></a><p class=\"app-footer-note\">Open-source. <a href=\"https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md\" target=\"_blank\" rel=\"noopener noreferrer\">PRs welcome</a>.<br>Indexed automatically from <span class=\"app-footer-mono\">README.md</span>.</p><div class=\"app-footer-contact\"><button class=\"btn disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs\" data-ds-variant=\"ghost\" data-testid=\"contact-open-form\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-mail\" aria-hidden=\"true\"><rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"></rect><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\"></path></svg>Contact maintainers</button></div></div></div><div class=\"app-footer-meta\"><span data-testid=\"footer-copyright\">© 2026 awesome.video · content CC0, code MIT</span><nav class=\"app-footer-meta-links\" aria-label=\"Site policies\"><a data-testid=\"footer-about\" href=\"/about\">About</a><a data-testid=\"footer-terms\" href=\"/terms\">Terms</a><a data-testid=\"footer-privacy\" href=\"/privacy\">Privacy</a><a data-testid=\"footer-code-of-conduct\" aria-label=\"Code of Conduct\" href=\"/code-of-conduct\">Conduct</a><button type=\"button\" data-testid=\"footer-cookie-settings\" class=\"btn ghost footer-cookie-settings\">Cookie settings</button><a href=\"https://github.com/krzemienski/awesome-video/issues\" target=\"_blank\" rel=\"noopener noreferrer\">Issues ↗</a><a href=\"/sitemap.xml\">Sitemap</a></nav><span>built with the awesome-list framework</span></div></footer></div></div></div></div></div>\n    <script nonce=\"\">\n      // BUG-018 (run19): routes without server-injected content (admin,\n      // noindex pages) used to show a blank black page until React mounted.\n      // Paint a minimal skeleton ONLY when #root is empty — injected SSR\n      // content (most public routes) already gives instant real content.\n      // React's createRoot().render() replaces this on mount.\n      (function () {\n        try {\n          var root = document.getElementById('root');\n          if (!root) return;\n          // Crawler-injected routes (#ssr-seo-content, never the hydrated Home\n          // tree): move the markup into the fixed #ssr-seo-hold overlay HERE,\n          // before the first paint, instead of in main.tsx after the bundle\n          // has executed. Re-inserting the nodes later re-registers the lead\n          // paragraph as a fresh Largest Contentful Paint candidate measured\n          // in the swapped web font (a few percent larger than the fallback\n          // paint), which dated the route's LCP to the bundle's execution\n          // instead of the document's first paint. The overlay stays\n          // semantic and interactive (real h1, links, no aria-hidden/inert)\n          // until main.tsx adopts it (data-preboot) right before React\n          // mounts underneath — so a bundle that never runs still leaves a\n          // usable page, exactly like the old in-#root fallback.\n          var ssr = root.querySelector('#ssr-seo-content');\n          if (ssr && root.getAttribute('data-home-ssr') !== 'true' && !document.getElementById('ssr-seo-hold')) {\n            var overlay = document.createElement('div');\n            overlay.id = 'ssr-seo-hold';\n            overlay.setAttribute('data-preboot', 'true');\n            // main.tsx judges readiness for THIS document's URL, not a later one.\n            overlay.setAttribute('data-pathname', location.pathname);\n            overlay.setAttribute(\n              'style',\n              'position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain'\n            );\n            while (root.firstChild) overlay.appendChild(root.firstChild);\n            document.body.appendChild(overlay);\n            return;\n          }\n          if (root.firstElementChild) return;\n          root.innerHTML =\n            '<div aria-hidden=\"true\" style=\"min-height:100vh;background:var(--bg);padding:40px 20px;max-width:960px;margin:0 auto\">' +\n            '<style nonce=\"Xu8DFpPpFblZDt9Hrv6oBQ==\">@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:var(--surface-2);animation:bsk 1.4s ease-in-out infinite}</style>' +\n            '<div class=\"bsk\" style=\"height:2rem;width:60%;max-width:420px;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:1rem;width:80%;max-width:640px;margin-bottom:2rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%;margin-bottom:1rem\"></div>' +\n            '<div class=\"bsk\" style=\"height:8rem;width:100%\"></div>' +\n            '</div>';\n        } catch (e) {}\n      })();\n    </script>\n    <script nonce=\"\">\n      // The Replit dev banner is a development-only convenience. Inject it only\n      // on Replit/dev hosts so production (awesome.video) never requests it.\n      (function () {\n        try {\n          var isDev = location.hostname.endsWith('.replit.dev') ||\n                      location.hostname === 'localhost' ||\n                      location.hostname.endsWith('.repl.co');\n          if (!isDev) return;\n          var s = document.createElement('script');\n          s.type = 'text/javascript';\n          s.src = 'https://replit.com/public/js/replit-dev-banner.js';\n          document.body.appendChild(s);\n        } catch (e) {}\n      })();\n    </script>\n    <script nonce=\"\" type=\"module\">(function(){var started=false;var start=function(){if(started)return;started=true;var s=document.createElement(\"script\");s.type=\"module\";s.crossOrigin=\"anonymous\";s.src=\"/assets/index-0OZjaKaA.js\";document.head.appendChild(s);};if(document.visibilityState===\"hidden\"||typeof requestAnimationFrame!==\"function\"){start();return;}requestAnimationFrame(function(){requestAnimationFrame(function(){setTimeout(start,0);});});setTimeout(start,1000);})();</script>\n<script src=\"https://i.replit.com/script.js\" async=\"\" data-website-id=\"71ccccc7-37f7-4f07-a880-5973ae4aa911\"></script>\n\n<script crossorigin=\"anonymous\" async=\"\" src=\"/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js\" data-clerk-publishable-key=\"pk_live_Y2xlcmsuYXdlc29tZS52aWRlbyQ\" data-clerk-proxy-url=\"/api/__clerk\"></script></body>",
+  "controls": [
+    {
+      "name": "Skip to main content",
+      "role": "A",
+      "href": "#main",
+      "rect": {
+        "x": 8,
+        "y": -100,
+        "width": 156.234375,
+        "height": 44,
+        "top": -100,
+        "right": 164.234375,
+        "bottom": -56,
+        "left": 8
+      },
+      "class": "skip-link"
+    },
+    {
+      "name": "Toggle sidebar",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 24,
+        "y": 7.5,
+        "width": 44,
+        "height": 44,
+        "top": 7.5,
+        "right": 68,
+        "bottom": 51.5,
+        "left": 24
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost icon min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))] h-7 w-7 btn icon ghost mobile-menu-btn",
+      "disabled": false
+    },
+    {
+      "name": "av\nAWESOME.VIDEO\nAWESOME.VIDEO home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 82,
+        "y": 7.5,
+        "width": 147.203125,
+        "height": 44,
+        "top": 7.5,
+        "right": 229.203125,
+        "bottom": 51.5,
+        "left": 82
+      },
+      "class": "header-brand"
+    },
+    {
+      "name": "Search 3,825 resources\nSearch\n⌘K",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 514.703125,
+        "y": 7.5,
+        "width": 180,
+        "height": 44,
+        "top": 7.5,
+        "right": 694.703125,
+        "bottom": 51.5,
+        "left": 514.703125
+      },
+      "class": "header-search-trigger",
+      "disabled": false
+    },
+    {
+      "name": "Sign in\nSign in, account menu",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 708.703125,
+        "y": 7.5,
+        "width": 87.296875,
+        "height": 44,
+        "top": 7.5,
+        "right": 796,
+        "bottom": 51.5,
+        "left": 708.703125
+      },
+      "class": "user-pill",
+      "disabled": false
+    },
+    {
+      "name": "Home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 39,
+        "y": 107,
+        "width": 39.234375,
+        "height": 20,
+        "top": 107,
+        "right": 78.234375,
+        "bottom": 127,
+        "left": 39
+      },
+      "class": "transition-colors hover:text-foreground"
+    },
+    {
+      "name": "awesome.video home",
+      "role": "A",
+      "href": "/",
+      "rect": {
+        "x": 40,
+        "y": 517.3125,
+        "width": 195.046875,
+        "height": 44,
+        "top": 517.3125,
+        "right": 235.046875,
+        "bottom": 561.3125,
+        "left": 40
+      },
+      "class": "display-h app-footer-name"
+    },
+    {
+      "name": "Community & Events",
+      "role": "A",
+      "href": "/category/community-events",
+      "rect": {
+        "x": 290.65625,
+        "y": 694.09375,
+        "width": 218.671875,
+        "height": 44,
+        "top": 694.09375,
+        "right": 509.328125,
+        "bottom": 738.09375,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Encoding & Codecs",
+      "role": "A",
+      "href": "/category/encoding-codecs",
+      "rect": {
+        "x": 290.65625,
+        "y": 722.90625,
+        "width": 218.671875,
+        "height": 44,
+        "top": 722.90625,
+        "right": 509.328125,
+        "bottom": 766.90625,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "General Tools",
+      "role": "A",
+      "href": "/category/general-tools",
+      "rect": {
+        "x": 290.65625,
+        "y": 751.71875,
+        "width": 218.671875,
+        "height": 44,
+        "top": 751.71875,
+        "right": 509.328125,
+        "bottom": 795.71875,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "role": "A",
+      "href": "/category/infrastructure-delivery",
+      "rect": {
+        "x": 290.65625,
+        "y": 780.53125,
+        "width": 218.671875,
+        "height": 44,
+        "top": 780.53125,
+        "right": 509.328125,
+        "bottom": 824.53125,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Intro & Learning",
+      "role": "A",
+      "href": "/category/intro-learning",
+      "rect": {
+        "x": 290.65625,
+        "y": 809.34375,
+        "width": 218.671875,
+        "height": 44,
+        "top": 809.34375,
+        "right": 509.328125,
+        "bottom": 853.34375,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Media Tools",
+      "role": "A",
+      "href": "/category/media-tools",
+      "rect": {
+        "x": 290.65625,
+        "y": 838.15625,
+        "width": 218.671875,
+        "height": 44,
+        "top": 838.15625,
+        "right": 509.328125,
+        "bottom": 882.15625,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Players & Clients",
+      "role": "A",
+      "href": "/category/players-clients",
+      "rect": {
+        "x": 290.65625,
+        "y": 866.96875,
+        "width": 218.671875,
+        "height": 44,
+        "top": 866.96875,
+        "right": 509.328125,
+        "bottom": 910.96875,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Protocols & Transport",
+      "role": "A",
+      "href": "/category/protocols-transport",
+      "rect": {
+        "x": 290.65625,
+        "y": 895.78125,
+        "width": 218.671875,
+        "height": 44,
+        "top": 895.78125,
+        "right": 509.328125,
+        "bottom": 939.78125,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "Standards & Industry",
+      "role": "A",
+      "href": "/category/standards-industry",
+      "rect": {
+        "x": 290.65625,
+        "y": 924.59375,
+        "width": 218.671875,
+        "height": 44,
+        "top": 924.59375,
+        "right": 509.328125,
+        "bottom": 968.59375,
+        "left": 290.65625
+      },
+      "class": ""
+    },
+    {
+      "name": "krzemienski/awesome-video\n↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "rect": {
+        "x": 541.328125,
+        "y": 705.6875,
+        "width": 218.671875,
+        "height": 60.375,
+        "top": 705.6875,
+        "right": 760,
+        "bottom": 766.0625,
+        "left": 541.328125
+      },
+      "class": "app-footer-repo"
+    },
+    {
+      "name": "PRs welcome",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "rect": {
+        "x": 619.6875,
+        "y": 778.0625,
+        "width": 73,
+        "height": 24,
+        "top": 778.0625,
+        "right": 692.6875,
+        "bottom": 802.0625,
+        "left": 619.6875
+      },
+      "class": ""
+    },
+    {
+      "name": "Contact maintainers",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 541.328125,
+        "y": 832.453125,
+        "width": 218.671875,
+        "height": 44,
+        "top": 832.453125,
+        "right": 760,
+        "bottom": 876.453125,
+        "left": 541.328125
+      },
+      "class": "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-w-[44px] contact-footer-open min-h-[44px] px-0 text-xs",
+      "disabled": false
+    },
+    {
+      "name": "About",
+      "role": "A",
+      "href": "/about",
+      "rect": {
+        "x": 40,
+        "y": 1050,
+        "width": 44,
+        "height": 44,
+        "top": 1050,
+        "right": 84,
+        "bottom": 1094,
+        "left": 40
+      },
+      "class": ""
+    },
+    {
+      "name": "Terms",
+      "role": "A",
+      "href": "/terms",
+      "rect": {
+        "x": 98,
+        "y": 1050,
+        "width": 44,
+        "height": 44,
+        "top": 1050,
+        "right": 142,
+        "bottom": 1094,
+        "left": 98
+      },
+      "class": ""
+    },
+    {
+      "name": "Privacy",
+      "role": "A",
+      "href": "/privacy",
+      "rect": {
+        "x": 156,
+        "y": 1050,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050,
+        "right": 204.515625,
+        "bottom": 1094,
+        "left": 156
+      },
+      "class": ""
+    },
+    {
+      "name": "Code of Conduct",
+      "role": "A",
+      "href": "/code-of-conduct",
+      "rect": {
+        "x": 218.515625,
+        "y": 1050,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050,
+        "right": 267.03125,
+        "bottom": 1094,
+        "left": 218.515625
+      },
+      "class": ""
+    },
+    {
+      "name": "Cookie settings",
+      "role": "BUTTON",
+      "href": null,
+      "rect": {
+        "x": 281.03125,
+        "y": 1050,
+        "width": 103.953125,
+        "height": 44,
+        "top": 1050,
+        "right": 384.984375,
+        "bottom": 1094,
+        "left": 281.03125
+      },
+      "class": "btn ghost footer-cookie-settings",
+      "disabled": false
+    },
+    {
+      "name": "Issues ↗",
+      "role": "A",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "rect": {
+        "x": 398.984375,
+        "y": 1050,
+        "width": 55.46875,
+        "height": 44,
+        "top": 1050,
+        "right": 454.453125,
+        "bottom": 1094,
+        "left": 398.984375
+      },
+      "class": ""
+    },
+    {
+      "name": "Sitemap",
+      "role": "A",
+      "href": "/sitemap.xml",
+      "rect": {
+        "x": 468.453125,
+        "y": 1050,
+        "width": 48.515625,
+        "height": 44,
+        "top": 1050,
+        "right": 516.96875,
+        "bottom": 1094,
+        "left": 468.453125
+      },
+      "class": ""
+    }
+  ]
+}

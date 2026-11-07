@@ -1,0 +1,133 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 3,826 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 3,826 resources
+        - button "Sign in, account menu" [ref=e18] [cursor=pointer]:
+          - img [ref=e20]
+          - generic [ref=e23]: Sign in, account menu
+      - generic [ref=e25]:
+        - main [ref=e26]:
+          - generic [ref=e27]:
+            - navigation "Breadcrumb" [ref=e28]:
+              - list [ref=e29]:
+                - listitem [ref=e30]:
+                  - link "Home" [ref=e31] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e32]:
+                  - img [ref=e33]
+                - listitem:
+                  - link "Recommendations" [disabled]
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - img [ref=e38]
+                  - heading "Recommendations" [level=1] [ref=e40]
+                - paragraph [ref=e41]: Checking your session…
+              - status [ref=e43]: Loading recommendations
+        - contentinfo [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - paragraph [ref=e54]: ── INDEX
+              - link "awesome.video home" [ref=e55] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e56]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e58]:
+              - heading "INDEXED" [level=2] [ref=e59]
+              - paragraph [ref=e60]: 3,826
+              - paragraph [ref=e61]:
+                - text: 9 categories
+                - text: 99 subcategories
+                - generic [ref=e62]: live
+            - navigation "Explore categories" [ref=e64]:
+              - heading "EXPLORE" [level=2] [ref=e65]
+              - generic [ref=e66]:
+                - link "Community & Events" [ref=e67] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e68]: ◈
+                  - generic [ref=e69]: Community
+                - link "Encoding & Codecs" [ref=e70] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e71]: ◇
+                  - generic [ref=e72]: Encoding
+                - link "General Tools" [ref=e73] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e74]: ◆
+                  - generic [ref=e75]: General
+                - link "Infrastructure & Delivery" [ref=e76] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e77]: ▣
+                  - generic [ref=e78]: Infrastructure
+                - link "Intro & Learning" [ref=e79] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e80]: ▤
+                  - generic [ref=e81]: Intro
+                - link "Media Tools" [ref=e82] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e83]: ▥
+                  - generic [ref=e84]: Media
+                - link "Players & Clients" [ref=e85] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e86]: ▶
+                  - generic [ref=e87]: Players
+                - link "Protocols & Transport" [ref=e88] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e89]: ⟁
+                  - generic [ref=e90]: Protocols
+                - link "Standards & Industry" [ref=e91] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e92]: ◉
+                  - generic [ref=e93]: Standards
+            - generic [ref=e94]:
+              - heading "SOURCE" [level=2] [ref=e95]
+              - link "krzemienski/awesome-video" [ref=e96] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e97]
+                - generic [ref=e99]:
+                  - text: krzemienski
+                  - generic [ref=e100]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e101]: ↗
+              - paragraph [ref=e102]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e103] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+              - button "Contact maintainers" [ref=e105] [cursor=pointer]:
+                - img
+                - text: Contact maintainers
+          - generic [ref=e106]:
+            - generic [ref=e107]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e108]:
+              - link "About" [ref=e109] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e110] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e111] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e112] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - button "Cookie settings" [ref=e113] [cursor=pointer]
+              - link "Issues ↗" [ref=e114] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e115] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e116]: built with the awesome-list framework

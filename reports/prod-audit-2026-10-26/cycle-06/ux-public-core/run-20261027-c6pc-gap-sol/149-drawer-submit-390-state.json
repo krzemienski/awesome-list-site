@@ -1,0 +1,4 @@
+Script ran on page and returned:
+```json
+{"url":"https://awesome.video/submit","title":"Submit a Resource — Awesome Video","width":390,"height":844,"scrollY":542,"bodyWidth":384,"online":true,"focus":{"tag":"H1","id":"","label":null,"text":"Add to the index","rect":{"x":20,"y":-401.203125,"width":304,"height":30.796875,"top":-401.203125,"right":324,"bottom":-370.40625,"left":20}},"headings":[{"text":"Add to the index","id":""},{"text":"INDEXED","id":""},{"text":"EXPLORE","id":""},{"text":"SOURCE","id":""}],"pressed":[{"text":"Submit","label":null,"current":"page"},{"text":"Submit","label":null,"current":"page"}],"status":[],"analyticsDisabled":"1"}
+```
