@@ -1,8 +1,9 @@
 /**
  * Daily scheduled database backup with age-based retention.
  *
- * Called by POST /api/ops/run-due-jobs (every 15 min). Safe to call as often as
- * wanted: it only dumps when the newest backup is older than 24 h.
+ * Called by the in-process backup scheduler (server/jobs/backupScheduler.ts).
+ * Safe to call as often as wanted: it only dumps when the newest backup is
+ * older than 24 h.
  *
  * Advisory lock ids in use: 5116/7 link health (linkHealthService),
  * 5117/1 this backup, hashtext('enrichment_job_admission'),
@@ -28,12 +29,6 @@ const BACKUP_LOCK = [5117, 1] as const;
 const DUE_AFTER_MS = 24 * 3_600_000;
 const KEEP_DAYS = 14;
 const KEEP_NEWEST = 3;
-
-let lastSuccessAt: string | null = null;
-let lastFailureAt: string | null = null;
-
-/** When this instance last finished a scheduled backup or failed one; null until it has. */
-export const getScheduledBackupState = () => ({ lastSuccessAt, lastFailureAt });
 
 export interface ScheduledBackupResult {
   status: "created" | "skipped" | "locked" | "error";
@@ -112,7 +107,6 @@ async function backupIfDue(): Promise<ScheduledBackupResult> {
     // The new backup exists; a failed prune only delays cleanup to the next run.
     logger.error("Backup prune failed", { errorClass: errorClass(error) });
   }
-  lastSuccessAt = new Date().toISOString();
   return { status: "created", id: manifest.id };
 }
 
@@ -137,7 +131,6 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
       await lockClient.query("select pg_advisory_unlock($1, $2)", [...BACKUP_LOCK]).catch(() => undefined);
     }
   } catch (error) {
-    lastFailureAt = new Date().toISOString();
     // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
     logger.error("Scheduled backup failed", error, { errorClass: errorClass(error) });
     return { status: "error" };
