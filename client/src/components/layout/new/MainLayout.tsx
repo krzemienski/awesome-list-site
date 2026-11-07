@@ -214,8 +214,8 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       // ENTERS that range carrying a stale expanded preference.
       defaultOpen={typeof window !== "undefined" && window.innerWidth >= 1024}
       initialOpen={homeBoot?.sidebarOpen}
-      initialDrawer={homeBoot?.viewport === "tablet" || homeBoot?.viewport === "phone"}
-      initialPhone={homeBoot?.viewport === "phone"}
+      initialDrawer={homeBoot ? homeBoot.viewport !== "desktop" : undefined}
+      initialPhone={homeBoot ? homeBoot.viewport === "phone" : undefined}
       // DS shell parity: column layout — the full-width header owns the brand
       // (reference layout.jsx Header), and the sidebar/icon-rail starts BELOW
       // it. Keep the responsive header height in one shell variable so the

@@ -19,6 +19,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+function matchesViewport(query: string): boolean {
+  return typeof window !== "undefined" && window.matchMedia(query).matches
+}
+
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 // Canonical shell geometry comes from the parity tokens. Keep these aliases in
@@ -82,8 +86,15 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
-    const [isDrawer, setIsDrawer] = React.useState(initialDrawer ?? false)
-    const [isPhone, setIsPhone] = React.useState(initialPhone ?? false)
+    // Client-only renders (no server markup to match) read the viewport on the
+    // first render, so a tablet never paints the 56px rail and then widens to
+    // 240px after the effects below run.
+    const [isDrawer, setIsDrawer] = React.useState(
+      () => initialDrawer ?? matchesViewport("(max-width: 1024px)"),
+    )
+    const [isPhone, setIsPhone] = React.useState(
+      () => initialPhone ?? matchesViewport("(max-width: 767px)"),
+    )
     const [openMobile, setOpenMobile] = React.useState(false)
     // Radix retains its own opener, but the responsive header can rerender
     // while the drawer closes. Keep the element that actually opened this
