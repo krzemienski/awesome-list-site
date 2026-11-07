@@ -1,0 +1,45 @@
+{
+  "queriedAt": "2026-11-07T03:04:33Z",
+  "scanned": 21,
+  "truncated": false,
+  "failedReads": 0,
+  "instances": [
+    "awesome-list-site.replit.app",
+    "awesome-list-site.replit.app-1894a707",
+    "awesome-list-site.replit.app-2441095d"
+  ],
+  "records": 761,
+  "newest": "2026-11-07T03:03:54.795Z",
+  "oldest": "2026-11-07T02:45:30.473Z",
+  "perInstance": [
+    {
+      "instance": "awesome-list-site.replit.app",
+      "lines": 277
+    },
+    {
+      "instance": "awesome-list-site.replit.app-1894a707",
+      "lines": 35
+    },
+    {
+      "instance": "awesome-list-site.replit.app-2441095d",
+      "lines": 449
+    }
+  ],
+  "sample": [
+    {
+      "_time": "2026-11-07T02:45:30.497Z",
+      "level": "info",
+      "area": "migrations"
+    },
+    {
+      "_time": "2026-11-07T02:45:30.497Z",
+      "level": "info",
+      "area": "migrations"
+    },
+    {
+      "_time": "2026-11-07T02:45:30.473Z",
+      "level": "info",
+      "area": "claude"
+    }
+  ]
+}
