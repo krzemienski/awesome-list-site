@@ -29,7 +29,7 @@ main() {
 
     branch="selfheal/$fp-$(date -u +%H%M%S)"; wt="$WT_DIR/$fp-$day-$((n + 1))"
     git -C "$REPO_DIR" worktree add -q -b "$branch" "$wt" origin/main || { log "worktree add failed"; continue; }
-    ln -s "$MAIN_CHECKOUT/node_modules" "$wt/node_modules"
+    ln -s "$REPO_DIR/node_modules" "$wt/node_modules"
     prompt=$(sed -e "s|{{ISSUE}}|$number|g" -e "s|{{REPO}}|$GH_REPO|g" -e "s|{{FP}}|$fp|g" -e "s|{{BRANCH}}|$branch|g" "$REPO_DIR/scripts/selfheal/prompt.md")
     out="$LOG_DIR/triage-$fp-$day-$((n + 1)).json"
 

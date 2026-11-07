@@ -8,7 +8,6 @@ REPO_DIR="$SH_HOME/repo"
 STATE_DIR="$SH_HOME/state"
 WT_DIR="$SH_HOME/wt"
 LOG_DIR="$HOME/Library/Logs/awesome-selfheal"
-MAIN_CHECKOUT="/Users/nick/Desktop/awesome-list-site"
 GH_REPO="krzemienski/awesome-list-site"
 mkdir -p "$STATE_DIR" "$WT_DIR" "$LOG_DIR"
 
@@ -66,21 +65,23 @@ run_limited() {
   return $rc
 }
 
-# Create the dedicated worktree on first use, then pin it to $SELFHEAL_REF.
+# Standalone clone (not a worktree of the Desktop checkout): launchd jobs cannot read ~/Desktop (macOS TCC blocks open()),
+# so the repo, its .git and its node_modules must all live outside protected folders.
 sync_repo() {
   acquire_lock sync 10 || { sleep 20; acquire_lock sync 10 || return 1; }
-  local rc=0
-  if [ ! -e "$REPO_DIR/.git" ]; then
-    git -C "$MAIN_CHECKOUT" fetch -q origin || rc=1
-    git -C "$MAIN_CHECKOUT" worktree add -f --detach "$REPO_DIR" "$SELFHEAL_REF" >/dev/null 2>&1 \
-      || git -C "$MAIN_CHECKOUT" worktree add -f --detach "$REPO_DIR" origin/main >/dev/null 2>&1 || rc=1
+  local rc=0 lock_before
+  if [ ! -d "$REPO_DIR/.git" ]; then
+    timeout 300 git clone -q "https://github.com/$GH_REPO.git" "$REPO_DIR" || rc=1
   fi
   if [ "$rc" -eq 0 ]; then
-    git -C "$REPO_DIR" fetch -q --prune origin \
-      && { git -C "$REPO_DIR" checkout -q -f --detach "$SELFHEAL_REF" 2>/dev/null \
-           || git -C "$REPO_DIR" checkout -q -f --detach origin/main; } || rc=1
+    lock_before=$(shasum "$REPO_DIR/package-lock.json" 2>/dev/null)
+    timeout 60 git -C "$REPO_DIR" fetch -q --prune origin \
+      && { git -C "$REPO_DIR" checkout -q --force --detach "$SELFHEAL_REF" 2>/dev/null \
+           || git -C "$REPO_DIR" checkout -q --force --detach origin/main; } || rc=1
+    if [ "$rc" -eq 0 ] && { [ ! -d "$REPO_DIR/node_modules" ] || [ "$lock_before" != "$(shasum "$REPO_DIR/package-lock.json")" ]; }; then
+      (cd "$REPO_DIR" && timeout 900 npm ci --no-audit --no-fund >/dev/null 2>&1) || { log "npm ci failed"; rc=1; }
+    fi
   fi
-  [ -e "$REPO_DIR/node_modules" ] || ln -s "$MAIN_CHECKOUT/node_modules" "$REPO_DIR/node_modules"
   release_lock sync
   return $rc
 }

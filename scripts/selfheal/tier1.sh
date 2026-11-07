@@ -95,6 +95,8 @@ main() {
   fi
 
   RUN_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  # prod-check signs the audit admin in itself from ~/.cache/awesome-audit/audit-admin.env; only the (non-secret) user ids are exported here.
+  export PROD_CHECK_AUDIT_ADMIN_ID=user_3Ll7BiTtwPUMFSN96bgs6ClDXYI PROD_CHECK_AUDIT_MEMBER_ID=user_3Lk0O4nWTo2VnwbqvnFWyoCDyPo
   local out rc
   out=$(mktemp "$STATE_DIR/tier1-run.XXXXXX")
   npx tsx scripts/prod-check/index.ts --tier 0,1 --schedule --json >"$out" 2> >(redact >&2)
@@ -110,6 +112,8 @@ main() {
         + (if any(.checks[]; .authExpired) then [{id:"AUTH-EXPIRED",tier:1,detail:"owner session expired; refresh the owner header",values:{}}] else [] end)' "$out") ;;
   esac
   rm -f "$out"
+  # Exit 5 (expired session): every admin check fails for the same reason, so file one "auth" issue only.
+  [ "$rc" -eq 5 ] && failing='[{"id":"AUTH-EXPIRED","tier":1,"detail":"owner session expired; refresh the owner header","values":{}}]'
   if [ -n "${SELFHEAL_SELFTEST:-}" ]; then
     failing=$(jq -c '. + [{id:"SELFTEST",tier:1,detail:"[selfheal self-test] synthetic failing check; safe to close",values:{}}]' <<<"$failing")
   fi
