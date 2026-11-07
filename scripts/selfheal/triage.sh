@@ -46,7 +46,7 @@ main() {
         --output-format json --no-session-persistence >"$out" 2>>"$LOG_DIR/triage.err"
     )
     rc=$?
-    log "#$number $fp: claude exit $rc ($(jq -r '"is_error=\(.is_error) turns=\(.num_turns) cost=\(.total_cost_usd)"' "$out" 2>/dev/null || echo 'no json'))"
+    log "#$number $fp: claude exit $rc ($(jq -r '[.[]? | select(.type=="result")][0] | "is_error=\(.is_error) turns=\(.num_turns) cost=\(.total_cost_usd)"' "$out" 2>/dev/null || echo 'no json'))"
     [ "$rc" -ne 0 ] && notify "Triage failed for #$number (exit $rc)"
     # Worktrees that opened no PR are removed; ones with a PR stay for 7 days.
     if [ -z "$(gh pr list --repo "$GH_REPO" --head "$branch" --state all --json number --jq '.[0].number')" ]; then
