@@ -247,10 +247,6 @@ function MeasuredAccordionBody({
 }: { id: string; open: boolean; animate: boolean; children: () => ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
-  // A non-animated open leaves max-height unset until the content has settled,
-  // so nested accordions that open in the same commit never get clipped by a
-  // premature measurement.
-  const [settled, setSettled] = useState(false);
   // Keep the control's target in the DOM while closed, but delay the expensive
   // taxonomy subtree (and its ResizeObserver) until a user opens it once.
   // `open` makes an active route mount immediately; `hasBeenOpened` keeps the
@@ -279,19 +275,10 @@ function MeasuredAccordionBody({
     return () => observer.disconnect();
   }, [shouldMountContent]);
 
-  // Once open, re-measure after nested bodies have laid out, then pin the
-  // height so a later user close can transition from a pixel value.
-  useEffect(() => {
-    if (!open) {
-      setSettled(false);
-      return;
-    }
-    const content = contentRef.current;
-    if (content) setHeight(content.scrollHeight);
-    setSettled(true);
-  }, [open]);
-
-  const unclamped = open && !animate && !settled;
+  // A non-animated open leaves max-height unset until a real (non-zero)
+  // measurement exists. Pinning an early zero read clipped the body shut, and
+  // the later correction pushed every row below it down (CLS).
+  const unclamped = open && !animate && height === 0;
 
   return (
     <div id={id} className="accordion-body"
@@ -681,12 +668,16 @@ export default function AppSidebar({
 
   const filtered = useMemo(() => visibleNavCategories(categories), [categories]);
 
+  // The server-rendered Home paints the tree collapsed. Restoring remembered
+  // expansions right after hydration would push the rows below them down while
+  // the visitor is reading, so they come back on the first navigation instead.
   useEffect(() => {
-    if (!homeBoot || openKeysReady) return;
-    setOpenCategories(readOpenKeys(OPEN_CATEGORIES_STORAGE_KEY));
-    setOpenSubcategories(readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY));
+    if (!homeBoot || openKeysReady || location === "/") return;
+    const merge = (stored: string[]) => (prev: string[]) => [...new Set([...stored, ...prev])];
+    setOpenCategories(merge(readOpenKeys(OPEN_CATEGORIES_STORAGE_KEY)));
+    setOpenSubcategories(merge(readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY)));
     setOpenKeysReady(true);
-  }, [homeBoot, openKeysReady]);
+  }, [homeBoot, openKeysReady, location]);
 
   useEffect(() => {
     if (!openKeysReady) return;
@@ -698,8 +689,10 @@ export default function AppSidebar({
     writeOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY, openSubcategories);
   }, [openSubcategories, openKeysReady]);
 
-  /* auto-expand active category and subcategory on route change */
-  useEffect(() => {
+  /* auto-expand active category and subcategory on route change. A layout
+     effect, so the route's category is open in the first painted frame of the
+     tree rather than opening a frame later and pushing the rows below it. */
+  useIsomorphicLayoutEffect(() => {
     if (categories.length === 0) return;
     const parts = location.split("/");
     if (
