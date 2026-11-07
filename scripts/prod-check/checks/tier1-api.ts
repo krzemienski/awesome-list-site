@@ -97,8 +97,8 @@ function busiestWindow(times: number[]): number {
 }
 
 /** remove once the Replit secret is set; then this 503 must not happen (OPS_CRON_TOKEN not configured, ops-cron.ts) */
-const CRON_UNCONFIGURED_REQ = "POST /api/ops/run-due-jobs";
-const isCronUnconfigured = (r: LogRecord) => httpStatus(r) === 503 && r.message.includes(CRON_UNCONFIGURED_REQ);
+const CRON_UNCONFIGURED_REQS = ["POST /api/ops/run-due-jobs", "GET /api/ops/signals"];
+const isCronUnconfigured = (r: LogRecord) => httpStatus(r) === 503 && CRON_UNCONFIGURED_REQS.some((req) => r.message.includes(req));
 
 const isKnownUnapprove409 = (r: LogRecord) => r.message.includes("Error unapproving resource") && /not approved/i.test(`${r.message} ${r.fields ?? ""}`);
 
