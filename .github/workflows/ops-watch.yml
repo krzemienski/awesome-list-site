@@ -20,6 +20,8 @@ concurrency:
 
 env:
   SITE: https://awesome.video
+  # The job has no checkout, so gh needs the repository named explicitly.
+  GH_REPO: ${{ github.repository }}
   # An existing issue gets a new comment only if it was quiet for this long.
   COMMENT_EVERY_HOURS: "6"
 
