@@ -67,7 +67,7 @@ npm run build
 
 Gates per change: `npx tsc --noEmit`, `npm run build`, and `npx eslint <touched files>`. Whole-repo `eslint .` fails on ~4.4k pre-existing type-strictness errors (and on gitignored `.claude/worktrees`), so lint only what you touch.
 
-Before merging, run the merge gate `scripts/merge-gate.sh <branch>` (issue #84). Deploys go through the `replit-deploy` skill, whose pre-publish checks (schema diff, running jobs, one backup per deploy) must pass before `publish_app`, and whose final step runs the read-only prod-check runner `npx tsx scripts/prod-check/index.ts --tier 0,1`. The merge gate (issue #84, PR #295) and the runner (issue #286, PR #297) land with their own PRs; until merged, say they were not run.
+Before merging, run main's copy of the merge gate: `bash <(git show origin/main:scripts/merge-gate.sh) <branch>`. Deploys go through the `replit-deploy` skill, whose pre-publish checks (schema diff, running jobs, one backup per deploy) must pass before `publish_app`, and whose final step runs the read-only prod-check runner `npx tsx scripts/prod-check/index.ts --tier 0,1`.
 
 ## Deploy
 
