@@ -27,6 +27,7 @@ check_path() { # tool path
   [ -n "${SELFHEAL_FIX_DIR:-}" ] || block "write with no fix worktree" "$p"
   [[ "$p" == *".."* ]] && block "path traversal" "$p"
   [[ "$p" == */.git || "$p" == */.git/* ]] && block "git internals" "$p"
+  [[ "$p" == */node_modules/* || "$p" == */package.json || "$p" == */package-lock.json || "$p" == */.npmrc || "$p" == *.config.* || "$p" == */scripts/selfheal/* ]] && block "protected path (deps, config, selfheal)" "$p"
   real="$p"
   case "$real" in "$SELFHEAL_FIX_DIR"/*) return 0 ;; esac
   block "write outside fix worktree" "$p"
@@ -34,21 +35,20 @@ check_path() { # tool path
 
 TOOLS_OK_FOR_HOST='^(curl|echo|printf|grep|rg|git|gh|cat|head|tail|jq|sed|awk|wc|sort|uniq|cut|tr|ls)$'
 
-check_curl() { # token array in $@
-  local t prev=""
+check_curl() { # token array in $@: only plain GET/HEAD shapes with at most one URL
+  local t prev="" urls=0
   for t in "$@"; do
     case "$t" in
-      --data*|--form*|--upload-file|--json|--post*|--config|--next|-K) block "curl write flag" "$*" ;;
-      --request=*) [[ "${t#--request=}" =~ ^(GET|HEAD)$ ]] || block "curl non-GET" "$*" ;;
-      -X?*) [[ "${t#-X}" =~ ^(GET|HEAD)$ ]] || block "curl non-GET" "$*" ;;
+      --data*|--form*|--upload-file|--json|--post*|--config|--next|--request=*|--request|--url*) block "curl write/indirect flag" "$*" ;;
+      http://*|https://*) urls=$((urls + 1)) ;;
       --*) ;;
-      -[A-Za-z]*) [[ "$t" =~ [dFTK] ]] && block "curl write flag" "$*" ;;
+      -X) ;;
+      -?*) [[ "$t" =~ ^-[A-Za-z]+$ ]] && { [[ "$t" =~ [XdFTKQ] ]] && block "curl bundled write flag" "$*"; } ;;
     esac
-    case "$prev" in
-      -X|--request) [[ "$t" =~ ^(GET|HEAD)$ ]] || block "curl non-GET" "$*" ;;
-    esac
+    [ "$prev" = "-X" ] && { [[ "$t" =~ ^(GET|HEAD)$ ]] || block "curl non-GET" "$*"; }
     prev="$t"
   done
+  [ "$urls" -le 1 ] || block "curl with more than one URL" "$*"
   return 0
 }
 
@@ -113,6 +113,8 @@ case "$tool" in
   Bash)
     cmd=$(jq -r '.tool_input.command // ""' <<<"$input")
     [[ "$cmd" =~ $SECRET_RE ]] && block "secret reference" "$cmd"
+    # globs/expansions next to a sensitive directory name can spell a secret path without matching SECRET_RE
+    [[ "$cmd" =~ (\.cache|\.ssh|\.config|\.aws|\.gnupg|awesome-|owner|Keychains) && "$cmd" =~ [\*\?\[\$\`~\\] ]] && block "glob/expansion near sensitive path" "$cmd"
     while IFS= read -r seg; do check_segment "$seg"; done < <(printf '%s\n' "$cmd" | sed -E 's/(&&|\|\||;|\|)/\n/g')
     # sh -c / eval wrappers hide the real command: scan their payload as one more segment
     [[ "$cmd" =~ (sh|bash|zsh)[[:space:]]+-c|eval[[:space:]] ]] && block "shell wrapper" "$cmd"

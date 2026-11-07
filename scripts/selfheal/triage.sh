@@ -39,7 +39,7 @@ main() {
       claude_env_clean
       export SELFHEAL_FIX_DIR="$wt"
       run_limited "$CLAUDE_TIMEOUT" claude -p "$prompt" \
-        --settings "$REPO_DIR/scripts/selfheal/settings.json" \
+        --setting-sources project --settings "$REPO_DIR/scripts/selfheal/settings.json" \
         --strict-mcp-config --mcp-config '{"mcpServers":{}}' \
         --permission-mode dontAsk --permission-prompts none \
         --max-turns 60 --max-budget-usd 5 --model sonnet \

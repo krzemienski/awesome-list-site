@@ -64,6 +64,9 @@ file_one() { # id tier detail values
   if [ -n "$found" ]; then
     read -r number state closed <<<"$found"
     if [ "$state" = "OPEN" ]; then
+      local stamp="$STATE_DIR/commented-$fp" now; now=$(date +%s)
+      if [ -f "$stamp" ] && [ $(( now - $(cat "$stamp") )) -lt 21600 ]; then log "fp $fp: recurrence on #$number (occurrence $n), comment suppressed (<6 h)"; echo "$fp seen #$number"; return; fi
+      echo "$now" >"$stamp"
       gh_write issue comment "$number" --repo "$GH_REPO" --body "Recurrence #$n at $RUN_TS (revision \`$REVISION\`): $(printf '%s' "$detail" | tr '\n' ' ' | cut -c1-200 | redact)" >/dev/null
       log "fp $fp: commented on #$number (open, occurrence $n)"; echo "$fp updated #$number"; return
     fi
@@ -104,13 +107,13 @@ main() {
   log "prod-check exit $rc"
 
   local failing
-  case "$rc" in
-    3|4) failing=$(jq -nc --argjson rc "$rc" '[{id:"RUNNER",tier:1,detail:"prod-check runner error (exit \($rc))",values:{}}]'); REVISION=unknown; EVIDENCE_DIR="(none)" ;;
-    *)
-      REVISION=$(jq -r '.revision' "$out"); EVIDENCE_DIR="$HOME/.cache/awesome-prod-check/$(jq -r '.runId' "$out")"
+  if [[ ! "$rc" =~ ^(0|1|5)$ ]] || ! jq -e '.checks' "$out" >/dev/null 2>&1; then
+    failing=$(jq -nc --argjson rc "$rc" '[{id:"RUNNER",tier:1,detail:"prod-check runner error (exit \($rc))",values:{}}]'); REVISION=unknown; EVIDENCE_DIR="(none)"
+  else
+      REVISION=$(jq -r '.revision' "$out"); EVIDENCE_DIR="~/.cache/awesome-prod-check/$(jq -r '.runId' "$out")"
       failing=$(jq -c '[.checks[] | select(.status=="fail" and (.authExpired | not)) | {id, tier, detail, values}]
-        + (if any(.checks[]; .authExpired) then [{id:"AUTH-EXPIRED",tier:1,detail:"owner session expired; refresh the owner header",values:{}}] else [] end)' "$out") ;;
-  esac
+        + (if any(.checks[]; .authExpired) then [{id:"AUTH-EXPIRED",tier:1,detail:"owner session expired; refresh the owner header",values:{}}] else [] end)' "$out")
+  fi
   rm -f "$out"
   # Exit 5 (expired session): every admin check fails for the same reason, so file one "auth" issue only.
   [ "$rc" -eq 5 ] && failing='[{"id":"AUTH-EXPIRED","tier":1,"detail":"owner session expired; refresh the owner header","values":{}}]'
