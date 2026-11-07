@@ -587,6 +587,23 @@ tracking plan, applies to all four):
 
 Enforced in code by `sanitizeEventProps()`; checked by hand in a consented browser.
 
+## First-party document traffic
+
+Page documents (not `/api`, not static files) are counted in the server with no
+consent needed, because only counts are kept: `traffic_hourly` holds
+`hour × template × class × status_class → count`. No IP, path or user agent is
+stored. Class is `human`, `bot-search`, `bot-ai`, `bot-other` or `qa`. A request
+with an `X-Audit-Run` header, or a user agent containing `awesome-audit`, is
+`qa`: the prod-check harness sets the header on its HTTP client and browser
+contexts, and agent-browser runs should send it too
+(`agent-browser set headers '{"X-Audit-Run":"<lane>"}'`).
+
+The server flushes deltas every 5 minutes and on SIGTERM; a failed flush keeps
+the counts for the next one. Rows older than 400 days are pruned once a day.
+`GET /api/admin/traffic?days=28|90` (admin; any 1 to 400) returns totals per
+template × class × status and a per-day series. The since-boot counters on
+`/api/admin/operations/health` are unchanged.
+
 ## Interaction helpers
 
 Search and taxonomy browse pages call `trackFilterUsage`, `trackSortChange`, and

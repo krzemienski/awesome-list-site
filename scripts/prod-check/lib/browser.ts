@@ -1,7 +1,7 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { redact, type HttpClient } from "./http.ts";
+import { AUDIT_RUN_HEADER, redact, type HttpClient } from "./http.ts";
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 const SAFE_PATH = /^\/[A-Za-z0-9\-._~%/]*(\?[A-Za-z0-9\-._~%=&,+]*)?(#[\w-]*)?$/;
@@ -82,7 +82,7 @@ export async function createBrowserKit(base: string, http: HttpClient, evidenceD
           violations.push({ method: req.method(), url: redact(req.url().split("?")[0]) });
           return route.abort();
         }
-        return route.continue();
+        return route.continue(isFirstParty(req.url()) ? { headers: { ...req.headers(), ...AUDIT_RUN_HEADER } } : undefined);
       });
       if (auth === "owner") {
         await context.addCookies(http.ownerCookies().map((c) => ({ ...c, url: base })));

@@ -10,6 +10,7 @@ import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import { initializeDigestScheduler } from "./jobs/digestScheduler";
 import { initializeContactRetentionScheduler } from "./jobs/contactRetentionScheduler";
 import { initializeBackupScheduler } from "./jobs/backupScheduler";
+import { initializeTrafficFlush } from "./ops/trafficFlush";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -559,7 +560,7 @@ app.use((req, res, next) => {
       // B15: count page documents by template and client class (counts only).
       // Static files (anything with an extension) are not page views.
       if ((req.method === "GET" || req.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path)) {
-        recordDocumentRequest(documentTemplate(path), clientClass(req.get("user-agent")), res.statusCode);
+        recordDocumentRequest(documentTemplate(path), clientClass(req.get("user-agent"), req.get("x-audit-run")), res.statusCode);
       }
       // Page documents are logged only when they fail (404 / 5xx), so missing
       // pages are visible in the logs without logging every page view.
@@ -775,6 +776,7 @@ void (async () => {
     initializeDigestScheduler();
     initializeContactRetentionScheduler();
     initializeBackupScheduler();
+    initializeTrafficFlush();
   }).on('error', (err) => {
     logger.error(`Server failed to start on port ${port}`, err);
     process.exit(1);
