@@ -1,4 +1,5 @@
 import type { HttpClient } from "./lib/http.ts";
+import type { Actor } from "./lib/audit-actor.ts";
 import type { BrowserKit, KitContext } from "./lib/browser.ts";
 
 export type Status = "pass" | "fail" | "skip" | "info";
@@ -21,6 +22,8 @@ export interface Ctx {
   browser?: BrowserKit;
   /** Browser context signed in as the audit admin, when audit-admin.env exists; admin-page checks reuse it. */
   adminKit?: KitContext;
+  /** The signed-in audit admin itself (same session as adminKit). */
+  admin?: Actor;
   shared: Map<string, unknown>;
 }
 

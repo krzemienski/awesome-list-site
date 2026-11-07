@@ -32,7 +32,8 @@ function findById(value: unknown, id: number): Record<string, unknown> | undefin
 const state = (ctx: Ctx) => ctx.shared;
 const actors = (ctx: Ctx) => state(ctx).get("t2.actors") as { admin: Actor; member: Actor };
 const num = (ctx: Ctx, key: string) => state(ctx).get(key) as number | undefined;
-const title = (ctx: Ctx, label: string) => `[QA-${ctx.runId}] ${label}`;
+const runPrefix = (ctx: Ctx) => `[QA-${ctx.runId}]`;
+const title = (ctx: Ctx, label: string) => `${runPrefix(ctx)} ${label}`;
 const qaUrl = (ctx: Ctx, n: number) => `${ctx.base}/qa-probe/${ctx.runId}-${n}`;
 
 /** A step that runs only when the steps it depends on stored their ids. */
@@ -63,10 +64,17 @@ async function submit(ctx: Ctx, member: Actor, label: string, n: number): Promis
   return { id: row.id, problems };
 }
 
+/** Only rows whose title carries this run's id, so another lane's [QA- rows are never touched. */
+function ownRows(ctx: Ctx, found: QaRows) {
+  return QA_TABLES.flatMap((table) => (found.rows[table] ?? []).filter((r) => r.title?.startsWith(runPrefix(ctx))).map((row) => ({ table, row })));
+}
+
 const listQaRows = async (admin: Actor) => admin.call("GET", "/api/admin/qa-rows");
 
-async function pendingApprovals(admin: Actor): Promise<number> {
-  return (await admin.call("GET", "/api/admin/stats")).json<{ pendingApprovals: number }>().pendingApprovals;
+/** Pending submissions carrying this run's prefix; real visitor submissions never count. */
+async function pendingFromThisRun(ctx: Ctx, admin: Actor): Promise<Rows[]> {
+  const queue = (await admin.call("GET", "/api/admin/pending-resources")).json<{ resources: Rows[] }>();
+  return queue.resources.filter((r) => r.title?.startsWith(runPrefix(ctx)));
 }
 
 async function syncQueueTotal(admin: Actor): Promise<number | undefined> {
@@ -80,7 +88,7 @@ const setup: Check = {
     const adminCreds = loadCredentials("Admin");
     const memberCreds = loadCredentials("Member");
     if (!adminCreds || !memberCreds || !ctx.browser) return fail("audit credentials or ids missing");
-    const admin = await openActor(ctx.browser, ctx.base, "Admin", adminCreds);
+    const admin = ctx.admin ?? (await openActor(ctx.browser, ctx.base, "Admin", adminCreds));
     const member = await openActor(ctx.browser, ctx.base, "Member", memberCreds);
     state(ctx).set("t2.actors", { admin, member });
 
@@ -97,10 +105,8 @@ const setup: Check = {
     if (qa.status === 403) return fail("QA_CLEANUP_USER_IDS does not list the audit accounts (publish the .replit change first)");
     if (qa.status !== 200) return fail(`qa-rows answered ${qa.status}`);
     const leftovers = Object.entries(qa.json<QaRows>().counts).filter(([t]) => QA_TABLES.includes(t as never));
-    state(ctx).set("t2.baselinePending", await pendingApprovals(admin));
-    state(ctx).set("t2.baselineLeftovers", Object.fromEntries(leftovers));
     state(ctx).set("t2.ready", 1);
-    return pass(`both audit accounts signed in; pendingApprovals baseline ${num(ctx, "t2.baselinePending")}`, { leftovers: Object.fromEntries(leftovers) });
+    return pass("both audit accounts signed in", { leftoversFromOtherRuns: Object.fromEntries(leftovers) });
   },
 };
 
@@ -118,13 +124,10 @@ const queueStep = step("T2-02", ["t2.id1"], async (ctx, { admin }) => {
   const id = num(ctx, "t2.id1")!;
   const queue = (await admin.call("GET", "/api/admin/pending-resources")).json<{ resources: Rows[]; total: number }>();
   const row = queue.resources.find((r) => r.id === id);
-  const stats = await pendingApprovals(admin);
-  const baseline = num(ctx, "t2.baselinePending")!;
   const problems: string[] = [];
   if (!row) problems.push(`#${id} not in the pending queue`);
-  else if (!row.title?.startsWith(`[QA-${ctx.runId}]`)) problems.push("queued title lost its prefix");
-  if (stats !== baseline + 1) problems.push(`pendingApprovals ${stats}, expected ${baseline + 1}`);
-  return verdict(problems, `#${id} is in the approvals queue; pendingApprovals ${baseline} -> ${stats}`);
+  else if (!row.title?.startsWith(runPrefix(ctx))) problems.push("queued title lost its prefix");
+  return verdict(problems, `#${id} is in the approvals queue`);
 });
 
 const rejectStep = step("T2-03", ["t2.id1"], async (ctx, { admin, member }) => {
@@ -171,13 +174,16 @@ const bookmarkStep = step("T2-05", ["t2.ready"], async (ctx, { member }) => {
   if (rid === undefined) return fail("no approved resource that the audit member has not already bookmarked");
   const problems: string[] = [];
   const notes = `QA ${ctx.runId}`;
-  const add = await member.call("POST", `/api/bookmarks/${rid}`, { notes });
-  if (add.status !== 200) return fail(`bookmark add answered ${add.status}`);
-  const saved = findById((await member.call("GET", "/api/bookmarks")).json(), rid);
-  if (!saved) problems.push("bookmark not listed after add");
-  else if (saved.notes !== notes) problems.push("bookmark notes lost");
-  const remove = await member.call("DELETE", `/api/bookmarks/${rid}`);
-  if (remove.status !== 200) problems.push(`bookmark remove answered ${remove.status}`);
+  try {
+    const add = await member.call("POST", `/api/bookmarks/${rid}`, { notes });
+    if (add.status !== 200) return fail(`bookmark add answered ${add.status}`);
+    const saved = findById((await member.call("GET", "/api/bookmarks")).json(), rid);
+    if (!saved) problems.push("bookmark not listed after add");
+    else if (saved.notes !== notes) problems.push("bookmark notes lost");
+  } finally {
+    const remove = await member.call("DELETE", `/api/bookmarks/${rid}`);
+    if (remove.status !== 200 && remove.status !== 404) problems.push(`bookmark remove answered ${remove.status}`);
+  }
   if (findById((await member.call("GET", "/api/bookmarks")).json(), rid)) problems.push("bookmark still listed after remove");
   return verdict(problems, `bookmark on #${rid} added, read back, removed`, { resourceId: rid });
 });
@@ -201,13 +207,13 @@ const editStep = step("T2-06", ["t2.id1", "t2.description0"], async (ctx, { admi
   return verdict(problems, `#${id} edited and reverted; sync queue ${queueBefore} -> ${queueAfter}`);
 });
 
-/** Always runs: takes a fresh backup, then deletes every `[QA-` row the server marks deletable, one id per call. */
-const cleanup = step("T2-10", ["t2.ready"], async (_ctx, { admin }) => {
+/** Runs from index.ts after every Tier 2 run, however it ended: backs up, then deletes this run's `[QA-<run>]` rows, one id per call. */
+export const cleanup = step("T2-10", ["t2.ready"], async (ctx, { admin }) => {
   const listing = await listQaRows(admin);
   if (listing.status !== 200) return fail(`qa-rows answered ${listing.status}`);
   const found = listing.json<QaRows>();
-  const targets = QA_TABLES.flatMap((table) => (found.rows[table] ?? []).map((row) => ({ table, row })));
-  if (targets.length === 0) return pass("no [QA- rows to remove");
+  const targets = ownRows(ctx, found);
+  if (targets.length === 0) return pass(`no ${runPrefix(ctx)} rows to remove`);
 
   const backup = await admin.call("POST", "/api/admin/database-backups");
   const sha = backup.status === 201 ? backup.json<{ dump?: { sha256?: string }; sha256?: string }>() : undefined;
@@ -226,23 +232,27 @@ const cleanup = step("T2-10", ["t2.ready"], async (_ctx, { admin }) => {
   return verdict(problems, `backup ${backupSha256.slice(0, 12)}; removed ${removed} of ${targets.length} rows`);
 });
 
-const verifyGone = step("T2-11", ["t2.ready"], async (ctx, { admin }) => {
+export const verifyGone = step("T2-11", ["t2.ready"], async (ctx, { admin }) => {
   const problems: string[] = [];
   const listing = await listQaRows(admin);
   if (listing.status !== 200) return fail(`qa-rows answered ${listing.status}`);
-  const found = listing.json<QaRows>();
-  for (const table of QA_TABLES) if ((found.counts[table] ?? 0) > 0) problems.push(`${found.counts[table]} ${table} row(s) with the [QA- prefix remain`);
+  const left = ownRows(ctx, listing.json<QaRows>());
+  if (left.length) problems.push(`rows remain: ${left.map(({ table, row }) => `${table}#${row.id}`).join(", ")}`);
   for (const key of ["t2.id1", "t2.id2"]) {
     const id = num(ctx, key);
     if (id === undefined) continue;
     const status = (await ctx.http.get(`/api/resources/${id}`)).status;
     if (status !== 404) problems.push(`GET /api/resources/${id} answered ${status}, expected 404`);
   }
-  const baseline = num(ctx, "t2.baselinePending");
-  const now = await pendingApprovals(admin);
-  if (baseline !== undefined && now !== baseline) problems.push(`pendingApprovals ${now}, baseline ${baseline}`);
-  await Promise.all(Object.values(actors(ctx)).map((a) => a.close()));
-  return verdict(problems, `zero [QA- rows left; re-read 404; pendingApprovals back to ${baseline}`);
+  const pending = await pendingFromThisRun(ctx, admin);
+  if (pending.length) problems.push(`still pending: ${pending.map((r) => `#${r.id}`).join(", ")}`);
+  return verdict(problems, `zero ${runPrefix(ctx)} rows left; re-read 404; none pending`);
 });
 
-register(setup, submitStep, queueStep, rejectStep, withdrawStep, bookmarkStep, editStep, cleanup, verifyGone);
+/** True once T2-00 passed, i.e. once any write could have happened. */
+export const tier2Wrote = (ctx: Ctx) => ctx.shared.get("t2.ready") !== undefined;
+
+export const closeTier2Actors = (ctx: Ctx) =>
+  Promise.all(Object.values((ctx.shared.get("t2.actors") ?? {}) as Record<string, Actor>).map((a) => a.close().catch(() => undefined)));
+
+register(setup, submitStep, queueStep, rejectStep, withdrawStep, bookmarkStep, editStep);

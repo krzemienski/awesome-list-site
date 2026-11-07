@@ -11,7 +11,7 @@ import "./checks/tier0.ts";
 import "./checks/tier1-api.ts";
 import "./checks/tier1-browser.ts";
 import "./checks/tier1-admin-ui.ts";
-import "./checks/tier2.ts";
+import { cleanup, closeTier2Actors, tier2Wrote, verifyGone } from "./checks/tier2.ts";
 import "./checks/tier3.ts";
 
 const PROD_BASE = "https://awesome.video";
@@ -69,10 +69,20 @@ async function main(): Promise<number> {
   const log = (line: string) => process.stderr.write(line + "\n");
 
   const checks = select(args.tiers, args.only);
+  const tier2 = checks.some((c) => c.tier === 2);
+  if (tier2 && !checks.some((c) => c.id === "T2-00")) checks.unshift(...select([2], ["T2-00"]));
   if (checks.length === 0) throw new UsageError("no checks selected");
   const http = createHttp(args.base);
   let browser: BrowserKit | undefined;
   const adminCreds = checks.some((c) => c.needs?.includes("owner")) ? loadCredentials("Admin") : null;
+  let interrupted = false;
+  for (const sig of ["SIGINT", "SIGTERM"] as const) {
+    process.once(sig, () => {
+      interrupted = true;
+      log(`${sig}: finishing the current check, then cleaning up Tier 2 rows`);
+      process.once(sig, () => process.exit(EXIT.runner));
+    });
+  }
   if (adminCreds || checks.some((c) => c.kind === "browser")) browser = await createBrowserKit(args.base, http, dir, args.tiers.includes(2));
   let admin: Actor | undefined;
 
@@ -87,15 +97,25 @@ async function main(): Promise<number> {
         throw new AuthExpiredError("audit admin sign-in failed", true);
       });
       ctx.adminKit = admin.kit;
+      ctx.admin = admin;
       http.useAdmin(admin);
     }
     run.revision = (await http.get("/api/version")).json<{ revision: string }>().revision;
     for (const check of checks) {
+      if (interrupted) break;
       const rec = await runCheck(check, ctx);
       run.records.push(rec);
       log(`${rec.status.toUpperCase().padEnd(4)} ${rec.id.padEnd(7)} ${String(rec.ms).padStart(6)} ms  ${rec.detail}`);
     }
   } finally {
+    if (tier2Wrote(ctx)) {
+      for (const check of [cleanup, verifyGone]) {
+        const rec = await runCheck(check, ctx);
+        run.records.push(rec);
+        log(`${rec.status.toUpperCase().padEnd(4)} ${rec.id.padEnd(7)} ${String(rec.ms).padStart(6)} ms  ${rec.detail}`);
+      }
+    }
+    await closeTier2Actors(ctx);
     run.violations = browser?.violations ?? [];
     await admin?.close().catch(() => undefined);
     await browser?.close().catch(() => undefined);
