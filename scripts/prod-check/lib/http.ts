@@ -6,8 +6,8 @@ export const GOOGLEBOT_UA = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www
 const TIMEOUT_MS = 15_000;
 
 export class AuthExpiredError extends Error {
-  constructor(reason: string) {
-    super(`owner session expired (${reason})`);
+  constructor(reason: string, verbatim = false) {
+    super(verbatim ? reason : `owner session expired (${reason})`);
   }
 }
 

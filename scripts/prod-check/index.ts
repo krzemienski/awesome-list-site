@@ -84,8 +84,9 @@ async function main(): Promise<number> {
   try {
     if (adminCreds && browser) {
       admin = await openActor(browser, args.base, "Admin", adminCreds).catch(() => {
-        throw new AuthExpiredError("audit admin sign-in failed");
+        throw new AuthExpiredError("audit admin sign-in failed", true);
       });
+      ctx.adminKit = admin.kit;
       http.useAdmin(admin);
     }
     run.revision = (await http.get("/api/version")).json<{ revision: string }>().revision;
@@ -116,6 +117,6 @@ main().then(
   (err) => {
     const usage = err instanceof UsageError || (err as NodeJS.ErrnoException)?.code === "ERR_PARSE_ARGS_UNKNOWN_OPTION";
     process.stderr.write(`${redact(err instanceof Error ? err.message : String(err))}\n${usage ? USAGE + "\n" : ""}`);
-    process.exit(usage ? EXIT.usage : EXIT.runner);
+    process.exit(usage ? EXIT.usage : err instanceof AuthExpiredError ? EXIT.authExpired : EXIT.runner);
   },
 );

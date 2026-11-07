@@ -16,17 +16,17 @@ interface Stats {
 /** Verifies the owner session with a GET first (a 401 throws AuthExpiredError), then runs fn; owner-page console errors turn a pass into info. */
 async function withOwner(ctx: Ctx, fn: (kit: KitContext) => Promise<Result>): Promise<Result> {
   await stats(ctx);
-  const kit = await ctx.browser!.newContext("owner");
+  const kit = ctx.adminKit ?? (await ctx.browser!.newContext("owner"));
   const before = ctx.browser!.consoleErrors.length;
   try {
     const result = await fn(kit);
-    const errors = ctx.browser!.consoleErrors.slice(before).filter((e) => e.auth === "owner");
+    const errors = ctx.browser!.consoleErrors.slice(before).filter((e) => e.auth === kit.auth);
     if (result.status === "pass" && errors.length) {
       return { ...result, status: "info", detail: `${result.detail ?? ""}; ${errors.length} console errors on admin pages, e.g. ${errors[0].page}: ${errors[0].text.slice(0, 100)}` };
     }
     return result;
   } finally {
-    await kit.close();
+    if (kit !== ctx.adminKit) await kit.close();
   }
 }
 

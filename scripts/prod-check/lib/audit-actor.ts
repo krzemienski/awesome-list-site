@@ -24,6 +24,8 @@ export interface ApiResponse {
 export interface Actor {
   readonly role: ActorRole;
   readonly id: string | undefined;
+  /** The signed-in browser context, for checks that need to look at pages as this account. */
+  readonly kit: KitContext;
   call(method: string, path: string, body?: unknown): Promise<ApiResponse>;
   close(): Promise<void>;
 }
@@ -99,6 +101,7 @@ export async function openActor(kit: BrowserKit, base: string, role: ActorRole, 
   return {
     role,
     id: creds.id,
+    kit: ctx,
     async call(method, path, body) {
       let res = await rawCall(page, method, path, body);
       if (res.status === 401) {
