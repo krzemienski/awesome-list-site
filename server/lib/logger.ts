@@ -29,6 +29,7 @@
  * set) is built from these same scrubbed values; nothing raw reaches it.
  */
 import { randomUUID } from "node:crypto";
+import { recordErrorSignature } from "../ops/errorSignatures";
 import { getRequestLogContext } from "../ops/requestContext";
 import { getLogSink, type LogRecord } from "./logSink";
 
@@ -252,6 +253,7 @@ const write = (level: LogLevel, line: string, record: LogRecord) => {
   if (level === "error") console.error(clipped);
   else if (level === "warn") console.warn(clipped);
   else console.log(clipped);
+  if (level === "error") recordErrorSignature(record.area, record.message, record._time);
   getLogSink(sinkNotice).push(record);
 };
 

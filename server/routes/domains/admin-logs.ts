@@ -9,7 +9,9 @@
  * `level` is a minimum severity (warn returns warn + error); `area` is exact;
  * `q` is a case-insensitive substring of message + fields. Records were scrubbed
  * before they were buffered, so nothing here re-reads env values.
- * Bounds: window <= 7 days, limit <= 2000, objects scanned <= 200.
+ * Bounds: window <= 7 days, limit <= 2000, objects scanned <= 200 (whole hours).
+ * A truncated result carries `nextUntil`; repeat the query with `until=<nextUntil>`
+ * to page back through the whole 7 days.
  */
 import type { Express, RequestHandler } from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
@@ -50,6 +52,8 @@ export interface LogQueryResult {
   /** Objects that could not be read; their records are missing from the result. */
   failedReads: number;
   truncated: boolean;
+  /** When truncated: pass as `until` to read the next (older) page. A record at exactly this time may repeat. */
+  nextUntil?: string;
 }
 
 /** `-60m` / `-2h` / `-1d` relative to `now`, or an ISO timestamp. */
@@ -78,19 +82,27 @@ const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { messag
   return result.value;
 };
 
-/** Object names in the hours covering [since, until], newest hour first, newest object first, capped at MAX_OBJECTS. */
-async function listWindowObjects(storage: PrivateStorage, since: number, until: number): Promise<{ names: string[]; capped: boolean }> {
+/**
+ * Object names in the hours covering [since, until], newest hour first, newest object first.
+ * Whole hours are taken until MAX_OBJECTS would be exceeded (always at least one), so the
+ * unread remainder starts at an hour boundary: `resumeUntil` is the end of the first skipped hour.
+ */
+async function listWindowObjects(storage: PrivateStorage, since: number, until: number): Promise<{ names: string[]; resumeUntil?: number }> {
   const hours: number[] = [];
   for (let hour = Math.floor(until / HOUR_MS) * HOUR_MS; hour >= Math.floor(since / HOUR_MS) * HOUR_MS; hour -= HOUR_MS) hours.push(hour);
-  const names: string[] = [];
+  const perHour: string[][] = [];
   for (let i = 0; i < hours.length; i += LIST_CONCURRENCY) {
-    const listings = await Promise.all(hours.slice(i, i + LIST_CONCURRENCY).map(async (hour) =>
+    perHour.push(...await Promise.all(hours.slice(i, i + LIST_CONCURRENCY).map(async (hour) =>
       unwrap(await storage.client.list({ prefix: `${storage.prefix}${hourPath(hour)}` }), "list")
         .map((object) => object.name)
-        .sort((a, b) => b.localeCompare(a))));
-    names.push(...listings.flat());
+        .sort((a, b) => b.localeCompare(a)))));
   }
-  return { names: names.slice(0, MAX_OBJECTS), capped: names.length > MAX_OBJECTS };
+  const names: string[] = [];
+  for (const [i, hourNames] of perHour.entries()) {
+    if (names.length > 0 && names.length + hourNames.length > MAX_OBJECTS) return { names, resumeUntil: hours[i] + HOUR_MS - 1 };
+    names.push(...hourNames);
+  }
+  return { names };
 }
 
 function matches(record: LogRecord, query: LogQuery): boolean {
@@ -115,7 +127,7 @@ function parseLines(jsonl: string): LogRecord[] {
 }
 
 export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promise<LogQueryResult> {
-  const { names, capped } = await listWindowObjects(storage, query.since, query.until);
+  const { names, resumeUntil } = await listWindowObjects(storage, query.since, query.until);
   const found: LogRecord[] = [];
   let failedReads = 0;
   for (let i = 0; i < names.length; i += READ_CONCURRENCY) {
@@ -127,12 +139,16 @@ export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promi
     }
   }
   found.sort((a, b) => b._time.localeCompare(a._time));
+  const records = found.slice(0, query.limit);
+  const limited = found.length > query.limit;
+  const nextUntil = limited ? records[records.length - 1]._time : resumeUntil === undefined ? undefined : new Date(resumeUntil).toISOString();
   return {
-    records: found.slice(0, query.limit),
+    records,
     instances: [...new Set(found.map((record) => record.instance))].sort(),
     scanned: names.length,
     failedReads,
-    truncated: capped || found.length > query.limit,
+    truncated: nextUntil !== undefined,
+    nextUntil,
   };
 }
 

@@ -6,6 +6,10 @@
  * idempotent and decides for itself whether it is due; the timers in
  * server/jobs/* stay as the fallback.
  *
+ * GET /api/ops/signals (same auth) returns counts and timestamps for the
+ * ops-watch workflow: revision, readiness, pool, 5xx and DB error counts, and
+ * error-level log signatures since boot. No PII, no request input.
+ *
  * Auth: `Authorization: Bearer <OPS_CRON_TOKEN>`. 503 while the env var is unset.
  * Clerk's middleware leaves a non-session Bearer untouched (checked with a
  * throwaway server), so no custom header is needed.
@@ -13,10 +17,14 @@
 import crypto from "node:crypto";
 import type { Express, Request, RequestHandler } from "express";
 import { secretsMatch } from "../../clerkAuth";
-import { runScheduledBackupIfDue } from "../../backup/scheduledBackup";
+import { getScheduledBackupState, runScheduledBackupIfDue } from "../../backup/scheduledBackup";
+import { pool } from "../../db";
+import { getReadinessSnapshot } from "../../health";
 import { createLogger } from "../../lib/logger";
 import { linkHealthIntervalHours } from "../../jobs/linkHealthScheduler";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { getErrorSignatureSnapshot } from "../../ops/errorSignatures";
+import { getOperationalTelemetrySnapshot } from "../../ops/operationalTelemetry";
 import { createRateLimiter } from "../../middleware/rateLimit";
 import { purgeExpiredContactSubmissions } from "../../repositories";
 import { runDigestCycle } from "../../services/digestService";
@@ -104,6 +112,43 @@ function runBackup(): Promise<JobResult> {
   return within(finished, BACKUP_REQUEST_BUDGET_MS, { status: "started" });
 }
 
+async function lastLinkScanCompletedAt(): Promise<string | null> {
+  try {
+    const jobs = await linkHealthService.getJobHistory();
+    return jobs.find((job) => job.status === "completed")?.completedAt ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Sum of `count` / `errors` over aggregates whose label ends with `suffix`. */
+function sumByLabel(aggregates: Record<string, { count: number; errors: number }>, suffix: string, field: "count" | "errors"): number {
+  return Object.entries(aggregates).reduce((sum, [label, value]) => (label.endsWith(suffix) ? sum + value[field] : sum), 0);
+}
+
+async function collectSignals() {
+  const telemetry = getOperationalTelemetrySnapshot();
+  const readiness = getReadinessSnapshot();
+  const errors = getErrorSignatureSnapshot(20);
+  return {
+    revision: [process.env.BUILD_REVISION, process.env.REPLIT_GIT_COMMIT_SHA, process.env.GITHUB_SHA].find(Boolean) ?? "unknown",
+    bootAt: new Date(Date.now() - process.uptime() * 1000).toISOString(),
+    now: new Date().toISOString(),
+    readiness: { migrations: readiness.migrations.status, lastProbe: readiness.lastProbe },
+    pool: {
+      max: (pool as unknown as { options: { max: number } }).options.max,
+      waiting: pool.waitingCount,
+      peakWaiting: telemetry.pool.peakWaiting,
+      errors: telemetry.pool.errors,
+    },
+    http5xx: sumByLabel(telemetry.endpoints, ":5xx", "count"),
+    dbQueryErrors: Object.values(telemetry.databaseQueries).reduce((sum, value) => sum + value.errors, 0),
+    errorLogs: { sinceBoot: errors.total, topSignatures: errors.signatures },
+    scheduledBackup: getScheduledBackupState(),
+    lastLinkScanCompletedAt: await lastLinkScanCompletedAt(),
+  };
+}
+
 export function registerOpsCronRoutes(app: Express): void {
   const limiter = createRateLimiter({ name: "ops-cron", max: 10, windowMs: 15 * 60_000 });
   // Counts failed authentication only, so guessing is throttled without letting
@@ -135,5 +180,10 @@ export function registerOpsCronRoutes(app: Express): void {
     };
     res.set("Cache-Control", "no-store");
     res.json({ ranAt: new Date().toISOString(), jobs });
+  }));
+
+  app.get("/api/ops/signals", authorize, limiter, asyncHandler(async (_req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.json(await collectSignals());
   }));
 }

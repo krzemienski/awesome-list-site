@@ -29,6 +29,12 @@ const DUE_AFTER_MS = 24 * 3_600_000;
 const KEEP_DAYS = 14;
 const KEEP_NEWEST = 3;
 
+let lastSuccessAt: string | null = null;
+let lastFailureAt: string | null = null;
+
+/** When this instance last finished a scheduled backup or failed one; null until it has. */
+export const getScheduledBackupState = () => ({ lastSuccessAt, lastFailureAt });
+
 export interface ScheduledBackupResult {
   status: "created" | "skipped" | "locked" | "error";
   id?: string;
@@ -106,6 +112,7 @@ async function backupIfDue(): Promise<ScheduledBackupResult> {
     // The new backup exists; a failed prune only delays cleanup to the next run.
     logger.error("Backup prune failed", { errorClass: errorClass(error) });
   }
+  lastSuccessAt = new Date().toISOString();
   return { status: "created", id: manifest.id };
 }
 
@@ -130,7 +137,9 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
       await lockClient.query("select pg_advisory_unlock($1, $2)", [...BACKUP_LOCK]).catch(() => undefined);
     }
   } catch (error) {
-    logger.error("Scheduled backup failed", { errorClass: errorClass(error) });
+    lastFailureAt = new Date().toISOString();
+    // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
+    logger.error("Scheduled backup failed", error, { errorClass: errorClass(error) });
     return { status: "error" };
   } finally {
     await lockClient.end().catch(() => undefined);
