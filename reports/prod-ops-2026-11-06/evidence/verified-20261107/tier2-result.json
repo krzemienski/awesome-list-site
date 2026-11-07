@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "runId": "20261107T030323Z",
+  "startedAt": "2026-11-07T03:03:23.728Z",
+  "finishedAt": "2026-11-07T03:04:07.416Z",
+  "base": "https://awesome.video",
+  "revision": "9d580ddb753652028178fa922aeb653b27a54ccd",
+  "tiers": [
+    2
+  ],
+  "flags": {
+    "only": [],
+    "schedule": false
+  },
+  "exit": 0,
+  "counts": {
+    "pass": 9,
+    "fail": 0,
+    "skip": 0,
+    "info": 0
+  },
+  "guard": {
+    "nonGet": 0,
+    "violations": []
+  },
+  "checks": [
+    {
+      "id": "T2-00",
+      "tier": 2,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 24775,
+      "detail": "both audit accounts signed in",
+      "values": {
+        "leftoversFromOtherRuns": {
+          "resources": 0,
+          "resource_edits": 0,
+          "bookmark_collections": 0
+        }
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-01",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 661,
+      "detail": "submitted #190958, pending, listed for the member",
+      "values": {
+        "id": 190958
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-02",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 226,
+      "detail": "#190958 is in the approvals queue",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-03",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 1374,
+      "detail": "#190958 rejected; hidden from the public",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-04",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 1452,
+      "detail": "#190959 submitted and withdrawn; second withdraw 409",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-05",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 1191,
+      "detail": "bookmark on #190896 added, read back, removed",
+      "values": {
+        "resourceId": 190896
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-06",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 1763,
+      "detail": "#190958 edited and reverted; sync queue 49 -> 49",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-10",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 11157,
+      "detail": "backup c7da09c24327; removed 2 of 2 rows",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T2-11",
+      "tier": 2,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 805,
+      "detail": "zero [QA-20261107T030323Z] rows left; re-read 404; none pending",
+      "owner": false,
+      "authExpired": false
+    }
+  ]
+}

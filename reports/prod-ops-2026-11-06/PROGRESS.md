@@ -148,3 +148,12 @@ Then ONE batched publish (owner yes) → Tier 0+1 on prod.
 - 01:1xZ (Nov 7) LIVE 882a4316 (399 s), ready 200, home 200 0.24 s. prod-check tier 0,1 PASS exit 0 (25 pass, 0 fail, NEW-1..3 now pass), tier 3 PASS exit 0, 0 non-GET. Live spot-checks: 410/404/200 on archived/rejected/approved; pool max 8; 29 DOC: counters; cache live/expired evictions; POST /api/ops/run-due-jobs → 503 (token unset; no work run; the only non-GET outside the publish steps); /api/admin/usage 200; /api/admin/qa-rows 403 (allowlist unset, deny-by-default).
   Issues closed with evidence: #285 #286 #287 #288 #84 #78. Commented (awaiting owner setup): #284 #283 #282 #281 #77. Open: #76 (audit account), #85.
 ## STATE: WAVE 1 SHIPPED. Owner-side steps remaining (see final report). Wave 2 (audit account #76 → Tier 2; restore drill; self-heal loop) waits on them.
+
+## VERIFIED: 2026-11-07 03:05Z (owner: "publish + promote", keep admin)
+- Live 9d580ddb = origin/main (3 publishes: a691ef35, 3c1663e6, 9d580ddb; each after the 5.3a jobs probe and a fresh 5.3b backup, latest 20261107T025603Z-0d5543a6, 42 tables, 107,965 rows).
+- Tier 0+1: 25/25 PASS, exit 0 (`evidence/verified-20261107/tier01-*`).
+- Tier 2: 9/9 PASS, exit 0; zero `[QA-20261107T030323Z]` rows left, re-read 404 (`evidence/verified-20261107/tier2-*`).
+- Logs: unattended GET /api/admin/logs returns 761 lines from the last hour from 2 instances of the new build (#311 boot-suffixed instance tag) (`evidence/verified-20261107/logs-query.json`).
+- Audit admin user_3Ll7BiTtwPUMFSN96bgs6ClDXYI promoted to admin (PUT role 200, read-back admin); kept by owner decision.
+- B5 code fix #310, B11 docs #309, log instance #311 merged and live. Self-heal loop dropped by owner (PR #307 closed).
+- Open: B2/B1 "two days running" finish lines (time-based; check the backup list on 2026-11-09); B5 data half (archive 27 duplicate rows) needs owner per-pair OK.

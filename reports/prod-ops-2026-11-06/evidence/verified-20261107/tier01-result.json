@@ -1,0 +1,393 @@
+{
+  "schema": 1,
+  "runId": "20261107T030126Z",
+  "startedAt": "2026-11-07T03:01:26.394Z",
+  "finishedAt": "2026-11-07T03:03:12.595Z",
+  "base": "https://awesome.video",
+  "revision": "9d580ddb753652028178fa922aeb653b27a54ccd",
+  "tiers": [
+    0,
+    1
+  ],
+  "flags": {
+    "only": [],
+    "schedule": false
+  },
+  "exit": 0,
+  "counts": {
+    "pass": 25,
+    "fail": 0,
+    "skip": 0,
+    "info": 1
+  },
+  "guard": {
+    "nonGet": 0,
+    "violations": []
+  },
+  "checks": [
+    {
+      "id": "T0-01",
+      "tier": 0,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 261,
+      "detail": "live revision = main 9d580ddb",
+      "values": {
+        "live": "9d580ddb753652028178fa922aeb653b27a54ccd",
+        "main": "9d580ddb753652028178fa922aeb653b27a54ccd"
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T0-02",
+      "tier": 0,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 263,
+      "detail": "ready probe 200 in 263 ms",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T0-03",
+      "tier": 0,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 208,
+      "detail": "home 200 in 208 ms",
+      "values": {
+        "ms": 208
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-02",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 1185,
+      "detail": "sitemap = categories = totalPublic = 4074",
+      "values": {
+        "sitemap": 4074,
+        "categories": 4074,
+        "totalPublic": 4074
+      },
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-03",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 0,
+      "detail": "4766 sitemap URLs",
+      "values": {
+        "total": 4766
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-04",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 268,
+      "detail": "3 resource pages ok (/resource/185568, /resource/189635, /resource/189590)",
+      "values": {
+        "picks": [
+          "/resource/185568",
+          "/resource/189635",
+          "/resource/189590"
+        ]
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-05",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 220,
+      "detail": "search ffmpeg total 451",
+      "values": {
+        "total": 451
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-07",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 752,
+      "detail": "4 page types ok (/, /category/community-events, /resource/189950, /journey/10)",
+      "values": {
+        "paths": [
+          "/",
+          "/category/community-events",
+          "/resource/189950",
+          "/journey/10"
+        ]
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-08",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 78,
+      "detail": "robots.txt 200 with Sitemap:",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-09",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 90,
+      "detail": "unknown route answers 404",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-14",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 443,
+      "detail": "admin stats 200",
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-15",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 181,
+      "detail": "approvals readable, 24 pending",
+      "values": {
+        "total": 24
+      },
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-16",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 296,
+      "detail": "ops health ready",
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-17",
+      "tier": 1,
+      "kind": "api",
+      "blocking": false,
+      "status": "info",
+      "ms": 422,
+      "detail": "newest backup 0.1 h old (info only until backup scheduling ships)",
+      "values": {
+        "completedAt": "2026-11-07T02:56:11.061Z",
+        "ageHours": 0.1
+      },
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-18",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 189,
+      "detail": "link scan 14 completed 14.9 h ago",
+      "values": {
+        "id": 14,
+        "ageHours": 14.9
+      },
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-19",
+      "tier": 1,
+      "kind": "api",
+      "blocking": true,
+      "status": "pass",
+      "ms": 234,
+      "detail": "newest job 109 cancelled",
+      "values": {
+        "id": 109,
+        "status": "cancelled",
+        "ageDays": 1
+      },
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "T1-01",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 15022,
+      "detail": "12 pages show resources",
+      "values": {
+        "paths": [
+          "/",
+          "/category/community-events",
+          "/category/encoding-codecs",
+          "/category/general-tools",
+          "/category/infrastructure-delivery",
+          "/category/intro-learning",
+          "/category/media-tools",
+          "/category/players-clients",
+          "/category/protocols-transport",
+          "/category/standards-industry",
+          "/subcategory/live-streaming-servers",
+          "/sub-subcategory/android"
+        ]
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-06",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 2367,
+      "detail": "palette shows 16 options for ffmpeg",
+      "values": {
+        "options": 16
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-10",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 2662,
+      "detail": "sign-in shows the Clerk identifier input",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-11",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 2779,
+      "detail": "/profile redirects to sign-in",
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-12",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 4723,
+      "detail": "no horizontal overflow at 390 px on /, /category/intro-learning, /resource/188968",
+      "values": {
+        "paths": [
+          "/",
+          "/category/intro-learning",
+          "/resource/188968"
+        ]
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "T1-13",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 0,
+      "detail": "0 console errors on visitor pages",
+      "values": {
+        "errors": 0
+      },
+      "owner": false,
+      "authExpired": false
+    },
+    {
+      "id": "NEW-1",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": false,
+      "status": "pass",
+      "ms": 26652,
+      "detail": "6 admin tabs render and match their GETs",
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "NEW-2",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": false,
+      "status": "pass",
+      "ms": 25933,
+      "detail": "Resources tab total, search, status filters, pager and deep links work",
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "NEW-3",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": false,
+      "status": "pass",
+      "ms": 8932,
+      "detail": "Review and Edit dialogs open populated and close; nothing saved",
+      "owner": true,
+      "authExpired": false
+    },
+    {
+      "id": "NEW-4",
+      "tier": 1,
+      "kind": "browser",
+      "blocking": true,
+      "status": "pass",
+      "ms": 7359,
+      "detail": "signed-out /admin redirects to sign-in with no admin data",
+      "owner": false,
+      "authExpired": false
+    }
+  ]
+}
