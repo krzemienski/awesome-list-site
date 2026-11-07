@@ -18,7 +18,7 @@ export const MAX_ARCHIVE_SHARE = 0.02;
 const MAX_ARCHIVE_FLOOR = 10;
 
 export type LinkObservation = "ok" | "dead" | "moved" | "suspect" | "unknown";
-export type RemediationKind = "archive" | "restore" | "rewrite-url" | "review" | "watch";
+export type RemediationKind = "archive" | "restore" | "rewrite-url" | "duplicate" | "review" | "watch";
 
 export interface RemediationAction {
   resourceId: number;
@@ -233,6 +233,27 @@ export interface RemediationPlan {
   actions: RemediationAction[];
 }
 
+/**
+ * A rewrite whose target URL already belongs to another resource can never
+ * apply. Show it as a "duplicate" for an admin to merge, naming the holder.
+ * The plan is rebuilt from the scans each time, so a recorded clash is never
+ * re-queued as an applicable rewrite.
+ */
+async function markRewriteClashes(actions: RemediationAction[]): Promise<void> {
+  const rewrites = actions.filter((a) => a.kind === "rewrite-url" && a.to);
+  if (rewrites.length === 0) return;
+  const holders = await db
+    .select({ id: resources.id, url: resources.url, status: resources.status })
+    .from(resources)
+    .where(inArray(resources.url, rewrites.map((a) => a.to!)));
+  for (const a of rewrites) {
+    const other = holders.find((h) => h.url === a.to && h.id !== a.resourceId);
+    if (!other) continue;
+    a.kind = "duplicate";
+    a.reason = `Moved page is already resource ${other.id} (${other.status ?? "approved"}); duplicate listing, merge or archive one`;
+  }
+}
+
 export async function buildRemediationPlan(): Promise<RemediationPlan> {
   const scans = await retainedScans();
   if (scans.length === 0) return { jobId: null, checked: 0, actions: [] };
@@ -281,7 +302,8 @@ export async function buildRemediationPlan(): Promise<RemediationPlan> {
     );
     if (action) actions.push(action);
   }
-  const order: Record<RemediationKind, number> = { archive: 0, restore: 1, "rewrite-url": 2, review: 3, watch: 4 };
+  await markRewriteClashes(actions);
+  const order: Record<RemediationKind, number> = { archive: 0, restore: 1, "rewrite-url": 2, duplicate: 3, review: 4, watch: 5 };
   actions.sort((a, b) => order[a.kind] - order[b.kind] || a.resourceId - b.resourceId);
   return { jobId: scans[0].id, checked, actions };
 }
@@ -289,6 +311,7 @@ export async function buildRemediationPlan(): Promise<RemediationPlan> {
 export interface AppliedAction extends RemediationAction {
   outcome: "applied" | "skipped";
   detail?: string;
+  clash?: boolean;
 }
 
 type Tx = Parameters<Parameters<typeof withResourcePublication>[0]>[0];
@@ -356,13 +379,13 @@ async function applyOne(a: RemediationAction, actor?: string): Promise<AppliedAc
     });
     return clash === null
       ? { ...a, outcome: "applied" }
-      : { ...a, outcome: "skipped", detail: `Resource ${clash} already uses ${to}` };
+      : { ...a, outcome: "skipped", clash: true, detail: `Resource ${clash} already uses ${to}` };
   }
   return { ...a, outcome: "skipped", detail: "Report-only action" };
 }
 
 /** Apply the current plan. Each change is its own audited transaction; one failure never blocks the rest. */
-export async function applyRemediationPlan(actor?: string): Promise<{ jobId: number | null; results: AppliedAction[]; breaker?: string }> {
+export async function applyRemediationPlan(actor?: string): Promise<{ jobId: number | null; results: AppliedAction[]; duplicates: number; breaker?: string }> {
   const plan = await buildRemediationPlan();
   const archives = plan.actions.filter((a) => a.kind === "archive").length;
   const limit = Math.max(MAX_ARCHIVE_FLOOR, Math.floor(plan.checked * MAX_ARCHIVE_SHARE));
@@ -372,7 +395,7 @@ export async function applyRemediationPlan(actor?: string): Promise<{ jobId: num
 
   const results: AppliedAction[] = [];
   for (const a of plan.actions) {
-    if (a.kind === "review" || a.kind === "watch") continue;
+    if (a.kind === "review" || a.kind === "watch" || a.kind === "duplicate") continue;
     if (a.kind === "archive" && breaker) {
       results.push({ ...a, outcome: "skipped", detail: "Mass-failure breaker" });
       continue;
@@ -386,7 +409,8 @@ export async function applyRemediationPlan(actor?: string): Promise<{ jobId: num
   const applied = results.filter((r) => r.outcome === "applied").length;
   if (breaker) logger.warn(`Remediation breaker for job ${plan.jobId}: ${breaker}`);
   logger.info(`Remediation for job ${plan.jobId}: ${applied} applied, ${results.length - applied} skipped`);
-  return { jobId: plan.jobId, results, breaker };
+  const duplicates = plan.actions.filter((a) => a.kind === "duplicate").length;
+  return { jobId: plan.jobId, results, duplicates, breaker };
 }
 
 /** Mark a published resource so the planner leaves it alone (an admin judged the link fine), or clear the mark. */

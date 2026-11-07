@@ -4,14 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { formatAdminDateTime } from "@/lib/utils";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 
-type RemediationKind = "archive" | "restore" | "rewrite-url" | "review" | "watch";
+type RemediationKind = "archive" | "restore" | "rewrite-url" | "duplicate" | "review" | "watch";
 
 interface RemediationAction {
   resourceId: number;
@@ -38,6 +38,7 @@ const KIND_LABEL: Record<RemediationKind, string> = {
   archive: "Hide (dead)",
   restore: "Restore",
   "rewrite-url": "Update URL",
+  duplicate: "Duplicate",
   review: "Review",
   watch: "Watching",
 };
@@ -67,7 +68,9 @@ export default function LinkRemediationPanel() {
       });
       refresh();
     },
-    onError: (error: Error) => toast({
+    onError: (error: Error) => error instanceof ApiError && error.status === 409
+      ? toast({ title: "Nothing applied", description: error.message, variant: "destructive" })
+      : toast({
       title: "Remediation failed",
       description: describeWriteError(error, { fallback: "The plan could not be applied.", outcome: "Some changes may have been made. Reload the plan before trying again." }),
       variant: "destructive",
@@ -125,7 +128,7 @@ export default function LinkRemediationPanel() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Apply the remediation plan?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden (refused if more than 2% of the catalog at once), ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
+                  {`${data?.plan.counts.archive ?? 0} dead links will be hidden (refused if more than 2% of the catalog at once), ${data?.plan.counts.restore ?? 0} restored and ${data?.plan.counts["rewrite-url"] ?? 0} URLs updated. ${data?.plan.counts.duplicate ?? 0} duplicate listings are not touched. Nothing is deleted, and every change is logged in the resource audit log with its previous value.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -158,7 +161,7 @@ export default function LinkRemediationPanel() {
                     <TableCell><Badge variant={a.kind === "archive" ? "destructive" : "outline"}>{KIND_LABEL[a.kind]}</Badge></TableCell>
                     <TableCell className="text-sm">{a.reason}</TableCell>
                     <TableCell>
-                      {a.kind !== "restore" && (
+                      {a.kind !== "restore" && a.kind !== "duplicate" && (
                         <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
                           aria-label={`Link is fine for ${a.title}`}>
                           Link is fine
