@@ -45,6 +45,7 @@ check_curl() { # whole segment must match one strict shape; no flag parsing
 check_gh_api() { # dequoted tokens after `gh api`
   local t
   for t in "$@"; do
+    [[ "$t" == *..* ]] && block "gh api path traversal" "$*"
     case "$t" in
       -X*|--method*|-f|-F|-f?*|-F?*|--field*|--raw-field*|--input*) block "gh api write flag" "$*" ;;
       graphql|*/graphql) block "gh api graphql" "$*" ;;
