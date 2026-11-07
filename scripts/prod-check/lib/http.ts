@@ -31,6 +31,10 @@ export interface HttpClient {
 
 const secrets = new Set<string>();
 
+export function addSecret(value: string): void {
+  if (value.length >= 6) secrets.add(value);
+}
+
 /** Removes any owner cookie value from text that may reach a log, result or evidence file. */
 export function redact(text: string): string {
   let out = text;

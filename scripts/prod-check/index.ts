@@ -4,17 +4,19 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AuthExpiredError, createHttp, redact } from "./lib/http.ts";
 import { createBrowserKit, type BrowserKit } from "./lib/browser.ts";
+import { loadCredentials } from "./lib/audit-actor.ts";
 import { select, type Check, type Ctx, type Result } from "./registry.ts";
 import { EXIT, exitCode, linkLatest, pruneScheduled, record, writeReport, type CheckRecord, type RunSummary } from "./report.ts";
 import "./checks/tier0.ts";
 import "./checks/tier1-api.ts";
 import "./checks/tier1-browser.ts";
 import "./checks/tier1-admin-ui.ts";
+import "./checks/tier2.ts";
 import "./checks/tier3.ts";
 
 const PROD_BASE = "https://awesome.video";
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
-const USAGE = "usage: npx tsx scripts/prod-check/index.ts [--tier 0,1,3] [--base https://awesome.video] [--only T1-04,T0-01] [--json] [--schedule]";
+const USAGE = "usage: npx tsx scripts/prod-check/index.ts [--tier 0,1,3] [--base https://awesome.video] [--only T1-04,T0-01] [--json] [--schedule]\n       Tier 2 (writes): --tier 2 --allow-writes, with PROD_CHECK_AUDIT_ADMIN_ID and PROD_CHECK_AUDIT_MEMBER_ID set";
 
 class UsageError extends Error {}
 
@@ -26,12 +28,19 @@ function parse() {
       only: { type: "string", default: "" },
       json: { type: "boolean", default: false },
       schedule: { type: "boolean", default: false },
+      "allow-writes": { type: "boolean", default: false },
     },
     strict: true,
   });
   const tiers = values.tier.split(",").map(Number);
   if (tiers.some((t) => ![0, 1, 2, 3].includes(t))) throw new UsageError(`bad --tier ${values.tier}`);
-  if (tiers.includes(2)) throw new UsageError("Tier 2 not available until #76/#77");
+  if (tiers.includes(2)) {
+    if (!values["allow-writes"]) throw new UsageError("Tier 2 writes to production: pass --allow-writes");
+    if (values.schedule) throw new UsageError("Tier 2 never runs on a schedule");
+    if (!loadCredentials("Admin") || !loadCredentials("Member")) {
+      throw new UsageError("Tier 2 needs the audit admin and member email, password and PROD_CHECK_AUDIT_*_ID");
+    }
+  }
   if (values.base !== PROD_BASE) throw new UsageError(`--base must be ${PROD_BASE}: the owner session is only sent there`);
   return { tiers, only: values.only.split(",").filter(Boolean), json: values.json, schedule: values.schedule, base: values.base };
 }

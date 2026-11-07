@@ -6,7 +6,23 @@ import { redact, type HttpClient } from "./http.ts";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 const SAFE_PATH = /^\/[A-Za-z0-9\-._~%/]*(\?[A-Za-z0-9\-._~%=&,+]*)?(#[\w-]*)?$/;
 
-export type AuthState = "visitor" | "owner";
+export type AuthState = "visitor" | "owner" | "auditMember" | "auditAdmin";
+
+/** The only first-party writes an audit context may make: Clerk sign-in plus the Tier 2 steps. */
+const AUDIT_WRITES: [method: string, path: RegExp][] = [
+  ["POST", /^\/api\/__clerk\//],
+  ["POST", /^\/api\/resources$/],
+  ["POST", /^\/api\/user\/contributions\/resource\/\d+\/withdraw$/],
+  ["POST", /^\/api\/bookmarks\/\d+$/],
+  ["DELETE", /^\/api\/bookmarks\/\d+$/],
+  ["POST", /^\/api\/admin\/resources\/\d+\/reject$/],
+  ["PUT", /^\/api\/admin\/resources\/\d+$/],
+  ["POST", /^\/api\/admin\/database-backups$/],
+  ["DELETE", /^\/api\/admin\/qa-rows\/(resources|resource_edits|bookmark_collections)\/\d+$/],
+];
+
+const writeAllowed = (auth: AuthState, method: string, pathname: string) =>
+  auth.startsWith("audit") && AUDIT_WRITES.some(([m, re]) => m === method && re.test(pathname));
 
 export interface Violation {
   method: string;
@@ -62,7 +78,7 @@ export async function createBrowserKit(base: string, http: HttpClient, evidenceD
       const context = await browser.newContext(viewport ? { viewport } : {});
       await context.route("**/*", (route) => {
         const req = route.request();
-        if (isFirstParty(req.url()) && !SAFE_METHODS.has(req.method())) {
+        if (isFirstParty(req.url()) && !SAFE_METHODS.has(req.method()) && !writeAllowed(auth, req.method(), new URL(req.url()).pathname)) {
           violations.push({ method: req.method(), url: redact(req.url().split("?")[0]) });
           return route.abort();
         }
