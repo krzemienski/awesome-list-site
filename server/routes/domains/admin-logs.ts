@@ -28,6 +28,7 @@ export const MAX_LIMIT = 2000;
 export const MAX_OBJECTS = 200;
 const HOUR_MS = 60 * 60 * 1000;
 const READ_CONCURRENCY = 10;
+const LIST_CONCURRENCY = 8;
 const SEVERITY = { info: 0, warn: 1, error: 2 } as const;
 type Level = keyof typeof SEVERITY;
 const RELATIVE = /^-(\d+)([mhd])$/;
@@ -46,6 +47,8 @@ export interface LogQueryResult {
   records: LogRecord[];
   instances: string[];
   scanned: number;
+  /** Objects that could not be read; their records are missing from the result. */
+  failedReads: number;
   truncated: boolean;
 }
 
@@ -64,7 +67,7 @@ export function parseLogQuery(query: Record<string, unknown>, now: number): LogQ
   const since = Math.max(single(query.since) ? parseTime(single(query.since)!, now) : now - HOUR_MS, now - LOG_RETENTION_MS);
   if (since > until) throw new BadRequestError("since is after until.");
   const level = single(query.level);
-  if (level !== undefined && !(level in SEVERITY)) throw new BadRequestError("level must be info, warn or error.");
+  if (level !== undefined && !Object.hasOwn(SEVERITY, level)) throw new BadRequestError("level must be info, warn or error.");
   const limit = single(query.limit) === undefined ? DEFAULT_LIMIT : Number(query.limit);
   if (!Number.isInteger(limit) || limit < 1) throw new BadRequestError("limit must be a positive integer.");
   return { since, until, level: level as Level | undefined, area: single(query.area), q: single(query.q)?.toLowerCase(), limit: Math.min(limit, MAX_LIMIT) };
@@ -79,11 +82,14 @@ const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { messag
 async function listWindowObjects(storage: PrivateStorage, since: number, until: number): Promise<{ names: string[]; capped: boolean }> {
   const hours: number[] = [];
   for (let hour = Math.floor(until / HOUR_MS) * HOUR_MS; hour >= Math.floor(since / HOUR_MS) * HOUR_MS; hour -= HOUR_MS) hours.push(hour);
-  const listings = await Promise.all(hours.map(async (hour) =>
-    unwrap(await storage.client.list({ prefix: `${storage.prefix}${hourPath(hour)}` }), "list")
-      .map((object) => object.name)
-      .sort((a, b) => b.localeCompare(a))));
-  const names = listings.flat();
+  const names: string[] = [];
+  for (let i = 0; i < hours.length; i += LIST_CONCURRENCY) {
+    const listings = await Promise.all(hours.slice(i, i + LIST_CONCURRENCY).map(async (hour) =>
+      unwrap(await storage.client.list({ prefix: `${storage.prefix}${hourPath(hour)}` }), "list")
+        .map((object) => object.name)
+        .sort((a, b) => b.localeCompare(a))));
+    names.push(...listings.flat());
+  }
   return { names: names.slice(0, MAX_OBJECTS), capped: names.length > MAX_OBJECTS };
 }
 
@@ -111,16 +117,21 @@ function parseLines(jsonl: string): LogRecord[] {
 export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promise<LogQueryResult> {
   const { names, capped } = await listWindowObjects(storage, query.since, query.until);
   const found: LogRecord[] = [];
+  let failedReads = 0;
   for (let i = 0; i < names.length; i += READ_CONCURRENCY) {
-    const texts = await Promise.all(names.slice(i, i + READ_CONCURRENCY).map(async (name) =>
+    const settled = await Promise.allSettled(names.slice(i, i + READ_CONCURRENCY).map(async (name) =>
       unwrap(await storage.client.downloadAsText(name), "read")));
-    for (const text of texts) found.push(...parseLines(text).filter((record) => matches(record, query)));
+    for (const result of settled) {
+      if (result.status === "rejected") failedReads++;
+      else found.push(...parseLines(result.value).filter((record) => matches(record, query)));
+    }
   }
   found.sort((a, b) => b._time.localeCompare(a._time));
   return {
     records: found.slice(0, query.limit),
     instances: [...new Set(found.map((record) => record.instance))].sort(),
     scanned: names.length,
+    failedReads,
     truncated: capped || found.length > query.limit,
   };
 }
