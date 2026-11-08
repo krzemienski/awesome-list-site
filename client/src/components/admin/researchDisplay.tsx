@@ -24,7 +24,7 @@ export function getStatusBadge(status: string) {
       ? "queues-agent__status--ok"
       : status === "failed" || status === "rejected"
         ? "queues-agent__status--bad"
-        : status === "processing" || status === "pending" || status === "pending_review" || status === "budget_stopped"
+        : status === "processing" || status === "pending" || status === "pending_review" || status === "budget_stopped" || status === "turn_stopped"
           ? "queues-agent__status--warn"
           : "queues-agent__status--muted";
   switch (status) {
@@ -39,6 +39,9 @@ export function getStatusBadge(status: string) {
     case "budget_stopped":
       // The run spent its configured USD cap — not a crash, not a normal finish.
       return <Badge variant="outline" className={`queues-agent__status ${statusClass} ${WARN_OUTLINE}`}><AlertCircle className="w-3 h-3 mr-1" />Stopped at budget</Badge>;
+    case "turn_stopped":
+      // The run used its configured turn cap — not a crash, not a normal finish.
+      return <Badge variant="outline" className={`queues-agent__status ${statusClass} ${WARN_OUTLINE}`}><AlertCircle className="w-3 h-3 mr-1" />Stopped at turn cap</Badge>;
     default:
       return <Badge variant="outline" className={`queues-agent__status ${statusClass}`}><Clock className="w-3 h-3 mr-1" />{status}</Badge>;
   }

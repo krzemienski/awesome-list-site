@@ -1701,7 +1701,7 @@ export const enrichmentJobs = pgTable(
   "enrichment_jobs",
   {
     id: serial("id").primaryKey(),
-    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled, budget_stopped
+    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled, budget_stopped, turn_stopped
     filter: text("filter").default("all"), // all, unenriched
     batchSize: integer("batch_size").default(10),
     totalResources: integer("total_resources").default(0),

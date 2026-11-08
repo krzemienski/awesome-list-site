@@ -172,6 +172,7 @@ const STATUS_VARIANTS: Record<string, string> = {
   degraded: "warn",
   partial: "warn",
   budget_stopped: "warn",
+  turn_stopped: "warn",
   admin: "accent",
   moderator: "warn",
   user: "muted",
@@ -191,6 +192,7 @@ const STATUS_VARIANTS: Record<string, string> = {
 // Machine status values whose raw form reads badly as a chip label.
 const STATUS_LABELS: Record<string, string> = {
   budget_stopped: "stopped at budget",
+  turn_stopped: "stopped at turn cap",
 };
 
 export function StatusChip({ status, className, children, ...props }: StatusChipProps) {

@@ -296,10 +296,10 @@ function renderHealthRows(
     const finished = String(latestJob.completedAt ?? latestJob.createdAt ?? "");
     enrichmentRow = {
       label: "Enrichment queue",
-      detail: `last run ${status === "budget_stopped" ? "stopped at budget" : status === "cancelled" ? "cancelled before finishing" : status} · ${relativeAge(finished)}`,
+      detail: `last run ${status === "budget_stopped" ? "stopped at budget" : status === "turn_stopped" ? "stopped at turn cap" : status === "cancelled" ? "cancelled before finishing" : status} · ${relativeAge(finished)}`,
       // A cancelled run left resources unenriched: not an outage, but not a
       // clean "ok" either.
-      state: status === "failed" ? "bad" : status === "budget_stopped" || status === "cancelled" ? "warn" : "ok",
+      state: status === "failed" ? "bad" : status === "budget_stopped" || status === "turn_stopped" || status === "cancelled" ? "warn" : "ok",
     };
   } else {
     enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "unknown" };

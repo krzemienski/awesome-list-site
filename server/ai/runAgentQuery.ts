@@ -194,6 +194,9 @@ export function agentUsageFromError(err: unknown): AgentRunUsage | null {
 /** Terminal job status for a run the configured USD budget cap stopped. */
 export const BUDGET_STOPPED_STATUS = "budget_stopped";
 
+/** Terminal job status for a run the configured turn cap stopped. */
+export const TURN_STOPPED_STATUS = "turn_stopped";
+
 const BUDGET_CAP_MESSAGE_RE = /maximum budget|max budget|budget \(\$/i;
 
 /**
@@ -215,6 +218,13 @@ export function isBudgetCapStop(source: unknown): boolean {
   if (s.subtype === "error_max_budget_usd" || s.agentSubtype === "error_max_budget_usd") return true;
   if (s.terminalReason === "budget_exhausted" || s.agentTerminalReason === "budget_exhausted") return true;
   return source instanceof Error && BUDGET_CAP_MESSAGE_RE.test(source.message);
+}
+
+/** Whether a run ended because it hit its configured turn cap (returned result or thrown SDK error). */
+export function isTurnCapStop(source: unknown): boolean {
+  if (!source || typeof source !== "object") return false;
+  const s = source as { subtype?: string; agentSubtype?: string };
+  return s.subtype === "error_max_turns" || s.agentSubtype === "error_max_turns";
 }
 
 function actorFromMessage(msg: any): { actor: string; actorType: "orchestrator" | "subagent" } {
@@ -793,13 +803,19 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           if (typeof (msg as any).terminal_reason === "string") {
             result.terminalReason = (msg as any).terminal_reason;
           }
-          terminalSdkError = msg.is_error === true;
+          // error_max_* results carry is_error true but are normal cap stops: the
+          // SDK throws right after yielding them and the catch below absorbs it.
+          terminalSdkError = msg.is_error === true && !isNativeCapSubtype(msg.subtype);
           sawResultMessage = true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.costBasis = "reported";
           result.tokensIn = msg.usage?.input_tokens ?? 0;
           result.tokensOut = msg.usage?.output_tokens ?? 0;
-          result.numTurns = msg.num_turns ?? 0;
+          // The SDK counts the turn it refused to start when it stops at the cap
+          // (num_turns = cap + 1); the run never completed more than the cap.
+          result.numTurns = msg.subtype === "error_max_turns" && maxTurns != null
+            ? Math.min(msg.num_turns ?? 0, maxTurns)
+            : msg.num_turns ?? 0;
           result.durationMs = msg.duration_ms ?? 0;
           result.resultText = typeof msg.result === "string" ? msg.result : "";
           result.ok = msg.subtype === "success" && msg.is_error !== true;

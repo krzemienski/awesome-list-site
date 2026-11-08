@@ -460,7 +460,7 @@ export default function BatchEnrichmentPanel() {
                 value={formatRelativeAgo(lastEnriching?.completedAt ?? null)}
                 sub={jobsUnknownNote
                   ?? (lastEnriching
-                    ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status}`}`
+                    ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status === "turn_stopped" ? "stopped at turn cap" : lastEnriching.status}`}`
                     : "No recent batch enriched resources")}
               />
             );
@@ -943,7 +943,7 @@ export default function BatchEnrichmentPanel() {
                           className={`queues-agent__status ${
                             effectiveStatus(job) === 'completed' ? 'queues-agent__status--ok' :
                             effectiveStatus(job) === 'failed' ? 'queues-agent__status--bad' :
-                            effectiveStatus(job) === 'processing' || effectiveStatus(job) === 'pending' || effectiveStatus(job) === 'budget_stopped' ? 'queues-agent__status--warn' :
+                            effectiveStatus(job) === 'processing' || effectiveStatus(job) === 'pending' || effectiveStatus(job) === 'budget_stopped' || effectiveStatus(job) === 'turn_stopped' ? 'queues-agent__status--warn' :
                             'queues-agent__status--muted'
                           } ${getStatusBadgeClassName(effectiveStatus(job))}`}
                           data-testid={`status-badge-${job.id}`}
@@ -954,10 +954,10 @@ export default function BatchEnrichmentPanel() {
                           {effectiveStatus(job) === 'completed' && (
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                           )}
-                          {(effectiveStatus(job) === 'failed' || effectiveStatus(job) === 'budget_stopped') && (
+                          {(effectiveStatus(job) === 'failed' || effectiveStatus(job) === 'budget_stopped' || effectiveStatus(job) === 'turn_stopped') && (
                             <AlertCircle className="h-3 w-3 mr-1" />
                           )}
-                          {effectiveStatus(job) === 'budget_stopped' ? 'stopped at budget' : effectiveStatus(job)}
+                          {effectiveStatus(job) === 'budget_stopped' ? 'stopped at budget' : effectiveStatus(job) === 'turn_stopped' ? 'stopped at turn cap' : effectiveStatus(job)}
                         </Badge>
                         {/* BUG-029: a job stored as "failed" even though every
                             processed resource succeeded reads as a

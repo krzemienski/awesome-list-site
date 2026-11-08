@@ -58,6 +58,12 @@ function endingCopy(outcome: RunOutcome, saved: number, job: ResearchJob): strin
         ? `${cap} — review the ${found}, or relaunch with a higher cap.`
         : `${cap} before the run saved a discovery. Relaunch with a higher cap.`;
     }
+    case "turn_stopped": {
+      const cap = `Turn cap reached (${job.maxTurns ?? "?"} turns)`;
+      return saved > 0
+        ? `${cap} — review the ${found}, or relaunch with a higher cap.`
+        : `${cap} before the run saved a discovery. Relaunch with a higher cap.`;
+    }
     case "cancelled":
       return saved > 0 ? `Run cancelled — review the ${found} it made before stopping.` : "Run cancelled before it saved a discovery.";
     case "failed":
@@ -320,7 +326,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
                 {outcome === "completed" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                 <AlertDescription className="space-y-3 break-words">
                   <p>{endingCopy(outcome, saved, job)}</p>
-                  {outcome === "budget_stopped" && (
+                  {(outcome === "budget_stopped" || outcome === "turn_stopped") && (
                     <Button size="sm" className="min-h-11 max-w-full whitespace-normal" onClick={onRelaunchHigherCap} data-testid="button-relaunch-higher-cap">
                       <Play className="mr-1 h-3 w-3" />Relaunch with a higher cap
                     </Button>

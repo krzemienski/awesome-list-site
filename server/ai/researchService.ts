@@ -30,7 +30,7 @@ export class DiscoveryConflictError extends Error {
   }
 }
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
-import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError, isBudgetCapStop, isTurnCapStop, BUDGET_STOPPED_STATUS, TURN_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { KnownUrls, knownInDb, normalizeUrl, surfacedByScout } from './researchDedup';
@@ -293,19 +293,21 @@ const COST_BASIS_LABEL: Record<CostBasis, string> = {
 
 /**
  * Terminal status of a finished run. A run the SDK stopped at its USD cap is
- * budget_stopped (distinct from completed or failed); reaching the discovery
+ * budget_stopped and one stopped at its turn cap is turn_stopped (both distinct from completed or failed); reaching the discovery
  * target wins over both that and the backstop abort.
  */
 function finalStatusOf(result: { aborted: boolean; subtype?: string; terminalReason?: string }, stoppedAtTarget: boolean): string {
   if (stoppedAtTarget) return 'completed';
   if (result.aborted) return 'cancelled';
-  return isBudgetCapStop(result) ? BUDGET_STOPPED_STATUS : 'completed';
+  if (isBudgetCapStop(result)) return BUDGET_STOPPED_STATUS;
+  return isTurnCapStop(result) ? TURN_STOPPED_STATUS : 'completed';
 }
 
 /** Terminal status of a run whose agent query threw (see finalStatusOf for runs that returned). */
 function errorStatusOf(err: unknown): string {
   if (err && typeof err === 'object' && (err as { researchTargetReached?: boolean }).researchTargetReached) return 'completed';
-  return isBudgetCapStop(err) ? BUDGET_STOPPED_STATUS : 'failed';
+  if (isBudgetCapStop(err)) return BUDGET_STOPPED_STATUS;
+  return isTurnCapStop(err) ? TURN_STOPPED_STATUS : 'failed';
 }
 
 interface ActiveJob {
@@ -1751,7 +1753,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       .select({ costUsd: researchJobs.estimatedCostUsd, costBasis: researchJobs.costBasis })
       .from(researchJobs)
       .where(and(
-        inArray(researchJobs.status, ['completed', 'budget_stopped']),
+        inArray(researchJobs.status, ['completed', 'budget_stopped', 'turn_stopped']),
         sql`${researchJobs.totalDiscoveries} > 0`,
         sql`${cost} > 0`,
       ))
