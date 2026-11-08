@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertCircle,
   AlertTriangle,
@@ -355,7 +356,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   // F11: Run Link Check starts the persistent link-health job (the same job
   // /admin/linkhealth runs) and this tab follows it by polling its status,
   // so the check survives navigation, shows progress and can be cancelled.
-  const { data: linkJobData, isError: isLinkJobError, error: linkJobError, isFetching: isLinkJobFetching, refetch: refetchLinkJob } = useQuery<{ success: boolean; job: LinkHealthJob | null }>({
+  const { data: linkJobData, isPending: isLinkJobPending, isError: isLinkJobError, error: linkJobError, isFetching: isLinkJobFetching, refetch: refetchLinkJob } = useQuery<{ success: boolean; job: LinkHealthJob | null }>({
     queryKey: ["/api/admin/link-health/status"],
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -476,9 +477,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       </details>
 
       {/* F11: the export link check is the persistent link-health job. */}
-      {(linkJob || isLinkJobError) && (
-        <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check">
-          {isLinkJobError && !linkJob ? (
+      <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check" aria-busy={isLinkJobPending}>
+          {isLinkJobPending ? (
+            <>
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-full max-w-md" />
+              <Skeleton className="h-4 w-full max-w-lg" />
+            </>
+          ) : isLinkJobError && !linkJob ? (
             <AdminLoadError
               subject="the link check status"
               error={linkJobError}
@@ -548,9 +554,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               ) : null}
               <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
             </>
-          ) : null}
+          ) : (
+            <p className="admin-ops-export__link-job-scope">
+              No link check has been run yet. Run Link Check to scan every approved resource URL.
+            </p>
+          )}
         </section>
-      )}
 
       <div className="admin-ops-export__cards">
         <article className="card admin-ops-export-card hoverable">
