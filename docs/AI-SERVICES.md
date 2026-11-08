@@ -281,7 +281,7 @@ runs emit:
   `get_existing_resources`), `scouting` (a scout started), `verifying`
   (`check_duplicate`), `saving` (`save_discovery`), `finishing` (always last;
   `outcome` is the terminal status: `completed`, `cancelled`,
-  `budget_stopped` or `failed`). Phases repeat as the orchestrator moves
+  `budget_stopped`, `turn_stopped` or `failed`). Phases repeat as the orchestrator moves
   between gaps; an event is emitted only on change.
 - `scout_end.status` ∈ `completed`, `failed`, `aborted` (still running when
   the run stopped). Every `scout_start` gets exactly one `scout_end`.
