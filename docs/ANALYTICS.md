@@ -594,8 +594,7 @@ consent needed, because only counts are kept: `traffic_hourly` holds
 `hour × template × class × status_class → count`. No IP, path or user agent is
 stored. Class is `human`, `bot-search`, `bot-ai`, `bot-other` or `qa`. A request
 with an `X-Audit-Run` header, or a user agent containing `awesome-audit`, is
-`qa`: the prod-check harness sets the header on its HTTP client and browser
-contexts, and agent-browser runs should send it too
+`qa`: agent-browser runs should send it
 (`agent-browser set headers '{"X-Audit-Run":"<lane>"}'`).
 
 The server flushes deltas every 5 minutes and on SIGTERM; a failed flush keeps

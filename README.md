@@ -161,7 +161,6 @@ Dead links are handled as data, not as bugs. Three checks share one policy.
 
   Timeouts and 401/403/429 responses never trigger a change. Hiding needs scans spread over 20 hours, so an interval below 10 hours still waits that long before it hides anything. With `LINK_HEALTH_REMEDIATION=plan` (default) the plan is only shown; `apply` applies it after every scan. Nothing is deleted, and every change is written to the resource audit log with its previous value.
 - **Enrichment.** Each enriched resource stores the same verdict in `metadata.linkCheck`.
-- **CI.** `.github/workflows/link-check.yml` runs awesome_bot 1.20.0 nightly over every production URL (report and artifact only) and on pull requests over changed Markdown (fails on dead links). Known false positives go in `scripts/awesome-bot-allowlist.txt`.
 
 The admin panel's Link Health tab shows the schedule, the plan, an **Apply** button, and a per-link **Link is fine** override that can be undone from the same card. `GET /api/link-health/summary` reports when links were last checked. A failed scan is retried after an hour; a scan no instance finished is marked failed after 90 minutes.
 
