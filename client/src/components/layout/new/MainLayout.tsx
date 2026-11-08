@@ -106,7 +106,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   // still represent a new route for the global palette's lifecycle.
   const search = useSearch();
   const isAdmin = /^\/admin(?:\/|$)/.test(location);
-  const isAuth = /^\/(?:sign-in|sign-up)(?:\/|$)/.test(location);
+  const isAuth = /^\/(?:sign-in|sign-up|logout)(?:\/|$)/.test(location);
   const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory|tag)\//.test(location);
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: publicConfig } = useContactConfig(true);
