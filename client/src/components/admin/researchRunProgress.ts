@@ -11,7 +11,7 @@ import { isActiveJobStatus } from "./researchDisplay";
 export const TIMELINE_STEPS = ["planning", "scouting", "verifying", "saving", "done"] as const;
 export type TimelineStep = (typeof TIMELINE_STEPS)[number];
 
-export type RunOutcome = "completed" | "budget_stopped" | "cancelled" | "failed";
+export type RunOutcome = "completed" | "budget_stopped" | "turn_stopped" | "cancelled" | "failed";
 
 export const STEP_LABEL: Record<TimelineStep, string> = {
   planning: "Planning",
@@ -24,6 +24,7 @@ export const STEP_LABEL: Record<TimelineStep, string> = {
 export const OUTCOME_LABEL: Record<RunOutcome, string> = {
   completed: "Done",
   budget_stopped: "Stopped at budget",
+  turn_stopped: "Stopped at turn cap",
   cancelled: "Cancelled",
   failed: "Failed",
 };
@@ -52,7 +53,7 @@ export interface RunProgress {
   scouts: ScoutActivity[];
 }
 
-const RUN_OUTCOMES: readonly string[] = ["completed", "budget_stopped", "cancelled", "failed"];
+const RUN_OUTCOMES: readonly string[] = ["completed", "budget_stopped", "turn_stopped", "cancelled", "failed"];
 
 function asOutcome(value: unknown): RunOutcome | null {
   return typeof value === "string" && RUN_OUTCOMES.includes(value) ? (value as RunOutcome) : null;

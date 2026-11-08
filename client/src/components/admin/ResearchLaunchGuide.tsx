@@ -37,7 +37,7 @@ interface ResearchLaunchGuideProps {
   onFollow: (jobId: number) => void;
   onLaunched: (jobId: number) => void;
   costRange: { min: number; max: number } | null;
-  /** The cheapest completed or budget-stopped run that saved a discovery, over the whole history. */
+  /** The cheapest completed, budget-stopped or turn-stopped run that saved a discovery, over the whole history. */
   cheapestSavingRun: CheapestSavingRun | null;
   catalogSize: number | null;
 }

@@ -156,6 +156,7 @@
 }
 
 .research-run__step--budget_stopped.research-run__step--current,
+.research-run__step--turn_stopped.research-run__step--current,
 .research-run__step--cancelled.research-run__step--current {
   border-top-color: var(--status-warn);
 }
@@ -312,6 +313,7 @@
   }
 
   .research-run__step--budget_stopped.research-run__step--current,
+  .research-run__step--turn_stopped.research-run__step--current,
   .research-run__step--cancelled.research-run__step--current {
     border-left-color: var(--status-warn);
   }

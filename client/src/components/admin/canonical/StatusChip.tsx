@@ -23,6 +23,7 @@ const STATUS_TONES: Record<string, StatusTone> = {
   active: "warn",
   degraded: "warn",
   budget_stopped: "warn",
+  turn_stopped: "warn",
   bad: "bad",
   failed: "bad",
   error: "bad",

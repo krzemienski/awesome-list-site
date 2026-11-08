@@ -13,7 +13,7 @@ import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../githu
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
-import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError, isBudgetCapStop, isTurnCapStop, BUDGET_STOPPED_STATUS, TURN_STOPPED_STATUS } from './runAgentQuery';
 import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { defaultEnrichmentModel, resolveModel, type AgentRunConfig } from './agentRuntime';
 import type { EnrichmentJob, EnrichmentQueueItem } from '@shared/schema';
@@ -370,14 +370,15 @@ export class EnrichmentService {
       // give it a distinct status so admins can tell "spent its allowance"
       // from "broke".
       const budgetStop = isBudgetCapStop(error);
-      const status = finishedAllWork ? 'completed' : budgetStop ? BUDGET_STOPPED_STATUS : 'failed';
+      const turnStop = isTurnCapStop(error);
+      const status = finishedAllWork ? 'completed' : budgetStop ? BUDGET_STOPPED_STATUS : turnStop ? TURN_STOPPED_STATUS : 'failed';
       await this.enrichmentRepo.updateEnrichmentJob(jobId, {
         ...(reclaimed ? {} : { status, errorMessage: error.message, completedAt: new Date() }),
         metadata: this.buildJobMetadata(cur, cur?.model || defaultEnrichmentModel(), totals, agentLog),
       });
       await this.enrichmentRepo.closeOutQueue(
         jobId,
-        budgetStop ? 'Not processed: the job stopped at its budget cap' : 'Not processed: the job failed',
+        budgetStop ? 'Not processed: the job stopped at its budget cap' : turnStop ? 'Not processed: the job stopped at its turn cap' : 'Not processed: the job failed',
       );
       logger[status === 'failed' ? 'error' : 'warn']('Enrichment job ended with an error', {
         jobId,
@@ -721,6 +722,15 @@ ${taxonomyHint}`;
       ) as Error & { agentSubtype?: string; agentTerminalReason?: string };
       stop.agentSubtype = 'error_max_budget_usd';
       if (result.terminalReason) stop.agentTerminalReason = result.terminalReason;
+      throw stop;
+    }
+    // Same for a returned turn-cap result: re-running the unsubmitted items
+    // would pay again, so stop the job and record turn_stopped.
+    if (!result.aborted && submitted < items && isTurnCapStop(result)) {
+      const stop = new Error(
+        `Reached maximum number of turns (${maxTurns}) for an enrichment batch with ${submitted}/${items} enriched`,
+      ) as Error & { agentSubtype?: string };
+      stop.agentSubtype = 'error_max_turns';
       throw stop;
     }
   }
