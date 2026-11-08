@@ -228,6 +228,22 @@ export class EnrichmentRepository {
   }
 
   /**
+   * Worker status write that lands only while the row is still pending or
+   * processing. A run reclaimed as orphaned (or cancelled from another
+   * instance) has a terminal verdict already; a late worker write must not
+   * resurrect it as 'processing' or overwrite it with 'completed'. Returns
+   * the updated row, or undefined when the write did not land.
+   */
+  async updateEnrichmentJobIfActive(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob | undefined> {
+    const [job] = await db
+      .update(enrichmentJobs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(enrichmentJobs.id, id), inArray(enrichmentJobs.status, ['pending', 'processing'])))
+      .returning();
+    return job;
+  }
+
+  /**
    * BUG-047 (run25): initialize an admitted job (totals/token fields) and
    * enqueue its resources in ONE transaction, so a mid-initialization failure
    * can never leave a half-enqueued job. Queue rows are batch-inserted in
