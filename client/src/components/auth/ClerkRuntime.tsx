@@ -84,6 +84,17 @@ function ClerkBridgePublisher() {
         await clerk.signOut(() => {});
       },
       openUserProfile: () => clerk.openUserProfile(),
+      sendEmailCode: async () => {
+        const address = clerk.user?.primaryEmailAddress;
+        if (!address) throw new Error("This account has no email address to verify.");
+        await address.prepareVerification({ strategy: "email_code" });
+      },
+      confirmEmailCode: async (code) => {
+        const address = clerk.user?.primaryEmailAddress;
+        if (!address) throw new Error("This account has no email address to verify.");
+        const attempt = await address.attemptVerification({ code });
+        if (attempt.verification.status !== "verified") throw new Error("That code didn’t verify your email.");
+      },
     }),
     [clerk],
   );

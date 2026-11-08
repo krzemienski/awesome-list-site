@@ -32,6 +32,10 @@ export interface BridgedClerk {
   /** End the local Clerk session without Clerk's own after-sign-out navigation. */
   signOut: () => Promise<void>;
   openUserProfile: () => void;
+  /** Email the signed-in user a code that verifies their primary email address. */
+  sendEmailCode: () => Promise<void>;
+  /** Verify the primary email address with the emailed code; throws if Clerk rejects it. */
+  confirmEmailCode: (code: string) => Promise<void>;
 }
 
 interface ClerkBridgeSnapshot {
