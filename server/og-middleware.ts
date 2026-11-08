@@ -181,6 +181,25 @@ function isRetryableSaturationFailure(error: unknown): boolean {
   );
 }
 
+// A real browser navigation, as opposed to a crawler or a script: browsers send
+// both headers on every top-level page load, and crawlers that fetch plain
+// HTML do not send Sec-Fetch-Mode.
+function isBrowserNavigation(req: Request): boolean {
+  return (
+    String(req.headers.accept ?? "").includes("text/html") &&
+    String(req.headers["sec-fetch-mode"] ?? "").toLowerCase() === "navigate"
+  );
+}
+
+/** Short label for why a route resolution was shed, for the "shed" log line. */
+function shedReason(error: unknown): string {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (message.includes("uncached route resolution capacity")) return "route-gate";
+  if (message.includes("rebuild capacity")) return "cache-cap";
+  if (message.includes("aborted")) return "aborted";
+  return "dependency";
+}
+
 function routeResolutionAbortedError(): ServiceUnavailableError {
   return new ServiceUnavailableError("Route resolution request was aborted");
 }
@@ -2531,8 +2550,8 @@ export function ogInjectionMiddleware() {
     let notFound = false;
     let gone = false;
     // Task 592 V20: set when route resolution hit a bounded dependency failure
-    // on a browser navigation — the SPA shell is still served (with HTTP 503 +
-    // Retry-After) so the client can render its own error card and Retry.
+    // for a non-navigation HTML client — the SPA shell is still served (with
+    // HTTP 503 + Retry-After) so the client can render its own error card.
     let dependencyUnavailable = false;
     let bodyHtml: string | undefined;
     // Route-chunk hints for pages main.tsx renders only once their chunk is in.
@@ -2567,27 +2586,39 @@ export function ogInjectionMiddleware() {
         if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
           if (e instanceof ServiceUnavailableError) res.locals.shed = true;
+          res.locals.shedReason = shedReason(e);
           logger.warn(
             "[og-middleware] bounded dependency failure for",
             urlPath,
             String((e as any)?.message ?? e),
           );
-          // Task 592 V20: a browser navigation (Accept: text/html) used to get
-          // a raw JSON body here, so a visitor saw `{"message":…}` instead of
-          // the app's catalog error card + Retry. Browsers now get the SPA
-          // shell with the same 503 + Retry-After (crawlers treat 5xx as
-          // transient and ignore the body); non-HTML clients — including the
-          // cheap cache-admission rejection probed by the resilience gate —
-          // keep the generic JSON body.
+          // Task 592 V20: an HTML client used to get a raw JSON body here, so
+          // a visitor saw `{"message":…}` instead of the app's catalog error
+          // card + Retry. HTML clients now get the SPA shell: a real browser
+          // navigation with 200 (#336), anything else with 503 + Retry-After
+          // (crawlers treat 5xx as transient and ignore the body). Non-HTML
+          // clients — including the cheap cache-admission rejection probed by
+          // the resilience gate — keep the generic JSON 503.
           if (!String(req.headers.accept ?? "").includes("text/html")) {
             return res
               .status(503)
               .set("Retry-After", "1")
               .json({ message: "Service is temporarily unavailable" });
           }
-          dependencyUnavailable = true;
           meta = defaultMeta(urlPath);
           notFound = false;
+          if (isBrowserNavigation(req)) {
+            // A real visitor is never answered with a 5xx for our own capacity
+            // limit: the shell boots the SPA, which fetches its own data. The
+            // degraded shell carries a generic title and no prerender, so it is
+            // noindex and (like every buffered document) no-store. Flagging it
+            // shed keeps it visible: index.ts logs a "shed" line with the
+            // client class and reason even though the status is no longer 5xx.
+            res.locals.shed = true;
+            meta.noindex = true;
+          } else {
+            dependencyUnavailable = true;
+          }
         } else {
           logger.warn("[og-middleware] meta lookup failed for", urlPath, e);
           // Fail open: never demote a real page to 404 on a transient lookup error.

@@ -388,6 +388,9 @@ export function logHttpRequest(entry: {
   userId?: string | number;
   /** An intentional 503 from ServiceUnavailableError (load shedding): WARN, one signature. */
   shed?: boolean;
+  /** Shed lines only: the caller's client class (never the user-agent) and why it was shed. */
+  clientClass?: string;
+  shedReason?: string;
 }): void {
   const level: LogLevel =
     entry.shed ? "warn" : entry.status >= 500 ? "error" : entry.status >= 400 && entry.status !== 401 ? "warn" : "info";
@@ -396,6 +399,8 @@ export function logHttpRequest(entry: {
   if (entry.userId !== undefined) details.user = entry.userId;
   if (entry.id) details.rid = entry.id;
   if (entry.shed) {
+    if (entry.clientClass) details.class = entry.clientClass;
+    if (entry.shedReason) details.reason = entry.shedReason;
     emit(level, "http", ["shed", { ...details, req: `${entry.method} ${scrubPath(entry.path)}` }], { requestContext: false });
     return;
   }
