@@ -36,17 +36,21 @@ export interface ScheduledBackupResult {
 }
 
 /** Where a run is, so a failure names the step that threw. "dump" covers createDatabaseBackup (dump and storage upload). */
-type BackupStage = "lock-connect" | "lock-query" | "list" | "dump" | "audit" | "prune";
+type BackupStage = "lock-connect" | "lock-query" | "list" | "dump";
 
 interface BackupRun {
   stage: BackupStage;
   readonly startedAt: number;
 }
 
-/** The single structured line every run ends with (failures are logged by the catch in runScheduledBackupIfDue). */
-function logOutcome(run: BackupRun, stage: string, fields: Record<string, unknown>): void {
-  logger.info("Scheduled backup outcome", { stage, durationMs: Date.now() - run.startedAt, ...fields });
+/** The single structured line a backing-up run ends with (failures are logged by the catch in runScheduledBackupIfDue). */
+function logOutcome(run: BackupRun, level: "info" | "warn", fields: Record<string, unknown>): void {
+  logger[level]("Scheduled backup outcome", { durationMs: Date.now() - run.startedAt, ...fields });
 }
+
+// The scheduler ticks every 30 min and a misconfigured instance would skip on every tick: log each config skip once per process.
+let loggedStorageNotConfigured = false;
+let loggedDatabaseUrlNotSet = false;
 
 /** Backups to delete: older than KEEP_DAYS and not among the newest KEEP_NEWEST. `backups` is newest first. */
 function expiredBackups(backups: BackupManifest[], now: number): BackupManifest[] {
@@ -75,7 +79,8 @@ async function pruneBackups(): Promise<number> {
   return expired.length;
 }
 
-async function recordAudit(manifest: BackupManifest): Promise<void> {
+/** Returns the failure message instead of throwing or logging: the run's single outcome line carries it. */
+async function recordAudit(manifest: BackupManifest): Promise<string | undefined> {
   try {
     await new AuditRepository().logResourceAudit(
       null,
@@ -92,21 +97,20 @@ async function recordAudit(manifest: BackupManifest): Promise<void> {
       },
       `Scheduled full database backup (${manifest.coverage.tables.length} tables, ${manifest.coverage.totalRows} rows) into private storage`,
     );
+    return undefined;
   } catch (error) {
-    logger.error("Scheduled backup audit row failed", error, { backupId: manifest.id, errorClass: errorClass(error) });
+    return errorMessage(error);
   }
 }
 
 const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
   run.stage = "list";
   const { backups } = await listDatabaseBackupsDetailed();
   const newest = Math.max(0, ...withValidDates(backups).map((b) => Date.parse(b.completedAt)));
-  if (Date.now() - newest < DUE_AFTER_MS) {
-    logOutcome(run, "skipped", { reason: "not-due" });
-    return { status: "skipped" };
-  }
+  if (Date.now() - newest < DUE_AFTER_MS) return { status: "skipped" };
 
   let manifest: BackupManifest;
   run.stage = "dump";
@@ -115,29 +119,29 @@ async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
   } catch (error) {
     const busy = error instanceof ServiceUnavailableError || (error instanceof DatabaseBackupError && error.status === 409);
     if (busy) {
-      logOutcome(run, "dump", { outcome: "locked", reason: "backup-already-running" });
+      logOutcome(run, "info", { outcome: "locked", reason: "backup-already-running" });
       return { status: "locked" };
     }
     throw error;
   }
-  run.stage = "audit";
-  await recordAudit(manifest);
-  run.stage = "prune";
+  const auditError = await recordAudit(manifest);
   let pruned = 0;
+  let pruneError: string | undefined;
   try {
     pruned = await pruneBackups();
-    if (pruned > 0) logger.info("Pruned expired backups", { pruned });
   } catch (error) {
     // The new backup exists; a failed prune only delays cleanup to the next run.
-    logger.error("Backup prune failed", error, { stage: "prune", errorClass: errorClass(error) });
+    pruneError = errorMessage(error);
   }
-  logOutcome(run, "done", {
-    outcome: "created",
+  logOutcome(run, pruneError || auditError ? "warn" : "info", {
+    outcome: "done",
     backupId: manifest.id,
     bytes: manifest.dump.bytes,
     tables: manifest.coverage.tables.length,
     rows: manifest.coverage.totalRows,
     pruned,
+    ...(pruneError && { pruneError }),
+    ...(auditError && { auditError }),
   });
   return { status: "created", id: manifest.id };
 }
@@ -146,7 +150,13 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
   const run: BackupRun = { stage: "lock-connect", startedAt: Date.now() };
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl || !isBackupStorageConfigured()) {
-    logOutcome(run, "skipped", { outcome: "skipped", reason: databaseUrl ? "storage-not-configured" : "database-url-not-set" });
+    if (databaseUrl && !loggedStorageNotConfigured) {
+      loggedStorageNotConfigured = true;
+      logOutcome(run, "info", { outcome: "skipped", reason: "storage-not-configured" });
+    } else if (!databaseUrl && !loggedDatabaseUrlNotSet) {
+      loggedDatabaseUrlNotSet = true;
+      logOutcome(run, "info", { outcome: "skipped", reason: "database-url-not-set" });
+    }
     return { status: "skipped" };
   }
 
@@ -162,7 +172,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
       [...BACKUP_LOCK],
     );
     if (!rows[0].locked) {
-      logOutcome(run, "lock-query", { outcome: "locked", reason: "advisory-lock-held-by-another-instance" });
+      logOutcome(run, "info", { outcome: "locked", reason: "advisory-lock-held-by-another-instance" });
       return { status: "locked" };
     }
     try {
