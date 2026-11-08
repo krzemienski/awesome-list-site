@@ -222,22 +222,22 @@ async function runPeriodicSweep(): Promise<OrphanSweepResult> {
     return await sweep();
   } catch (err) {
     if (!isConnectionTimeout(err)) throw err;
+    const atTimeout = poolState();
     await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    let result: OrphanSweepResult;
     try {
-      const result = await sweep();
-      logger.warn('Orphan watchdog periodic sweep hit a connect timeout; the retry succeeded', poolState());
-      return result;
+      result = await sweep();
     } catch (retryErr) {
-      throw new SweepRetryFailedError(retryErr);
+      if (typeof retryErr === 'object' && retryErr !== null) retryFailures.add(retryErr);
+      throw retryErr;
     }
+    logger.warn('Orphan watchdog periodic sweep hit a connect timeout; the retry succeeded', atTimeout);
+    return result;
   }
 }
 
-class SweepRetryFailedError extends Error {
-  constructor(cause: unknown) {
-    super('Orphan watchdog sweep retry failed after a connect timeout', { cause });
-  }
-}
+/** Errors thrown by the retry: the failure log marks them retried without wrapping, so the pg error stays readable. */
+const retryFailures = new WeakSet<object>();
 
 function poolState() {
   return { poolTotal: pool.totalCount, poolIdle: pool.idleCount, poolWaiting: pool.waitingCount };
@@ -247,7 +247,7 @@ function reportSweepFailure(err: unknown): void {
   consecutiveFailures += 1;
   const details = {
     consecutiveFailures,
-    retried: err instanceof SweepRetryFailedError,
+    retried: typeof err === 'object' && err !== null && retryFailures.has(err),
     ...poolState(),
   };
   const message = 'Orphan watchdog periodic sweep failed (non-fatal):';
