@@ -805,7 +805,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           }
           // error_max_* results carry is_error true but are normal cap stops: the
           // SDK throws right after yielding them and the catch below absorbs it.
-          terminalSdkError = msg.is_error === true && !isNativeCapSubtype(msg.subtype);
+          terminalSdkError = msg.is_error === true && !isNativeCapSubtype(result.subtype);
           sawResultMessage = true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.costBasis = "reported";
@@ -813,9 +813,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           result.tokensOut = msg.usage?.output_tokens ?? 0;
           // The SDK counts the turn it refused to start when it stops at the cap
           // (num_turns = cap + 1); the run never completed more than the cap.
-          result.numTurns = msg.subtype === "error_max_turns" && maxTurns != null
-            ? Math.min(msg.num_turns ?? 0, maxTurns)
-            : msg.num_turns ?? 0;
+          const reportedTurns: number = msg.num_turns ?? 0;
+          result.numTurns = isTurnCapStop(result) && maxTurns != null ? Math.min(reportedTurns, maxTurns) : reportedTurns;
           result.durationMs = msg.duration_ms ?? 0;
           result.resultText = typeof msg.result === "string" ? msg.result : "";
           result.ok = msg.subtype === "success" && msg.is_error !== true;
