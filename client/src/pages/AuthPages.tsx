@@ -91,6 +91,16 @@ export function SignInPage() {
 }
 
 export function SignUpPage() {
+  // Same URL hygiene as SignInPage: drop unsafe redirect_url values before
+  // Clerk reads them, and again whenever the URL changes in-app.
+  const [location] = useLocation();
+  const search = useSearch();
+  const [urlReady, setUrlReady] = useState(false);
+  useLayoutEffect(() => {
+    sanitizeRedirectParam();
+    setUrlReady(true);
+  }, [location, search]);
+  if (!urlReady) return null;
   return (
     <div
       // F009: the Clerk card's Continue button used to sit under the fixed

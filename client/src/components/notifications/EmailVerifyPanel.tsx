@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,12 +10,26 @@ function clerkErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong. Please try again.";
 }
 
+const RESEND_COOLDOWN_SECONDS = 30;
+
 /** Verifies the member's email in place: Clerk emails a code, the member types it here. */
 export default function EmailVerifyPanel({ onVerified }: { onVerified: () => void }) {
   const [step, setStep] = useState<"start" | "code">("start");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [cooldown, setCooldown] = useState(0);
+  const codeInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((seconds) => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+  useEffect(() => {
+    if (step === "code") codeInput.current?.focus();
+  }, [step]);
 
   const run = (action: () => Promise<void>) => {
     if (busy) return;
@@ -28,8 +42,11 @@ export default function EmailVerifyPanel({ onVerified }: { onVerified: () => voi
   const sendCode = () => run(async () => {
     await (await whenClerkLoaded()).sendEmailCode();
     setStep("code");
+    setCooldown(RESEND_COOLDOWN_SECONDS);
   });
-  const confirmCode = () => { if (code.trim().length >= 6) run(async () => {
+  const confirmCode = (event?: { preventDefault: () => void }) => {
+    event?.preventDefault();
+    if (code.trim().length >= 6) run(async () => {
     await (await whenClerkLoaded()).confirmEmailCode(code.trim());
     onVerified();
   }); };
@@ -41,10 +58,12 @@ export default function EmailVerifyPanel({ onVerified }: { onVerified: () => voi
         Email digests need a verified email address. {step === "start" ? "We’ll email you a 6-digit code." : "We emailed you a 6-digit code."}
       </p>
       {step === "code" ? (
+        <form onSubmit={confirmCode} className="space-y-3">
         <div>
           <Label htmlFor="digest-verify-code">Verification code</Label>
           <input
             id="digest-verify-code"
+            ref={codeInput}
             value={code}
             onChange={(e) => setCode(e.target.value)}
             inputMode="numeric"
@@ -53,17 +72,14 @@ export default function EmailVerifyPanel({ onVerified }: { onVerified: () => voi
             className="mt-2 min-h-[44px] w-full max-w-[12rem] rounded-md border border-input bg-[var(--surface)] px-3 font-mono text-sm tracking-widest"
           />
         </div>
-      ) : null}
-      <div className="flex flex-wrap gap-2">
-        {step === "start" ? (
-          <Button className="min-h-[44px]" onClick={sendCode} aria-disabled={busy} aria-busy={busy}>{busy ? "Sending…" : "Verify email"}</Button>
-        ) : (
-          <>
-            <Button className="min-h-[44px]" onClick={confirmCode} aria-disabled={busy || code.trim().length < 6} aria-busy={busy}>{busy ? "Checking…" : "Confirm code"}</Button>
-            <Button variant="ghost" className="min-h-[44px]" onClick={sendCode} aria-disabled={busy}>Send a new code</Button>
-          </>
-        )}
-      </div>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" className="min-h-[44px]" aria-disabled={busy || code.trim().length < 6} aria-busy={busy}>{busy ? "Checking…" : "Confirm code"}</Button>
+          <Button type="button" variant="ghost" className="min-h-[44px]" onClick={() => { if (cooldown === 0) sendCode(); }} aria-disabled={busy || cooldown > 0}>{cooldown > 0 ? `Send a new code (${cooldown}s)` : "Send a new code"}</Button>
+        </div>
+        </form>
+      ) : (
+        <Button className="min-h-[44px]" onClick={sendCode} aria-disabled={busy} aria-busy={busy}>{busy ? "Sending…" : "Verify email"}</Button>
+      )}
       {error ? <p className="text-destructive" role="alert">{error}</p> : null}
     </div>
   );
