@@ -562,9 +562,10 @@ app.use((req, res, next) => {
       if ((req.method === "GET" || req.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path)) {
         recordDocumentRequest(documentTemplate(path), clientClass(req.get("user-agent"), req.get("x-audit-run")), res.statusCode);
       }
-      // Page documents are logged only when they fail (404 / 5xx), so missing
-      // pages are visible in the logs without logging every page view.
-      if (res.statusCode >= 400) {
+      // Page documents are logged only when they fail (404 / 5xx) or were shed
+      // (a shed browser navigation is answered 200), so missing pages and
+      // saturation are visible in the logs without logging every page view.
+      if (res.statusCode >= 400 || res.locals.shed === true) {
         logHttpRequest({
           id: res.locals.requestId,
           method: req.method,
@@ -572,6 +573,8 @@ app.use((req, res, next) => {
           status: res.statusCode,
           durationMs: duration,
           shed: res.locals.shed === true,
+          clientClass: clientClass(req.get("user-agent"), req.get("x-audit-run")),
+          shedReason: res.locals.shedReason as string | undefined,
         });
       }
     }
