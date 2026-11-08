@@ -91,6 +91,8 @@ import { stripInternalResourceFields } from "./lib/publicResource";
 import { CollectionRepository } from "./repositories/CollectionRepository";
 import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 import { getPublicCacheValue } from "./cache/publicCache";
+import { resolveDuplicateTarget } from "./lib/duplicateTarget";
+import { UNCACHED_CATALOG_CACHE_CONTROL } from "./http-cache-policy";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { loadHomeNav } from "./home-ssr-data";
@@ -290,6 +292,8 @@ interface ResolvedRoute {
   found: boolean;
   /** true → the entity existed publicly and was removed → HTTP 410 instead of 404. */
   gone?: boolean;
+  /** Set → the entity is an archived duplicate: 301 here instead of 410. */
+  redirectTo?: string;
   /**
    * Prerendered semantic body HTML for the SPA shell (Task #80), injected into
    * `<!--app-html-->` so non-JS crawlers see real content. Absent for
@@ -1656,6 +1660,14 @@ function homeShellChrome(): string {
     if (idNum !== null) {
       try {
         const resource = await storage.getResource(idNum);
+        // An archived duplicate with a documented kept row 301s to it (the
+        // target is cached with the route, not the archived row's meta).
+        if (resource?.status === "archived") {
+          const keptId = await resolveDuplicateTarget(resource, (id) => storage.getResource(id));
+          if (keptId !== null) {
+            return { meta: notFoundMeta(path), found: false, redirectTo: `/resource/${keptId}` };
+          }
+        }
         // B10: an archived resource was public and then removed, so it answers
         // 410 Gone; rejected rows were never public and stay a plain 404.
         gone = resource?.status === "archived";
@@ -2575,6 +2587,11 @@ export function ogInjectionMiddleware() {
           urlPath,
           routeResolutionAbort.signal,
         );
+        if (resolved.redirectTo) {
+          const qs = (req.originalUrl || req.url).split("?")[1];
+          res.setHeader("Cache-Control", UNCACHED_CATALOG_CACHE_CONTROL);
+          return res.redirect(301, resolved.redirectTo + (qs ? `?${qs}` : ""));
+        }
         meta = resolved.meta;
         notFound = !resolved.found;
         gone = resolved.gone === true;

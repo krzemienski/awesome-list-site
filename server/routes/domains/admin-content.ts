@@ -58,6 +58,7 @@ import { z } from "zod";
 import { adminResourceWriteSchema } from "@shared/schema";
 import { resourceKindSchema } from "@shared/resourceKinds";
 import { classifyKindForStorage } from "../../lib/resourceKinds";
+import { resolveDuplicateTarget } from "../../lib/duplicateTarget";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
@@ -726,7 +727,34 @@ export function registerAdminContentRoutes(
         }
       }
 
+      // Archive-as-duplicate: duplicateOf names the approved row this one
+      // duplicates and is only valid on an archived row. Leaving archived
+      // clears a stale pointer, so a restored row never redirects.
+      const nextStatus = validatedData.status ?? resource.status;
+      let nextDuplicateOf = validatedData.duplicateOf;
+      if (nextDuplicateOf != null) {
+        if (nextStatus !== 'archived') {
+          return res.status(400).json({ message: 'duplicateOf can only be set on an archived resource' });
+        }
+        const target = await resourceRepo.getResource(nextDuplicateOf);
+        if (nextDuplicateOf === resourceId || !target) {
+          return res.status(400).json({ message: 'duplicateOf must name a different, existing resource' });
+        }
+        const keptId = await resolveDuplicateTarget(
+          { id: resourceId, status: 'archived', duplicateOf: nextDuplicateOf },
+          (rid) => resourceRepo.getResource(rid),
+        );
+        if (keptId === null) {
+          return res.status(400).json({ message: 'duplicateOf must lead to an approved resource without looping back' });
+        }
+      } else if (nextDuplicateOf === undefined && nextStatus !== 'archived') {
+        nextDuplicateOf = null;
+      }
+
       const updateData: Record<string, any> = {};
+      if (nextDuplicateOf !== undefined && nextDuplicateOf !== resource.duplicateOf) {
+        updateData.duplicateOf = nextDuplicateOf;
+      }
       
       if (validatedData.title !== undefined) updateData.title = validatedData.title;
       if (validatedData.url !== undefined) updateData.url = validatedData.url;

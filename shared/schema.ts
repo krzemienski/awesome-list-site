@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType, check, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType, check, foreignKey, type AnyPgColumn } from "drizzle-orm/pg-core";
 
 /**
  * Postgres tsvector column type for full-text search (BUG-018).
@@ -313,6 +313,10 @@ export const resources = pgTable(
     // Durable lifecycle timestamp for contributor-facing status changes. This
     // is separate from updatedAt, which also changes for ordinary catalog edits.
     statusChangedAt: timestamp("status_changed_at"),
+    // Archived duplicate -> the resource it duplicates (migrations/0061).
+    // /resource/:id and GET /api/resources/:id answer 301 to the kept row when
+    // this is set; an archived row without it keeps answering 410/404.
+    duplicateOf: integer("duplicate_of").references((): AnyPgColumn => resources.id, { onDelete: "set null" }),
     githubSynced: boolean("github_synced").default(false),
     lastSyncedAt: timestamp("last_synced_at"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
@@ -385,6 +389,8 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
 const adminOnlyResourceFieldsSchema = z.object({
   // Nullable on purpose: null means "no stored kind, resolve at read time".
   kind: resourceKindSchema.nullable().optional(),
+  // Set when archiving a row as a duplicate of an approved one (null clears it).
+  duplicateOf: z.number().int().positive().nullable().optional(),
 });
 /** Repository-level write shape (superset: admin-only columns are optional). */
 export type InsertResource = z.infer<typeof adminResourceWriteSchema>;
