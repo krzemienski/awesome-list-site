@@ -326,8 +326,8 @@ exactly as before. The rules live in
   deleting the key. A value set by hand (no app flag beside it) is never
   changed or removed. The boot script in `client/index.html` applies the same
   rule before the tracker evaluates (set only when absent, never remove), so a
-  returning decliner is covered from the first beacon. Before any choice,
-  Replit counts page views by design.
+  returning decliner is covered from the first beacon. Before any choice and
+  after Allow, Replit counts page views by design.
 - **Residual gaps.**
   - The first page of a device that has never had the marker is, by
     definition, not yet an admin session.

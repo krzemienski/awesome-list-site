@@ -225,8 +225,8 @@
           var declined = legacyConsent === 'denied' ||
             (legacyConsent !== 'granted' && /(?:^|;\s*)analytics-consent=denied(?:;|$)/.test(document.cookie));
           if (declined && localStorage.getItem('umami.disabled') === null) {
-            localStorage.setItem('umami.disabled', '1');
             localStorage.setItem('analytics-umami-disabled-by-app', '1');
+            localStorage.setItem('umami.disabled', '1');
           }
         } catch (_) {}
       })();

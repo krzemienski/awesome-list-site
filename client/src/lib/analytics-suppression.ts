@@ -90,8 +90,9 @@ export const syncReplitPageviewOptOut = () => {
   const setByApp = read(UMAMI_SET_BY_APP_KEY) === '1';
   if (isAnalyticsSuppressed() || hasDeclinedAnalytics()) {
     if (read(UMAMI_DISABLED_KEY) === null) {
-      write(UMAMI_DISABLED_KEY, '1');
+      // Marker first: a flag without its marker could never be removed again.
       write(UMAMI_SET_BY_APP_KEY, '1');
+      write(UMAMI_DISABLED_KEY, '1');
     }
   } else if (setByApp) {
     write(UMAMI_DISABLED_KEY, null);
