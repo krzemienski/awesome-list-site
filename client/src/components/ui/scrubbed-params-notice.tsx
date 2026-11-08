@@ -20,8 +20,13 @@ declare global {
  * Renders once per full page load (the scrubber only runs on document boot,
  * never on SPA navigations) and is dismissible.
  */
+// The scrubbed params belong to the page load, not to one mount: the layout
+// remounts its content column on sidebar/full-width switches, and a dismissed
+// notice must stay dismissed for the rest of the load.
+let dismissedThisLoad = false;
+
 export default function ScrubbedParamsNotice() {
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(dismissedThisLoad);
   const scrubbed =
     typeof window !== "undefined" ? window.__scrubbedParams : undefined;
 
@@ -45,6 +50,7 @@ export default function ScrubbedParamsNotice() {
         className="inline-flex min-h-8 max-lg:min-h-11 items-center gap-1 underline underline-offset-2"
         onClick={(e) => {
           handoffFocusOnUnmount(e.currentTarget);
+          dismissedThisLoad = true;
           setDismissed(true);
         }}
         data-testid="button-dismiss-scrubbed-params"
