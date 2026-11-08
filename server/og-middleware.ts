@@ -159,10 +159,9 @@ function rethrowBoundedDependencyFailure(error: unknown): void {
 }
 
 // Crawler-burst saturation — pool acquire-queue timeout (connectionTimeoutMillis),
-// Neon connection-slot exhaustion (SQLSTATE 53300), the public cache's
-// in-flight rebuild cap, or the uncached-resolution gate below — is transient
-// by nature: the queue drains within a few hundred ms once the burst passes.
-// One short retry converts those into
+// Neon connection-slot exhaustion (SQLSTATE 53300), or the public cache's
+// in-flight rebuild cap — is transient by nature: the queue drains within a few
+// hundred ms once the burst passes. One short retry converts those into
 // successful renders instead of 503ing real crawlers mid-burst.
 // Lock/statement timeouts (55P03/57014) and connection-loss classes are
 // deliberately EXCLUDED: during a genuine outage the first attempt already
@@ -178,9 +177,7 @@ function isRetryableSaturationFailure(error: unknown): boolean {
     // pg-pool acquire-queue timeout (pool saturated, DB itself healthy)
     message.includes("timeout exceeded when trying to connect") ||
     // publicCache MAX_IN_FLIGHT guard (rebuild burst, instant rejection)
-    message.includes("rebuild capacity is temporarily full") ||
-    // uncached-resolution gate (5 active + 32 waiting, instant rejection)
-    message.includes("uncached route resolution capacity is temporarily full")
+    message.includes("rebuild capacity is temporarily full")
   );
 }
 
