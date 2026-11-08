@@ -248,12 +248,12 @@ export class EnrichmentService {
 
     this.startProcessing(job.id).catch(error => {
       logger.error(`Error processing enrichment job ${job.id}:`, error);
-      this.enrichmentRepo.updateEnrichmentJob(job.id, {
+      this.enrichmentRepo.updateEnrichmentJobIfActive(job.id, {
         status: 'failed',
         errorMessage: error.message,
         completedAt: new Date()
       })
-        .then(() => this.enrichmentRepo.closeOutQueue(job.id, 'Not processed: the job failed'))
+        .then((landed) => landed ? this.enrichmentRepo.closeOutQueue(job.id, 'Not processed: the job failed') : undefined)
         .catch(updateError => {
           // Previously an unhandled rejection; the job row stays as it was.
           logger.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
@@ -280,16 +280,14 @@ export class EnrichmentService {
     // Liveness heartbeat: lets another instance (or this one after a restart)
     // tell a running job from an orphaned one. If the row leaves the active
     // states under us — cancelled from another instance, or reclaimed as
-    // orphaned after missed heartbeats — stop the run. A reclaimed job keeps
-    // the reclaim's 'failed' verdict instead of being overwritten below.
-    let reclaimed = false;
+    // orphaned after missed heartbeats — stop the run. The heartbeat is only
+    // the fast path: every status write below lands only while the row is
+    // still active, so a reclaimed or cancelled job keeps its verdict even if
+    // the worker has not noticed yet.
     const stopHeartbeat = startJobHeartbeat({
       label: `enrichment:${jobId}`,
       beat: () => this.enrichmentRepo.heartbeatEnrichmentJob(jobId),
-      onLost: (status) => {
-        if (status !== 'cancelled') reclaimed = true;
-        abortController.abort();
-      },
+      onLost: () => abortController.abort(),
     });
 
     try {
@@ -303,12 +301,16 @@ export class EnrichmentService {
         return;
       }
 
-      await this.enrichmentRepo.updateEnrichmentJob(jobId, {
+      const started = await this.enrichmentRepo.updateEnrichmentJobIfActive(jobId, {
         status: 'processing',
         startedAt: new Date(),
         workerId: WORKER_ID,
         heartbeatAt: new Date(),
       });
+      if (!started) {
+        this.logDiscardedResult(jobId, 'processing');
+        return;
+      }
 
       const config: AgentRunConfig = {
         model: job.model || null,
@@ -321,24 +323,24 @@ export class EnrichmentService {
       await this.processJobBatches(jobId, job.batchSize || 10, model, config, abortController, emitter, totals, agentLog);
 
       const updatedJob = await this.enrichmentRepo.getEnrichmentJob(jobId);
-      if (reclaimed || updatedJob?.status === 'failed') {
-        // Reclaimed as orphaned while we ran: record usage, keep its verdict.
-        await this.enrichmentRepo.updateEnrichmentJob(jobId, {
-          metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
-        });
-        await this.enrichmentRepo.closeOutQueue(jobId, 'Not processed: the job was orphaned by a server restart');
-        logger.warn('Enrichment job stopped', { jobId, reason: 'reclaimed as orphaned while running' });
+      const metadata = this.buildJobMetadata(updatedJob, model, totals, agentLog);
+      const cancelled = updatedJob?.status === 'cancelled' || abortController.signal.aborted;
+      const finalStatus = cancelled ? 'cancelled' : 'completed';
+      const finished = await this.enrichmentRepo.updateEnrichmentJobIfActive(jobId, {
+        status: finalStatus,
+        completedAt: new Date(),
+        metadata,
+      });
+      if (!finished) {
+        // Reclaimed or cancelled while we ran: record usage, keep its verdict.
+        // Whoever set that verdict already closed out the queue.
+        await this.enrichmentRepo.updateEnrichmentJob(jobId, { metadata });
+        this.logDiscardedResult(jobId, finalStatus);
         return;
       }
-      const cancelled = updatedJob?.status === 'cancelled' || abortController.signal.aborted;
-      await this.enrichmentRepo.updateEnrichmentJob(jobId, {
-        status: cancelled ? 'cancelled' : 'completed',
-        completedAt: new Date(),
-        metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
-      });
       logger.info('Enrichment job finished', {
         jobId,
-        status: cancelled ? 'cancelled' : 'completed',
+        status: finalStatus,
         processed: updatedJob?.processedResources ?? 0,
         succeeded: updatedJob?.successfulResources ?? 0,
         failed: updatedJob?.failedResources ?? 0,
@@ -372,10 +374,18 @@ export class EnrichmentService {
       const budgetStop = isBudgetCapStop(error);
       const turnStop = isTurnCapStop(error);
       const status = finishedAllWork ? 'completed' : budgetStop ? BUDGET_STOPPED_STATUS : turnStop ? TURN_STOPPED_STATUS : 'failed';
-      await this.enrichmentRepo.updateEnrichmentJob(jobId, {
-        ...(reclaimed ? {} : { status, errorMessage: error.message, completedAt: new Date() }),
-        metadata: this.buildJobMetadata(cur, cur?.model || defaultEnrichmentModel(), totals, agentLog),
+      const errorMetadata = this.buildJobMetadata(cur, cur?.model || defaultEnrichmentModel(), totals, agentLog);
+      const ended = await this.enrichmentRepo.updateEnrichmentJobIfActive(jobId, {
+        status,
+        errorMessage: error.message,
+        completedAt: new Date(),
+        metadata: errorMetadata,
       });
+      if (!ended) {
+        await this.enrichmentRepo.updateEnrichmentJob(jobId, { metadata: errorMetadata });
+        this.logDiscardedResult(jobId, status);
+        return;
+      }
       await this.enrichmentRepo.closeOutQueue(
         jobId,
         budgetStop ? 'Not processed: the job stopped at its budget cap' : turnStop ? 'Not processed: the job stopped at its turn cap' : 'Not processed: the job failed',
@@ -392,6 +402,10 @@ export class EnrichmentService {
       this.processingJobs.delete(jobId);
       this.activeJobs.delete(jobId);
     }
+  }
+
+  private logDiscardedResult(jobId: number, attemptedStatus: string): void {
+    logger.warn('enrichment job reclaimed or cancelled; worker result discarded', { jobId, attemptedStatus });
   }
 
   private buildJobMetadata(
