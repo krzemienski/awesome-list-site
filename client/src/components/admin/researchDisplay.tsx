@@ -57,6 +57,9 @@ export function humanizeJobError(msg: string): string {
   if (/reached maximum budget/i.test(msg)) {
     return `The run reached its budget cap and stopped. Relaunch with a higher cap to let it go further. (Technical detail: ${msg})`;
   }
+  if (/reached maximum number of turns/i.test(msg)) {
+    return `The run reached its turn cap and stopped. Relaunch with a higher cap to let it go further. (Technical detail: ${msg})`;
+  }
   if (isConfigJobError(msg)) {
     return `The AI provider rejected the request, which usually means a setting such as the model name or API key is wrong. Relaunching will fail the same way until the setting is fixed. (Technical detail: ${msg})`;
   }

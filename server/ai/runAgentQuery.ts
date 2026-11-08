@@ -803,9 +803,10 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           if (typeof (msg as any).terminal_reason === "string") {
             result.terminalReason = (msg as any).terminal_reason;
           }
-          // error_max_* results carry is_error true but are normal cap stops: the
-          // SDK throws right after yielding them and the catch below absorbs it.
-          terminalSdkError = msg.is_error === true && !isNativeCapSubtype(result.subtype);
+          // An error_max_turns result carries is_error true but is a normal turn-cap
+          // stop: the SDK throws right after yielding it and the catch below
+          // absorbs it. Budget caps keep the thrown, usage-tagged error path.
+          terminalSdkError = msg.is_error === true && result.subtype !== "error_max_turns";
           sawResultMessage = true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.costBasis = "reported";

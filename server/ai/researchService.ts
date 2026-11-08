@@ -293,8 +293,9 @@ const COST_BASIS_LABEL: Record<CostBasis, string> = {
 
 /**
  * Terminal status of a finished run. A run the SDK stopped at its USD cap is
- * budget_stopped and one stopped at its turn cap is turn_stopped (both distinct from completed or failed); reaching the discovery
- * target wins over both that and the backstop abort.
+ * budget_stopped and one stopped at its turn cap is turn_stopped (both
+ * distinct from completed or failed); reaching the discovery target wins over
+ * both that and the backstop abort.
  */
 function finalStatusOf(result: { aborted: boolean; subtype?: string; terminalReason?: string }, stoppedAtTarget: boolean): string {
   if (stoppedAtTarget) return 'completed';
@@ -1620,9 +1621,15 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // A target-stop aborts the SDK query on purpose — that is a successful
     // completion, not a cancellation.
     const stoppedAtTarget = runCtx.targetReached;
+    const outcomeLabel = result.aborted
+      ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled')
+      : stoppedAtTarget ? 'completed'
+      : isBudgetCapStop(result) ? 'stopped at budget cap'
+      : isTurnCapStop(result) ? 'stopped at turn cap'
+      : 'completed';
     await addLog(
       'system',
-      `Research ${result.aborted ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled') : (!stoppedAtTarget && isBudgetCapStop(result) ? 'stopped at budget cap' : 'completed')} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
+      `Research ${outcomeLabel} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
       `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
       `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)} (${COST_BASIS_LABEL[result.costBasis]})`,
