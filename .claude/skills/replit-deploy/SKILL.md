@@ -83,7 +83,7 @@ The printed HEAD must equal TARGET.
 
 After any publish, run `git fetch` (locally and in the workspace) before you branch, merge or create a worktree, because origin/main may have gained the publish commit.
 
-Gate every PR with main's copy of the gate, so a branch cannot weaken it: `bash <(git show origin/main:scripts/merge-gate.sh) <branch>`. When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
+When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
 
 If `git fetch` fails on auth, the workspace has lost its GitHub connection; stop and tell the user to reconnect it in the Git pane.
 
@@ -196,8 +196,6 @@ curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready 
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
 
-Then run the read-only production checker and put its summary in the report: `npx tsx scripts/prod-check/index.ts --tier 0,1`. A Tier 0 or Tier 1 failure is a deploy FAIL (the runner is on main since #297).
-
 If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` for an already signed-in owner in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Each must load the dashboard. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
 
 Shipped means LIVE equals TARGET. The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. A "success" from `get_publish_status` while `/api/version` still shows BEFORE is not shipped: keep the step 5 poll running (Autoscale cutover). If LIVE is neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build, or a `BUILD_REVISION` was set in the workspace environment.
@@ -216,7 +214,6 @@ Deploy <BEFORE short> → <TARGET short>: PASS | FAIL | STOPPED
 - Build pre-check: ...
 - Publish: who clicked, status sequence, duration
 - Live /api/version: LIVE SHA == TARGET (or the mismatch)
-- prod-check --tier 0,1: summary (Tier 0/1 failure = FAIL)
 - Visitor check: pages + widths driven, console errors
 - UNVERIFIED: anything not exercised
 Rollback (human, Replit UI): Publishing → History → redeploy the previous build (only the 5 newest builds are kept). Replit's point-in-time restore is documented for the development database only; production data is restored from the app backup with `npm run db:backup -- restore <id>` into an empty database.

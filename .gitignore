@@ -167,3 +167,6 @@ tests/parity/expected/*.repeat.png
 /docs/audit-final/proof/**/*.svg
 /docs/audit-final/proof/**/*.webm
 /docs/audit-final/proof/**/*.mp4
+
+# HAR captures can hold session cookies
+*.har
