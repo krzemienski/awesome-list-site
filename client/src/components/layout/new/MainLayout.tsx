@@ -106,6 +106,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   // still represent a new route for the global palette's lifecycle.
   const search = useSearch();
   const isAdmin = /^\/admin(?:\/|$)/.test(location);
+  const isAuth = /^\/(?:sign-in|sign-up)(?:\/|$)/.test(location);
   const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory|tag)\//.test(location);
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: publicConfig } = useContactConfig(true);
@@ -291,7 +292,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           // axis leaves the other axis `visible`), so sticky works inside routes.
           className="app-shell-main focus:outline-none"
         >
-          <div className="page-content-wrap" data-admin={isAdmin}>
+          <div className="page-content-wrap" data-admin={isAdmin} data-auth={isAuth}>
           <PageBreadcrumb categories={nav?.categories ?? []} />
           {children}
           </div>
