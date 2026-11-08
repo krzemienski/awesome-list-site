@@ -61,6 +61,7 @@
 import type { Express, Response } from "express";
 import type { RequestHandler } from "express";
 import crypto from "crypto";
+import { z } from "zod";
 import { sql } from "drizzle-orm";
 import type { Resource } from "@shared/schema";
 import {
@@ -70,6 +71,7 @@ import {
 } from "@shared/resourceKinds";
 import { taxonomyScopeIntro, type TaxonomyIntroInput } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
+import { RESEED_CONFIRMATION } from "@shared/reseed-confirmation";
 import { describeTaxonomyPlan } from "@shared/github-import";
 import { db, runInTransaction } from "../../db";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
@@ -1246,6 +1248,11 @@ export function registerExportLinkHealthRoutes(
     }
   }));
 
+  const seedDatabaseBodySchema = z.object({
+    clearExisting: z.boolean().default(false),
+    confirm: z.string().optional(),
+  });
+
   // POST /api/admin/seed-database - Manual database seeding (optional)
   // Note: Database is automatically seeded on first startup. This endpoint is for:
   // - Re-seeding after data changes
@@ -1253,12 +1260,19 @@ export function registerExportLinkHealthRoutes(
   // - Manual admin intervention when needed
   app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
+      const parsed = seedDatabaseBodySchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        return res.status(400).json({ success: false, message: 'Invalid request body' });
+      }
+      const { clearExisting, confirm } = parsed.data;
+      if (clearExisting && confirm !== RESEED_CONFIRMATION) {
+        return res.status(400).json({
+          success: false,
+          message: `Clearing the catalog requires confirm: "${RESEED_CONFIRMATION}"`,
+        });
+      }
+
       logger.info('Starting manual database seeding...');
-      
-      // Get options from request body
-      const { clearExisting = false } = req.body;
-      
-      // Run seeding
       const result = await runHeavyWork(
         'manual-seed',
         () => seedDatabase({ clearExisting }),
