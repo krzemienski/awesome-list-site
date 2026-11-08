@@ -255,7 +255,7 @@ export default function ConsentBanner() {
           We use analytics ({vendorList}) to understand how the site is used — only if you allow
           it.{" "}
           <span>
-            Decline and none of them load.
+            Decline and none of them load. Our host, Replit, also counts pages without cookies; Decline stops that too.
             {ANALYTICS_VENDORS.includes("Mixpanel")
               ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
               : ""}{" "}

@@ -219,6 +219,8 @@
           if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
             root.setAttribute('data-consent-known', 'true');
           }
+          // Visitors who declined before the Umami opt-out flag existed.
+          if (legacyConsent === 'denied') localStorage.setItem('umami.disabled', '1');
         } catch (_) {}
       })();
     </script>
