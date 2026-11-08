@@ -27,6 +27,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { formatRelativeAgo } from "@/lib/utils";
 import type { AdminDatabaseOverview } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
+import { RESEED_CONFIRMATION } from "@shared/reseed-confirmation";
 import { AdminOpsTable as Table, Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "./admin-ops-export-database.css";
 
@@ -118,7 +119,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   const [seedFailure, setSeedFailure] = useState<{ mode: "seed" | "reseed"; message: string } | null>(null);
 
   const seedDatabaseMutation = useMutation({
-    mutationFn: async (options: { clearExisting?: boolean } = {}) => {
+    mutationFn: async (options: { clearExisting?: boolean; confirm?: string } = {}) => {
       return (await apiRequest("/api/admin/seed-database", {
         method: "POST",
         body: JSON.stringify(options),
@@ -171,7 +172,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   const confirmClearAndReseed = () => {
     if (!reseedConfirmed) return;
     setReseedDialogOpen(false);
-    seedDatabaseMutation.mutate({ clearExisting: true });
+    seedDatabaseMutation.mutate({ clearExisting: true, confirm: RESEED_CONFIRMATION });
   };
 
   const database = stats?.database;
