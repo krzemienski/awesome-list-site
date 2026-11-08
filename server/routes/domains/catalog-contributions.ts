@@ -85,7 +85,8 @@ import { RESOURCE_KIND_VALUES, resourceKindSchema } from "@shared/resourceKinds"
 import { RESOURCE_FACET_KINDS } from "@shared/resourceFacets";
 import { parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
 import { trackServerEvent } from "../../lib/mixpanelServer";
-import { CATALOG_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
+import { CATALOG_CACHE_CONTROL, SESSION_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
+import { resolveDuplicateTarget } from "../../lib/duplicateTarget";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
 import { buildRelatedResources } from "../../services/relatedResources";
@@ -704,6 +705,12 @@ export function registerCatalogContributionsRoutes(
         const userId = req.dbUser?.id;
         const user = userId ? await userRepo.getUser(userId) : undefined;
         if (!user || user.role !== 'admin') {
+          // An archived duplicate points at the row it duplicates: 301 there.
+          const keptId = await resolveDuplicateTarget(resource, (rid) => resourceRepo.getResource(rid));
+          if (keptId !== null) {
+            res.set('Cache-Control', req.dbUser ? SESSION_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL);
+            return res.redirect(301, `/api/resources/${keptId}`);
+          }
           return res.status(404).json({ message: 'Resource not found' });
         }
       }

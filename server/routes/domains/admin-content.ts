@@ -58,6 +58,7 @@ import { z } from "zod";
 import { adminResourceWriteSchema } from "@shared/schema";
 import { resourceKindSchema } from "@shared/resourceKinds";
 import { classifyKindForStorage } from "../../lib/resourceKinds";
+import { resolveDuplicateTarget } from "../../lib/duplicateTarget";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
@@ -726,7 +727,32 @@ export function registerAdminContentRoutes(
         }
       }
 
+      // Archive-as-duplicate: duplicateOf names the approved row this one
+      // duplicates and is only valid on an archived row. Leaving archived
+      // clears the pointer in transitionResourceInTransaction.
+      const nextStatus = validatedData.status ?? resource.status;
+      const nextDuplicateOf = validatedData.duplicateOf;
+      if (nextDuplicateOf != null) {
+        if (nextStatus !== 'archived') {
+          return res.status(400).json({ message: 'duplicateOf can only be set on an archived resource' });
+        }
+        const target = await resourceRepo.getResource(nextDuplicateOf);
+        if (nextDuplicateOf === resourceId || !target) {
+          return res.status(400).json({ message: 'duplicateOf must name a different, existing resource' });
+        }
+        const keptId = await resolveDuplicateTarget(
+          { id: resourceId, status: 'archived', duplicateOf: nextDuplicateOf },
+          (rid) => resourceRepo.getResource(rid),
+        );
+        if (keptId === null) {
+          return res.status(400).json({ message: 'duplicateOf must lead to an approved resource without looping back' });
+        }
+      }
+
       const updateData: Record<string, any> = {};
+      if (nextDuplicateOf !== undefined && nextDuplicateOf !== resource.duplicateOf) {
+        updateData.duplicateOf = nextDuplicateOf;
+      }
       
       if (validatedData.title !== undefined) updateData.title = validatedData.title;
       if (validatedData.url !== undefined) updateData.url = validatedData.url;
@@ -1103,7 +1129,7 @@ export function registerAdminContentRoutes(
       // Run16 BUG-001/BUG-031 + Run21 R4-016: admin-created resources go live
       // immediately — full shared validation (https-only bounded URL, visible
       // title, bounded description when provided).
-      const createSchema = adminResourceWriteSchema.extend({
+      const createSchema = adminResourceWriteSchema.omit({ duplicateOf: true }).extend({
         title: resourceTitleSchema,
         url: httpsUrlSchema,
         description: optionalResourceDescriptionSchema.optional(),

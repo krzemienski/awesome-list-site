@@ -116,6 +116,7 @@ function ResourceCard({
     approvedAt: null,
     contributorRejectionReason: null,
     statusChangedAt: null,
+    duplicateOf: null,
     githubSynced: false,
     lastSyncedAt: null,
     metadata: {},
