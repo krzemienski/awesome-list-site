@@ -167,7 +167,7 @@ async function runStartupSweep(): Promise<void> {
     } else {
       logger.info('✅ Orphan watchdog: no stuck jobs found');
     }
-  } catch (err: any) {
+  } catch (err) {
     logger.error('❌ Orphan watchdog failed (non-fatal):', err);
   }
 }
@@ -223,17 +223,32 @@ async function runPeriodicSweep(): Promise<OrphanSweepResult> {
   } catch (err) {
     if (!isConnectionTimeout(err)) throw err;
     await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
-    return sweep();
+    try {
+      const result = await sweep();
+      logger.warn('Orphan watchdog periodic sweep hit a connect timeout; the retry succeeded', poolState());
+      return result;
+    } catch (retryErr) {
+      throw new SweepRetryFailedError(retryErr);
+    }
   }
+}
+
+class SweepRetryFailedError extends Error {
+  constructor(cause: unknown) {
+    super('Orphan watchdog sweep retry failed after a connect timeout', { cause });
+  }
+}
+
+function poolState() {
+  return { poolTotal: pool.totalCount, poolIdle: pool.idleCount, poolWaiting: pool.waitingCount };
 }
 
 function reportSweepFailure(err: unknown): void {
   consecutiveFailures += 1;
   const details = {
     consecutiveFailures,
-    poolTotal: pool.totalCount,
-    poolIdle: pool.idleCount,
-    poolWaiting: pool.waitingCount,
+    retried: err instanceof SweepRetryFailedError,
+    ...poolState(),
   };
   const message = 'Orphan watchdog periodic sweep failed (non-fatal):';
   if (consecutiveFailures >= ERROR_AFTER_CONSECUTIVE_FAILURES) logger.error(message, err, details);
