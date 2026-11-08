@@ -58,7 +58,7 @@ function DiffValue({ value }: { value: unknown }) {
   const visibleRest = text.replace(/‹U\+[0-9A-F]{4,6}›/g, "").trim();
   return (
     <>
-      <span className="break-all">{text}</span>
+      <span className="[overflow-wrap:anywhere]">{text}</span>
       {count > 0 && (
         <span className={"ml-1 inline-block align-middle rounded bg-[var(--status-warn)]/15 px-1 text-[10px] font-medium uppercase tracking-wide text-[var(--status-warn)]" /* DS-OK: status warn */}>
           {visibleRest === "" ? "invisible characters only" : `${count} invisible char${count === 1 ? "" : "s"}`}

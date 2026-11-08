@@ -361,7 +361,7 @@ export default function AuditTab() {
             subject="the audit log"
             error={error}
             offline={unavailable === "offline"}
-            note="Your filter is still applied."
+            note={appliedFilter ? "Your filter is still applied." : undefined}
             onRetry={() => { void refetch(); }}
             retrying={isFetching}
             testId="alert-audit-error"
