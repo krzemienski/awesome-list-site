@@ -241,8 +241,11 @@ adds the script, a website id or an env var for it, and `script-src` /
   `topics`) arrive as comma-separated strings, as in GA4; event names over 50
   characters are not sent (none exist today).
 - **No tracker** (dev, analytics disabled, blocked script) is a silent no-op.
-  The consent banner does not name Replit Analytics: it lists only the tools
-  the banner switches on.
+  The consent banner does not list Replit Analytics among the tools it
+  switches on, but says that Replit counts page views without cookies until
+  the visitor chooses and that Decline stops it on this browser. The privacy
+  policy (`shared/legal-policy-content.tsx`) says the same and notes that
+  blocked site storage cannot hold the opt-out flag.
 
 ### Admin sessions and QA paths
 
@@ -312,11 +315,19 @@ exactly as before. The rules live in
 - **Replit page views.** The injected Umami tracker checks
   `localStorage['umami.disabled']` before every send, page views included
   ([Umami docs](https://umami.is/docs/exclude-my-own-visits)).
-  `syncReplitPageviewOptOut()` sets it (plus the flag
-  `analytics-umami-disabled-by-app`) while suppressed, at entry-module load
-  and on every route change before the tracker's ~300 ms soft-navigation
-  delay, and removes both when no longer suppressed. A value set by hand (no
-  app flag beside it) is never changed or removed.
+  `syncReplitPageviewOptOut()` is the only writer of that key. It sets it
+  (plus the flag `analytics-umami-disabled-by-app`) while suppressed **or
+  while the visitor has declined analytics** (localStorage `analytics-consent`
+  is `denied`, or, with no stored choice, the `analytics-consent=denied` mirror
+  cookie), at entry-module load, on every route change before the tracker's
+  ~300 ms soft-navigation delay, and from `setAnalyticsConsent`. It removes
+  both only when neither applies and the app set the key, so a decline
+  survives sign-out and navigation, and Allow re-runs the sync instead of
+  deleting the key. A value set by hand (no app flag beside it) is never
+  changed or removed. The boot script in `client/index.html` applies the same
+  rule before the tracker evaluates (set only when absent, never remove), so a
+  returning decliner is covered from the first beacon. Before any choice and
+  after Allow, Replit counts page views by design.
 - **Residual gaps.**
   - The first page of a device that has never had the marker is, by
     definition, not yet an admin session.

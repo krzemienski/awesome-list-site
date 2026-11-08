@@ -20,7 +20,7 @@
 
 import { captureAcquisition, getAcquisition } from './acquisition';
 import type { AnalyticsDispatchRequest } from './analytics-dispatch';
-import { isAnalyticsSuppressed } from './analytics-suppression';
+import { isAnalyticsSuppressed, syncReplitPageviewOptOut } from './analytics-suppression';
 
 // Define the gtag function globally
 declare global {
@@ -43,7 +43,8 @@ export const ANALYTICS_VENDORS = [
   { name: 'Amplitude', configured: Boolean(import.meta.env.VITE_AMPLITUDE_API_KEY) },
   // Replit Analytics is not listed: the platform injects its cookie-free
   // tracker into every published page, so it is not something the banner can
-  // switch on. Only an explicit Decline stops the app's custom events to it.
+  // switch on. An explicit Decline sets its `umami.disabled` opt-out flag
+  // (syncReplitPageviewOptOut) and the app stops forwarding custom events to it.
 ].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
 
 // BUG-020 (run13): analytics is consent-gated. The choice lives in
@@ -81,6 +82,7 @@ export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
     // localStorage remains the canonical client preference; the cookie only
     // lets the next document paint the same consent state before hydration.
     document.cookie = `${CONSENT_KEY}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    syncReplitPageviewOptOut();
     window.dispatchEvent(new Event('analytics-consent-changed'));
   }
 };
