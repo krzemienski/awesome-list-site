@@ -273,7 +273,12 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         {/* The reference PageFooter closes the content column beside the sticky
             sidebar. Keep it a sibling of <main> so it stays the page's
             top-level contentinfo landmark. */}
-        <div className="app-shell-column">
+        {/* The sidebar appearing or disappearing moves the column sideways. On
+            Back/Forward that lands outside any input window and counts as CLS
+            (~0.2). Keying the column on the layout mode mounts a new element
+            instead of moving the old one; inserted nodes are not shifts. The
+            route content under it is replaced by the navigation anyway. */}
+        <div key={hasBrowseSidebar ? "with-sidebar" : "full-width"} className="app-shell-column">
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.
           Canonical page-content-wrap owns the token-backed measure and gutters.
