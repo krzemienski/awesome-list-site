@@ -11,7 +11,8 @@ import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/Se
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
 import { ViewModeToggle, isLayoutViewMode, type ViewMode } from "@/components/ui/view-mode-toggle";
-import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
+import { ResourceCardSkeleton } from "@/components/ui/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/layout/SEOHead";
 import {
   categorySeoDescription,
@@ -173,6 +174,26 @@ function pageAdjustedMessage(requested: number | string, adjusted: number): stri
   if (!text) return `No page number was entered, so page ${adjusted} is shown.`;
   const echo = text.length > ECHO_PAGE_TEXT_MAX ? `${text.slice(0, ECHO_PAGE_TEXT_MAX).trimEnd()}…` : text;
   return `Page “${echo}” doesn't exist, so page ${adjusted} is shown.`;
+}
+
+/**
+ * Rows for what the loaded category header holds (eyebrow, title, three-line
+ * description, count chips). Their heights sum to the .taxonomy-loading-header
+ * reserve, so the header lands without a shift and without a blank band.
+ */
+function TaxonomyHeaderSkeleton() {
+  return (
+    <div className="taxonomy-loading-header">
+      <Skeleton className="h-[22px] w-48 max-w-full" />
+      <Skeleton className="h-[62px] w-80 max-w-full" />
+      <div className="taxonomy-loading-description">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
+      <Skeleton className="h-[27px] w-56 max-w-full" />
+    </div>
+  );
 }
 
 export default function TaxonomyListing({ level }: Props) {
@@ -527,7 +548,7 @@ export default function TaxonomyListing({ level }: Props) {
     .sort((a, b) => b.totalResourceCount - a.totalResourceCount)
     .slice(0, 8);
 
-  if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
+  if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><TaxonomyHeaderSkeleton /><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors

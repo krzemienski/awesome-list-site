@@ -30,8 +30,8 @@ function HomeLayoutPreferenceControl({
   className,
   ...props
 }: HomeLayoutPreferenceControlProps) {
-  const { layout, isLoading, setLayout, isSaving, isError, error } = useHomeLayout();
-  const isDisabled = disabled || isLoading || isSaving;
+  const { layout, isSavedLayoutUnknown, isLoading, setLayout, isSaving, isError, error } = useHomeLayout();
+  const isDisabled = disabled || isLoading || isSaving || isSavedLayoutUnknown;
 
   return (
     // C8-VX-02: aria-disabled while saving, not native disabled — disabling
@@ -39,7 +39,7 @@ function HomeLayoutPreferenceControl({
     <fieldset
       {...props}
       className={className}
-      disabled={disabled || isLoading}
+      disabled={disabled || isLoading || isSavedLayoutUnknown}
       aria-disabled={isDisabled}
       aria-busy={isSaving}
       data-testid="home-layout-preference-control"
@@ -50,7 +50,7 @@ function HomeLayoutPreferenceControl({
       </p>
       <RadioGroup
         aria-label="Home layout"
-        value={layout}
+        value={isSavedLayoutUnknown ? "" : layout}
         onValueChange={(value) => {
           const next = OPTIONS.find((option) => option.value === value)?.value;
           if (next && !isSaving) setLayout(next);
@@ -86,6 +86,10 @@ function HomeLayoutPreferenceControl({
       ) : isSaving ? (
         <p className="mt-3 text-xs text-[color:var(--text-2)]" role="status">
           Saving your home layout…
+        </p>
+      ) : isSavedLayoutUnknown ? (
+        <p className="mt-3 text-sm text-destructive" role="alert">
+          We couldn’t load your saved home layout, so none is shown as selected.
         </p>
       ) : isError ? (
         <p className="mt-3 text-sm text-destructive" role="alert">

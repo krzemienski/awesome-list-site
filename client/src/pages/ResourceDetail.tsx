@@ -207,8 +207,8 @@ export default function ResourceDetail() {
   const relatedQuery = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
     queryFn: () => apiRequest(`/api/resources/${id}/related`, { method: "GET" }),
-    // Fetched alongside the resource, not after it: the endpoint answers a
-    // missing or hidden id with an empty list.
+    // Fetched alongside the resource, not after it: a missing or hidden id
+    // answers 404 here too, same as the resource request.
     enabled: validId
   });
   const relatedResources = relatedQuery.data;

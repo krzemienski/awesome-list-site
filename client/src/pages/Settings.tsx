@@ -7,7 +7,8 @@ import {
   DEFAULT_LEARNING_PREFERENCES,
   type LearningPreferencesValues,
 } from "@shared/onboarding-values";
-import { completedLearningPreferencesSchema } from "@shared/onboarding";
+import { completedLearningPreferencesSchema, ONBOARDING_DRAFT_STORAGE_KEY } from "@shared/onboarding";
+import { safeRemoveItem } from "@/lib/safeStorage";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
@@ -224,6 +225,7 @@ export default function Settings() {
     setPreferenceRequestError(null);
     try {
       await resetPreferencesAsync();
+      safeRemoveItem(ONBOARDING_DRAFT_STORAGE_KEY);
       trackLearningPreferencesReset();
       setValues(DEFAULT_LEARNING_PREFERENCES);
       setShowEmptyPreferencesEditor(false);

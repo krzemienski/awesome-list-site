@@ -33,7 +33,7 @@ export default function ResourceTopNextSteps({ related, loading, onRelatedClick 
         {loading &&
           Array.from({ length: TOP_RELATED_LIMIT }, (_, index) => (
             <li key={index} aria-hidden="true" className="resource-detail-top-next-item">
-              <Skeleton className="inline-block w-3/4">{" "}</Skeleton>
+              <Skeleton className="h-4 w-3/4" />
             </li>
           ))}
         {!loading &&

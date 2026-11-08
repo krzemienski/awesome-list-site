@@ -203,6 +203,11 @@ export function useHomeLayout() {
 
   return {
     layout,
+    // Signed in, but the saved choice could not be read. `layout` still falls
+    // back to the index so Home renders; a picker must not present that
+    // fallback as the member's saved selection.
+    isSavedLayoutUnknown:
+      isAuthenticated && preferencesQuery.isError && !preferencesQuery.data,
     isLoading:
       // Exact anonymous Home markup is already a valid guest presentation.
       // Do not replace it with a skeleton merely because its fresh auth check

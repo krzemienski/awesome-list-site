@@ -161,7 +161,7 @@ export function useLearningPreferences() {
 
   return {
     preferences: query.data?.preferences ?? null,
-    homeLayout: query.data?.homeLayout ?? "index",
+    homeLayout: query.data?.homeLayout,
     theme: query.data?.theme ?? null,
     isAuthenticated,
     isLoading: authLoading || query.isLoading,
