@@ -66,15 +66,19 @@ const seenSessions = new Map<string, number>();
 
 const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
 
-function writeAuthAudit(action: "auth.login" | "auth.register", userId: string, notes: string): Promise<void> {
-  return auditRepo.logResourceAudit(null, action, userId, { method: "clerk" }, notes);
+function writeRegisterAudit(userId: string, notes: string): Promise<void> {
+  return auditRepo.logResourceAudit(null, "auth.register", userId, { method: "clerk" }, notes);
 }
 
 /**
- * One `auth.login` audit row per Clerk session, written the first time this
- * process sees the session. Without a session id the user is rate-limited to
- * one row per 30 minutes. The key is claimed before the insert so concurrent
- * requests of a fresh session cannot write twice; a failed insert releases it.
+ * One `auth.login` audit row per Clerk session. Production runs several
+ * instances, so the database is the source of truth: the insert is skipped
+ * when a row for this (user, session) already exists, whichever instance wrote
+ * it. The in-process map is a fast path in front of that check so a session
+ * costs one query per instance, not one per request. Without a session id the
+ * user gets one row per 30 minutes. The key is claimed before the insert so
+ * concurrent requests of a fresh session in this process cannot both write; a
+ * failed insert releases it.
  */
 function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
   const key = identity.sessionId ?? `user:${userId}`;
@@ -90,7 +94,7 @@ function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
     const [oldest] = seenSessions.keys();
     seenSessions.delete(oldest);
   }
-  writeAuthAudit("auth.login", userId, "Signed in with Clerk").catch((error) => {
+  auditRepo.logSignInOnce(userId, identity.sessionId, "Signed in with Clerk", SESSION_FALLBACK_WINDOW_MS).catch((error) => {
     seenSessions.delete(key);
     logger.error("[clerkAuth] auth.login audit row failed", { user: userId, errorClass: errorClass(error) });
   });
@@ -191,7 +195,7 @@ export async function ensureDbUser(
         sign_up_method: "clerk",
       });
       logger.info("New account provisioned from Clerk sign-up", { user: created.id });
-      writeAuthAudit("auth.register", created.id, "Account created from Clerk sign-up").catch((error) => {
+      writeRegisterAudit(created.id, "Account created from Clerk sign-up").catch((error) => {
         logger.error("[clerkAuth] auth.register audit row failed", { user: created.id, errorClass: errorClass(error) });
       });
     }

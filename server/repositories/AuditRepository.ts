@@ -122,6 +122,30 @@ export class AuditRepository {
   }
 
   /**
+   * Insert one `auth.login` row for a sign-in unless the database already has
+   * it. Check and insert are a single statement, so two requests in one
+   * process cannot both pass, and a second server instance sees the first
+   * instance's row. With a Clerk session id the row is unique per
+   * (user, session); without one the user gets one row per `windowMs`.
+   * @returns true when a row was written
+   */
+  async logSignInOnce(userId: string, sessionId: string | undefined, notes: string, windowMs: number): Promise<boolean> {
+    const changes = JSON.stringify(sessionId ? { method: "clerk", sessionId } : { method: "clerk" });
+    const alreadyRecorded = sessionId
+      ? sql`changes->>'sessionId' = ${sessionId}`
+      : sql`created_at > now() - ${`${windowMs} milliseconds`}::interval`;
+    const result = await db.execute(sql`
+      INSERT INTO resource_audit_log (action, performed_by, changes, notes)
+      SELECT 'auth.login', ${userId}, ${changes}::jsonb, ${notes}
+      WHERE NOT EXISTS (
+        SELECT 1 FROM resource_audit_log
+        WHERE action = 'auth.login' AND performed_by = ${userId} AND ${alreadyRecorded}
+      )
+      RETURNING id`);
+    return result.rows.length > 0;
+  }
+
+  /**
    * Get audit log entries for a resource
    * @param resourceId - Resource ID to get logs for (null for all logs)
    * @param limit - Maximum number of entries to return (default: 50)
