@@ -1958,3 +1958,25 @@ The phrase “Appendix B” in the PR re-check contract refers to the cycle-7 de
 - 47 audit findings (2026-11-03) re-proved on production 59dedea0: 44 PASS, 3 UNVERIFIED (BUG-010/018/019: Adobe/O'Reilly Access Denied from this machine), 0 FAIL. Table: docs/audit/C20-COMPLETION.md.
 - Fix waves 1–5: PRs #234–#246. All deployed with replit-deploy; each live revision equalled origin/main.
 - P0 smoke 18/18 PASS (9 journeys × 1440/375). Member/admin flows BLOCKED (no owner session); sign-up skipped by owner.
+
+## Run 20261108T1819Z (2026-11-08): zero known production defects
+Full report: [audit/runs/20261108T1819Z/REPORT.md](runs/20261108T1819Z/REPORT.md).
+Format: id · surface · symptom · root cause · fix PR → SHA · prod proof · status.
+- R-HARNESS · repo · ops/self-heal/CI harness · owner decision #332 · #335 → bfd08f7a · grep 0, build 0 · FIXED
+- R-336 · page documents · real navigations got 503 when the uncached route gate was full · og-middleware gate rejected every HTML client alike · #338 → d9a90bd4 · navigations 200 under a burst · FIXED
+- R-D2 · scheduled backup · failures logged with no stage · scheduledBackup.ts logged errorClass only · #339 → 5c0d66af · outcome line due after 2026-11-09T14:10Z · DEPLOYED, proof pending
+- R-337 · /resource/:id archived duplicates · 410 instead of 301 · no duplicate pointer · #341 → 83079b6b · 27/27 301, unmapped 410 · FIXED
+- R-CONSENT-REPLIT · consent · Replit's Umami counted after Decline · flag never set; suppression module owned it · #340 → 396abf2c · 0 beacons after Decline · FIXED
+- R-284c3 · job-watchdog · retry outcome unlogged · only failures logged · #342 → e123be1d · appears on the next real timeout · DEPLOYED
+- R-RESEARCH-TURNCAP · admin researcher · turn cap stored as failed, "4 of 3" · is_error on error_max_turns treated as terminal · #343 → 68ff5fc2 · run #111 stopped at turn cap, 1 of 1 · FIXED
+- R-SIGNIN-390 · auth pages · card off-centre · back-to-top lane padding · #344 → 20c36511 · equal gutters at 3 widths · FIXED
+- R-AUTHLOGIN-DUP · audit log · 2 auth.login rows per session · per-instance Map dedupe · #345 → a7a673b2 · 1 row per session · FIXED
+- R-ENRICH-RACE (H-04) · enrichment jobs · a reclaimed run could overwrite its status · unguarded worker writes · #346 → b451f455 · TLA+ model passes · FIXED
+- R-RESEED-GUARD (H-05) · admin seed API · clearExisting with no server confirmation · UI-only guard · #347 → ac96736a · 400 without confirm · FIXED
+- R-RESEARCH-RACE · research jobs · same race as H-04 · unguarded worker writes · #348 → 496c51c9 · reviewed · FIXED
+- R-CLS-BACKFWD · browse ↔ resource Back/Forward · CLS 0.21/0.22 · sidebar toggled in the same commit, column moved · #349 → ff4d51bf · counted CLS 0 in every case · FIXED
+- R-GA4-DOUBLE-PV · GA4 · 2 page_view per SPA navigation · GA4 Enhanced Measurement history events · — · confirmed · OWNER (GA4 setting)
+- R-WWW-LOOP · www.awesome.video · redirect loop · Cloudflare rule with scheme-less target · — · confirmed · OWNER (Cloudflare)
+- R-CATALOG-9 · 9 resources · wrong destination or text · import/content · — · confirmed · OWNER (PUTs)
+- R-SLUG-TITLES · 390 resources · repo-name titles · researcher discovery · — · — · OWNER decision
+- Not defects (reclassified with evidence): L1-11 410 on dead-link archives, R-LISTING 404s, R-OPS stale callers, R-BANNER-390 sticky banner, R-DEEPLINK-KIND typo, R-L3-PROTECTED public routes, R-VERSION-500 edge-side, H-06 journey progress, H-10 dead-link telemetry (1 POST on the live SHA).
