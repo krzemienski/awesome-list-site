@@ -96,7 +96,7 @@ export function registerNotificationRoutes(
       } catch (error) {
         const code = error instanceof Error ? error.message : "unknown";
         const message = PREFERENCE_ERROR_MESSAGES[code];
-        if (message) return response.status(400).json({ message });
+        if (message) return response.status(400).json({ message, code });
         if (code === "clerk_unavailable") {
           return response.status(503).json({
             message: "We couldn't check your email verification right now. Try again in a moment.",

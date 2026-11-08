@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Bookmark, Bell, Settings, User, LogOut, LogIn, Palette, Shield } from "lucide-react";
+import { Bookmark, Bell, Settings, User, LogOut, LogIn, Palette, Shield, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -134,6 +134,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           {!user && <DropdownMenuItem onSelect={signIn} aria-label="Sign in"><LogIn className="mr-2 h-4 w-4" />Sign in</DropdownMenuItem>}
+          {!user && <DropdownMenuItem onSelect={() => navigate("/sign-up")}><UserPlus className="mr-2 h-4 w-4" />Sign up</DropdownMenuItem>}
           {user && <>
             <DropdownMenuItem onSelect={() => navigate("/profile")}><User className="mr-2 h-4 w-4" />Profile</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => navigate("/bookmarks")}><Bookmark className="mr-2 h-4 w-4" />Bookmarks</DropdownMenuItem>

@@ -19,6 +19,7 @@ import type { DigestPreview, NotificationPreferencesPatch, NotificationPreferenc
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { RetryButton } from "@/components/layout/StatePanel";
+import EmailVerifyPanel from "./EmailVerifyPanel";
 
 // "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
 const CADENCE_LABELS: Record<(typeof DIGEST_CADENCES)[number], string> = {
@@ -47,6 +48,14 @@ const defaults = (): NotificationPreferencesUpdate => ({
 });
 
 const PAUSE_DAYS = 7;
+
+function isEmailUnverifiedError(error: unknown): boolean {
+  try {
+    return (JSON.parse((error as { body?: string })?.body ?? "") as { code?: string }).code === "email_unverified";
+  } catch {
+    return false;
+  }
+}
 
 // What a save was for, plus the last server-confirmed preferences it replaces,
 // so analytics compares server state to server state (never unsaved edits).
@@ -104,6 +113,7 @@ export default function NotificationPreferencesCard() {
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [timezoneError, setTimezoneError] = useState<string | null>(null);
+  const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
 
   // Unsaved edits survive a refetch and the quick actions below; only an
   // explicit "Save choices" commits them.
@@ -143,6 +153,12 @@ export default function NotificationPreferencesCard() {
     },
     onError: (error) => {
       setSavedMessage(null);
+      if (isEmailUnverifiedError(error)) {
+        setValues((current) => ({ ...current, emailDigestEnabled: false }));
+        setRequestError(null);
+        setNeedsEmailVerification(true);
+        return;
+      }
       setRequestError(describeWriteError(error, { fallback: "We couldn’t save notification preferences.", outcome: NOTHING_CHANGED_OUTCOME }));
     },
   });
@@ -250,6 +266,12 @@ export default function NotificationPreferencesCard() {
               <Button className="ml-auto min-h-[44px]" onClick={save} aria-disabled={saveMutation.isPending} aria-busy={saveMutation.isPending}>{saveMutation.isPending ? "Saving…" : "Save choices"}</Button>
             </div>
             {paused ? <p className="flex items-center gap-2 text-xs text-[color:var(--text-2)]"><Clock3 className="h-4 w-4" />Paused until {new Date(values.pausedUntil!).toLocaleDateString()}.</p> : null}
+            {needsEmailVerification ? (
+              <EmailVerifyPanel onVerified={() => {
+                setNeedsEmailVerification(false);
+                setSavedMessage("Email verified. Turn on Email digest, then choose Save choices.");
+              }} />
+            ) : null}
             {requestError ? <p className="border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">{requestError}</p> : null}
             {savedMessage ? <p className="flex items-center gap-2 text-sm text-[var(--accent-ink)]" role="status"><Check className="h-4 w-4 shrink-0" />{savedMessage}</p> : null}
             <Separator />

@@ -22,6 +22,9 @@ import { humanizeApiError, OFFLINE_MESSAGE } from "@/lib/apiError";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+// A new account lands where Home offers the optional onboarding invitation.
+const NEW_MEMBER_LANDING = `${basePath}/?context=account&welcome=1`;
+
 // Clerk's own requests bypass the app API layer, so offline they just hang.
 function OfflineNotice() {
   const online = useOnlineStatus();
@@ -76,6 +79,7 @@ export function SignInPage() {
                 routing="path"
                 path={`${basePath}/sign-in`}
                 signUpUrl={`${basePath}/sign-up`}
+                signUpFallbackRedirectUrl={NEW_MEMBER_LANDING}
                 fallback={<ClerkUiFallback flow="sign-in" />}
               />
             </StaleSessionGate>
@@ -105,6 +109,7 @@ export function SignUpPage() {
               routing="path"
               path={`${basePath}/sign-up`}
               signInUrl={`${basePath}/sign-in`}
+              fallbackRedirectUrl={NEW_MEMBER_LANDING}
               fallback={<ClerkUiFallback flow="sign-up" />}
             />
           </StaleSessionGate>
