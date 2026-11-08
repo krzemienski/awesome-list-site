@@ -20,7 +20,7 @@
 
 import { captureAcquisition, getAcquisition } from './acquisition';
 import type { AnalyticsDispatchRequest } from './analytics-dispatch';
-import { isAnalyticsSuppressed } from './analytics-suppression';
+import { isAnalyticsSuppressed, syncReplitPageviewOptOut } from './analytics-suppression';
 
 // Define the gtag function globally
 declare global {
@@ -44,7 +44,7 @@ export const ANALYTICS_VENDORS = [
   // Replit Analytics is not listed: the platform injects its cookie-free
   // tracker into every published page, so it is not something the banner can
   // switch on. An explicit Decline sets its `umami.disabled` opt-out flag
-  // (setAnalyticsConsent) and the app stops forwarding custom events to it.
+  // (syncReplitPageviewOptOut) and the app stops forwarding custom events to it.
 ].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
 
 // BUG-020 (run13): analytics is consent-gated. The choice lives in
@@ -52,7 +52,6 @@ export const ANALYTICS_VENDORS = [
 // so gtag.js is never even downloaded pre-consent. Every tracking helper
 // already no-ops while window.gtag is undefined.
 const CONSENT_KEY = 'analytics-consent';
-const UMAMI_DISABLED_KEY = 'umami.disabled';
 export type AnalyticsConsent = 'granted' | 'denied' | null;
 
 export const getAnalyticsConsent = (): AnalyticsConsent => {
@@ -78,19 +77,12 @@ export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
   } catch {
     // Storage unavailable (private mode) — treat as session-only choice.
   }
-  // Replit's injected Umami tracker checks this flag before every beacon, so
-  // it is the only switch that stops its automatic page views after Decline.
-  try {
-    if (value === 'denied') localStorage.setItem(UMAMI_DISABLED_KEY, '1');
-    else localStorage.removeItem(UMAMI_DISABLED_KEY);
-  } catch {
-    // Storage unavailable (private mode) — nothing to persist.
-  }
   if (typeof window !== 'undefined') {
     // Keep a tiny, non-identifying mirror for the server-rendered Home shell.
     // localStorage remains the canonical client preference; the cookie only
     // lets the next document paint the same consent state before hydration.
     document.cookie = `${CONSENT_KEY}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    syncReplitPageviewOptOut();
     window.dispatchEvent(new Event('analytics-consent-changed'));
   }
 };

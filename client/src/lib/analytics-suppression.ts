@@ -16,11 +16,13 @@
 // check `isAnalyticsSuppressed()`. Replit's own page views come from the
 // platform-injected Umami tracker, which skips every send while
 // `localStorage['umami.disabled']` is set; `syncReplitPageviewOptOut` sets it
-// while suppressed and removes it again only if this module set it.
+// while suppressed or while the visitor has declined analytics, and removes it
+// again only if this module set it. This module is the only writer of the key.
 
 const ADMIN_SESSION_KEY = 'analytics-admin-session';
 const UMAMI_DISABLED_KEY = 'umami.disabled';
 const UMAMI_SET_BY_APP_KEY = 'analytics-umami-disabled-by-app';
+const CONSENT_KEY = 'analytics-consent';
 
 const SENTINEL_RESOURCE_PATH = /^\/resource\/9{8,}\/?$/;
 
@@ -58,6 +60,18 @@ export const isSuppressedAnalyticsPath = (pathname: string, search = ''): boolea
 export const isAutomatedBrowser = (): boolean =>
   typeof navigator !== 'undefined' && navigator.webdriver === true;
 
+/**
+ * True once the visitor chose Decline. The localStorage choice wins; the
+ * mirror cookie covers a decision that exists only there (the server-rendered
+ * Home shell trusts it). Kept here, not in analytics.ts, so the sync below
+ * needs no circular import.
+ */
+export const hasDeclinedAnalytics = (): boolean => {
+  const stored = read(CONSENT_KEY);
+  if (stored === 'granted' || stored === 'denied') return stored === 'denied';
+  return typeof document !== 'undefined' && /(?:^|;\s*)analytics-consent=denied(?:;|$)/.test(document.cookie);
+};
+
 export const isAnalyticsSuppressed = (): boolean => {
   if (typeof window === 'undefined') return false;
   return (
@@ -68,13 +82,13 @@ export const isAnalyticsSuppressed = (): boolean => {
 };
 
 /**
- * Keeps the platform Umami tracker quiet while suppressed. A value the owner
- * set by hand (no app flag beside it) is never changed or removed.
+ * Keeps the platform Umami tracker quiet while suppressed or declined. A value
+ * the owner set by hand (no app flag beside it) is never changed or removed.
  */
 export const syncReplitPageviewOptOut = () => {
   if (typeof window === 'undefined') return;
   const setByApp = read(UMAMI_SET_BY_APP_KEY) === '1';
-  if (isAnalyticsSuppressed()) {
+  if (isAnalyticsSuppressed() || hasDeclinedAnalytics()) {
     if (read(UMAMI_DISABLED_KEY) === null) {
       write(UMAMI_DISABLED_KEY, '1');
       write(UMAMI_SET_BY_APP_KEY, '1');

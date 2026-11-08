@@ -198,8 +198,9 @@ export default function ConsentBanner() {
         <DialogHeader>
           <DialogTitle>Cookie settings</DialogTitle>
           <DialogDescription>
-            Analytics ({vendorList}) load only if you allow them. Your current choice is selected;
-            Cancel keeps it unchanged.{" "}
+            Analytics ({vendorList}) load only if you allow them. Until you choose, our host Replit
+            counts page views without cookies; Decline stops that on this browser. Your current choice
+            is selected; Cancel keeps it unchanged.{" "}
             <Link href="/privacy" onClick={() => setSettingsOpen(false)} className="system-consent-banner__privacy-link" data-testid="cookie-settings-privacy-link">
               Privacy Policy
             </Link>
@@ -255,7 +256,8 @@ export default function ConsentBanner() {
           We use analytics ({vendorList}) to understand how the site is used — only if you allow
           it.{" "}
           <span>
-            Decline and none of them load. Our host, Replit, also counts pages without cookies; Decline stops that too.
+            Decline and none of them load. Until you choose, our host Replit counts page views without
+            cookies; Decline stops that on this browser.
             {ANALYTICS_VENDORS.includes("Mixpanel")
               ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
               : ""}{" "}
