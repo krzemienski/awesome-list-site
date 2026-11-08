@@ -65,6 +65,19 @@
   }
 }
 
+/* Sign-in / sign-up: one centred card, no scrolling column beside it. The
+   back-to-top lane is not reserved, so both gutters match and the card sits
+   in the middle of the viewport rather than the middle of a lopsided column. */
+.app-shell-main > .page-content-wrap[data-auth="true"] {
+  padding-inline: var(--page-pad-x);
+}
+
+@media (max-width: 640px) {
+  .app-shell-main > .page-content-wrap[data-auth="true"] {
+    padding-inline: 20px;
+  }
+}
+
 .app-shell-main > .page-content-wrap[data-admin="true"] {
   /* The canonical admin canvas is a left-anchored 1400px measure (no
      auto centering); centering it doubles the desktop gutter. */
