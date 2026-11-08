@@ -6,9 +6,11 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import {
   DEFAULT_LEARNING_PREFERENCES,
+  ONBOARDING_DRAFT_STORAGE_KEY,
   ONBOARDING_STEP_COUNT,
   type LearningPreferencesValues,
 } from "@shared/onboarding-values";
+import { learningPreferencesValuesSchema } from "@shared/onboarding";
 import LearningPreferencesForm, {
   LEARNING_PREFERENCE_STEPS,
 } from "@/components/onboarding/learning-preferences-form";
@@ -37,8 +39,6 @@ interface CategoryOption {
 type PreferenceErrors = Partial<
   Record<keyof LearningPreferencesValues, string>
 >;
-
-const DRAFT_STORAGE_KEY = "awesome-video-onboarding-draft-v1";
 
 function stepFromUrl(): number | null {
   const raw = Number(new URLSearchParams(window.location.search).get("step"));
@@ -106,12 +106,12 @@ export default function Onboarding() {
     let initialValues = valuesFromPreferences(preferences);
     let initialStep =
       stepFromUrl() ?? preferences?.onboardingStep ?? 1;
-    const stored = safeGetItem(DRAFT_STORAGE_KEY);
+    const stored = safeGetItem(ONBOARDING_DRAFT_STORAGE_KEY);
     if (stored) {
       try {
         const draft = JSON.parse(stored) as {
           userId?: string;
-          values?: LearningPreferencesValues;
+          values?: unknown;
           step?: number;
           revision?: number | null;
         };
@@ -121,19 +121,21 @@ export default function Onboarding() {
         const draftIsCurrent =
           preferences?.onboardingStatus !== "completed" ||
           (preferences?.revision !== undefined && draft.revision === preferences.revision);
-        if (
+        const draftValues = learningPreferencesValuesSchema.safeParse(draft.values);
+        if (!draftValues.success) {
+          safeRemoveItem(ONBOARDING_DRAFT_STORAGE_KEY);
+        } else if (
           draftIsCurrent &&
           draft.userId === user.id &&
-          draft.values &&
           Number.isInteger(draft.step) &&
           Number(draft.step) >= 1 &&
           Number(draft.step) <= ONBOARDING_STEP_COUNT
         ) {
-          initialValues = draft.values;
+          initialValues = draftValues.data;
           initialStep = stepFromUrl() ?? Number(draft.step);
         }
       } catch {
-        safeRemoveItem(DRAFT_STORAGE_KEY);
+        safeRemoveItem(ONBOARDING_DRAFT_STORAGE_KEY);
       }
     }
 
@@ -186,7 +188,7 @@ export default function Onboarding() {
   ) => {
     if (!user?.id) return;
     safeSetItem(
-      DRAFT_STORAGE_KEY,
+      ONBOARDING_DRAFT_STORAGE_KEY,
       JSON.stringify({
         userId: user.id,
         values: nextValues,
@@ -288,7 +290,7 @@ export default function Onboarding() {
         values,
         alreadyCompleted,
       });
-      safeRemoveItem(DRAFT_STORAGE_KEY);
+      safeRemoveItem(ONBOARDING_DRAFT_STORAGE_KEY);
       window.location.href = "/";
     } catch (error) {
       setRequestError(
@@ -310,7 +312,7 @@ export default function Onboarding() {
         values,
         alreadyCompleted: preferences?.onboardingStatus === "completed",
       });
-      safeRemoveItem(DRAFT_STORAGE_KEY);
+      safeRemoveItem(ONBOARDING_DRAFT_STORAGE_KEY);
       setCompleted(true);
       requestAnimationFrame(() => headingRef.current?.focus());
     } catch (error) {

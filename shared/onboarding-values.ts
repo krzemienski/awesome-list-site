@@ -13,6 +13,9 @@ export const ONBOARDING_STATUS_VALUES = [
 ] as const;
 export type OnboardingStatus = (typeof ONBOARDING_STATUS_VALUES)[number];
 
+/** localStorage key of the unsaved onboarding draft; Onboarding reads it and Settings clears it on reset. */
+export const ONBOARDING_DRAFT_STORAGE_KEY = "awesome-video-onboarding-draft-v1";
+
 /**
  * The home feed has two intentionally stable presentation modes. Keep this
  * vocabulary beside the other persisted preference values so the browser and

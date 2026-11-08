@@ -523,8 +523,20 @@
   text-transform: none;
 }
 
+/* The reserve is unchanged; the skeleton rows (eyebrow 22 + title 62 +
+   description 77 + chips 27 + 3 gaps) fill it so no blank band shows. */
 .taxonomy-loading-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   min-height: 260px;
+}
+
+.taxonomy-loading-description {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 77px;
 }
 
 .taxonomy-child:focus-visible,
