@@ -729,9 +729,9 @@ export function registerAdminContentRoutes(
 
       // Archive-as-duplicate: duplicateOf names the approved row this one
       // duplicates and is only valid on an archived row. Leaving archived
-      // clears a stale pointer, so a restored row never redirects.
+      // clears the pointer in transitionResourceInTransaction.
       const nextStatus = validatedData.status ?? resource.status;
-      let nextDuplicateOf = validatedData.duplicateOf;
+      const nextDuplicateOf = validatedData.duplicateOf;
       if (nextDuplicateOf != null) {
         if (nextStatus !== 'archived') {
           return res.status(400).json({ message: 'duplicateOf can only be set on an archived resource' });
@@ -747,8 +747,6 @@ export function registerAdminContentRoutes(
         if (keptId === null) {
           return res.status(400).json({ message: 'duplicateOf must lead to an approved resource without looping back' });
         }
-      } else if (nextDuplicateOf === undefined && nextStatus !== 'archived') {
-        nextDuplicateOf = null;
       }
 
       const updateData: Record<string, any> = {};
@@ -1131,7 +1129,7 @@ export function registerAdminContentRoutes(
       // Run16 BUG-001/BUG-031 + Run21 R4-016: admin-created resources go live
       // immediately — full shared validation (https-only bounded URL, visible
       // title, bounded description when provided).
-      const createSchema = adminResourceWriteSchema.extend({
+      const createSchema = adminResourceWriteSchema.omit({ duplicateOf: true }).extend({
         title: resourceTitleSchema,
         url: httpsUrlSchema,
         description: optionalResourceDescriptionSchema.optional(),

@@ -1660,8 +1660,9 @@ function homeShellChrome(): string {
     if (idNum !== null) {
       try {
         const resource = await storage.getResource(idNum);
-        // An archived duplicate with a documented kept row 301s to it (the
-        // target is cached with the route, not the archived row's meta).
+        // An archived duplicate with a documented kept row 301s to it. The
+        // redirect is deliberately uncached (found:false route-meta is never
+        // stored), so a restore or pointer change applies on the next request.
         if (resource?.status === "archived") {
           const keptId = await resolveDuplicateTarget(resource, (id) => storage.getResource(id));
           if (keptId !== null) {

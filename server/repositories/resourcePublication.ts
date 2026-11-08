@@ -51,6 +51,7 @@ export async function transitionResourceInTransaction(
     data.approvedAt = status === 'approved' ? now : null;
     data.approvedBy = status === 'approved' ? actor ?? null : null;
     data.contributorRejectionReason = status === 'rejected' ? options.rejectionReason ?? null : null;
+    if (status !== 'archived') data.duplicateOf = null;
   }
   // Publishing applies the one minimum-description policy. Later admin edits to
   // an already-published row keep the admin's validated (10+ visible chars)
