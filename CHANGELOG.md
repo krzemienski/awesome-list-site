@@ -4,6 +4,44 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## November 8, 2026
+
+### Real visitors get the page during crawler bursts (#336)
+- When an automated burst of cold page requests fills the uncached route-resolution gate, a browser navigation (`Accept: text/html` with `Sec-Fetch-Mode: navigate`) now gets the page shell with a 200 and `noindex`, not a 503. Other clients still get 503 with `Retry-After`. Each shed request writes one log line with the client class and the shed reason.
+
+### Archived duplicates redirect to the resource they duplicate (#337)
+- A resource that was archived as a duplicate now records the resource it duplicates (`resources.duplicate_of`). Its page and `GET /api/resources/:id` answer 301 to the kept resource, query string included, by following up to 5 links and stopping on a cycle. Archived resources with no duplicate keep answering 410 Gone. The migration links the 27 audited duplicate pairs. The pointer is cleared whenever a resource leaves archived, and creating a resource can't set it.
+
+### Decline also stops Replit's page counting
+- Declining analytics now sets the opt-out flag that Replit's injected, cookie-free page counter checks before every send. This covers a decline stored only in the consent cookie, and visitors who declined before this release. Allowing analytics clears the flag only if the app set it. The banner, Cookie settings and Privacy Policy now say Replit counts page views unless you decline.
+
+### Researcher runs that reach their turn cap are stopped, not failed
+- A researcher or enrichment run that reaches its admin-set turn cap now ends as "stopped at turn cap", not "failed", and its turn counter never reads above the cap. A turn-capped enrichment batch closes its unprocessed items, so they don't run again. Budget-cap stops behave as before.
+
+### Centred sign-in and sign-up card
+- The sign-in, sign-up and sign-out screens no longer reserve the back-to-top lane, so the Clerk card sits in the middle of the screen at every width, with equal gutters at 390, 768 and 1280.
+
+### One login audit row per session
+- A sign-in writes one `auth.login` audit row per Clerk session, even when production runs several server instances. Duplicates are prevented in the database, not in one instance's memory.
+
+### Scheduled backup outcome line (#281 diagnostics)
+- Each scheduled backup run logs exactly one outcome line (done, error, locked or skipped). On error the line names the failing stage. Runs that are not yet due stay silent.
+
+### Observable watchdog retry (#284)
+- When the orphan-job watchdog's periodic sweep hits a database connect timeout and its retry succeeds, it logs one warning with the pool state at the moment of the timeout. A failed retry is marked `retried: true` and keeps the original database error readable.
+
+### A reclaimed or cancelled AI job keeps its final status
+- When the orphan-job watchdog marks a stalled enrichment or researcher job failed, or an admin cancels it, the old run can no longer write over that verdict later. Every status write from a running job lands only while the job is still pending or running. Usage and cost are still recorded.
+
+### Re-seed needs a typed confirmation on the server
+- `POST /api/admin/seed-database` now refuses to clear the catalog unless the request carries the exact confirmation phrase. The admin Clear & Re-seed dialog sends it after its existing typed check. Plain seeding is unchanged.
+
+### Removed the ops and self-heal harness
+- Removed the link-check workflow, merge-gate and post-merge scripts, the production check scripts and the harness skills. The product's runtime is unchanged.
+
+### Back/Forward no longer shifts the page
+- Going Back or Forward between a browse page with the sidebar and a resource page used to slide the content column sideways (CLS 0.21 at 1280, 0.22 at 768). The column is now a fresh element per layout mode, so nothing moves. Clicks, Enter and phone widths were already unaffected.
+
 ## November 4, 2026
 
 ### Equivalent responsive analytics consent (BUG-044)
