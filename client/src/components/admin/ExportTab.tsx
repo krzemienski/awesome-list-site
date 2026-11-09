@@ -476,91 +476,6 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       </div>
       </details>
 
-      {/* F11: the export link check is the persistent link-health job. */}
-      <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check" aria-busy={isLinkJobPending}>
-          {isLinkJobPending ? (
-            <>
-              <Skeleton className="h-5 w-48" />
-              <Skeleton className="h-4 w-full max-w-md" />
-              <Skeleton className="h-4 w-full max-w-lg" />
-            </>
-          ) : isLinkJobError && !linkJob ? (
-            <AdminLoadError
-              subject="the link check status"
-              error={linkJobError}
-              note="This is not evidence that links are healthy."
-              onRetry={() => { void refetchLinkJob(); }}
-              retrying={isLinkJobFetching}
-              testId="alert-export-link-check-error"
-              retryTestId="button-retry-export-link-check"
-            />
-          ) : linkJob ? (
-            <>
-              <div className="admin-ops-export__link-job-row">
-                <h2 id="export-link-job-heading">
-                  Link check #{linkJob.id}{" "}
-                  <StatusChip
-                    status={
-                      isLinkJobActive ? "Running"
-                        : linkJob.status === "completed" ? "Completed"
-                          : linkJob.status === "failed" ? "Failed" : "Cancelled"
-                    }
-                  />
-                </h2>
-                {isLinkJobActive ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(event) => {
-                      if (cancelLinkCheckMutation.isPending) return;
-                      // The button unmounts once the job is cancelled; keep focus on
-                      // this panel's heading, which now reads "Cancelled" (C22-EX-08).
-                      handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-link-job-heading"));
-                      cancelLinkCheckMutation.mutate(linkJob.id);
-                    }}
-                    aria-disabled={cancelLinkCheckMutation.isPending}
-                    aria-busy={cancelLinkCheckMutation.isPending}
-                    data-testid="button-cancel-export-link-check"
-                  >
-                    {cancelLinkCheckMutation.isPending ? "Cancelling…" : "Cancel link check"}
-                  </Button>
-                ) : null}
-              </div>
-              <p className="admin-ops-export__link-job-scope">
-                Checks the stored URL of every approved resource — the same URLs the exports write.
-              </p>
-              <p role="status" data-testid="export-link-check-progress">
-                {isLinkJobActive
-                  ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
-                  : linkJob.status === "completed"
-                    ? `Scan #${linkJob.id} completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}. At scan time: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
-                    : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
-              </p>
-              {isLinkJobError ? (
-                <AdminLoadError
-                  subject="the latest link check status"
-                  error={linkJobError}
-                  note="The progress above may be out of date."
-                  onRetry={() => { void refetchLinkJob(); }}
-                  retrying={isLinkJobFetching}
-                  testId="alert-export-link-check-stale"
-                  retryTestId="button-retry-export-link-check"
-                />
-              ) : null}
-              {linkJob.status === "completed" ? (
-                <p className="admin-ops-export__link-job-scope" data-testid="export-link-check-scan-time-note">
-                  These are the counts saved when the scan finished. Link Health shows the same scan&apos;s problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed.
-                </p>
-              ) : null}
-              <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
-            </>
-          ) : (
-            <p className="admin-ops-export__link-job-scope">
-              No link check has been run yet. Run Link Check to scan every approved resource URL.
-            </p>
-          )}
-        </section>
-
       <div className="admin-ops-export__cards">
         <article className="card admin-ops-export-card hoverable">
           <div className="admin-ops-export-card__icon" aria-hidden="true">
@@ -646,6 +561,93 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         </article>
 
       </div>
+
+      {/* F11: the export link check is the persistent link-health job. It sits
+          below the export cards: its height depends on the job state and width
+          (219-386 px), so above them it pushed the cards down when it loaded. */}
+      <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check" aria-busy={isLinkJobPending}>
+          {isLinkJobPending ? (
+            <>
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-full max-w-md" />
+              <Skeleton className="h-4 w-full max-w-lg" />
+            </>
+          ) : isLinkJobError && !linkJob ? (
+            <AdminLoadError
+              subject="the link check status"
+              error={linkJobError}
+              note="This is not evidence that links are healthy."
+              onRetry={() => { void refetchLinkJob(); }}
+              retrying={isLinkJobFetching}
+              testId="alert-export-link-check-error"
+              retryTestId="button-retry-export-link-check"
+            />
+          ) : linkJob ? (
+            <>
+              <div className="admin-ops-export__link-job-row">
+                <h2 id="export-link-job-heading">
+                  Link check #{linkJob.id}{" "}
+                  <StatusChip
+                    status={
+                      isLinkJobActive ? "Running"
+                        : linkJob.status === "completed" ? "Completed"
+                          : linkJob.status === "failed" ? "Failed" : "Cancelled"
+                    }
+                  />
+                </h2>
+                {isLinkJobActive ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(event) => {
+                      if (cancelLinkCheckMutation.isPending) return;
+                      // The button unmounts once the job is cancelled; keep focus on
+                      // this panel's heading, which now reads "Cancelled" (C22-EX-08).
+                      handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-link-job-heading"));
+                      cancelLinkCheckMutation.mutate(linkJob.id);
+                    }}
+                    aria-disabled={cancelLinkCheckMutation.isPending}
+                    aria-busy={cancelLinkCheckMutation.isPending}
+                    data-testid="button-cancel-export-link-check"
+                  >
+                    {cancelLinkCheckMutation.isPending ? "Cancelling…" : "Cancel link check"}
+                  </Button>
+                ) : null}
+              </div>
+              <p className="admin-ops-export__link-job-scope">
+                Checks the stored URL of every approved resource — the same URLs the exports write.
+              </p>
+              <p role="status" data-testid="export-link-check-progress">
+                {isLinkJobActive
+                  ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
+                  : linkJob.status === "completed"
+                    ? `Scan #${linkJob.id} completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}. At scan time: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
+                    : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
+              </p>
+              {isLinkJobError ? (
+                <AdminLoadError
+                  subject="the latest link check status"
+                  error={linkJobError}
+                  note="The progress above may be out of date."
+                  onRetry={() => { void refetchLinkJob(); }}
+                  retrying={isLinkJobFetching}
+                  testId="alert-export-link-check-stale"
+                  retryTestId="button-retry-export-link-check"
+                />
+              ) : null}
+              {linkJob.status === "completed" ? (
+                <p className="admin-ops-export__link-job-scope" data-testid="export-link-check-scan-time-note">
+                  These are the counts saved when the scan finished. Link Health shows the same scan&apos;s problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed.
+                </p>
+              ) : null}
+              <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
+            </>
+          ) : (
+            <p className="admin-ops-export__link-job-scope">
+              No link check has been run yet. Run Link Check to scan every approved resource URL.
+            </p>
+          )}
+        </section>
 
       <details className="admin-ops-more">
         <summary className="btn ghost">Export history &amp; validation results</summary>
