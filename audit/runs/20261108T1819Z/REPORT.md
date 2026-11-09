@@ -3,7 +3,7 @@
 ## Outcome
 - Production served origin/main at every checkpoint. The last checkpoint was 2026-11-09 00:2xZ, on `69ef14e7`, before this docs PR merged. Merging it moves main ahead of production by one docs-only commit.
 - Every code defect the run found or inherited is fixed, independently reviewed and merged. That is 17 PRs: #335, #338–#349 and #351–#353.
-  - 14 are proven on awesome.video (#351's D13 is code-only, since no pending edit exists).
+  - 13 are proven on awesome.video. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
   - #339 (backup outcome line) and #342 (watchdog retry line) are deployed, but their proof needs a real event: the next scheduled backup, and a real database connect timeout.
   - #346 and #348 (job status guards) rest on a TLA+ model check and independent review. They have no production check.
 - The final matrix pass covered 218 rows, one per surface per width, across final-L1 to L6: 212 PASS, 5 CARRIED, 1 RECLASSIFIED, 0 FAIL.
