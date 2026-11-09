@@ -1967,14 +1967,20 @@ Format: id · surface · symptom · root cause · fix PR → SHA · prod proof �
 - R-D2 · scheduled backup · failures logged with no stage · scheduledBackup.ts logged errorClass only · #339 → 5c0d66af · outcome line due after 2026-11-09T14:10Z · DEPLOYED, proof pending
 - R-337 · /resource/:id archived duplicates · 410 instead of 301 · no duplicate pointer · #341 → 83079b6b · 27/27 301, unmapped 410 · FIXED
 - R-CONSENT-REPLIT · consent · Replit's Umami counted after Decline · flag never set; suppression module owned it · #340 → 396abf2c · 0 beacons after Decline · FIXED
-- R-284c3 · job-watchdog · retry outcome unlogged · only failures logged · #342 → e123be1d · appears on the next real timeout · DEPLOYED
+- R-284c3 · job-watchdog · retry outcome unlogged · only failures logged · #342 → e123be1d · DEPLOYED, proof pending (needs a real connect timeout)
 - R-RESEARCH-TURNCAP · admin researcher · turn cap stored as failed, "4 of 3" · is_error on error_max_turns treated as terminal · #343 → 68ff5fc2 · run #111 stopped at turn cap, 1 of 1 · FIXED
 - R-SIGNIN-390 · auth pages · card off-centre · back-to-top lane padding · #344 → 20c36511 · equal gutters at 3 widths · FIXED
 - R-AUTHLOGIN-DUP · audit log · 2 auth.login rows per session · per-instance Map dedupe · #345 → a7a673b2 · 1 row per session · FIXED
-- R-ENRICH-RACE (H-04) · enrichment jobs · a reclaimed run could overwrite its status · unguarded worker writes · #346 → b451f455 · TLA+ model passes · FIXED
+- R-ENRICH-RACE (H-04) · enrichment jobs · a reclaimed run could overwrite its status · unguarded worker writes · #346 → b451f455 · TLA+ model passes, independent review, no prod proof · FIXED (code)
 - R-RESEED-GUARD (H-05) · admin seed API · clearExisting with no server confirmation · UI-only guard · #347 → ac96736a · 400 without confirm · FIXED
-- R-RESEARCH-RACE · research jobs · same race as H-04 · unguarded worker writes · #348 → 496c51c9 · reviewed · FIXED
+- R-RESEARCH-RACE · research jobs · same race as H-04 · unguarded worker writes · #348 → 496c51c9 · independent review, no prod proof · FIXED (code)
 - R-CLS-BACKFWD · browse ↔ resource Back/Forward · CLS 0.21/0.22 · sidebar toggled in the same commit, column moved · #349 → ff4d51bf · counted CLS 0 in every case · FIXED
+- R-320-D10a · admin Audit · "filter still applied" note shown with no filter · constant note prop · #351 → b03197c6 · both cases PASS · FIXED
+- R-320-D10b · admin Export · link-check card load shifted the cards (0.1005) · card mounted after its query · #351 → b03197c6, then #353 → 69ef14e7 (card moved below the cards; 390 still shifted 0.0278 after #351) · see REPORT · FIXED
+- R-320-D13 · admin Pending Edits · break-all split words · class · #351 → b03197c6 · code only (queue empty) · FIXED (code)
+- R-320-D9 · onboarding · draft survived a prefs reset; a malformed draft crashed the page · reset never cleared the key; no validation · #352 → 2a6eafa1 · PASS · FIXED
+- R-320-D11a/b · category loading and related loading · ~200 px blank band; zero-height skeletons · skeleton smaller than the reserve; inline-block · #352 → 2a6eafa1 · gap 41-45 px, CLS 0, bars visible · FIXED
+- R-320-M2 · Settings · showed "Index" when prefs failed · hook defaulted homeLayout · #352 → 2a6eafa1 · PASS at 1280/390 · FIXED
 - R-GA4-DOUBLE-PV · GA4 · 2 page_view per SPA navigation · GA4 Enhanced Measurement history events · — · confirmed · OWNER (GA4 setting)
 - R-WWW-LOOP · www.awesome.video · redirect loop · Cloudflare rule with scheme-less target · — · confirmed · OWNER (Cloudflare)
 - R-CATALOG-9 · 9 resources · wrong destination or text · import/content · — · confirmed · OWNER (PUTs)
