@@ -1,9 +1,9 @@
-# Run 20261108T1819Z: zero known production defects, harness removal, PostHog-chosen improvements identified (none shipped)
+# Run 20261108T1819Z: zero open code defects (owner-side items remain), harness removal, PostHog-chosen improvements identified (none shipped)
 
 ## Outcome
 - Production served origin/main at every checkpoint. The last checkpoint was 2026-11-09 00:2xZ, on `69ef14e7`, before this docs PR merged. Merging it moves main ahead of production by one docs-only commit.
-- Every code defect the run found or inherited is fixed, independently reviewed and merged. That is 17 PRs: #335, #338–#349 and #351–#353.
-  - 13 are proven on awesome.video. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
+- Every code defect the run found or inherited is fixed, independently reviewed and merged. That is 16 PRs: #335, #338–#349 and #351–#353.
+  - 12 are proven on awesome.video: #335, #338, #340, #341, #343, #344, #345, #347, #349, #351, #352, #353. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
   - #339 (backup outcome line) and #342 (watchdog retry line) are deployed, but their proof needs a real event: the next scheduled backup, and a real database connect timeout.
   - #346 and #348 (job status guards) rest on a TLA+ model check and independent review. They have no production check.
 - The final matrix pass covered 218 rows, one per surface per width, across final-L1 to L6: 212 PASS, 5 CARRIED, 1 RECLASSIFIED, 0 FAIL.
@@ -17,12 +17,12 @@ Still open:
 | # | Finish line | State | Evidence |
 |---|---|---|---|
 | 1 | `/api/version` equals origin/main HEAD | MET before this docs PR, `69ef14e7` both. A docs-only merge moves main ahead of the live SHA without changing any shipped file | `curl -s https://awesome.video/api/version` |
-| 2 | The whole matrix passes | 0 FAIL in the final matrix (218 rows). 5 CARRIED rows: sign-up, sign-out and role change, which owner rules forbid re-driving. They kept their first-pass PASS, and the code under them (#345) is proven separately. 1 RECLASSIFIED: an edge-side 500 on `/api/version`. `matrix-fixes.tsv` also records three non-PASS fix checks: P336-01 INCONCLUSIVE (load burst 1 never filled the gate), P336-05 PARTIAL (shed lines classed the test traffic as human, so the user agent was wrong), and P340-B8b FAIL (GA4 counts each SPA page view twice; owner setting) | final-L1..L6.tsv, matrix-fixes.tsv |
+| 2 | The whole matrix passes | 0 FAIL in the final matrix (218 rows). 5 CARRIED rows: sign-up, sign-out and role change, which owner rules forbid re-driving. They kept their first-pass PASS, and the code under them (#345) is proven separately. 1 RECLASSIFIED: an edge-side 500 on `/api/version`. `matrix-fixes.tsv` also records three non-PASS fix checks: P336-01 INCONCLUSIVE (load burst 1 never filled the gate), P336-05 PARTIAL (shed lines classed the test traffic as human, not qa as expected; cause not established), and P340-B8b FAIL (GA4 counts each SPA page view twice; owner setting) | final-L1..L6.tsv, matrix-fixes.tsv |
 | 3 | No bug-labelled issue open; #284 closed with its 3 conditions | NOT MET. #284 is open with the `bug` label. Conditions 1 and 2 have production evidence. Condition 3 (the watchdog retry) is code-only and has not been observed on production. #336 and #337 are closed | `gh issue list --label bug --state open` |
 | 4 | 0 5xx for 2 h after the last deploy | IN PROGRESS. 0 5xx in the 11 minutes read after the 22:31Z deploy. Later deploys restarted the window. The 20:13Z burst of 23 human-class 503s was this run's own #336 load test | telemetry-2240.md |
-| 5 | No new PostHog exception groups | WEAK. 0 `$exception` in a 3 h read at about 20:38Z (capture on at 19:47:38Z; last exception ever 2026-09-16; only 4 `$pageview` in that window). Not re-read since | decisions.tsv |
-| 6 | Harness grep empty and build passes | MET at #335. Each later PR records its own build result; `decisions.tsv` records exit 0 explicitly for #340, #342, #343 and #349 | PR bodies |
-| 7 | 0 qa-audit rows | MET for deletable tables: resources 0, edits 0, collections 0, bookmarks 0. Audit-log rows are append-only by design | cleanup/qa-rows-after.json |
+| 5 | No new PostHog exception groups | WEAK. 0 `$exception` in a 3 h read at about 20:38Z (capture approved 19:47:38Z, turned on 19:48:59Z with read-back true, so on for about 1 h 50 min of that window; last exception ever 2026-09-16; only 4 `$pageview` in that window). Not re-read since | decisions.tsv |
+| 6 | Harness grep empty and build passes | MET at #335. Every PR body (#335–#353) records `npm run build` exit 0 or pass. `decisions.tsv` records build 0 for #340 and #349, tsc 0 only for #343, #345–#348, #351 and #353, and no gate result for #342 | PR bodies |
+| 7 | 0 qa-audit rows | MET for deletable tables: resources 0, edits 0, collections 0, bookmarks 0. Audit-log rows are append-only by design | e2e-evidence/20261108T1819Z/cleanup/qa-rows-after.json |
 | 8 | improvements.md has a baseline and target for each item | MET | improvements.md |
 | — | #320 (draft approval package) | Closed on GitHub at 2026-11-09T00:25Z. Its 7 still-reproducing findings were fixed in #351–#353 and its owner items moved to "Owner decisions" | ledger rows R-320-* |
 | 9 | REPORT.md and a ledger entry | This file, plus the run section in `audit/ledger.md` | |

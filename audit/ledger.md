@@ -1959,7 +1959,7 @@ The phrase “Appendix B” in the PR re-check contract refers to the cycle-7 de
 - Fix waves 1–5: PRs #234–#246. All deployed with replit-deploy; each live revision equalled origin/main.
 - P0 smoke 18/18 PASS (9 journeys × 1440/375). Member/admin flows BLOCKED (no owner session); sign-up skipped by owner.
 
-## Run 20261108T1819Z (2026-11-08): zero known production defects
+## Run 20261108T1819Z (2026-11-08): zero open code defects; owner-side items remain (GA4, www redirect, catalog links, titles) and #284 condition 3 awaits a real timeout
 Full report: [audit/runs/20261108T1819Z/REPORT.md](runs/20261108T1819Z/REPORT.md).
 Format: id · surface · symptom · root cause · fix PR → SHA · prod proof · status.
 - R-HARNESS · repo · ops/self-heal/CI harness · owner decision #332 · #335 → bfd08f7a · grep 0, build 0 · FIXED
