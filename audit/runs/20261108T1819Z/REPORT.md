@@ -3,8 +3,8 @@
 ## Outcome
 - Production served origin/main at every checkpoint. The last checkpoint was 2026-11-09 00:2xZ, on `69ef14e7`, before this docs PR merged. Merging it moves main ahead of production by one docs-only commit.
 - Every code defect the run found or inherited is fixed, independently reviewed and merged. That is 16 PRs: #335, #338–#349 and #351–#353.
-  - 12 are proven on awesome.video: #335, #338, #340, #341, #343, #344, #345, #347, #349, #351, #352, #353. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
-  - #339 (backup outcome line) and #342 (watchdog retry line) are deployed, but their proof needs a real event: the next scheduled backup, and a real database connect timeout.
+  - 13 are proven on awesome.video: #335, #338, #339, #340, #341, #343, #344, #345, #347, #349, #351, #352, #353. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
+  - #342 (watchdog retry line) is deployed, but its proof needs a real event: a database connect timeout.
   - #346 and #348 (job status guards) rest on a TLA+ model check and independent review. They have no production check.
 - The final matrix pass covered 218 rows, one per surface per width, across final-L1 to L6: 212 PASS, 5 CARRIED, 1 RECLASSIFIED, 0 FAIL.
 - QA cleanup brought every deletable table to 0 qa-audit rows.
@@ -32,7 +32,7 @@ Still open:
 |---|---|---|
 | #335 → bfd08f7a | Ops, self-heal and CI harness removed | grep 0, build 0 |
 | #338 → d9a90bd4 | Real navigations got 503 during crawler bursts (#336) | Burst: 10/10 navigations got 200; non-navigation clients still got 503 + Retry-After |
-| #339 → 5c0d66af | Scheduled backup failures logged no stage (D2) | DEPLOYED, proof pending: the outcome line appears on the next scheduled run, after 2026-11-09T14:10Z |
+| #339 → 5c0d66af | Scheduled backup failures logged no stage (D2) | Scheduled run at 2026-11-09T14:22:51Z on dece06ae logged `Scheduled backup outcome` with `outcome: done`, backupId `20261109T142251Z-22db804d`, 43 tables, 113,805 rows, `pruned: 0`, no `pruneError`. Read-only `/api/admin/logs` read; evidence e2e-evidence/20261108T1819Z/backup-339/logs.json |
 | #341 → 83079b6b | Archived duplicates answered 410 (#337) | 27/27 pairs return 301 on page and API; query string kept; unmapped archived still 410; sitemap shows 0 |
 | #340 → 396abf2c | Decline did not stop Replit's page counting | 0 beacons after Decline; Allow restores them; earlier, cookie-only and hand-set cases pass; policy and copy agree |
 | #342 → e123be1d | Watchdog retry outcome was invisible (#284) | DEPLOYED, proof pending: the line appears on the next real connect timeout |
