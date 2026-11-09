@@ -23,7 +23,7 @@ Run unattended. Stop and report only on the stop conditions named in each step; 
 
 Check these first; if one is missing, stop and tell the user exactly which, because no later step works without them.
 
-1. **Replit MCP authenticated.** `mcp__replit__*` tools beyond `authenticate` are available. If only `authenticate`/`complete_authentication` exist, the user must run `/mcp` → replit → Authenticate → choose workspace → Allow.
+1. **Replit MCP authenticated.** `mcp__replit__*` tools beyond `authenticate` are available. If only `authenticate`/`complete_authentication` exist, the user must run `/mcp` → replit → Authenticate → choose workspace → Allow. Before asking for re-auth after an ECONNREFUSED or "not connected", probe: `curl -sS -o /dev/null -w '%{http_code}' https://mcp.replit.com/server/mcp` returning 401 means the endpoint is reachable and auth is intact; a resolve failure while `dig +short mcp.replit.com @1.1.1.1` answers is a local DNS blip that usually clears in minutes.
 2. **SSH host alias `awesome-replit`.** `ssh -o BatchMode=yes -o ConnectTimeout=20 awesome-replit true` exits 0. Setup if missing: `ssh-keygen -t ed25519 -f ~/.ssh/replit -q -N ""`, add `~/.ssh/replit.pub` at replit.com/settings/advanced → SSH keys, then copy the host/user from the project's SSH pane (Connect → "Connect manually") into `~/.ssh/config`:
    ```
    Host awesome-replit
@@ -43,6 +43,8 @@ Check these first; if one is missing, stop and tell the user exactly which, beca
 Save every command and its output under `e2e-evidence/replit-deploy/<UTC timestamp>/` (one file per step). The final report cites these files.
 
 ### 1. Pin the target
+
+First check whether a final pass or a timed observation window (the 2-hour no-5xx window, a 24-hour reading) is running on the live SHA. A publish voids that pass and restarts the window. If the diff since BEFORE is docs or reports only, do not publish: hold the docs PR until the next code batch, or say which window the publish resets. Merge run reports before the last code deploy, not after it.
 
 ```bash
 git fetch origin
@@ -144,7 +146,7 @@ Safe in the workspace: the image-trim step runs only when `REPLIT_DEPLOYMENT=1` 
 
 Before publishing, list the live audit lanes and tell each that the revision is about to change (pause it or note it per row), and stamp the revision on each row. Evidence is valid only for its stamped revision.
 
-1. Find the app: `search_apps` by URL returns `[]` (2026-11-06), and a name search ("Awesome Video") also returns look-alike apps. Search by name, or take the replId from the `awesome-replit` SSH user (`ssh awesome-replit 'echo $REPL_ID'`), then confirm with `get_publish_status(replId)` that the deployment serves https://awesome.video before any publish. Cache nothing across runs.
+1. Find the app: `search_apps` by URL returns `[]` (2026-11-06), and a name search ("Awesome Video") also returns look-alike apps. Search by name, or take the replId from the `awesome-replit` SSH user (`ssh awesome-replit 'echo $REPL_ID'`), then confirm with `get_publish_status(replId)` that the deployment serves https://awesome.video before any publish. Cache nothing across runs. The `deploymentId` that `get_publish_status` returns is a different UUID from the replId; passing it as `replId` fails with "No Replit app matched this ID". The replId is the `User` value in the SSH config: `ssh -G awesome-replit | awk '/^user /{print $2}'`.
 2. `get_publish_status(replId)` first. If a publish is already in progress, wait for it instead of starting another.
 3. Pre-publish check, immediately before step 3a (and before telling the owner to publish). `ask_question(replId, "Run git status --short and git rev-parse HEAD^{tree} and quote both outputs verbatim.")`, or the same commands over SSH. `git status --short` must print nothing at all: no `??` line and no modified file. A `package-lock.json` that step 3's `npm install` rewrote also fails; restore it with `git checkout -- package-lock.json` and check again. HEAD's tree must equal `git rev-parse "$TARGET^{tree}"`. Delete unwanted untracked files now, before the publish, never after. The build guard (step 4) refuses untracked files and a tree that is not main's, but it does not see modified tracked files or ignored files, so this check is the only one for those. Ignored files ship too, so no secret-bearing file may be in the workspace; secrets live in Replit Secrets. A workspace `.env` (gitignored, not in the repo) may hold only the mirror of public `VITE_*` config (#273): check its key names only (`cut -d= -f1 .env`, never the values) and stop only if a secret key name (a password, token, key or `DATABASE_URL`) appears. From here until step 5 ends, make no edit in the workspace, and publish only while no Replit Agent run or other writer is active there: autosave commits untracked files into the build that is being published.
 3a. (Step 5.3a) Running-jobs check, immediately before step 4 and again after any wait in step 4. A deploy restarts the instance and kills in-process scans (three jobs died "Interrupted by server restart"). Paste this as its own shell call (the `exit 1` ends that shell); it uses the cached owner header file and never prints it. Every probe fails closed:
@@ -188,6 +190,8 @@ Then stop and report: what failed, at which stage, the evidence, and that produc
 **Agent sync.** Without SSH, steps 2–3 go through `update_app_using_prompt` with an explicit "sync only, write no code, fast-forward only (or `git reset --keep origin/main` past an empty Published your App commit, after checking it changes no files), npm install and db:push only as the step-3 diff decides, abort on any drizzle prompt, no checkpoint or lockfile commit" brief. On 2026-10-25 this fast-forwarded 5a4e0d87 → e12a4e67, ran npm install and db:push, and left no checkpoint commit. The call returns `phase: updating` at once, and the sync itself runs for about 2–3 minutes. Its completion, or a STOP, shows only through polling: every 30 s, ask read-only `ask_question` whether the Agent's sync run is still working or is idle (finished or paused), plus HEAD, `git status --short` and `git log --oneline -3`. HEAD equal to TARGET alone does not mean the brief finished: the fast-forward lands first, and the Agent may still be running `npm install` or `db:push`. The sync is done only when one answer shows all three: the Agent idle, HEAD equal to TARGET, and `git status --short --untracked-files=all` empty. `ask_question` answers are Agent's own report, so ask for the commands' verbatim output, not a summary. Stop polling early if the Agent reports a stop. Never sleep blind instead. The last answer must show that nothing landed on top of origin/main.
 
 ### 7. Prove it live
+
+Also check the www host: `curl -sSI https://www.awesome.video/` must answer one 301 whose `location` is `https://awesome.video/` (a scheme-less target loops). The redirect is a Cloudflare zone rule; fix it with the Cloudflare plugin's API, not as an owner chore.
 
 ```bash
 LIVE=$(curl -s https://awesome.video/api/version | jq -r .revision)
