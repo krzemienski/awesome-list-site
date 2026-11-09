@@ -652,10 +652,7 @@
   padding: 1rem 1.25rem;
   font-size: 0.8125rem;
   color: var(--text);
-  /* Reserve the settled card's height so the cards grid below never shifts
-     when the status query resolves (or the card has nothing to report). */
   align-content: start;
-  min-height: 219px;
 }
 
 .admin-ops-export__link-job h2 {
