@@ -23,6 +23,7 @@ async function runCycle(workerId: string): Promise<void> {
       recovered: result.recovered,
       queued: result.queued,
       processed: result.processed,
+      cleaned: result.cleaned,
       ms: Date.now() - startedAt,
     });
   } catch (error) {
