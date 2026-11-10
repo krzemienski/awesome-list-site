@@ -3,7 +3,9 @@
  *
  * Called by the in-process backup scheduler (server/jobs/backupScheduler.ts).
  * Safe to call as often as wanted: it only dumps when the newest backup is
- * older than 24 h.
+ * older than 24 h. That check reads object storage only, so a run with a fresh
+ * backup opens no database connection; the advisory lock is taken only when a
+ * backup looks due, and the check is repeated under it.
  *
  * Advisory lock ids in use: 5116/7 link health (linkHealthService),
  * 5117/1 this backup, hashtext('enrichment_job_admission'),
@@ -106,11 +108,17 @@ async function recordAudit(manifest: BackupManifest): Promise<string | undefined
 const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+/** True when no backup exists or the newest one is DUE_AFTER_MS old or older. Shared by the pre-lock check and the re-check under the lock. */
+function isBackupDue(backups: BackupManifest[], now: number): boolean {
+  const newest = Math.max(0, ...withValidDates(backups).map((b) => Date.parse(b.completedAt)));
+  return now - newest >= DUE_AFTER_MS;
+}
+
+/** Runs with the lock held. Lists again: another instance may have finished a dump since the pre-lock check. */
 async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
   run.stage = "list";
   const { backups } = await listDatabaseBackupsDetailed();
-  const newest = Math.max(0, ...withValidDates(backups).map((b) => Date.parse(b.completedAt)));
-  if (Date.now() - newest < DUE_AFTER_MS) return { status: "skipped" };
+  if (!isBackupDue(backups, Date.now())) return { status: "skipped" };
 
   let manifest: BackupManifest;
   run.stage = "dump";
@@ -146,8 +154,20 @@ async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
   return { status: "created", id: manifest.id };
 }
 
+function logRunFailure(run: BackupRun, error: unknown): ScheduledBackupResult {
+  // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
+  // Passing the Error is what puts err/code/cause on the line; the original call logged only errorClass.
+  logger.error("Scheduled backup failed", error, {
+    outcome: "error",
+    stage: run.stage,
+    errorName: errorClass(error),
+    durationMs: Date.now() - run.startedAt,
+  });
+  return { status: "error" };
+}
+
 export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> {
-  const run: BackupRun = { stage: "lock-connect", startedAt: Date.now() };
+  const run: BackupRun = { stage: "list", startedAt: Date.now() };
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl || !isBackupStorageConfigured()) {
     if (databaseUrl && !loggedStorageNotConfigured) {
@@ -160,8 +180,18 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
     return { status: "skipped" };
   }
 
+  // Most ticks find a fresh backup. Decide that from object storage alone: a freshly booted
+  // instance is starved for its first minutes, and a DB connection it never needs times out there.
+  try {
+    const { backups } = await listDatabaseBackupsDetailed();
+    if (!isBackupDue(backups, Date.now())) return { status: "skipped" };
+  } catch (error) {
+    return logRunFailure(run, error);
+  }
+
   // Session-level lock on its own connection: the in-flight flag in
   // databaseBackup.ts is per process, and another Autoscale instance may be dumping.
+  run.stage = "lock-connect";
   const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: 5000 });
   lockClient.on("error", (error) => logger.error("Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) }));
   try {
@@ -181,15 +211,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
       await lockClient.query("select pg_advisory_unlock($1, $2)", [...BACKUP_LOCK]).catch(() => undefined);
     }
   } catch (error) {
-    // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
-    // Passing the Error is what puts err/code/cause on the line; the original call logged only errorClass.
-    logger.error("Scheduled backup failed", error, {
-      outcome: "error",
-      stage: run.stage,
-      errorName: errorClass(error),
-      durationMs: Date.now() - run.startedAt,
-    });
-    return { status: "error" };
+    return logRunFailure(run, error);
   } finally {
     await lockClient.end().catch(() => undefined);
   }
