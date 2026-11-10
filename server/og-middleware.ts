@@ -576,9 +576,11 @@ function safeDecode(segment: string): string {
 // abort-aware so a burst of unique /search or revocable /collection routes
 // cannot retain unlimited promises or later execute work for disconnected
 // clients. Slot-transfer release keeps the active count exact.
-// An uncached resolution takes ~5 ms, so 5 slots drain a 512-deep queue in
-// about a second. The old 32-deep queue shed (503) any cold burst past 37
-// requests, which is every crawler sweep after a restart or catalog write.
+// An uncached resolution is a few DB selects: ~5 ms locally, ~40 ms in
+// production (ops-health). Five slots therefore drain a full 512-deep queue in
+// about a second locally and a few seconds in production. The old 32-deep queue
+// shed (503) any cold burst past 37 requests, which is every crawler sweep after
+// a restart or catalog write.
 const UNCACHED_RESOLVE_LIMIT = 5;
 const UNCACHED_RESOLVE_MAX_WAITERS = 512;
 let uncachedResolveActive = 0;

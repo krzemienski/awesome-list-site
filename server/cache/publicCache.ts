@@ -28,6 +28,7 @@ export type PublicCacheNamespace =
 
 export type PublicCacheInvalidationReason =
   | "category-mutation"
+  | "journey-mutation"
   | "manual"
   | "resource-mutation"
   | "seed-mutation"
@@ -67,6 +68,7 @@ const inFlight = new Map<string, Promise<unknown>>();
 const metrics = new Map<PublicCacheNamespace, CacheMetrics>();
 const invalidations: Record<PublicCacheInvalidationReason, number> = {
   "category-mutation": 0,
+  "journey-mutation": 0,
   manual: 0,
   "resource-mutation": 0,
   "seed-mutation": 0,

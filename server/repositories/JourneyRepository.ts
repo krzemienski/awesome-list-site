@@ -37,6 +37,7 @@
  * ============================================================================
  */
 
+import { invalidatePublicCache } from "../cache/publicCache";
 import { db as dbInstance } from "../db";
 import { eq, and, sql, asc } from "drizzle-orm";
 import {
@@ -169,6 +170,7 @@ export class JourneyRepository {
       .insert(learningJourneys)
       .values(data)
       .returning();
+    invalidatePublicCache('journey-mutation');
 
     return newJourney;
   }
@@ -200,6 +202,7 @@ export class JourneyRepository {
       .set({ ...data, updatedAt: new Date() })
       .where(eq(learningJourneys.id, id))
       .returning();
+    invalidatePublicCache('journey-mutation');
 
     return updatedJourney;
   }
@@ -217,6 +220,7 @@ export class JourneyRepository {
     await this.db
       .delete(learningJourneys)
       .where(eq(learningJourneys.id, id));
+    invalidatePublicCache('journey-mutation');
   }
 
   /**
