@@ -353,6 +353,11 @@ function activeTagFilters(url: string): string[] {
   return parseTagFilterValues([...q.getAll("tags"), ...q.getAll("tag")]);
 }
 
+// Crawlers visit each of the ~2,700 route URLs about once, so a 60 s TTL never
+// hit (4.8% in production). Freshness does not depend on the TTL: every catalog
+// write calls invalidatePublicCache(), which clears this namespace.
+const ROUTE_META_TTL_MS = 6 * 60 * 60 * 1000;
+
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -381,7 +386,7 @@ async function resolveRoute(
   return getPublicCacheValue({
     namespace: "route-meta",
     key,
-    ttlMs: 60_000,
+    ttlMs: ROUTE_META_TTL_MS,
     load: () => resolveRouteUncached(url, signal),
   });
 }
@@ -571,8 +576,11 @@ function safeDecode(segment: string): string {
 // abort-aware so a burst of unique /search or revocable /collection routes
 // cannot retain unlimited promises or later execute work for disconnected
 // clients. Slot-transfer release keeps the active count exact.
+// An uncached resolution takes ~5 ms, so 5 slots drain a 512-deep queue in
+// about a second. The old 32-deep queue shed (503) any cold burst past 37
+// requests, which is every crawler sweep after a restart or catalog write.
 const UNCACHED_RESOLVE_LIMIT = 5;
-const UNCACHED_RESOLVE_MAX_WAITERS = 32;
+const UNCACHED_RESOLVE_MAX_WAITERS = 512;
 let uncachedResolveActive = 0;
 
 interface UncachedResolveWaiter {
