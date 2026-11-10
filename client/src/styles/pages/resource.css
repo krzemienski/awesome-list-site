@@ -221,6 +221,11 @@
   min-height: calc(3 * 44px + 2 * 4px);
 }
 .resource-detail-top-next li { min-width: 0; }
+.resource-detail-top-next-empty {
+  padding: 12px;
+  color: var(--text-3);
+  font-size: 13px;
+}
 .resource-detail-top-next-item {
   display: flex;
   align-items: center;
