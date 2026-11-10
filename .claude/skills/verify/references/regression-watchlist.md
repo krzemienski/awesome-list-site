@@ -147,6 +147,8 @@ Example IDs below come from the history docs (for example /resource/188015, /res
 
 ## 2. Always re-check after any change (ranked by blast radius × recurrence)
 
+The standing post-deploy sweep runs only the Tier 1 items (`../SKILL.md` Standing post-deploy sweep). Items that fall outside Tier 1 (bookmarks, `/recommendations`, admin dialogs, admin write freshness) run when the change touches them.
+
 1. **Counts agree across surfaces.** On `/category/players-clients`, the sidebar badge, header total, subcategory cards plus Uncategorized, and sidebar child rows must all agree, and the sidebar footer "N indexed" must match the home total. This class broke at least 6 times: 37861134, 0c03c707, 8b37da63, N-12/14/15 via 2349a26c, Advanced undercount, admin inflation.
 2. **Sticky header and consent banner layout at all three widths.** Fresh profile on `/` and `/submit`: the banner never covers content or buttons, and the header stays pinned on scroll (43c947b7, 2462a0eb, BUG-004).
 3. **Card to detail from every listing type.** Category, subcategory, sub-subcategory, tag and search cards all open `/resource/<id>` (c37f266c, resource-browsing-parity).

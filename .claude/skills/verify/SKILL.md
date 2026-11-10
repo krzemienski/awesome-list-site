@@ -58,6 +58,17 @@ Run before driving, and whenever anything looks off. All read-only.
 7. In the browser, `list_console_messages` has no `Invalid hook call` or "more than one copy of React". If it does, two dev instances share a `node_modules/.vite` cache: each checkout needs its own real `node_modules`. `[FrameManager] Failed to notify focus taken` errors come from the shared browser, not the app.
 
 
+## Standing post-deploy sweep
+
+Scope follows what visitors use, not what exists. Evidence (run discovery-20261110T1759Z, PostHog 28 d, 2026-11-10): `/` 257 views, `/resource` 145, `/subcategory` 104; `command_palette_opened` 109, `search_performed` 96, `resource_link_opened` 41; resource pages were 74% of first-party human requests; real members used bookmarks, collections, API keys and notifications 0 times.
+
+- **Tier 1, every deploy**, each at 1440 and 390: resource page cold landing; the browse page types (home, tag, category, subcategory, sub-subcategory, `/categories`); the ⌘K palette and the `/` key; the outbound resource click; the submit form loading (signed out, no submit); admin approvals, resources and overview, read-only.
+- **Log check after every deploy:** `GET /api/admin/logs?since=-30m&level=error&limit=500` with the owner header. Expect 0 unexplained errors; each one found is explained or filed.
+- **Tier 2, smoke only when the change touches it:** the `/search` page, info pages, sign-in/up, admin edits, categories, users, audit, link health, export.
+- **Tier 3, skip unless the change touches it:** bookmarks, collections, API keys, notifications, digests, journeys, onboarding, `/advanced`, GitHub sync, enrichment, researcher/research, the database tab.
+
+A change always gets its own journey driven in full (rule 1 above), whatever its tier. The tiers only bound the standing sweep. Re-rank them when usage data changes.
+
 ## Before merging
 
 Check the tree the merge will produce, not the branch alone.

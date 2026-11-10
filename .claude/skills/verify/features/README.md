@@ -7,7 +7,7 @@ The maintained source for verifying awesome.video's user-facing behaviour. Read 
 - A server launched per `../SKILL.md` Launch on a local DB cloned from `awesome_waves`, and the Doctor checks passing.
 - A fresh `isolatedContext` per role: `<run>-guest` and, when needed, `<run>-admin` (Clerk test account, `role:"admin"` confirmed via `/api/auth/user`).
 - Consent decided before clicking near the bottom of a page.
-- Every journey runs at 1440×900, 820×1180 and 390×844 unless the feature file narrows it.
+- Every journey runs at 1440×900, 820×1180 and 390×844 unless the feature file narrows it. The standing post-deploy sweep is narrower: Tier 1 only, at 1440 and 390 (see `../SKILL.md` Standing post-deploy sweep).
 
 ## Driving conventions
 
@@ -29,6 +29,8 @@ The maintained source for verifying awesome.video's user-facing behaviour. Read 
 Each feature file starts with an H1 and one paragraph on the user-visible behaviour, then exactly four H2 sections in this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with chrome-devtools MCP`, `Gotchas`. Keep implementation detail out; name user paths, stable handles, required state and observable proof.
 
 ## Features
+
+Sweep tier of each feature: Tier 1 is browse catalog, resource page and search (palette and `/` key); Tier 2 is the `/search` page, analytics and consent smoke, admin GitHub import and the admin shell outside approvals, resources and overview; Tier 3 is bookmarks and admin researcher. A tier decides what the standing sweep runs, not how deeply a changed feature is proved.
 
 - [Browse the catalog](./browse-catalog.md) covers home, category and subcategory listings, the sidebar and drawer, and counts that must agree.
 - [Resource page](./resource-page.md) covers the detail page, its primary link, related and onward links, report and suggest edit.
