@@ -3,6 +3,7 @@ import {
   useCallback,
   useLayoutEffect,
   useState,
+  useRef,
   lazy,
   Suspense,
   Component,
@@ -63,22 +64,35 @@ function retryFailedRouteImports(): void {
 
 function lazyRoute<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   let rejected = false;
-  const create = () =>
-    lazy(() =>
-      factory().catch((error: unknown) => {
+  // React.lazy suspends on the first render of a route even when its chunk is
+  // already in memory, which can paint the generic route skeleton for a frame.
+  // A mount that finds the page loaded (by an earlier visit or by preload)
+  // renders it directly.
+  let loaded: T | null = null;
+  const load = () =>
+    factory().then(
+      (module) => {
+        loaded = module.default;
+        return module;
+      },
+      (error: unknown) => {
         rejected = true;
         throw error;
-      }),
+      },
     );
-  let Inner = create();
+  let Inner = lazy(load);
   routeImportResets.add(() => {
     if (!rejected) return;
     rejected = false;
-    Inner = create();
+    Inner = lazy(load);
   });
-  return function LazyRoute(props: ComponentProps<T>) {
-    return <Inner {...props} />;
-  };
+  function LazyRoute(props: ComponentProps<T>) {
+    const Page = useRef(loaded).current ?? Inner;
+    return <Page {...props} />;
+  }
+  /** Start fetching the chunk. A failure is swallowed: the lazy import retries itself on navigation. */
+  LazyRoute.preload = () => void load().catch(() => undefined);
+  return LazyRoute;
 }
 
 // Guard and terminal error surfaces only render after routing has selected a
@@ -110,6 +124,28 @@ const Subcategory = lazyRoute(() => import("@/pages/Subcategory"));
 const SubSubcategory = lazyRoute(() => import("@/pages/SubSubcategory"));
 const TagLanding = lazyRoute(() => import("@/pages/TagLanding"));
 const ResourceDetail = lazyRoute(() => import("@/pages/ResourceDetail"));
+
+/** Fetch the resource page chunk before a listing link is followed: once the
+ * browser is idle, and as soon as a pointer, touch or focus reaches a resource
+ * link. Otherwise the first soft navigation paints the generic route skeleton
+ * and then swaps to a page of a different height. */
+function useResourceChunkWarmup(): void {
+  useEffect(() => {
+    const preload = ResourceDetail.preload;
+    const warm = (event: Event) => {
+      if ((event.target as Element | null)?.closest?.('a[href^="/resource/"]')) preload();
+    };
+    const events = ["pointerover", "pointerdown", "focusin"] as const;
+    events.forEach((name) => document.addEventListener(name, warm, { passive: true }));
+    const hasIdle = "requestIdleCallback" in window;
+    const idle = hasIdle ? window.requestIdleCallback(preload, { timeout: 4000 }) : window.setTimeout(preload, 2000);
+    return () => {
+      events.forEach((name) => document.removeEventListener(name, warm));
+      if (hasIdle) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, []);
+}
 const Categories = lazyRoute(() => import("@/pages/Categories"));
 const About = lazyRoute(() => import("@/pages/About"));
 const Advanced = lazyRoute(() => import("@/pages/Advanced"));
@@ -680,6 +716,7 @@ function Router({
   // would unmount the banner (and its focused Retry) until the retry fails.
   const [authRetrying, setAuthRetrying] = useState(false);
   const [location] = useLocation();
+  useResourceChunkWarmup();
   // A signed-in visitor needs Clerk for token refresh and sign-out.
   useEffect(() => {
     if (user) requestClerk();

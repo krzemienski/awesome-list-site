@@ -74,7 +74,10 @@ import { findCachedResource } from "@/lib/cached-resource";
 import "@/styles/pages/resource.css";
 
 // GET /api/resources/:id/related returns five matches unless asked for more.
-const RELATED_PLACEHOLDER_ROWS = 5;
+// The top "More like this" rail shows the first TOP_RELATED_LIMIT of them, so
+// the Related Resources card lists at most the rest: reserve exactly that many.
+const RELATED_RESPONSE_SIZE = 5;
+const RELATED_PLACEHOLDER_ROWS = RELATED_RESPONSE_SIZE - TOP_RELATED_LIMIT;
 
 // Match resource cards: fetch the editor and form dependencies only on demand.
 const SuggestEditDialog = lazy(() =>

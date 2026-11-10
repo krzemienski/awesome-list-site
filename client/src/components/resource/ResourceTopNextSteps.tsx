@@ -20,11 +20,12 @@ interface ResourceTopNextStepsProps {
 /**
  * Compact "More like this" under the title. Most visitors arrive from search
  * and leave after one page, so the closest neighbours sit above the fold; the
- * rows keep their loaded height so the description below never shifts.
+ * rows keep their loaded height so the description below never shifts: the
+ * list reserves three rows, and a resource with no close matches says so in
+ * place instead of removing the block.
  */
 export default function ResourceTopNextSteps({ related, loading, onRelatedClick }: ResourceTopNextStepsProps) {
   const items = related.slice(0, TOP_RELATED_LIMIT);
-  if (!loading && items.length === 0) return null;
 
   return (
     <nav className="resource-detail-top-next" aria-labelledby="resource-top-next-heading" data-testid="resource-top-next">
@@ -36,6 +37,11 @@ export default function ResourceTopNextSteps({ related, loading, onRelatedClick 
               <Skeleton className="h-4 w-3/4" />
             </li>
           ))}
+        {!loading && items.length === 0 && (
+          <li className="resource-detail-top-next-empty" data-testid="resource-top-next-empty">
+            No close matches yet.
+          </li>
+        )}
         {!loading &&
           items.map((item, index) => (
             <li key={item.id}>
