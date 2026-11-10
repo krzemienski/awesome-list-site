@@ -1149,42 +1149,81 @@ export async function dispatchDigestBatch(
   return processed;
 }
 
-export async function cleanupDigestRetention(): Promise<{
+export interface DigestRetentionResult {
   notifications: number;
   jobs: number;
   tokens: number;
-}> {
+  /** Tables whose delete failed this run; their counts above are 0. */
+  failed: string[];
+}
+
+/**
+ * Each retention delete runs on its own: one table failing must not discard the
+ * other deletes' results or fail the digest cycle. The failure is logged with
+ * its table and the Postgres SQLSTATE.
+ */
+async function runRetentionDelete(
+  table: string,
+  run: () => Promise<unknown[]>,
+): Promise<number | null> {
+  try {
+    return (await run()).length;
+  } catch (error) {
+    // Drizzle wraps the driver error; the SQLSTATE lives on its cause.
+    const cause = error instanceof Error && error.cause ? error.cause : error;
+    const code = (cause as { code?: unknown } | null)?.code;
+    logger.error("Digest retention delete failed", {
+      table,
+      code: typeof code === "string" ? code : "unknown",
+      reason: cause instanceof Error ? cause.message : "unknown error",
+    });
+    return null;
+  }
+}
+
+export async function cleanupDigestRetention(): Promise<DigestRetentionResult> {
   const notificationCutoff = new Date(
     Date.now() - NOTIFICATION_RETENTION_DAYS * 86_400_000,
   );
   const jobCutoff = new Date(
     Date.now() - COMPLETED_RETENTION_DAYS * 86_400_000,
   );
-  const [notificationsDeleted, jobsDeleted, tokensDeleted] = await Promise.all([
-    db
-      .delete(inAppNotifications)
-      .where(
-        sql`${inAppNotifications.expiresAt} < now() OR ${inAppNotifications.createdAt} < ${notificationCutoff}`,
-      )
-      .returning({ id: inAppNotifications.id }),
-    db
-      .delete(digestJobs)
-      .where(
-        and(
-          inArray(digestJobs.status, ["sent", "failed", "skipped"]),
-          sql`${digestJobs.completedAt} < ${jobCutoff}`,
-        ),
-      )
-      .returning({ id: digestJobs.id }),
-    db
-      .delete(digestUnsubscribeTokens)
-      .where(sql`${digestUnsubscribeTokens.expiresAt} < now()`)
-      .returning({ id: digestUnsubscribeTokens.id }),
+  const [notifications, jobs, tokens] = await Promise.all([
+    runRetentionDelete("in_app_notifications", () =>
+      db
+        .delete(inAppNotifications)
+        .where(
+          sql`${inAppNotifications.expiresAt} < now() OR ${inAppNotifications.createdAt} < ${notificationCutoff}`,
+        )
+        .returning({ id: inAppNotifications.id }),
+    ),
+    runRetentionDelete("digest_jobs", () =>
+      db
+        .delete(digestJobs)
+        .where(
+          and(
+            inArray(digestJobs.status, ["sent", "failed", "skipped"]),
+            sql`${digestJobs.completedAt} < ${jobCutoff}`,
+          ),
+        )
+        .returning({ id: digestJobs.id }),
+    ),
+    runRetentionDelete("digest_unsubscribe_tokens", () =>
+      db
+        .delete(digestUnsubscribeTokens)
+        .where(sql`${digestUnsubscribeTokens.expiresAt} < now()`)
+        .returning({ id: digestUnsubscribeTokens.id }),
+    ),
   ]);
+  const failed: string[] = [];
+  if (notifications === null) failed.push("in_app_notifications");
+  if (jobs === null) failed.push("digest_jobs");
+  if (tokens === null) failed.push("digest_unsubscribe_tokens");
   return {
-    notifications: notificationsDeleted.length,
-    jobs: jobsDeleted.length,
-    tokens: tokensDeleted.length,
+    notifications: notifications ?? 0,
+    jobs: jobs ?? 0,
+    tokens: tokens ?? 0,
+    failed,
   };
 }
 
@@ -1195,7 +1234,7 @@ export async function runDigestCycle(options: {
   recovered: number;
   queued: number;
   processed: number;
-  cleaned: { notifications: number; jobs: number; tokens: number };
+  cleaned: DigestRetentionResult;
 }> {
   const workerId =
     options.workerId ?? `digest-${process.pid}-${crypto.randomUUID().slice(0, 8)}`;

@@ -124,6 +124,8 @@ interface HealthRow {
   label: string;
   detail: string;
   state: HealthState;
+  /** A job is pending or processing right now; a finished, stopped or cancelled run is not. */
+  working?: boolean;
 }
 
 const title = (value: string) =>
@@ -203,6 +205,7 @@ function renderHealthRows(
       label: "GitHub sync",
       detail: `${title(activeGithub.status)} · ${relativeAge(activeGithub.createdAt)}`,
       state: "warn",
+      working: true,
     };
   } else if (latestGithub?.status === "failed") {
     github = {
@@ -239,6 +242,7 @@ function renderHealthRows(
       label: "Link checker",
       detail: `${title(currentLink.status)} · ${relativeAge(currentLink.createdAt)}`,
       state: "warn",
+      working: true,
     };
   } else if (currentLink?.status === "failed" || currentLink?.status === "cancelled") {
     link = {
@@ -290,6 +294,7 @@ function renderHealthRows(
       label: "Enrichment queue",
       detail: `${activeJobs} active`,
       state: "warn",
+      working: true,
     };
   } else if (latestJob) {
     const status = latestJob.status ?? "completed";
@@ -386,9 +391,11 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     ? "One or more systems need attention"
     : healthRows.some((row) => row.state === "unknown")
       ? "Checking current readiness"
-      : healthRows.some((row) => row.state === "warn")
+      : healthRows.some((row) => row.working)
         ? "Some systems are still working"
-        : "All systems nominal";
+        : healthRows.some((row) => row.state === "warn")
+          ? "Some systems need a look"
+          : "All systems nominal";
   const topCategories = (categories.data ?? [])
     .filter((category) => (category.resourceCount ?? 0) > 0)
     .sort((left, right) => (
