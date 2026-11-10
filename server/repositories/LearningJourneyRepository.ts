@@ -20,6 +20,7 @@
  * ============================================================================
  */
 
+import { invalidatePublicCache } from "../cache/publicCache";
 import {
   learningJourneys,
   journeySteps,
@@ -248,6 +249,7 @@ export class LearningJourneyRepository {
         .set({ updatedAt: new Date() })
         .where(eq(learningJourneys.id, journeyId));
     });
+    invalidatePublicCache('journey-mutation');
 
     return this.listJourneySteps(journeyId);
   }
@@ -313,6 +315,7 @@ export class LearningJourneyRepository {
         }, `Reordered ${assignments.length} step row(s)`);
       }
     });
+    invalidatePublicCache('journey-mutation');
 
     return this.listJourneySteps(journeyId);
   }
@@ -334,6 +337,7 @@ export class LearningJourneyRepository {
    */
   async createLearningJourney(journey: InsertLearningJourney): Promise<LearningJourney> {
     const [newJourney] = await db.insert(learningJourneys).values(journey).returning();
+    invalidatePublicCache('journey-mutation');
     return newJourney;
   }
 
@@ -348,7 +352,7 @@ export class LearningJourneyRepository {
     journey: Partial<InsertLearningJourney>,
     audit?: JourneyAuditContext,
   ): Promise<LearningJourney> {
-    return db.transaction(async (tx) => {
+    const updated = await db.transaction(async (tx) => {
       const [before] = await tx.select().from(learningJourneys).where(eq(learningJourneys.id, id)).for('update');
       const [updatedJourney] = await tx
         .update(learningJourneys)
@@ -367,6 +371,8 @@ export class LearningJourneyRepository {
       }
       return updatedJourney;
     });
+    invalidatePublicCache('journey-mutation');
+    return updated;
   }
 
   /**
@@ -375,6 +381,7 @@ export class LearningJourneyRepository {
    */
   async deleteLearningJourney(id: number): Promise<void> {
     await db.delete(learningJourneys).where(eq(learningJourneys.id, id));
+    invalidatePublicCache('journey-mutation');
   }
 
   /**
@@ -440,7 +447,7 @@ export class LearningJourneyRepository {
    * @returns The created step
    */
   async createJourneyStep(step: InsertJourneyStep, audit?: JourneyAuditContext): Promise<JourneyStep> {
-    return db.transaction(async (tx) => {
+    const created = await db.transaction(async (tx) => {
       await tx.select({ id: learningJourneys.id }).from(learningJourneys)
         .where(eq(learningJourneys.id, step.journeyId)).for('update');
       if (step.resourceId != null) {
@@ -461,6 +468,8 @@ export class LearningJourneyRepository {
       }
       return newStep;
     });
+    invalidatePublicCache('journey-mutation');
+    return created;
   }
 
   /**
@@ -475,7 +484,7 @@ export class LearningJourneyRepository {
     wholeGroup = false,
     audit?: JourneyAuditContext,
   ): Promise<JourneyStep> {
-    return db.transaction(async (tx) => {
+    const updated = await db.transaction(async (tx) => {
       const [anchor] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
       if (!anchor) throw Object.assign(new Error('Step no longer exists. Reload the steps.'), { code: 'STEP_CONFLICT' });
       await tx.select({ id: learningJourneys.id }).from(learningJourneys)
@@ -520,6 +529,8 @@ export class LearningJourneyRepository {
       }
       return updatedStep;
     });
+    invalidatePublicCache('journey-mutation');
+    return updated;
   }
 
   /**
@@ -551,6 +562,7 @@ export class LearningJourneyRepository {
         );
       }
     });
+    invalidatePublicCache('journey-mutation');
   }
 
   /**
