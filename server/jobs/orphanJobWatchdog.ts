@@ -5,6 +5,7 @@ import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } fr
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
+import { isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("job-watchdog");
 
@@ -258,6 +259,7 @@ function reportSweepFailure(err: unknown): void {
 export function startOrphanWatchdogPeriodic(): void {
   if (periodicTimer) return; // idempotent — never double-schedule
   periodicTimer = setInterval(() => void runWithJobContext('orphan-watchdog', 'periodic', async () => {
+    if (!isServingTraffic()) return;
     try {
       const r = await runPeriodicSweep();
       consecutiveFailures = 0;
