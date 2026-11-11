@@ -1,5 +1,6 @@
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
+import { isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("link-health");
 
@@ -30,8 +31,9 @@ export function initializeLinkHealthScheduler(): void {
   // Each tick recovers stale jobs and reads the last completed scan's age from
   // the database, so the schedule survives restarts and every autoscale
   // instance shares one cadence; startCheck's lock stops overlapping scans.
-  const tick = () =>
-    runWithJobContext("link-health", "tick", async () => {
+  const tick = () => {
+    if (!isServingTraffic()) return;
+    return runWithJobContext("link-health", "tick", async () => {
       try {
         const job = await (await service()).startCheckIfDue(hours);
         if (job) logger.info(`Scheduled link scan started (job ${job.id}, every ${hours}h)`);
@@ -39,6 +41,7 @@ export function initializeLinkHealthScheduler(): void {
         logger.error("Scheduled link scan failed to start:", messageOf(err));
       }
     });
+  };
 
   setTimeout(() => void tick(), 60_000).unref();
   setInterval(() => void tick(), TICK_MS).unref();

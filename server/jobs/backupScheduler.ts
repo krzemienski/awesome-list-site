@@ -1,5 +1,6 @@
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
+import { isServingTraffic } from "../ops/serviceActivity";
 import { runScheduledBackupIfDue } from "../backup/scheduledBackup";
 
 const logger = createLogger("backup-scheduler");
@@ -10,6 +11,7 @@ let timer: NodeJS.Timeout | null = null;
 let running = false;
 
 async function runCycle(): Promise<void> {
+  if (!isServingTraffic()) return;
   if (running) return;
   running = true;
   try {

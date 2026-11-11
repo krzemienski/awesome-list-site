@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
+import { markRequestServed } from "./serviceActivity";
 
 type OperationalRequestState = {
   kind: "request";
@@ -60,6 +61,7 @@ export function operationalRequestContext(
   res: Response,
   next: NextFunction,
 ): void {
+  markRequestServed();
   const id = randomBytes(3).toString("hex");
   res.locals.requestId = id;
   requestContext.run({ kind: "request", databaseUnavailable: false, id, method: req.method, path: req.path }, () => {

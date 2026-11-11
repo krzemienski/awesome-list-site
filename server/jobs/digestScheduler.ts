@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { runDigestCycle } from "../services/digestService";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
+import { isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("digest");
 
@@ -16,6 +17,7 @@ const runScheduledCycle = (workerId: string): Promise<void> =>
   runWithJobContext("digest", workerId, () => runCycle(workerId));
 
 async function runCycle(workerId: string): Promise<void> {
+  if (!isServingTraffic()) return;
   if (running) return;
   running = true;
   const startedAt = Date.now();

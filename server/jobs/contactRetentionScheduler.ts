@@ -2,6 +2,7 @@ import { config } from "../config";
 import { ContactRepository, purgeExpiredContactSubmissions } from "../repositories/ContactRepository";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
+import { isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("contact-retention");
 
@@ -14,7 +15,7 @@ let running = false;
 const runScheduledCycle = (): Promise<void> => runWithJobContext("contact-retention", "hourly", runCycle);
 
 async function runCycle(): Promise<void> {
-  if (process.env.NODE_ENV === "test" || process.env.VITEST || running) return;
+  if (process.env.NODE_ENV === "test" || process.env.VITEST || running || !isServingTraffic()) return;
   running = true;
   let deletedCount = 0;
   try {
