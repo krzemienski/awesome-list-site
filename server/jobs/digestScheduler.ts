@@ -6,6 +6,9 @@ import { runWithJobContext } from "../ops/requestContext";
 const logger = createLogger("digest");
 
 const RUN_EVERY_MS = 60 * 60 * 1000;
+// A freshly booted Autoscale instance is starved for its first ~3 minutes: pool
+// connects time out at 3 s and queries take seconds. Start after that window.
+const STARTUP_DELAY_MS = 5 * 60 * 1000;
 let timer: NodeJS.Timeout | null = null;
 let running = false;
 
@@ -38,10 +41,9 @@ async function runCycle(workerId: string): Promise<void> {
 export function initializeDigestScheduler(): void {
   if (timer) return;
   const workerId = `server-${process.pid}-${crypto.randomUUID().slice(0, 8)}`;
-  // Let startup and migrations settle before the first claim.
   const startup = setTimeout(() => {
     void runScheduledCycle(workerId);
-  }, 15_000);
+  }, STARTUP_DELAY_MS);
   startup.unref();
   timer = setInterval(() => {
     void runScheduledCycle(workerId);
