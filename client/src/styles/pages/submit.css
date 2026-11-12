@@ -224,6 +224,19 @@
   font-weight: 600;
 }
 
+/* Unavailable (signed out, or submitting): a neutral control at full opacity.
+   The global 50% fade left the bright accent fill half-transparent and hard
+   to read. A focused button is disabled via aria-disabled (useFocusSafeDisabled)
+   rather than the attribute, so both forms match. */
+.submit-submit-button:is(:disabled, [aria-disabled="true"]),
+.submit-submit-button:is(:disabled, [aria-disabled="true"]):hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+  box-shadow: none;
+  opacity: 1;
+}
+
 .submit-submit-button:hover {
   border-color: var(--accent);
   background: var(--accent);
