@@ -378,19 +378,9 @@ export default function PendingEdits() {
             {recheckState === 'checking' ? 'Checking…' : 'Check again'}
           </Button>
         </div>
-        {/* axe scrollable-region-focusable: the header-only empty table still
-            scrolls sideways on narrow viewports, so the wrap must be reachable. */}
-        <div
-          className="admin-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-          tabIndex={0}
-          role="region"
-          aria-label="Pending edits table, empty, scrollable"
-        >
-          <table className="table">
-            <thead><tr><th>Resource</th><th>Field</th><th>Editor</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
-            <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
-          </table>
-        </div>
+        {/* An empty queue is a sentence, not a header-only table that clips
+            on a phone with nothing to scroll to (same as Approvals). */}
+        <p className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="text-pending-edits-empty">No pending edits.</p>
         <p
           className={`system-state-note${recheckState === 'offline' ? ' font-medium text-[var(--accent-ink)]' : ''}`}
           role="status"

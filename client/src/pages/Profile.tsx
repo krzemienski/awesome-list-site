@@ -421,8 +421,10 @@ export default function Profile({ user }: ProfileProps) {
         <div className="flex-1 min-w-0 w-full sm:w-auto text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>{"// Profile"}</div>
           <h1 className="page-title text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
-            {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
-            <span className="truncate">{user.name || "User"}</span>
+            {/* Run17 BUG-012: clamp — CSS defense for names at the 50-char cap.
+                Two lines, not one: on a phone a one-line truncate cut a normal
+                name to "[AUDIT] C22 M…". */}
+            <span className="min-w-0 line-clamp-2 [overflow-wrap:anywhere]">{user.name || "User"}</span>
             <Button
               variant="ghost"
               size="icon"
@@ -440,8 +442,10 @@ export default function Profile({ user }: ProfileProps) {
               <span className="flex items-center gap-1 min-w-0 max-w-full">
                 <Mail className="h-4 w-4 shrink-0" />
                 {/* R5-026 (run24): long emails must wrap inside the column,
-                    never overflow under the action buttons. */}
-                <span className="break-all">{user.email}</span>
+                    never overflow under the action buttons. overflow-wrap
+                    breaks only when the address cannot fit, unlike break-all,
+                    which split "fldubai.com" mid-word at 390. */}
+                <span className="min-w-0 [overflow-wrap:anywhere]">{user.email}</span>
               </span>
             )}
             {user.createdAt && (

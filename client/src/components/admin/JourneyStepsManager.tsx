@@ -853,8 +853,8 @@ export default function JourneyStepsManager() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium line-clamp-2 break-words min-w-0" title={j.title}>{j.title}</span>
-                  <Badge variant="outline" className="max-w-full min-w-0" title={j.category}>
-                    <span className="truncate">{j.category}</span>
+                  <Badge variant="outline" className="max-w-full min-w-0 whitespace-normal text-left" title={j.category}>
+                    <span className="break-words">{j.category}</span>
                   </Badge>
                   {j.status && j.status !== "published" && (
                     <Badge variant="secondary">{j.status}</Badge>
@@ -862,7 +862,7 @@ export default function JourneyStepsManager() {
                   <Badge variant="outline">{j.stepCount} steps</Badge>
                 </div>
                 {j.description && (
-                  <p className="text-xs text-muted-foreground mt-1 truncate">
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                     {j.description}
                   </p>
                 )}

@@ -3,6 +3,7 @@
  *
  *   GET   /api/resources/:id/link-report    the signed-in member's report, or null
  *   POST  /api/resources/:id/link-report    report the resource's link as dead
+ *   DELETE /api/resources/:id/link-report   withdraw the member's own open report
  *   GET   /api/admin/link-reports           admin triage list (?status=open|resolved|dismissed)
  *   PATCH /api/admin/link-reports/:resourceId/:reporter   resolve or dismiss
  *         (`reporter` is the member's varchar user id; a name ending in "Id"
@@ -98,6 +99,24 @@ export function registerLinkReportRoutes(app: Express, ctx: LinkReportsContext):
       })
       .returning(reportFields);
     res.status(existing ? 200 : 201).json({ alreadyReported: false, report });
+  }));
+
+  // Only the reporter's own report, and only while it is open: a handled
+  // report is the maintainer's record of what they did.
+  app.delete("/api/resources/:id/link-report", isAuthenticated, asyncHandler(async (req: Parameters<RequestHandler>[0], res) => {
+    const resourceId = parseResourceId(req.params.id);
+    const userId = String(req.dbUser?.id ?? "");
+    if (resourceId === null || !userId) return res.status(404).json({ message: "Report not found" });
+    const [removed] = await db
+      .delete(resourceLinkReports)
+      .where(and(
+        eq(resourceLinkReports.resourceId, resourceId),
+        eq(resourceLinkReports.userId, userId),
+        eq(resourceLinkReports.status, "open"),
+      ))
+      .returning({ resourceId: resourceLinkReports.resourceId });
+    if (!removed) return res.status(404).json({ message: "No open report to withdraw" });
+    res.status(204).end();
   }));
 
   app.get("/api/admin/link-reports", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
