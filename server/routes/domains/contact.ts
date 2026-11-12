@@ -29,7 +29,7 @@ import {
   type ContactSubmissionInput,
 } from "@shared/contact";
 import { parseIntInRange } from "@shared/validation";
-import type { ContactRepository } from "../../repositories";
+import type { AuditRepository, ContactRepository } from "../../repositories";
 import { config } from "../../config";
 import { configuredContactDestinations, configuredSourceRepository } from "../../public-contact";
 import { SITE_URL } from "../../og-middleware";
@@ -46,7 +46,10 @@ export interface ContactRoutesContext {
   isAuthenticated: RequestHandler;
   isAdmin: RequestHandler;
   contactRepo: ContactRepository;
+  auditRepo: AuditRepository;
 }
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Limits documented in docs/CONTACT-VARIANTS.md ("Backend"). */
 export const CONTACT_RATE_LIMIT = { windowMs: 60 * 60 * 1000, limit: 5 } as const;
@@ -157,7 +160,7 @@ function sendDatabaseFailure(
 }
 
 export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): void {
-  const { isAuthenticated, isAdmin, contactRepo } = ctx;
+  const { isAuthenticated, isAdmin, contactRepo, auditRepo } = ctx;
 
   if (config.contact.enabled && !isFormReady()) {
     logger.error(
@@ -258,6 +261,29 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
       return res.json({ submissions, total, limit, offset });
     } catch (error) {
       return sendDatabaseFailure(res, error, "inbox listing failed", "Could not list contact submissions");
+    }
+  }));
+
+  // Remove one message (spam, a test). The param is not named `id`/`…Id`: the
+  // contract layer types those as integers, and this id is a uuid. The audit
+  // row keeps only the id and receipt time, never the sender or the message.
+  app.delete("/api/admin/contact-submissions/:submission", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const submissionId = String(req.params.submission ?? "");
+    if (!UUID_PATTERN.test(submissionId)) return res.status(404).json({ message: "Submission not found" });
+    const adminId = String((req as Request & { dbUser?: { id?: string } }).dbUser?.id ?? "");
+    try {
+      const removed = await contactRepo.deleteSubmission(submissionId);
+      if (!removed) return res.status(404).json({ message: "Submission not found" });
+      await auditRepo.logResourceAudit(
+        null,
+        "contact_submission_deleted",
+        adminId || undefined,
+        { id: removed.id, receivedAt: removed.createdAt },
+        "Deleted a contact submission",
+      );
+      return res.status(204).end();
+    } catch (error) {
+      return sendDatabaseFailure(res, error, "inbox delete failed", "Could not delete the contact submission");
     }
   }));
 }
