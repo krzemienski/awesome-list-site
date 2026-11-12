@@ -2589,8 +2589,10 @@ export function ogInjectionMiddleware() {
           logger.warn("[og-middleware] homepage metadata not ready by the response deadline; serving the default shell");
           res.locals.shed = true;
           res.locals.shedReason = "deadline";
+          // defaultMeta("/") is the real homepage title, description and
+          // canonical, so a crawler that arrives on a cold instance still
+          // indexes the homepage instead of reading a noindex shell.
           meta = defaultMeta(urlPath);
-          meta.noindex = true;
           notFound = false;
         } else if (resolved.redirectTo) {
           const qs = (req.originalUrl || req.url).split("?")[1];

@@ -12,7 +12,7 @@
  * hashtext('research_job_admission').
  */
 import pg from "pg";
-import { DB_CONNECT_TIMEOUT_MS } from "../db";
+import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
 import { createLogger } from "../lib/logger";
 import { ServiceUnavailableError } from "../middleware/errors";
 import { runHeavyWork } from "../ops/heavyWork";
