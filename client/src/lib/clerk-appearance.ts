@@ -432,6 +432,14 @@ function buildClerkAppearance(
         alignItems: "center",
         minHeight: "44px",
       },
+      // The code step echoes the address the code went to; Clerk ellipsises it
+      // ("…@fldubai…" in a 400px card), so the visitor can't confirm it.
+      identityPreviewText: {
+        whiteSpace: "normal",
+        overflow: "visible",
+        textOverflow: "clip",
+        overflowWrap: "anywhere",
+      },
       identityPreviewEditButton: {
         ...(palette.accent ? { color: palette.accent } : {}),
         // Confirmed on Clerk's live email-code verification variant: this is

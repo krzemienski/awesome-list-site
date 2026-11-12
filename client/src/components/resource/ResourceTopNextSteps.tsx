@@ -48,6 +48,9 @@ export default function ResourceTopNextSteps({ related, loading, onRelatedClick 
               <a
                 href={`/resource/${item.id}`}
                 className="resource-detail-top-next-item"
+                // One line keeps the block's reserved height; the full name
+                // stays available where a long title is cut short.
+                title={item.title}
                 onClick={(event) => onRelatedClick(event, item, index + 1)}
                 data-testid={`top-next-related-${item.id}`}
               >

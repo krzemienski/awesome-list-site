@@ -541,24 +541,22 @@ export default function Profile({ user }: ProfileProps) {
               <CardContent className="p-4 flex items-center gap-3">
                 <Icon className={`h-8 w-8 ${stat.color}`} />
                 <div>
+                  {/* The empty streak keeps the card's number/label/hint shape
+                      (a bold four-line sentence read unlike its neighbours);
+                      the hint carries the onboarding nudge. */}
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                   {isEmptyStreak ? (
-                    <>
-                      <p className="text-sm font-semibold" data-testid="text-streak-onboarding">
-                        Start your streak — come back tomorrow!
-                      </p>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
-                    </>
+                    <p className="account-stat-hint" data-testid="text-streak-onboarding">
+                      Start one — come back tomorrow
+                    </p>
                   ) : (
-                    <>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
-                      {/* BUG-052 (run14): explain what feeds the metric. */}
-                      {"hint" in stat && stat.hint && (
-                        <p className="account-stat-hint" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
-                          {stat.hint}
-                        </p>
-                      )}
-                    </>
+                    /* BUG-052 (run14): explain what feeds the metric. */
+                    "hint" in stat && stat.hint && (
+                      <p className="account-stat-hint" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                        {stat.hint}
+                      </p>
+                    )
                   )}
                 </div>
               </CardContent>

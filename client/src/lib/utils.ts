@@ -8,8 +8,16 @@ export function cn(...inputs: ClassValue[]) {
 // Avatar fallback initials: first + last word of the display name ("Ada
 // Lovelace" -> "AL"), the email's first letter when there is no name.
 export function getInitials(name?: string | null, email?: string | null): string {
-  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return (email?.trim()[0] ?? "U").toUpperCase();
+  // Initials come from letters and digits only: a name like "[AUDIT] C22
+  // Member" gave "[M" (and "[" in the one-letter header avatar).
+  const words = (name ?? "")
+    .split(/\s+/)
+    .map((word) => Array.from(word).filter((ch) => /[\p{L}\p{N}]/u.test(ch)).join(""))
+    .filter(Boolean);
+  if (words.length === 0) {
+    const fromEmail = Array.from(email?.trim() ?? "").find((ch) => /[\p{L}\p{N}]/u.test(ch));
+    return (fromEmail ?? "U").toUpperCase();
+  }
   const first = Array.from(words[0])[0];
   const last = words.length > 1 ? Array.from(words[words.length - 1])[0] : "";
   return (first + last).toUpperCase();

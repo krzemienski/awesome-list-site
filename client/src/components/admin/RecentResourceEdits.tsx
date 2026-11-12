@@ -122,7 +122,7 @@ export function RecentResourceEdits() {
           )}
           <div
             ref={scrollCue.ref}
-            className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            className="admin-table-wrap queue-review-table-wrap queue-review-table-wrap--uncapped focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"
             aria-label="Recently resolved edits table, scrollable"

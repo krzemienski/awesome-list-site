@@ -30,25 +30,47 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, asc, sql } from "drizzle-orm";
-import { invalidatePublicCache } from "../cache/publicCache";
+import { getPublicCacheValue, invalidatePublicCache } from "../cache/publicCache";
+import { normalizeTagFilter } from "@shared/tagNormalize";
 
-/** Canonical public vocabulary: tags belong to approved resource metadata. */
+/**
+ * Canonical public vocabulary: tags belong to approved resource metadata.
+ * Buckets use normalizeTagFilter, the same key /tag/:slug pages, filters and
+ * the client chips use; SQL only folds case and separators, so "codecs" and
+ * "codec" were two buckets here and one everywhere else (1,657 vs 1,650).
+ * A resource counts once per canonical tag even if it lists two spellings.
+ */
 export async function listApprovedResourceTags(): Promise<{ total: number; tags: Array<{ tag: string; count: number }> }> {
   const result = await db.execute(sql`
-    SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
-           count(*)::int AS count
+    SELECT r.id AS id, btrim(tag) AS tag
     FROM resources r,
          jsonb_array_elements_text(
            CASE WHEN jsonb_typeof(r.metadata->'tags') = 'array'
                 THEN r.metadata->'tags' ELSE '[]'::jsonb END
          ) AS tag
     WHERE r.status = 'approved' AND btrim(tag) <> ''
-    GROUP BY 1 ORDER BY count DESC, tag ASC
   `);
-  return {
-    total: result.rows.length,
-    tags: result.rows.map((row) => ({ tag: String(row.tag), count: Number(row.count) })),
-  };
+  const resourcesByTag = new Map<string, Set<number>>();
+  for (const row of result.rows) {
+    const tag = normalizeTagFilter(String(row.tag));
+    if (!tag) continue;
+    const ids = resourcesByTag.get(tag) ?? new Set<number>();
+    ids.add(Number(row.id));
+    resourcesByTag.set(tag, ids);
+  }
+  const counted = Array.from(resourcesByTag, ([tag, ids]) => ({ tag, count: ids.size }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  return { total: counted.length, tags: counted };
+}
+
+/** The tag vocabulary through the public cache; /api/tags and /api/public/tags share one entry. */
+export function loadPublicTagVocabulary() {
+  return getPublicCacheValue({
+    namespace: "catalog-taxonomy",
+    key: "tags",
+    ttlMs: 60_000,
+    load: listApprovedResourceTags,
+  });
 }
 
 /**
