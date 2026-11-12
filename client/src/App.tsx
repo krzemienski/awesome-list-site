@@ -170,6 +170,10 @@ const Terms = lazyRoute(() => import("@/pages/Terms"));
 const Privacy = lazyRoute(() => import("@/pages/Privacy"));
 const CodeOfConduct = lazyRoute(() => import("@/pages/CodeOfConduct"));
 const SearchDialog = lazyRoute(loadSearchDialog);
+/** Routes whose page root widens the shell box (layout.css, `[data-shell-wide]`
+ * and the page roots). The skeleton claims the same box so the page replacing
+ * it does not reflow. */
+const SHELL_WIDE_ROUTE = /^\/(about|submit)\/?$/;
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
@@ -177,7 +181,16 @@ function RouteFallback() {
   const pendingTitle =
     typeof window === "undefined" ? undefined : pendingRouteTitle(queryClient, window.location.pathname);
   return (
-    <div className="space-y-6" data-testid="route-chunk-skeleton" role="status" aria-busy="true" aria-label="Loading page">
+    <div
+      className="space-y-6"
+      data-testid="route-chunk-skeleton"
+      data-shell-wide={
+        typeof window !== "undefined" && SHELL_WIDE_ROUTE.test(window.location.pathname) ? "" : undefined
+      }
+      role="status"
+      aria-busy="true"
+      aria-label="Loading page"
+    >
       {/* BUG-031 (run22): while a lazy chunk loads, the head must already
           belong to the CURRENT route (brand title + current-path canonical),
           never linger on the previous route's metadata. The destination page

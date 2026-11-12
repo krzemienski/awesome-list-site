@@ -106,7 +106,7 @@
    the shell box itself rather than pulling the page root left with a negative
    margin: the box can only grow as far as <main> allows, so its gutter always
    holds. At wide desktop widths the root lands where it always did. */
-.app-shell-main > .page-content-wrap:has(> :is(.about-page, .submit-page)) {
+.app-shell-main > .page-content-wrap:has(> :is(.about-page, .submit-page, [data-shell-wide])) {
   --box-max: calc(
     var(--shell-page-measure, var(--content-max))
     + var(--content-max-admin) - var(--content-max)
