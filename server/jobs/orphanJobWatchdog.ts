@@ -187,7 +187,7 @@ async function runStartupSweep(): Promise<void> {
 // worker has started yet, so nothing is legitimately owned.
 const PERIODIC_SWEEP_INTERVAL_MS = 60 * 1000;
 let periodicTimer: NodeJS.Timeout | null = null;
-// A cold sweep reconnects every minute and the pool's 3 s connect timeout
+// A cold sweep reconnects every minute and the pool's connect timeout
 // sometimes loses: retry once, and call it an ERROR only after repeated misses.
 const RETRY_DELAY_MS = 1000;
 const ERROR_AFTER_CONSECUTIVE_FAILURES = 3;

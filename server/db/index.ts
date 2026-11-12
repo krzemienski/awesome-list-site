@@ -21,10 +21,10 @@ const logger = createLogger("db");
 // - One faceted listing (ResourceRepository.listResources) runs THREE
 //   concurrent queries (count + page + facets via Promise.all), so the old
 //   max=3 let a SINGLE request occupy the whole pool and a handful of
-//   concurrent listings exhaust it (3s acquisition timeouts under burst).
+//   concurrent listings exhaust it (8s acquisition timeouts under burst).
 // - A cold catalog-tree rebuild takes 4 sequential queries; taxonomy loaders
 //   add 1-2 more. max=8 lets ~2-3 faceted listings plus background work
-//   overlap without queueing anywhere near the 3s acquisition bound
+//   overlap without queueing anywhere near the 8s acquisition bound
 //   (measured with 20 concurrent
 //   faceted listings, zero acquisition timeouts).
 // - Budget per instance = 8 here + 2 in the rate-limit store's dedicated
@@ -34,12 +34,16 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 8,
   // Keep one client warm: idle clients drop after 30 s, so without a floor the
-  // 60 s orphan-job watchdog reconnects on every sweep under a 3 s timeout.
+  // 60 s orphan-job watchdog reconnects on every sweep under the connect timeout.
   min: 1,
   idleTimeoutMillis: 30000,
   // Bound pool acquisition and server execution. A saturated pool must fail
-  // predictably instead of leaving HTTP requests hanging.
-  connectionTimeoutMillis: 3000,
+  // predictably instead of leaving HTTP requests hanging. pg also applies this
+  // value to a NEW client's TCP+TLS+startup. Production failures (2026-11-10..12)
+  // were never a full pool (poolTotal <= 4 of 8, waiting 0): the pool shrinks to
+  // min after 30 s idle, and the next burst needs fresh Neon connections, which
+  // an Autoscale instance short of CPU can take longer than 3 s to open.
+  connectionTimeoutMillis: 8000,
   statement_timeout: 8000,
   query_timeout: 10000,
   options: "-c lock_timeout=2000",

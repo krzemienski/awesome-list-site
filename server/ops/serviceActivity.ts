@@ -4,8 +4,8 @@
 const SERVING_WINDOW_MS = 60_000;
 
 /**
- * A freshly booted Autoscale instance is starved for its first ~3 minutes: pool
- * connects time out at 3 s and queries take seconds. Scheduled jobs make their
+ * A freshly booted Autoscale instance is starved for its first ~3 minutes:
+ * connects can exceed the pool's connect timeout and queries take seconds. Scheduled jobs make their
  * first tick after this delay.
  */
 export const POST_BOOT_DELAY_MS = 5 * 60_000;

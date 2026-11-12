@@ -357,6 +357,11 @@ async function template(): Promise<string> {
  * server initial-state contract is available; we never serialize identity,
  * claims, tokens, or a fabricated anonymous auth snapshot.
  */
+// Replit's Promote step fails if the homepage takes over 5 s; on a cold pool the
+// data load can wait the full 8 s connect timeout, so fall back to the SPA first.
+const HOME_SSR_DATA_DEADLINE_MS = 3500;
+const HOME_SSR_DATA_PENDING = Symbol("home-ssr-data-pending");
+
 export async function handleSSR(req: Request, res: Response, next: NextFunction) {
   const requestedUrl = new URL(req.originalUrl || req.url, "http://home-ssr.invalid");
   const layoutValues = requestedUrl.searchParams.getAll("layout");
@@ -374,11 +379,27 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
   }
 
   try {
-    const [data, render, htmlTemplate] = await Promise.all([
-      loadHomeSSRData(),
+    const startedAt = Date.now();
+    const dataLoad = loadHomeSSRData();
+    // The load keeps running after the deadline so it still warms the public
+    // cache; this catch keeps a late rejection from going unhandled.
+    dataLoad.catch(() => undefined);
+    let deadline: NodeJS.Timeout | undefined;
+    const [loaded, render, htmlTemplate] = await Promise.all([
+      Promise.race([
+        dataLoad,
+        new Promise<typeof HOME_SSR_DATA_PENDING>((resolve) => {
+          deadline = setTimeout(() => resolve(HOME_SSR_DATA_PENDING), HOME_SSR_DATA_DEADLINE_MS);
+        }),
+      ]).finally(() => clearTimeout(deadline)),
       renderer(),
       template(),
     ]);
+    if (loaded === HOME_SSR_DATA_PENDING) {
+      logger.warn(`[home-ssr] data not ready in ${Date.now() - startedAt}ms; serving the SPA fallback`);
+      return next();
+    }
+    const data = loaded;
     assertSsrTemplate(htmlTemplate);
     const homeCssLinks = await homeStylesheetLinks(htmlTemplate);
     const boot = homeBoot(req);
