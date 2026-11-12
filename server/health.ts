@@ -31,7 +31,8 @@ let abandonedAcquisition: Promise<unknown> | null = null;
 
 async function acquireProbeClient(): Promise<PoolClient> {
   if (abandonedAcquisition) {
-    throw new Error("readiness pool acquisition still pending from an earlier probe");
+    // Same cause as the timeout that abandoned it, so it classifies as "timeout".
+    throw new Error("readiness pool acquisition timeout: an earlier probe's acquisition is still pending");
   }
   const acquisition = pool.connect();
   let timer: NodeJS.Timeout | undefined;
