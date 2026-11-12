@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ToastActionElement } from "@/components/ui/toast";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
@@ -44,6 +44,7 @@ export default function ReportLinkAction({
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
+  const reportButtonRef = useRef<HTMLButtonElement>(null);
   const queryKey = [`/api/resources/${resourceId}/link-report`];
 
   const { data } = useQuery<{ report: LinkReport | null }>({
@@ -74,8 +75,18 @@ export default function ReportLinkAction({
     onSuccess: () => {
       queryClient.setQueryData(queryKey, { report: null });
       toast({ title: "Report withdrawn", description: "You can report this link again any time." });
+      // The Withdraw button unmounts with focus on it; keep focus on the report control.
+      reportButtonRef.current?.focus();
     },
     onError: (error) => {
+      // 404: a maintainer handled it, or another tab withdrew it. The shown
+      // state is stale, so re-read it instead of offering a retry that fails.
+      if (error instanceof ApiError && error.status === 404) {
+        void queryClient.invalidateQueries({ queryKey });
+        toast({ title: "This report is no longer open", description: "A maintainer may already have handled it." });
+        reportButtonRef.current?.focus();
+        return;
+      }
       toast({
         title: "Couldn't withdraw the report",
         description: describeWriteError(error, { fallback: "Please try again.", outcome: NOTHING_CHANGED_OUTCOME }),
@@ -110,6 +121,7 @@ export default function ReportLinkAction({
         variant="outline"
         size="sm"
         onClick={handleClick}
+        ref={reportButtonRef}
         data-testid="button-report-link"
         className="min-h-[44px] px-4"
         aria-pressed={reported || undefined}

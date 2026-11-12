@@ -105,6 +105,9 @@ export function RecentResourceEdits() {
             </div>
           ))}
         </div>
+      ) : !edits?.length ? (
+        // A sentence, not a header-only table that clips on a phone.
+        <p className="py-8 text-center text-sm text-[var(--text-2)]" data-testid="text-recent-edits-empty">No resolved edits yet.</p>
       ) : (
         <>
         <TableScrollHint overflows={scrollCue.overflows} className="admin-ops-scroll-hint" data-testid="text-swipe-hint-recent-edits">
@@ -137,10 +140,7 @@ export function RecentResourceEdits() {
                 <tr><th>Resource</th><th>Field</th><th>Editor</th><th>Outcome</th><th>Resolved</th></tr>
               </thead>
               <tbody>
-                {!edits?.length && (
-                  <tr><td colSpan={5} className="queue-review-empty-row">No resolved edits yet.</td></tr>
-                )}
-                {edits?.map((edit) => {
+                {edits.map((edit) => {
                   const title = edit.resourceTitle ?? `Resource #${edit.resourceId}`;
                   const outcome = OUTCOME[edit.status];
                   return (

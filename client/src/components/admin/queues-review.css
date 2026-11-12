@@ -55,13 +55,6 @@
   opacity: 0.45;
 }
 
-.queue-review-empty-row {
-  color: var(--text-2);
-  font-size: 0.8125rem;
-  padding: 18px 22px;
-  text-align: center;
-}
-
 .queue-review-table-wrap {
   max-height: 37.5rem;
   overflow: auto;
