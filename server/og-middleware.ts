@@ -96,7 +96,7 @@ import { resolveDuplicateTarget } from "./lib/duplicateTarget";
 import { UNCACHED_CATALOG_CACHE_CONTROL } from "./http-cache-policy";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
-import { loadHomeNav } from "./home-ssr-data";
+import { HOME_DEADLINE_PASSED, loadHomeNav, withinHomeDeadline } from "./home-ssr-data";
 import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
 import { createLogger } from "./lib/logger";
 
@@ -2576,22 +2576,34 @@ export function ogInjectionMiddleware() {
       try {
         // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
         // render search results; resolveRoute keys its cache on path + page.
-        const resolved = await resolveRouteWithSaturationRetry(
+        const resolution = resolveRouteWithSaturationRetry(
           pageParamStripped ?? (req.originalUrl || req.url),
           urlPath,
           routeResolutionAbort.signal,
         );
-        if (resolved.redirectTo) {
+        // The homepage shares one response deadline with the SSR step: its nav
+        // lookup can wait a full cold connect, which would hold the request past
+        // the hosting limit before the SPA fallback is reached.
+        const resolved = urlPath === "/" ? await withinHomeDeadline(res, resolution) : await resolution;
+        if (resolved === HOME_DEADLINE_PASSED) {
+          logger.warn("[og-middleware] homepage metadata not ready by the response deadline; serving the default shell");
+          res.locals.shed = true;
+          res.locals.shedReason = "deadline";
+          meta = defaultMeta(urlPath);
+          meta.noindex = true;
+          notFound = false;
+        } else if (resolved.redirectTo) {
           const qs = (req.originalUrl || req.url).split("?")[1];
           res.setHeader("Cache-Control", UNCACHED_CATALOG_CACHE_CONTROL);
           return res.redirect(301, resolved.redirectTo + (qs ? `?${qs}` : ""));
-        }
-        meta = resolved.meta;
-        notFound = !resolved.found;
-        gone = resolved.gone === true;
-        bodyHtml = resolved.bodyHtml;
-        if (resolved.found && bodyHtml && /^\/resource\/\d+$/.test(urlPath)) {
-          headPreload = await routeChunkPreloadTags(RESOURCE_DETAIL_MANIFEST_KEY);
+        } else {
+          meta = resolved.meta;
+          notFound = !resolved.found;
+          gone = resolved.gone === true;
+          bodyHtml = resolved.bodyHtml;
+          if (resolved.found && bodyHtml && /^\/resource\/\d+$/.test(urlPath)) {
+            headPreload = await routeChunkPreloadTags(RESOURCE_DETAIL_MANIFEST_KEY);
+          }
         }
       } catch (e) {
         if (req.aborted || res.destroyed) return;

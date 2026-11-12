@@ -12,6 +12,7 @@
  * hashtext('research_job_admission').
  */
 import pg from "pg";
+import { DB_CONNECT_TIMEOUT_MS } from "../db";
 import { createLogger } from "../lib/logger";
 import { ServiceUnavailableError } from "../middleware/errors";
 import { runHeavyWork } from "../ops/heavyWork";
@@ -192,7 +193,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
   // Session-level lock on its own connection: the in-flight flag in
   // databaseBackup.ts is per process, and another Autoscale instance may be dumping.
   run.stage = "lock-connect";
-  const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: 5000 });
+  const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: DB_CONNECT_TIMEOUT_MS });
   lockClient.on("error", (error) => logger.error("Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) }));
   try {
     await lockClient.connect();

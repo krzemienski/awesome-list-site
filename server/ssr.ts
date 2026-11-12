@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import fs from "fs/promises";
 import path from "path";
 import { pathToFileURL } from "url";
-import { loadHomeSSRData } from "./home-ssr-data";
+import { HOME_DEADLINE_PASSED, loadHomeSSRData, withinHomeDeadline } from "./home-ssr-data";
 import type { HomeBoot } from "../client/src/lib/home-boot";
 import { createLogger } from "./lib/logger";
 
@@ -357,11 +357,6 @@ async function template(): Promise<string> {
  * server initial-state contract is available; we never serialize identity,
  * claims, tokens, or a fabricated anonymous auth snapshot.
  */
-// Replit's Promote step fails if the homepage takes over 5 s; on a cold pool the
-// data load can wait the full 8 s connect timeout, so fall back to the SPA first.
-const HOME_SSR_DATA_DEADLINE_MS = 3500;
-const HOME_SSR_DATA_PENDING = Symbol("home-ssr-data-pending");
-
 export async function handleSSR(req: Request, res: Response, next: NextFunction) {
   const requestedUrl = new URL(req.originalUrl || req.url, "http://home-ssr.invalid");
   const layoutValues = requestedUrl.searchParams.getAll("layout");
@@ -380,28 +375,29 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
 
   try {
     const startedAt = Date.now();
-    const dataLoad = loadHomeSSRData();
-    // The load keeps running after the deadline so it still warms the public
-    // cache; this catch keeps a late rejection from going unhandled.
-    dataLoad.catch(() => undefined);
-    let deadline: NodeJS.Timeout | undefined;
-    const [loaded, render, htmlTemplate] = await Promise.all([
-      Promise.race([
-        dataLoad,
-        new Promise<typeof HOME_SSR_DATA_PENDING>((resolve) => {
-          deadline = setTimeout(() => resolve(HOME_SSR_DATA_PENDING), HOME_SSR_DATA_DEADLINE_MS);
-        }),
-      ]).finally(() => clearTimeout(deadline)),
-      renderer(),
-      template(),
-    ]);
-    if (loaded === HOME_SSR_DATA_PENDING) {
-      logger.warn(`[home-ssr] data not ready in ${Date.now() - startedAt}ms; serving the SPA fallback`);
+    let servedFallback = false;
+    const prepared = (async () => {
+      const [data, render, htmlTemplate] = await Promise.all([
+        loadHomeSSRData(),
+        renderer(),
+        template(),
+      ]);
+      assertSsrTemplate(htmlTemplate);
+      return { data, render, htmlTemplate, homeCssLinks: await homeStylesheetLinks(htmlTemplate) };
+    })();
+    // Preparation keeps running after the deadline so the data load still warms
+    // the public cache. A failure before the deadline is logged by the catch
+    // below; one after it would otherwise go unreported.
+    prepared.catch((error: unknown) => {
+      if (servedFallback) logger.error("[home-ssr] render preparation failed after the SPA fallback was sent", error);
+    });
+    const ready = await withinHomeDeadline(res, prepared);
+    if (ready === HOME_DEADLINE_PASSED) {
+      servedFallback = true;
+      logger.warn(`[home-ssr] not ready ${Date.now() - startedAt}ms into the SSR step; serving the SPA fallback`);
       return next();
     }
-    const data = loaded;
-    assertSsrTemplate(htmlTemplate);
-    const homeCssLinks = await homeStylesheetLinks(htmlTemplate);
+    const { data, render, htmlTemplate, homeCssLinks } = ready;
     const boot = homeBoot(req);
     const rendered = render.renderHome({ boot, ...data });
     const state = safeJson({ boot, dehydratedState: rendered.dehydratedState });

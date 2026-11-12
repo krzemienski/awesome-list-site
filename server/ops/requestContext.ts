@@ -62,6 +62,7 @@ export function operationalRequestContext(
   next: NextFunction,
 ): void {
   markRequestServed(req.path);
+  res.locals.requestStartedAt = Date.now();
   const id = randomBytes(3).toString("hex");
   res.locals.requestId = id;
   requestContext.run({ kind: "request", databaseUnavailable: false, id, method: req.method, path: req.path }, () => {
