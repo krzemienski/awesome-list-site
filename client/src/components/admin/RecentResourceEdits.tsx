@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ResolvedResourceEdit } from "@shared/schema";
@@ -105,6 +106,10 @@ export function RecentResourceEdits() {
           ))}
         </div>
       ) : (
+        <>
+        <TableScrollHint overflows={scrollCue.overflows} className="admin-ops-scroll-hint" data-testid="text-swipe-hint-recent-edits">
+          Swipe the table sideways to see the outcome and when it was resolved.
+        </TableScrollHint>
         <div className="relative">
           {scrollCue.showCue && (
             <div
@@ -172,12 +177,8 @@ export function RecentResourceEdits() {
               </tbody>
             </table>
           </div>
-          {scrollCue.showCue && (
-            <p className="admin-ops-scroll-hint mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-recent-edits">
-              Swipe the table sideways to see the outcome and when it was resolved.
-            </p>
-          )}
         </div>
+        </>
       )}
     </section>
   );

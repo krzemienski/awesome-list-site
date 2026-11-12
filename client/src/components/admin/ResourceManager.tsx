@@ -42,6 +42,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -1577,6 +1578,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
+          <TableScrollHint overflows={tableScrollCue.overflows} className="admin-catalog-resources__scroll-hint" data-testid="hint-swipe-resources-table">
+            Swipe the table sideways to see category, tags, featured, and actions.
+          </TableScrollHint>
           <div className="relative">
           {tableScrollCue.showCue && (
             <div
@@ -1748,11 +1752,6 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 </>
               ) : "No resources yet."}
             </div>
-          )}
-          {tableScrollCue.showCue && (
-            <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
-              Swipe the table sideways to see category, tags, featured, and actions.
-            </p>
           )}
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}

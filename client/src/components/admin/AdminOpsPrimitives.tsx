@@ -27,6 +27,27 @@ const AdminOpsScrollBar = React.forwardRef<
 ));
 AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
+/**
+ * The "swipe sideways" line for a horizontally scrolling table. Render it
+ * ABOVE the scroller: below a 25-row table it sits off-screen, so nothing
+ * near the clipped edge says more columns exist. It follows `overflows`
+ * (stable while the table is wider than its scroller), not `showCue`, so it
+ * does not appear and vanish as the reader scrolls.
+ */
+export function TableScrollHint({
+  overflows,
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLParagraphElement> & { overflows: boolean }) {
+  if (!overflows) return null;
+  return (
+    <p className={cn("mb-2 text-xs text-muted-foreground", className)} {...props}>
+      {children}
+    </p>
+  );
+}
+
 const DEFAULT_SCROLL_HINT = "Swipe the table sideways to see all columns.";
 
 /**
