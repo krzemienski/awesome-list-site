@@ -37,7 +37,7 @@ import { storage } from "../storage";
 import { publicApiRateLimiter, RATE_LIMIT_TIERS } from "../middleware/rateLimit";
 import { optionalApiKey, requireApiKey } from "../middleware/apiAuth";
 import { stripInternalResourceFields } from "../lib/publicResource";
-import { listApprovedResourceTags } from "../repositories/TagRepository";
+import { loadPublicTagVocabulary } from "../repositories/TagRepository";
 import { parseBoundedInt } from "../validation/inputs";
 import {
   PUBLIC_API_CACHE_CONTROL,
@@ -426,7 +426,7 @@ export function registerPublicApiRoutes(app: Express): void {
    */
   app.get('/api/public/tags', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, asyncHandler(async (req: Request, res: Response) => {
     try {
-      const payload = await listApprovedResourceTags();
+      const payload = await loadPublicTagVocabulary();
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json(payload);

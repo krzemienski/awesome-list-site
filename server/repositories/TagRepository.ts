@@ -30,7 +30,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, asc, sql } from "drizzle-orm";
-import { invalidatePublicCache } from "../cache/publicCache";
+import { getPublicCacheValue, invalidatePublicCache } from "../cache/publicCache";
 import { normalizeTagFilter } from "@shared/tagNormalize";
 
 /**
@@ -61,6 +61,16 @@ export async function listApprovedResourceTags(): Promise<{ total: number; tags:
   const counted = Array.from(resourcesByTag, ([tag, ids]) => ({ tag, count: ids.size }))
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
   return { total: counted.length, tags: counted };
+}
+
+/** The tag vocabulary through the public cache; /api/tags and /api/public/tags share one entry. */
+export function loadPublicTagVocabulary() {
+  return getPublicCacheValue({
+    namespace: "catalog-taxonomy",
+    key: "tags",
+    ttlMs: 60_000,
+    load: listApprovedResourceTags,
+  });
 }
 
 /**

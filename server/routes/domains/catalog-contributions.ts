@@ -96,7 +96,7 @@ import { isDatabaseUnavailableError } from "../../db/errors";
 import { isUniqueViolation } from "../../errors/pgErrors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { registerHomeFeed } from "./home-feed";
-import { listApprovedResourceTags } from "../../repositories/TagRepository";
+import { loadPublicTagVocabulary } from "../../repositories/TagRepository";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
@@ -1319,19 +1319,11 @@ export function registerCatalogContributionsRoutes(
 
   // GET /api/tags - Aggregated tag counts (public, R2-M02). Tags live in
   // resources.metadata->'tags' (jsonb string array), not the (empty) tags
-  // table, so aggregate over approved resources. ~2k rows → single-digit ms.
+  // table, so aggregate over approved resources, bucketed by the canonical
+  // tag key (TagRepository.listApprovedResourceTags).
   app.get('/api/tags', asyncHandler(async (_req, res) => {
     try {
-      // run9 BUG-018: canonicalize before aggregating — lowercase and collapse
-      // spaces/underscores to hyphens so "open source", "Open Source" and
-      // "open-source" merge into one "open-source" bucket instead of showing
-      // as three near-duplicate filter chips.
-      const payload = await getPublicCacheValue({
-        namespace: 'catalog-taxonomy',
-        key: 'tags',
-        ttlMs: 60_000,
-        load: listApprovedResourceTags,
-      });
+      const payload = await loadPublicTagVocabulary();
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(payload);
