@@ -179,10 +179,11 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const jobsRegionRef = useRef<HTMLDivElement | null>(null);
   // The jobs table scrolls sideways inside its card; the shared cue says so.
   const jobsScrollCue = useHorizontalScrollCue();
+  const { ref: jobsScrollRef } = jobsScrollCue;
   const setJobsRegion = useCallback((node: HTMLDivElement | null) => {
     jobsRegionRef.current = node;
-    jobsScrollCue.ref(node);
-  }, [jobsScrollCue.ref]);
+    jobsScrollRef(node);
+  }, [jobsScrollRef]);
   const jobsMoreFocusPending = useRef(false);
   useEffect(() => {
     if (!jobsMoreFocusPending.current || jobsFetching) return;

@@ -37,6 +37,7 @@ import { validateBody } from "../../validation/inputs";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
 import { isDatabaseUnavailableError } from "../../db/errors";
+import { runInTransaction } from "../../db";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { createLogger } from "../../lib/logger";
 
@@ -272,15 +273,22 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
     if (!UUID_PATTERN.test(submissionId)) return res.status(404).json({ message: "Submission not found" });
     const adminId = String((req as Request & { dbUser?: { id?: string } }).dbUser?.id ?? "");
     try {
-      const removed = await contactRepo.deleteSubmission(submissionId);
+      // One transaction: a failed audit insert must not leave the message
+      // deleted behind an error response.
+      const removed = await runInTransaction(async () => {
+        const row = await contactRepo.deleteSubmission(submissionId);
+        if (row) {
+          await auditRepo.logResourceAudit(
+            null,
+            "contact_submission_deleted",
+            adminId || undefined,
+            { id: row.id, receivedAt: row.createdAt },
+            "Deleted a contact submission",
+          );
+        }
+        return row;
+      });
       if (!removed) return res.status(404).json({ message: "Submission not found" });
-      await auditRepo.logResourceAudit(
-        null,
-        "contact_submission_deleted",
-        adminId || undefined,
-        { id: removed.id, receivedAt: removed.createdAt },
-        "Deleted a contact submission",
-      );
       return res.status(204).end();
     } catch (error) {
       return sendDatabaseFailure(res, error, "inbox delete failed", "Could not delete the contact submission");

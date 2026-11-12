@@ -26,7 +26,8 @@ function Row({ label, value, source, override, extra }: { label: string; value: 
           when it cannot fit a line on its own. */}
       <dd className="mt-0.5 font-mono text-xs [overflow-wrap:anywhere]">
         <span className="inline-block max-w-full">{value ?? "unresolved"}</span>
-        {source && <span className="inline-block max-w-full text-muted-foreground">{" · "}{source}</span>}
+        {/* The space between the spans is the line-break opportunity. */}
+        {source && <>{" "}<span className="inline-block max-w-full text-muted-foreground">{"·\u00a0"}{source}</span></>}
       </dd>
     </div>
   );

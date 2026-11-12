@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
@@ -98,17 +98,26 @@ export default function ContactSubmissions() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // After a delete the row that opened the dialog is gone, so focus goes to
+  // the table region instead of the dialog's default return target.
+  const deletedRef = useRef(false);
   const removeSubmission = useMutation({
     mutationFn: (id: string) => apiRequest(`/api/admin/contact-submissions/${id}`, { method: "DELETE" }),
     onSuccess: () => {
+      deletedRef.current = true;
       setConfirmDelete(false);
-      setSelectedSubmission(null);
-      setRevealedId(null);
+      closeSubmission();
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-submissions"] });
       toast({ title: "Message deleted" });
     },
     onError: () => setConfirmDelete(false),
   });
+  const closeSubmission = () => {
+    setSelectedSubmission(null);
+    setRevealedId(null);
+    // A failed delete's message belongs to that submission only.
+    removeSubmission.reset();
+  };
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const unavailable = queryUnavailableReason(submissionsQuery);
 
@@ -285,13 +294,18 @@ export default function ContactSubmissions() {
       <Dialog
         open={!!selectedSubmission}
         onOpenChange={(open) => {
-          if (!open) {
-            setSelectedSubmission(null);
-            setRevealedId(null);
-          }
+          if (!open) closeSubmission();
         }}
       >
-        <DialogContent className="admin-ops-contact-dialog max-w-2xl">
+        <DialogContent
+          className="admin-ops-contact-dialog max-w-2xl"
+          onCloseAutoFocus={(event) => {
+            if (!deletedRef.current) return;
+            deletedRef.current = false;
+            event.preventDefault();
+            document.querySelector<HTMLElement>('[aria-label="Contact submissions table, scrollable"]')?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Contact submission</DialogTitle>
             <DialogDescription>
