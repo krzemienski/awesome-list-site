@@ -1,4 +1,4 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -95,10 +95,14 @@ pool.on('connect', (client: any) => {
 
     if (callbackIndex >= 0) {
       const callback = args[callbackIndex];
-      args[callbackIndex] = (error: unknown, ...callbackArgs: unknown[]) => {
+      // pg-pool runs a callback-style query's completion in the async context
+      // of whichever request opened the pooled socket, so a slow query would be
+      // logged (and a transient failure flagged) under that request. Bind the
+      // wrapper to the context of the call.
+      args[callbackIndex] = AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
         finish(error);
         return callback(error, ...callbackArgs);
-      };
+      });
     }
 
     try {
@@ -128,15 +132,23 @@ pool.on('connect', (client: any) => {
 // failures into the current request context; successful query instrumentation
 // remains exclusively client-level to avoid double-counting.
 const originalPoolQuery = pool.query.bind(pool);
+
+// pool.query() acquires its client through this.connect(cb). A caller that has
+// to queue gets its callback invoked from whichever request releases a client,
+// so the query would be dispatched, timed and logged under that request's
+// context. Run connect callbacks in the context of the caller that asked.
+const originalPoolConnect = pool.connect.bind(pool) as (cb?: unknown) => unknown;
+(pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) =>
+  typeof cb === 'function' ? originalPoolConnect(AsyncResource.bind(cb as (...a: unknown[]) => unknown)) : originalPoolConnect();
 (pool as any).query = (...args: any[]) => {
   const callbackIndex =
     typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
   if (callbackIndex >= 0) {
     const callback = args[callbackIndex];
-    args[callbackIndex] = (error: unknown, ...callbackArgs: unknown[]) => {
+    args[callbackIndex] = AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
       if (error) markTransientRequestFailure(error);
       return callback(error, ...callbackArgs);
-    };
+    });
   }
   try {
     const result = (originalPoolQuery as any)(...args);
