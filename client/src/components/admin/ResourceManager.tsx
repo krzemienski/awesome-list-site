@@ -1180,7 +1180,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const activeFilterSummary = [
     search.trim() ? `"${search.trim()}"` : null,
     categoryFilter || null,
-    statusFilter !== "approved" ? shownStatusLabel : null,
+    `status ${shownStatusLabel}`,
     featuredOnly ? "Featured only" : null,
   ].filter(Boolean).join(" · ");
 

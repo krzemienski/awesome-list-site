@@ -88,7 +88,9 @@ export default function PendingResources() {
   const [bulkApproveError, setBulkApproveError] = useState<string | null>(null);
   const [bulkRejectError, setBulkRejectError] = useState<string | null>(null);
   const [bulkOutcome, setBulkOutcome] = useState<BulkResourceOutcome | null>(null);
-  // Run17 BUG-027: "Check again" busy/outcome state for the empty view.
+  // Run17 BUG-027: "Check again" busy/outcome state. An offline recheck keeps
+  // the listed rows and says they may be out of date; a server failure shows
+  // the load-error view instead.
   const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked' | 'offline'>('idle');
 
   // BUG-011 (run22): the swipe hint must appear whenever the table actually
@@ -612,7 +614,7 @@ export default function PendingResources() {
           <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-recheck-failed">
             <strong>Couldn&apos;t check for new submissions.</strong>
             <span>
-              {navigator.onLine ? "The server didn't answer" : "You're offline"}, so this list may be out of date.
+              You&apos;re offline, so this list may be out of date.
             </span>
           </div>
         )}
