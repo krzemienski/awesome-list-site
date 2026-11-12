@@ -98,12 +98,26 @@ export const ABOUT_PROJECT = {
   ],
 };
 
+/** The lead sentence split around its two numbers, so the client can reserve space for them. */
+export function getAboutCatalogSummaryParts(siteName: string) {
+  return {
+    beforeResources: `${siteName} is a hand-curated index of `,
+    betweenCounts: " resources across ",
+    afterDomains:
+      " domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. ",
+  };
+}
+
+export function formatAboutResourceCount(resourceCount: number): string {
+  return resourceCount.toLocaleString("en-US");
+}
+
 export function getAboutCatalogSummary(
   siteName: string,
   resourceCount?: number,
   categoryCount?: number,
 ): string {
-  return resourceCount && categoryCount
-    ? `${siteName} is a hand-curated index of ${resourceCount.toLocaleString("en-US")} resources across ${categoryCount} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
-    : "";
+  if (!resourceCount || !categoryCount) return "";
+  const { beforeResources, betweenCounts, afterDomains } = getAboutCatalogSummaryParts(siteName);
+  return `${beforeResources}${formatAboutResourceCount(resourceCount)}${betweenCounts}${categoryCount}${afterDomains}`;
 }
