@@ -62,6 +62,14 @@
   scrollbar-width: thin;
 }
 
+/* A fixed short list (Recently resolved: the last 10) needs no height cap:
+   capped, it hid rows 8-10 with no cue at 1280 and cut a row in half at 390.
+   With no cap the content never overflows vertically, so only the sideways
+   scroll remains. */
+.queue-review-table-wrap.queue-review-table-wrap--uncapped {
+  max-height: none;
+}
+
 .queue-review-table-wrap::-webkit-scrollbar {
   display: block;
   height: 8px;
