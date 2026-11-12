@@ -1186,6 +1186,15 @@ components:
       required:
         - id
       additionalProperties: {}
+    delete_3a__2f_api_2f_resources_2f__7b_id_7d__2f_link-report.Params:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^\d+$
+      required:
+        - id
+      additionalProperties: {}
     patch_3a__2f_api_2f_admin_2f_link-reports_2f__7b_resourceId_7d__2f__7b_reporter_7d_.Params:
       type: object
       properties:
@@ -1199,6 +1208,15 @@ components:
       required:
         - resourceId
         - reporter
+      additionalProperties: {}
+    post_3a__2f_api_2f_admin_2f_link-health_2f_resources_2f__7b_id_7d__2f_ignore.Params:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^\d+$
+      required:
+        - id
       additionalProperties: {}
     JourneysQuery:
       type: object
@@ -1441,6 +1459,16 @@ components:
         - id
       additionalProperties: {}
     delete_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d_.Params:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 512
+      required:
+        - id
+      additionalProperties: {}
+    post_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d__2f_link-clerk.Params:
       type: object
       properties:
         id:
@@ -1712,6 +1740,20 @@ components:
       required:
         - id
       additionalProperties: {}
+    delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Params:
+      type: object
+      properties:
+        table:
+          type: string
+          minLength: 1
+          maxLength: 512
+        id:
+          type: string
+          pattern: ^\d+$
+      required:
+        - table
+        - id
+      additionalProperties: {}
     get_3a__2f_api_2f_github_2f_sync-status_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -1857,6 +1899,31 @@ components:
       required:
         - id
       additionalProperties: {}
+    ResearcherConfigQuery:
+      type: object
+      properties:
+        model:
+          description: Preview an orchestrator model override
+          type: string
+          maxLength: 512
+        scoutModel:
+          description: Preview a scout model override
+          type: string
+          maxLength: 512
+        baseUrl:
+          description: Preview a base URL override (validated like POST /api/researcher/start)
+          type: string
+          maxLength: 512
+        hasAuthToken:
+          description: Preview as if an override auth token were supplied
+          type: string
+          enum:
+            - '1'
+        allowInsecureHttp:
+          description: Preview with a plain-http override confirmed
+          type: string
+          enum:
+            - '1'
     ResearcherJobsQuery:
       type: object
       properties:
@@ -2019,6 +2086,8 @@ components:
           maximum: 9007199254740991
         scopeIntro:
           type: string
+        scopeIntroTagged:
+          type: string
         scope:
           type: object
           properties:
@@ -2155,6 +2224,7 @@ components:
         - totalAll
         - generalCount
         - scopeIntro
+        - scopeIntroTagged
         - scope
         - children
         - tags
@@ -2643,7 +2713,7 @@ components:
           type: string
           maxLength: 320
           format: email
-          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
         subject:
           type: string
           minLength: 1
@@ -2667,8 +2737,7 @@ components:
         id:
           type: string
           format: uuid
-          pattern: >-
-            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         status:
           type: string
           enum:
@@ -2697,8 +2766,7 @@ components:
               id:
                 type: string
                 format: uuid
-                pattern: >-
-                  ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
               name:
                 type: string
               replyTo:
@@ -2752,6 +2820,16 @@ components:
         - limit
         - offset
       additionalProperties: false
+    delete_3a__2f_api_2f_admin_2f_contact-submissions_2f__7b_submission_7d_.Params:
+      type: object
+      properties:
+        submission:
+          type: string
+          minLength: 1
+          maxLength: 512
+      required:
+        - submission
+      additionalProperties: {}
     AiHealthQuery:
       type: object
       properties:
@@ -4296,12 +4374,11 @@ paths:
           in: query
           required: false
           schema:
-            description: true adds every facet count to the response; categories adds the category facet only
+            description: true adds provider/format/skillLevel/kind facet counts to the response
             type: string
             enum:
               - 'true'
               - 'false'
-              - categories
         - name: status
           in: query
           required: false
@@ -4807,6 +4884,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SingleResourceResponse'
+        '301':
+          description: Redirect
         '400':
           description: Request validation failed
           content:
@@ -4891,6 +4970,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JsonResponse'
+        '301':
+          description: Redirect
         '400':
           description: Request validation failed
           content:
@@ -9079,6 +9160,101 @@ paths:
       x-contract-schemas:
         params: post_3a__2f_api_2f_resources_2f__7b_id_7d__2f_link-report.Params
         body: JsonObjectBody
+    delete:
+      operationId: delete:/api/resources/{id}/link-report
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '204':
+          description: Successful response with no body
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - resources
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^\d+$
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: resources
+      x-requires-auth: true
+      x-middleware:
+        - requireAuth
+      x-contract-schemas:
+        params: delete_3a__2f_api_2f_resources_2f__7b_id_7d__2f_link-report.Params
+        body: JsonObjectBody
   /api/admin/link-reports:
     get:
       operationId: get:/api/admin/link-reports
@@ -9262,6 +9438,346 @@ paths:
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_link-reports_2f__7b_resourceId_7d__2f__7b_reporter_7d_.Params
+        body: JsonObjectBody
+  /api/link-health/summary:
+    get:
+      operationId: get:/api/link-health/summary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - link-health
+      x-domain: link-health
+      x-middleware: []
+      x-contract-schemas: {}
+  /api/admin/link-health/remediation:
+    get:
+      operationId: get:/api/admin/link-health/remediation
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
+  /api/admin/link-health/remediation/apply:
+    post:
+      operationId: post:/api/admin/link-health/remediation/apply
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        body: JsonObjectBody
+  /api/admin/link-health/resources/{id}/ignore:
+    post:
+      operationId: post:/api/admin/link-health/resources/{id}/ignore
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^\d+$
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        params: post_3a__2f_api_2f_admin_2f_link-health_2f_resources_2f__7b_id_7d__2f_ignore.Params
         body: JsonObjectBody
   /api/journeys:
     get:
@@ -10922,6 +11438,103 @@ paths:
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d_.Params
         body: JsonObjectBody
+  /api/admin/users/{id}/link-clerk:
+    post:
+      operationId: post:/api/admin/users/{id}/link-clerk
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        params: post_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d__2f_link-clerk.Params
+        body: JsonObjectBody
   /api/admin/audit-logs:
     get:
       operationId: get:/api/admin/audit-logs
@@ -12198,6 +12811,87 @@ paths:
   /api/admin/resource-edits:
     get:
       operationId: get:/api/admin/resource-edits
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
+  /api/admin/resource-edits/recent:
+    get:
+      operationId: get:/api/admin/resource-edits/recent
       responses:
         '200':
           description: Successful response
@@ -13650,6 +14344,352 @@ paths:
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_sub-subcategories_2f__7b_id_7d_.Params
+        body: JsonObjectBody
+  /api/admin/usage:
+    get:
+      operationId: get:/api/admin/usage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
+  /api/admin/traffic:
+    get:
+      operationId: get:/api/admin/traffic
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
+  /api/admin/qa-rows:
+    get:
+      operationId: get:/api/admin/qa-rows
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
+  /api/admin/qa-rows/{table}/{id}:
+    delete:
+      operationId: delete:/api/admin/qa-rows/{table}/{id}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^\d+$
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        params: delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Params
         body: JsonObjectBody
   /api/github/configure:
     post:
@@ -16517,6 +17557,126 @@ paths:
         - isAdmin
       x-contract-schemas:
         body: JsonObjectBody
+  /api/researcher/config:
+    get:
+      operationId: get:/api/researcher/config
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - researcher
+      parameters:
+        - name: model
+          in: query
+          required: false
+          schema:
+            description: Preview an orchestrator model override
+            type: string
+            maxLength: 512
+        - name: scoutModel
+          in: query
+          required: false
+          schema:
+            description: Preview a scout model override
+            type: string
+            maxLength: 512
+        - name: baseUrl
+          in: query
+          required: false
+          schema:
+            description: Preview a base URL override (validated like POST /api/researcher/start)
+            type: string
+            maxLength: 512
+        - name: hasAuthToken
+          in: query
+          required: false
+          schema:
+            description: Preview as if an override auth token were supplied
+            type: string
+            enum:
+              - '1'
+        - name: allowInsecureHttp
+          in: query
+          required: false
+          schema:
+            description: Preview with a plain-http override confirmed
+            type: string
+            enum:
+              - '1'
+      security:
+        - SessionCookie: []
+      x-domain: researcher
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        query: ResearcherConfigQuery
   /api/researcher/brief:
     get:
       operationId: get:/api/researcher/brief
@@ -18812,6 +19972,186 @@ paths:
         - isAdmin
       x-contract-schemas:
         query: AdminContactSubmissionsQuery
+  /api/admin/contact-submissions/{submission}:
+    delete:
+      operationId: delete:/api/admin/contact-submissions/{submission}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '204':
+          description: Successful response with no body
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: submission
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        params: delete_3a__2f_api_2f_admin_2f_contact-submissions_2f__7b_submission_7d_.Params
+        body: JsonObjectBody
+  /api/admin/logs:
+    get:
+      operationId: get:/api/admin/logs
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas: {}
   /api/health:
     get:
       operationId: get:/api/health
@@ -19834,6 +21174,7 @@ tags:
   - name: collections
   - name: public
   - name: user
+  - name: link-health
   - name: journeys
   - name: claude
   - name: github
