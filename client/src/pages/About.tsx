@@ -23,12 +23,28 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAboutFaqs } from "@shared/faq";
-import { ABOUT_PROJECT, getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
+import {
+  ABOUT_PROJECT,
+  formatAboutResourceCount,
+  getAboutCatalogSummaryParts,
+  MAINTAINER,
+} from "@shared/about-content";
 import { aboutTitle } from "@shared/page-headings";
 import { resolveSiteIdentity, siteHost } from "@shared/site-identity";
 import { fetchAwesomeListNav, visibleNavCategories } from "@/lib/static-data";
 import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/about.css";
+
+/** Holds the number's final width until the nav query lands, so the lead paragraph never reflows. */
+function CatalogCount({ value, placeholder }: { value?: string; placeholder: string }) {
+  return value === undefined ? (
+    <span className="about-count about-count-pending" aria-hidden="true">
+      {placeholder}
+    </span>
+  ) : (
+    <span className="about-count">{value}</span>
+  );
+}
 
 export default function About() {
   // Run22 BUG-018 / C8-V1-01: the resource and domain counts come from the nav
@@ -62,11 +78,7 @@ export default function About() {
     site: siteIdentity,
   });
   const siteHostName = siteHost(siteIdentity.url);
-  const catalogSummary = getAboutCatalogSummary(
-    siteHostName || siteIdentity.name,
-    resourceCount,
-    domainCount,
-  );
+  const summary = getAboutCatalogSummaryParts(siteHostName || siteIdentity.name);
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
 
   const toggleFaq = (faqIndex: number) => {
@@ -110,7 +122,16 @@ export default function About() {
         <Card className="about-card about-lead-card">
           <CardContent className="about-lead-content">
             <p className="about-lead-copy">
-              <span>{catalogSummary}</span>
+              <span>
+                {summary.beforeResources}
+                <CatalogCount
+                  value={resourceCount ? formatAboutResourceCount(resourceCount) : undefined}
+                  placeholder="0,000"
+                />
+                {summary.betweenCounts}
+                <CatalogCount value={domainCount ? String(domainCount) : undefined} placeholder="0" />
+                {summary.afterDomains}
+              </span>
               {ABOUT_PROJECT.introLead}{" "}
               <span className="about-strong">{ABOUT_PROJECT.sourceName}</span>{" "}
               {ABOUT_PROJECT.introDescription}

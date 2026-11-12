@@ -78,6 +78,16 @@
   font-weight: inherit;
 }
 
+.about-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.about-count-pending {
+  color: transparent;
+  background: var(--border);
+  border-radius: 3px;
+}
+
 .about-callout-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
