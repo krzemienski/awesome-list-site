@@ -26,30 +26,21 @@ import { getAboutFaqs } from "@shared/faq";
 import { ABOUT_PROJECT, getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
 import { aboutTitle } from "@shared/page-headings";
 import { resolveSiteIdentity, siteHost } from "@shared/site-identity";
-import { fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories } from "@/lib/static-data";
+import { fetchAwesomeListNav, visibleNavCategories } from "@/lib/static-data";
 import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/about.css";
 
-interface AboutCatalogData {
-  resources?: unknown[];
-  categories?: unknown[];
-}
-
 export default function About() {
-  // Run22 BUG-018: FAQ resource-count claim rendered from the live catalog
-  // (same shared cache key as App/Home — no extra network round-trip).
-  const { data: treeData } = useQuery<AboutCatalogData>({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60,
-  });
-  // C8-V1-01: "domains" counts the categories the public site lists, not
-  // empty admin-created ones (shared nav cache with App/Home).
+  // Run22 BUG-018 / C8-V1-01: the resource and domain counts come from the nav
+  // tree, the one query the prerender hold waits for (main.tsx), so the lead
+  // paragraph is complete on the first frame the visitor sees. The full corpus
+  // arrives later and would grow the paragraph under the callout grid.
   const { data: navData } = useQuery({
     queryKey: ["awesome-list-nav"],
     queryFn: fetchAwesomeListNav,
     staleTime: 1000 * 60 * 60,
   });
+  const resourceCount = navData?.totalResources;
   const domainCount = navData ? visibleNavCategories(navData.categories).length : undefined;
   const { data: contactConfig } = useContactConfig(true);
   const contactDestination = preferredContactDestination(contactConfig);
@@ -66,14 +57,14 @@ export default function About() {
       : undefined,
   );
   const aboutFaqs = getAboutFaqs({
-    resourceCount: treeData?.resources?.length,
+    resourceCount,
     categoryCount: domainCount,
     site: siteIdentity,
   });
   const siteHostName = siteHost(siteIdentity.url);
   const catalogSummary = getAboutCatalogSummary(
     siteHostName || siteIdentity.name,
-    treeData?.resources?.length,
+    resourceCount,
     domainCount,
   );
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
