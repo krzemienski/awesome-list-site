@@ -1,25 +1,23 @@
 # Run 20261108T1819Z: zero open code defects (owner-side items remain), harness removal, PostHog-chosen improvements identified (none shipped)
 
 ## Outcome
-- Production served origin/main at every checkpoint. The last checkpoint was 2026-11-09 00:2xZ, on `69ef14e7`, before this docs PR merged. Merging it moves main ahead of production by one docs-only commit.
+- Production served origin/main at every checkpoint. The last checkpoint was 2026-11-09 about 02:59Z, on `dece06ae` (the #350 report publish at 00:53:16Z).
 - Every code defect the run found or inherited is fixed, independently reviewed and merged. That is 16 PRs: #335, #338–#349 and #351–#353.
-  - 12 are proven on awesome.video: #335, #338, #340, #341, #343, #344, #345, #347, #349, #351, #352, #353. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
-  - #339 (backup outcome line) and #342 (watchdog retry line) are deployed, but their proof needs a real event: the next scheduled backup, and a real database connect timeout.
+  - 13 are proven on awesome.video: #335, #338, #339, #340, #341, #343, #344, #345, #347, #349, #351, #352, #353. One part of #351 (D13, word wrap in pending edits) is code-only, because no pending edit exists to render.
+  - #342 (watchdog retry line) is deployed, but its proof needs a real event: a database connect timeout.
   - #346 and #348 (job status guards) rest on a TLA+ model check and independent review. They have no production check.
 - The final matrix pass covered 218 rows, one per surface per width, across final-L1 to L6: 212 PASS, 5 CARRIED, 1 RECLASSIFIED, 0 FAIL.
 - QA cleanup brought every deletable table to 0 qa-audit rows.
 
-Still open:
-- The 2-hour no-5xx window restarts with each deploy. It starts from the last deploy.
-- Owner-only items, listed under "Owner decisions" below.
+Still open: owner-only items, listed under "Owner decisions" below.
 
 ## Finish lines
 | # | Finish line | State | Evidence |
 |---|---|---|---|
-| 1 | `/api/version` equals origin/main HEAD | MET before this docs PR, `69ef14e7` both. A docs-only merge moves main ahead of the live SHA without changing any shipped file | `curl -s https://awesome.video/api/version` |
+| 1 | `/api/version` equals origin/main HEAD | MET at the last checkpoint: `dece06ae` both. A later docs-only merge moves main ahead of the live SHA without changing any shipped file | `curl -s https://awesome.video/api/version` |
 | 2 | The whole matrix passes | 0 FAIL in the final matrix (218 rows). 5 CARRIED rows: sign-up, sign-out and role change, which owner rules forbid re-driving. They kept their first-pass PASS, and the code under them (#345) is proven separately. 1 RECLASSIFIED: an edge-side 500 on `/api/version`. `matrix-fixes.tsv` also records three non-PASS fix checks: P336-01 INCONCLUSIVE (load burst 1 never filled the gate), P336-05 PARTIAL (shed lines classed the test traffic as human, not qa as expected; cause not established), and P340-B8b FAIL (GA4 counts each SPA page view twice; owner setting) | final-L1..L6.tsv, matrix-fixes.tsv |
 | 3 | No bug-labelled issue open; #284 closed with its 3 conditions | NOT MET. #284 is open with the `bug` label. Conditions 1 and 2 have production evidence. Condition 3 (the watchdog retry) is code-only and has not been observed on production. #336 and #337 are closed | `gh issue list --label bug --state open` |
-| 4 | 0 5xx for 2 h after the last deploy | IN PROGRESS. 0 5xx in the 11 minutes read after the 22:31Z deploy. Later deploys restarted the window. The 20:13Z burst of 23 human-class 503s was this run's own #336 load test | telemetry-2240.md |
+| 4 | 0 5xx for 2 h after the last deploy | MET on dece06ae. `/api/admin/logs` read at info level from 00:49:00Z to 02:58:47Z on 2026-11-09 (2 h 9 m 47 s after the 00:53:16Z publish): 12,464 records, 12,339 HTTP, 0 with status ≥ 500 and 0 at error level; cross-checked at warn level. No watchdog retry or sweep-failure line in the window (the periodic sweep logs only when it flips rows or fails) | audit/20261108T1819Z/telemetry-2h.md |
 | 5 | No new PostHog exception groups | WEAK. 0 `$exception` in a 3 h read at about 20:38Z (capture approved 19:47:38Z, turned on 19:48:59Z with read-back true, so on for about 1 h 50 min of that window; last exception ever 2026-09-16; only 4 `$pageview` in that window). Not re-read since | decisions.tsv |
 | 6 | Harness grep empty and build passes | MET at #335. Every PR body (#335–#353) records `npm run build` exit 0 or pass. `decisions.tsv` records build 0 for #340 and #349, tsc 0 only for #343, #345–#348, #351 and #353, and no gate result for #342 | PR bodies |
 | 7 | 0 qa-audit rows | MET for deletable tables: resources 0, edits 0, collections 0, bookmarks 0. Audit-log rows are append-only by design | e2e-evidence/20261108T1819Z/cleanup/qa-rows-after.json |
@@ -32,7 +30,7 @@ Still open:
 |---|---|---|
 | #335 → bfd08f7a | Ops, self-heal and CI harness removed | grep 0, build 0 |
 | #338 → d9a90bd4 | Real navigations got 503 during crawler bursts (#336) | Burst: 10/10 navigations got 200; non-navigation clients still got 503 + Retry-After |
-| #339 → 5c0d66af | Scheduled backup failures logged no stage (D2) | DEPLOYED, proof pending: the outcome line appears on the next scheduled run, after 2026-11-09T14:10Z |
+| #339 → 5c0d66af | Scheduled backup failures logged no stage (D2) | Scheduled run at 2026-11-09T14:22:51Z on dece06ae logged `Scheduled backup outcome` with `outcome: done`, backupId `20261109T142251Z-22db804d`, 43 tables, 113,805 rows, `pruned: 0`, no `pruneError`. Read-only `/api/admin/logs` read; evidence e2e-evidence/20261108T1819Z/backup-339/logs.json |
 | #341 → 83079b6b | Archived duplicates answered 410 (#337) | 27/27 pairs return 301 on page and API; query string kept; unmapped archived still 410; sitemap shows 0 |
 | #340 → 396abf2c | Decline did not stop Replit's page counting | 0 beacons after Decline; Allow restores them; earlier, cookie-only and hand-set cases pass; policy and copy agree |
 | #342 → e123be1d | Watchdog retry outcome was invisible (#284) | DEPLOYED, proof pending: the line appears on the next real connect timeout |
@@ -62,7 +60,7 @@ Identified with baselines and targets. None shipped; defects came first, as the 
 | I-03 | Home CLS p75 | 0.116/0.121 | < 0.1 |
 
 ## Owner decisions
-1. **www.awesome.video redirect loop.** Cloudflare answers with `location: awesome.video` and no scheme. Set the rule's target to `https://awesome.video` plus the path.
+1. **www.awesome.video redirect loop.** Resolved after the run through the Cloudflare API: `curl -sSI https://www.awesome.video/` now answers one 301 to `https://awesome.video/`.
 2. **GA4 counts each SPA navigation twice.** GA4 Admin → Data streams → web stream → Enhanced measurement: turn off "Page changes based on browser history events".
 3. **9 catalog link replacements** (cycle-23 table). You apply these PUTs yourself.
 4. **Repo-name titles.** 390 of 4,000. The default is to keep them.
@@ -74,7 +72,7 @@ Identified with baselines and targets. None shipped; defects came first, as the 
 7. **#281 scheduled backups.** These stay: escalated, not closed.
 
 ## Follow-ups (not defects on the live SHA)
-- H-02: compare link-scan apply timing with backup failures once the D2 outcome line exists.
+- H-02: compare link-scan apply timing with backup failures; the D2 outcome line has existed since the 2026-11-09T14:22:51Z scheduled backup.
 - H-11/H-12: admin cosmetics.
 - A cancel from a second instance can overlap the running job for up to 10 s; the heartbeat bounds it.
 - #302: the routes split, parked by the brief.
