@@ -51,7 +51,7 @@ const pool = new Pool({
 // Add error handler for connection issues
 pool.on('error', (err) => {
   recordPoolError();
-  logger.error('Database pool error:', { code: (err as any)?.code ?? 'unknown' });
+  logger.error('Database pool error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
 });
 
 function markTransientRequestFailure(error: unknown): void {
@@ -74,7 +74,7 @@ pool.on('connect', (client: any) => {
   client.on('error', (err: unknown) => {
     recordPoolError();
     markTransientRequestFailure(err);
-    logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown' });
+    logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
   });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
