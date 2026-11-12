@@ -1169,14 +1169,18 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // "approved" is the default status, not a filter the admin chose.
   const hasActiveFilters = Boolean(search || categoryFilter || featuredOnly || statusFilter !== "approved");
 
+  // The list is scoped to one status even when it is the default, so the
+  // header and the empty state always say which one is shown.
+  const shownStatusLabel = statusFilter === "all"
+    ? "All statuses"
+    : FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter;
+
   // The empty state names exactly these filters, so "nothing found" explains
   // which search/category/status/featured choices produced it.
   const activeFilterSummary = [
     search.trim() ? `"${search.trim()}"` : null,
     categoryFilter || null,
-    statusFilter !== "approved"
-      ? FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter
-      : null,
+    statusFilter !== "approved" ? shownStatusLabel : null,
     featuredOnly ? "Featured only" : null,
   ].filter(Boolean).join(" · ");
 
@@ -1241,6 +1245,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   {` · ★ ${featuredCount.toLocaleString()} featured on the home page`}
                 </span>
               ) : null}
+              {` · Status: ${shownStatusLabel}`}
               {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
@@ -1750,7 +1755,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     Clear filters
                   </button>
                 </>
-              ) : "No resources yet."}
+              ) : (
+                <>
+                  No {shownStatusLabel.toLowerCase()} resources yet. Only {shownStatusLabel.toLowerCase()} resources are listed; choose another status above to see the rest.
+                </>
+              )}
             </div>
           )}
 
