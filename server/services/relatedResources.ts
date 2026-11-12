@@ -1,4 +1,5 @@
 import type { Resource } from "@shared/schema";
+import { stripInternalResourceFields } from "../lib/publicResource";
 
 /**
  * Related Resources service
@@ -223,5 +224,33 @@ export function buildRelatedResources(
     prerequisites,
     nextSteps,
     totalFound: similar.length + prerequisites.length + nextSteps.length,
+  };
+}
+
+/** The one repository read the related payload needs. */
+export interface RelatedPoolSource {
+  listApprovedInCategory(category: string): Promise<RelatedCandidate[]>;
+}
+
+/**
+ * The public related payload for a resource: ranked against its whole
+ * category and stripped of internal fields. The only producer, shared by
+ * GET /api/resources/:id/related and the server-rendered resource page's
+ * boot payload, so both show the same items in the same order.
+ */
+export async function loadRelatedResources(
+  source: RelatedPoolSource,
+  resource: RelatedCandidate,
+  limit = 5,
+): Promise<RelatedResourcesResult> {
+  const pool = resource.category ? await source.listApprovedInCategory(resource.category) : [];
+  const related = buildRelatedResources(resource, pool, limit);
+  const sanitize = (items: RelatedItem[]): RelatedItem[] =>
+    items.map((item) => ({ ...item, resource: stripInternalResourceFields(item.resource) }));
+  return {
+    ...related,
+    similar: sanitize(related.similar),
+    prerequisites: sanitize(related.prerequisites),
+    nextSteps: sanitize(related.nextSteps),
   };
 }

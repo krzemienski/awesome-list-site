@@ -89,7 +89,7 @@ import { CATALOG_CACHE_CONTROL, SESSION_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CO
 import { resolveDuplicateTarget } from "../../lib/duplicateTarget";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
-import { buildRelatedResources } from "../../services/relatedResources";
+import { loadRelatedResources } from "../../services/relatedResources";
 import { stripInternalResourceFields } from "../../lib/publicResource";
 import { getPublicCacheValue } from "../../cache/publicCache";
 import { isDatabaseUnavailableError } from "../../db/errors";
@@ -747,19 +747,7 @@ export function registerCatalogContributionsRoutes(
           return res.status(404).json({ message: 'Resource not found' });
         }
       }
-      const pool = resource.category ? await resourceRepo.listApprovedInCategory(resource.category) : [];
-      const related = buildRelatedResources(resource, pool, limit);
-      const sanitizeItems = (items: any[]) =>
-        items.map((item) => ({
-          ...item,
-          resource: stripInternalResourceFields(item.resource),
-        }));
-      res.json({
-        ...related,
-        similar: sanitizeItems(related.similar),
-        prerequisites: sanitizeItems(related.prerequisites),
-        nextSteps: sanitizeItems(related.nextSteps),
-      });
+      res.json(await loadRelatedResources(resourceRepo, resource, limit));
     } catch (error) {
       logger.error('Error fetching related resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch related resources');

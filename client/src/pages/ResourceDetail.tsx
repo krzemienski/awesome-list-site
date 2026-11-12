@@ -73,6 +73,10 @@ import type { ResourceKind } from "@shared/resourceKinds";
 import { findCachedResource } from "@/lib/cached-resource";
 import "@/styles/pages/resource.css";
 
+// A "Same category: …" row only pads the list; its score is not a match.
+const isCategoryFiller = (reasons?: string[]) =>
+  !!reasons?.length && reasons.every((reason) => reason.startsWith("Same category"));
+
 // GET /api/resources/:id/related returns five matches unless asked for more.
 // The top "More like this" rail shows the first TOP_RELATED_LIMIT of them, so
 // the Related Resources card lists at most the rest: reserve exactly that many.
@@ -1039,7 +1043,7 @@ export default function ResourceDetail() {
                   <span className="font-medium text-sm line-clamp-2 sm:line-clamp-1 flex-1 min-w-0">
                     {related.title}
                   </span>
-                  {related.score !== undefined && (
+                  {related.score !== undefined && !isCategoryFiller(related.reasons) && (
                     <Badge variant="secondary" className="text-xs flex-shrink-0 hidden sm:inline-flex">
                       <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
                       {related.score}% match
