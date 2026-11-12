@@ -65,6 +65,7 @@ import {
 } from "../lib/resourceKinds";
 import { compareTitles, titleOrderAsc, titleOrderDesc } from "../lib/titleOrder";
 import { createLogger } from "../lib/logger";
+import type { RelatedCandidate } from "../services/relatedResources";
 
 const logger = createLogger("resources");
 
@@ -855,6 +856,21 @@ export class ResourceRepository {
   async getResource(id: number): Promise<Resource | undefined> {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
+  }
+
+  /**
+   * Every approved resource in a category, newest edit first, without the
+   * generated `searchTsv` column. Ranks related resources against the whole
+   * category instead of one page of it.
+   */
+  async listApprovedInCategory(category: string): Promise<RelatedCandidate[]> {
+    const { searchTsv, ...columns } = getTableColumns(resources);
+    void searchTsv;
+    return db
+      .select(columns)
+      .from(resources)
+      .where(and(eq(resources.status, 'approved'), eq(resources.category, category)))
+      .orderBy(desc(resources.updatedAt), desc(resources.id));
   }
 
   /**
