@@ -9,9 +9,9 @@
 // - Automated browsers. `navigator.webdriver === true` (WebDriver, CDP-driven
 //   Chrome, agent-browser, chrome-devtools MCP, Playwright) is a synchronous
 //   property, so the very first page view is already covered.
-// - Non-production hosts. Only the production site (VITE_SITE_URL's host)
-//   sends to a vendor, so localhost and *.replit.dev dev sessions never reach
-//   production analytics.
+// - Non-production hosts. Only the canonical site host (baked at build from
+//   PUBLIC_SITE_URL, vite.config.ts) sends to a vendor, so localhost and
+//   *.replit.dev dev sessions never reach production analytics.
 // - QA paths: `/qa-*`, the all-nines sentinel resource ids test runs use, and
 //   the owner sign-in page `/sign-in?admin`.
 //
