@@ -86,9 +86,10 @@ import {
   findSubcategory,
   findSubSubcategory,
 } from "./seo-content";
-import { buildRelatedResources } from "./services/relatedResources";
+import { loadRelatedResources } from "./services/relatedResources";
 import { stripInternalResourceFields } from "./lib/publicResource";
 import { CollectionRepository } from "./repositories/CollectionRepository";
+import { ResourceRepository } from "./repositories/ResourceRepository";
 import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 import { getPublicCacheValue } from "./cache/publicCache";
 import { resolveDuplicateTarget } from "./lib/duplicateTarget";
@@ -108,6 +109,7 @@ export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
 const collectionRepo = new CollectionRepository();
+const resourceRepo = new ResourceRepository();
 
 export interface RouteMeta {
   title: string;
@@ -1818,23 +1820,8 @@ function homeShellChrome(): string {
           // boot; undefined when it could not be built (the client fetches).
           let relatedBoot: unknown;
           try {
-            const { resources: pool } = await storage.listResources({
-              status: "approved",
-              category: resource.category ?? undefined,
-              limit: 60,
-            });
-            const related = buildRelatedResources(resource as any, pool, 5);
-            const sanitizeItems = (items: any[]) =>
-              items.map((item) => ({
-                ...item,
-                resource: stripInternalResourceFields(item.resource),
-              }));
-            relatedBoot = {
-              ...related,
-              similar: sanitizeItems(related.similar),
-              prerequisites: sanitizeItems(related.prerequisites),
-              nextSteps: sanitizeItems(related.nextSteps),
-            };
+            const related = await loadRelatedResources(resourceRepo, resource as any, 5);
+            relatedBoot = related;
             const seen = new Set<number>();
             for (const bucket of [
               related.similar,
