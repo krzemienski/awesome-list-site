@@ -69,6 +69,21 @@ export default function ReportLinkAction({
     },
   });
 
+  const withdraw = useMutation({
+    mutationFn: () => apiRequest(`/api/resources/${resourceId}/link-report`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.setQueryData(queryKey, { report: null });
+      toast({ title: "Report withdrawn", description: "You can report this link again any time." });
+    },
+    onError: (error) => {
+      toast({
+        title: "Couldn't withdraw the report",
+        description: describeWriteError(error, { fallback: "Please try again.", outcome: NOTHING_CHANGED_OUTCOME }),
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleClick = () => {
     if (!isAuthenticated) {
       toast({
@@ -81,7 +96,7 @@ export default function ReportLinkAction({
     if (reported) {
       toast({
         title: "You already reported this link",
-        description: "A maintainer will check it. You can report it again after they've handled it.",
+        description: "A maintainer will check it. Withdraw it if you reported it by mistake.",
       });
       return;
     }
@@ -102,6 +117,19 @@ export default function ReportLinkAction({
         <Flag className={`h-4 w-4 mr-2 ${reported ? "fill-current" : ""}`} aria-hidden="true" />
         <span>{reported ? "Link reported" : "Report broken link"}</span>
       </Button>
+      {reported && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => { if (!withdraw.isPending) withdraw.mutate(); }}
+          aria-disabled={withdraw.isPending}
+          aria-busy={withdraw.isPending}
+          data-testid="button-withdraw-link-report"
+          className="min-h-[44px] px-4"
+        >
+          {withdraw.isPending ? "Withdrawing…" : "Withdraw report"}
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={(next) => { if (!submit.isPending) setOpen(next); }}>
         <DialogContent className="sm:max-w-[425px]" data-testid="dialog-report-link">
