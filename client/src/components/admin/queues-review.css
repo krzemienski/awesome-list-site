@@ -48,11 +48,15 @@
   min-height: 44px;
 }
 
+/* Unavailable actions read as neutral controls at full opacity, matching the
+   shared disabled-primary rule (app-bridge.css); a 0.45 fade made the ghost
+   "Bulk reject" look dimmer than the disabled "Approve all" beside it. */
 .queue-review-actions .btn:disabled,
 .queue-review-actions button:disabled,
 .queue-review-actions button[aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.45;
+  color: var(--text-2);
+  opacity: 1;
 }
 
 .queue-review-table-wrap {

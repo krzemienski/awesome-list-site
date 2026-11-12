@@ -49,7 +49,8 @@ import { useToast } from "@/hooks/use-toast";
 import { describeWriteError } from "@/lib/apiError";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { Stat, StatusChip, TableScrollHint, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import type { EnrichmentJob } from "@shared/schema";
 import { baseUrlSyntaxError, insecureHttpRefusal, plainHttpHost } from "@shared/validation";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -130,6 +131,8 @@ function costPerResource(jobs: EnrichmentJob[]): number | null {
 
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
+  // The jobs table scrolls sideways inside its card; the shared cue says so.
+  const jobsScrollCue = useHorizontalScrollCue();
   const queryClient = useQueryClient();
   const aiDefaults = useAiDefaults();
   const defaultEnrichmentModel = aiDefaults.flowModel("enrichment");
@@ -489,7 +492,12 @@ export default function BatchEnrichmentPanel() {
             </Button>
           }
         >
+          <TableScrollHint overflows={jobsScrollCue.overflows} className="admin-ops-scroll-hint" data-testid="hint-swipe-enrichment-jobs">
+            Swipe the table sideways to see when each job finished and its logs.
+          </TableScrollHint>
           <div
+            ref={jobsScrollCue.ref}
+            onKeyDown={jobsScrollCue.onKeyDown}
             className="queues-agent__canonical-table focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"

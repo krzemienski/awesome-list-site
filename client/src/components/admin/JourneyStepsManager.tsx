@@ -852,7 +852,8 @@ export default function JourneyStepsManager() {
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium line-clamp-2 break-words min-w-0" title={j.title}>{j.title}</span>
+                  {/* Titles are short; show them whole (two lines cut "Advanced Live Streaming..." at 390). */}
+                  <span className="font-medium break-words min-w-0">{j.title}</span>
                   <Badge variant="outline" className="max-w-full min-w-0 whitespace-normal text-left" title={j.category}>
                     <span className="break-words">{j.category}</span>
                   </Badge>

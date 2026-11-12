@@ -21,9 +21,13 @@ function Row({ label, value, source, override, extra }: { label: string; value: 
         {override && <OverrideBadge />}
         {extra && <OverrideBadge>{extra}</OverrideBadge>}
       </dt>
-      <dd className="mt-0.5 break-all font-mono text-xs">
-        {value ?? "unresolved"}
-        {source && <span className="text-muted-foreground"> · {source}</span>}
+      {/* break-all split names mid-word ("ANTHROPIC_BASE_UR / L", "haik / u");
+          wrap between the value and its source, and break a single token only
+          when it cannot fit a line on its own. */}
+      <dd className="mt-0.5 font-mono text-xs [overflow-wrap:anywhere]">
+        <span className="inline-block max-w-full">{value ?? "unresolved"}</span>
+        {/* The space between the spans is the line-break opportunity. */}
+        {source && <>{" "}<span className="inline-block max-w-full text-muted-foreground">{"·\u00a0"}{source}</span></>}
       </dd>
     </div>
   );

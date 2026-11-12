@@ -224,21 +224,8 @@
   font-weight: 600;
 }
 
-/* Unavailable (signed out, or submitting): a neutral control at full opacity.
-   The global 50% fade left the bright accent fill half-transparent and hard
-   to read. A focused button is disabled via aria-disabled (useFocusSafeDisabled)
-   rather than the attribute, so both forms match. */
-/* `:root[data-system] .btn.primary` (app-bridge.css, 0,4,0) sets the black
-   on-accent ink; the selector must outrank it or the label turns black on
-   this neutral fill (prod: ~1.1:1). */
-:root[data-system] .btn.submit-submit-button:is(:disabled, [aria-disabled="true"]),
-:root[data-system] .btn.submit-submit-button:is(:disabled, [aria-disabled="true"]):hover {
-  border-color: var(--border);
-  background: var(--surface-2);
-  color: var(--text-2);
-  box-shadow: none;
-  opacity: 1;
-}
+/* Unavailable (signed out, or submitting): the shared disabled-primary rule in
+   app-bridge.css paints it neutral at full opacity. */
 
 .submit-submit-button:hover {
   border-color: var(--accent);

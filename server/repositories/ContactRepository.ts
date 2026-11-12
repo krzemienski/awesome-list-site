@@ -5,7 +5,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { config } from "../config";
-import { desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 /**
  * Delete submissions older than config.contact.retention_days in bounded
@@ -53,6 +53,15 @@ export class ContactRepository {
       .orderBy(desc(contactSubmissions.createdAt), desc(contactSubmissions.id))
       .limit(limit)
       .offset(offset);
+  }
+
+  /** Remove one submission (spam, or a test message); returns its id and time, or null. */
+  async deleteSubmission(id: string): Promise<Pick<ContactSubmission, "id" | "createdAt"> | null> {
+    const [removed] = await db
+      .delete(contactSubmissions)
+      .where(eq(contactSubmissions.id, id))
+      .returning({ id: contactSubmissions.id, createdAt: contactSubmissions.createdAt });
+    return removed ?? null;
   }
 
   async countSubmissions(): Promise<number> {

@@ -1,11 +1,23 @@
-import { useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ApiError } from "@/lib/queryClient";
+import { useRef, useState } from "react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ApiError, apiRequest } from "@/lib/queryClient";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, ChevronLeft, ChevronRight, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Eye, EyeOff, RefreshCw, Trash2 } from "lucide-react";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
@@ -83,6 +95,29 @@ export default function ContactSubmissions() {
     // kept the skeleton on screen instead of ever reaching the error state.
   });
   const { data, isLoading, error, refetch, isFetching } = submissionsQuery;
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  // After a delete the row that opened the dialog is gone, so focus goes to
+  // the table region instead of the dialog's default return target.
+  const deletedRef = useRef(false);
+  const removeSubmission = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/admin/contact-submissions/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      deletedRef.current = true;
+      setConfirmDelete(false);
+      closeSubmission();
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-submissions"] });
+      toast({ title: "Message deleted" });
+    },
+    onError: () => setConfirmDelete(false),
+  });
+  const closeSubmission = () => {
+    setSelectedSubmission(null);
+    setRevealedId(null);
+    // A failed delete's message belongs to that submission only.
+    removeSubmission.reset();
+  };
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const unavailable = queryUnavailableReason(submissionsQuery);
 
@@ -259,13 +294,18 @@ export default function ContactSubmissions() {
       <Dialog
         open={!!selectedSubmission}
         onOpenChange={(open) => {
-          if (!open) {
-            setSelectedSubmission(null);
-            setRevealedId(null);
-          }
+          if (!open) closeSubmission();
         }}
       >
-        <DialogContent className="admin-ops-contact-dialog max-w-2xl">
+        <DialogContent
+          className="admin-ops-contact-dialog max-w-2xl"
+          onCloseAutoFocus={(event) => {
+            if (!deletedRef.current) return;
+            deletedRef.current = false;
+            event.preventDefault();
+            document.querySelector<HTMLElement>('[aria-label="Contact submissions table, scrollable"]')?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Contact submission</DialogTitle>
             <DialogDescription>
@@ -321,10 +361,51 @@ export default function ContactSubmissions() {
                   {selectedSubmission.message || "—"}
                 </p>
               </div>
+              {removeSubmission.isError && (
+                <p role="alert" className="text-sm text-destructive" data-testid="text-contact-delete-error">
+                  {describeWriteError(removeSubmission.error, { fallback: "The message could not be deleted. Please try again.", outcome: NOTHING_CHANGED_OUTCOME })}
+                </p>
+              )}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  onClick={() => setConfirmDelete(true)}
+                  data-testid="button-contact-detail-delete"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                  Delete message
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+      <AlertDialog open={confirmDelete} onOpenChange={(open) => { if (!removeSubmission.isPending) setConfirmDelete(open); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The message is removed from the inbox for good. The audit log records that a message was deleted, not what it said.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeSubmission.isPending} data-testid="button-contact-delete-cancel">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                if (selectedSubmission && !removeSubmission.isPending) removeSubmission.mutate(selectedSubmission.id);
+              }}
+              aria-busy={removeSubmission.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-contact-delete-confirm"
+            >
+              {removeSubmission.isPending ? "Deleting…" : "Delete message"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </TableShell>
     </div>
   );

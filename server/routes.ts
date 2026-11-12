@@ -391,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Default-off contact surface (docs/CONTACT-VARIANTS.md "Backend").
-  registerContactRoutes(app, { isAuthenticated, isAdmin, contactRepo });
+  registerContactRoutes(app, { isAuthenticated, isAdmin, contactRepo, auditRepo });
 
   // Before registerOperationsRoutes: that registrar installs the /api 404 fallbacks.
   registerAdminLogsRoutes(app, { isAuthenticated, isAdmin });
