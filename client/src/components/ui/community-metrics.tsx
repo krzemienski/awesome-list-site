@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -72,19 +73,20 @@ export default function CommunityMetrics({ resources, categories, className, sub
       };
     }).sort((a, b) => b.resourceCount - a.resourceCount || a.name.localeCompare(b.name));
 
-    // Calculate actual weekly growth from recent resources
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const recentlyAddedCount = resources.filter(r => {
-      if (!r.createdAt) return false;
-      return new Date(r.createdAt) > oneWeekAgo;
-    }).length;
-
     return {
       categoryMetrics,
       totalContributions: resources.length,
-      weeklyGrowth: recentlyAddedCount
     };
   }, [resources, categories]);
+  // "This week" is the home feed's approvedThisWeek (approval date, falling
+  // back to creation), the one count Home also shows. The catalog payload
+  // carries no approvedAt, so counting it here would disagree with Home.
+  const homeQuery = useQuery<{ approvedThisWeek: number }>({
+    queryKey: ["/api/home"],
+    staleTime: 1000 * 60,
+  });
+  const weeklyGrowth = homeQuery.data?.approvedThisWeek;
+  const weeklyGrowthText = weeklyGrowth === undefined ? "—" : `+${weeklyGrowth.toLocaleString()}`;
 
   return (
     <div className={className}>
@@ -120,7 +122,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                     </div>
                     <p className="text-2xl font-bold mt-1">{metrics.totalContributions.toLocaleString()}</p>
                     <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
-                      +{metrics.weeklyGrowth.toLocaleString()} this week
+                      {weeklyGrowthText} this week
                     </p>
                   </CardContent>
                 </Card>
@@ -146,9 +148,9 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           count, not a percentage — label it honestly. */}
                       <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth.toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-1">{weeklyGrowthText}</p>
                     <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
-                      resources added
+                      newly indexed
                     </p>
                   </CardContent>
                 </Card>
