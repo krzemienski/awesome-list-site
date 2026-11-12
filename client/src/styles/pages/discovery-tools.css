@@ -512,6 +512,12 @@
     text-align: start;
   }
 
+  /* A wrapping label squeezed the icon to nothing ("AI Recommendations" lost
+     it); the icon keeps its size and only the label wraps. */
+  .discovery-tools-tab > svg {
+    flex-shrink: 0;
+  }
+
   .discovery-tools-format-card-content {
     min-height: 0;
   }

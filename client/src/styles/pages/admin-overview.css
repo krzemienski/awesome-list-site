@@ -5,7 +5,9 @@
  */
 .admin-overview-stats-canonical.admin-stat-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* auto-fit, not auto-fill: four cards in a wide column must stretch across
+     it, not leave an empty fifth track (1280: cards stopped at x≈975). */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 14px;
   margin-block-end: var(--space-6, 1.5rem);
 }

@@ -532,6 +532,15 @@ export default function PendingResources() {
     );
   }
 
+  // One visible alert for both views: an offline "Check again" says the shown
+  // queue (rows, or the empty message) may be out of date.
+  const recheckAlert = recheckState === 'offline' ? (
+    <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-recheck-failed">
+      <strong>Couldn&apos;t check for new submissions.</strong>
+      <span>You&apos;re offline, so this list may be out of date.</span>
+    </div>
+  ) : null;
+
   if (totalPending === 0) {
     return (
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
@@ -552,25 +561,13 @@ export default function PendingResources() {
             <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
           </div>
         )}
-        {/* axe scrollable-region-focusable: the header-only empty table still
-            scrolls sideways on narrow viewports, so the wrap must be reachable. */}
-        <div
-          className="admin-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-          tabIndex={0}
-          role="region"
-          aria-label="Pending approvals table, empty, scrollable"
-        >
-          <table className="table">
-            <thead><tr><th>Title</th><th>Category</th><th>Submitted by</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
-            <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending submissions.</td></tr></tbody>
-          </table>
-        </div>
+        {recheckAlert}
+        {/* An empty queue is a sentence, not a header-only table: the
+            five-column header overflowed a phone's scrollport ("WHE…") with
+            nothing to scroll to. */}
+        <p className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="text-pending-empty">No pending submissions.</p>
         <span className="sr-only" role="status" aria-live="polite">
-          {recheckState === 'checked'
-            ? 'Checked — still no pending resources.'
-            : recheckState === 'offline'
-              ? "You're offline — couldn't check for new submissions."
-              : ''}
+          {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
         </span>
       </section>
     );
@@ -610,14 +607,7 @@ export default function PendingResources() {
             <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
           </div>
         )}
-        {recheckState === 'offline' && (
-          <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-recheck-failed">
-            <strong>Couldn&apos;t check for new submissions.</strong>
-            <span>
-              You&apos;re offline, so this list may be out of date.
-            </span>
-          </div>
-        )}
+        {recheckAlert}
         {/* R4-011 (run21): shared narrow-admin-table strategy — a single
               contained overflow-auto viewport (scrolls BOTH axes) around a
               min-w table. The previous sticky-right Actions cell (338px) was

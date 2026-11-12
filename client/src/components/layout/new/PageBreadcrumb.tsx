@@ -13,6 +13,7 @@ import { lazyOptional } from "@/lib/lazy-optional";
 import { deslugify } from "@/lib/utils";
 import { tagDisplayNameBranded } from "@shared/seo-templates";
 import { normalizeTagPathSegment } from "@shared/tagNormalize";
+import { normalizeAdminTab, type AdminTabId } from "@shared/admin-tabs";
 
 // The breadcrumb sits outside RouteErrorBoundary; a failed chunk drops the
 // disclosure and leaves the plain trail.
@@ -101,7 +102,8 @@ const STATIC_PATH_LABELS: Record<string, string> = {
   "/logout": "Signing out",
 };
 
-const ADMIN_LABELS: Record<string, string> = {
+// Keyed by canonical tab id; normalizeAdminTab maps the aliases.
+const ADMIN_LABELS: Record<AdminTabId, string> = {
   overview: "Overview",
   approvals: "Approvals",
   edits: "Edits",
@@ -114,14 +116,10 @@ const ADMIN_LABELS: Record<string, string> = {
   categories: "Categories",
   subcategories: "Subcategories",
   subsubcategories: "Sub-Subcategories",
-  "sub-subcategories": "Sub-Subcategories",
-  "sub-subcats": "Sub-Subcategories",
   journeys: "Journeys",
   users: "Users",
   github: "GitHub",
-  "github-sync": "GitHub",
   linkhealth: "Link Health",
-  "link-health": "Link Health",
   digests: "Digests",
   audit: "Audit",
   contact: "Contact inbox",
@@ -160,7 +158,7 @@ function decodedSlug(value: string): string {
   }
 }
 
-function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title: string): Crumb[] {
+function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title: string, hash = ""): Crumb[] {
   const taxonomy = taxonomyCrumbs(categories, pathname);
   if (taxonomy) return taxonomy;
   const parts = pathname.split("/").filter(Boolean);
@@ -184,11 +182,14 @@ function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title
   if (root === "sign-in") return [{ label: "Sign in" }];
   if (root === "sign-up") return [{ label: "Sign up" }];
   if (root === "admin") {
-    if (!value) return [{ label: "Admin" }];
-    const label = ADMIN_LABELS[value.toLowerCase()];
-    return label
-      ? [{ href: "/admin", label: "Admin" }, { label }]
-      : [{ label: "Page Not Found" }];
+    // Tabs open as /admin/<section> deep links or as /admin#<section> (the
+    // dashboard's own tab clicks and Settings menu); both name the section.
+    const section = value ?? hash;
+    if (!section) return [{ label: "Admin" }];
+    const tab = normalizeAdminTab(section);
+    return tab
+      ? [{ href: "/admin", label: "Admin" }, { label: ADMIN_LABELS[tab] }]
+      : value ? [{ label: "Page Not Found" }] : [{ label: "Admin" }];
   }
   if (pathname === "/settings/theme") {
     return [{ href: "/settings", label: "Settings" }, { label: "Appearance" }];
@@ -225,9 +226,23 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     return () => observer.disconnect();
   }, [location]);
 
+  // wouter's location has no hash; the admin tabs live in it. The dashboard
+  // switches tabs with history.pushState, which wouter's history patch
+  // announces as a "pushState" event (wouter/src/use-browser-location.js).
+  const [hash, setHash] = useState(() => (typeof window === "undefined" ? "" : window.location.hash.slice(1)));
+  useEffect(() => {
+    const sync = () => setHash(window.location.hash.slice(1));
+    const events = ["hashchange", "popstate", "pushState", "replaceState"] as const;
+    sync();
+    for (const type of events) window.addEventListener(type, sync);
+    return () => {
+      for (const type of events) window.removeEventListener(type, sync);
+    };
+  }, []);
+
   const crumbs = useMemo(
-    () => resolveCrumbs(categories, location, pageHeading ?? pageTitle),
-    [categories, location, pageHeading, pageTitle],
+    () => resolveCrumbs(categories, location, pageHeading ?? pageTitle, hash),
+    [categories, location, pageHeading, pageTitle, hash],
   );
   // A page that paints its own trail (subcategory and sub-subcategory
   // listings) owns the one Breadcrumb landmark; a second, hidden copy made
