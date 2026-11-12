@@ -44,6 +44,7 @@ interface AuditLogsResponse {
    deletion is not a failure, and an unknown action is not silently reported
    as successful. */
 const ACTION_STATUS: Record<string, string> = {
+  contact_submission_deleted: "completed",
   create: "completed",
   created: "completed",
   update: "completed",

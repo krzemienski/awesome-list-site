@@ -398,6 +398,7 @@ export default function ContactSubmissions() {
                 if (selectedSubmission && !removeSubmission.isPending) removeSubmission.mutate(selectedSubmission.id);
               }}
               aria-busy={removeSubmission.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-contact-delete-confirm"
             >
               {removeSubmission.isPending ? "Deleting…" : "Delete message"}
