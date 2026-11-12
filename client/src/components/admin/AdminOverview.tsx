@@ -378,14 +378,14 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     queryFn: () => apiRequest("/api/enrichment/jobs?limit=100"),
     staleTime: 30_000,
   });
-  // Same key and default fetcher as the metric strip (AdminStats), so a Retry
-  // in either section recovers both.
   // Same key as the Link Health tab, so both read one cached response.
   const brokenLinks = useQuery<BrokenLinksResponse>({
     queryKey: ["/api/admin/link-health/broken-links"],
     queryFn: () => apiRequest("/api/admin/link-health/broken-links"),
     staleTime: 30_000,
   });
+  // Same key and default fetcher as the metric strip (AdminStats), so a Retry
+  // in either section recovers both.
   const categories = useQuery<CategorySummary[]>({
     queryKey: ["/api/categories"],
     staleTime: 60_000,
