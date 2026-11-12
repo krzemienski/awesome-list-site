@@ -61,7 +61,7 @@ export function operationalRequestContext(
   res: Response,
   next: NextFunction,
 ): void {
-  markRequestServed();
+  markRequestServed(req.path);
   const id = randomBytes(3).toString("hex");
   res.locals.requestId = id;
   requestContext.run({ kind: "request", databaseUnavailable: false, id, method: req.method, path: req.path }, () => {

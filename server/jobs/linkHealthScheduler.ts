@@ -1,6 +1,6 @@
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { isServingTraffic } from "../ops/serviceActivity";
+import { POST_BOOT_DELAY_MS, isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("link-health");
 
@@ -43,7 +43,7 @@ export function initializeLinkHealthScheduler(): void {
     });
   };
 
-  setTimeout(() => void tick(), 60_000).unref();
+  setTimeout(() => void tick(), POST_BOOT_DELAY_MS).unref();
   setInterval(() => void tick(), TICK_MS).unref();
   logger.info(`Link health schedule on: a full scan every ${hours}h`);
 }

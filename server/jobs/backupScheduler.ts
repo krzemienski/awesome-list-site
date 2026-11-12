@@ -1,12 +1,11 @@
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { isServingTraffic } from "../ops/serviceActivity";
+import { POST_BOOT_DELAY_MS, isServingTraffic } from "../ops/serviceActivity";
 import { runScheduledBackupIfDue } from "../backup/scheduledBackup";
 
 const logger = createLogger("backup-scheduler");
 
 const RUN_EVERY_MS = 30 * 60 * 1000;
-const STARTUP_DELAY_MS = 2 * 60 * 1000;
 let timer: NodeJS.Timeout | null = null;
 let running = false;
 
@@ -30,7 +29,7 @@ async function runCycle(): Promise<void> {
 // runScheduledBackupIfDue, so this timer may fire as often as it likes.
 export function initializeBackupScheduler(): void {
   if (timer) return;
-  const startup = setTimeout(() => void runCycle(), STARTUP_DELAY_MS);
+  const startup = setTimeout(() => void runCycle(), POST_BOOT_DELAY_MS);
   startup.unref();
   timer = setInterval(() => void runCycle(), RUN_EVERY_MS);
   timer.unref();
