@@ -38,8 +38,12 @@ const pool = new Pool({
   min: 1,
   idleTimeoutMillis: 30000,
   // Bound pool acquisition and server execution. A saturated pool must fail
-  // predictably instead of leaving HTTP requests hanging.
-  connectionTimeoutMillis: 3000,
+  // predictably instead of leaving HTTP requests hanging. pg also applies this
+  // value to a NEW client's TCP+TLS+startup. Production failures (2026-11-10..12)
+  // were never a full pool (poolTotal <= 4 of 8, waiting 0): the pool shrinks to
+  // min after 30 s idle, and the next burst needs fresh Neon connections, which
+  // an Autoscale instance short of CPU can take longer than 3 s to open.
+  connectionTimeoutMillis: 8000,
   statement_timeout: 8000,
   query_timeout: 10000,
   options: "-c lock_timeout=2000",
