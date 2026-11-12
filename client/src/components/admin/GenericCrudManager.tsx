@@ -24,6 +24,7 @@ import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 import { Paginator } from "@/components/ui/paginator";
 import { parsePageInput } from "@/lib/page-param";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "@/styles/pages/admin-catalog-taxonomy.css";
 import { apiFetch } from "@/lib/api-fetch";
@@ -2922,6 +2923,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         ) : (
           <>
+          <TableScrollHint overflows={tableScrollCue.overflows} className="admin-taxonomy-scroll-hint" data-testid={`hint-swipe-${testIdEntityPlural}-table`}>
+            Swipe the table sideways to see all columns, including Edit/Delete.
+          </TableScrollHint>
           <div className="relative">
           {tableScrollCue.showCue && (
             <div
@@ -3070,11 +3074,6 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           {(!paginatedItems || paginatedItems.length === 0) && (
             <p className="py-8 text-center text-sm text-muted-foreground" data-testid={`empty-${testIdEntityPlural}`}>
               No {entityNamePlural.toLowerCase()} match your search.
-            </p>
-          )}
-          {tableScrollCue.showCue && (
-            <p className="admin-taxonomy-scroll-hint mt-2 text-xs text-muted-foreground" data-testid={`hint-swipe-${testIdEntityPlural}-table`}>
-              Swipe the table sideways to see all columns, including Edit/Delete.
             </p>
           )}
 

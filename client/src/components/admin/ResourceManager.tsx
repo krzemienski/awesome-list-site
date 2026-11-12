@@ -42,6 +42,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -1168,14 +1169,18 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // "approved" is the default status, not a filter the admin chose.
   const hasActiveFilters = Boolean(search || categoryFilter || featuredOnly || statusFilter !== "approved");
 
+  // The list is scoped to one status even when it is the default, so the
+  // header and the empty state always say which one is shown.
+  const shownStatusLabel = statusFilter === "all"
+    ? "All statuses"
+    : FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter;
+
   // The empty state names exactly these filters, so "nothing found" explains
   // which search/category/status/featured choices produced it.
   const activeFilterSummary = [
     search.trim() ? `"${search.trim()}"` : null,
     categoryFilter || null,
-    statusFilter !== "approved"
-      ? FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter
-      : null,
+    `status ${shownStatusLabel}`,
     featuredOnly ? "Featured only" : null,
   ].filter(Boolean).join(" · ");
 
@@ -1240,6 +1245,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   {` · ★ ${featuredCount.toLocaleString()} featured on the home page`}
                 </span>
               ) : null}
+              {` · Status: ${shownStatusLabel}`}
               {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
@@ -1577,6 +1583,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
+          <TableScrollHint overflows={tableScrollCue.overflows} className="admin-catalog-resources__scroll-hint" data-testid="hint-swipe-resources-table">
+            Swipe the table sideways to see category, tags, featured, and actions.
+          </TableScrollHint>
           <div className="relative">
           {tableScrollCue.showCue && (
             <div
@@ -1746,13 +1755,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     Clear filters
                   </button>
                 </>
-              ) : "No resources yet."}
+              ) : (
+                <>
+                  No {shownStatusLabel.toLowerCase()} resources yet. Only {shownStatusLabel.toLowerCase()} resources are listed; choose another status above to see the rest.
+                </>
+              )}
             </div>
-          )}
-          {tableScrollCue.showCue && (
-            <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
-              Swipe the table sideways to see category, tags, featured, and actions.
-            </p>
           )}
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}

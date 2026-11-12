@@ -312,8 +312,11 @@
   line-height: 1.3;
   text-align: end;
   /* The actions cell is nowrap; wrap the reason to the buttons' width so it
-     never widens the column. */
+     never widens the column. A zero base width keeps the unwrapped sentence
+     out of the cell's intrinsic width, and min-width fills the buttons' row. */
   white-space: normal;
+  inline-size: 0;
+  min-inline-size: 100%;
 }
 
 @media (hover: none), (pointer: coarse), (max-width: 64rem) {

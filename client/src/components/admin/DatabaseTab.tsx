@@ -366,7 +366,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Rows</th>
+              <th title="Every row in the table, whatever its status. The catalog size on Overview counts approved resources only.">Rows (all statuses)</th>
               <th>Size</th>
               {/* max(updated_at|created_at) over the rows that still exist:
                   deletes leave no timestamp, so this is not a last-write time. */}

@@ -124,6 +124,7 @@ const ADMIN_LABELS: Record<string, string> = {
   "link-health": "Link Health",
   digests: "Digests",
   audit: "Audit",
+  contact: "Contact inbox",
 };
 
 function taxonomyCrumbs(categories: AwesomeListNavNode[], pathname: string): Crumb[] | undefined {

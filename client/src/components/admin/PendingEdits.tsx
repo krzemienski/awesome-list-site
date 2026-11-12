@@ -8,6 +8,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { RECENT_EDITS_KEY, RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -422,6 +423,9 @@ export default function PendingEdits() {
             min-width:100%, so it never scrolled horizontally and clipped the
             Actions column ≤768px. max-h keeps short lists compact; the
             desktop layout (table already fits, no scroll) is unchanged. */}
+        <TableScrollHint overflows={scrollCue.overflows} className="admin-ops-scroll-hint" data-testid="text-swipe-hint-edits">
+          Swipe the table sideways to see all columns, including Approve/Reject.
+        </TableScrollHint>
         <div className="relative">
           {scrollCue.showCue && (
             <div
@@ -555,11 +559,6 @@ export default function PendingEdits() {
               </tbody>
             </table>
           </div>
-          {scrollCue.showCue && (
-            <p className="admin-ops-scroll-hint mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
-              Swipe the table sideways to see all columns, including Approve/Reject.
-            </p>
-          )}
         </div>
         <RecentResourceEdits />
       </section>
