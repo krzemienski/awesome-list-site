@@ -178,7 +178,7 @@ function isRetryableSaturationFailure(error: unknown): boolean {
   if (code === "53300") return true; // too_many_connections
   const message = String((error as any)?.message ?? "").toLowerCase();
   return (
-    // pg-pool acquire-queue timeout (pool saturated, DB itself healthy)
+    // pg-pool acquire timeout: a full pool, or a wait on a slow new connect (DB may be degraded)
     message.includes("timeout exceeded when trying to connect") ||
     // publicCache MAX_IN_FLIGHT guard (rebuild burst, instant rejection)
     message.includes("rebuild capacity is temporarily full")
@@ -258,14 +258,10 @@ async function resolveRouteWithSaturationRetry(
   urlPath: string,
   signal?: AbortSignal,
 ): Promise<ResolvedRoute> {
-  // Two escalating backoffs: the first rides out a momentary acquire-queue
-  // spike; the second (~1.2s) outlasts a sustained crawler burst window in
-  // which the whole 3s connection queue stayed full. Only crawler-facing
-  // prerender pays this latency, and only under saturation.
-  const backoffsMs = [
-    250 + Math.floor(Math.random() * 250),
-    1000 + Math.floor(Math.random() * 500),
-  ];
+  // One short retry rides out a momentary acquire spike. A second attempt was
+  // dropped because each attempt can now wait the full 8 s connect timeout,
+  // which keeps the worst case at about 16.5 s.
+  const backoffsMs = [250 + Math.floor(Math.random() * 250)];
   for (let attempt = 0; ; attempt++) {
     try {
       throwIfRouteResolutionAborted(signal);
@@ -568,12 +564,12 @@ function safeDecode(segment: string): string {
 
 // F027 first line of defense: cap concurrent UNCACHED route resolutions so a
 // crawler burst can never queue more DB work than the pg pool (max 8) can
-// absorb inside its 3s acquire window. A 12-way crawl of an all-cold cache
+// absorb inside its 8s acquire window. A 12-way crawl of an all-cold cache
 // (exactly what a gate run or a fresh Googlebot sweep is) previously piled up
 // enough acquire waiters that a handful of routes 503'd even with the retry
 // ladder above — the retry lands while the pool is STILL saturated because the
 // crawl keeps pushing. Capping at 5 leaves pool headroom for interactive
-// traffic and keeps worst-case acquire waits well inside the 3s window.
+// traffic and keeps worst-case acquire waits well inside the 8s window.
 // Cached hits never touch this gate. The pending queue is also bounded and
 // abort-aware so a burst of unique /search or revocable /collection routes
 // cannot retain unlimited promises or later execute work for disconnected
