@@ -124,3 +124,20 @@
     padding-right: 2.75rem;
   }
 }
+
+/* ADM-4: on a phone the header actions wrapped raggedly (search beside Row
+   actions, Export and Invite right-aligned on their own rows). Stack them on
+   one left edge at full width instead. */
+@media (max-width: 40rem) {
+  .admin-ops-users-shell .admin-ops-table-shell__actions {
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .admin-ops-users-shell .admin-ops-table-shell__actions > * {
+    max-width: none;
+    width: 100%;
+  }
+}
