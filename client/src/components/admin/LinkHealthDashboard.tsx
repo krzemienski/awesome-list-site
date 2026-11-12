@@ -484,7 +484,7 @@ export default function LinkHealthDashboard() {
       ) : lastCompletedJob ? (
         <p className="text-xs text-muted-foreground" data-testid="text-link-health-count-source">
           {countsFromListedLinks && brokenLinksData
-            ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(checkTime(latestJob ?? lastCompletedJob).at)}) for resources still in the catalog.${
+            ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(checkTime(latestJob ?? lastCompletedJob).at)}). Healthy is the total saved when the scan finished; Broken, Redirect, Timeout and Suspect count only resources still in the catalog, so the five cards can add up to slightly more than the live catalog.${
                 (latestJob?.brokenLinks ?? 0) !== summaryCounts.broken
                   ? ` When it finished, the scan recorded ${(latestJob?.brokenLinks ?? 0).toLocaleString()} broken; ${summaryCounts.broken.toLocaleString()} of those resources are still listed.`
                   : ""
