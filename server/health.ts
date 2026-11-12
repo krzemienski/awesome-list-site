@@ -22,7 +22,18 @@ let inFlight: Promise<ProbeResult> | null = null;
 let lastResult: ProbeResult | null = null;
 let lastCompletedAt = 0;
 
+// pool.connect() cannot be cancelled, so a probe that gives up after
+// ACQUIRE_TIMEOUT_MS leaves its acquisition holding a pool slot for up to the
+// pool's connect timeout. Only one such abandoned acquisition may exist at a
+// time; until it settles, probes report not-ready without opening another, so
+// repeated probes against a cold database cannot fill the application pool.
+let abandonedAcquisition: Promise<unknown> | null = null;
+
 async function acquireProbeClient(): Promise<PoolClient> {
+  if (abandonedAcquisition) {
+    // Same cause as the timeout that abandoned it, so it classifies as "timeout".
+    throw new Error("readiness pool acquisition timeout: an earlier probe's acquisition is still pending");
+  }
   const acquisition = pool.connect();
   let timer: NodeJS.Timeout | undefined;
   try {
@@ -36,9 +47,14 @@ async function acquireProbeClient(): Promise<PoolClient> {
       }),
     ]);
   } catch (error) {
-    // pool.connect() cannot be cancelled. If it wins after our deadline, release
-    // the late client immediately so a probe can never leak pool capacity.
-    acquisition.then((client) => client.release()).catch(() => undefined);
+    // If the late client arrives after our deadline, release it immediately.
+    const abandoned = acquisition
+      .then((client) => client.release())
+      .catch(() => undefined)
+      .finally(() => {
+        if (abandonedAcquisition === abandoned) abandonedAcquisition = null;
+      });
+    abandonedAcquisition = abandoned;
     throw error;
   } finally {
     if (timer) clearTimeout(timer);

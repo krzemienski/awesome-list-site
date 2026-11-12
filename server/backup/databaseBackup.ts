@@ -46,6 +46,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import pg from "pg";
+import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
 import { createLogger } from "../lib/logger";
 import {
   isPrivateStorageConfigured,
@@ -284,7 +285,11 @@ export async function collectSchemaInventory(client: pg.Client): Promise<SchemaI
 }
 
 async function withClient<T>(connectionString: string, fn: (client: pg.Client) => Promise<T>): Promise<T> {
-  const client = new pg.Client({ connectionString, statement_timeout: 120_000 });
+  const client = new pg.Client({
+    connectionString,
+    connectionTimeoutMillis: DB_CONNECT_TIMEOUT_MS,
+    statement_timeout: 120_000,
+  });
   try {
     await client.connect();
   } catch (error) {
