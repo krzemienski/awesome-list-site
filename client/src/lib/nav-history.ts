@@ -32,6 +32,14 @@ function currentScrollKey(): string {
   return SCROLL_KEY_PREFIX + window.location.pathname + window.location.search;
 }
 
+function saveScroll(): void {
+  try {
+    sessionStorage.setItem(currentScrollKey(), String(window.scrollY));
+  } catch {
+    // Storage full/unavailable — restoration silently degrades to top.
+  }
+}
+
 // The pop flag MUST be set before React re-renders for the new location.
 // wouter subscribes to popstate during mount, so a listener registered in a
 // useEffect lands AFTER wouter's in the dispatch order — React 18 then
@@ -74,11 +82,7 @@ export function useScrollRestoration(location: string, search: string): void {
       rafPending = true;
       requestAnimationFrame(() => {
         rafPending = false;
-        try {
-          sessionStorage.setItem(currentScrollKey(), String(window.scrollY));
-        } catch {
-          // Storage full/unavailable — restoration silently degrades to top.
-        }
+        saveScroll();
       });
     };
 
@@ -93,6 +97,10 @@ export function useScrollRestoration(location: string, search: string): void {
     lastPath.current = location;
     if (!pendingPop) {
       if (pathChanged) window.scrollTo(0, 0);
+      // A new entry whose scroll lands where it already was (the paginator
+      // scrolling to a list top that is already at the top) fires no scroll
+      // event, so without this Forward would find nothing saved for it.
+      saveScroll();
       return;
     }
     pendingPop = false;
