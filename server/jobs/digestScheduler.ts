@@ -2,14 +2,11 @@ import crypto from "crypto";
 import { runDigestCycle } from "../services/digestService";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { isServingTraffic } from "../ops/serviceActivity";
+import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
 const logger = createLogger("digest");
 
 const RUN_EVERY_MS = 60 * 60 * 1000;
-// A freshly booted Autoscale instance is starved for its first ~3 minutes: pool
-// connects time out at 3 s and queries take seconds. Start after that window.
-const STARTUP_DELAY_MS = 5 * 60 * 1000;
 let timer: NodeJS.Timeout | null = null;
 let running = false;
 
@@ -17,7 +14,6 @@ const runScheduledCycle = (workerId: string): Promise<void> =>
   runWithJobContext("digest", workerId, () => runCycle(workerId));
 
 async function runCycle(workerId: string): Promise<void> {
-  if (!isServingTraffic()) return;
   if (running) return;
   running = true;
   const startedAt = Date.now();
@@ -43,13 +39,10 @@ async function runCycle(workerId: string): Promise<void> {
 export function initializeDigestScheduler(): void {
   if (timer) return;
   const workerId = `server-${process.pid}-${crypto.randomUUID().slice(0, 8)}`;
-  const startup = setTimeout(() => {
-    void runScheduledCycle(workerId);
-  }, STARTUP_DELAY_MS);
+  const tick = deferUntilServing(() => runScheduledCycle(workerId));
+  const startup = setTimeout(tick, POST_BOOT_DELAY_MS);
   startup.unref();
-  timer = setInterval(() => {
-    void runScheduledCycle(workerId);
-  }, RUN_EVERY_MS);
+  timer = setInterval(tick, RUN_EVERY_MS);
   timer.unref();
   logger.info("Digest scheduler initialized (hourly)");
 }

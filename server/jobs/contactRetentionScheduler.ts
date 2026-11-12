@@ -2,7 +2,7 @@ import { config } from "../config";
 import { ContactRepository, purgeExpiredContactSubmissions } from "../repositories/ContactRepository";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { isServingTraffic } from "../ops/serviceActivity";
+import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
 const logger = createLogger("contact-retention");
 
@@ -15,7 +15,7 @@ let running = false;
 const runScheduledCycle = (): Promise<void> => runWithJobContext("contact-retention", "hourly", runCycle);
 
 async function runCycle(): Promise<void> {
-  if (process.env.NODE_ENV === "test" || process.env.VITEST || running || !isServingTraffic()) return;
+  if (process.env.NODE_ENV === "test" || process.env.VITEST || running) return;
   running = true;
   let deletedCount = 0;
   try {
@@ -48,8 +48,9 @@ async function runCycle(): Promise<void> {
 
 export function initializeContactRetentionScheduler(): void {
   if (process.env.NODE_ENV === "test" || process.env.VITEST || timer) return;
-  const startup = setTimeout(() => { void runScheduledCycle(); }, 30_000);
+  const tick = deferUntilServing(runScheduledCycle);
+  const startup = setTimeout(tick, POST_BOOT_DELAY_MS);
   startup.unref();
-  timer = setInterval(() => { void runScheduledCycle(); }, RUN_EVERY_MS);
+  timer = setInterval(tick, RUN_EVERY_MS);
   timer.unref();
 }
