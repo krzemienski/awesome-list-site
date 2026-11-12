@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { StatusChip, TableScrollHint, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { ResearchLaunchGuide, type ResearchLaunchGuideHandle } from "@/components/admin/ResearchLaunchGuide";
 import { ResearchRunView } from "@/components/admin/ResearchRunView";
 import { CancelResearchRunDialog } from "@/components/admin/CancelResearchRunDialog";
@@ -56,7 +56,8 @@ import { ToastAction } from "@/components/ui/toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
 import "./research-run.css";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { flushSync } from "react-dom";
 import { apiFetch } from "@/lib/api-fetch";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -175,7 +176,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const hasMoreJobs = !!jobs && (jobs.length > visibleJobs.length || jobsTotal > jobs.length);
   // When the last "Load more" removes the button, hand focus to the table
   // region instead of letting it fall to <body>.
-  const jobsRegionRef = useRef<HTMLDivElement>(null);
+  const jobsRegionRef = useRef<HTMLDivElement | null>(null);
+  // The jobs table scrolls sideways inside its card; the shared cue says so.
+  const jobsScrollCue = useHorizontalScrollCue();
+  const setJobsRegion = useCallback((node: HTMLDivElement | null) => {
+    jobsRegionRef.current = node;
+    jobsScrollCue.ref(node);
+  }, [jobsScrollCue.ref]);
   const jobsMoreFocusPending = useRef(false);
   useEffect(() => {
     if (!jobsMoreFocusPending.current || jobsFetching) return;
@@ -442,8 +449,12 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
             ? `Latest ${visibleJobs.length} of ${jobsTotal} research runs`
             : "Recent agentic research runs"}
         >
+          <TableScrollHint overflows={jobsScrollCue.overflows} className="admin-ops-scroll-hint" data-testid="hint-swipe-researcher-jobs">
+            Swipe the table sideways to see cost, turns and when each run started.
+          </TableScrollHint>
           <div
-            ref={jobsRegionRef}
+            ref={setJobsRegion}
+            onKeyDown={jobsScrollCue.onKeyDown}
             className="queues-agent__canonical-table queues-agent__canonical-table--research focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"

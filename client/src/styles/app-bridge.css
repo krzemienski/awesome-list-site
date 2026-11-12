@@ -80,6 +80,18 @@ body { font-feature-settings: "ss01", "cv11"; }
    primary labels use black --on-accent (`[data-system]` keeps the selector's
    original weight; the boot always sets it). */
 :root[data-system] .btn.primary { color: var(--on-accent); }
+/* An unavailable primary action is a neutral control at full opacity. The
+   global 50% fade left the accent fill half-transparent with black ink on it
+   (about 2:1). A focused button is disabled through aria-disabled
+   (useFocusSafeDisabled) instead of the attribute, so both forms match. */
+:root[data-system] .btn.primary:is(:disabled, [aria-disabled="true"]),
+:root[data-system] .btn.primary:is(:disabled, [aria-disabled="true"]):hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+  box-shadow: none;
+  opacity: 1;
+}
 :root .chip.accent,
 :root .btn.danger,
 :root .btn.link,
