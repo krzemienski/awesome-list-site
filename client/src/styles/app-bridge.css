@@ -80,6 +80,19 @@ body { font-feature-settings: "ss01", "cv11"; }
    primary labels use black --on-accent (`[data-system]` keeps the selector's
    original weight; the boot always sets it). */
 :root[data-system] .btn.primary { color: var(--on-accent); }
+/* Destructive confirms (AlertDialogAction + `bg-destructive`) must read as
+   destructive in every accent. Tailwind utilities load unlayered at (0,1,0),
+   so the design system's `.btn.primary` fill (0,2,0) won and every admin
+   Delete confirm wore the accent: crimson by default, green under Emerald. */
+:root .btn.bg-destructive {
+  border-color: transparent;
+  background: var(--color-destructive);
+  color: var(--color-destructive-foreground);
+}
+:root .btn.bg-destructive:hover {
+  background: color-mix(in srgb, var(--color-destructive) 90%, transparent);
+}
+
 /* An unavailable primary action is a neutral control at full opacity. The
    global 50% fade left the accent fill half-transparent with black ink on it
    (about 2:1). A focused button is disabled through aria-disabled
