@@ -11,16 +11,21 @@ import type { Resource } from "@shared/schema";
  * - prerequisites: introductory material in the same area (keyword heuristic)
  * - nextSteps:     advanced material in the same area (keyword heuristic)
  *
- * Every bucket only holds candidates with a real relevance signal (same
- * sub-subcategory, same subcategory, or enough rare shared terms), so a bucket
- * may hold fewer than `limit` items, or none. Shared terms are weighted by how
- * rare they are across the pool, so "hevc" counts and "guide" does not.
+ * Ranked candidates need a real relevance signal (same sub-subcategory, same
+ * subcategory, or enough rare shared terms). Shared terms are weighted by how
+ * rare they are across the pool, so "hevc" counts and "guide" does not. When
+ * fewer than `limit` candidates qualify, `similar` is padded with the
+ * category's other resources; the other buckets may hold fewer than `limit`
+ * items, or none.
  *
  * All fields are derived from real resource data; there is no external call.
  */
 
+/** A resource row without the generated search column, which ranking never reads. */
+export type RelatedCandidate = Omit<Resource, "searchTsv">;
+
 export interface RelatedItem {
-  resource: Resource;
+  resource: RelatedCandidate;
   /** 1-100 relevance score */
   score: number;
   /** 1-100 confidence (mirrors score) */
@@ -63,6 +68,8 @@ const KEYWORD_FLOOR = 1.2;
 const KEYWORD_SCORE_PER_WEIGHT = 0.12;
 const KEYWORD_SCORE_CAP = 0.35;
 const MAX_TERM_REASONS = 3;
+/** Score of a same-category filler: below every ranked match (which all score at least 0.15 + a signal). */
+const CATEGORY_FILL_SCORE = 0.1;
 
 function tokenize(text: string): Set<string> {
   return new Set(
@@ -88,7 +95,7 @@ function rarityWeights(docs: Set<string>[]): (term: string) => number {
 }
 
 interface Scored {
-  resource: Resource;
+  resource: RelatedCandidate;
   rawScore: number;
   reasons: string[];
 }
@@ -114,12 +121,12 @@ function toItem(
 /**
  * Build the three related-resource buckets for a resource.
  * @param current - The resource being viewed.
- * @param pool - Candidate resources (typically approved, same category).
+ * @param pool - Approved resources of the same category, most recently updated first.
  * @param limit - Max items per bucket (default 5).
  */
 export function buildRelatedResources(
-  current: Resource,
-  pool: Resource[],
+  current: RelatedCandidate,
+  pool: RelatedCandidate[],
   limit = 5,
 ): RelatedResourcesResult {
   const candidates = pool.filter((r) => r.id !== current.id);
@@ -170,6 +177,16 @@ export function buildRelatedResources(
   const bySimilarity = [...scored].sort((a, b) => b.rawScore - a.rawScore);
 
   const similar = bySimilarity.slice(0, limit).map((s) => toItem(s, "similar"));
+  if (similar.length < limit) {
+    // Never leave a resource without neighbours while its category has others:
+    // pad with the category's most recently updated resources.
+    const chosen = new Set(similar.map((s) => s.resource.id));
+    for (const r of candidates) {
+      if (similar.length >= limit) break;
+      if (chosen.has(r.id)) continue;
+      similar.push(toItem({ resource: r, rawScore: CATEGORY_FILL_SCORE, reasons: [`Same category: ${r.category}`] }, "similar"));
+    }
+  }
   const similarIds = new Set(similar.map((s) => s.resource.id));
 
   const rest = bySimilarity.filter((s) => !similarIds.has(s.resource.id));

@@ -747,13 +747,7 @@ export function registerCatalogContributionsRoutes(
           return res.status(404).json({ message: 'Resource not found' });
         }
       }
-      // Pull a pool of approved resources in the same category to rank against.
-      const { resources: pool } = await resourceRepo.listResources({
-        page: 1,
-        limit: 60,
-        status: 'approved',
-        category: resource.category ?? undefined,
-      });
+      const pool = resource.category ? await resourceRepo.listApprovedInCategory(resource.category) : [];
       const related = buildRelatedResources(resource, pool, limit);
       const sanitizeItems = (items: any[]) =>
         items.map((item) => ({
