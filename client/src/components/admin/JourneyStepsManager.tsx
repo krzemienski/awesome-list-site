@@ -852,7 +852,7 @@ export default function JourneyStepsManager() {
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium line-clamp-1 break-words min-w-0" title={j.title}>{j.title}</span>
+                  <span className="font-medium line-clamp-2 break-words min-w-0" title={j.title}>{j.title}</span>
                   <Badge variant="outline" className="max-w-full min-w-0" title={j.category}>
                     <span className="truncate">{j.category}</span>
                   </Badge>
