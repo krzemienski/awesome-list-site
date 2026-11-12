@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { TableScrollHint } from "@/components/admin/AdminOpsPrimitives";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -93,8 +95,7 @@ export default function PendingResources() {
   // overflows its scrollport (which is always the case at ≤768px, where the
   // 720px min-width table exceeds the content area) — the previous `sm:hidden`
   // class hid it between 640–768px even though the table still scrolled.
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const scrollCue = useHorizontalScrollCue();
 
   const pendingQuery = useQuery<PendingResourcesResponse>({
     queryKey: ['/api/admin/pending-resources'],
@@ -103,6 +104,13 @@ export default function PendingResources() {
   const { data, isLoading, refetch, isFetching } = pendingQuery;
   // C9-V5A-03: a fetch paused while offline is not an empty queue.
   const unavailable = queryUnavailableReason(pendingQuery);
+
+  // A fresh response supersedes an earlier failed re-check, so its
+  // "may be out of date" notice does not outlive the problem.
+  const { dataUpdatedAt } = pendingQuery;
+  useEffect(() => {
+    setRecheckState((state) => (state === 'offline' ? 'idle' : state));
+  }, [dataUpdatedAt]);
 
   const pendingResourceData = data?.resources;
   const pendingResources = useMemo(
@@ -126,32 +134,6 @@ export default function PendingResources() {
       return next.size === previous.size ? previous : next;
     });
   }, [pendingResourceIds]);
-
-  // BUG-011 (run22): keep the hint in sync with real horizontal overflow.
-  // Deps include the loading/count flags because the scroll container only
-  // mounts once data has arrived (early returns above it).
-  // R5-058 (run25): track the table viewport's scrollLeft so the gradient cue
-  // hides once the user reaches the rightmost columns, and re-shows when they
-  // scroll back.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-    const check = () => {
-      const hasOverflow = scroller.scrollWidth > scroller.clientWidth + 1;
-      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
-      setShowSwipeHint(hasOverflow && !atEnd);
-    };
-    check();
-    const ro = new ResizeObserver(check);
-    ro.observe(el);
-    ro.observe(scroller);
-    scroller.addEventListener('scroll', check, { passive: true });
-    return () => {
-      ro.disconnect();
-      scroller.removeEventListener('scroll', check);
-    };
-  }, [isLoading, data?.total]);
 
   // F890: approving/rejecting removes the row whose button opened the dialog,
   // so the dialog's return-focus target disappears. Plan a surviving target
@@ -463,6 +445,32 @@ export default function PendingResources() {
     return formatAdminDate(date);
   };
 
+  const recheck = () => {
+    if (recheckState === 'checking') return;
+    if (!navigator.onLine) {
+      setRecheckState('offline');
+      return;
+    }
+    setRecheckState('checking');
+    const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/pending-resources'])?.status !== 'error' ? 'checked' : 'offline');
+    void queryClient
+      .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
+      .then(done, done);
+  };
+  const recheckButton = (
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-disabled={recheckState === 'checking'}
+      aria-busy={recheckState === 'checking'}
+      onClick={recheck}
+      data-testid="button-refresh-pending-resources"
+    >
+      <RefreshCw className={`h-3 w-3 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
+      {recheckState === 'checking' ? 'Checking…' : 'Check again'}
+    </Button>
+  );
+
   if (unavailable) {
     return (
       <section className="admin-panel queue-review-shell" aria-label="Approvals">
@@ -533,28 +541,7 @@ export default function PendingResources() {
           <div className="queue-review-actions">
             <button type="button" className="btn ghost" disabled>Bulk reject</button>
             <button type="button" className="btn primary" disabled>Approve all</button>
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-disabled={recheckState === 'checking'}
-              aria-busy={recheckState === 'checking'}
-              onClick={() => {
-                if (recheckState === 'checking') return;
-                if (!navigator.onLine) {
-                  setRecheckState('offline');
-                  return;
-                }
-                setRecheckState('checking');
-                const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/pending-resources'])?.status !== 'error' ? 'checked' : 'offline');
-                void queryClient
-                  .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
-                  .then(done, done);
-              }}
-              data-testid="button-refresh-pending-resources"
-            >
-              <RefreshCw className={`h-3 w-3 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
-              {recheckState === 'checking' ? 'Checking…' : 'Check again'}
-            </Button>
+            {recheckButton}
           </div>
         </div>
         {bulkOutcome && (
@@ -596,6 +583,7 @@ export default function PendingResources() {
             <p>{totalPending} {totalPending === 1 ? "submission" : "submissions"} awaiting review</p>
           </div>
           <div className="queue-review-actions" role="toolbar" aria-label="Pending approval actions">
+            {recheckButton}
             <Button
               variant="ghost"
               onClick={openBulkRejectDialog}
@@ -620,6 +608,14 @@ export default function PendingResources() {
             <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
           </div>
         )}
+        {recheckState === 'offline' && (
+          <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-recheck-failed">
+            <strong>Couldn&apos;t check for new submissions.</strong>
+            <span>
+              {navigator.onLine ? "The server didn't answer" : "You're offline"}, so this list may be out of date.
+            </span>
+          </div>
+        )}
         {/* R4-011 (run21): shared narrow-admin-table strategy — a single
               contained overflow-auto viewport (scrolls BOTH axes) around a
               min-w table. The previous sticky-right Actions cell (338px) was
@@ -630,8 +626,11 @@ export default function PendingResources() {
           {/* R5-058: the scroller is keyboard-operable (tabbable region with
               arrow-key scrolling) and shows a right-edge gradient cue while
               more columns remain off-screen. */}
+          <TableScrollHint overflows={scrollCue.overflows} className="admin-ops-scroll-hint" data-testid="hint-swipe-pending-table">
+            Swipe the table sideways to see all columns, including Approve/Reject.
+          </TableScrollHint>
           <div className="relative">
-            {showSwipeHint && (
+            {scrollCue.showCue && (
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
@@ -639,18 +638,12 @@ export default function PendingResources() {
               />
             )}
             <div
-              ref={scrollRef}
+              ref={scrollCue.ref}
               className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
               tabIndex={0}
               role="region"
               aria-label="Pending approvals table, scrollable"
-              onKeyDown={(e) => {
-                const el = scrollRef.current;
-                if (!el) return;
-                const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-                if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
-                else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
-              }}
+              onKeyDown={scrollCue.onKeyDown}
             >
             {/* BUG-011 (run22): fixed layout with <col> widths keeps the
                 table inside its container at desktop (no scroll) while the
@@ -793,14 +786,6 @@ export default function PendingResources() {
             </table>
             </div>
           </div>
-          {/* R4-011 (run21) + BUG-011 (run22): discoverability hint for the
-              contained horizontal scroll — shown whenever the table actually
-              overflows (always at ≤768px), not just below the sm breakpoint. */}
-          {showSwipeHint && (
-            <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-pending-table">
-              Swipe the table sideways to see all columns, including Approve/Reject.
-            </p>
-          )}
       </section>
 
       {/* View Details Dialog */}
