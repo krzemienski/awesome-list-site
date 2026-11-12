@@ -225,7 +225,7 @@ export default function AdminStats({
           users.isError
             ? "unavailable"
             : users.data
-            ? `${activeAdmins} admins · ${activeContributors} contributors`
+            ? `${activeAdmins} admins · ${activeContributors} contributors · updated in 30 days`
             : "updated within 30 days"
         }
         loading={usersLoading}
