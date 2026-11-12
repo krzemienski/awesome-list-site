@@ -260,6 +260,9 @@ exactly as before. The rules live in
   `/sign-in?admin`. `/admin` and `/bookmarks` are **not** path-blocked:
   visitors' `/bookmarks` stays tracked, and admin pages are covered by the
   session rule.
+- **Non-production hosts.** Any page not served from the `VITE_SITE_URL` host
+  (default `awesome.video`: localhost, 127.0.0.1, `*.replit.dev`) sends nothing
+  to any vendor, because dev launches carry the real public vendor keys.
 - **Automated browsers.** `navigator.webdriver === true` suppresses every
   vendor (and Replit's Umami via `umami.disabled`) from the first page view.
   Verified true in agent-browser and the chrome-devtools MCP browser, so audit
