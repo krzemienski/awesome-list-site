@@ -29,6 +29,7 @@ import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
+import ContactSubmissions from "@/components/admin/ContactSubmissions";
 import { ResearchWorkspace } from "@/components/admin/ResearchWorkspace";
 import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
   // Sections reached only through the Settings menu: the trigger names the
   // open one, because no strip tab can (Sub-Subcats also keeps its parent
   // Subcategories tab highlighted).
-  const settingsSection = ({ journeys: "Journeys", digests: "Digests", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
+  const settingsSection = ({ journeys: "Journeys", digests: "Digests", contact: "Contact inbox", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -412,6 +413,7 @@ export default function AdminDashboard() {
               ) : null}
               <DropdownMenuItem data-testid="tab-subsubcategories" aria-current={activeTab === "subsubcategories" ? "page" : undefined} onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats{activeTab === "subsubcategories" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
               <DropdownMenuItem data-testid="tab-journeys" aria-current={activeTab === "journeys" ? "page" : undefined} onSelect={() => handleTabChange("journeys")}>Journeys{activeTab === "journeys" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-contact" aria-current={activeTab === "contact" ? "page" : undefined} onSelect={() => handleTabChange("contact")}>Contact inbox{activeTab === "contact" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
               <DropdownMenuItem data-testid="tab-digests" aria-current={activeTab === "digests" ? "page" : undefined} onSelect={() => handleTabChange("digests")}>Digests{activeTab === "digests" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -569,6 +571,9 @@ export default function AdminDashboard() {
 
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
+        </TabsContent>
+        <TabsContent value="contact" data-testid="content-contact" aria-label="Contact inbox">
+          <ErrorBoundary label="Contact inbox"><ContactSubmissions /></ErrorBoundary>
         </TabsContent>
         <TabsContent value="journeys" data-testid="content-journeys" aria-label="Journeys">
           <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>

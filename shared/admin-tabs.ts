@@ -4,7 +4,7 @@
 const ADMIN_TAB_IDS = [
   "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
-  "users", "github", "linkhealth", "digests", "audit", "research",
+  "users", "github", "linkhealth", "digests", "audit", "research", "contact",
 ] as const;
 
 export type AdminTabId = (typeof ADMIN_TAB_IDS)[number];

@@ -16,7 +16,6 @@ import {
   StatusChip,
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
-import ContactSubmissions from "@/components/admin/ContactSubmissions";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import "@/styles/pages/admin-ops-audit.css";
@@ -546,7 +545,6 @@ export default function AuditTab() {
         </Dialog>
       </div>
     </TableShell>
-    {showTools && <ContactSubmissions />}
     </div>
   );
 }
