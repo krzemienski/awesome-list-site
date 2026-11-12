@@ -9,6 +9,9 @@
 // - Automated browsers. `navigator.webdriver === true` (WebDriver, CDP-driven
 //   Chrome, agent-browser, chrome-devtools MCP, Playwright) is a synchronous
 //   property, so the very first page view is already covered.
+// - Non-production hosts. Only the canonical site host (baked at build from
+//   PUBLIC_SITE_URL, vite.config.ts) sends to a vendor, so localhost and
+//   *.replit.dev dev sessions never reach production analytics.
 // - QA paths: `/qa-*`, the all-nines sentinel resource ids test runs use, and
 //   the owner sign-in page `/sign-in?admin`.
 //
@@ -57,6 +60,18 @@ export const isSuppressedAnalyticsPath = (pathname: string, search = ''): boolea
   SENTINEL_RESOURCE_PATH.test(pathname) ||
   (/^\/sign-in(\/|$)/.test(pathname) && new URLSearchParams(search).has('admin'));
 
+// Dev servers launch with the real public vendor keys (verify skill), so any
+// host other than the production site must send nothing to a vendor.
+const PRODUCTION_HOSTNAME = (() => {
+  try {
+    return new URL(import.meta.env.VITE_SITE_URL || 'https://awesome.video').hostname;
+  } catch {
+    return 'awesome.video';
+  }
+})();
+
+export const isNonProductionHost = (hostname: string): boolean => hostname !== PRODUCTION_HOSTNAME;
+
 export const isAutomatedBrowser = (): boolean =>
   typeof navigator !== 'undefined' && navigator.webdriver === true;
 
@@ -75,6 +90,7 @@ export const hasDeclinedAnalytics = (): boolean => {
 export const isAnalyticsSuppressed = (): boolean => {
   if (typeof window === 'undefined') return false;
   return (
+    isNonProductionHost(window.location.hostname) ||
     isAutomatedBrowser() ||
     isAdminAnalyticsSession() ||
     isSuppressedAnalyticsPath(window.location.pathname, window.location.search)
