@@ -94,6 +94,13 @@ interface LinkHistoryResponse {
   jobs: LinkHealthJob[];
 }
 
+// Same payload the Link Health tab reads: problem links of the latest
+// completed scan whose resources are still listed.
+interface BrokenLinksResponse {
+  success: boolean;
+  checks: { status: string }[];
+}
+
 interface EnrichmentResponse {
   success: boolean;
   jobs: EnrichmentJob[];
@@ -127,6 +134,10 @@ interface HealthRow {
   /** A job is pending or processing right now; a finished, stopped or cancelled run is not. */
   working?: boolean;
 }
+
+// A sync older than this no longer says the catalog is current.
+const GITHUB_SYNC_STALE_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const title = (value: string) =>
   value.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -182,6 +193,7 @@ function renderHealthRows(
   githubHistory: UseQueryResult<GithubHistoryItem[]>,
   linkStatus: UseQueryResult<{ success: boolean; job: LinkHealthJob | null }>,
   linkHistory: UseQueryResult<LinkHistoryResponse>,
+  brokenLinks: UseQueryResult<BrokenLinksResponse>,
   ai: UseQueryResult<{ status?: string }>,
   enrichment: UseQueryResult<EnrichmentResponse>,
 ): HealthRow[] {
@@ -214,10 +226,14 @@ function renderHealthRows(
       state: "bad",
     };
   } else if (latestGithub) {
+    const syncedAt = dateValue(latestGithub.createdAt)?.getTime();
+    const stale = syncedAt === undefined || Date.now() - syncedAt > GITHUB_SYNC_STALE_DAYS * DAY_MS;
     github = {
       label: "GitHub sync",
-      detail: `${title(latestGithub.status ?? "completed")} · ${relativeAge(latestGithub.createdAt)}`,
-      state: "ok",
+      detail: stale
+        ? `last sync ${relativeAge(latestGithub.createdAt)}`
+        : `${title(latestGithub.status ?? "completed")} · ${relativeAge(latestGithub.createdAt)}`,
+      state: stale ? "warn" : "ok",
     };
   } else {
     github = { label: "GitHub sync", detail: "no runs", state: "unknown" };
@@ -233,9 +249,9 @@ function renderHealthRows(
   const lastCompletedLink = completedLinks[0];
   const currentLink = linkStatus.data?.job;
   let link: HealthRow;
-  if (linkStatus.isPending || linkHistory.isPending) {
+  if (linkStatus.isPending || linkHistory.isPending || brokenLinks.isPending) {
     link = { label: "Link checker", detail: "checking…", state: "unknown" };
-  } else if (linkStatus.isError || linkHistory.isError || linkStatus.data?.success === false) {
+  } else if (linkStatus.isError || linkHistory.isError || brokenLinks.isError || linkStatus.data?.success === false) {
     link = { label: "Link checker", detail: "unavailable", state: "bad" };
   } else if (currentLink?.status === "pending" || currentLink?.status === "processing") {
     link = {
@@ -251,7 +267,11 @@ function renderHealthRows(
       state: "bad",
     };
   } else if (lastCompletedLink) {
-    const broken = lastCompletedLink.brokenLinks;
+    // The job's own brokenLinks also counts links whose resources were hidden
+    // or removed since the scan. Count what the Link Health tab shows as Broken.
+    const broken = (brokenLinks.data?.checks ?? []).filter(
+      (check) => check.status === "broken" || check.status === "dns_failure",
+    ).length;
     link = {
       label: "Link checker",
       detail: `last ${relativeAge(lastCompletedLink.completedAt ?? lastCompletedLink.createdAt)}${broken ? ` · ${broken} broken` : ""}`,
@@ -301,10 +321,9 @@ function renderHealthRows(
     const finished = String(latestJob.completedAt ?? latestJob.createdAt ?? "");
     enrichmentRow = {
       label: "Enrichment queue",
-      detail: `last run ${status === "budget_stopped" ? "stopped at budget" : status === "turn_stopped" ? "stopped at turn cap" : status === "cancelled" ? "cancelled before finishing" : status} · ${relativeAge(finished)}`,
-      // A cancelled run left resources unenriched: not an outage, but not a
-      // clean "ok" either.
-      state: status === "failed" ? "bad" : status === "budget_stopped" || status === "turn_stopped" || status === "cancelled" ? "warn" : "ok",
+      detail: `last run ${status === "budget_stopped" ? "stopped at budget" : status === "turn_stopped" ? "stopped at turn cap" : status} · ${relativeAge(finished)}`,
+      // An admin cancelling a run is a choice, not a fault.
+      state: status === "failed" ? "bad" : status === "budget_stopped" || status === "turn_stopped" ? "warn" : "ok",
     };
   } else {
     enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "unknown" };
@@ -361,6 +380,12 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
   });
   // Same key and default fetcher as the metric strip (AdminStats), so a Retry
   // in either section recovers both.
+  // Same key as the Link Health tab, so both read one cached response.
+  const brokenLinks = useQuery<BrokenLinksResponse>({
+    queryKey: ["/api/admin/link-health/broken-links"],
+    queryFn: () => apiRequest("/api/admin/link-health/broken-links"),
+    staleTime: 30_000,
+  });
   const categories = useQuery<CategorySummary[]>({
     queryKey: ["/api/categories"],
     staleTime: 60_000,
@@ -372,6 +397,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     githubHistory,
     linkStatus,
     linkHistory,
+    brokenLinks,
     ai,
     enrichment,
   );
@@ -383,6 +409,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     githubHistory,
     linkStatus,
     linkHistory,
+    brokenLinks,
     ai,
     enrichment,
   ];
