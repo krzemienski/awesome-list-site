@@ -117,6 +117,34 @@
   justify-content: space-between;
 }
 
+.research-run__head-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+/* The status badge's box (a 25px-high "Completed" pill), held while the job loads. */
+.research-run__badge-slot {
+  height: 1.5625rem;
+  width: 6rem;
+}
+
+/* Loading state: one block as tall as a finished run's body (timeline, scouts,
+   meters, ending, review, details), so the jobs table below the run view
+   starts about where it ends up instead of being pushed out of the screen
+   when the run arrives (LG-027). Phone and tablet widths stack the timeline
+   and the meters, so they need the taller block. */
+.research-run__skeleton {
+  height: 26rem;
+}
+
+@media (max-width: 48rem) {
+  .research-run__skeleton {
+    height: 43rem;
+  }
+}
+
 .research-run__head h3:focus-visible,
 .research-run__review h4:focus-visible {
   outline: 2px solid var(--accent);
@@ -324,6 +352,13 @@
 
   .research-run__discovery-actions {
     width: 100%;
+  }
+
+  /* Badge and Cancel always take their own row under the heading, so the row
+     does not appear when the job's status text arrives. */
+  .research-run__head-actions {
+    flex-basis: 100%;
+    min-height: 2.75rem;
   }
 }
 

@@ -202,7 +202,12 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
     wasActive.current = nowActive;
   }, [job, queryClient]);
 
-  const pollTrouble = (jobQuery.isError && !!job) || (eventsQuery.isError && !!eventsQuery.data) || (discoveriesQuery.isError && !!discoveriesQuery.data);
+  // The body (timeline, meters, ending, review) renders once, after the job,
+  // its events and its discoveries have all answered. Painting it in stages
+  // grew the run view three times and pushed the jobs table below it out of
+  // the screen each time (LG-027). A failed job read shows its own error.
+  const bodyPending = !jobQuery.isError && (jobQuery.isPending || eventsQuery.isPending || discoveriesQuery.isPending);
+  const pollTrouble =(jobQuery.isError && !!job) || (eventsQuery.isError && !!eventsQuery.data) || (discoveriesQuery.isError && !!discoveriesQuery.data);
   const budget = job?.maxBudgetUsd != null ? Number(job.maxBudgetUsd) : null;
   const turnsUsed = job?.turnsUsed ?? 0;
   const costNote = job?.costBasis ? COST_BASIS_NOTE[job.costBasis] : null;
@@ -223,13 +228,17 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
             <h3 id={`research-run-heading-${jobId}`} ref={headingRef} tabIndex={-1} className="text-base font-semibold">
               Research run #{jobId}
             </h3>
+            {/* Both lines exist from first paint (non-breaking space until their
+                text is known), so the heading block never gains a line. */}
             <p className="text-xs text-muted-foreground">
-              {job?.categoryFocus ? `Focus: ${job.categoryFocus}` : "All categories"}
-              {ranFor ? ` · ${active ? "running for" : "ran for"} ${ranFor}` : ""}
+              {!job ? " " : job.categoryFocus ? `Focus: ${job.categoryFocus}` : "All categories"}
+            </p>
+            <p className="text-xs text-muted-foreground" data-testid="text-run-elapsed">
+              {ranFor ? `${active ? "Running" : "Ran"} for ${ranFor}` : " "}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {job && getStatusBadge(job.status)}
+          <div className="research-run__head-actions">
+            {job ? getStatusBadge(job.status) : !jobQuery.isError && <Skeleton className="research-run__badge-slot" aria-hidden="true" />}
             {job && active && (
               <Button size="sm" variant="outline" className="min-h-11" onClick={() => { cancel.reset(); setConfirmCancel(true); }} disabled={cancel.isPending} data-testid="button-cancel-run">
                 <XCircle className="mr-1 h-3 w-3" />{cancel.isPending ? "Cancelling…" : "Cancel run"}
@@ -243,12 +252,10 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           {announcement}
         </p>
 
-        {jobQuery.isPending && !job && (
-          <div className="space-y-3 py-2" role="status" data-testid="loading-research-run">
+        {bodyPending && (
+          <div className="research-run__skeleton" role="status" data-testid="loading-research-run">
             <span className="sr-only">Loading research run #{jobId}…</span>
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-full w-full" />
           </div>
         )}
         {jobQuery.isError && !job && (
@@ -288,7 +295,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           </Alert>
         )}
 
-        {job && (
+        {job && !bodyPending && (
           <>
             <ResearchPhaseTimeline progress={progress} active={active} />
 
