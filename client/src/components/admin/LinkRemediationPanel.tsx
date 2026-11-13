@@ -33,6 +33,11 @@ interface RemediationResponse {
 
 const QUERY_KEY = ["/api/admin/link-health/remediation"];
 
+// The plan can run to hundreds of rows. Bounding the table area keeps the card
+// the same height whatever the plan size, and the loading placeholder reserves
+// that height so Member reports below does not move when the plan arrives.
+const PLAN_TABLE_SHELL = { title: "Planned changes", sub: "From the last three scans. Nothing is deleted." };
+
 const KIND_LABEL: Record<RemediationKind, string> = {
   archive: "Hide (dead)",
   restore: "Restore",
@@ -140,40 +145,49 @@ export default function LinkRemediationPanel() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        {actions.length === 0 ? (
-          <p className="text-sm text-[color:var(--text-2)]">{query.isLoading ? "Loading plan…" : "No link needs attention."}</p>
+        {query.isLoading ? (
+          <TableShell {...PLAN_TABLE_SHELL}>
+            <div className="h-[28rem]" role="status" aria-busy="true" data-testid="skeleton-remediation-plan">
+              <span className="sr-only">Loading plan…</span>
+              <span aria-hidden="true" className="skeleton block h-full w-full" />
+            </div>
+          </TableShell>
+        ) : actions.length === 0 ? (
+          <p className="text-sm text-[color:var(--text-2)]">No link needs attention.</p>
         ) : (
-          <TableShell title="Planned changes" sub="From the last three scans. Nothing is deleted.">
-            <Table scrollLabel="Planned link remediation">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Resource</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Why</TableHead>
-                  <TableHead><span className="sr-only">Override</span></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {actions.map((a) => (
-                  <TableRow key={`${a.resourceId}-${a.kind}`} data-testid={`remediation-row-${a.resourceId}`}>
-                    <TableCell>
-                      <a href={`/resource/${a.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center hover:underline">{a.title}</a>
-                      <div className="break-all text-xs text-[color:var(--text-2)]">{a.url}{a.to ? ` → ${a.to}` : ""}</div>
-                    </TableCell>
-                    <TableCell><Badge variant={a.kind === "archive" ? "destructive" : "outline"}>{KIND_LABEL[a.kind]}</Badge></TableCell>
-                    <TableCell className="text-sm">{a.reason}</TableCell>
-                    <TableCell>
-                      {a.kind !== "restore" && a.kind !== "duplicate" && (
-                        <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
-                          aria-label={`Link is fine for ${a.title}`}>
-                          Link is fine
-                        </Button>
-                      )}
-                    </TableCell>
+          <TableShell {...PLAN_TABLE_SHELL}>
+            <div className="[&_[role=region]]:max-h-[28rem]" data-testid="remediation-plan-scroller">
+              <Table scrollLabel="Planned link remediation">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Resource</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Why</TableHead>
+                    <TableHead><span className="sr-only">Override</span></TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {actions.map((a) => (
+                    <TableRow key={`${a.resourceId}-${a.kind}`} data-testid={`remediation-row-${a.resourceId}`}>
+                      <TableCell>
+                        <a href={`/resource/${a.resourceId}`} className="inline-flex min-h-6 max-lg:min-h-11 items-center hover:underline">{a.title}</a>
+                        <div className="break-all text-xs text-[color:var(--text-2)]">{a.url}{a.to ? ` → ${a.to}` : ""}</div>
+                      </TableCell>
+                      <TableCell><Badge variant={a.kind === "archive" ? "destructive" : "outline"}>{KIND_LABEL[a.kind]}</Badge></TableCell>
+                      <TableCell className="text-sm">{a.reason}</TableCell>
+                      <TableCell>
+                        {a.kind !== "restore" && a.kind !== "duplicate" && (
+                          <Button variant="ghost" size="sm" disabled={ignore.isPending} onClick={() => ignore.mutate({ id: a.resourceId, ignored: true })}
+                            aria-label={`Link is fine for ${a.title}`}>
+                            Link is fine
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </TableShell>
         )}
         {(data?.ignored.length ?? 0) > 0 && (

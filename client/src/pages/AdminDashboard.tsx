@@ -300,13 +300,74 @@ export default function AdminDashboard() {
     );
   }
 
+  // Shared by the loading and loaded layouts so the masthead keeps one box
+  // (the dashboard header must not shift when the stats answer).
+  const masthead = (
+  <div className="admin-dashboard__masthead">
+    <div className="admin-dashboard__intro">
+    <div className="admin-dashboard__eyebrow-slot">
+    <div className="eyebrow admin-dashboard__eyebrow">
+      <span aria-hidden="true" className="live-dot" />
+      <span>Admin console · {user?.name ?? "Administrator"}</span>
+    </div>
+    </div>
+    <h1 className="page-title">
+      Operations <em>dashboard</em>
+    </h1>
+    <p>Manage {resourceCount === undefined ? "resources" : `the ${resourceCount.toLocaleString()} resources`}, jobs, and contributors that keep the index alive.</p>
+    </div>
+    <div className="admin-dashboard__actions">
+      <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className={settingsSection ? "admin-dashboard__settings-trigger--active" : undefined}
+            aria-current={settingsSection ? "page" : undefined}
+            aria-label={settingsSection ? `Settings, ${settingsSection} section open` : undefined}
+            data-testid="button-admin-settings"
+          >
+            <Settings className="h-4 w-4" /> Settings
+            {settingsSection ? <span className="admin-dashboard__settings-current" aria-hidden="true">· {settingsSection}</span> : null}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="admin-dashboard__settings-menu" align="start" sideOffset={6} collisionPadding={12}>
+          <DropdownMenuItem asChild><WLink href="/settings/theme">Theme settings</WLink></DropdownMenuItem>
+          {(stats?.totalPending ?? stats?.pendingApprovals ?? 0) > 0 ? (
+            <DropdownMenuItem data-testid="link-stat-pending" onSelect={() => handleTabChange("approvals")}>Pending approvals</DropdownMenuItem>
+          ) : null}
+          {(stats?.totalRejected ?? 0) > 0 ? (
+            <DropdownMenuItem
+              data-testid="link-stat-rejected"
+              onSelect={() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set("status", "rejected");
+                window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+                handleTabChange("resources");
+              }}
+            >
+              Rejected resources
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuItem data-testid="tab-subsubcategories" aria-current={activeTab === "subsubcategories" ? "page" : undefined} onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats{activeTab === "subsubcategories" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+          <DropdownMenuItem data-testid="tab-journeys" aria-current={activeTab === "journeys" ? "page" : undefined} onSelect={() => handleTabChange("journeys")}>Journeys{activeTab === "journeys" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+          <DropdownMenuItem data-testid="tab-contact" aria-current={activeTab === "contact" ? "page" : undefined} onSelect={() => handleTabChange("contact")}>Contact inbox{activeTab === "contact" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+          <DropdownMenuItem data-testid="tab-digests" aria-current={activeTab === "digests" ? "page" : undefined} onSelect={() => handleTabChange("digests")}>Digests{activeTab === "digests" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button className="btn primary" onClick={handleNewEntry} title="Add a new resource to the catalog" aria-label="New entry: add a resource" data-testid="button-admin-new-entry"><Plus className="h-4 w-4" /> New entry</Button>
+    </div>
+  </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center bg-background" role="status" aria-busy="true">
-        <h1 className="sr-only">Admin Dashboard</h1>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
-          <p className="text-[var(--text-2)]">Loading admin dashboard...</p>
+      <div className="admin-dashboard" aria-busy="true">
+        {masthead}
+        <div className="flex items-center justify-center py-16" role="status">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
+            <p className="text-[var(--text-2)]">Loading admin dashboard...</p>
+          </div>
         </div>
       </div>
     );
@@ -366,60 +427,7 @@ export default function AdminDashboard() {
         description="Awesome Video admin panel."
         noindex
       />
-      <div className="admin-dashboard__masthead">
-        <div className="admin-dashboard__intro">
-        <div className="admin-dashboard__eyebrow-slot">
-        <div className="eyebrow admin-dashboard__eyebrow">
-          <span aria-hidden="true" className="live-dot" />
-          <span>Admin console · {user?.name ?? "Administrator"}</span>
-        </div>
-        </div>
-        <h1 className="page-title">
-          Operations <em>dashboard</em>
-        </h1>
-        <p>Manage {resourceCount === undefined ? "resources" : `the ${resourceCount.toLocaleString()} resources`}, jobs, and contributors that keep the index alive.</p>
-        </div>
-        <div className="admin-dashboard__actions">
-          <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={settingsSection ? "admin-dashboard__settings-trigger--active" : undefined}
-                aria-current={settingsSection ? "page" : undefined}
-                aria-label={settingsSection ? `Settings, ${settingsSection} section open` : undefined}
-                data-testid="button-admin-settings"
-              >
-                <Settings className="h-4 w-4" /> Settings
-                {settingsSection ? <span className="admin-dashboard__settings-current" aria-hidden="true">· {settingsSection}</span> : null}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="admin-dashboard__settings-menu" align="start" sideOffset={6} collisionPadding={12}>
-              <DropdownMenuItem asChild><WLink href="/settings/theme">Theme settings</WLink></DropdownMenuItem>
-              {(stats?.totalPending ?? stats?.pendingApprovals ?? 0) > 0 ? (
-                <DropdownMenuItem data-testid="link-stat-pending" onSelect={() => handleTabChange("approvals")}>Pending approvals</DropdownMenuItem>
-              ) : null}
-              {(stats?.totalRejected ?? 0) > 0 ? (
-                <DropdownMenuItem
-                  data-testid="link-stat-rejected"
-                  onSelect={() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("status", "rejected");
-                    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-                    handleTabChange("resources");
-                  }}
-                >
-                  Rejected resources
-                </DropdownMenuItem>
-              ) : null}
-              <DropdownMenuItem data-testid="tab-subsubcategories" aria-current={activeTab === "subsubcategories" ? "page" : undefined} onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats{activeTab === "subsubcategories" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-journeys" aria-current={activeTab === "journeys" ? "page" : undefined} onSelect={() => handleTabChange("journeys")}>Journeys{activeTab === "journeys" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-contact" aria-current={activeTab === "contact" ? "page" : undefined} onSelect={() => handleTabChange("contact")}>Contact inbox{activeTab === "contact" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-digests" aria-current={activeTab === "digests" ? "page" : undefined} onSelect={() => handleTabChange("digests")}>Digests{activeTab === "digests" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button className="btn primary" onClick={handleNewEntry} title="Add a new resource to the catalog" aria-label="New entry: add a resource" data-testid="button-admin-new-entry"><Plus className="h-4 w-4" /> New entry</Button>
-        </div>
-      </div>
+      {masthead}
 
       <p className="sr-only" role="status" data-testid="text-admin-hidden-section-status">
         {settingsSection ? `${settingsSection} section open` : ""}
