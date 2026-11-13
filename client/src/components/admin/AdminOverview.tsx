@@ -135,6 +135,8 @@ interface HealthRow {
   working?: boolean;
 }
 
+const ACTIVITY_ROWS = 6;
+
 // A sync older than this no longer says the catalog is current.
 const GITHUB_SYNC_STALE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -437,12 +439,25 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       <div className="admin-canonical-overview-grid">
         <TableShell
           title="Recent activity"
-          subtitle="Latest 6 events"
+          subtitle={`Latest ${ACTIVITY_ROWS} events`}
           className="admin-panel admin-activity"
           testId="admin-overview-activity"
         >
           {audit.isPending ? (
-            <p className="admin-canonical-empty">Loading activity…</p>
+            // Reserve the six two-line rows the loaded list fills, so the
+            // panels below do not jump down (and off the fold) when it arrives.
+            <div className="admin-canonical-activity-list admin-table-wrap relative" aria-busy="true">
+              <p className="admin-canonical-empty absolute inset-x-0 top-0">Loading activity…</p>
+              {Array.from({ length: ACTIVITY_ROWS }, (_, index) => (
+                <div key={index} className="admin-canonical-activity-row invisible" aria-hidden="true">
+                  <span className="admin-canonical-activity-id">TX#00000</span>
+                  <span className="admin-canonical-activity-actor">a•••@example.com</span>
+                  <span className="admin-canonical-activity-action">auth login</span>
+                  <span className="admin-canonical-activity-target">Signed in with Clerk</span>
+                  <span className="admin-canonical-activity-time">1m ago</span>
+                </div>
+              ))}
+            </div>
           ) : audit.isError ? (
             <AdminLoadError
               subject="recent activity"
@@ -454,7 +469,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
             />
           ) : audit.data?.logs.length ? (
             <div className="admin-canonical-activity-list admin-table-wrap">
-              {audit.data.logs.slice(0, 6).map((entry) => (
+              {audit.data.logs.slice(0, ACTIVITY_ROWS).map((entry) => (
                 <div key={entry.id} className="admin-canonical-activity-row">
                   <span className="admin-canonical-activity-id">
                     TX#{entry.id}
