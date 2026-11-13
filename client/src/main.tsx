@@ -122,7 +122,7 @@ const initialRouteChunk = preloadInitialRouteChunk();
 // nodes into a fixed full-viewport overlay so the pixels never disappear;
 // React mounts underneath, and the overlay is removed only once the app has
 // real content to show. We still never hydrate this markup (see
-// .agents/memory/spa-crawler-prerender.md).
+// docs/notes/spa-crawler-prerender.md).
 // Before the hold below evaluates readiness: a seeded resource page renders
 // finished on its first commit.
 if (!homeSsr) seedResourceBoot(queryClient);

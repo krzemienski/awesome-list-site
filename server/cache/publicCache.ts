@@ -51,8 +51,8 @@ type CacheMetrics = {
   rejectedRebuilds: number;
 };
 
-// ~2,700 legitimate route-meta keys plus ~300 other keys (reports/prod-ops
-// B14); the byte cap below, not this count, bounds memory.
+// ~2,700 legitimate route-meta keys plus ~300 other keys
+// (docs/history/reports/prod-ops-2026-11-06 B14); the byte cap below, not this count, bounds memory.
 const MAX_ENTRIES = 4096;
 // A serialized filtered catalog variant includes the full category tree as
 // well as its filtered flat resource list (roughly 1–3 MB depending on the
@@ -129,11 +129,22 @@ function sweepExpired(now: number): void {
 function evictToBounds(): void {
   if (entries.size <= MAX_ENTRIES && bytes <= MAX_BYTES) return;
   sweepExpired(Date.now());
+  let evicted = 0;
   while (entries.size > MAX_ENTRIES || bytes > MAX_BYTES) {
     const oldest = entries.keys().next().value as string | undefined;
     if (!oldest) break;
     removeEntry(oldest);
     evictedLive++;
+    evicted++;
+  }
+  if (evicted > 0) {
+    logger.warn("Public cache evicted live entries", {
+      evicted,
+      entries: entries.size,
+      bytes,
+      maxEntries: MAX_ENTRIES,
+      maxBytes: MAX_BYTES,
+    });
   }
 }
 

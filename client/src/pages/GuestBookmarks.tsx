@@ -66,7 +66,7 @@ export default function GuestBookmarks() {
     })),
   });
 
-  // Self-healing: a 404 (or a 400 validation_failed for a malformed id) means
+  // Prune dead saves: a 404 (or a 400 validation_failed for a malformed id) means
   // the resource can never load — drop that save. Network or server errors
   // keep the save (never silently lose a guest's list).
   const deadIds = useMemo(

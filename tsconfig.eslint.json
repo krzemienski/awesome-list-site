@@ -8,7 +8,7 @@
   ],
   "exclude": [
     "node_modules", "**/node_modules", "dist", "**/dist",
-    "build", ".cache", "scripts/archive"
+    "build", ".cache"
   ],
   "compilerOptions": { "incremental": false }
 }

@@ -59,12 +59,6 @@ export interface PlanResource extends Pick<Resource, "id" | "title" | "url" | "s
   linkHealth?: LinkHealthMeta;
 }
 
-export type RemediationMode = "plan" | "apply";
-
-export function remediationMode(): RemediationMode {
-  return process.env.LINK_HEALTH_REMEDIATION === "apply" ? "apply" : "plan";
-}
-
 const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err));
 const linkHealthOf = (metadata: unknown): LinkHealthMeta | undefined =>
   (metadata as { linkHealth?: LinkHealthMeta } | null)?.linkHealth;

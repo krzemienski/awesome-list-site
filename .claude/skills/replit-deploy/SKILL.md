@@ -204,7 +204,14 @@ If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, a
 
 Shipped means LIVE equals TARGET. The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. A "success" from `get_publish_status` while `/api/version` still shows BEFORE is not shipped: keep the step 5 poll running (Autoscale cutover). If LIVE is neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build, or a `BUILD_REVISION` was set in the workspace environment.
 
-Then check the site as a visitor with the project `verify` skill's browser method against `https://awesome.video` (home, a category page, a resource page, search) at 1440×900 and 390×844, reading the console for errors. Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. Do not sign in or write anything on production.
+Then check the site as a visitor in a browser against `https://awesome.video` (home, a category page, a resource page, search):
+
+1. Emulate three viewports, 1280, 768 and 390 wide (390 as mobile with touch), reload, and read `innerWidth` back before judging any layout.
+2. Wait until `#ssr-seo-hold` is gone and `#root` has children, then wait for expected text. Never wait for network idle: some pages keep a connection open.
+3. Add an init script that sets `analytics-consent=denied` in localStorage and `umami.disabled=1`, so the consent bar and analytics stay out of the way.
+4. Read the browser console for errors on each page.
+
+Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. Do not sign in or write anything on production.
 
 ### 8. Report
 

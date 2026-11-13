@@ -159,7 +159,7 @@ Dead links are handled as data, not as bugs. Three checks share one policy.
   - *update URL*: a redirect that keeps the page (http to https, `www.` added or dropped, a trailing slash, `index.html` or an English prefix such as `/en/` or `/en-us/` added or dropped, same query), or a GitHub repository that was renamed or transferred (owner or name changes, the rest of the path stays the same), lands on the same URL in two scans in a row.
   - *review*: a redirect to another site or page, an error page, or a parked domain. These are never changed automatically.
 
-  Timeouts and 401/403/429 responses never trigger a change. Hiding needs scans spread over 20 hours, so an interval below 10 hours still waits that long before it hides anything. With `LINK_HEALTH_REMEDIATION=plan` (default) the plan is only shown; `apply` applies it after every scan. Nothing is deleted, and every change is written to the resource audit log with its previous value.
+  Timeouts and 401/403/429 responses never trigger a change. Hiding needs scans spread over 20 hours, so an interval below 10 hours still waits that long before it hides anything. The plan is only shown; an admin applies it from the Link health panel. Nothing is deleted, and every change is written to the resource audit log with its previous value.
 - **Enrichment.** Each enriched resource stores the same verdict in `metadata.linkCheck`.
 
 The admin panel's Link Health tab shows the schedule, the plan, an **Apply** button, and a per-link **Link is fine** override that can be undone from the same card. `GET /api/link-health/summary` reports when links were last checked. A failed scan is retried after an hour; a scan no instance finished is marked failed after 90 minutes.
@@ -182,20 +182,6 @@ have separate token and interaction evidence.
 form, `c` GitHub Discussions, `d` resource edit suggestion, or `e` command
 palette. Unset or invalid values add no contact feature. Server intake is
 independently disabled by default. See [configuration and five screenshots](docs/CONTACT-VARIANTS.md).
-
-### Parity verification
-
-```bash
-npm run test:parity -- --list
-BASE_URL=http://127.0.0.1:5000 npm run test:parity
-```
-
-Start the application first. A full run requires the existing authorized
-disposable-admin setup and is not read-only; it creates and cleans up its own
-test identity. For prerequisites, selection flags, and retained evidence see
-[the harness guide](tests/parity/README.md). Current parity acceptance is
-**blocked**, not release-ready: [report](docs/parity/REPORT.md),
-[independent verification](docs/parity/VERIFICATION.md).
 
 ## Admin Access
 

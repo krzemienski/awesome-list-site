@@ -2,7 +2,7 @@
  * Link-health remediation and schedule.
  *
  *   GET  /api/link-health/summary                     public: when links were last checked
- *   GET  /api/admin/link-health/remediation           admin: schedule, mode, current plan, ignored links
+ *   GET  /api/admin/link-health/remediation           admin: schedule, current plan, ignored links
  *   POST /api/admin/link-health/remediation/apply     admin: apply the current plan
  *   POST /api/admin/link-health/resources/:id/ignore  admin: { ignored } skip or resume one link
  */
@@ -17,7 +17,6 @@ import {
   applyRemediationPlan,
   buildRemediationPlan,
   listIgnoredLinks,
-  remediationMode,
   setLinkHealthIgnored,
 } from "../../services/linkRemediation";
 
@@ -40,7 +39,6 @@ async function scheduleSnapshot() {
     : null;
   return {
     intervalHours,
-    mode: remediationMode(),
     nextDueAt,
     latestJob: latest ? { id: latest.id, status: latest.status, createdAt: latest.createdAt.toISOString() } : null,
     lastCompleted: lastCompleted
