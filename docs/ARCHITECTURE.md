@@ -505,13 +505,15 @@ Three layers sit between a visitor and the database. Each has its own rule.
   misses share one loader, a failed loader is never replaced by stale data,
   and the cache is bounded (512 entries, 48 MB, 64 rebuilds in flight). The
   cache is per process, not shared between instances.
-- **Page metadata is cached for 60 s too.** `resolveRoute()` in
+- **Page metadata is cached for 6 h.** `resolveRoute()` in
   `server/og-middleware.ts` resolves the title, description and found/not-found
-  state for a path through `getPublicCacheValue()` with `ttlMs: 60_000`
-  (namespace `route-meta`). The key is the path plus `?page=` (and
-  `/sign-in?admin`). `/search`, filtered category pages and `/collection/*`
-  bypass it, so an unpublished shared collection is not reachable for another
-  minute.
+  state for a path through `getPublicCacheValue()` with `ttlMs:
+  ROUTE_META_TTL_MS` (6 hours; namespace `route-meta`). Crawlers visit each
+  route about once, so a 60 s TTL never hit. Freshness does not depend on the
+  TTL: every catalog write calls `invalidatePublicCache()`. The key is the path
+  plus `?page=` (and `/sign-in?admin`). `/search`, filtered category pages and
+  `/collection/*` bypass it, so an unpublished shared collection is never
+  served from it.
 
 **When a change becomes visible.** Every resource, category and tag write calls
 `invalidatePublicCache(reason)` with `resource-mutation`, `category-mutation`,
