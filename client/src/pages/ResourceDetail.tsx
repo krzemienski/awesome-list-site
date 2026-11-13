@@ -852,6 +852,7 @@ export default function ResourceDetail() {
                 buttons at 375px were mystery meat for sighted mobile users. */}
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
             <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
+            {!isAuthenticated && " "}
             {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· account</span>}
           </Button>
           <Button
@@ -870,6 +871,7 @@ export default function ResourceDetail() {
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            {!isAuthenticated && " "}
             {!isAuthenticated && <span className="ml-1.5 text-xs font-normal opacity-70">· this device</span>}
           </Button>
           <Button 
