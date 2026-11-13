@@ -34,6 +34,7 @@ import { useHomeBoot } from "@/lib/home-boot";
 import { docsUrl, shellRepo } from "@/lib/docs-url";
 import { BROWSE_ROUTE_PREFIXES } from "./AppHeader";
 import { visibleNavCategories } from "@/lib/static-data";
+import { countedName, resourceCountLabel } from "@/lib/a11y-labels";
 import type { CatalogNavCategory } from "@shared/catalog-nav";
 
 /**
@@ -65,10 +66,6 @@ interface AppSidebarProps {
 
 function formatCount(n: number): string {
   return n.toLocaleString();
-}
-
-function resourceCountLabel(n: number): string {
-  return `${formatCount(n)} ${n === 1 ? "resource" : "resources"}`;
 }
 
 /* Bring an item into its nearest scrolling ancestor ("block: nearest").
@@ -171,7 +168,7 @@ function SubItem({
       )}
       style={count === 0 ? { opacity: 0.45 } : undefined}
       title={count === 0 ? `${label} (no resources yet)` : label}
-      aria-label={typeof count === "number" ? `${label}, ${resourceCountLabel(count)}` : undefined}
+      aria-label={typeof count === "number" ? countedName(label, count) : undefined}
     >
       <span className="av-sidebar-leaf-label" title={label}>{label}</span>
       {typeof count === "number" && (
@@ -491,7 +488,7 @@ function CategoryAccordion({
                         aria-current={subIsPage ? "page" : undefined}
                         data-active={subActive || undefined}
                         title={sub.name}
-                        aria-label={`${sub.name}, ${resourceCountLabel(subCount)}`}
+                        aria-label={countedName(sub.name, subCount)}
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
@@ -546,7 +543,7 @@ function CategoryAccordion({
                                   navigate(ssPath);
                                 }}
                                 data-testid={`subsub-${ssSlug}`}
-                                aria-label={`${ss.name}, ${resourceCountLabel(ss.totalResourceCount)}`}
+                                aria-label={countedName(ss.name, ss.totalResourceCount)}
                                 data-active={activePath === ssPath || undefined}
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
@@ -565,7 +562,7 @@ function CategoryAccordion({
                                 navigate(subGeneralPath);
                               }}
                               data-testid={`subsub-${subSlug}-uncategorized`}
-                              aria-label={`Uncategorized in ${sub.name}, ${resourceCountLabel(subDirectCount)}`}
+                              aria-label={`${countedName("Uncategorized", subDirectCount)} in ${sub.name}`}
                               data-active={(activePath === subPath && generalActive) || undefined}
                               aria-current={activePath === subPath && generalActive ? "page" : undefined}
                               className="av-sidebar-l3-row no-underline"

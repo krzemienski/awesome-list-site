@@ -3,9 +3,30 @@ export function formatTileCount(count: number): string {
   return count.toLocaleString();
 }
 
-/** Accessible name for a taxonomy/tag tile: "<name>, N resource(s)[, category total]". */
+/** "N resource(s)": the count with its unit, for names and hover titles. */
+export function resourceCountLabel(count: number): string {
+  return `${formatTileCount(count)} ${count === 1 ? "resource" : "resources"}`;
+}
+
+/**
+ * Accessible name for a link showing "<name> <count>": starts with that exact
+ * visible text (WCAG 2.5.3 Label in Name) and adds the unit after it.
+ */
+export function countedName(name: string, count: number): string {
+  return `${name} ${resourceCountLabel(count)}`;
+}
+
+/** Accessible name for a taxonomy/tag tile: "<name> N resource(s)[, category total]". */
 export function tileLabel(name: string, count: number, categoryTotal = false): string {
-  return `${name}, ${formatTileCount(count)} ${count === 1 ? "resource" : "resources"}${categoryTotal ? ", category total" : ""}`;
+  return `${countedName(name, count)}${categoryTotal ? ", category total" : ""}`;
+}
+
+/**
+ * Accessible name for a text toggle: the visible words first, then the extra
+ * explanation. The pressed state is carried by aria-pressed, not by the name.
+ */
+export function labeledToggleName(visibleText: string, hint?: string): string {
+  return hint ? `${visibleText} — ${hint}` : visibleText;
 }
 
 /** Accessible name of a bookmark toggle; shared by cards and the resource page. */
