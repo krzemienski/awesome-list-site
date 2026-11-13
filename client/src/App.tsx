@@ -988,16 +988,12 @@ function Router({
         <Route path="/account">
           <Redirect to="/profile" replace />
         </Route>
-        <Route path="/admin">
-          <AdminGuard>
-            <Suspense fallback={<RouteFallback />}>
-              <AdminDashboard />
-            </Suspense>
-          </AdminGuard>
-        </Route>
         {/* R3-02: admin section deep-links (/admin/users, /admin/resources, …)
-            open the matching tab — AdminDashboard reads :section via useRoute. */}
-        <Route path="/admin/:section">
+            open the matching tab — AdminDashboard reads :section via useRoute.
+            One route for both URLs: a tab click moves /admin/overview to
+            /admin#approvals, and two sibling routes would unmount the
+            dashboard and destroy the focused tab (LG-023). */}
+        <Route path="/admin/:section?">
           <AdminGuard>
             <Suspense fallback={<RouteFallback />}>
               <AdminDashboard />

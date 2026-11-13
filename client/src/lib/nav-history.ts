@@ -232,6 +232,15 @@ function isTextEntry(element: Element | null): boolean {
   );
 }
 
+function isTabInMain(element: Element | null): boolean {
+  return (
+    element instanceof HTMLElement &&
+    element.isConnected &&
+    element.getAttribute("role") === "tab" &&
+    document.getElementById("main")?.contains(element) === true
+  );
+}
+
 interface Handoff {
   outgoing: OutgoingHeading;
   fragment: string;
@@ -309,6 +318,9 @@ export function useRouteFocus(location: string): void {
     // A page that mounted in this same commit may already have focused its
     // search box (a clicked link is never a text field).
     if (isTextEntry(document.activeElement)) return;
+    // A WAI-ARIA tab that changes the URL keeps focus: the user is still on the
+    // tablist, and moving to the heading would drop them off it.
+    if (isTabInMain(document.activeElement)) return;
     stopHandoff.current();
     stopHandoff.current = startHandoff({
       outgoing: outgoingHeading,
