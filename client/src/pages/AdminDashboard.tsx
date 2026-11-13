@@ -323,7 +323,13 @@ export default function AdminDashboard() {
     <h1 className="page-title">
       Operations <em>dashboard</em>
     </h1>
-    <p>Manage {resourceCount === undefined ? "resources" : `the ${resourceCount.toLocaleString()} resources`}, jobs, and contributors that keep the index alive.</p>
+    <p>
+      Manage the{" "}
+      <span className="admin-dashboard__count-slot" data-testid="text-admin-resource-count">
+        {resourceCount === undefined ? <span aria-hidden="true" className="skeleton admin-dashboard__count-skeleton" /> : resourceCount.toLocaleString()}
+      </span>
+      {" "}resources, jobs, and contributors that keep the index alive.
+    </p>
     </div>
     <div className="admin-dashboard__actions">
       <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
