@@ -298,6 +298,11 @@ interface ResolvedRoute {
    * keep the empty shell.
    */
   bodyHtml?: string;
+  /**
+   * true → a data lookup failed and the route fell back to generic metadata or
+   * a partial body. Served to this request only; the public cache never stores it.
+   */
+  degraded?: boolean;
 }
 
 function abs(path: string) {
@@ -649,15 +654,28 @@ async function resolveRouteUncached(
   await acquireUncachedResolveSlot(signal);
   try {
     throwIfRouteResolutionAborted(signal);
-    return await resolveRouteUncachedInner(url);
+    const state = { degraded: false };
+    const resolved = await resolveRouteUncachedInner(url, state);
+    return state.degraded ? { ...resolved, degraded: true } : resolved;
   } finally {
     releaseUncachedResolveSlot();
   }
 }
 
-async function resolveRouteUncachedInner(url: string): Promise<ResolvedRoute> {
+async function resolveRouteUncachedInner(
+  url: string,
+  state: { degraded: boolean },
+): Promise<ResolvedRoute> {
   const path = url.split("?")[0].replace(/\/+$/, "") || "/";
   const page = parsePage(url);
+
+  // A lookup that failed for a reason other than a bounded dependency failure
+  // is swallowed and the route renders without that data. Record it so the
+  // public cache serves the result once instead of pinning it for the TTL.
+  const tolerateLookupFailure = (error: unknown): void => {
+    rethrowBoundedDependencyFailure(error);
+    state.degraded = true;
+  };
 
 // BUG-004 / BUG-035: static header chrome for HTML-grounded clients (the SPA's
 // pre-hydration shell sees an empty top-bar / zero search inputs). Emits the
@@ -694,7 +712,7 @@ function homeShellChrome(): string {
         count: c.totalResourceCount,
      }));
     } catch (error) {
-      rethrowBoundedDependencyFailure(error);
+      tolerateLookupFailure(error);
     }
     m.structuredData = webSiteSchema(m.description);
    const bodyHtml =
@@ -948,7 +966,7 @@ function homeShellChrome(): string {
           })),
         });
       } catch (error) {
-        rethrowBoundedDependencyFailure(error);
+        tolerateLookupFailure(error);
       }
     } else if (Object.hasOwn(legalPolicies, path)) {
       const policyPath = path as LegalPolicyPath;
@@ -984,7 +1002,7 @@ function homeShellChrome(): string {
           count: corpusTotalCount(c),
         }));
       } catch (error) {
-        rethrowBoundedDependencyFailure(error);
+        tolerateLookupFailure(error);
       }
       // Keep SSR FAQ JSON-LD on the same public-config boundary as the client
       // About page. `config.source.url` is the raw GitHub URL; normalize it to
@@ -1203,7 +1221,7 @@ function homeShellChrome(): string {
             description: r.description,
           }));
         } catch (error) {
-          rethrowBoundedDependencyFailure(error);
+          tolerateLookupFailure(error);
         }
       }
       bodyHtml = renderSearchContent({
@@ -1227,7 +1245,7 @@ function homeShellChrome(): string {
           count: corpusTotalCount(c),
         }));
       } catch (error) {
-        rethrowBoundedDependencyFailure(error);
+        tolerateLookupFailure(error);
       }
       m.structuredData = [
         collectionPageSchema({
@@ -1352,7 +1370,7 @@ function homeShellChrome(): string {
         return { meta: m, found: true, bodyHtml };
       }
     } catch (error) {
-      rethrowBoundedDependencyFailure(error);
+      tolerateLookupFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1478,7 +1496,7 @@ function homeShellChrome(): string {
       });
       return { meta: m, found: true, bodyHtml };
     } catch (error) {
-      rethrowBoundedDependencyFailure(error);
+      tolerateLookupFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
   }
@@ -1561,7 +1579,7 @@ function homeShellChrome(): string {
         return { meta: m, found: true, bodyHtml };
       }
     } catch (error) {
-      rethrowBoundedDependencyFailure(error);
+      tolerateLookupFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1647,7 +1665,7 @@ function homeShellChrome(): string {
         return { meta: m, found: true, bodyHtml };
       }
     } catch (error) {
-      rethrowBoundedDependencyFailure(error);
+      tolerateLookupFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1723,7 +1741,7 @@ function homeShellChrome(): string {
               }
             }
           } catch (error) {
-            rethrowBoundedDependencyFailure(error);
+            tolerateLookupFailure(error);
           }
           crumbs.push({ name: resource.title });
           const metadataTags = Array.isArray((resource as any).metadata?.tags)
@@ -1836,7 +1854,7 @@ function homeShellChrome(): string {
               }
             }
           } catch (error) {
-            rethrowBoundedDependencyFailure(error);
+            tolerateLookupFailure(error);
           }
           const bodyHtml = renderResourceContent({
             heading: resource.title,
@@ -1864,7 +1882,7 @@ function homeShellChrome(): string {
           return { meta: m, found: true, bodyHtml };
         }
       } catch (error) {
-        rethrowBoundedDependencyFailure(error);
+        tolerateLookupFailure(error);
         return { meta: defaultMeta(path), found: true };
       }
     }
@@ -1976,7 +1994,7 @@ function homeShellChrome(): string {
           return { meta: m, found: true, bodyHtml };
         }
       } catch (error) {
-        rethrowBoundedDependencyFailure(error);
+        tolerateLookupFailure(error);
         return { meta: defaultMeta(path), found: true };
       }
     }
