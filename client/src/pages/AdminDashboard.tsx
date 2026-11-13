@@ -300,8 +300,17 @@ export default function AdminDashboard() {
     );
   }
 
-  // Shared by the loading and loaded layouts so the masthead keeps one box
-  // (the dashboard header must not shift when the stats answer).
+  // The loading and loaded layouts share their leading children (SEOHead, then
+  // masthead): React matches children by position, so a different order would
+  // unmount the loading masthead and reuse its sibling's node for the loaded one.
+  const adminSeoHead = (
+    <SEOHead
+      title="Admin"
+      description="Awesome Video admin panel."
+      noindex
+    />
+  );
+
   const masthead = (
   <div className="admin-dashboard__masthead">
     <div className="admin-dashboard__intro">
@@ -362,6 +371,7 @@ export default function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="admin-dashboard" aria-busy="true">
+        {adminSeoHead}
         {masthead}
         <div className="flex items-center justify-center py-16" role="status">
           <div className="text-center">
@@ -422,11 +432,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-dashboard">
-      <SEOHead
-        title="Admin"
-        description="Awesome Video admin panel."
-        noindex
-      />
+      {adminSeoHead}
       {masthead}
 
       <p className="sr-only" role="status" data-testid="text-admin-hidden-section-status">

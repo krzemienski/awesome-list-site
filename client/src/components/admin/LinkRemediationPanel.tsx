@@ -38,6 +38,10 @@ const QUERY_KEY = ["/api/admin/link-health/remediation"];
 // that height so Member reports below does not move when the plan arrives.
 const PLAN_TABLE_SHELL = { title: "Planned changes", sub: "From the last three scans. Nothing is deleted." };
 
+// Same typography and a line of the same length as the loaded "Last scan" text,
+// so it wraps to the same number of lines at every width.
+const LAST_SCAN_PLACEHOLDER = "Last scan #000 finished Jan 00, 0000, 00:00 PM: 0000 checked, 0000 healthy, 000 dead.";
+
 const KIND_LABEL: Record<RemediationKind, string> = {
   archive: "Hide (dead)",
   restore: "Restore",
@@ -111,9 +115,9 @@ export default function LinkRemediationPanel() {
       </CardHeader>
       <CardContent className="space-y-4">
         {query.isLoading && (
-          <div className="min-h-10 sm:min-h-5" aria-hidden="true" data-testid="skeleton-last-scan">
-            <span className="skeleton block h-5 w-full max-w-xl" />
-          </div>
+          <p className="text-sm" aria-hidden="true" data-testid="skeleton-last-scan">
+            <span className="skeleton text-transparent select-none">{LAST_SCAN_PLACEHOLDER}</span>
+          </p>
         )}
         {data?.lastCompleted && (
           <p className="text-sm text-[color:var(--text-2)]" data-testid="text-last-scan">
