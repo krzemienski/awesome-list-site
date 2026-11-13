@@ -34,10 +34,17 @@ const logger = createLogger("db");
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 8,
-  // Keep one client warm: idle clients drop after 30 s, so without a floor the
-  // 60 s orphan-job watchdog reconnects on every sweep under the connect timeout.
+  // Keep one client warm so the first request after a quiet spell does not pay
+  // a fresh Neon connect (idle clients above the floor drop after 30 s).
   min: 1,
   idleTimeoutMillis: 30000,
+  // pg sets TCP keepalive only when asked (Client defaults keepAlive to false).
+  // The warm min client and any idle client sit silent between bursts; a proxy or
+  // NAT that drops a silent socket leaves it looking open, so the next query hangs
+  // to query_timeout (10.3-11.3 s "Query read timeout" in production) or all idle
+  // sockets die at once ("Connection terminated unexpectedly", 2026-11-12 22:39Z).
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
   // Bound pool acquisition and server execution. A saturated pool must fail
   // predictably instead of leaving HTTP requests hanging. pg also applies this
   // value to a NEW client's TCP+TLS+startup.

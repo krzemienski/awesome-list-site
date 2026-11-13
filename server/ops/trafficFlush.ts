@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { db } from "../db";
 import { createLogger } from "../lib/logger";
 import { restoreDocDeltas, takeDocDeltas } from "./operationalTelemetry";
+import { deferUntilServing } from "./serviceActivity";
 
 const logger = createLogger("traffic-flush");
 
@@ -60,6 +61,9 @@ export function flushTraffic(): Promise<void> {
 
 export function initializeTrafficFlush(): void {
   if (process.env.NODE_ENV === "test" || process.env.VITEST || timer) return;
-  timer = setInterval(() => void flushTraffic(), FLUSH_EVERY_MS);
+  // The only timed job that ran on idle instances: an Autoscale instance with no
+  // traffic has no CPU for a connect. Wait until it serves a request, like the
+  // other job ticks; the counts stay in memory and SIGTERM flushes them.
+  timer = setInterval(deferUntilServing(flushTraffic), FLUSH_EVERY_MS);
   timer.unref();
 }
