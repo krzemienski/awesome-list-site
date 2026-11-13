@@ -31,7 +31,7 @@ import {
   NotebookPen
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
-import { bookmarkAriaLabel } from "@/lib/a11y-labels";
+import { labeledToggleName } from "@/lib/a11y-labels";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
 import ResourceOnwardPaths from "@/components/resource/ResourceOnwardPaths";
 import ResourceTopNextSteps, { TOP_RELATED_LIMIT, TOP_SURFACE } from "@/components/resource/ResourceTopNextSteps";
@@ -843,11 +843,10 @@ export default function ResourceDetail() {
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
             aria-pressed={isFavorite}
-            aria-label={
-              isFavorite
-                ? (isAuthenticated ? "Remove from favorites" : "Remove from account favorites — sign in required")
-                : (isAuthenticated ? "Add to favorites" : "Favorite to your account — sign in required")
-            }
+            aria-label={labeledToggleName(
+              `${isFavorite ? "Favorited" : "Favorite"}${isAuthenticated ? "" : " · account"}`,
+              isAuthenticated ? undefined : "sign in required",
+            )}
           >
             {/* BUG-050 (run19): labels stay visible at every width — icon-only
                 buttons at 375px were mystery meat for sighted mobile users. */}
@@ -864,7 +863,10 @@ export default function ResourceDetail() {
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}
-            aria-label={bookmarkAriaLabel(isBookmarked, isAuthenticated, resource.title)}
+            aria-label={labeledToggleName(
+              `${isBookmarked ? "Bookmarked" : "Bookmark"}${isAuthenticated ? "" : " · this device"}`,
+              isAuthenticated ? undefined : "no sign-in required",
+            )}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
