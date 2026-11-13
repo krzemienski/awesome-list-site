@@ -73,6 +73,16 @@
   flex: 1;
 }
 
+/* On a phone the copy always takes its own row under the mark. Left to the
+   200px min-width it sat beside the mark while "Loading repository…" was
+   short and dropped below it once the repository name arrived, moving the
+   copy, the actions and the Sync jobs table by 60px (LG-022). */
+@media (max-width: 30rem) {
+  .ops-github-panel__repository-copy {
+    flex-basis: 100%;
+  }
+}
+
 .ops-github-panel__repository-name {
   font-size: 0.875rem;
   font-weight: 600;
