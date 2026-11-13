@@ -23,8 +23,11 @@ Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHA
 ### Catalog edits reach every server within 30 seconds (#396)
 - After an admin edit, withdrawal or tag change, other running server instances could keep showing the old page for up to 6 hours. Each serving instance now checks a fingerprint of the catalog at most every 30 seconds and clears its cache when it changes.
 
-### Link names match what you see, with a space before the count (#390, #391)
-- Sidebar rows, category and tag tiles and the Favorite and Bookmark buttons now have accessible names that start with their visible text (for example "Codecs 74 resources"), and the visible label and count are separated by a space. This meets WCAG 2.5.3 Label in Name.
+### Link names match what you see, with a space before the count (#390, #391, #398)
+- Sidebar rows, category and tag tiles and the Favorite and Bookmark buttons now have accessible names that start with their visible text (for example "Codecs 74 resources"), and the visible label and count are separated by a space. Home category headings, the type chips and the search facet and tag buttons now also start with their visible text. This meets WCAG 2.5.3 Label in Name.
+
+### Admin tabs keep keyboard focus (#399)
+- After opening an /admin/<section> link, choosing another admin tab with the keyboard keeps focus on the tabs instead of jumping to the page heading. The admin pages now use a single route.
 
 ### Removing a bookmark while signed out no longer errors (#392)
 - A signed-out visitor removing a bookmark no longer triggers a request to the signed-in bookmarks list, a 401, or a console error. Undo still restores it.
