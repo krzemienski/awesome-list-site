@@ -368,10 +368,14 @@ export function useBookmarkToggle(opts: ResourceToggleOptions) {
     }
   };
 
+  const { isAuthenticated } = useAuth();
+
   return useResourceToggle({
     ...opts,
     onOptimistic: (next, vars) => {
-      if (!next) {
+      // Guests have no server list (it answers 401); guestToggle keeps its own
+      // Undo snapshot from the device store.
+      if (!next && isAuthenticated) {
         const sameRow = (entry: { id: number | string }) => String(entry.id) === String(opts.resourceId);
         const cached = queryClient.getQueryData<(RemovedBookmark & { id: number | string })[]>(["/api/bookmarks"]);
         removedRef.current = cached?.find(sameRow);
