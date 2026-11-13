@@ -171,6 +171,7 @@ function SubItem({
       aria-label={typeof count === "number" ? countedName(label, count) : undefined}
     >
       <span className="av-sidebar-leaf-label" title={label}>{label}</span>
+      {typeof count === "number" && " "}
       {typeof count === "number" && (
         <span
           className="av-sidebar-leaf-count font-mono shrink-0 tabular-nums"
@@ -491,7 +492,7 @@ function CategoryAccordion({
                         aria-label={countedName(sub.name, subCount)}
                         className="av-sidebar-l2-link no-underline"
                       >
-                        <span>{sub.name}</span>
+                        <span>{sub.name}</span>{" "}
                         <span
                           className="font-mono tabular-nums"
                           title={resourceCountLabel(subCount)}
@@ -549,7 +550,7 @@ function CategoryAccordion({
                                 className="av-sidebar-l3-row no-underline"
                               >
                                 <span aria-hidden="true">{index === subSubs.length - 1 && subDirectCount === 0 ? "└" : "├"}</span>
-                                <span title={ss.name}>{ss.name}</span>
+                                <span title={ss.name}>{ss.name}</span>{" "}
                                 <span className="font-mono tabular-nums">{formatCount(ss.totalResourceCount)}</span>
                               </a>
                             );
@@ -568,7 +569,7 @@ function CategoryAccordion({
                               className="av-sidebar-l3-row no-underline"
                             >
                               <span aria-hidden="true">└</span>
-                              <span title={`Uncategorized in ${sub.name}`}>Uncategorized</span>
+                              <span title={`Uncategorized in ${sub.name}`}>Uncategorized</span>{" "}
                               <span className="font-mono tabular-nums">{formatCount(subDirectCount)}</span>
                             </a>
                           )}
