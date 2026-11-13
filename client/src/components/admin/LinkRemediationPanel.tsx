@@ -94,7 +94,7 @@ export default function LinkRemediationPanel() {
   return (
     <Card data-testid="link-remediation-panel">
       <CardHeader>
-        <CardTitle>Automatic remediation</CardTitle>
+        <CardTitle>Remediation plan</CardTitle>
         <CardDescription>
           {data
             ? data.intervalHours
