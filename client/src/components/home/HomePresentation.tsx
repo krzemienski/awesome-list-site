@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tagLandingPath } from "@shared/tagNormalize";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { countedName } from "@/lib/a11y-labels";
 import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 
 export interface HomeSubcategoryView {
@@ -215,7 +216,7 @@ function KindStrip({
           type="button"
           className="home-kind-chip"
           data-testid={`home-kind-chip-${kind}`}
-          aria-label={counts ? `${KIND_LABELS[kind]}, ${formatCount(counts[kind])} resources` : `${KIND_LABELS[kind]}, loading`}
+          aria-label={counts ? countedName(KIND_LABELS[kind], counts[kind]) : `${KIND_LABELS[kind]} loading`}
           title={`Browse ${KIND_LABELS[kind]}`}
           aria-pressed={selectedKind === kind}
           onClick={(event) => {
@@ -442,7 +443,7 @@ function CategoryHeading({
       href={`/category/${category.slug}${tagsQuery}`}
       className="home-category-heading"
       data-testid={`link-category-${category.slug}`}
-      aria-label={`${category.name}, ${category.count} resources`}
+      aria-label={countedName(category.name, category.count)}
     >
       <span className="home-category-icon" aria-hidden="true">
         {category.icon}
