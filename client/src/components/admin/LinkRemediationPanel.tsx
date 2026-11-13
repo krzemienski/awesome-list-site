@@ -25,7 +25,6 @@ interface RemediationAction {
 
 interface RemediationResponse {
   intervalHours: number;
-  mode: "plan" | "apply";
   nextDueAt: string | null;
   lastCompleted: { id: number; completedAt: string | null; checked: number; healthy: number; broken: number } | null;
   plan: { jobId: number | null; checked: number; counts: Partial<Record<RemediationKind, number>>; actions: RemediationAction[] };
@@ -102,9 +101,7 @@ export default function LinkRemediationPanel() {
               ? `A full scan runs every ${data.intervalHours} h. ${data.nextDueAt ? `Next due ${formatAdminDateTime(data.nextDueAt)}.` : ""} `
               : "Scheduled scans are off. "
             : "Loading schedule… "}
-          {data && (data.mode === "apply"
-            ? "Dead links are hidden, recovered ones restored and moved ones updated automatically after each scan, once two scans agree. Review, Watching and Duplicate items are never changed automatically; they wait for a person."
-            : "Nothing is changed automatically (set LINK_HEALTH_REMEDIATION=apply to turn that on). Hide, Restore and Update URL items wait for Apply here; Review, Watching and Duplicate items always wait for a person.")}
+          {data && "Nothing is changed automatically. Hide, Restore and Update URL items wait for Apply here; Review, Watching and Duplicate items always wait for a person."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

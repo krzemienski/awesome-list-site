@@ -5,7 +5,7 @@ import { desc, eq, ne, and, inArray, notInArray, or, lt, sql } from "drizzle-orm
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
 import { createLogger } from "../lib/logger";
-import { RETAINED_SCANS, applyRemediationPlan, linkHealthArchivedFilter, remediationMode } from "./linkRemediation";
+import { RETAINED_SCANS, linkHealthArchivedFilter } from "./linkRemediation";
 
 const logger = createLogger("link-health");
 
@@ -266,7 +266,7 @@ export const linkHealthService = {
       }
 
       // Second verification pass (strict dead-link policy, see
-      // .agents/memory/link-scan-false-positives.md): the pass-1 sweep from
+      // docs/notes/link-scan-false-positives.md): the pass-1 sweep from
       // this datacenter IP over-flags bot-blocked sites (403/429/timeouts)
       // by ~100x. Re-check every pass-1 failure with a real browser UA and
       // only keep it as a problem link if the strict policy confirms it dead
@@ -383,9 +383,6 @@ export const linkHealthService = {
 
       logger.info({ jobId }, `Link scan finished: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
-      if (remediationMode() === 'apply') {
-        await applyRemediationPlan().catch((err: unknown) => logger.error('Automatic remediation failed:', err instanceof Error ? err.message : String(err)));
-      }
       })();
     } catch (err: any) {
       if (signal.aborted) return;

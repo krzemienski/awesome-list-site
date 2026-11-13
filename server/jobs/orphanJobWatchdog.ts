@@ -1,11 +1,10 @@
-import { db, pool } from "../db";
+import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
 import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { isServingTraffic } from "../ops/serviceActivity";
 
 const logger = createLogger("job-watchdog");
 
@@ -171,107 +170,4 @@ async function runStartupSweep(): Promise<void> {
   } catch (err) {
     logger.error('❌ Orphan watchdog failed (non-fatal):', err);
   }
-}
-
-// Run15 BUG-011: the startup sweep only catches jobs orphaned BEFORE the
-// current boot. A worker that dies mid-run while the server stays up (e.g.
-// unhandled rejection inside the GitHub sync loop) left rows in 'processing'
-// forever, so the admin GitHub tab showed perpetual in-progress jobs. Sweep
-// periodically too. AI jobs are judged by worker liveness (a dead owner or a
-// heartbeat stale for >45 s), so the sweep runs every minute to reclaim them
-// promptly; the GitHub queue keeps its 5-minute age threshold.
-// The periodic sweep excludes ids owned by live in-process workers (architect
-// review: a genuine enrichment run regularly exceeds 5 minutes and startedAt
-// is never refreshed — without the exclusion every real run would be flipped
-// to failed mid-flight). The startup sweep needs no exclusion: at boot no
-// worker has started yet, so nothing is legitimately owned.
-const PERIODIC_SWEEP_INTERVAL_MS = 60 * 1000;
-let periodicTimer: NodeJS.Timeout | null = null;
-// A cold sweep reconnects every minute and the pool's connect timeout
-// sometimes loses: retry once, and call it an ERROR only after repeated misses.
-const RETRY_DELAY_MS = 1000;
-const ERROR_AFTER_CONSECUTIVE_FAILURES = 3;
-let consecutiveFailures = 0;
-
-const CONNECTION_TIMEOUT = /connection terminated due to connection timeout|timeout exceeded when trying to connect/i;
-const MAX_CAUSE_DEPTH = 5;
-
-/** Drizzle wraps the pg error in `.cause`, so walk the chain. */
-export function isConnectionTimeout(err: unknown): boolean {
-  let current: unknown = err;
-  for (let depth = 0; depth < MAX_CAUSE_DEPTH && current instanceof Error; depth++) {
-    if (CONNECTION_TIMEOUT.test(current.message)) return true;
-    current = current.cause;
-  }
-  return false;
-}
-
-async function runPeriodicSweep(): Promise<OrphanSweepResult> {
-  // Dynamic imports keep the watchdog free of load-order coupling.
-  const [{ enrichmentService }, { syncService }, { researchService }] = await Promise.all([
-    import('../ai/enrichmentService'),
-    import('../github/syncService'),
-    import('../ai/researchService'),
-  ]);
-  const sweep = () =>
-    sweepOrphanedJobs(undefined, {
-      enrichmentJobIds: enrichmentService.getActiveJobIds(),
-      syncQueueIds: syncService.getActiveQueueIds(),
-      researchJobIds: researchService.getActiveJobIds(),
-    });
-  try {
-    return await sweep();
-  } catch (err) {
-    if (!isConnectionTimeout(err)) throw err;
-    const atTimeout = poolState();
-    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
-    let result: OrphanSweepResult;
-    try {
-      result = await sweep();
-    } catch (retryErr) {
-      if (typeof retryErr === 'object' && retryErr !== null) retryFailures.add(retryErr);
-      throw retryErr;
-    }
-    logger.warn('Orphan watchdog periodic sweep hit a connect timeout; the retry succeeded', atTimeout);
-    return result;
-  }
-}
-
-/** Errors thrown by the retry: the failure log marks them retried without wrapping, so the pg error stays readable. */
-const retryFailures = new WeakSet<object>();
-
-function poolState() {
-  return { poolTotal: pool.totalCount, poolIdle: pool.idleCount, poolWaiting: pool.waitingCount };
-}
-
-function reportSweepFailure(err: unknown): void {
-  consecutiveFailures += 1;
-  const details = {
-    consecutiveFailures,
-    retried: typeof err === 'object' && err !== null && retryFailures.has(err),
-    ...poolState(),
-  };
-  const message = 'Orphan watchdog periodic sweep failed (non-fatal):';
-  if (consecutiveFailures >= ERROR_AFTER_CONSECUTIVE_FAILURES) logger.error(message, err, details);
-  else logger.warn(message, err, details);
-}
-
-export function startOrphanWatchdogPeriodic(): void {
-  if (periodicTimer) return; // idempotent — never double-schedule
-  periodicTimer = setInterval(() => void runWithJobContext('orphan-watchdog', 'periodic', async () => {
-    if (!isServingTraffic()) return;
-    try {
-      const r = await runPeriodicSweep();
-      consecutiveFailures = 0;
-      if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
-        logger.info(
-          `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed`,
-        );
-      }
-    } catch (err) {
-      reportSweepFailure(err);
-    }
-  }), PERIODIC_SWEEP_INTERVAL_MS);
-  // Never keep the process alive just for the watchdog.
-  periodicTimer.unref?.();
 }
