@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState, type ReactNode } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronDown, ChevronRight, Play, RefreshCw, Wand2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -136,7 +136,21 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   const overrideCount = config ? Object.entries(config.overrides).filter(([k, v]) => k !== "insecureHttp" && v).length : 0;
 
   const effectivePrompt = briefMode === "custom" ? prompt : "";
-  const target = targetDiscoveries.trim() === "" ? null : Number(targetDiscoveries);
+  // A type=number input reports text it cannot parse ("0-1") as value "", which
+  // looks like a blank field. validity.badInput is the only signal, so it is
+  // recorded per field and a malformed field is never "blank" (no cap).
+  const [malformed, setMalformed] = useState<Record<string, boolean>>({});
+  const isBlank = (field: string, value: string) => value.trim() === "" && !malformed[field];
+  const parseField = (field: string, value: string) => (malformed[field] ? NaN : Number(value));
+  const numberInputProps = (field: string, value: string, set: (v: string) => void) => ({
+    value,
+    onChange: (e: ChangeEvent<HTMLInputElement>) => {
+      set(e.target.value);
+      const bad = e.currentTarget.validity.badInput;
+      setMalformed((m) => (m[field] === bad ? m : { ...m, [field]: bad }));
+    },
+  });
+  const target = isBlank("target-discoveries", targetDiscoveries) ? null : parseField("target-discoveries", targetDiscoveries);
 
   const brief = useMutation({
     mutationFn: async () => {
@@ -161,9 +175,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
       body: JSON.stringify({
         prompt: effectivePrompt,
         categoryFocus: categoryFocus !== "all" ? categoryFocus : undefined,
-        maxBudgetUsd: maxBudget.trim() === "" ? undefined : Number(maxBudget),
-        maxTurns: maxTurns.trim() === "" ? undefined : Number(maxTurns),
-        minDurationMinutes: minDurationMinutes.trim() === "" ? undefined : Number(minDurationMinutes),
+        maxBudgetUsd: isBlank("budget", maxBudget) ? undefined : parseField("budget", maxBudget),
+        maxTurns: isBlank("turns", maxTurns) ? undefined : parseField("turns", maxTurns),
+        minDurationMinutes: isBlank("minimum-duration", minDurationMinutes) ? undefined : parseField("minimum-duration", minDurationMinutes),
         targetDiscoveries: target ?? undefined,
         model: model.trim() || undefined,
         scoutModel: scoutModel.trim() || undefined,
@@ -187,8 +201,10 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     // remains visible and the operator can retry without a toast remount.
   });
 
-  const minutesN = Number(minDurationMinutes);
+  const minutesN = parseField("minimum-duration", minDurationMinutes);
   const minutesValid = Number.isInteger(minutesN) && minutesN >= 1 && minutesN <= 240;
+  const budgetN = parseField("budget", maxBudget);
+  const turnsN = parseField("turns", maxTurns);
 
   // The input id the message is about, so the failing field can be marked and focused.
   const validate = (): { field: string; message: string } | null => {
@@ -196,15 +212,13 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     if (briefMode === "custom" && trimmed.length < 10) {
       return { field: "prompt", message: "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\"." };
     }
-    if (maxBudget.trim() !== "") {
-      const b = Number(maxBudget);
-      if (!Number.isFinite(b) || b <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
+    if (!isBlank("budget", maxBudget)) {
+      if (!Number.isFinite(budgetN) || budgetN <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
     }
-    if (maxTurns.trim() !== "") {
-      const t = Number(maxTurns);
-      if (!Number.isInteger(t) || t <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
+    if (!isBlank("turns", maxTurns)) {
+      if (!Number.isInteger(turnsN) || turnsN <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
     }
-    if (minDurationMinutes.trim() !== "" && !minutesValid) {
+    if (!isBlank("minimum-duration", minDurationMinutes) && !minutesValid) {
       return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
     }
     if (target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000)) {
@@ -235,13 +249,11 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
         : null;
   const launchDisabled = !activeStateKnown || activeJobId !== null || preflightBlocked || !previewCurrent || start.isPending;
 
-  const budgetN = Number(maxBudget);
-  const turnsN = Number(maxTurns);
   const limitsSummary = [
-    target !== null && Number.isInteger(target) && target > 0 ? `stop after ${target}` : "no target",
-    maxBudget.trim() === "" ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
-    maxTurns.trim() === "" ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
-    minDurationMinutes.trim() === "" ? "no minimum duration" : minutesValid ? `${minutesN} min minimum` : "minimum?",
+    target === null ? "no target" : Number.isInteger(target) && target > 0 ? `stop after ${target}` : "target?",
+    isBlank("budget", maxBudget) ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
+    isBlank("turns", maxTurns) ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
+    isBlank("minimum-duration", minDurationMinutes) ? "no minimum duration" : minutesValid ? `${minutesN} min minimum` : "minimum?",
   ].join(" · ");
 
   return (
@@ -321,7 +333,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
           <div>
             <Label htmlFor="target-discoveries">Stop after (discoveries)</Label>
             <Input id="target-discoveries" type="number" min={1} max={1000} step={1} placeholder="No target"
-              value={targetDiscoveries} onChange={(e) => setTargetDiscoveries(e.target.value)}
+              {...numberInputProps("target-discoveries", targetDiscoveries, setTargetDiscoveries)}
               {...invalidProps("target-discoveries")}
               className="mt-1 min-h-11" data-testid="input-target-discoveries" />
             <p className={hint(target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000))} data-testid="text-target-hint">
@@ -333,11 +345,11 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
           <div>
             <Label htmlFor="budget">Budget cap (USD)</Label>
             <Input id="budget" ref={budgetRef} type="number" step="0.25" min="0" placeholder="No cap"
-              value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)}
+              {...numberInputProps("budget", maxBudget, setMaxBudget)}
               {...invalidProps("budget")}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
-            <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
-              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it."
+            <p className={hint(!isBlank("budget", maxBudget) && !(Number.isFinite(budgetN) && budgetN > 0))}>
+              {isBlank("budget", maxBudget) ? "No cap — the run spends until it stops or you cancel it."
                 : !(Number.isFinite(budgetN) && budgetN > 0) ? "Enter a positive amount in USD (blank = no cap)."
                   : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
@@ -353,17 +365,17 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
           <div>
             <Label htmlFor="turns">Max turns</Label>
             <Input id="turns" type="number" min={1} step={1} placeholder="No cap"
-              value={maxTurns} onChange={(e) => setMaxTurns(e.target.value)}
+              {...numberInputProps("turns", maxTurns, setMaxTurns)}
               {...invalidProps("turns")}
               className="mt-1 min-h-11" data-testid="input-research-turns" />
-            <p className={hint(maxTurns.trim() !== "" && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
-              {maxTurns.trim() === "" ? "No turn cap." : "Positive whole number (blank = no cap)."}
+            <p className={hint(!isBlank("turns", maxTurns) && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
+              {isBlank("turns", maxTurns) ?"No turn cap." : "Positive whole number (blank = no cap)."}
             </p>
           </div>
           <div>
             <Label htmlFor="minimum-duration">Minimum duration (minutes)</Label>
             <Input id="minimum-duration" type="number" min={1} max={240} step={1} placeholder="No minimum"
-              value={minDurationMinutes} onChange={(e) => setMinDurationMinutes(e.target.value)}
+              {...numberInputProps("minimum-duration", minDurationMinutes, setMinDurationMinutes)}
               {...invalidProps("minimum-duration")}
               className="mt-1 min-h-11" data-testid="input-research-min-duration" />
             <p className="mt-1 text-xs text-muted-foreground" data-testid="text-min-duration-hint">
