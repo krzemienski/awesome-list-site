@@ -62,9 +62,18 @@ const MAX_ENTRIES = 4096;
 // LRU still protects the process from unbounded memory use.
 const MAX_BYTES = 48 * 1024 * 1024;
 const MAX_IN_FLIGHT = 64;
+// A miss past MAX_IN_FLIGHT waits for a slot instead of failing at once. Each
+// in-flight route-meta loader is itself queued behind og-middleware's
+// 5-slot/512-waiter resolve gate and finishes in tens of milliseconds, so a cold
+// crawl of distinct keys drains in a few seconds; rejecting instantly made the
+// 512-deep gate queue unreachable. The waiter count and the wait are both
+// bounded, so memory and DB work stay bounded.
+const MAX_SLOT_WAITERS = 512;
+const SLOT_WAIT_MS = 5000;
 
 const entries = new Map<string, CacheEntry<unknown>>();
 const inFlight = new Map<string, Promise<unknown>>();
+const slotWaiters: (() => void)[] = [];
 const metrics = new Map<PublicCacheNamespace, CacheMetrics>();
 const invalidations: Record<PublicCacheInvalidationReason, number> = {
   "category-mutation": 0,
@@ -148,6 +157,37 @@ function evictToBounds(): void {
   }
 }
 
+function rebuildCapacityError(): ServiceUnavailableError {
+  return new ServiceUnavailableError(
+    "Public cache rebuild capacity is temporarily full",
+  );
+}
+
+/**
+ * Resolves when an in-flight slot may be free (the caller re-reads cache,
+ * coalescing and generation, then tries again) and rejects once the deadline
+ * passes or MAX_SLOT_WAITERS callers are already waiting.
+ */
+function waitForFlightSlot(deadline: number): Promise<void> {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0 || slotWaiters.length >= MAX_SLOT_WAITERS) {
+    return Promise.reject(rebuildCapacityError());
+  }
+  return new Promise<void>((resolve, reject) => {
+    const waiter = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(() => {
+      const index = slotWaiters.indexOf(waiter);
+      if (index !== -1) slotWaiters.splice(index, 1);
+      reject(rebuildCapacityError());
+    }, remaining);
+    timer.unref();
+    slotWaiters.push(waiter);
+  });
+}
+
 /** An unresolved route (soft 404) is never stored: crawler junk would fill the cache. */
 function isUncacheable(namespace: PublicCacheNamespace, value: unknown): boolean {
   return (
@@ -170,6 +210,7 @@ export async function getPublicCacheValue<T>(options: {
   // Retry if a successful mutation changes the generation while a rebuild is
   // in flight. This prevents an old result from either repopulating the cache
   // or being returned after the mutation has completed.
+  let slotDeadline: number | undefined;
   for (;;) {
     const requestGeneration = generation;
     const now = Date.now();
@@ -194,10 +235,16 @@ export async function getPublicCacheValue<T>(options: {
       stats.coalesced++;
     } else {
       if (inFlight.size >= MAX_IN_FLIGHT) {
-        stats.rejectedRebuilds++;
-        throw new ServiceUnavailableError(
-          "Public cache rebuild capacity is temporarily full",
-        );
+        slotDeadline ??= Date.now() + SLOT_WAIT_MS;
+        try {
+          await waitForFlightSlot(slotDeadline);
+        } catch (error) {
+          stats.rejectedRebuilds++;
+          throw error;
+        }
+        // A slot may be free, the entry may now be cached or in flight, or a
+        // mutation may have moved the generation: decide again from the top.
+        continue;
       }
       stats.rebuilds++;
       loader = options.load();
@@ -228,7 +275,13 @@ export async function getPublicCacheValue<T>(options: {
       stats.rebuildFailures++;
       throw error;
     } finally {
-      if (inFlight.get(flightKey) === loader) inFlight.delete(flightKey);
+      if (inFlight.get(flightKey) === loader) {
+        inFlight.delete(flightKey);
+        // Wake every waiter, not one: a woken waiter may hit the cache or join
+        // an existing flight and take no slot, and a new arrival may take the
+        // freed one. Losers wait again under their original deadline.
+        for (const wake of slotWaiters.splice(0)) wake();
+      }
     }
   }
 }
