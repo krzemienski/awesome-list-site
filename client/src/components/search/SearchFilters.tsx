@@ -163,7 +163,10 @@ export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevan
   }
   state.tags.forEach(tag => chips.push({ key: "tags", value: tag, text: `Tag: ${tagLabel(tag)}` }));
   if (!chips.length) return null;
-  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div>;
+  // At phone widths "Clear all" always takes its own row: a category chip that
+  // swaps its slug for the resolved name changes width, and "Clear all" used to
+  // wrap (or not) with it, shifting everything below the row.
+  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<div className="max-sm:basis-full"><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
 }
 
 export const sortLabels = RESOURCE_SEARCH_SORT_LABELS as Record<string, string>;
