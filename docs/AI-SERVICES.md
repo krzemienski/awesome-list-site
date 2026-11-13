@@ -355,8 +355,8 @@ Rejected:
 - **Session resume after a restart.** `resume` needs the CLI transcript on
   the same machine (Autoscale instances do not share it) and the in-process
   MCP bridge does not survive a restart; replaying a run cut off mid-delegation
-  is also unsafe. The orphan watchdog keeps marking such runs failed; saved
-  discoveries survive.
+  is also unsafe. The one-shot sweep at server boot marks such runs failed;
+  saved discoveries survive.
 - **LLM source curation / judge pass** (GPT-Researcher's curator is off by
   default, costs a call per batch, and the admin queue already reviews).
 - **Embedding similarity for near-duplicates** — the project-key match covers

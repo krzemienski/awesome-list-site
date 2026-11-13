@@ -503,8 +503,10 @@ Three layers sit between a visitor and the database. Each has its own rule.
   `server/cache/publicCache.ts` holds catalog bodies, nav, taxonomy and the
   `route-meta` namespace under a caller-supplied TTL, normally 60 s. Concurrent
   misses share one loader, a failed loader is never replaced by stale data,
-  and the cache is bounded (512 entries, 48 MB, 64 rebuilds in flight). The
-  cache is per process, not shared between instances.
+  and the cache is bounded (512 entries, 48 MB, 64 rebuilds in flight). A miss
+  past the 64 waits up to 5 s for a rebuild slot (at most 512 waiters) instead
+  of being turned away. The cache is per process, not shared between
+  instances.
 - **Page metadata is cached for 6 h.** `resolveRoute()` in
   `server/og-middleware.ts` resolves the title, description and found/not-found
   state for a path through `getPublicCacheValue()` with `ttlMs:
@@ -531,10 +533,14 @@ invalidate (`server/repositories/ResourceRepository.ts`,
 - A browser that already holds a catalog API response keeps it for up to 60 s
   without asking (`max-age=60`); after that it revalidates. The page document
   itself is always fetched fresh.
-- Other instances do not hear about the write. Autoscale can run several, so
-  a new or edited resource can take up to 60 s to appear on an instance that
-  did not handle the write. Treat 60 s as the staleness window for public
-  pages and do not expect an audit to see a change sooner on a second request.
+- Other instances do not hear about the write directly. Each serving instance
+  reads a fingerprint of the catalog tables (`server/cache/catalogStamp.ts`)
+  in the background at most once per 30 s, and clears its cache when the
+  fingerprint changes (reason `catalog-stamp`). There is no timer, so an idle
+  instance never queries. A new or edited resource can therefore take up to
+  about 30 s to reach an instance that did not handle the write, plus the
+  60 s a browser may reuse an API response. Do not expect an audit to see a
+  change sooner on a second request.
 
 **Facets.** `listResources()` counts facet groups only when asked: the
 `facets` option takes the kinds to count (`categories`, `subcategories`,
