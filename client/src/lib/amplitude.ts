@@ -122,6 +122,22 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
   return true;
 }
 
+// Guides & Surveys is a ~500 ms task on a throttled phone and nothing tracked
+// depends on it, so it starts in an idle period after the page's first seconds
+// instead of landing on a visitor's first taps.
+const ENGAGEMENT_DEFER_MS = 3_000;
+const ENGAGEMENT_IDLE_TIMEOUT_MS = 2_000;
+
+function afterStartup(callback: () => void): void {
+  window.setTimeout(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
+    } else {
+      callback();
+    }
+  }, ENGAGEMENT_DEFER_MS);
+}
+
 export function initAmplitude(): void {
   if (!vendorSdksAllowed()) return;
   disabled = false;
@@ -184,6 +200,17 @@ export function initAmplitude(): void {
     const flush = pendingEvents;
     pendingEvents = [];
     flush.forEach(({ name, props }) => ampTrack(name, props));
+
+    // Guides & Surveys is a ~500 ms task on a throttled phone. It is not
+    // needed for tracking, so it waits until the first seconds of taps are over.
+    afterStartup(() => {
+      // A revoke bumped the version and already tore everything down; a later
+      // grant runs its own init and schedules its own Guides & Surveys.
+      if (runVersion !== lifecycleVersion) return;
+      void options
+        .addAmplitudeEngagement(amplitude, products, isBlocked, () => consentWasRevoked(runVersion))
+        .catch((err) => console.warn('Amplitude Guides & Surveys setup failed', err));
+    });
   })().catch((err) => {
     // Unlatch so a later call can retry after a transient setup failure.
     initStarted = false;

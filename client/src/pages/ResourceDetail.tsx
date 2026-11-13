@@ -112,18 +112,23 @@ function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: Rea
 // Runs `task` exactly once, after the frame the tap produced, so vendor SDK
 // work (GA, Mixpanel, PostHog, Amplitude) never sits between a tap and its
 // paint. The Visit CTA opens a new tab, which hides this one and stops
-// requestAnimationFrame; the timer, the visibility change and pagehide
-// guarantee the task still runs and the event is still delivered.
+// requestAnimationFrame; the timer, the hide and pagehide guarantee the task
+// still runs and the event is still delivered. Hiding only schedules the task
+// on its own macrotask, so it never runs inside the task that opened the tab;
+// pagehide runs it synchronously because an unloading page gets no later task.
 function runAfterPaint(task: () => void) {
   let done = false;
   const run = () => {
     if (done) return;
     done = true;
-    document.removeEventListener("visibilitychange", run);
+    document.removeEventListener("visibilitychange", onHide);
     window.removeEventListener("pagehide", run);
     task();
   };
-  document.addEventListener("visibilitychange", run);
+  const onHide = () => {
+    if (document.visibilityState === "hidden") setTimeout(run, 0);
+  };
+  document.addEventListener("visibilitychange", onHide);
   window.addEventListener("pagehide", run);
   requestAnimationFrame(() => setTimeout(run, 0));
   setTimeout(run, 250);
@@ -468,14 +473,19 @@ export default function ResourceDetail() {
   };
 
   const trackInteraction = useMutation({
-    mutationFn: async (interaction: {
+    mutationFn: async (variables: {
       resourceId: string;
       interactionType: string;
       interactionValue?: number;
       metadata?: any;
+      // The Visit click is sent as the page hides; keepalive lets the request
+      // outlive an unload. Other callers keep a plain fetch.
+      keepalive?: boolean;
     }) => {
+      const { keepalive, ...interaction } = variables;
       return apiRequest("/api/interactions", {
         method: "POST",
+        keepalive,
         body: JSON.stringify({
           userId: user?.id,
           ...interaction
@@ -574,6 +584,7 @@ export default function ResourceDetail() {
             resourceId: resource.id.toString(),
             interactionType: "click",
             metadata: { source: "visit" },
+            keepalive: true,
           });
         }
       });

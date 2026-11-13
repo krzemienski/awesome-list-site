@@ -224,8 +224,7 @@ export interface AmplitudeProductSlots {
 }
 
 /**
- * Adds Session Replay, Experiment and Guides & Surveys in Unified's initAll
- * order. Each stage imports its own SDK chunk and re-checks `revoked()` after
+ * Adds Session Replay and Experiment in Unified's initAll order. Each stage imports its own SDK chunk and re-checks `revoked()` after
  * every await, so a revoke mid-setup never adds a recorder/plugin afterward.
  * Returns false as soon as consent was revoked (the caller stops there).
  */
@@ -265,8 +264,20 @@ export const addAmplitudeProducts = async (
     slots.experiment.instance = plugin;
     slots.experiment.added = true;
   }
-  if (await revoked()) return false;
+  return !(await revoked());
+};
 
+/**
+ * Adds Guides & Surveys. Kept apart from addAmplitudeProducts because its
+ * script is a 500 ms task on a throttled phone; the caller starts it after the
+ * visitor's first taps. Same revoke handling as the products above.
+ */
+export const addAmplitudeEngagement = async (
+  amplitude: typeof import('@amplitude/analytics-browser'),
+  slots: AmplitudeProductSlots,
+  isBlocked: () => boolean,
+  revoked: () => Promise<boolean>,
+): Promise<boolean> => {
   if (!slots.engagement.added) {
     const { plugin: engagementPlugin } = await import('@amplitude/engagement-browser');
     if (await revoked()) return false;
