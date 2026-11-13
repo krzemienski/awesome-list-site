@@ -101,10 +101,15 @@ export default function LinkRemediationPanel() {
               ? `A full scan runs every ${data.intervalHours} h. ${data.nextDueAt ? `Next due ${formatAdminDateTime(data.nextDueAt)}.` : ""} `
               : "Scheduled scans are off. "
             : "Loading schedule… "}
-          {data && "Nothing is changed automatically. Hide, Restore and Update URL items wait for Apply here; Review, Watching and Duplicate items always wait for a person."}
+          {"Nothing is changed automatically. Hide, Restore and Update URL items wait for Apply here; Review, Watching and Duplicate items always wait for a person."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {query.isLoading && (
+          <div className="min-h-10 sm:min-h-5" aria-hidden="true" data-testid="skeleton-last-scan">
+            <span className="skeleton block h-5 w-full max-w-xl" />
+          </div>
+        )}
         {data?.lastCompleted && (
           <p className="text-sm text-[color:var(--text-2)]" data-testid="text-last-scan">
             Last scan #{data.lastCompleted.id} finished {data.lastCompleted.completedAt ? formatAdminDateTime(data.lastCompleted.completedAt) : "—"}:
