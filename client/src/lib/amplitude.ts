@@ -1,4 +1,4 @@
-import { getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
+import { afterStartup, getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
 import { isAnalyticsSuppressed } from "./analytics-suppression";
 import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
@@ -184,6 +184,17 @@ export function initAmplitude(): void {
     const flush = pendingEvents;
     pendingEvents = [];
     flush.forEach(({ name, props }) => ampTrack(name, props));
+
+    // Guides & Surveys is a ~500 ms task on a throttled phone. It is not
+    // needed for tracking, so it waits until the first seconds of taps are over.
+    afterStartup(() => {
+      // A revoke bumped the version and already tore everything down; a later
+      // grant runs its own init and schedules its own Guides & Surveys.
+      if (runVersion !== lifecycleVersion) return;
+      void options
+        .addAmplitudeEngagement(amplitude, products, isBlocked, () => consentWasRevoked(runVersion))
+        .catch((err) => console.warn('Amplitude Guides & Surveys setup failed', err));
+    });
   })().catch((err) => {
     // Unlatch so a later call can retry after a transient setup failure.
     initStarted = false;
