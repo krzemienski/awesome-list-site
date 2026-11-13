@@ -31,6 +31,10 @@
   font-weight: 400;
 }
 .admin-dashboard .admin-dashboard__masthead p { font-size: 14px; margin-top: 8px; }
+/* The intro's resource count has the same inline box while stats load and after,
+   so the sentence wraps identically in both states. */
+.admin-dashboard__count-slot { display: inline-block; min-width: 5ch; font-variant-numeric: tabular-nums; vertical-align: bottom; }
+.admin-dashboard__count-skeleton { display: block; width: 4.4ch; height: 1em; margin-top: 0.2em; }
 .admin-dashboard .admin-dashboard__actions { width: auto; gap: 8px; }
 /* Canonical `.btn`: retain its intrinsic padding/leading while honoring the
    approved 44px interactive-control floor. */

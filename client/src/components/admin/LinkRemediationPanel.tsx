@@ -33,14 +33,17 @@ interface RemediationResponse {
 
 const QUERY_KEY = ["/api/admin/link-health/remediation"];
 
-// The plan can run to hundreds of rows. Bounding the table area keeps the card
-// the same height whatever the plan size, and the loading placeholder reserves
-// that height so Member reports below does not move when the plan arrives.
+// The plan can run to hundreds of rows. The plan region is a fixed 28rem box in
+// every state (loading, empty, short, long), so Member reports below never
+// moves when the plan arrives or changes size.
 const PLAN_TABLE_SHELL = { title: "Planned changes", sub: "From the last three scans. Nothing is deleted." };
 
-// Same typography and a line of the same length as the loaded "Last scan" text,
-// so it wraps to the same number of lines at every width.
-const LAST_SCAN_PLACEHOLDER = "Last scan #000 finished Jan 00, 0000, 00:00 PM: 0000 checked, 0000 healthy, 000 dead.";
+// The two variable text rows get a fixed box in every state instead of a
+// placeholder that "probably" wraps like the real text. Each box holds the
+// longest real form at its breakpoint (3 lines under 640px, 2 under 1024px,
+// 1 above) and clamps beyond it; the full text is in the title attribute.
+const VARIABLE_ROW_BOX = "h-[3lh] line-clamp-3 sm:h-[2lh] sm:line-clamp-2 lg:h-[1lh] lg:line-clamp-1";
+const SCHEDULE_ROW_BOX = "h-[2lh] line-clamp-2 sm:h-[1lh] sm:line-clamp-1";
 
 const KIND_LABEL: Record<RemediationKind, string> = {
   archive: "Hide (dead)",
@@ -99,30 +102,32 @@ export default function LinkRemediationPanel() {
   const data = query.data;
   const actions = data?.plan.actions ?? [];
   const changes = actions.filter((a) => a.kind === "archive" || a.kind === "restore" || a.kind === "rewrite-url").length;
+  const schedule = !data
+    ? "Loading schedule…"
+    : data.intervalHours
+      ? `A full scan runs every ${data.intervalHours} h.${data.nextDueAt ? ` Next due ${formatAdminDateTime(data.nextDueAt)}.` : ""}`
+      : "Scheduled scans are off.";
+  const lastScan = data?.lastCompleted
+    ? `Last scan #${data.lastCompleted.id} finished ${data.lastCompleted.completedAt ? formatAdminDateTime(data.lastCompleted.completedAt) : "—"}: ${data.lastCompleted.checked} checked, ${data.lastCompleted.healthy} healthy, ${data.lastCompleted.broken} dead.`
+    : "No scan has finished yet.";
 
   return (
     <Card data-testid="link-remediation-panel">
       <CardHeader>
         <CardTitle>Remediation plan</CardTitle>
         <CardDescription>
-          {data
-            ? data.intervalHours
-              ? `A full scan runs every ${data.intervalHours} h. ${data.nextDueAt ? `Next due ${formatAdminDateTime(data.nextDueAt)}.` : ""} `
-              : "Scheduled scans are off. "
-            : "Loading schedule… "}
+          <span className={SCHEDULE_ROW_BOX} title={schedule} data-testid="text-schedule">{schedule}</span>
           {"Nothing is changed automatically. Hide, Restore and Update URL items wait for Apply here; Review, Watching and Duplicate items always wait for a person."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {query.isLoading && (
-          <p className="text-sm" aria-hidden="true" data-testid="skeleton-last-scan">
-            <span className="skeleton text-transparent select-none">{LAST_SCAN_PLACEHOLDER}</span>
+        {query.isLoading ? (
+          <p className={`${VARIABLE_ROW_BOX} text-sm`} aria-hidden="true" data-testid="skeleton-last-scan">
+            <span className="skeleton block h-[1lh] w-3/4" />
           </p>
-        )}
-        {data?.lastCompleted && (
-          <p className="text-sm text-[color:var(--text-2)]" data-testid="text-last-scan">
-            Last scan #{data.lastCompleted.id} finished {data.lastCompleted.completedAt ? formatAdminDateTime(data.lastCompleted.completedAt) : "—"}:
-            {` ${data.lastCompleted.checked} checked, ${data.lastCompleted.healthy} healthy, ${data.lastCompleted.broken} dead.`}
+        ) : (
+          <p className={`${VARIABLE_ROW_BOX} text-sm text-[color:var(--text-2)]`} title={lastScan} data-testid="text-last-scan">
+            {lastScan}
           </p>
         )}
         <div className="flex flex-wrap items-center gap-2" data-testid="remediation-counts">
@@ -149,18 +154,21 @@ export default function LinkRemediationPanel() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        {query.isLoading ? (
-          <TableShell {...PLAN_TABLE_SHELL}>
+        <TableShell {...PLAN_TABLE_SHELL}>
+          {query.isLoading ? (
             <div className="h-[28rem]" role="status" aria-busy="true" data-testid="skeleton-remediation-plan">
               <span className="sr-only">Loading plan…</span>
               <span aria-hidden="true" className="skeleton block h-full w-full" />
             </div>
-          </TableShell>
-        ) : actions.length === 0 ? (
-          <p className="text-sm text-[color:var(--text-2)]">No link needs attention.</p>
-        ) : (
-          <TableShell {...PLAN_TABLE_SHELL}>
-            <div className="[&_[role=region]]:max-h-[28rem]" data-testid="remediation-plan-scroller">
+          ) : actions.length === 0 ? (
+            <div className="flex h-[28rem] items-center justify-center" data-testid="remediation-plan-empty">
+              <p className="text-sm text-[color:var(--text-2)]">No link needs attention.</p>
+            </div>
+          ) : (
+            <div
+              className="flex h-[28rem] flex-col [&>div.relative]:flex [&>div.relative]:min-h-0 [&>div.relative]:flex-1 [&>div.relative]:flex-col [&_[role=region]]:min-h-0 [&_[role=region]]:flex-1"
+              data-testid="remediation-plan-scroller"
+            >
               <Table scrollLabel="Planned link remediation">
                 <TableHeader>
                   <TableRow>
@@ -192,8 +200,8 @@ export default function LinkRemediationPanel() {
                 </TableBody>
               </Table>
             </div>
-          </TableShell>
-        )}
+          )}
+        </TableShell>
         {(data?.ignored.length ?? 0) > 0 && (
           <details data-testid="remediation-ignored">
             <summary className="cursor-pointer text-sm">Marked fine by an admin ({data?.ignored.length})</summary>
