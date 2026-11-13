@@ -30,6 +30,11 @@ export function isServingTraffic(now = Date.now()): boolean {
   return lastRequestAt > 0 && now - lastRequestAt <= SERVING_WINDOW_MS;
 }
 
+/** When the last non-probe request was served (epoch ms); 0 if none yet. */
+export function lastServedAt(): number {
+  return lastRequestAt;
+}
+
 /**
  * Wraps a job tick so an idle instance defers it instead of dropping it: the
  * tick re-checks every DEFERRED_TICK_RETRY_MS until the instance serves
