@@ -188,14 +188,18 @@ function waitForFlightSlot(deadline: number): Promise<void> {
   });
 }
 
-/** An unresolved route (soft 404) is never stored: crawler junk would fill the cache. */
+/**
+ * An unresolved route (soft 404) is never stored: crawler junk would fill the
+ * cache. Neither is a degraded one (a lookup failed and the route fell back to
+ * generic metadata): it is served once, and the next request retries the lookup
+ * instead of inheriting the fallback for the whole TTL.
+ */
 function isUncacheable(namespace: PublicCacheNamespace, value: unknown): boolean {
-  return (
-    namespace === "route-meta" &&
-    typeof value === "object" &&
-    value !== null &&
-    (value as { found?: unknown }).found === false
-  );
+  if (namespace !== "route-meta" || typeof value !== "object" || value === null) {
+    return false;
+  }
+  const route = value as { found?: unknown; degraded?: unknown };
+  return route.found === false || route.degraded === true;
 }
 
 export async function getPublicCacheValue<T>(options: {
