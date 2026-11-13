@@ -1,4 +1,4 @@
-import { afterStartup, getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
+import { getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
 import { isAnalyticsSuppressed } from "./analytics-suppression";
 import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
@@ -120,6 +120,22 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
     queueMicrotask(initAmplitude);
   }
   return true;
+}
+
+// Guides & Surveys is a ~500 ms task on a throttled phone and nothing tracked
+// depends on it, so it starts in an idle period after the page's first seconds
+// instead of landing on a visitor's first taps.
+const ENGAGEMENT_DEFER_MS = 3_000;
+const ENGAGEMENT_IDLE_TIMEOUT_MS = 2_000;
+
+function afterStartup(callback: () => void): void {
+  window.setTimeout(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
+    } else {
+      callback();
+    }
+  }, ENGAGEMENT_DEFER_MS);
 }
 
 export function initAmplitude(): void {

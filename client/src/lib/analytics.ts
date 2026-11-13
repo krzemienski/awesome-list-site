@@ -103,35 +103,6 @@ const domainOf = (url: string): string | undefined => {
 // mount-only init would drop the initial page_view.
 let gaInitialized = false;
 
-const STARTUP_DEFER_MS = 3_000;
-const STARTUP_IDLE_TIMEOUT_MS = 2_000;
-
-/**
- * Runs `callback` after the first seconds of the page, in an idle period, so
- * vendor code that parses and sets up in one long task does not land on the
- * taps of a visitor who just arrived.
- */
-export const afterStartup = (callback: () => void): void => {
-  window.setTimeout(() => {
-    if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(callback, { timeout: STARTUP_IDLE_TIMEOUT_MS });
-    } else {
-      callback();
-    }
-  }, STARTUP_DEFER_MS);
-};
-
-let gtagScriptRequested = false;
-let gtagLoadSkipped = false;
-const loadGtagScript = (measurementId: string) => {
-  if (gtagScriptRequested) return;
-  gtagScriptRequested = true;
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
-};
-
 const MAX_PENDING_GA_EVENTS = 100;
 const pendingEvents: Array<{
   name: string;
@@ -153,8 +124,6 @@ export const initGA = () => {
   window[`ga-disable-${measurementId}`] = false;
   if (gaInitialized) {
     window.gtag?.('consent', 'update', { analytics_storage: 'granted' });
-    // A revoke before the deferred load skipped it; the visitor's re-grant loads it now.
-    if (gtagLoadSkipped) loadGtagScript(measurementId);
     return;
   }
 
@@ -163,14 +132,11 @@ export const initGA = () => {
   // Capture first-touch acquisition (UTM + referrer) before any event fires.
   captureAcquisition();
 
-  // gtag.js (~115 ms to evaluate on a throttled phone) loads after startup.
-  // The gtag stub below queues every command on dataLayer meanwhile and the
-  // library replays them in order when it arrives, so the initial page_view
-  // and consent updates are not lost.
-  afterStartup(() => {
-    if (vendorSdksAllowed()) loadGtagScript(measurementId);
-    else gtagLoadSkipped = true;
-  });
+  // Add Google Analytics script to the head
+  const script1 = document.createElement('script');
+  script1.async = true;
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script1);
 
   // Initialize gtag. send_page_view:false — the initial page_view and every
   // route-change page_view are fired manually from use-analytics (single
