@@ -521,7 +521,7 @@ export class LinkChecker {
 
 /**
  * Second-pass verification with a real browser User-Agent (strict dead-link
- * policy, per .agents/memory/link-scan-false-positives.md): a datacenter-IP
+ * policy, per docs/notes/link-scan-false-positives.md): a datacenter-IP
  * scan over-flags by ~100x because sites bot-block HEAD/bot-UA requests with
  * 403/429/connect-timeouts. Only classify as dead:
  *   - DNS ENOTFOUND
