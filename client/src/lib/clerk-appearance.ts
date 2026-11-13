@@ -389,6 +389,9 @@ function buildClerkAppearance(
       // The design system's `.input` paints the field; the 44px touch minimum
       // rides on `.cl-formFieldInput.input` in app-bridge.css.
       formFieldInput: "input auth-edge",
+      // The password field carries the show-password toggle on its right edge;
+      // `auth-password` makes `.input`'s padding leave room for it.
+      formFieldInput__password: "auth-password",
       // Clerk insets the toggle 3px inside the 44px field, leaving it 38px
       // tall; pinning it to the field's edges gives it the full 44px.
       formFieldInputShowPasswordButton: {

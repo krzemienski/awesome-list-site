@@ -214,6 +214,10 @@ body { font-feature-settings: "ss01", "cv11"; }
 .input.auth-edge.auth-edge:focus { border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong)); }
 .btn.auth-edge.auth-edge:not(:hover) { box-shadow: none; }
 .btn.primary.auth-edge::after { display: none; }
+/* The show-password toggle is pinned 44px wide over the field's right edge;
+   `.input`'s 14px padding let long passwords run under it. Reserve the toggle's
+   width plus the normal inner padding. */
+.input.auth-password.auth-password { padding-right: calc(44px + 14px); }
 /* Clerk renders some steps' secondary button with no content (the password
    reset code step's formButtonReset). Unstyled it was invisible; with the
    `.btn` edge above it painted as an empty bordered bar under Continue. */
