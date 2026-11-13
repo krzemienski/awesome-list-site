@@ -435,10 +435,8 @@ export async function runBackgroundInitialization(): Promise<void> {
   logger.info("📊 Note: /api/awesome-list now serves from PostgreSQL database");
 
   try {
-    const { runOrphanWatchdogStartup, startOrphanWatchdogPeriodic } =
-      await import("./jobs/orphanJobWatchdog");
+    const { runOrphanWatchdogStartup } = await import("./jobs/orphanJobWatchdog");
     await runOrphanWatchdogStartup();
-    startOrphanWatchdogPeriodic();
   } catch (error) {
     logger.error("Failed to import/run orphan watchdog (non-fatal):", error);
   }
