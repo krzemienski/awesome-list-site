@@ -2,6 +2,24 @@ Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHA
 
 ## November 13, 2026
 
+### Password text clears the show-password toggle (#402)
+- On sign-in and sign-up, a long password no longer runs under the "Show password" button; the field keeps room for it at every width.
+
+### Fewer layout jumps on phones (#401, #402, #404)
+- The admin research run view, a search link with a category filter, and a shared collection page no longer shift their content while they load on a phone.
+
+### Offline retry restores the page's styles (#405, #406)
+- If a page failed to load while offline, coming back online (or pressing Retry) now reloads its stylesheet too, so the page no longer appears unstyled.
+
+### A mistyped research budget is rejected (#407)
+- In the admin researcher wizard, text that is not a number (for example "0-1") in the budget, turns or duration field now shows the invalid-value message instead of silently meaning "no cap".
+
+### Clerk sign-in errors appear in the admin logs (#403)
+- A server error returned through the sign-in proxy is now recorded in the admin logs, so the error count covers sign-in traffic too.
+
+### Run report (2026-11-13)
+- The production state after this run, with the architecture diagram, is in `docs/production-state-2026-11-13.md`.
+
 ### The harness and self-repair layer no longer runs (#381)
 - The orphan-job watchdog no longer sweeps every 60 seconds. It runs once at server start to fail jobs a restart stranded. Link health scans only plan changes now: nothing is hidden or rewritten unless an admin presses Apply in the Link health panel, and `LINK_HEALTH_REMEDIATION` is gone.
 - Agent tooling, the TLA+ models, one-off scripts and the separate lint pass in the build were removed from the repository. The build runs `tsc --noEmit`, then the Vite, SSR and server bundles.
