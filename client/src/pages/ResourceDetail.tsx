@@ -109,6 +109,26 @@ function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: Rea
   ) : <>{props.fallback}</>;
 }
 
+// Runs `task` exactly once, after the frame the tap produced, so vendor SDK
+// work (GA, Mixpanel, PostHog, Amplitude) never sits between a tap and its
+// paint. The Visit CTA opens a new tab, which hides this one and stops
+// requestAnimationFrame; the timer, the visibility change and pagehide
+// guarantee the task still runs and the event is still delivered.
+function runAfterPaint(task: () => void) {
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    document.removeEventListener("visibilitychange", run);
+    window.removeEventListener("pagehide", run);
+    task();
+  };
+  document.addEventListener("visibilitychange", run);
+  window.addEventListener("pagehide", run);
+  requestAnimationFrame(() => setTimeout(run, 0));
+  setTimeout(run, 250);
+}
+
 // Name where the button goes ("View on GitHub", "Open on dashif.org") so a
 // visitor knows what they get before leaving the site.
 function visitLabel(url: string): string {
@@ -545,16 +565,18 @@ export default function ResourceDetail() {
   // and fires the toast.
   const handleVisitResource = () => {
     if (resource) {
-      trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized", "resource_detail");
-      // The analytics event above never reaches the user's interaction
-      // history; record the visit there like the page view.
-      if (user?.id) {
-        trackInteraction.mutate({
-          resourceId: resource.id.toString(),
-          interactionType: "click",
-          metadata: { source: "visit" },
-        });
-      }
+      runAfterPaint(() => {
+        trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized", "resource_detail");
+        // The analytics event above never reaches the user's interaction
+        // history; record the visit there like the page view.
+        if (user?.id) {
+          trackInteraction.mutate({
+            resourceId: resource.id.toString(),
+            interactionType: "click",
+            metadata: { source: "visit" },
+          });
+        }
+      });
     }
     toast({
       title: "Opening resource",
