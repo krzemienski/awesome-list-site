@@ -6,7 +6,7 @@ import { BookOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
+import { PageHeaderSkeleton } from "@/components/ui/skeletons";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
@@ -82,7 +82,12 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
 
   if (isLoading) {
     return (
-      <div className="discovery-page space-y-6" aria-busy="true" aria-live="polite">
+      // The loaded header's height depends on the collection name and
+      // description, which are unknown until the fetch ends, so nothing is
+      // painted below the header skeleton. min-h-[100svh] keeps the shell
+      // footer (a sibling of <main> below this page) past the first viewport;
+      // the loaded content replaces this, and nothing visible moves.
+      <div className="discovery-page min-h-[100svh] space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead
           title="Loading shared collection"
           description="Loading a shared Awesome Video collection"
@@ -90,11 +95,6 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           ogUrl={publicUrl}
         />
         <PageHeaderSkeleton />
-        <div className="discovery-grid">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <ResourceCardSkeleton key={index} />
-          ))}
-        </div>
       </div>
     );
   }
