@@ -6,8 +6,7 @@ import { BookOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { ResourceCardSkeleton } from "@/components/ui/skeletons";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeaderSkeleton } from "@/components/ui/skeletons";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
@@ -83,32 +82,19 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
 
   if (isLoading) {
     return (
-      <div className="discovery-page space-y-6" aria-busy="true" aria-live="polite">
+      // The loaded header's height depends on the collection name and
+      // description, which are unknown until the fetch ends, so nothing is
+      // painted below the header skeleton. min-h-[100svh] keeps the shell
+      // footer (a sibling of <main> below this page) past the first viewport;
+      // the loaded content replaces this, and nothing visible moves.
+      <div className="discovery-page min-h-[100svh] space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead
           title="Loading shared collection"
           description="Loading a shared Awesome Video collection"
           noindex
           ogUrl={publicUrl}
         />
-        {/* Mirrors the loaded header's box: the collection name and description
-            are unknown until the fetch ends, so the reserve is the measured
-            phone-width header (name wrapping to 3 lines, description to 3-4);
-            from 640px up both fit in 1-2 lines and the rows set the height. */}
-        <header className="discovery-header min-h-[292px] sm:min-h-0">
-          <Skeleton className="h-[18px] w-40 max-w-full" />
-          <div className="mt-2 flex items-start gap-3">
-            <Skeleton className="h-8 w-8 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <Skeleton className="h-[93px] w-full sm:h-11 sm:w-2/3" />
-              <Skeleton className="mt-2 h-24 w-full max-w-prose sm:h-12" />
-            </div>
-          </div>
-        </header>
-        <div className="discovery-grid">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <ResourceCardSkeleton key={index} />
-          ))}
-        </div>
+        <PageHeaderSkeleton />
       </div>
     );
   }
