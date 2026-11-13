@@ -22,9 +22,22 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import https from 'https';
 import type { RequestHandler } from 'express';
+import { createLogger } from '../lib/logger';
 
 const CLERK_FAPI = 'https://frontend-api.clerk.dev';
 export const CLERK_PROXY_PATH = '/api/__clerk';
+
+const log = createLogger('clerk-proxy');
+
+// Clerk ids look like sess_2abc..., client_2abc..., user_2abc...
+const CLERK_ID_SEGMENT = /^[a-z]+_[A-Za-z0-9]{10,}$/;
+
+/** The proxied path with the query dropped and Clerk ids replaced by ':id'. */
+function loggablePath(upstreamPath: string): string {
+  const pathname = upstreamPath.split('?')[0];
+  const segments = pathname.split('/').map((s) => (CLERK_ID_SEGMENT.test(s) ? ':id' : s));
+  return CLERK_PROXY_PATH + segments.join('/');
+}
 
 /**
  * Returns the first effective public hostname for the given request,
@@ -80,6 +93,22 @@ export function clerkProxyMiddleware(): RequestHandler {
   return (req, res) => {
     // Mounted at CLERK_PROXY_PATH, so req.url is already the path below it.
     const upstreamPath = req.url || '/';
+    const startedAt = Date.now();
+    let logged = false;
+
+    // The proxy is mounted before request logging, so a 5xx it sends would
+    // otherwise never reach the app logs. 2xx-4xx are not logged (volume).
+    function logServerError(status: number, level: 'warn' | 'error', message: string) {
+      if (logged || status < 500) return;
+      logged = true;
+      log[level](message, {
+        method: req.method,
+        path: loggablePath(upstreamPath),
+        status,
+        ms: Date.now() - startedAt,
+        upstream: 'clerk',
+      });
+    }
 
     const headers: OutgoingHttpHeaders = {};
     for (const [name, value] of Object.entries(req.headers)) {
@@ -130,6 +159,7 @@ export function clerkProxyMiddleware(): RequestHandler {
         const bodyless =
           req.method === 'HEAD' || status < 200 || status === 204 || status === 304;
         if (resHeaders['content-length'] !== undefined || bodyless) {
+          logServerError(status, 'warn', 'Clerk proxy relayed upstream 5xx');
           res.writeHead(status, resHeaders);
           // Headers are already sent, so abort the response if the upstream
           // stream errors mid-pipe rather than leaving a hung client.
@@ -143,6 +173,7 @@ export function clerkProxyMiddleware(): RequestHandler {
         proxyRes.on('end', () => {
           const body = Buffer.concat(chunks);
           resHeaders['content-length'] = String(body.length);
+          logServerError(status, 'warn', 'Clerk proxy relayed upstream 5xx');
           res.writeHead(status, resHeaders);
           res.end(body);
         });
@@ -153,7 +184,10 @@ export function clerkProxyMiddleware(): RequestHandler {
     // Set a length so the empty 502 isn't sent chunked (which the deployment
     // edge would reject just like the original response).
     function sendBadGateway() {
-      if (!res.headersSent) res.writeHead(502, { 'content-length': '0' });
+      if (!res.headersSent) {
+        logServerError(502, 'error', 'Clerk proxy failed to reach upstream (502)');
+        res.writeHead(502, { 'content-length': '0' });
+      }
       res.end();
     }
 
