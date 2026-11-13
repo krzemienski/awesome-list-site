@@ -136,6 +136,7 @@ interface HealthRow {
 }
 
 const ACTIVITY_ROWS = 6;
+const TOP_CATEGORY_ROWS = 5;
 
 // A sync older than this no longer says the catalog is current.
 const GITHUB_SYNC_STALE_DAYS = 7;
@@ -431,7 +432,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       (right.resourceCount ?? 0) - (left.resourceCount ?? 0)
       || left.name.localeCompare(right.name)
     ))
-    .slice(0, 5);
+    .slice(0, TOP_CATEGORY_ROWS);
   const categoryMax = Math.max(1, ...topCategories.map((category) => category.resourceCount ?? 0));
 
   return (
@@ -543,7 +544,20 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
           testId="admin-overview-categories"
         >
           {categories.isPending ? (
-            <p className="admin-canonical-empty">Loading categories…</p>
+            // Reserve the five rows the loaded list fills, so the panels
+            // below do not move when the categories arrive.
+            <div className="admin-canonical-category-list relative" aria-busy="true">
+              <p className="admin-canonical-empty absolute inset-x-0 top-0">Loading categories…</p>
+              {Array.from({ length: TOP_CATEGORY_ROWS }, (_, index) => (
+                <div key={index} className="admin-canonical-category-row invisible" aria-hidden="true">
+                  <div className="admin-canonical-category-label">
+                    <span>Category name</span>
+                    <strong>0,000</strong>
+                  </div>
+                  <div className="admin-canonical-category-track" />
+                </div>
+              ))}
+            </div>
           ) : categories.isError ? (
             <AdminLoadError
               subject="top categories"
