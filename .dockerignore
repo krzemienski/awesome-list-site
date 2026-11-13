@@ -52,7 +52,6 @@ awesome-list-site-ds/
 .cursor/
 .serena/
 .specs/
-.mcp.json
 scripts/p7-*.mjs
 
 # Auto Claude
@@ -96,5 +95,4 @@ tests/
 .claude/
 .omc/
 .omp/
-.agents/
 .codex/

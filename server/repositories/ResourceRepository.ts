@@ -968,7 +968,7 @@ export class ResourceRepository {
       // Task #215: if the resources id sequence has drifted behind max(id)
       // (rows were ever inserted with explicit ids by imports/seeds), the
       // insert fails with 23505 on the PRIMARY KEY and used to surface as an
-      // intermittent opaque 500. Self-heal: resync the sequence to max(id)
+      // intermittent opaque 500. Recovery: resync the sequence to max(id)
       // and retry once. (URL-unique 23505s are NOT retried — they rethrow so
       // routes can map them to a 409.)
       const cause = error?.cause ?? error;

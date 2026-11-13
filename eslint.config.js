@@ -4,7 +4,6 @@ import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import prettierConfig from "eslint-config-prettier";
-import { guardRules } from "./eslint.guards.config.js";
 
 export default tseslint.config(
   // Base JavaScript rules
@@ -100,9 +99,6 @@ export default tseslint.config(
     },
   },
 
-  // Repo guard rules (also run alone by `npm run lint:guards` inside the build)
-  ...guardRules,
-
   // Ignore patterns
   {
     ignores: [
@@ -111,12 +107,9 @@ export default tseslint.config(
       "build/**",
       ".auto-claude/**",
       ".cache/**",
-      ".agents/**",
       ".local/**",
       "attached_assets/**",
-      "scripts/archive/**",
       "docs/**",
-      "reports/**",
       "awesome-list-site-ds/**",
       "awesome-list-site-ds-20260929/**",
       "client/public/ds/**",

@@ -252,7 +252,6 @@ export default defineConfig({
         path.resolve(import.meta.dirname, "dist") + "/**",
         path.resolve(import.meta.dirname, "_planning") + "/**",
         path.resolve(import.meta.dirname, "attached_assets") + "/**",
-        path.resolve(import.meta.dirname, ".agents") + "/**",
         path.resolve(import.meta.dirname, "logs") + "/**",
         "**/*.log",
       ],
