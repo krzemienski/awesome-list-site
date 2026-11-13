@@ -40,6 +40,7 @@ import { focusPageHeading } from "@/hooks/focus-handoff";
 import ErrorPage from "@/pages/ErrorPage";
 import { useHeldError } from "@/hooks/useHeldError";
 import { isChunkLoadError } from "@/lib/chunk-load-error";
+import { reloadFailedStylesheets } from "@/lib/reload-failed-stylesheets";
 import {
   clearPendingPalette,
   focusPaletteOpener,
@@ -499,6 +500,8 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         document.activeElement?.closest("[data-testid='route-error-boundary']"),
       );
       if (cardHadFocus) this.cardRetryFocusAt = Date.now();
+      await reloadFailedStylesheets();
+      if (!this.state.error) return;
       retryFailedRouteImports();
       this.setState({ error: null, retryBlocked: null, failedOffline: false });
       if (cardHadFocus) focusRecoveredHeading();
