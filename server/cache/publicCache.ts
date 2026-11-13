@@ -7,6 +7,9 @@
  * - values expire after their caller-supplied TTL (normally 60 seconds)
  * - identical misses coalesce into one loader
  * - invalidation increments a generation and clears all public entries
+ * - a write made by another instance clears this process's entries too: a cache
+ *   read starts a background catalog-stamp check when the last one is over 30 s
+ *   old (no timer, so an idle instance never queries)
  * - an in-flight loader from an older generation is discarded and retried
  * - loader failures are never replaced with invented/stale success data
  * - committed entries, approximate bytes, and concurrent rebuilds are bounded
@@ -14,6 +17,7 @@
 import { ServiceUnavailableError } from "../middleware/errors";
 import { afterCommit } from "../db";
 import { createLogger } from "../lib/logger";
+import { refreshCatalogStampIfDue } from "./catalogStamp";
 
 const logger = createLogger("public-cache");
 
@@ -27,6 +31,7 @@ export type PublicCacheNamespace =
   | "route-meta";
 
 export type PublicCacheInvalidationReason =
+  | "catalog-stamp"
   | "category-mutation"
   | "journey-mutation"
   | "manual"
@@ -76,6 +81,7 @@ const inFlight = new Map<string, Promise<unknown>>();
 const slotWaiters: (() => void)[] = [];
 const metrics = new Map<PublicCacheNamespace, CacheMetrics>();
 const invalidations: Record<PublicCacheInvalidationReason, number> = {
+  "catalog-stamp": 0,
   "category-mutation": 0,
   "journey-mutation": 0,
   manual: 0,
@@ -208,6 +214,7 @@ export async function getPublicCacheValue<T>(options: {
   ttlMs: number;
   load: () => Promise<T>;
 }): Promise<T> {
+  refreshCatalogStampIfDue(() => clearPublicCache("catalog-stamp"));
   const key = fullKey(options.namespace, options.key);
   const stats = namespaceMetrics(options.namespace);
 
