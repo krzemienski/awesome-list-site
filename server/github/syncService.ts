@@ -595,12 +595,14 @@ export class GitHubSyncService {
       resources: [],
       wouldCreateTaxonomy: []
     };
+    const beat = this.queueHeartbeat(options.queueId);
     logger.info('Import started', { repo: repoUrl, dryRun: !!options.dryRun });
 
     try {
       // Fetch README content
       logger.info(`Fetching README from ${repoUrl}...`);
       const { content: readmeContent, branch: readmeBranch } = await this.client.fetchFile(repoUrl, 'README.md');
+      await beat();
       result.branch = readmeBranch;
       
       // STEP 1: Validate with awesome-lint BEFORE importing
@@ -648,6 +650,7 @@ export class GitHubSyncService {
       logger.info('Parsing awesome list content...');
       const parsedList = await parseAwesomeList(readmeContent);
       const dbResources = convertToDbResources(parsedList);
+      await beat();
       
       logger.info(`Found ${dbResources.length} resources in the awesome list`);
       
@@ -726,6 +729,7 @@ export class GitHubSyncService {
       result.wouldCreateTaxonomy = plannedTaxonomy;
 
       logger.info('Category hierarchy setup complete');
+      await beat();
       
       // STEP 4: Process each resource. The catalog is read once: reading every
       // row per item timed the request out on a catalog of a few thousand.
@@ -738,7 +742,7 @@ export class GitHubSyncService {
       // A dry run records the rows it would write under ids no real row has,
       // so later items match them exactly as the real run does.
       let plannedId = 0;
-      const beat = this.queueHeartbeat(options.queueId);
+      await beat();
       for (const resource of dbResources) {
         await beat();
         const urlKey = normalizeUrlForDedup(resource.url ?? '');
@@ -1139,10 +1143,12 @@ export class GitHubSyncService {
 
       // Get repository info
       const { data: repoInfo } = await octokit.repos.get({ owner, repo });
+      await beat();
       const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
       // Fetch all approved resources using storage method
       const currentResources = await this.resourceRepo.getAllApprovedResources();
+      await beat();
 
       if (currentResources.length === 0) {
         throw new Error('No approved resources to export');
@@ -1152,6 +1158,7 @@ export class GitHubSyncService {
 
       // Get last sync history to calculate diff
       const lastSync = await this.syncRepo.getLastSyncHistory(repoUrl, 'export');
+      await beat();
       const lastSnapshot = lastSync?.snapshot?.resources as Resource[] || [];
 
       // Calculate diff: added, updated, removed
@@ -1210,6 +1217,7 @@ export class GitHubSyncService {
             }
           },
         });
+        await beat();
         if (!gate.passed) {
           const details = gate.confirmedBroken
             .map((b) => `  - ${b.url} (${b.verdict})`)
@@ -1246,6 +1254,7 @@ export class GitHubSyncService {
         repo,
         ref: `heads/${defaultBranch}`
       });
+      await beat();
       const currentCommitSha = refData.object.sha;
 
       // Get the tree SHA of the current commit
@@ -1254,6 +1263,7 @@ export class GitHubSyncService {
         repo,
         commit_sha: currentCommitSha
       });
+      await beat();
       const currentTreeSha = commitData.tree.sha;
 
       // Create blobs for README and CONTRIBUTING files
@@ -1263,6 +1273,7 @@ export class GitHubSyncService {
         content: Buffer.from(readmeContent).toString('base64'),
         encoding: 'base64'
       });
+      await beat();
 
       const contributingBlob = await octokit.git.createBlob({
         owner,
@@ -1270,6 +1281,8 @@ export class GitHubSyncService {
         content: Buffer.from(contributingContent).toString('base64'),
         encoding: 'base64'
       });
+
+      await beat();
 
       // Create a new tree with both files
       const { data: treeData } = await octokit.git.createTree({
@@ -1291,6 +1304,7 @@ export class GitHubSyncService {
           }
         ]
       });
+      await beat();
 
       // Create a commit
       const { data: newCommit } = await octokit.git.createCommit({
@@ -1300,6 +1314,7 @@ export class GitHubSyncService {
         tree: treeData.sha,
         parents: [currentCommitSha]
       });
+      await beat();
 
       // Update the reference to point to the new commit (commit directly to default branch)
       await octokit.git.updateRef({
@@ -1308,6 +1323,7 @@ export class GitHubSyncService {
         ref: `heads/${defaultBranch}`,
         sha: newCommit.sha
       });
+      await beat();
 
       result.commitSha = newCommit.sha;
       result.commitUrl = newCommit.html_url;
@@ -1327,6 +1343,7 @@ export class GitHubSyncService {
       // Promise.all here exhausted the pg pool on large exports)
       const resourceIds = currentResources.map(r => r.id);
       await this.resourceRepo.markResourcesSynced(resourceIds);
+      await beat();
 
       // Store sync history with snapshot and diff counts
       await this.syncRepo.saveSyncHistory({
