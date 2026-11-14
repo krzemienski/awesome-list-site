@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
-import { and, eq, inArray, notInArray, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, notInArray, lt, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
@@ -37,6 +37,23 @@ export interface OrphanSweepExclusions {
   enrichmentJobIds?: number[];
   syncQueueIds?: number[];
   researchJobIds?: number[];
+}
+
+// Epoch ms of a sync's last sign of life from its queue-row metadata:
+// heartbeatAt, else processingStartedAt. Only strings in the exact toISOString
+// form the writer uses count; anything else (missing, non-string, another
+// format, an impossible date that Date.parse would roll over, metadata that is
+// not an object) is absent.
+function lastSyncSignOfLife(metadata: unknown): number | undefined {
+  if (typeof metadata !== 'object' || metadata === null || Array.isArray(metadata)) return undefined;
+  const fields = metadata as Record<string, unknown>;
+  for (const key of ['heartbeatAt', 'processingStartedAt']) {
+    const value = fields[key];
+    if (typeof value !== 'string') continue;
+    const ms = Date.parse(value);
+    if (Number.isFinite(ms) && new Date(ms).toISOString() === value) return ms;
+  }
+  return undefined;
 }
 
 export async function sweepOrphanedJobs(
@@ -91,51 +108,72 @@ export async function sweepOrphanedJobs(
   // no worker has picked them up yet (architect review: avoid failing untouched
   // backlog by age).
   // A sync records metadata.processingStartedAt when it starts and refreshes
-  // metadata.heartbeatAt at its progress points, so the last sign of life is the
-  // newer of the two. Rows written before that change have neither key and keep
-  // the old rule: created_at older than the cutoff.
-  // Only ISO-shaped strings are cast; anything else counts as absent, so one
-  // malformed value cannot abort the sweep. A metadata that is not an object
-  // yields null from ->>, so it falls back to created_at.
-  const isoOrNull = (key: string) =>
-    sql`(CASE WHEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} ~ '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|[+-]\\d{2}:?\\d{2})$' THEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} END)`;
-  const lastSignOfLife = sql`coalesce(${isoOrNull('heartbeatAt')}, ${isoOrNull('processingStartedAt')})`;
+  // metadata.heartbeatAt at its progress points, so the last sign of life is
+  // heartbeatAt, else processingStartedAt. Rows written before that change have
+  // neither key and keep the old rule: created_at older than the cutoff.
+  // The metadata is caller-supplied JSON (the import routes store the request's
+  // options as it), so the timestamps are parsed here, not cast in SQL, where one
+  // impossible value would abort the whole statement. A value that is not a
+  // string, or is not an exact ISO timestamp, counts as absent; a metadata
+  // that is not an object has no keys, so it falls back to created_at.
   const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
-  const gConditions = [
-    or(
-      and(
-        inArray(githubSyncQueue.status, ['processing']),
-        or(
-          and(
-            sql`${lastSignOfLife} is not null`,
-            sql`(${lastSignOfLife})::timestamptz < ${cutoff.toISOString()}::timestamptz`,
-          ),
-          and(
-            sql`${lastSignOfLife} is null`,
-            lt(githubSyncQueue.createdAt, cutoff),
-          ),
-        ),
-      ),
-      // Abandoned backlog: pending for over a week is never legitimate.
-      and(
-        inArray(githubSyncQueue.status, ['pending']),
-        lt(githubSyncQueue.createdAt, stalePendingCutoff),
-      ),
-    ),
+  const gCandidateConditions = [eq(githubSyncQueue.status, 'processing')];
+  if (liveSyncIds.length > 0) {
+    gCandidateConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
+  }
+  const gCandidates = await db
+    .select({
+      id: githubSyncQueue.id,
+      metadata: githubSyncQueue.metadata,
+      heartbeatText: sql<string | null>`${githubSyncQueue.metadata}->>'heartbeatAt'`,
+      createdAt: githubSyncQueue.createdAt,
+    })
+    .from(githubSyncQueue)
+    .where(and(...gCandidateConditions));
+
+  const failedValues = {
+    status: 'failed',
+    errorMessage: ORPHANED_BY_RESTART_MESSAGE,
+    processedAt: new Date(),
+  };
+  let syncFailed = 0;
+  for (const row of gCandidates) {
+    const lastSignOfLife = lastSyncSignOfLife(row.metadata) ?? row.createdAt?.getTime();
+    // A row with no usable time at all (null created_at) is left alone.
+    if (lastSignOfLife === undefined || lastSignOfLife >= cutoff.getTime()) continue;
+    // Per-row UPDATE guarded by the heartbeat text read above (text compare, no
+    // cast): a sync that finished, or beat, since the select keeps its row. A
+    // failure on one row is logged and must not skip the rest of the sweep.
+    try {
+      const hit = await db
+        .update(githubSyncQueue)
+        .set(failedValues)
+        .where(and(
+          eq(githubSyncQueue.id, row.id),
+          eq(githubSyncQueue.status, 'processing'),
+          sql`${githubSyncQueue.metadata}->>'heartbeatAt' IS NOT DISTINCT FROM ${row.heartbeatText}`,
+        ))
+        .returning({ id: githubSyncQueue.id });
+      syncFailed += hit.length;
+    } catch (err) {
+      logger.warn(`Orphan watchdog: could not fail github_sync_queue row ${row.id}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  // Abandoned backlog: pending for over a week is never legitimate. Decided by
+  // condition, not by an id list, so no ids are expanded into bind parameters.
+  const pendingConditions = [
+    eq(githubSyncQueue.status, 'pending'),
+    lt(githubSyncQueue.createdAt, stalePendingCutoff),
   ];
   if (liveSyncIds.length > 0) {
-    gConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
+    pendingConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
   }
-
-  const gResult = await db
+  const pendingHit = await db
     .update(githubSyncQueue)
-    .set({
-      status: 'failed',
-      errorMessage: ORPHANED_BY_RESTART_MESSAGE,
-      processedAt: new Date(),
-    })
-    .where(and(...gConditions))
+    .set(failedValues)
+    .where(and(...pendingConditions))
     .returning({ id: githubSyncQueue.id });
+  syncFailed += pendingHit.length;
 
   // Research jobs: a server restart mid-run would otherwise strand a job in
   // 'processing' forever (the SDK subprocess dies with the server, so no cost
@@ -169,7 +207,7 @@ export async function sweepOrphanedJobs(
 
   return {
     enrichmentJobsFailed: enrichmentFailed,
-    githubSyncQueueFailed: gResult.length,
+    githubSyncQueueFailed: syncFailed,
     researchJobsFailed: researchFailed,
     cutoff,
   };
