@@ -17,6 +17,12 @@ Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHA
 - Offline Retry no longer acts on a newer error, and keeps the error card if another stylesheet fails while it reloads.
 - Amplitude Guides & Surveys waits for a quiet moment on Safari as well, and comes back after consent is withdrawn and granted again.
 
+### Catalog freshness, GitHub syncs and the edit dialog (#415, #416)
+- Every catalog write now changes the cache stamp, including two writes to the same resource in the same millisecond.
+- Restarting a server no longer marks a GitHub sync as failed while another instance is still running it: a sync records when it started and refreshes a heartbeat as it works, and only a sync whose heartbeat has stopped for 5 minutes is failed.
+- A failed edit suggestion now shows its error inside the dialog, above the buttons, instead of a notice that covered the Submit button. The buttons stay in view, and a duplicate URL moves focus to the URL field.
+- The Report broken link dialog opens empty each time instead of showing a note from an earlier, cancelled attempt.
+
 ## November 13, 2026
 
 ### Password text clears the show-password toggle (#402)
