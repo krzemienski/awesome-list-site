@@ -186,8 +186,7 @@ export const runOrphanWatchdogStartup = (): Promise<void> =>
 // running sync keeps a fresh heartbeat and is left alone; a row whose worker
 // died stops beating and is failed once its last sign of life is older than the
 // cutoff. Rows written before this change carry neither key and are judged by
-// created_at as before. An import started through the admin route that does not
-// pass its queueId has no heartbeat, so only its processingStartedAt counts.
+// created_at as before.
 async function runStartupSweep(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();
