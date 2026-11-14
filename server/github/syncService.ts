@@ -52,6 +52,10 @@ import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
 
 const logger = createLogger("github-sync");
 
+// Floor between two heartbeat writes on one queue row. The orphan sweep's
+// cutoff is five minutes, so a beat every 30 s leaves ten missed beats of room.
+const HEARTBEAT_MIN_INTERVAL_MS = 30_000;
+
 interface SyncOptions {
   dryRun?: boolean;
   forceOverwrite?: boolean;
@@ -62,6 +66,7 @@ interface SyncOptions {
   /**
    * Queue row that owns this run. Stamped into the export's history row so
    * the admin panel can tie a commit to exactly one run (never by timestamp).
+   * Import and export also refresh this row's heartbeat while they work.
    */
   queueId?: number;
 }
@@ -539,6 +544,31 @@ export class GitHubSyncService {
   }
 
   /**
+   * Heartbeat for the queue row that owns a run, called at the run's own
+   * progress points (per imported item, per batch of checked links). It writes
+   * at most once per HEARTBEAT_MIN_INTERVAL_MS and starts no timer, so a run
+   * that stops making progress stops beating and the boot sweep can tell it
+   * from one a sibling instance is still working. A run with no queue row, or a
+   * failed write, changes nothing: liveness is bookkeeping, never a reason to
+   * fail the sync.
+   */
+  private queueHeartbeat(queueId: number | undefined): () => Promise<void> {
+    let lastBeatAt = Date.now();
+    return async () => {
+      if (queueId === undefined || Date.now() - lastBeatAt < HEARTBEAT_MIN_INTERVAL_MS) return;
+      lastBeatAt = Date.now();
+      try {
+        await this.syncRepo.recordGithubSyncHeartbeat(queueId);
+      } catch (error) {
+        logger.warn('Queue heartbeat write failed', {
+          queueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    };
+  }
+
+  /**
    * Import resources from a GitHub awesome list repository
    */
   async importFromGitHub(
@@ -708,7 +738,9 @@ export class GitHubSyncService {
       // A dry run records the rows it would write under ids no real row has,
       // so later items match them exactly as the real run does.
       let plannedId = 0;
+      const beat = this.queueHeartbeat(options.queueId);
       for (const resource of dbResources) {
+        await beat();
         const urlKey = normalizeUrlForDedup(resource.url ?? '');
         const listedUnder = firstListing.get(urlKey);
         if (listedUnder !== undefined) {
@@ -1083,6 +1115,7 @@ export class GitHubSyncService {
       exported: 0,
       errors: []
     };
+    const beat = this.queueHeartbeat(options.queueId);
     logger.info('Export started', {
       repo: repoUrl,
       dryRun: !!options.dryRun,
@@ -1171,6 +1204,7 @@ export class GitHubSyncService {
         logger.info('[export-link-check] scanning generated README for confirmed-broken links...');
         const gate = await runExportLinkGate(readmeContent, {
           onProgress: (checked, total) => {
+            void beat();
             if (checked % 200 === 0 || checked === total) {
               logger.info(`[export-link-check] first pass ${checked}/${total}`);
             }
@@ -1202,6 +1236,7 @@ export class GitHubSyncService {
       }
 
       // Detect the default branch (main, master, or repository default)
+      await beat();
       const defaultBranch = await this.detectDefaultBranch(octokit, owner, repo);
       result.branch = defaultBranch;
 
@@ -1442,7 +1477,7 @@ export class GitHubSyncService {
           // importFromGitHub insert a second one.
           const result = await this.importFromGitHub(
             item.repositoryUrl,
-            { dryRun: false },
+            { dryRun: false, queueId: item.id },
             { queueRowOwnedByCaller: true },
           );
 

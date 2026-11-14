@@ -27,7 +27,7 @@ import {
   type InsertGithubSyncHistory,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc } from "drizzle-orm";
+import { eq, and, desc, asc, sql } from "drizzle-orm";
 
 /**
  * Repository class for GitHub sync-related database operations
@@ -64,18 +64,46 @@ export class GithubSyncRepository {
    * @param status - New status ('pending', 'processing', 'completed', 'failed')
    * @param errorMessage - Optional error message if status is 'failed'
    * @param branch - Branch the sync actually read from / wrote to, once known
+   *
+   * Marking a row 'processing' stamps metadata.processingStartedAt and
+   * metadata.heartbeatAt (merged into the stored metadata). The orphan sweep
+   * reads them to tell a sync a sibling instance is still running from one whose
+   * worker died; the terminal write replaces metadata as before.
    */
   async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: Record<string, any>, branch?: string): Promise<void> {
+    const startedAt = new Date().toISOString();
     await db
       .update(githubSyncQueue)
       .set({
         status,
         errorMessage,
-        ...(metadata !== undefined ? { metadata } : {}),
+        ...(status === 'processing'
+          ? {
+              metadata: sql`coalesce(${githubSyncQueue.metadata}, '{}'::jsonb) || ${JSON.stringify({
+                ...metadata,
+                processingStartedAt: startedAt,
+                heartbeatAt: startedAt,
+              })}::jsonb`,
+            }
+          : metadata !== undefined ? { metadata } : {}),
         ...(branch !== undefined ? { branch } : {}),
         processedAt: status === 'completed' || status === 'failed' ? new Date() : null
       })
       .where(eq(githubSyncQueue.id, id));
+  }
+
+  /**
+   * Refresh metadata.heartbeatAt on a row that is still 'processing', so a
+   * sibling instance's boot sweep sees it as alive. Called at a sync's own
+   * progress points; a row that already finished is left untouched.
+   */
+  async recordGithubSyncHeartbeat(id: number): Promise<void> {
+    await db
+      .update(githubSyncQueue)
+      .set({
+        metadata: sql`coalesce(${githubSyncQueue.metadata}, '{}'::jsonb) || ${JSON.stringify({ heartbeatAt: new Date().toISOString() })}::jsonb`,
+      })
+      .where(and(eq(githubSyncQueue.id, id), eq(githubSyncQueue.status, 'processing')));
   }
 
   /**
