@@ -190,7 +190,7 @@ export default function SubmitResource() {
     enabled: isAuthenticated,
   });
 
-  const successCardRef = useRef<HTMLElement | null>(null);
+  const successCardRef = useRef<HTMLDivElement>(null);
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
     mode: "onTouched",
@@ -445,6 +445,14 @@ export default function SubmitResource() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [isDirty, showSuccess]);
 
+  // C8-VX-01: hand focus to the confirmation once, when it appears, so the
+  // last edited (now empty) field isn't left ringed and a keyboard submit
+  // doesn't strand focus on <body>. Keyed on showSuccess, not on a ref
+  // callback, so later re-renders never pull focus back from the form.
+  useEffect(() => {
+    if (showSuccess && successCardRef.current) focusElement(successCardRef.current);
+  }, [showSuccess]);
+
   // Submit mutation
   const submitMutation = useMutation({
     mutationFn: async (data: SubmitResourceFormData) => {
@@ -594,10 +602,7 @@ export default function SubmitResource() {
           <Card
             className="submit-success-card"
             role="status"
-            // C8-VX-01: hand focus to the confirmation once it renders, so the
-            // last edited (now empty) field isn't left ringed and a keyboard
-            // submit doesn't strand focus on <body>.
-            ref={(el) => { if (el && el !== successCardRef.current) { successCardRef.current = el; focusElement(el); } if (!el) successCardRef.current = null; }}
+            ref={successCardRef}
           > {/* DS-OK: status ok */}
             <CardHeader className="submit-success-header">
               <div className="submit-success-heading">
