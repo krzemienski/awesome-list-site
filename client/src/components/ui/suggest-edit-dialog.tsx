@@ -200,6 +200,8 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
   const [analyzingWithAI, setAnalyzingWithAI] = useState(false);
   // Analysis is a paid Claude request, so it needs an explicit second step.
   const [confirmAnalyze, setConfirmAnalyze] = useState(false);
+  // Friendly copy for a failed submit, shown inline next to the dialog's buttons.
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const analyzeButtonRef = useRef<HTMLButtonElement>(null);
   const runAnalysisButtonRef = useRef<HTMLButtonElement>(null);
   const refocusAnalyzeRef = useRef(false);
@@ -271,10 +273,20 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
       subSubcategory: "",
     });
     setClaudeSuggestions(null);
+    setSubmitError(null);
     // Deliberately keyed to open + resource identity only: re-running when the
     // same resource's fields refetch mid-edit would wipe the user's typing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, resource.id]);
+
+  // A failed submit's message goes away as soon as the user edits a field
+  // (type "change" is user input; programmatic setValue calls do not clear it).
+  useEffect(() => {
+    const subscription = form.watch((_values, { type }) => {
+      if (type === "change") setSubmitError(null);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   useEffect(() => {
     if (open && categories.length > 0) {
@@ -500,11 +512,10 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
         }
       }
       // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.
-      toast({
-        title: "Submission Failed",
-        description: humanizeApiError(error, "Failed to submit edit suggestion. Please try again."),
-        variant: "destructive",
-      });
+      // LG-039: the dialog stays open, and a toast fixed bottom-right sat on
+      // top of its Submit button for ~5 s at 1280, so the failure is shown
+      // inline next to the buttons instead.
+      setSubmitError(humanizeApiError(error, "Failed to submit edit suggestion. Please try again."));
     },
   });
 
@@ -531,6 +542,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
       return;
     }
 
+    setSubmitError(null);
     submitMutation.mutate({ data: resolved, changedFields: Object.keys(proposedChanges) });
   };
 
@@ -881,6 +893,16 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {submitError && (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm font-medium text-destructive"
+                data-testid="text-submit-error"
+              >
+                {submitError}
+              </p>
             )}
 
             <DialogFooter>
