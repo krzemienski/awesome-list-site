@@ -123,7 +123,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">Total Resources</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{metrics.totalContributions.toLocaleString()}</p>
-                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
+                    <p className={weeklyGrowthFailed ? "text-xs text-muted-foreground mt-1" : "text-xs text-[var(--status-ok)] mt-1"}>{/* DS-OK: status ok */}
                       {weeklyGrowthFailed ? "weekly count unavailable" : `${weeklyGrowthText} this week`}
                     </p>
                   </CardContent>
