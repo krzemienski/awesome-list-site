@@ -122,6 +122,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: .5rem;
+  /* The Cancel button's height (min-h-11), so it appearing does not grow the head. */
+  min-height: 2.75rem;
 }
 
 /* The status badge's box (a 25px-high "Completed" pill), held while the job loads. */

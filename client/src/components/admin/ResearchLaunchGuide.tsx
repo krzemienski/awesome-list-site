@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronDown, ChevronRight, Play, RefreshCw, Wand2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -48,6 +48,8 @@ type BriefMode = "auto" | "custom";
 // a discovery. docs/AI-SERVICES.md "Budget": $0.30 caps (jobs 65, 68)
 // stopped after 3 turns without a search.
 const LOW_BUDGET_USD = 1.25;
+
+const NUMBER_FIELDS = ["target-discoveries", "budget", "turns", "minimum-duration"];
 
 const hint = (warn: boolean) => `mt-1 text-xs ${warn ? WARN_TEXT : "text-muted-foreground"}`;
 
@@ -136,19 +138,39 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   const overrideCount = config ? Object.entries(config.overrides).filter(([k, v]) => k !== "insecureHttp" && v).length : 0;
 
   const effectivePrompt = briefMode === "custom" ? prompt : "";
-  // A type=number input reports text it cannot parse ("0-1") as value "", which
-  // looks like a blank field. validity.badInput is the only signal, so it is
-  // recorded per field and a malformed field is never "blank" (no cap).
-  const [malformed, setMalformed] = useState<Record<string, boolean>>({});
-  const isBlank = (field: string, value: string) => value.trim() === "" && !malformed[field];
-  const parseField = (field: string, value: string) => (malformed[field] ? NaN : Number(value));
+  // A type=number input reports text it cannot parse ("0-1", "e", "-") as value
+  // "", which looks like a blank field. validity.badInput is the only signal.
+  // React's onChange does not fire when the value stays "" while badInput
+  // flips, so the native input event feeds it, and Launch re-reads it from the
+  // DOM. The ref is the source (read synchronously by validate); the tick only
+  // re-renders. A malformed field is never "blank" (no cap).
+  const malformedRef = useRef<Record<string, boolean>>({});
+  const [, setMalformedTick] = useState(0);
+  const syncMalformed = (field: string, bad: boolean) => {
+    if (!!malformedRef.current[field] === bad) return false;
+    malformedRef.current = { ...malformedRef.current, [field]: bad };
+    setMalformedTick((n) => n + 1);
+    return true;
+  };
+  /** True when a flag changed: this render's parsed values are stale, so the caller waits for the re-render. */
+  const readMalformedFromDom = () => {
+    let changed = false;
+    for (const field of NUMBER_FIELDS) {
+      const el = document.getElementById(field);
+      if (el instanceof HTMLInputElement && syncMalformed(field, el.validity.badInput)) changed = true;
+    }
+    return changed;
+  };
+  const isMalformed = (field: string) => !!malformedRef.current[field];
+  const isBlank = (field: string, value: string) => value.trim() === "" && !isMalformed(field);
+  const parseField = (field: string, value: string) => (isMalformed(field) ? NaN : Number(value));
   const numberInputProps = (field: string, value: string, set: (v: string) => void) => ({
     value,
     onChange: (e: ChangeEvent<HTMLInputElement>) => {
       set(e.target.value);
-      const bad = e.currentTarget.validity.badInput;
-      setMalformed((m) => (m[field] === bad ? m : { ...m, [field]: bad }));
+      syncMalformed(field, e.currentTarget.validity.badInput);
     },
+    onInput: (e: FormEvent<HTMLInputElement>) => syncMalformed(field, e.currentTarget.validity.badInput),
   });
   const target = isBlank("target-discoveries", targetDiscoveries) ? null : parseField("target-discoveries", targetDiscoveries);
 
@@ -233,6 +255,8 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
 
   const handleLaunch = () => {
     setLaunchAttempted(true);
+    // launchAttempted is set, so the re-render shows the error for the fresh flags.
+    if (readMalformedFromDom()) return;
     const problem = validate();
     if (problem) {
       requestAnimationFrame(() => document.getElementById(problem.field)?.focus());
@@ -378,8 +402,10 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("minimum-duration", minDurationMinutes, setMinDurationMinutes)}
               {...invalidProps("minimum-duration")}
               className="mt-1 min-h-11" data-testid="input-research-min-duration" />
-            <p className="mt-1 text-xs text-muted-foreground" data-testid="text-min-duration-hint">
-              Optional. If the first turn ends early, the run continues with fresh research until this elapsed time, budget and turns allow.
+            <p className={hint(!isBlank("minimum-duration", minDurationMinutes) && !minutesValid)} data-testid="text-min-duration-hint">
+              {!isBlank("minimum-duration", minDurationMinutes) && !minutesValid
+                ? "Whole minutes from 1 to 240, or blank."
+                : "Optional. If the first turn ends early, the run continues with fresh research until this elapsed time, budget and turns allow."}
             </p>
           </div>
         </div>

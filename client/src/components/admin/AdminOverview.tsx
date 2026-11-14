@@ -543,21 +543,24 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
           className="admin-panel"
           testId="admin-overview-categories"
         >
-          {categories.isPending ? (
-            // Reserve the five rows the loaded list fills, so the panels
-            // below do not move when the categories arrive.
-            <div className="admin-canonical-category-list relative" aria-busy="true">
-              <p className="admin-canonical-empty absolute inset-x-0 top-0">Loading categories…</p>
-              {Array.from({ length: TOP_CATEGORY_ROWS }, (_, index) => (
-                <div key={index} className="admin-canonical-category-row invisible" aria-hidden="true">
-                  <div className="admin-canonical-category-label">
-                    <span>Category name</span>
-                    <strong>0,000</strong>
-                  </div>
-                  <div className="admin-canonical-category-track" />
+          {/* The five rows a full list fills are always laid out (invisible) in
+              the same grid cell as the current state, so the panels below do
+              not move between loading, a short list, an empty list and an error. */}
+          <div className="grid">
+          <div className="admin-canonical-category-list invisible [grid-area:1/1]" aria-hidden="true">
+            {Array.from({ length: TOP_CATEGORY_ROWS }, (_, index) => (
+              <div key={index} className="admin-canonical-category-row">
+                <div className="admin-canonical-category-label">
+                  <span>Category name</span>
+                  <strong>0,000</strong>
                 </div>
-              ))}
-            </div>
+                <div className="admin-canonical-category-track" />
+              </div>
+            ))}
+          </div>
+          <div className="min-w-0 [grid-area:1/1]">
+          {categories.isPending ? (
+            <p className="admin-canonical-empty" aria-busy="true">Loading categories…</p>
           ) : categories.isError ? (
             <AdminLoadError
               subject="top categories"
@@ -597,6 +600,8 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
           ) : (
             <p className="admin-canonical-empty">No categories have approved resources.</p>
           )}
+          </div>
+          </div>
         </TableShell>
       </div>
     </div>

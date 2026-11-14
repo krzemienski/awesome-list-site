@@ -21,6 +21,7 @@ import AuditTab from "@/components/admin/AuditTab";
 import PendingResources from "@/components/admin/PendingResources";
 import PendingEdits from "@/components/admin/PendingEdits";
 import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
+import "@/components/admin/queues-agent-enrichment.css";
 import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
 import LinkHealthDashboard from "@/components/admin/LinkHealthDashboard";
 import ResourceManager from "@/components/admin/ResourceManager";
@@ -118,9 +119,12 @@ export default function AdminDashboard() {
   // Subcategories tab highlighted).
   const settingsSection = ({ journeys: "Journeys", digests: "Digests", contact: "Contact inbox", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
 
-  // Keep the tab in sync if the user navigates between /admin/:section links.
+  // Keep the tab in sync if the user navigates between /admin/:section links,
+  // and from one back to bare /admin (the route is shared, so the dashboard
+  // stays mounted): no section means the #hash / ?tab tab, else the default.
+  // A tab click lands here too, after its pushState, and finds the same tab.
   useEffect(() => {
-    if (sectionTab) setActiveTab(sectionTab);
+    setActiveTab(sectionTab ?? tabFromWindow() ?? "overview");
   }, [sectionTab]);
 
   // Run16 BUG-034/086: keep the active tab in sync with manual hash edits
