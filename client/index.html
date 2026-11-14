@@ -219,12 +219,23 @@
           if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
             root.setAttribute('data-consent-known', 'true');
           }
-          // Declined (localStorage, else the mirror cookie) switches off Replit's
-          // Umami tracker. Same marker contract as analytics-suppression.ts:
-          // a flag already present is left alone; this script never removes one.
+          // Declined (localStorage, else the mirror cookie), a host other than the
+          // production site, or an automated browser switches off Replit's Umami
+          // tracker before its first pageview. The same rules as
+          // analytics-suppression.ts (isNonProductionHost, isAutomatedBrowser);
+          // the production host is the canonical link's, which carries the same
+          // PUBLIC_SITE_URL, with the module's awesome.video fallback.
+          // Same marker contract as that module: a flag already present is left
+          // alone; this script never removes one.
           var declined = legacyConsent === 'denied' ||
             (legacyConsent !== 'granted' && /(?:^|;\s*)analytics-consent=denied(?:;|$)/.test(document.cookie));
-          if (declined && localStorage.getItem('umami.disabled') === null) {
+          var productionHost = 'awesome.video';
+          try {
+            var canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) productionHost = new URL(canonical.href).hostname;
+          } catch (_) {}
+          var suppressed = declined || location.hostname !== productionHost || navigator.webdriver === true;
+          if (suppressed && localStorage.getItem('umami.disabled') === null) {
             localStorage.setItem('analytics-umami-disabled-by-app', '1');
             localStorage.setItem('umami.disabled', '1');
           }
