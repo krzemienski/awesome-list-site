@@ -42,6 +42,7 @@ interface ContactSubmissionsResponse {
 }
 
 const PAGE_SIZE = 20;
+const DELETE_TIMEOUT_MS = 15_000;
 
 function maskEmail(email: string): string {
   const at = email.indexOf("@");
@@ -102,12 +103,33 @@ export default function ContactSubmissions() {
   // the table region instead of the dialog's default return target.
   const deletedRef = useRef(false);
   const removeSubmission = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/admin/contact-submissions/${id}`, { method: "DELETE" }),
+    // The confirm cannot be dismissed while the DELETE is pending, so a request
+    // that never answers must end on its own: the timeout turns it into an
+    // error, onError closes the confirm and the dialog shows the message.
+    mutationFn: async (id: string) => {
+      try {
+        return await apiRequest(`/api/admin/contact-submissions/${id}`, {
+          method: "DELETE",
+          signal: AbortSignal.timeout(DELETE_TIMEOUT_MS),
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "TimeoutError") {
+          throw new Error("The server took too long to answer, so the message may not have been deleted. Check the inbox, then try again.");
+        }
+        throw error;
+      }
+    },
     onSuccess: () => {
       deletedRef.current = true;
       setConfirmDelete(false);
+      // Deleting the only row of a later page leaves that page empty; go back
+      // one page instead of showing "No submissions on this page".
+      if (data?.submissions.length === 1 && currentOffset > 0) {
+        setOffset(Math.max(0, currentOffset - pageSize));
+      }
       closeSubmission();
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-submissions"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({ title: "Message deleted" });
     },
     onError: () => setConfirmDelete(false),
@@ -117,6 +139,10 @@ export default function ContactSubmissions() {
     setRevealedId(null);
     // A failed delete's message belongs to that submission only.
     removeSubmission.reset();
+  };
+  const openSubmission = (submission: ContactSubmission) => {
+    removeSubmission.reset();
+    setSelectedSubmission(submission);
   };
   // A fetch started offline is paused, not failed (sweep NEW-002).
   const unavailable = queryUnavailableReason(submissionsQuery);
@@ -212,11 +238,11 @@ export default function ContactSubmissions() {
                         <TableRow
                           key={submission.id}
                           className="admin-ops-clickable-row cursor-pointer"
-                          onClick={() => setSelectedSubmission(submission)}
+                          onClick={() => openSubmission(submission)}
                           onKeyDown={(event) => {
                             if (event.key === "Enter" || event.key === " ") {
                               event.preventDefault();
-                              setSelectedSubmission(submission);
+                              openSubmission(submission);
                             }
                           }}
                           tabIndex={0}
