@@ -2,7 +2,7 @@ import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useState, useEffect, useMemo, useRef, Fragment, type ReactNode } from "react";
+import { lazy, Suspense, useState, useEffect, useMemo, useRef, Fragment, type CSSProperties, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -846,6 +846,7 @@ export default function ResourceDetail() {
       <ResourceTopNextSteps
         related={topRelated}
         loading={relatedQuery.isLoading}
+        failed={relatedQuery.isError}
         onRelatedClick={handleTopRelatedClick}
       />
 
@@ -1014,7 +1015,10 @@ export default function ResourceDetail() {
               Resources you might find interesting
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent
+            className="resource-detail-related-body space-y-2"
+            style={{ "--related-rows": RELATED_PLACEHOLDER_ROWS } as CSSProperties}
+          >
             {relatedQuery.isLoading && (
               <>
                 <p role="status" className="sr-only">Loading related resources…</p>
