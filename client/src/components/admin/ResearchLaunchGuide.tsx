@@ -20,6 +20,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { plainHttpHost } from "@shared/validation";
 import { WARN_OUTLINE, WARN_TEXT, type CheapestSavingRun } from "./researchDisplay";
 import { apiFetch } from "@/lib/api-fetch";
+import { budgetInRange, minutesInRange, targetInRange, turnsInRange } from "./research-launch-limits";
 
 export interface ResearchLaunchGuideHandle {
   /** Bring the budget field into view and focus it ("relaunch with a higher cap"). */
@@ -152,14 +153,11 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     setMalformedTick((n) => n + 1);
     return true;
   };
-  /** True when a flag changed: this render's parsed values are stale, so the caller waits for the re-render. */
   const readMalformedFromDom = () => {
-    let changed = false;
     for (const field of NUMBER_FIELDS) {
       const el = document.getElementById(field);
-      if (el instanceof HTMLInputElement && syncMalformed(field, el.validity.badInput)) changed = true;
+      if (el instanceof HTMLInputElement) syncMalformed(field, el.validity.badInput);
     }
-    return changed;
   };
   const isMalformed = (field: string) => !!malformedRef.current[field];
   const isBlank = (field: string, value: string) => value.trim() === "" && !isMalformed(field);
@@ -224,27 +222,32 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   });
 
   const minutesN = parseField("minimum-duration", minDurationMinutes);
-  const minutesValid = Number.isInteger(minutesN) && minutesN >= 1 && minutesN <= 240;
+  const minutesValid = minutesInRange(minutesN);
   const budgetN = parseField("budget", maxBudget);
   const turnsN = parseField("turns", maxTurns);
 
   // The input id the message is about, so the failing field can be marked and focused.
+  // Parses at call time: malformedRef is a ref, so a click that just synced it from the DOM sees the fresh flags.
   const validate = (): { field: string; message: string } | null => {
     const trimmed = effectivePrompt.trim();
     if (briefMode === "custom" && trimmed.length < 10) {
       return { field: "prompt", message: "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\"." };
     }
     if (!isBlank("budget", maxBudget)) {
-      if (!Number.isFinite(budgetN) || budgetN <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
+      if (!budgetInRange(parseField("budget", maxBudget))) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
     }
     if (!isBlank("turns", maxTurns)) {
-      if (!Number.isInteger(turnsN) || turnsN <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
+      if (!turnsInRange(parseField("turns", maxTurns))) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
     }
-    if (!isBlank("minimum-duration", minDurationMinutes) && !minutesValid) {
-      return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
+    if (!isBlank("minimum-duration", minDurationMinutes)) {
+      if (!minutesInRange(parseField("minimum-duration", minDurationMinutes))) {
+        return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
+      }
     }
-    if (target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000)) {
-      return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
+    if (!isBlank("target-discoveries", targetDiscoveries)) {
+      if (!targetInRange(parseField("target-discoveries", targetDiscoveries))) {
+        return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
+      }
     }
     return null;
   };
@@ -255,8 +258,8 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
 
   const handleLaunch = () => {
     setLaunchAttempted(true);
-    // launchAttempted is set, so the re-render shows the error for the fresh flags.
-    if (readMalformedFromDom()) return;
+    // Sync first, then validate in this same click: validate reads the fresh flags.
+    readMalformedFromDom();
     const problem = validate();
     if (problem) {
       requestAnimationFrame(() => document.getElementById(problem.field)?.focus());
@@ -274,9 +277,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   const launchDisabled = !activeStateKnown || activeJobId !== null || preflightBlocked || !previewCurrent || start.isPending;
 
   const limitsSummary = [
-    target === null ? "no target" : Number.isInteger(target) && target > 0 ? `stop after ${target}` : "target?",
-    isBlank("budget", maxBudget) ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
-    isBlank("turns", maxTurns) ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
+    target === null ? "no target" : targetInRange(target) ? `stop after ${target}` : "target?",
+    isBlank("budget", maxBudget) ? "no budget cap" : budgetInRange(budgetN) ? `$${budgetN.toFixed(2)} cap` : "budget?",
+    isBlank("turns", maxTurns) ? "no turn cap" : turnsInRange(turnsN) ? `${turnsN} turns` : "turns?",
     isBlank("minimum-duration", minDurationMinutes) ? "no minimum duration" : minutesValid ? `${minutesN} min minimum` : "minimum?",
   ].join(" · ");
 
@@ -360,9 +363,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("target-discoveries", targetDiscoveries, setTargetDiscoveries)}
               {...invalidProps("target-discoveries")}
               className="mt-1 min-h-11" data-testid="input-target-discoveries" />
-            <p className={hint(target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000))} data-testid="text-target-hint">
+            <p className={hint(target !== null && !targetInRange(target))} data-testid="text-target-hint">
               {target === null ? "No target — runs until the budget or turns end."
-                : !Number.isInteger(target) || target <= 0 || target > 1000 ? "Whole number from 1 to 1000, or blank."
+                : !targetInRange(target) ?"Whole number from 1 to 1000, or blank."
                   : `Stops after ${target} new ${target === 1 ? "discovery" : "discoveries"}.`}
             </p>
           </div>
@@ -372,12 +375,12 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("budget", maxBudget, setMaxBudget)}
               {...invalidProps("budget")}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
-            <p className={hint(!isBlank("budget", maxBudget) && !(Number.isFinite(budgetN) && budgetN > 0))}>
+            <p className={hint(!isBlank("budget", maxBudget) && !(budgetInRange(budgetN)))}>
               {isBlank("budget", maxBudget) ? "No cap — the run spends until it stops or you cancel it."
-                : !(Number.isFinite(budgetN) && budgetN > 0) ? "Enter a positive amount in USD (blank = no cap)."
+                : !(budgetInRange(budgetN)) ? "Enter a positive amount in USD (blank = no cap)."
                   : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
-            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < Math.max(cheapestSavingRun?.costUsd ?? 0, LOW_BUDGET_USD) && (
+            {budgetInRange(budgetN) && budgetN < Math.max(cheapestSavingRun?.costUsd ?? 0, LOW_BUDGET_USD) && (
               <p className={hint(true)} data-testid="text-budget-low">
                 {cheapestSavingRun !== null && budgetN < cheapestSavingRun.costUsd
                   ? `No run in the job history saved a discovery for less than ${cheapestSavingRun.costBasis === "reported" ? "" : "about "}$${cheapestSavingRun.costUsd.toFixed(2)}.`
@@ -392,7 +395,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("turns", maxTurns, setMaxTurns)}
               {...invalidProps("turns")}
               className="mt-1 min-h-11" data-testid="input-research-turns" />
-            <p className={hint(!isBlank("turns", maxTurns) && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
+            <p className={hint(!isBlank("turns", maxTurns) && !(turnsInRange(turnsN)))} data-testid="text-turns-hint">
               {isBlank("turns", maxTurns) ?"No turn cap." : "Positive whole number (blank = no cap)."}
             </p>
           </div>

@@ -162,26 +162,34 @@ function whenIdle(callback: () => void): void {
     window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
     return;
   }
-  listenForInput();
   const giveUpAt = performance.now() + ENGAGEMENT_IDLE_TIMEOUT_MS;
-  const attempt = () => {
+  const quiet = () => {
     const now = performance.now();
-    if (now - lastInputAt < INPUT_QUIET_MS && now < giveUpAt) {
+    return now - lastInputAt >= INPUT_QUIET_MS || now >= giveUpAt;
+  };
+  const attempt = () => {
+    if (!quiet()) {
       window.setTimeout(attempt, INPUT_QUIET_MS);
       return;
     }
-    void yieldToMain().then(callback);
+    // Input can land while the main thread is yielded: check again before the task starts.
+    void yieldToMain().then(() => (quiet() ? callback() : attempt()));
   };
   attempt();
 }
 
 function afterStartup(callback: () => void): void {
+  // Input is tracked from now, not from the end of the defer, so a tap in the
+  // first seconds counts when the quiet gap is checked.
+  if (typeof window.requestIdleCallback !== "function") listenForInput();
   window.setTimeout(() => whenIdle(callback), ENGAGEMENT_DEFER_MS);
 }
 
 // "idle": not set up and nothing queued (first run, after a failure, after a
 // revoke); "pending": queued or running; "done": plugin added.
 let engagementState: "idle" | "pending" | "done" = "idle";
+// The Guides & Surveys setup in flight; never rejects.
+let engagementInFlight: Promise<void> = Promise.resolve();
 
 function scheduleEngagement(): void {
   const amplitude = amplitudeClient;
@@ -199,14 +207,28 @@ function scheduleEngagement(): void {
     // A revoke bumped the version and already tore everything down; a later
     // grant runs its own init and schedules its own Guides & Surveys.
     if (runVersion !== lifecycleVersion) return;
-    options
-      .addAmplitudeEngagement(amplitude, products, isBlocked, () => engagementRevoked(runVersion))
-      .then((added) => settle(added ? "done" : "idle"))
+    // One setup at a time: a stale run's cleanup removes its plugin by name, so
+    // it must have finished before a newer run adds its own.
+    const previous = engagementInFlight;
+    const run: Promise<void> = previous
+      .then(() => {
+        if (runVersion !== lifecycleVersion) return;
+        return options
+          .addAmplitudeEngagement(
+            amplitude,
+            products,
+            isBlocked,
+            () => engagementRevoked(runVersion),
+            () => runVersion === lifecycleVersion,
+          )
+          .then((added) => settle(added ? "done" : "idle"));
+      })
       .catch((err) => {
         // Let the next initAmplitude() call retry instead of leaving it unavailable.
         settle("idle");
         console.warn("Amplitude Guides & Surveys setup failed", err);
       });
+    engagementInFlight = run;
   });
 }
 
