@@ -81,6 +81,7 @@ function teardownAmplitudePlugins(): Promise<void> {
     slot.added = false;
   }
   initialized = false;
+  engagementState = "idle";
   clearAmplitudeStorage();
   const remove = async () => {
     // Non-null plugins imply the options chunk was loaded (it adds them).
@@ -122,20 +123,91 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
   return true;
 }
 
+// Engagement setup never owns init: a run that a revoke has already outdated
+// only drops its own work. Reset the init latches or tearing down the slots here
+// would remove the plugins a newer grant installed in the meantime.
+async function engagementRevoked(runVersion: number): Promise<boolean> {
+  if (runVersion === lifecycleVersion) return consentWasRevoked(runVersion);
+  return true;
+}
+
 // Guides & Surveys is a ~500 ms task on a throttled phone and nothing tracked
 // depends on it, so it starts in an idle period after the page's first seconds
 // instead of landing on a visitor's first taps.
 const ENGAGEMENT_DEFER_MS = 3_000;
 const ENGAGEMENT_IDLE_TIMEOUT_MS = 2_000;
+const INPUT_QUIET_MS = 300;
+
+let lastInputAt = 0;
+let inputListening = false;
+
+function listenForInput(): void {
+  if (inputListening) return;
+  inputListening = true;
+  for (const type of ["pointerdown", "keydown", "touchstart", "wheel"]) {
+    window.addEventListener(type, () => (lastInputAt = performance.now()), { capture: true, passive: true });
+  }
+}
+
+function yieldToMain(): Promise<void> {
+  const scheduler = (window as typeof window & { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (typeof scheduler?.yield === "function") return scheduler.yield();
+  return new Promise((resolve) => window.setTimeout(resolve, 0));
+}
+
+// Without requestIdleCallback (Safari), wait for a quiet gap after the visitor's
+// last input, then yield once more, so the setup task never lands on a tap.
+function whenIdle(callback: () => void): void {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
+    return;
+  }
+  listenForInput();
+  const giveUpAt = performance.now() + ENGAGEMENT_IDLE_TIMEOUT_MS;
+  const attempt = () => {
+    const now = performance.now();
+    if (now - lastInputAt < INPUT_QUIET_MS && now < giveUpAt) {
+      window.setTimeout(attempt, INPUT_QUIET_MS);
+      return;
+    }
+    void yieldToMain().then(callback);
+  };
+  attempt();
+}
 
 function afterStartup(callback: () => void): void {
-  window.setTimeout(() => {
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
-    } else {
-      callback();
-    }
-  }, ENGAGEMENT_DEFER_MS);
+  window.setTimeout(() => whenIdle(callback), ENGAGEMENT_DEFER_MS);
+}
+
+// "idle": not set up and nothing queued (first run, after a failure, after a
+// revoke); "pending": queued or running; "done": plugin added.
+let engagementState: "idle" | "pending" | "done" = "idle";
+
+function scheduleEngagement(): void {
+  const amplitude = amplitudeClient;
+  const options = sdkOptions;
+  if (engagementState !== "idle" || !amplitude || !options) return;
+  engagementState = "pending";
+  const runVersion = lifecycleVersion;
+  const isBlocked = () => disabled || getAnalyticsConsent() !== "granted" || isAnalyticsSuppressed();
+  const settle = (state: "idle" | "done") => {
+    // A revoke bumped the version and already reset the state; whatever the
+    // newer lifecycle is doing is not this run's to overwrite.
+    if (runVersion === lifecycleVersion) engagementState = state;
+  };
+  afterStartup(() => {
+    // A revoke bumped the version and already tore everything down; a later
+    // grant runs its own init and schedules its own Guides & Surveys.
+    if (runVersion !== lifecycleVersion) return;
+    options
+      .addAmplitudeEngagement(amplitude, products, isBlocked, () => engagementRevoked(runVersion))
+      .then((added) => settle(added ? "done" : "idle"))
+      .catch((err) => {
+        // Let the next initAmplitude() call retry instead of leaving it unavailable.
+        settle("idle");
+        console.warn("Amplitude Guides & Surveys setup failed", err);
+      });
+  });
 }
 
 export function initAmplitude(): void {
@@ -143,6 +215,7 @@ export function initAmplitude(): void {
   disabled = false;
   if (initialized) {
     amplitudeClient?.setOptOut(false);
+    scheduleEngagement();
     return;
   }
   if (initStarted) return;
@@ -203,14 +276,7 @@ export function initAmplitude(): void {
 
     // Guides & Surveys is a ~500 ms task on a throttled phone. It is not
     // needed for tracking, so it waits until the first seconds of taps are over.
-    afterStartup(() => {
-      // A revoke bumped the version and already tore everything down; a later
-      // grant runs its own init and schedules its own Guides & Surveys.
-      if (runVersion !== lifecycleVersion) return;
-      void options
-        .addAmplitudeEngagement(amplitude, products, isBlocked, () => consentWasRevoked(runVersion))
-        .catch((err) => console.warn('Amplitude Guides & Surveys setup failed', err));
-    });
+    scheduleEngagement();
   })().catch((err) => {
     // Unlatch so a later call can retry after a transient setup failure.
     initStarted = false;
