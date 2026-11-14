@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
-import { and, eq, inArray, notInArray, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, notInArray, lt, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
@@ -40,9 +40,10 @@ export interface OrphanSweepExclusions {
 }
 
 // Epoch ms of a sync's last sign of life from its queue-row metadata:
-// heartbeatAt, else processingStartedAt. Only string values that parse to a
-// finite time count; anything else (missing, non-string, unparseable, metadata
-// that is not an object) is absent.
+// heartbeatAt, else processingStartedAt. Only strings in the exact toISOString
+// form the writer uses count; anything else (missing, non-string, another
+// format, an impossible date that Date.parse would roll over, metadata that is
+// not an object) is absent.
 function lastSyncSignOfLife(metadata: unknown): number | undefined {
   if (typeof metadata !== 'object' || metadata === null || Array.isArray(metadata)) return undefined;
   const fields = metadata as Record<string, unknown>;
@@ -50,7 +51,7 @@ function lastSyncSignOfLife(metadata: unknown): number | undefined {
     const value = fields[key];
     if (typeof value !== 'string') continue;
     const ms = Date.parse(value);
-    if (Number.isFinite(ms)) return ms;
+    if (Number.isFinite(ms) && new Date(ms).toISOString() === value) return ms;
   }
   return undefined;
 }
@@ -113,26 +114,16 @@ export async function sweepOrphanedJobs(
   // The metadata is caller-supplied JSON (the import routes store the request's
   // options as it), so the timestamps are parsed here, not cast in SQL, where one
   // impossible value would abort the whole statement. A value that is not a
-  // string, or does not parse to a finite time, counts as absent; a metadata
+  // string, or is not an exact ISO timestamp, counts as absent; a metadata
   // that is not an object has no keys, so it falls back to created_at.
   const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
-  const gCandidateConditions = [
-    or(
-      eq(githubSyncQueue.status, 'processing'),
-      // Abandoned backlog: pending for over a week is never legitimate.
-      and(
-        eq(githubSyncQueue.status, 'pending'),
-        lt(githubSyncQueue.createdAt, stalePendingCutoff),
-      ),
-    ),
-  ];
+  const gCandidateConditions = [eq(githubSyncQueue.status, 'processing')];
   if (liveSyncIds.length > 0) {
     gCandidateConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
   }
   const gCandidates = await db
     .select({
       id: githubSyncQueue.id,
-      status: githubSyncQueue.status,
       metadata: githubSyncQueue.metadata,
       heartbeatText: sql<string | null>`${githubSyncQueue.metadata}->>'heartbeatAt'`,
       createdAt: githubSyncQueue.createdAt,
@@ -145,37 +136,44 @@ export async function sweepOrphanedJobs(
     errorMessage: ORPHANED_BY_RESTART_MESSAGE,
     processedAt: new Date(),
   };
-  const stalePendingIds: number[] = [];
   let syncFailed = 0;
   for (const row of gCandidates) {
-    if (row.status === 'pending') {
-      stalePendingIds.push(row.id);
-      continue;
-    }
     const lastSignOfLife = lastSyncSignOfLife(row.metadata) ?? row.createdAt?.getTime();
     // A row with no usable time at all (null created_at) is left alone.
     if (lastSignOfLife === undefined || lastSignOfLife >= cutoff.getTime()) continue;
     // Per-row UPDATE guarded by the heartbeat text read above (text compare, no
-    // cast): a sync that finished, or beat, since the select keeps its row.
-    const hit = await db
-      .update(githubSyncQueue)
-      .set(failedValues)
-      .where(and(
-        eq(githubSyncQueue.id, row.id),
-        eq(githubSyncQueue.status, 'processing'),
-        sql`${githubSyncQueue.metadata}->>'heartbeatAt' IS NOT DISTINCT FROM ${row.heartbeatText}`,
-      ))
-      .returning({ id: githubSyncQueue.id });
-    syncFailed += hit.length;
+    // cast): a sync that finished, or beat, since the select keeps its row. A
+    // failure on one row is logged and must not skip the rest of the sweep.
+    try {
+      const hit = await db
+        .update(githubSyncQueue)
+        .set(failedValues)
+        .where(and(
+          eq(githubSyncQueue.id, row.id),
+          eq(githubSyncQueue.status, 'processing'),
+          sql`${githubSyncQueue.metadata}->>'heartbeatAt' IS NOT DISTINCT FROM ${row.heartbeatText}`,
+        ))
+        .returning({ id: githubSyncQueue.id });
+      syncFailed += hit.length;
+    } catch (err) {
+      logger.warn(`Orphan watchdog: could not fail github_sync_queue row ${row.id}: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
-  if (stalePendingIds.length > 0) {
-    const hit = await db
-      .update(githubSyncQueue)
-      .set(failedValues)
-      .where(and(inArray(githubSyncQueue.id, stalePendingIds), eq(githubSyncQueue.status, 'pending')))
-      .returning({ id: githubSyncQueue.id });
-    syncFailed += hit.length;
+  // Abandoned backlog: pending for over a week is never legitimate. Decided by
+  // condition, not by an id list, so no ids are expanded into bind parameters.
+  const pendingConditions = [
+    eq(githubSyncQueue.status, 'pending'),
+    lt(githubSyncQueue.createdAt, stalePendingCutoff),
+  ];
+  if (liveSyncIds.length > 0) {
+    pendingConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
   }
+  const pendingHit = await db
+    .update(githubSyncQueue)
+    .set(failedValues)
+    .where(and(...pendingConditions))
+    .returning({ id: githubSyncQueue.id });
+  syncFailed += pendingHit.length;
 
   // Research jobs: a server restart mid-run would otherwise strand a job in
   // 'processing' forever (the SDK subprocess dies with the server, so no cost
