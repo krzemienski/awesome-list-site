@@ -343,7 +343,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
+  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, dataUpdatedAt, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -388,18 +388,28 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // keep the previous rows as placeholder data) until a real response arrives.
   const rejectedStatus = resourcesError instanceof ApiError ? resourcesError.status : null;
   const authRejectedNow = isError && (rejectedStatus === 401 || rejectedStatus === 403);
-  const [authMasked, setAuthMasked] = useState(false);
-  const hasFreshResponse = !isError && !isPlaceholderData && Boolean(queryData);
-  const masked = authRejectedNow || (authMasked && !hasFreshResponse);
+  const [authMaskedAt, setAuthMaskedAt] = useState<number | null>(null);
+  // Only a response newer than the rejection clears the mask: a cached entry
+  // from another filter reads as fresh but predates the 401/403.
+  const hasFreshResponse =
+    !isError && !isPlaceholderData && Boolean(queryData) &&
+    authMaskedAt !== null && dataUpdatedAt > authMaskedAt;
+  const masked = authRejectedNow || (authMaskedAt !== null && !hasFreshResponse);
   useEffect(() => {
     if (authRejectedNow) {
       lastLoadedRef.current = null;
-      setAuthMasked(true);
+      setAuthMaskedAt(Date.now());
       setSelectedResourceIds([]);
+      // Drop pre-rejection pages that no observer is showing; the active
+      // query stays so this does not refetch in a loop.
+      queryClient.removeQueries({
+        queryKey: ['/api/admin/resources'],
+        predicate: (query) => query.getObserversCount() === 0,
+      });
     } else if (hasFreshResponse) {
-      setAuthMasked(false);
+      setAuthMaskedAt(null);
     }
-  }, [authRejectedNow, hasFreshResponse]);
+  }, [authRejectedNow, hasFreshResponse, queryClient]);
   useEffect(() => {
     if (!queryData || masked) return;
     lastLoadedRef.current = queryData;
