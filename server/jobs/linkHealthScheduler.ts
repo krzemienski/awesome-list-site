@@ -1,6 +1,6 @@
 import { createLogger } from "../lib/logger";
 import { runWithJobContext } from "../ops/requestContext";
-import { POST_BOOT_DELAY_MS, isServingTraffic } from "../ops/serviceActivity";
+import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
 const logger = createLogger("link-health");
 
@@ -22,28 +22,30 @@ export function initializeLinkHealthScheduler(): void {
   const hours = linkHealthIntervalHours();
   if (hours === 0) {
     logger.info("Link health schedule off (LINK_HEALTH_INTERVAL_HOURS=0)");
-    void service()
-      .then(s => s.recoverInterruptedJobs())
-      .catch((err: unknown) => logger.error("Interrupted-job recovery failed:", messageOf(err)));
+    const recover = deferUntilServing(() =>
+      service()
+        .then(s => s.recoverInterruptedJobs())
+        .catch((err: unknown) => logger.error("Interrupted-job recovery failed:", messageOf(err))),
+    );
+    setTimeout(recover, POST_BOOT_DELAY_MS).unref();
     return;
   }
 
   // Each tick recovers stale jobs and reads the last completed scan's age from
   // the database, so the schedule survives restarts and every autoscale
   // instance shares one cadence; startCheck's lock stops overlapping scans.
-  const tick = () => {
-    if (!isServingTraffic()) return;
-    return runWithJobContext("link-health", "tick", async () => {
+  const tick = deferUntilServing(() =>
+    runWithJobContext("link-health", "tick", async () => {
       try {
         const job = await (await service()).startCheckIfDue(hours);
         if (job) logger.info(`Scheduled link scan started (job ${job.id}, every ${hours}h)`);
       } catch (err) {
         logger.error("Scheduled link scan failed to start:", messageOf(err));
       }
-    });
-  };
+    }),
+  );
 
-  setTimeout(() => void tick(), POST_BOOT_DELAY_MS).unref();
-  setInterval(() => void tick(), TICK_MS).unref();
+  setTimeout(tick, POST_BOOT_DELAY_MS).unref();
+  setInterval(tick, TICK_MS).unref();
   logger.info(`Link health schedule on: a full scan every ${hours}h`);
 }
