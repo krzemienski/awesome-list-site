@@ -12,6 +12,7 @@
 const SETTLE_TIMEOUT_MS = 8000;
 
 const failedLinks = new Set<HTMLLinkElement>();
+let inFlight: Promise<boolean> | null = null;
 
 if (typeof document !== "undefined") {
   document.addEventListener(
@@ -24,23 +25,38 @@ if (typeof document !== "undefined") {
   );
 }
 
-function replaceWithClone(link: HTMLLinkElement): Promise<void> {
+/** Resolves true on `load`; false on `error` or timeout, and the clone stays recorded as failed. */
+function replaceWithClone(link: HTMLLinkElement): Promise<boolean> {
   const clone = link.cloneNode() as HTMLLinkElement;
-  return new Promise<void>((resolve) => {
-    const timer = window.setTimeout(resolve, SETTLE_TIMEOUT_MS);
-    const settle = () => {
+  return new Promise<boolean>((resolve) => {
+    const finish = (loaded: boolean) => {
       window.clearTimeout(timer);
-      resolve();
+      if (!loaded) failedLinks.add(clone);
+      resolve(loaded);
     };
-    clone.addEventListener("load", settle, { once: true });
-    clone.addEventListener("error", settle, { once: true });
+    const timer = window.setTimeout(() => finish(false), SETTLE_TIMEOUT_MS);
+    clone.addEventListener("load", () => finish(true), { once: true });
+    clone.addEventListener("error", () => finish(false), { once: true });
     link.replaceWith(clone);
   });
 }
 
-/** Resolves once every re-requested stylesheet has loaded or failed again; never rejects. */
-export async function reloadFailedStylesheets(): Promise<void> {
+/**
+ * Resolves true once every re-requested stylesheet has loaded, false when any
+ * errored again or timed out; never rejects. Overlapping calls (the `online`
+ * event and a Retry click) share one pass so a second call cannot replace the
+ * clones the first is still waiting on, nor resolve before they settle.
+ */
+export function reloadFailedStylesheets(): Promise<boolean> {
+  if (inFlight) return inFlight;
   const links = Array.from(failedLinks).filter((link) => link.isConnected);
-  failedLinks.clear();
-  await Promise.all(links.map(replaceWithClone));
+  const pass = Promise.all(links.map(replaceWithClone)).then((results) => {
+    for (const link of links) failedLinks.delete(link);
+    return results.every(Boolean);
+  });
+  inFlight = pass;
+  void pass.finally(() => {
+    if (inFlight === pass) inFlight = null;
+  });
+  return pass;
 }

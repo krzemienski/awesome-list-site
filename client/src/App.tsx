@@ -489,7 +489,8 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       }
       return;
     }
-    if (!this.state.error) return;
+    const startedWith = this.state.error;
+    if (!startedWith) return;
     // A chunk that failed offline was never stale: retry the import in place
     // (keeps app state, no document reload, so the 60s reload guard is not
     // consumed). If it fails again online, componentDidCatch applies that guard.
@@ -499,9 +500,21 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       const cardHadFocus = Boolean(
         document.activeElement?.closest("[data-testid='route-error-boundary']"),
       );
+      const stylesheetsLoaded = await reloadFailedStylesheets();
+      // Navigation may have cleared this error, or a newer route may have failed
+      // during the wait: only the error this pass started with may be retried.
+      if (this.state.error !== startedWith) return;
+      if (!stylesheetsLoaded) {
+        // A stylesheet errored again. Resetting the route import now would leave
+        // Vite's preload map skipping it and the route unstyled, so keep the card.
+        this.setState({ retryBlocked: "unreachable" });
+        const delay = CONNECTIVITY_PROBE_BACKOFF_MS[this.probeAttempts++];
+        if (delay !== undefined) {
+          this.probeTimer = window.setTimeout(() => void this.reloadWhenReachable(), delay);
+        }
+        return;
+      }
       if (cardHadFocus) this.cardRetryFocusAt = Date.now();
-      await reloadFailedStylesheets();
-      if (!this.state.error) return;
       retryFailedRouteImports();
       this.setState({ error: null, retryBlocked: null, failedOffline: false });
       if (cardHadFocus) focusRecoveredHeading();
