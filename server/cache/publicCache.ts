@@ -214,6 +214,9 @@ export async function getPublicCacheValue<T>(options: {
   ttlMs: number;
   load: () => Promise<T>;
 }): Promise<T> {
+  // Not awaited, by design: a due check must not add a database round trip to a
+  // cache hit. The one request that finds the check due can still be served the
+  // old entry; the clear lands when the check resolves (see catalogStamp.ts).
   refreshCatalogStampIfDue(() => clearPublicCache("catalog-stamp"));
   const key = fullKey(options.namespace, options.key);
   const stats = namespaceMetrics(options.namespace);
