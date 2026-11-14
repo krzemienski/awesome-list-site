@@ -277,6 +277,7 @@ export const addAmplitudeEngagement = async (
   slots: AmplitudeProductSlots,
   isBlocked: () => boolean,
   revoked: () => Promise<boolean>,
+  isCurrent: () => boolean,
 ): Promise<boolean> => {
   if (!slots.engagement.added) {
     const { plugin: engagementPlugin } = await import('@amplitude/engagement-browser');
@@ -291,10 +292,12 @@ export const addAmplitudeEngagement = async (
     });
     slots.engagement.instance = plugin;
     await amplitude.add(plugin).promise;
-    // A revoke that landed while add() was pending has already cleared the slot
-    // (and a newer grant may own it now). This plugin must not be written back:
-    // remove it, so the next grant finds the slot clean and sets Guides & Surveys up again.
-    if (await revoked()) {
+    // A revoke that landed while add() was pending has already cleared the slot.
+    // This plugin must not be written back: remove it, so the next grant finds the
+    // slot clean. The check and the writes below have no await between them, so a
+    // revoke cannot slip in. The caller runs one setup at a time, so this removal
+    // cannot hit a newer grant's plugin of the same name.
+    if (!isCurrent()) {
       controller.abort();
       await removeAmplitudePlugins(amplitude, [plugin]);
       return false;
