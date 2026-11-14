@@ -162,20 +162,26 @@ function whenIdle(callback: () => void): void {
     window.requestIdleCallback(callback, { timeout: ENGAGEMENT_IDLE_TIMEOUT_MS });
     return;
   }
-  listenForInput();
   const giveUpAt = performance.now() + ENGAGEMENT_IDLE_TIMEOUT_MS;
-  const attempt = () => {
+  const quiet = () => {
     const now = performance.now();
-    if (now - lastInputAt < INPUT_QUIET_MS && now < giveUpAt) {
+    return now - lastInputAt >= INPUT_QUIET_MS || now >= giveUpAt;
+  };
+  const attempt = () => {
+    if (!quiet()) {
       window.setTimeout(attempt, INPUT_QUIET_MS);
       return;
     }
-    void yieldToMain().then(callback);
+    // Input can land while the main thread is yielded: check again before the task starts.
+    void yieldToMain().then(() => (quiet() ? callback() : attempt()));
   };
   attempt();
 }
 
 function afterStartup(callback: () => void): void {
+  // Input is tracked from now, not from the end of the defer, so a tap in the
+  // first seconds counts when the quiet gap is checked.
+  if (typeof window.requestIdleCallback !== "function") listenForInput();
   window.setTimeout(() => whenIdle(callback), ENGAGEMENT_DEFER_MS);
 }
 
