@@ -42,8 +42,9 @@ function replaceWithClone(link: HTMLLinkElement): Promise<boolean> {
 }
 
 /**
- * Resolves true once every re-requested stylesheet has loaded, false when any
- * errored again or timed out; never rejects. Overlapping calls (the `online`
+ * Resolves true once every re-requested stylesheet has loaded and none failed
+ * meanwhile, false when any errored again, timed out, or failed during the
+ * pass; never rejects. Overlapping calls (the `online`
  * event and a Retry click) share one pass so a second call cannot replace the
  * clones the first is still waiting on, nor resolve before they settle.
  */
@@ -52,7 +53,11 @@ export function reloadFailedStylesheets(): Promise<boolean> {
   const links = Array.from(failedLinks).filter((link) => link.isConnected);
   const pass = Promise.all(links.map(replaceWithClone)).then((results) => {
     for (const link of links) failedLinks.delete(link);
-    return results.every(Boolean);
+    // A stylesheet that errored while the pass ran is not in the snapshot: the
+    // pass is not a success while one is still in the document, so the caller
+    // keeps its card and probes again.
+    const failedDuringPass = Array.from(failedLinks).some((link) => link.isConnected);
+    return results.every(Boolean) && !failedDuringPass;
   });
   inFlight = pass;
   void pass.finally(() => {
