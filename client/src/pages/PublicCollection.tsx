@@ -84,10 +84,11 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
     return (
       // The loaded header's height depends on the collection name and
       // description, which are unknown until the fetch ends, so nothing is
-      // painted below the header skeleton. min-h-[100svh] keeps the shell
-      // footer (a sibling of <main> below this page) past the first viewport;
-      // the loaded content replaces this, and nothing visible moves.
-      <div className="discovery-page min-h-[100svh] space-y-6" aria-busy="true" aria-live="polite">
+      // painted below the header skeleton. The shell's <main> already fills
+      // the first viewport (.app-shell-main min-height), which keeps the footer
+      // past the fold; a taller wrapper here would push it under the sticky
+      // consent banner. The loaded content replaces this, and nothing moves.
+      <div className="discovery-page space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead
           title="Loading shared collection"
           description="Loading a shared Awesome Video collection"
