@@ -79,7 +79,7 @@ export class GithubSyncRepository {
         errorMessage,
         ...(status === 'processing'
           ? {
-              metadata: sql`coalesce(${githubSyncQueue.metadata}, '{}'::jsonb) || ${JSON.stringify({
+              metadata: sql`(CASE WHEN jsonb_typeof(${githubSyncQueue.metadata}) = 'object' THEN ${githubSyncQueue.metadata} ELSE '{}'::jsonb END) || ${JSON.stringify({
                 ...metadata,
                 processingStartedAt: startedAt,
                 heartbeatAt: startedAt,
@@ -101,7 +101,7 @@ export class GithubSyncRepository {
     await db
       .update(githubSyncQueue)
       .set({
-        metadata: sql`coalesce(${githubSyncQueue.metadata}, '{}'::jsonb) || ${JSON.stringify({ heartbeatAt: new Date().toISOString() })}::jsonb`,
+        metadata: sql`(CASE WHEN jsonb_typeof(${githubSyncQueue.metadata}) = 'object' THEN ${githubSyncQueue.metadata} ELSE '{}'::jsonb END) || ${JSON.stringify({ heartbeatAt: new Date().toISOString() })}::jsonb`,
       })
       .where(and(eq(githubSyncQueue.id, id), eq(githubSyncQueue.status, 'processing')));
   }
