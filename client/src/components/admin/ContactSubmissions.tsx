@@ -44,6 +44,9 @@ interface ContactSubmissionsResponse {
 const PAGE_SIZE = 20;
 const DELETE_TIMEOUT_MS = 15_000;
 
+// A DELETE that timed out: the server's outcome is unknown.
+class TimedOutError extends Error {}
+
 function maskEmail(email: string): string {
   const at = email.indexOf("@");
   if (at <= 0) return "••••••";
@@ -114,7 +117,7 @@ export default function ContactSubmissions() {
         });
       } catch (error) {
         if (error instanceof DOMException && error.name === "TimeoutError") {
-          throw new Error("The server took too long to answer, so the message may not have been deleted. Check the inbox, then try again.");
+          throw new TimedOutError("The server took too long to answer, so the message may not have been deleted. Check the inbox, then try again.");
         }
         throw error;
       }
@@ -132,7 +135,15 @@ export default function ContactSubmissions() {
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({ title: "Message deleted" });
     },
-    onError: () => setConfirmDelete(false),
+    onError: (error) => {
+      setConfirmDelete(false);
+      // After a timeout the server may have committed the delete: re-read the
+      // inbox and the audit feed so neither keeps showing stale state.
+      if (error instanceof TimedOutError) {
+        void queryClient.invalidateQueries({ queryKey: ["/api/admin/contact-submissions"] });
+        void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
+      }
+    },
   });
   const closeSubmission = () => {
     setSelectedSubmission(null);
