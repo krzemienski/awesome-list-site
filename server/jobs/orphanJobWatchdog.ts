@@ -94,7 +94,12 @@ export async function sweepOrphanedJobs(
   // metadata.heartbeatAt at its progress points, so the last sign of life is the
   // newer of the two. Rows written before that change have neither key and keep
   // the old rule: created_at older than the cutoff.
-  const lastSignOfLife = sql`coalesce(${githubSyncQueue.metadata}->>'heartbeatAt', ${githubSyncQueue.metadata}->>'processingStartedAt')`;
+  // Only ISO-shaped strings are cast; anything else counts as absent, so one
+  // malformed value cannot abort the sweep. A metadata that is not an object
+  // yields null from ->>, so it falls back to created_at.
+  const isoOrNull = (key: string) =>
+    sql`(CASE WHEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} ~ '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|[+-]\\d{2}:?\\d{2})$' THEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} END)`;
+  const lastSignOfLife = sql`coalesce(${isoOrNull('heartbeatAt')}, ${isoOrNull('processingStartedAt')})`;
   const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
   const gConditions = [
     or(
