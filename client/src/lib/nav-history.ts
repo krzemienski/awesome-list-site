@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { focusElement } from "@/hooks/focus-handoff";
 
 // BUG-013 (run14): window.history.length is useless for "did the user
@@ -32,56 +32,10 @@ const SCROLL_KEY_PREFIX = "scrollpos:";
 // never hold one, so these paths keep no scroll position at all.
 const NO_SCROLL_KEY_PATHS = /^\/(sign-in|sign-up|forgot-password|reset-password|verify)/;
 
-// Same-URL entries (a link to the page you are on, Back after a repeat push)
-// would share one pathname+search key, so every pushState entry is stamped
-// with an id in history.state. Entries without one (the first load, state
-// that is not a plain object) fall back to the URL alone.
-const ENTRY_ID_STATE_KEY = "navEntryId";
-let entrySeq = 0;
-
-// The id of the entry the user is on, so a replaceState that drops it from the
-// state keeps the entry's identity instead of minting a second key.
-let lastEntryId: string | null = null;
-
-function stateEntryId(): string | null {
-  const state: unknown = window.history.state;
-  const id = state && typeof state === "object" ? (state as Record<string, unknown>)[ENTRY_ID_STATE_KEY] : undefined;
-  return typeof id === "string" ? id : null;
-}
-
-function currentEntryId(): string {
-  const id = stateEntryId();
-  return id ? `${id}:` : "";
-}
-
-// Runs after wouter's patched pushState/replaceState announce themselves, so
-// it also covers entries made by direct History API calls. Stamping calls
-// replaceState again; the entry then carries an id and the nested call exits.
-function stampEntryId(event: Event): void {
-  const existing = stateEntryId();
-  if (existing) {
-    lastEntryId = existing;
-    return;
-  }
-  const state: unknown = window.history.state;
-  if (state !== null && (typeof state !== "object" || Array.isArray(state))) return;
-  let id = event.type === "replaceState" ? lastEntryId : null;
-  if (!id) {
-    entrySeq += 1;
-    id = `${Date.now().toString(36)}-${entrySeq.toString(36)}`;
-  }
-  lastEntryId = id;
-  window.history.replaceState({ ...state, [ENTRY_ID_STATE_KEY]: id }, "");
-  // A pushed entry starts where the page already is: a same-URL push does not
-  // rerun the scroll hook, so without this Back to it would find no position.
-  // A push to another path is overwritten by the hook's scroll-to-top save.
-  if (event.type === "pushState") saveScroll();
-}
-
 function currentScrollKey(): string | null {
   const { pathname, search } = window.location;
   if (NO_SCROLL_KEY_PATHS.test(pathname)) return null;
-  return SCROLL_KEY_PREFIX + currentEntryId() + pathname + search;
+  return SCROLL_KEY_PREFIX + pathname + search;
 }
 
 function saveScroll(): void {
@@ -108,13 +62,7 @@ let pendingPop =
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
     pendingPop = true;
-    lastEntryId = stateEntryId();
   });
-  // wouter dispatches "pushState"/"replaceState" after the call; stamping here
-  // runs before its own subscribers re-render for the entry.
-  window.addEventListener("pushState", stampEntryId);
-  window.addEventListener("replaceState", stampEntryId);
-  lastEntryId = stateEntryId();
 }
 
 // Whether the current navigation is a Back/Forward (or a reload), and whether
@@ -131,14 +79,6 @@ let restoringScroll = false;
 // change starts at the top.
 export function useScrollRestoration(location: string, search: string): void {
   const lastPath = useRef(location);
-  // Back/Forward between two entries with the same URL changes neither
-  // `location` nor `search`; the entry id is what tells the restore to rerun.
-  const [popEntryId, setPopEntryId] = useState(stateEntryId);
-  useEffect(() => {
-    const onPop = () => setPopEntryId(stateEntryId());
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -165,8 +105,7 @@ export function useScrollRestoration(location: string, search: string): void {
     lastPath.current = location;
     if (!pendingPop) {
       // "instant": under html scroll-behavior: smooth a plain scrollTo
-      // animates, and saveScroll below would record a mid-animation offset
-      // under the new entry's key.
+      // animates, and saveScroll below would record a mid-animation offset.
       if (pathChanged) window.scrollTo({ top: 0, behavior: "instant" });
       // A new entry whose scroll lands where it already was (the paginator
       // scrolling to a list top that is already at the top) fires no scroll
@@ -213,7 +152,7 @@ export function useScrollRestoration(location: string, search: string): void {
       cancelled = true;
       restoringScroll = false;
     };
-  }, [location, search, popEntryId]);
+  }, [location, search]);
 }
 
 // A path change moves focus to the new page's <h1>, or to the element a
