@@ -152,14 +152,11 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     setMalformedTick((n) => n + 1);
     return true;
   };
-  /** True when a flag changed: this render's parsed values are stale, so the caller waits for the re-render. */
   const readMalformedFromDom = () => {
-    let changed = false;
     for (const field of NUMBER_FIELDS) {
       const el = document.getElementById(field);
-      if (el instanceof HTMLInputElement && syncMalformed(field, el.validity.badInput)) changed = true;
+      if (el instanceof HTMLInputElement) syncMalformed(field, el.validity.badInput);
     }
-    return changed;
   };
   const isMalformed = (field: string) => !!malformedRef.current[field];
   const isBlank = (field: string, value: string) => value.trim() === "" && !isMalformed(field);
@@ -229,22 +226,31 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   const turnsN = parseField("turns", maxTurns);
 
   // The input id the message is about, so the failing field can be marked and focused.
+  // Parses at call time: malformedRef is a ref, so a click that just synced it from the DOM sees the fresh flags.
   const validate = (): { field: string; message: string } | null => {
     const trimmed = effectivePrompt.trim();
     if (briefMode === "custom" && trimmed.length < 10) {
       return { field: "prompt", message: "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\"." };
     }
     if (!isBlank("budget", maxBudget)) {
-      if (!Number.isFinite(budgetN) || budgetN <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
+      const budgetNow = parseField("budget", maxBudget);
+      if (!Number.isFinite(budgetNow) || budgetNow <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
     }
     if (!isBlank("turns", maxTurns)) {
-      if (!Number.isInteger(turnsN) || turnsN <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
+      const turnsNow = parseField("turns", maxTurns);
+      if (!Number.isInteger(turnsNow) || turnsNow <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
     }
-    if (!isBlank("minimum-duration", minDurationMinutes) && !minutesValid) {
-      return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
+    if (!isBlank("minimum-duration", minDurationMinutes)) {
+      const minutesNow = parseField("minimum-duration", minDurationMinutes);
+      if (!Number.isInteger(minutesNow) || minutesNow < 1 || minutesNow > 240) {
+        return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
+      }
     }
-    if (target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000)) {
-      return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
+    if (!isBlank("target-discoveries", targetDiscoveries)) {
+      const targetNow = parseField("target-discoveries", targetDiscoveries);
+      if (!Number.isInteger(targetNow) || targetNow <= 0 || targetNow > 1000) {
+        return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
+      }
     }
     return null;
   };
@@ -255,8 +261,8 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
 
   const handleLaunch = () => {
     setLaunchAttempted(true);
-    // launchAttempted is set, so the re-render shows the error for the fresh flags.
-    if (readMalformedFromDom()) return;
+    // Sync first, then validate in this same click: validate reads the fresh flags.
+    readMalformedFromDom();
     const problem = validate();
     if (problem) {
       requestAnimationFrame(() => document.getElementById(problem.field)?.focus());
