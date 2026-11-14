@@ -17,6 +17,15 @@ Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHA
 - Offline Retry no longer acts on a newer error, and keeps the error card if another stylesheet fails while it reloads.
 - Amplitude Guides & Surveys waits for a quiet moment on Safari as well, and comes back after consent is withdrawn and granted again.
 
+### Catalog freshness, GitHub syncs and the edit dialog (#415, #416)
+- Every catalog write now changes the cache stamp, including two writes to the same resource in the same millisecond.
+- Restarting a server no longer marks a GitHub sync as failed just because it was queued more than 5 minutes ago. A sync records when it started and refreshes a heartbeat at its progress points (at most every 30 seconds). At startup, a processing sync is failed only when its last start or heartbeat is more than 5 minutes old; a sync from before this change, with neither recorded, is still judged by when it was queued. A sync still pending after 7 days is failed as before.
+- A failed edit suggestion now shows its error inside the dialog, above the buttons, instead of a notice that covered the Submit button. The buttons stay in view, and a duplicate URL moves focus to the URL field.
+- The Report broken link dialog opens empty each time instead of showing a note from an earlier, cancelled attempt.
+
+### The startup sweep cannot be stopped by a bad timestamp (#418)
+- A GitHub sync row whose recorded start or heartbeat time is not a valid timestamp no longer stops the startup cleanup for every other row. The value is treated as missing and the next fallback applies, a sync that heartbeats while the cleanup runs is left alone, and an error on one row no longer skips the rest.
+
 ## November 13, 2026
 
 ### Password text clears the show-password toggle (#402)
