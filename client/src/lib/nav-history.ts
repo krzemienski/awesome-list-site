@@ -39,17 +39,38 @@ const NO_SCROLL_KEY_PATHS = /^\/(sign-in|sign-up|forgot-password|reset-password|
 const ENTRY_ID_STATE_KEY = "navEntryId";
 let entrySeq = 0;
 
-function currentEntryId(): string {
+// The id of the entry the user is on, so a replaceState that drops it from the
+// state keeps the entry's identity instead of minting a second key.
+let lastEntryId: string | null = null;
+
+function stateEntryId(): string | null {
   const state: unknown = window.history.state;
   const id = state && typeof state === "object" ? (state as Record<string, unknown>)[ENTRY_ID_STATE_KEY] : undefined;
-  return typeof id === "string" ? `${id}:` : "";
+  return typeof id === "string" ? id : null;
 }
 
-function stampEntryId(): void {
+function currentEntryId(): string {
+  const id = stateEntryId();
+  return id ? `${id}:` : "";
+}
+
+// Runs after wouter's patched pushState/replaceState announce themselves, so
+// it also covers entries made by direct History API calls. Stamping calls
+// replaceState again; the entry then carries an id and the nested call exits.
+function stampEntryId(event: Event): void {
+  const existing = stateEntryId();
+  if (existing) {
+    lastEntryId = existing;
+    return;
+  }
   const state: unknown = window.history.state;
   if (state !== null && (typeof state !== "object" || Array.isArray(state))) return;
-  entrySeq += 1;
-  const id = `${Date.now().toString(36)}-${entrySeq.toString(36)}`;
+  let id = event.type === "replaceState" ? lastEntryId : null;
+  if (!id) {
+    entrySeq += 1;
+    id = `${Date.now().toString(36)}-${entrySeq.toString(36)}`;
+  }
+  lastEntryId = id;
   window.history.replaceState({ ...state, [ENTRY_ID_STATE_KEY]: id }, "");
 }
 
@@ -83,10 +104,13 @@ let pendingPop =
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
     pendingPop = true;
+    lastEntryId = stateEntryId();
   });
-  // wouter dispatches "pushState" after the push; stamping here runs before its
-  // own subscribers re-render for the new entry.
+  // wouter dispatches "pushState"/"replaceState" after the call; stamping here
+  // runs before its own subscribers re-render for the entry.
   window.addEventListener("pushState", stampEntryId);
+  window.addEventListener("replaceState", stampEntryId);
+  lastEntryId = stateEntryId();
 }
 
 // Whether the current navigation is a Back/Forward (or a reload), and whether
