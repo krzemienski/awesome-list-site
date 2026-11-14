@@ -509,6 +509,7 @@
     min-width: 0;
     justify-content: flex-start;
     white-space: normal;
+    overflow-wrap: anywhere;
     text-align: start;
   }
 
