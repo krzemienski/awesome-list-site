@@ -250,7 +250,15 @@ export const linkHealthService = {
             db.update(linkHealthJobs)
               .set({ checkedLinks: checked })
               .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')))
-              .catch(err => logger.error('Progress write failed:', err.message));
+              .catch((err: { cause?: { message?: string; code?: string } }) =>
+                // A dropped tick is non-fatal: the next one (2 s later) overwrites it.
+                // Drizzle's own message is only the "Failed query" wrapper, so report the driver's cause.
+                logger.warn('Progress write failed; the next tick overwrites it', {
+                  jobId,
+                  checked,
+                  cause: err.cause?.message ?? 'unknown',
+                  code: err.cause?.code,
+                }));
           }
         }
       });

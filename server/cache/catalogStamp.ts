@@ -12,6 +12,14 @@
  * query (Neon can scale to zero). The read never delays the request that
  * started it; that request is served from cache as before, and the clear lands
  * when the read resolves.
+ *
+ * Freshness bound, stated exactly: a write made on another instance reaches this
+ * one after the next check that starts at least one interval after the previous
+ * one started (the interval is measured from check start, not from its end) and
+ * is triggered by a cache read, plus that check's query time. The request that
+ * triggers the check can still be served the old entry. A check that fails
+ * clears nothing and waits out the interval, so the bound holds only while the
+ * database answers.
  */
 import { pool } from "../db";
 import { createLogger } from "../lib/logger";
@@ -21,22 +29,24 @@ const logger = createLogger("public-cache-stamp");
 export const CATALOG_STAMP_INTERVAL_MS = 30_000;
 
 // One round trip. Small tables are hashed whole, so a rename or reorder moves
-// the stamp whether or not the writer bumped updated_at. resources is the large
-// table: its aggregate covers every edit (all of them set updated_at), every
-// create and delete (count), publication (approved count) and the boot-time
-// kind backfill (count of stored kinds), which leaves updated_at alone.
-// resource_tags has no row-level stamp; count plus an id sum moves on any
-// assignment, removal or swap.
+// the stamp whether or not the writer bumped updated_at. resources and
+// resource_tags are hashed by the fields the public catalog reads: per row id,
+// updated_at, status, kind, category path and metadata->'tags', ordered by id.
+// max(updated_at) alone is not enough: two edits in one millisecond share it,
+// and the tag-canonicalization maintenance route rewrites metadata.tags without
+// touching updated_at. resource_tags is hashed as its ordered (resource_id,
+// tag_id) pairs, so a swap that keeps the count and an id sum still moves it.
 const CATALOG_STAMP_SQL = `
   SELECT concat_ws('|',
-    (SELECT concat_ws(':', count(*), count(kind),
-        count(*) FILTER (WHERE status = 'approved'), max(updated_at)) FROM resources),
+    (SELECT md5(coalesce(string_agg(concat_ws(':', r.id, r.updated_at, r.status, r.kind,
+        r.category, r.subcategory, r.sub_subcategory, r.metadata->'tags'), ',' ORDER BY r.id), ''))
+       FROM resources r),
     (SELECT md5(coalesce(string_agg(c::text, ',' ORDER BY c.id), '')) FROM categories c),
     (SELECT md5(coalesce(string_agg(s::text, ',' ORDER BY s.id), '')) FROM subcategories s),
     (SELECT md5(coalesce(string_agg(s::text, ',' ORDER BY s.id), '')) FROM sub_subcategories s),
     (SELECT md5(coalesce(string_agg(t::text, ',' ORDER BY t.id), '')) FROM tags t),
-    (SELECT concat_ws(':', count(*), coalesce(sum(resource_id::bigint * 1000003 + tag_id), 0))
-       FROM resource_tags),
+    (SELECT md5(coalesce(string_agg(rt.resource_id || ':' || rt.tag_id, ',' ORDER BY rt.resource_id, rt.tag_id), ''))
+       FROM resource_tags rt),
     (SELECT md5(coalesce(string_agg(j::text, ',' ORDER BY j.id), '')) FROM learning_journeys j),
     (SELECT md5(coalesce(string_agg(s::text, ',' ORDER BY s.id), '')) FROM journey_steps s)
   ) AS stamp
