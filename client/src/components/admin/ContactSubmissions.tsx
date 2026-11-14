@@ -106,9 +106,9 @@ export default function ContactSubmissions() {
     // The confirm cannot be dismissed while the DELETE is pending, so a request
     // that never answers must end on its own: the timeout turns it into an
     // error, onError closes the confirm and the dialog shows the message.
-    mutationFn: async (id: string) => {
+    mutationFn: async (id: string): Promise<void> => {
       try {
-        return await apiRequest(`/api/admin/contact-submissions/${id}`, {
+        await apiRequest(`/api/admin/contact-submissions/${id}`, {
           method: "DELETE",
           signal: AbortSignal.timeout(DELETE_TIMEOUT_MS),
         });
