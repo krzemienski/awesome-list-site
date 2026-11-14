@@ -3,8 +3,9 @@
 How any new page, component, artifact, or mockup **must** consume the awesome.video
 design system. The token catalog and rationale live in
 [`docs/DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md); this file is the contract you build
-against. The structural audit (`.agents/skills/verify-design-system/SKILL.md`) checks
-UI work against these rules.
+against. The generated-artifact check
+(`npm run generate:design-system-artifact -- --check`) fails when the published
+tokens drift from the runtime sources these rules describe.
 
 **Scope:** all UI in `client/`, plus any standalone HTML surface (exports, mockups,
 one-pagers) that ships to users.
@@ -123,5 +124,5 @@ Any new surface must remain correct under every `data-system`:
       suppress the global outline).
 - [ ] Renders sanely in all 5 systems; verified in Editorial + Crimson.
 - [ ] New route? SEOHead + og-middleware in lockstep.
-- [ ] Run the audit when the change is DS-relevant:
-      `.agents/skills/verify-design-system/SKILL.md`.
+- [ ] Run the check when the change is DS-relevant:
+      `npm run generate:design-system-artifact -- --check`.

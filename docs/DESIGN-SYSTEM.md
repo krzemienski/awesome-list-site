@@ -29,8 +29,8 @@ after changing tokens, themes, accents, or product profiles. The artifact refuse
 start or build when its generated token projection is stale.
 
 Consumption rules for new UI live in [`docs/AGENTS.md`](AGENTS.md). The component
-inventory lives in [`docs/COMPONENT-LIBRARY.md`](COMPONENT-LIBRARY.md). The structural
-compliance audit is `.agents/skills/verify-design-system/SKILL.md`.
+inventory lives in [`docs/COMPONENT-LIBRARY.md`](COMPONENT-LIBRARY.md). The design-system
+check is `npm run generate:design-system-artifact -- --check`.
 
 ---
 

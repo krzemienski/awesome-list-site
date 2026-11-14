@@ -215,18 +215,43 @@
             }, 4000);
           }
           var hasConsentCookie = /(?:^|;\s*)analytics-consent=(?:granted|denied)(?:;|$)/.test(document.cookie);
-          var legacyConsent = localStorage.getItem('analytics-consent');
+          var legacyConsent = null;
+          try { legacyConsent = localStorage.getItem('analytics-consent'); } catch (_) {}
           if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
             root.setAttribute('data-consent-known', 'true');
           }
-          // Declined (localStorage, else the mirror cookie) switches off Replit's
-          // Umami tracker. Same marker contract as analytics-suppression.ts:
-          // a flag already present is left alone; this script never removes one.
+          // Declined (localStorage, else the mirror cookie), a host other than the
+          // production site, or an automated browser switches off Replit's Umami
+          // tracker before its first pageview. The same rules as
+          // analytics-suppression.ts (isNonProductionHost, isAutomatedBrowser);
+          // the production host is the configured site URL.
+          // Same marker contract as that module: a flag already present is left
+          // alone; this script never removes one.
           var declined = legacyConsent === 'denied' ||
             (legacyConsent !== 'granted' && /(?:^|;\s*)analytics-consent=denied(?:;|$)/.test(document.cookie));
-          if (declined && localStorage.getItem('umami.disabled') === null) {
-            localStorage.setItem('analytics-umami-disabled-by-app', '1');
-            localStorage.setItem('umami.disabled', '1');
+          // Vite replaces the placeholder from the build environment; one that
+          // is still unreplaced keeps the module's awesome.video fallback.
+          var productionHost = 'awesome.video';
+          try {
+            var siteUrl = '%VITE_SITE_URL%';
+            if (siteUrl && siteUrl.charAt(0) !== '%') productionHost = new URL(siteUrl).hostname;
+          } catch (_) {}
+          // Same path and admin-session rules as isSuppressedAnalyticsPath and
+          // isAdminAnalyticsSession in analytics-suppression.ts.
+          var adminSession = false;
+          try { adminSession = localStorage.getItem('analytics-admin-session') === '1'; } catch (_) {}
+          var suppressedPath = location.pathname.indexOf('/qa-') === 0 ||
+            /^\/resource\/9{8,}\/?$/.test(location.pathname) ||
+            (/^\/sign-in(\/|$)/.test(location.pathname) && new URLSearchParams(location.search).has('admin'));
+          var suppressed = declined || adminSession || suppressedPath ||
+            location.hostname !== productionHost || navigator.webdriver === true;
+          // Each storage call has its own guard: one that throws must not skip
+          // the others or the decision above.
+          var alreadyDisabled = true;
+          try { alreadyDisabled = localStorage.getItem('umami.disabled') !== null; } catch (_) {}
+          if (suppressed && !alreadyDisabled) {
+            try { localStorage.setItem('analytics-umami-disabled-by-app', '1'); } catch (_) {}
+            try { localStorage.setItem('umami.disabled', '1'); } catch (_) {}
           }
         } catch (_) {}
       })();

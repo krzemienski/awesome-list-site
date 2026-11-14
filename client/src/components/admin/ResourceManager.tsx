@@ -378,9 +378,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // Retain the last successful response instead; every count below then
   // describes the rows that are actually on screen.
   const lastLoadedRef = useRef<ResourcesResponse | null>(null);
+  // The status filter that response was fetched for: while the previous rows
+  // stay up (placeholder data, or a failed fetch), the label names their
+  // status, not the one just selected.
+  const lastLoadedStatusRef = useRef(statusFilter);
   useEffect(() => {
-    if (queryData) lastLoadedRef.current = queryData;
-  }, [queryData]);
+    if (!queryData) return;
+    lastLoadedRef.current = queryData;
+    if (!isPlaceholderData) lastLoadedStatusRef.current = statusFilter;
+  }, [queryData, isPlaceholderData, statusFilter]);
   const data = queryData ?? lastLoadedRef.current ?? undefined;
 
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
@@ -1171,9 +1177,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   // The list is scoped to one status even when it is the default, so the
   // header and the empty state always say which one is shown.
-  const shownStatusLabel = statusFilter === "all"
+  const shownStatus = isPlaceholderData || isError ? lastLoadedStatusRef.current : statusFilter;
+  const shownStatusLabel = shownStatus === "all"
     ? "All statuses"
-    : FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter;
+    : FILTER_STATUS_OPTIONS.find((option) => option.value === shownStatus)?.label ?? shownStatus;
 
   // The empty state names exactly these filters, so "nothing found" explains
   // which search/category/status/featured choices produced it.

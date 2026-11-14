@@ -28,13 +28,21 @@ export function hasInAppHistory(): boolean {
 // navigations scroll to the top as before.
 const SCROLL_KEY_PREFIX = "scrollpos:";
 
-function currentScrollKey(): string {
-  return SCROLL_KEY_PREFIX + window.location.pathname + window.location.search;
+// Auth pages carry one-time tokens in their query string; a storage key must
+// never hold one, so these paths keep no scroll position at all.
+const NO_SCROLL_KEY_PATHS = /^\/(sign-in|sign-up|forgot-password|reset-password|verify)/;
+
+function currentScrollKey(): string | null {
+  const { pathname, search } = window.location;
+  if (NO_SCROLL_KEY_PATHS.test(pathname)) return null;
+  return SCROLL_KEY_PREFIX + pathname + search;
 }
 
 function saveScroll(): void {
+  const key = currentScrollKey();
+  if (!key) return;
   try {
-    sessionStorage.setItem(currentScrollKey(), String(window.scrollY));
+    sessionStorage.setItem(key, String(window.scrollY));
   } catch {
     // Storage full/unavailable — restoration silently degrades to top.
   }
@@ -96,7 +104,9 @@ export function useScrollRestoration(location: string, search: string): void {
     const pathChanged = lastPath.current !== location;
     lastPath.current = location;
     if (!pendingPop) {
-      if (pathChanged) window.scrollTo(0, 0);
+      // "instant": under html scroll-behavior: smooth a plain scrollTo
+      // animates, and saveScroll below would record a mid-animation offset.
+      if (pathChanged) window.scrollTo({ top: 0, behavior: "instant" });
       // A new entry whose scroll lands where it already was (the paginator
       // scrolling to a list top that is already at the top) fires no scroll
       // event, so without this Forward would find nothing saved for it.
@@ -107,7 +117,8 @@ export function useScrollRestoration(location: string, search: string): void {
 
     let saved = 0;
     try {
-      saved = Number(sessionStorage.getItem(currentScrollKey())) || 0;
+      const key = currentScrollKey();
+      saved = key ? Number(sessionStorage.getItem(key)) || 0 : 0;
     } catch {
       saved = 0;
     }

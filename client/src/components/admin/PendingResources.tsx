@@ -1,6 +1,6 @@
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
@@ -105,7 +105,15 @@ export default function PendingResources() {
   });
   const { data, isLoading, refetch, isFetching } = pendingQuery;
   // C9-V5A-03: a fetch paused while offline is not an empty queue.
-  const unavailable = queryUnavailableReason(pendingQuery);
+  // A background poll that fails keeps the last rows (TanStack Query v5 keeps
+  // `data` and sets isError), so the full error view is only for a queue that
+  // never loaded; with rows on screen the failure is a stale-data alert.
+  // A 401/403 is not recoverable by waiting: the session no longer allows this
+  // queue, so its rows must not stay on screen.
+  const rejectedStatus = pendingQuery.error instanceof ApiError ? pendingQuery.error.status : null;
+  const authRejected = rejectedStatus === 401 || rejectedStatus === 403;
+  const unavailable = data && !authRejected ? null : queryUnavailableReason(pendingQuery);
+  const staleData = Boolean(data) && pendingQuery.isError && !authRejected;
 
   // A fresh response supersedes an earlier failed re-check, so its
   // "may be out of date" notice does not outlive the problem.
@@ -532,9 +540,14 @@ export default function PendingResources() {
     );
   }
 
-  // One visible alert for both views: an offline "Check again" says the shown
-  // queue (rows, or the empty message) may be out of date.
-  const recheckAlert = recheckState === 'offline' ? (
+  // One visible alert for both views: a failed poll, or an offline "Check
+  // again", says the shown queue (rows, or the empty message) may be out of date.
+  const recheckAlert = staleData ? (
+    <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-stale">
+      <strong>Couldn&apos;t refresh the approvals queue.</strong>
+      <span>This list may be out of date. It rechecks every 10 seconds, or use Check again.</span>
+    </div>
+  ) : recheckState === 'offline' ? (
     <div className="queue-review-result queue-review-result--error" role="alert" data-testid="pending-resources-recheck-failed">
       <strong>Couldn&apos;t check for new submissions.</strong>
       <span>You&apos;re offline, so this list may be out of date.</span>

@@ -14,6 +14,7 @@ export interface TopRelated {
 interface ResourceTopNextStepsProps {
   related: TopRelated[];
   loading: boolean;
+  failed: boolean;
   onRelatedClick: (event: MouseEvent<HTMLAnchorElement>, related: TopRelated, position: number) => void;
 }
 
@@ -24,8 +25,11 @@ interface ResourceTopNextStepsProps {
  * list reserves three rows, and a resource with no close matches says so in
  * place instead of removing the block.
  */
-export default function ResourceTopNextSteps({ related, loading, onRelatedClick }: ResourceTopNextStepsProps) {
+export default function ResourceTopNextSteps({ related, loading, failed, onRelatedClick }: ResourceTopNextStepsProps) {
   const items = related.slice(0, TOP_RELATED_LIMIT);
+  // A failed refetch keeps the cached matches on screen; only say unavailable
+  // when there is nothing to show.
+  const unavailable = failed && items.length === 0;
 
   return (
     <nav className="resource-detail-top-next" aria-labelledby="resource-top-next-heading" data-testid="resource-top-next">
@@ -37,7 +41,12 @@ export default function ResourceTopNextSteps({ related, loading, onRelatedClick 
               <Skeleton className="h-4 w-3/4" />
             </li>
           ))}
-        {!loading && items.length === 0 && (
+        {!loading && unavailable && (
+          <li className="resource-detail-top-next-empty" data-testid="resource-top-next-unavailable">
+            Related resources are temporarily unavailable.
+          </li>
+        )}
+        {!loading && !unavailable && items.length === 0 && (
           <li className="resource-detail-top-next-empty" data-testid="resource-top-next-empty">
             No close matches yet.
           </li>

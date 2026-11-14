@@ -87,6 +87,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
   });
   const weeklyGrowth = homeQuery.data?.approvedThisWeek;
   const weeklyGrowthText = weeklyGrowth === undefined ? "—" : `+${weeklyGrowth.toLocaleString()}`;
+  // A failed request has no count either; "—" alone would read as still loading.
+  const weeklyGrowthFailed = homeQuery.isError && weeklyGrowth === undefined;
 
   return (
     <div className={className}>
@@ -121,8 +123,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">Total Resources</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{metrics.totalContributions.toLocaleString()}</p>
-                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
-                      {weeklyGrowthText} this week
+                    <p className={weeklyGrowthFailed ? "text-xs text-muted-foreground mt-1" : "text-xs text-[var(--status-ok)] mt-1"}>{/* DS-OK: status ok */}
+                      {weeklyGrowthFailed ? "weekly count unavailable" : `${weeklyGrowthText} this week`}
                     </p>
                   </CardContent>
                 </Card>
@@ -149,9 +151,23 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{weeklyGrowthText}</p>
-                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
-                      newly indexed
-                    </p>
+                    {weeklyGrowthFailed ? (
+                      <div role="alert" className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-testid="community-metrics-weekly-error">
+                        <span>Couldn&apos;t load.</span>
+                        <button
+                          type="button"
+                          onClick={() => void homeQuery.refetch()}
+                          className="btn ghost min-h-[44px]"
+                          data-testid="community-metrics-weekly-retry"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
+                        newly indexed
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               </div>

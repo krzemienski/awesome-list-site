@@ -187,6 +187,12 @@
 }
 .resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .resource-detail-related-item { border-radius: var(--radius-sm); }
+/* The card body keeps the height of its reserved placeholder rows (about
+   5.9rem each plus the 0.5rem gap) so fewer rows or a short message after
+   load do not pull the content below upward. */
+.resource-detail-related-body {
+  min-height: calc(var(--related-rows) * 5.9rem + (var(--related-rows) - 1) * 0.5rem);
+}
 .resource-detail-related-reason { border-radius: var(--radius-pill); }
 
 /* Keep exploring: under the actions on narrow screens; on wide ones it sits in
