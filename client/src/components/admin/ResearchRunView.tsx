@@ -191,22 +191,31 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
 
   // Ending: one last read of events + discoveries (polling just stopped),
   // refresh the jobs table, and hand focus to the review section.
+  // The review heading only exists once the body is painted, so an ending that
+  // lands while the body is withheld keeps the handoff owed until it appears.
   const wasActive = useRef<boolean | null>(null);
+  const focusOwed = useRef(false);
+  // The body (timeline, meters, ending, review) renders once, after the job,
+  // its events and its discoveries have all answered. Painting it in stages
+  // grew the run view three times and pushed the jobs table below it out of
+  // the screen each time (LG-027). A failed first job read shows its own error;
+  // a failed background refetch of a cached job must not release the body early.
+  const bodyPending = !(jobQuery.isError && !job) && (jobQuery.isPending || eventsQuery.isPending || discoveriesQuery.isPending);
   useEffect(() => {
     if (!job) return;
     const nowActive = isActiveJobStatus(job.status);
     if (wasActive.current === true && !nowActive) {
       void queryClient.invalidateQueries({ queryKey: ["/api/researcher/jobs"] });
-      requestAnimationFrame(() => focusElement(reviewHeadingRef.current));
+      focusOwed.current = true;
     }
     wasActive.current = nowActive;
   }, [job, queryClient]);
-
-  // The body (timeline, meters, ending, review) renders once, after the job,
-  // its events and its discoveries have all answered. Painting it in stages
-  // grew the run view three times and pushed the jobs table below it out of
-  // the screen each time (LG-027). A failed job read shows its own error.
-  const bodyPending = !jobQuery.isError && (jobQuery.isPending || eventsQuery.isPending || discoveriesQuery.isPending);
+  useEffect(() => {
+    if (!focusOwed.current || bodyPending || !job) return;
+    focusOwed.current = false;
+    const id = requestAnimationFrame(() => focusElement(reviewHeadingRef.current));
+    return () => cancelAnimationFrame(id);
+  }, [bodyPending, job]);
   const pollTrouble =(jobQuery.isError && !!job) || (eventsQuery.isError && !!eventsQuery.data) || (discoveriesQuery.isError && !!discoveriesQuery.data);
   const budget = job?.maxBudgetUsd != null ? Number(job.maxBudgetUsd) : null;
   const turnsUsed = job?.turnsUsed ?? 0;
