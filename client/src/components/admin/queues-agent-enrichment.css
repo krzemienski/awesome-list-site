@@ -1,0 +1,7 @@
+/* "Loading…" is one line; the loaded "batch #37 · 1 resource · cancelled" wraps
+   to two inside a 220px tile. Reserve two lines in every state so the jobs
+   table below does not move when the list arrives (LG-021). Split out of
+   queues-agent.css to keep that file under the 500-line limit. */
+.queues-agent--enrichment .queues-agent__stat .admin-ops-stat__description {
+  min-height: calc(2 * 0.75rem * var(--body-leading, 1.6));
+}

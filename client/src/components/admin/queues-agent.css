@@ -74,13 +74,6 @@
   padding: 20px;
 }
 
-/* "Loading…" is one line; the loaded "batch #37 · 1 resource · cancelled" wraps
-   to two inside a 220px tile. Reserve two lines in every state so the jobs
-   table below does not move when the list arrives (LG-021). */
-.queues-agent--enrichment .queues-agent__stat .admin-ops-stat__description {
-  min-height: calc(2 * 0.75rem * var(--body-leading, 1.6));
-}
-
 /* The enrichment strip follows the 0929 Stat's neutral labels, not the
    editorial skin's accent eyebrow. Scope above the skin without recoloring
    other admin eyebrow/ink contracts. */

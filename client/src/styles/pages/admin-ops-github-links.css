@@ -87,6 +87,9 @@
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: normal;
+  /* A long unbroken owner/name wraps inside the copy column instead of
+     running under the action buttons. */
+  overflow-wrap: anywhere;
   /* The frozen repository name is a plain h3 inheriting the system's body
      leading; CardTitle's leading-none shaved 8px off the row and pulled the
      table up, and a fixed 1.6 ran 0.7px long outside Editorial. */
