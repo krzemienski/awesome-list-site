@@ -20,6 +20,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { plainHttpHost } from "@shared/validation";
 import { WARN_OUTLINE, WARN_TEXT, type CheapestSavingRun } from "./researchDisplay";
 import { apiFetch } from "@/lib/api-fetch";
+import { budgetInRange, minutesInRange, targetInRange, turnsInRange } from "./research-launch-limits";
 
 export interface ResearchLaunchGuideHandle {
   /** Bring the budget field into view and focus it ("relaunch with a higher cap"). */
@@ -50,12 +51,6 @@ type BriefMode = "auto" | "custom";
 const LOW_BUDGET_USD = 1.25;
 
 const NUMBER_FIELDS = ["target-discoveries", "budget", "turns", "minimum-duration"];
-
-// One predicate per launch-limit rule: the render-time hints and the click-time validate() share them.
-const budgetInRange = (n: number) => Number.isFinite(n) && n > 0;
-const turnsInRange = (n: number) => Number.isInteger(n) && n > 0;
-const minutesInRange = (n: number) => Number.isInteger(n) && n >= 1 && n <= 240;
-const targetInRange = (n: number) => Number.isInteger(n) && n > 0 && n <= 1000;
 
 const hint = (warn: boolean) => `mt-1 text-xs ${warn ? WARN_TEXT : "text-muted-foreground"}`;
 
