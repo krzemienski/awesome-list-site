@@ -247,7 +247,7 @@ export function registerExportLinkHealthRoutes(
       await startHeavyWork('github-sync', () => syncService.runOwnedQueueItem(queueItem.id, async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
-          const result = await syncService.importFromGitHub(repositoryUrl, options, { queueRowOwnedByCaller: true });
+          const result = await syncService.importFromGitHub(repositoryUrl, { ...options, queueId: queueItem.id }, { queueRowOwnedByCaller: true });
           logger.info('GitHub import completed:', result);
           const completed = result.errors.length === 0 || result.imported > 0 || result.updated > 0;
           await githubSyncRepo.updateGithubSyncStatus(
