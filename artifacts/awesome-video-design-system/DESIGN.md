@@ -111,8 +111,10 @@ Saved user theme choices always win over first-visit profile defaults.
 6. Verify both personalities and the default Editorial + Crimson expression.
 7. New products compose approved patterns; they do not create a third foundation.
 
-See `docs/AGENTS.md` for the enforceable contract and
-`.agents/skills/verify-design-system/SKILL.md` for the compliance gate.
+See `docs/AGENTS.md` for the enforceable contract. The check the repo still
+runs is `npm run generate:design-system-artifact -- --check`, which fails when
+`tokens.json` or `contrast.json` no longer match the runtime sources.
+
 ## Living manual routes
 
 The registered artifact is a single, hash-routed modular manual. Its routes are stable
