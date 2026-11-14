@@ -202,6 +202,18 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
   const [confirmAnalyze, setConfirmAnalyze] = useState(false);
   // Friendly copy for a failed submit, shown inline next to the dialog's buttons.
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+  // LG-042: the inline error makes the dialog taller than its scroll area, which
+  // pushed the footer (and the focused Submit) out of view. Bring the footer
+  // back into the dialog's scroll container whenever an error appears.
+  useEffect(() => {
+    if (!submitError) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    submitButtonRef.current?.parentElement?.scrollIntoView({
+      block: "nearest",
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  }, [submitError]);
   const analyzeButtonRef = useRef<HTMLButtonElement>(null);
   const runAnalysisButtonRef = useRef<HTMLButtonElement>(null);
   const refocusAnalyzeRef = useRef(false);
@@ -917,6 +929,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
               </Button>
               <Button
                 type="submit"
+                ref={submitButtonRef}
                 disabled={submitMutation.isPending}
                 data-testid="button-submit-edit"
               >
