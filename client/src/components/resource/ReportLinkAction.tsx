@@ -111,7 +111,9 @@ export default function ReportLinkAction({
       });
       return;
     }
+    // Each open starts clean: Cancel, Esc and outside clicks keep the old draft otherwise.
     submit.reset();
+    setNote("");
     setOpen(true);
   };
 
