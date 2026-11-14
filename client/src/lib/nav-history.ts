@@ -123,7 +123,7 @@ export function useScrollRestoration(location: string, search: string): void {
       saved = 0;
     }
     if (saved <= 0) {
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: "instant" });
       return;
     }
 

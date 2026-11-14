@@ -343,7 +343,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
+  const { data: queryData, isLoading, isPending, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, dataUpdatedAt, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -382,12 +382,40 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // stay up (placeholder data, or a failed fetch), the label names their
   // status, not the one just selected.
   const lastLoadedStatusRef = useRef(statusFilter);
+  // A 401/403 is not recoverable by waiting: the session no longer allows this
+  // list, so its rows must not stay on screen. The mask is sticky: it holds
+  // across filter/key changes (pending, paused or non-auth failing requests
+  // keep the previous rows as placeholder data) until a real response arrives.
+  const rejectedStatus = resourcesError instanceof ApiError ? resourcesError.status : null;
+  const authRejectedNow = isError && (rejectedStatus === 401 || rejectedStatus === 403);
+  const [authMaskedAt, setAuthMaskedAt] = useState<number | null>(null);
+  // Only a response newer than the rejection clears the mask: a cached entry
+  // from another filter reads as fresh but predates the 401/403.
+  const hasFreshResponse =
+    !isError && !isPlaceholderData && Boolean(queryData) &&
+    authMaskedAt !== null && dataUpdatedAt > authMaskedAt;
+  const masked = authRejectedNow || (authMaskedAt !== null && !hasFreshResponse);
   useEffect(() => {
-    if (!queryData) return;
+    if (authRejectedNow) {
+      lastLoadedRef.current = null;
+      setAuthMaskedAt(Date.now());
+      setSelectedResourceIds([]);
+      // Drop pre-rejection pages that no observer is showing; the active
+      // query stays so this does not refetch in a loop.
+      queryClient.removeQueries({
+        queryKey: ['/api/admin/resources'],
+        predicate: (query) => query.getObserversCount() === 0,
+      });
+    } else if (hasFreshResponse) {
+      setAuthMaskedAt(null);
+    }
+  }, [authRejectedNow, hasFreshResponse, queryClient]);
+  useEffect(() => {
+    if (!queryData || masked) return;
     lastLoadedRef.current = queryData;
     if (!isPlaceholderData) lastLoadedStatusRef.current = statusFilter;
-  }, [queryData, isPlaceholderData, statusFilter]);
-  const data = queryData ?? lastLoadedRef.current ?? undefined;
+  }, [queryData, isPlaceholderData, statusFilter, masked]);
+  const data = masked ? undefined : (queryData ?? lastLoadedRef.current ?? undefined);
 
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
   // next one loads (or, offline, while its fetch is paused). The footer and

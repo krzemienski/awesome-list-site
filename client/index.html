@@ -389,8 +389,16 @@
          Google Fonts css2 request did (Inter, Fraunces, JetBrains Mono, Geist
          and IBM Plex Sans), so pixel parity with the design source holds.
          Fonts download only when used. Inter is the default body face of
-         both kept design systems, so it is the one font preloaded. -->
+         both kept design systems, so it is the body font preloaded. The
+         Fraunces italic latin file is preloaded on every route, unlike the
+         other fonts: the accent word of the page titles on Home, About, Submit
+         and the taxonomy listings is `.serif-italic` (design-system.css:68,
+         HomePresentation.tsx, About.tsx, SubmitResource.tsx,
+         TaxonomyListing.tsx), set in Fraunces italic under the editorial
+         system, and its late swap re-wrapped the title (LG-048). -->
+
     <link rel="preload" href="/fonts/inter-bec94a.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-italic-3cf092.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
 
     <!-- Vite generates the six font defaults after this sheet for no-JS SSR. -->

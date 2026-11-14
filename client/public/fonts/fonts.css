@@ -539,6 +539,23 @@
   descent-override: 21.84%;
   line-gap-override: 0%;
 }
+/* Italic face of the same family. Without it every italic run (the home hero's
+   "Video") falls back to a slanted Georgia regular at the roman scale above,
+   about 20% wider than Fraunces italic 400, so the h1 wraps to two lines
+   until the webfont lands. Measured in Chrome at 100px, weight 400, over the
+   same weighted lowercase + space sample: Fraunces italic 0.45304 em per
+   character, Georgia Italic 0.46079 em, so size-adjust = 98.32%. Ascent and
+   descent are the font's hhea 1956/510 per 2000 upem (97.8% / 25.5%) divided
+   by that size-adjust. */
+@font-face {
+  font-family: 'Fraunces Fallback';
+  font-style: italic;
+  src: local('Georgia Italic'), local('Georgia-Italic'), local('Gelasio Italic'), local('Gelasio-Italic');
+  size-adjust: 98.32%;
+  ascent-override: 99.47%;
+  descent-override: 25.94%;
+  line-gap-override: 0%;
+}
 @font-face {
   font-family: 'JetBrains Mono Fallback';
   src: local('Courier New'), local('Liberation Mono'), local('Cousine');
