@@ -1,5 +1,22 @@
 Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHANGELOG-through-2026-11-12.md)
 
+## November 14, 2026
+
+### Typing after a submission keeps every keystroke (#412)
+- After a resource is submitted, the success card takes focus once for that submission. Before, it took focus again on every render, so the next submission on the same page lost keystrokes as focus jumped back to the card.
+
+### Review findings fixed (#409, #410, #411)
+- An instance that is serving requests checks for catalog edits at most every 30 seconds, and the check now also catches two edits in the same millisecond and tag changes that do not touch the edit time.
+- A research budget that the browser cannot read as a number is now blocked when you press Launch, even if the field never fired a change event.
+- The admin dashboard tab follows the URL. The research run view focuses its heading once the run loads. Offline Retry keeps the error card when the stylesheet fails to load again, instead of showing an unstyled page. A shared collection page no longer reserves a full screen of empty space while it loads.
+- Sign-in proxy errors are logged after the response finishes, and a visitor closing the page is not logged as an error. A failed link-health progress write logs its cause as a warning.
+
+### Review findings fixed (#413)
+- Following a research run you just launched now moves focus to its review once it ends, even when the jobs list refreshes at that moment or the run had already ended. Opening an older run does not move focus.
+- One Launch click with an unreadable number now always ends in a result: the invalid field gets focus, or the confirm opens.
+- Offline Retry no longer acts on a newer error, and keeps the error card if another stylesheet fails while it reloads.
+- Amplitude Guides & Surveys waits for a quiet moment on Safari as well, and comes back after consent is withdrawn and granted again.
+
 ## November 13, 2026
 
 ### Password text clears the show-password toggle (#402)
@@ -21,7 +38,7 @@ Earlier entries: [docs/history/CHANGELOG-through-2026-11-12.md](docs/history/CHA
 - The production state after this run, with the architecture diagram, is in `docs/production-state-2026-11-13.md`.
 
 ### The harness and self-repair layer no longer runs (#381)
-- The orphan-job watchdog no longer sweeps every 60 seconds. It runs once at server start to fail jobs a restart stranded. A GitHub sync row that has been processing for over 5 minutes is failed at that point even if a sibling instance is still running it, because that queue records no worker liveness. Link health scans only plan changes now: nothing is hidden or rewritten unless an admin presses Apply in the Link health panel, and `LINK_HEALTH_REMEDIATION` is gone.
+- The orphan-job watchdog no longer sweeps every 60 seconds. It runs once at server start to fail jobs a restart stranded. A GitHub sync row that is processing and was queued more than 5 minutes ago is failed at that point, even if a sibling instance is still running it, because that queue records no worker liveness or processing start time. Link health scans only plan changes now: nothing is hidden or rewritten unless an admin presses Apply in the Link health panel, and `LINK_HEALTH_REMEDIATION` is gone.
 - Agent tooling, the TLA+ models, one-off scripts and the separate lint pass in the build were removed from the repository. The build runs `tsc --noEmit`, then the Vite, SSR and server bundles.
 - `reports/`, `audit/` and the old changelog moved to `docs/history/`; nothing was deleted. The public cache now logs one warning when it evicts live entries.
 
