@@ -387,7 +387,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     lastLoadedRef.current = queryData;
     if (!isPlaceholderData) lastLoadedStatusRef.current = statusFilter;
   }, [queryData, isPlaceholderData, statusFilter]);
-  const data = queryData ?? lastLoadedRef.current ?? undefined;
+  // A 401/403 is not recoverable by waiting: the session no longer allows this
+  // list, so its rows must not stay on screen. Other failures keep them.
+  const rejectedStatus = resourcesError instanceof ApiError ? resourcesError.status : null;
+  const authRejected = isError && (rejectedStatus === 401 || rejectedStatus === 403);
+  const data = authRejected ? undefined : (queryData ?? lastLoadedRef.current ?? undefined);
 
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
   // next one loads (or, offline, while its fetch is paused). The footer and
