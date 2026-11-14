@@ -207,13 +207,21 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
     if (wasActive.current === true && !nowActive) {
       void queryClient.invalidateQueries({ queryKey: ["/api/researcher/jobs"] });
       focusOwed.current = true;
+    } else if (wasActive.current === null && !nowActive && focusOnMount) {
+      // Opened right after a launch and the run had already ended: no active
+      // read will ever be seen, but the visitor still follows it to the review.
+      focusOwed.current = true;
     }
     wasActive.current = nowActive;
-  }, [job, queryClient]);
+  }, [job, queryClient, focusOnMount]);
   useEffect(() => {
     if (!focusOwed.current || bodyPending || !job) return;
-    focusOwed.current = false;
-    const id = requestAnimationFrame(() => focusElement(reviewHeadingRef.current));
+    // Owed until the frame has focused the heading: a job refetch or a body
+    // state change cancels the frame in cleanup, and the next run retries.
+    const id = requestAnimationFrame(() => {
+      focusOwed.current = false;
+      focusElement(reviewHeadingRef.current);
+    });
     return () => cancelAnimationFrame(id);
   }, [bodyPending, job]);
   const pollTrouble =(jobQuery.isError && !!job) || (eventsQuery.isError && !!eventsQuery.data) || (discoveriesQuery.isError && !!discoveriesQuery.data);
