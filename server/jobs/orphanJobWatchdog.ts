@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
-import { and, eq, inArray, notInArray, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
@@ -37,6 +37,22 @@ export interface OrphanSweepExclusions {
   enrichmentJobIds?: number[];
   syncQueueIds?: number[];
   researchJobIds?: number[];
+}
+
+// Epoch ms of a sync's last sign of life from its queue-row metadata:
+// heartbeatAt, else processingStartedAt. Only string values that parse to a
+// finite time count; anything else (missing, non-string, unparseable, metadata
+// that is not an object) is absent.
+function lastSyncSignOfLife(metadata: unknown): number | undefined {
+  if (typeof metadata !== 'object' || metadata === null || Array.isArray(metadata)) return undefined;
+  const fields = metadata as Record<string, unknown>;
+  for (const key of ['heartbeatAt', 'processingStartedAt']) {
+    const value = fields[key];
+    if (typeof value !== 'string') continue;
+    const ms = Date.parse(value);
+    if (Number.isFinite(ms)) return ms;
+  }
+  return undefined;
 }
 
 export async function sweepOrphanedJobs(
@@ -91,51 +107,71 @@ export async function sweepOrphanedJobs(
   // no worker has picked them up yet (architect review: avoid failing untouched
   // backlog by age).
   // A sync records metadata.processingStartedAt when it starts and refreshes
-  // metadata.heartbeatAt at its progress points, so the last sign of life is the
-  // newer of the two. Rows written before that change have neither key and keep
-  // the old rule: created_at older than the cutoff.
-  // Only ISO-shaped strings are cast; anything else counts as absent, so one
-  // malformed value cannot abort the sweep. A metadata that is not an object
-  // yields null from ->>, so it falls back to created_at.
-  const isoOrNull = (key: string) =>
-    sql`(CASE WHEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} ~ '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|[+-]\\d{2}:?\\d{2})$' THEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} END)`;
-  const lastSignOfLife = sql`coalesce(${isoOrNull('heartbeatAt')}, ${isoOrNull('processingStartedAt')})`;
+  // metadata.heartbeatAt at its progress points, so the last sign of life is
+  // heartbeatAt, else processingStartedAt. Rows written before that change have
+  // neither key and keep the old rule: created_at older than the cutoff.
+  // The metadata is caller-supplied JSON (the import routes store the request's
+  // options as it), so the timestamps are parsed here, not cast in SQL, where one
+  // impossible value would abort the whole statement. A value that is not a
+  // string, or does not parse to a finite time, counts as absent; a metadata
+  // that is not an object has no keys, so it falls back to created_at.
   const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
-  const gConditions = [
+  const gCandidateConditions = [
     or(
-      and(
-        inArray(githubSyncQueue.status, ['processing']),
-        or(
-          and(
-            sql`${lastSignOfLife} is not null`,
-            sql`(${lastSignOfLife})::timestamptz < ${cutoff.toISOString()}::timestamptz`,
-          ),
-          and(
-            sql`${lastSignOfLife} is null`,
-            lt(githubSyncQueue.createdAt, cutoff),
-          ),
-        ),
-      ),
+      eq(githubSyncQueue.status, 'processing'),
       // Abandoned backlog: pending for over a week is never legitimate.
       and(
-        inArray(githubSyncQueue.status, ['pending']),
+        eq(githubSyncQueue.status, 'pending'),
         lt(githubSyncQueue.createdAt, stalePendingCutoff),
       ),
     ),
   ];
   if (liveSyncIds.length > 0) {
-    gConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
+    gCandidateConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
+  }
+  const gCandidates = await db
+    .select({
+      id: githubSyncQueue.id,
+      status: githubSyncQueue.status,
+      metadata: githubSyncQueue.metadata,
+      createdAt: githubSyncQueue.createdAt,
+    })
+    .from(githubSyncQueue)
+    .where(and(...gCandidateConditions));
+
+  const processingIds: number[] = [];
+  const stalePendingIds: number[] = [];
+  for (const row of gCandidates) {
+    if (row.status === 'pending') {
+      stalePendingIds.push(row.id);
+      continue;
+    }
+    const lastSignOfLife = lastSyncSignOfLife(row.metadata) ?? row.createdAt?.getTime();
+    // A row with no usable time at all (null created_at) is left alone.
+    if (lastSignOfLife !== undefined && lastSignOfLife < cutoff.getTime()) processingIds.push(row.id);
   }
 
-  const gResult = await db
-    .update(githubSyncQueue)
-    .set({
-      status: 'failed',
-      errorMessage: ORPHANED_BY_RESTART_MESSAGE,
-      processedAt: new Date(),
-    })
-    .where(and(...gConditions))
-    .returning({ id: githubSyncQueue.id });
+  // Re-check the status in the UPDATE: a row that finished, or started, since
+  // the select is left alone.
+  const gTargets = [
+    processingIds.length > 0
+      ? and(inArray(githubSyncQueue.id, processingIds), eq(githubSyncQueue.status, 'processing'))
+      : undefined,
+    stalePendingIds.length > 0
+      ? and(inArray(githubSyncQueue.id, stalePendingIds), eq(githubSyncQueue.status, 'pending'))
+      : undefined,
+  ].filter((c) => c !== undefined);
+  const gResult = gTargets.length === 0
+    ? []
+    : await db
+        .update(githubSyncQueue)
+        .set({
+          status: 'failed',
+          errorMessage: ORPHANED_BY_RESTART_MESSAGE,
+          processedAt: new Date(),
+        })
+        .where(or(...gTargets))
+        .returning({ id: githubSyncQueue.id });
 
   // Research jobs: a server restart mid-run would otherwise strand a job in
   // 'processing' forever (the SDK subprocess dies with the server, so no cost
