@@ -168,6 +168,7 @@ export default function SubmitResource() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
   // NB-054 (run18): styled discard-confirmation dialog state (replaces window.confirm)
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [duplicateResource, setDuplicateResource] = useState(false);
@@ -190,7 +191,7 @@ export default function SubmitResource() {
     enabled: isAuthenticated,
   });
 
-  const successCardRef = useRef<HTMLElement | null>(null);
+  const successCardRef = useRef<HTMLDivElement>(null);
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
     mode: "onTouched",
@@ -445,6 +446,15 @@ export default function SubmitResource() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [isDirty, showSuccess]);
 
+  // C8-VX-01: hand focus to the confirmation once per successful submit, so
+  // the last edited (now empty) field isn't left ringed and a keyboard submit
+  // doesn't strand focus on <body>. Keyed on successCount (showSuccess stays
+  // true across submits), not on a ref callback, so later re-renders never
+  // pull focus back from the form.
+  useEffect(() => {
+    if (successCount > 0 && successCardRef.current) focusElement(successCardRef.current);
+  }, [successCount]);
+
   // Submit mutation
   const submitMutation = useMutation({
     mutationFn: async (data: SubmitResourceFormData) => {
@@ -492,6 +502,7 @@ export default function SubmitResource() {
       });
 
       setShowSuccess(true);
+      setSuccessCount((n) => n + 1);
       if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
       // A mouse submit keeps focus in the last edited field; blur it while it
       // still holds its value, or the success card taking focus after the
@@ -594,10 +605,7 @@ export default function SubmitResource() {
           <Card
             className="submit-success-card"
             role="status"
-            // C8-VX-01: hand focus to the confirmation once it renders, so the
-            // last edited (now empty) field isn't left ringed and a keyboard
-            // submit doesn't strand focus on <body>.
-            ref={(el) => { if (el && el !== successCardRef.current) { successCardRef.current = el; focusElement(el); } if (!el) successCardRef.current = null; }}
+            ref={successCardRef}
           > {/* DS-OK: status ok */}
             <CardHeader className="submit-success-header">
               <div className="submit-success-heading">
