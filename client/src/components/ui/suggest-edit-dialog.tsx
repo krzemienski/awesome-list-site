@@ -520,7 +520,8 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
         let body: { field?: string; message?: string } | null = null;
         try { body = JSON.parse(error.body); } catch { body = null; }
         if (body?.field === 'url' && body.message) {
-          form.setError('url', { type: 'server', message: body.message });
+          // Focus the field so the message is scrolled into view and the user can fix it.
+          form.setError('url', { type: 'server', message: body.message }, { shouldFocus: true });
           return;
         }
       }
