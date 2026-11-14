@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { focusElement } from "@/hooks/focus-handoff";
 
 // BUG-013 (run14): window.history.length is useless for "did the user
@@ -72,6 +72,10 @@ function stampEntryId(event: Event): void {
   }
   lastEntryId = id;
   window.history.replaceState({ ...state, [ENTRY_ID_STATE_KEY]: id }, "");
+  // A pushed entry starts where the page already is: a same-URL push does not
+  // rerun the scroll hook, so without this Back to it would find no position.
+  // A push to another path is overwritten by the hook's scroll-to-top save.
+  if (event.type === "pushState") saveScroll();
 }
 
 function currentScrollKey(): string | null {
@@ -127,6 +131,14 @@ let restoringScroll = false;
 // change starts at the top.
 export function useScrollRestoration(location: string, search: string): void {
   const lastPath = useRef(location);
+  // Back/Forward between two entries with the same URL changes neither
+  // `location` nor `search`; the entry id is what tells the restore to rerun.
+  const [popEntryId, setPopEntryId] = useState(stateEntryId);
+  useEffect(() => {
+    const onPop = () => setPopEntryId(stateEntryId());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -201,7 +213,7 @@ export function useScrollRestoration(location: string, search: string): void {
       cancelled = true;
       restoringScroll = false;
     };
-  }, [location, search]);
+  }, [location, search, popEntryId]);
 }
 
 // A path change moves focus to the new page's <h1>, or to the element a
