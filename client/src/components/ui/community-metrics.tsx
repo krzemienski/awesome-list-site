@@ -153,7 +153,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                     <p className="text-2xl font-bold mt-1">{weeklyGrowthText}</p>
                     {weeklyGrowthFailed ? (
                       <div role="alert" className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-testid="community-metrics-weekly-error">
-                        <span>Couldn't load.</span>
+                        <span>Couldn&apos;t load.</span>
                         <button
                           type="button"
                           onClick={() => void homeQuery.refetch()}
