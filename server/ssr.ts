@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import fs from "fs/promises";
 import path from "path";
 import { pathToFileURL } from "url";
-import { HOME_DEADLINE_PASSED, loadHomeSSRData, withinHomeDeadline } from "./home-ssr-data";
+import { HOME_DEADLINE_PASSED, homeDeadlineRemainingMs, loadHomeSSRData, withinHomeDeadline } from "./home-ssr-data";
 import type { HomeBoot } from "../client/src/lib/home-boot";
 import { createLogger } from "./lib/logger";
 
@@ -392,7 +392,9 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
       if (servedFallback) logger.error("[home-ssr] render preparation failed after the SPA fallback was sent", error);
     });
     const ready = await withinHomeDeadline(res, prepared);
-    if (ready === HOME_DEADLINE_PASSED) {
+    // renderHome and the document build below are synchronous, so no timer can
+    // fire inside them: re-check the deadline here, where the fallback is still possible.
+    if (ready === HOME_DEADLINE_PASSED || homeDeadlineRemainingMs(res) <= 0) {
       servedFallback = true;
       logger.warn(`[home-ssr] not ready ${Date.now() - startedAt}ms into the SSR step; serving the SPA fallback`);
       return next();
