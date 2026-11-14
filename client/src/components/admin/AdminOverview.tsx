@@ -421,10 +421,13 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     ? "One or more systems need attention"
     : healthRows.some((row) => row.state === "unknown")
       ? "Checking current readiness"
-      : healthRows.some((row) => row.working)
-        ? "Some systems are still working"
-        : healthRows.some((row) => row.state === "warn")
-          ? "Some systems need a look"
+      // A job that is running is also a "warn" row with `working` set, so a
+      // warn row that is not working is the one that needs a look and must
+      // come first, or a running job would hide it.
+      : healthRows.some((row) => row.state === "warn" && !row.working)
+        ? "Some systems need a look"
+        : healthRows.some((row) => row.working)
+          ? "Some systems are still working"
           : "All systems nominal";
   const topCategories = (categories.data ?? [])
     .filter((category) => (category.resourceCount ?? 0) > 0)
