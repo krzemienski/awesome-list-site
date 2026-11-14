@@ -870,7 +870,7 @@ export class ResourceRepository {
       .select(columns)
       .from(resources)
       .where(and(eq(resources.status, 'approved'), eq(resources.category, category)))
-      .orderBy(desc(resources.updatedAt), desc(resources.id));
+      .orderBy(sql`${resources.updatedAt} desc nulls last`, desc(resources.id));
   }
 
   /**

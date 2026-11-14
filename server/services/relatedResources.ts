@@ -243,7 +243,7 @@ export async function loadRelatedResources(
   resource: RelatedCandidate,
   limit = 5,
 ): Promise<RelatedResourcesResult> {
-  const pool = resource.category ? await source.listApprovedInCategory(resource.category) : [];
+  const pool = resource.category != null ? await source.listApprovedInCategory(resource.category) : [];
   const related = buildRelatedResources(resource, pool, limit);
   const sanitize = (items: RelatedItem[]): RelatedItem[] =>
     items.map((item) => ({ ...item, resource: stripInternalResourceFields(item.resource) }));
