@@ -35,8 +35,17 @@ const CLERK_ID_SEGMENT = /^[a-z]+_[A-Za-z0-9]{10,}$/;
 /** The proxied path with the query dropped and Clerk ids replaced by ':id'. */
 function loggablePath(upstreamPath: string): string {
   const pathname = upstreamPath.split('?')[0];
-  const segments = pathname.split('/').map((s) => (CLERK_ID_SEGMENT.test(s) ? ':id' : s));
+  const segments = pathname.split('/').map((s) => (CLERK_ID_SEGMENT.test(decodeSegment(s)) ? ':id' : s));
   return CLERK_PROXY_PATH + segments.join('/');
+}
+
+/** Percent-decoded segment, so an encoded id is masked like a plain one; a malformed escape is kept as is. */
+function decodeSegment(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
 }
 
 /**
@@ -95,13 +104,16 @@ export function clerkProxyMiddleware(): RequestHandler {
     const upstreamPath = req.url || '/';
     const startedAt = Date.now();
     let logged = false;
+    // Set when the browser went away first; tearing down the upstream request
+    // then is our doing, not a Clerk failure, so it must not be logged.
+    let clientAborted = false;
 
     // The proxy is mounted before request logging, so a 5xx it sends would
     // otherwise never reach the app logs. 2xx-4xx are not logged (volume).
-    function logServerError(status: number, level: 'warn' | 'error', message: string) {
-      if (logged || status < 500) return;
+    function logServerError(status: number, message: string) {
+      if (logged || clientAborted || status < 500) return;
       logged = true;
-      log[level](message, {
+      log.error(message, {
         method: req.method,
         path: loggablePath(upstreamPath),
         status,
@@ -159,7 +171,7 @@ export function clerkProxyMiddleware(): RequestHandler {
         const bodyless =
           req.method === 'HEAD' || status < 200 || status === 204 || status === 304;
         if (resHeaders['content-length'] !== undefined || bodyless) {
-          logServerError(status, 'warn', 'Clerk proxy relayed upstream 5xx');
+          logRelayedServerError(status);
           res.writeHead(status, resHeaders);
           // Headers are already sent, so abort the response if the upstream
           // stream errors mid-pipe rather than leaving a hung client.
@@ -173,7 +185,7 @@ export function clerkProxyMiddleware(): RequestHandler {
         proxyRes.on('end', () => {
           const body = Buffer.concat(chunks);
           resHeaders['content-length'] = String(body.length);
-          logServerError(status, 'warn', 'Clerk proxy relayed upstream 5xx');
+          logRelayedServerError(status);
           res.writeHead(status, resHeaders);
           res.end(body);
         });
@@ -185,14 +197,26 @@ export function clerkProxyMiddleware(): RequestHandler {
     // edge would reject just like the original response).
     function sendBadGateway() {
       if (!res.headersSent) {
-        logServerError(502, 'error', 'Clerk proxy failed to reach upstream (502)');
+        logServerError(502, 'Clerk proxy failed to reach upstream (502)');
         res.writeHead(502, { 'content-length': '0' });
       }
       res.end();
     }
 
+    // Logged once the response has been written, so ms covers the streamed
+    // body. 'close' is the fallback when the stream dies before 'finish'; it is
+    // skipped for a client abort.
+    function logRelayedServerError(status: number) {
+      const record = () => logServerError(status, 'Clerk proxy relayed upstream 5xx');
+      res.once('finish', record);
+      res.once('close', record);
+    }
+
     upstream.on('error', sendBadGateway);
-    req.on('aborted', () => upstream.destroy());
+    req.on('aborted', () => {
+      clientAborted = true;
+      upstream.destroy();
+    });
     req.pipe(upstream);
   };
 }
