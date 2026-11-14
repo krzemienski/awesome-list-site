@@ -503,10 +503,11 @@ Three layers sit between a visitor and the database. Each has its own rule.
   `server/cache/publicCache.ts` holds catalog bodies, nav, taxonomy and the
   `route-meta` namespace under a caller-supplied TTL, normally 60 s. Concurrent
   misses share one loader, a failed loader is never replaced by stale data,
-  and the cache is bounded (512 entries, 48 MB, 64 rebuilds in flight). A miss
-  past the 64 waits up to 5 s for a rebuild slot (at most 512 waiters) instead
-  of being turned away. The cache is per process, not shared between
-  instances.
+  and the cache is bounded (4,096 entries, 48 MiB, 64 rebuilds in flight). A
+  miss past the 64 waits up to 5 s for a rebuild slot (at most 512 waiters)
+  instead of being turned away at once; after 5 s without a slot, or with 512
+  already waiting, it still gets a 503. The cache is per process, not shared
+  between instances.
 - **Page metadata is cached for 6 h.** `resolveRoute()` in
   `server/og-middleware.ts` resolves the title, description and found/not-found
   state for a path through `getPublicCacheValue()` with `ttlMs:
@@ -536,11 +537,18 @@ invalidate (`server/repositories/ResourceRepository.ts`,
 - Other instances do not hear about the write directly. Each serving instance
   reads a fingerprint of the catalog tables (`server/cache/catalogStamp.ts`)
   in the background at most once per 30 s, and clears its cache when the
-  fingerprint changes (reason `catalog-stamp`). There is no timer, so an idle
-  instance never queries. A new or edited resource can therefore take up to
-  about 30 s to reach an instance that did not handle the write, plus the
-  60 s a browser may reuse an API response. Do not expect an audit to see a
-  change sooner on a second request.
+  fingerprint changes (reason `catalog-stamp`). The fingerprint hashes each
+  resource's id, `updated_at`, status, category path and `metadata.tags`, and
+  the exact (resource, tag) pairs, so a same-millisecond edit, a tag
+  canonicalization and a tag swap all change it. There is no timer, so an idle
+  instance never queries. The check starts from a cache read and is not awaited:
+  the request that finds it due is still served the old entry, and the clear
+  lands when the query resolves. A new or edited resource can therefore take
+  one 30 s check interval plus one request to reach an instance that did not
+  handle the write, plus the 60 s a browser may reuse an API response. A check
+  that fails clears nothing and is retried by the next cache read after the
+  interval, so the bound holds only while the database answers. Do not expect
+  an audit to see a change sooner on a second request.
 
 **Facets.** `listResources()` counts facet groups only when asked: the
 `facets` option takes the kinds to count (`categories`, `subcategories`,

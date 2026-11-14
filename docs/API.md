@@ -262,9 +262,11 @@ unknown kind is `400 invalid_kind` with the allowed values.
 
 - Public catalog representations use one process-local cache with schema
   version `public-v1`, explicit public-only namespaces, 30–60 second TTLs, a
-  512-entry/24 MiB committed-value bound, a 64-rebuild in-flight bound, and one
-  coalesced rebuild per key/generation. A miss past the in-flight bound waits
-  up to 5 s for a slot (at most 512 waiters) instead of failing at once.
+  4,096-entry/48 MiB committed-value bound (`MAX_ENTRIES`, `MAX_BYTES`), a
+  64-rebuild in-flight bound, and one coalesced rebuild per key/generation. A
+  miss past the in-flight bound waits up to 5 s for a slot (at most 512
+  waiters) instead of failing at once; a miss that finds no slot after 5 s, or
+  arrives when 512 are already waiting, still gets a 503.
   Route metadata that fell back after a failed lookup is never cached.
 - Every successful resource, taxonomy, or tag mutation advances the generation.
   An older in-flight rebuild is discarded and retried, so a completed mutation

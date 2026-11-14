@@ -157,6 +157,11 @@ export async function sweepOrphanedJobs(
 export const runOrphanWatchdogStartup = (): Promise<void> =>
   runWithJobContext('orphan-watchdog', 'startup', runStartupSweep);
 
+// Known limit: github_sync_queue has no worker liveness columns, so this boot
+// sweep (no exclusions) fails every 'processing' sync row older than 5 minutes,
+// including one a sibling instance is still running. Telling them apart needs a
+// heartbeat/worker column on that table (shared/schema.ts), which is outside
+// this file; the sync resumes from its next queued item.
 async function runStartupSweep(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();
