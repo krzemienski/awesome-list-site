@@ -480,8 +480,12 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       this.setState({ retryBlocked: "offline" });
       return;
     }
-    if (!(await isServerReachable())) {
-      if (!this.state.error) return;
+    // Taken before the probe: navigation may clear this error while it is pending,
+    // and a newer route's failure must not be adopted by this pass.
+    const startedWith = this.state.error;
+    const reachable = await isServerReachable();
+    if (!startedWith || this.state.error !== startedWith) return;
+    if (!reachable) {
       this.setState({ retryBlocked: "unreachable" });
       const delay = CONNECTIVITY_PROBE_BACKOFF_MS[this.probeAttempts++];
       if (delay !== undefined) {
@@ -489,8 +493,6 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       }
       return;
     }
-    const startedWith = this.state.error;
-    if (!startedWith) return;
     // A chunk that failed offline was never stale: retry the import in place
     // (keeps app state, no document reload, so the 60s reload guard is not
     // consumed). If it fails again online, componentDidCatch applies that guard.
