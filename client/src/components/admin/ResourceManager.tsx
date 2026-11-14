@@ -382,16 +382,30 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // stay up (placeholder data, or a failed fetch), the label names their
   // status, not the one just selected.
   const lastLoadedStatusRef = useRef(statusFilter);
+  // A 401/403 is not recoverable by waiting: the session no longer allows this
+  // list, so its rows must not stay on screen. The mask is sticky: it holds
+  // across filter/key changes (pending, paused or non-auth failing requests
+  // keep the previous rows as placeholder data) until a real response arrives.
+  const rejectedStatus = resourcesError instanceof ApiError ? resourcesError.status : null;
+  const authRejectedNow = isError && (rejectedStatus === 401 || rejectedStatus === 403);
+  const [authMasked, setAuthMasked] = useState(false);
+  const hasFreshResponse = !isError && !isPlaceholderData && Boolean(queryData);
+  const masked = authRejectedNow || (authMasked && !hasFreshResponse);
   useEffect(() => {
-    if (!queryData) return;
+    if (authRejectedNow) {
+      lastLoadedRef.current = null;
+      setAuthMasked(true);
+      setSelectedResourceIds([]);
+    } else if (hasFreshResponse) {
+      setAuthMasked(false);
+    }
+  }, [authRejectedNow, hasFreshResponse]);
+  useEffect(() => {
+    if (!queryData || masked) return;
     lastLoadedRef.current = queryData;
     if (!isPlaceholderData) lastLoadedStatusRef.current = statusFilter;
-  }, [queryData, isPlaceholderData, statusFilter]);
-  // A 401/403 is not recoverable by waiting: the session no longer allows this
-  // list, so its rows must not stay on screen. Other failures keep them.
-  const rejectedStatus = resourcesError instanceof ApiError ? resourcesError.status : null;
-  const authRejected = isError && (rejectedStatus === 401 || rejectedStatus === 403);
-  const data = authRejected ? undefined : (queryData ?? lastLoadedRef.current ?? undefined);
+  }, [queryData, isPlaceholderData, statusFilter, masked]);
+  const data = masked ? undefined : (queryData ?? lastLoadedRef.current ?? undefined);
 
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
   // next one loads (or, offline, while its fetch is paused). The footer and
