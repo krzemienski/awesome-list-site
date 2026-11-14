@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
-import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
+import { and, eq, inArray, notInArray, lt, or, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
@@ -134,13 +134,19 @@ export async function sweepOrphanedJobs(
       id: githubSyncQueue.id,
       status: githubSyncQueue.status,
       metadata: githubSyncQueue.metadata,
+      heartbeatText: sql<string | null>`${githubSyncQueue.metadata}->>'heartbeatAt'`,
       createdAt: githubSyncQueue.createdAt,
     })
     .from(githubSyncQueue)
     .where(and(...gCandidateConditions));
 
-  const processingIds: number[] = [];
+  const failedValues = {
+    status: 'failed',
+    errorMessage: ORPHANED_BY_RESTART_MESSAGE,
+    processedAt: new Date(),
+  };
   const stalePendingIds: number[] = [];
+  let syncFailed = 0;
   for (const row of gCandidates) {
     if (row.status === 'pending') {
       stalePendingIds.push(row.id);
@@ -148,30 +154,28 @@ export async function sweepOrphanedJobs(
     }
     const lastSignOfLife = lastSyncSignOfLife(row.metadata) ?? row.createdAt?.getTime();
     // A row with no usable time at all (null created_at) is left alone.
-    if (lastSignOfLife !== undefined && lastSignOfLife < cutoff.getTime()) processingIds.push(row.id);
+    if (lastSignOfLife === undefined || lastSignOfLife >= cutoff.getTime()) continue;
+    // Per-row UPDATE guarded by the heartbeat text read above (text compare, no
+    // cast): a sync that finished, or beat, since the select keeps its row.
+    const hit = await db
+      .update(githubSyncQueue)
+      .set(failedValues)
+      .where(and(
+        eq(githubSyncQueue.id, row.id),
+        eq(githubSyncQueue.status, 'processing'),
+        sql`${githubSyncQueue.metadata}->>'heartbeatAt' IS NOT DISTINCT FROM ${row.heartbeatText}`,
+      ))
+      .returning({ id: githubSyncQueue.id });
+    syncFailed += hit.length;
   }
-
-  // Re-check the status in the UPDATE: a row that finished, or started, since
-  // the select is left alone.
-  const gTargets = [
-    processingIds.length > 0
-      ? and(inArray(githubSyncQueue.id, processingIds), eq(githubSyncQueue.status, 'processing'))
-      : undefined,
-    stalePendingIds.length > 0
-      ? and(inArray(githubSyncQueue.id, stalePendingIds), eq(githubSyncQueue.status, 'pending'))
-      : undefined,
-  ].filter((c) => c !== undefined);
-  const gResult = gTargets.length === 0
-    ? []
-    : await db
-        .update(githubSyncQueue)
-        .set({
-          status: 'failed',
-          errorMessage: ORPHANED_BY_RESTART_MESSAGE,
-          processedAt: new Date(),
-        })
-        .where(or(...gTargets))
-        .returning({ id: githubSyncQueue.id });
+  if (stalePendingIds.length > 0) {
+    const hit = await db
+      .update(githubSyncQueue)
+      .set(failedValues)
+      .where(and(inArray(githubSyncQueue.id, stalePendingIds), eq(githubSyncQueue.status, 'pending')))
+      .returning({ id: githubSyncQueue.id });
+    syncFailed += hit.length;
+  }
 
   // Research jobs: a server restart mid-run would otherwise strand a job in
   // 'processing' forever (the SDK subprocess dies with the server, so no cost
@@ -205,7 +209,7 @@ export async function sweepOrphanedJobs(
 
   return {
     enrichmentJobsFailed: enrichmentFailed,
-    githubSyncQueueFailed: gResult.length,
+    githubSyncQueueFailed: syncFailed,
     researchJobsFailed: researchFailed,
     cutoff,
   };
