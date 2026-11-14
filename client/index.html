@@ -389,8 +389,11 @@
          Google Fonts css2 request did (Inter, Fraunces, JetBrains Mono, Geist
          and IBM Plex Sans), so pixel parity with the design source holds.
          Fonts download only when used. Inter is the default body face of
-         both kept design systems, so it is the one font preloaded. -->
+         both kept design systems, so it is the body font preloaded. The
+         Fraunces italic latin file is preloaded too: the home hero h1 sets
+         its accent word in it, and the late swap re-wrapped the title. -->
     <link rel="preload" href="/fonts/inter-bec94a.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-italic-3cf092.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
 
     <!-- Vite generates the six font defaults after this sheet for no-JS SSR. -->
