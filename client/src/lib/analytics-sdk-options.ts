@@ -291,6 +291,14 @@ export const addAmplitudeEngagement = async (
     });
     slots.engagement.instance = plugin;
     await amplitude.add(plugin).promise;
+    // A revoke that landed while add() was pending has already cleared the slot
+    // (and a newer grant may own it now). This plugin must not be written back:
+    // remove it, so the next grant finds the slot clean and sets Guides & Surveys up again.
+    if (await revoked()) {
+      controller.abort();
+      await removeAmplitudePlugins(amplitude, [plugin]);
+      return false;
+    }
     slots.engagement.instance = plugin;
     slots.engagement.added = true;
   }
