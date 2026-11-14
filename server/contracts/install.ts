@@ -178,6 +178,9 @@ function inferredResponsesFor(
       : override
         ? { "200": override }
         : { "200": { name: "JsonResponse", description: "Successful response", schema: jsonResponseSchema } };
+  // A handler that answers 204 and has no named 200 body replies with no
+  // content on success; advertising a JSON 200 beside it misdescribes the route.
+  if (!override && explicitStatuses.includes(204)) delete success["200"];
   for (const status of explicitStatuses) {
     if (status < 200 || status >= 400 || status === 200) continue;
     success[String(status)] =

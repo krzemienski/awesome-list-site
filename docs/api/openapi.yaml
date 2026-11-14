@@ -2825,8 +2825,6 @@ components:
       properties:
         submission:
           type: string
-          minLength: 1
-          maxLength: 512
       required:
         - submission
       additionalProperties: {}
@@ -4710,12 +4708,6 @@ paths:
     post:
       operationId: post:/api/telemetry/dead-link
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
         '204':
           description: Successful response with no body
         '400':
@@ -9163,12 +9155,6 @@ paths:
     delete:
       operationId: delete:/api/resources/{id}/link-report
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
         '204':
           description: Successful response with no body
         '400':
@@ -19976,12 +19962,6 @@ paths:
     delete:
       operationId: delete:/api/admin/contact-submissions/{submission}
       responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
         '204':
           description: Successful response with no body
         '400':
@@ -20052,8 +20032,6 @@ paths:
           required: true
           schema:
             type: string
-            minLength: 1
-            maxLength: 512
       requestBody:
         required: false
         content:

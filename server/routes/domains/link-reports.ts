@@ -81,14 +81,10 @@ export function registerLinkReportRoutes(app: Express, ctx: LinkReportsContext):
     const userId: string = req.dbUser.id;
 
     const [existing] = await db
-      .select({ status: resourceLinkReports.status })
+      .select(reportFields)
       .from(resourceLinkReports)
       .where(and(eq(resourceLinkReports.resourceId, resourceId), eq(resourceLinkReports.userId, userId)));
-    if (existing?.status === "open") {
-      const [report] = await db.select(reportFields).from(resourceLinkReports)
-        .where(and(eq(resourceLinkReports.resourceId, resourceId), eq(resourceLinkReports.userId, userId)));
-      return res.json({ alreadyReported: true, report });
-    }
+    if (existing?.status === "open") return res.json({ alreadyReported: true, report: existing });
 
     const [report] = await db
       .insert(resourceLinkReports)

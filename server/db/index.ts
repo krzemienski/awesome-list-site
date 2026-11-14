@@ -77,10 +77,12 @@ pool.on('connect', (client: any) => {
   // listener that unhandled 'error' event crashes the whole process — seen
   // under full validation-gate load. The in-flight query still rejects
   // through the normal promise path; this listener only absorbs the
-  // connection-level event and records it.
+  // connection-level event and records it. It must not flag the request: an
+  // EventEmitter listener runs in the async context the socket was opened under,
+  // which may be a different request than the one using the client now. That
+  // request learns of the failure from its own query rejection (finish() below).
   client.on('error', (err: unknown) => {
     recordPoolError();
-    markTransientRequestFailure(err);
     logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
   });
   const originalQuery = client.query.bind(client);

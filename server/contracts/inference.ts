@@ -213,6 +213,10 @@ export function inferParamsSchema(
       // API key ids are gen_random_uuid() varchars; an integer schema made
       // every revoke a 400 and left keys usable after "revoke".
       schema = boundedSafeStringSchema;
+    } else if (p.name === "submission" && path === "/api/admin/contact-submissions/:submission") {
+      // The handler checks the uuid itself and answers 404 for anything else;
+      // the bounded-string guard would answer a long or control-character id with 400.
+      schema = z.string();
     } else if (isIdParamName(p.name) || digitPattern) {
       schema = boundedIntStringSchema;
     } else if (p.pattern) {

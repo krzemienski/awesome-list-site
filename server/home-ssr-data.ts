@@ -46,6 +46,13 @@ export async function loadHomeKindCounts() {
 const HOME_RESPONSE_DEADLINE_MS = 3500;
 export const HOME_DEADLINE_PASSED = Symbol("home-deadline-passed");
 
+/** Milliseconds left of this request's homepage deadline; 0 or less once it has passed. */
+export function homeDeadlineRemainingMs(res: Response): number {
+  const requestStartedAt: unknown = res.locals.requestStartedAt;
+  const startedAt = typeof requestStartedAt === "number" ? requestStartedAt : Date.now();
+  return startedAt + HOME_RESPONSE_DEADLINE_MS - Date.now();
+}
+
 /**
  * Resolves with `work`, or with HOME_DEADLINE_PASSED once this request's
  * homepage deadline is reached. `work` keeps running either way, so a slow load
@@ -55,10 +62,13 @@ export function withinHomeDeadline<T>(
   res: Response,
   work: Promise<T>,
 ): Promise<T | typeof HOME_DEADLINE_PASSED> {
-  const requestStartedAt: unknown = res.locals.requestStartedAt;
-  const startedAt = typeof requestStartedAt === "number" ? requestStartedAt : Date.now();
-  const remainingMs = startedAt + HOME_RESPONSE_DEADLINE_MS - Date.now();
-  if (remainingMs <= 0) return Promise.resolve(HOME_DEADLINE_PASSED);
+  const remainingMs = homeDeadlineRemainingMs(res);
+  if (remainingMs <= 0) {
+    // Nothing awaits `work` on this path; a late rejection must not surface as
+    // an unhandled rejection. The caller logs failures it cares about.
+    work.catch(() => undefined);
+    return Promise.resolve(HOME_DEADLINE_PASSED);
+  }
   let timer: NodeJS.Timeout | undefined;
   return Promise.race([
     work,
