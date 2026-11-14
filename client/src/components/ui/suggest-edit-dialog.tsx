@@ -455,6 +455,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
       }
     }
     aiAppliedRef.current = true;
+    setSubmitError(null);
     trackResourceEditAiSuggestionsApplied(funnelInfo, appliedFieldCount);
     
     toast({
