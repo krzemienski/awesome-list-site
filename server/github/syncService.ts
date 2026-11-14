@@ -52,6 +52,10 @@ import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
 
 const logger = createLogger("github-sync");
 
+// Floor between two heartbeat writes on one queue row. The orphan sweep's
+// cutoff is five minutes, so a beat every 30 s leaves ten missed beats of room.
+const HEARTBEAT_MIN_INTERVAL_MS = 30_000;
+
 interface SyncOptions {
   dryRun?: boolean;
   forceOverwrite?: boolean;
@@ -62,6 +66,7 @@ interface SyncOptions {
   /**
    * Queue row that owns this run. Stamped into the export's history row so
    * the admin panel can tie a commit to exactly one run (never by timestamp).
+   * Import and export also refresh this row's heartbeat while they work.
    */
   queueId?: number;
 }
@@ -539,6 +544,31 @@ export class GitHubSyncService {
   }
 
   /**
+   * Heartbeat for the queue row that owns a run, called at the run's own
+   * progress points (per imported item, per batch of checked links). It writes
+   * at most once per HEARTBEAT_MIN_INTERVAL_MS and starts no timer, so a run
+   * that stops making progress stops beating and the boot sweep can tell it
+   * from one a sibling instance is still working. A run with no queue row, or a
+   * failed write, changes nothing: liveness is bookkeeping, never a reason to
+   * fail the sync.
+   */
+  private queueHeartbeat(queueId: number | undefined): () => Promise<void> {
+    let lastBeatAt = Date.now();
+    return async () => {
+      if (queueId === undefined || Date.now() - lastBeatAt < HEARTBEAT_MIN_INTERVAL_MS) return;
+      lastBeatAt = Date.now();
+      try {
+        await this.syncRepo.recordGithubSyncHeartbeat(queueId);
+      } catch (error) {
+        logger.warn('Queue heartbeat write failed', {
+          queueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    };
+  }
+
+  /**
    * Import resources from a GitHub awesome list repository
    */
   async importFromGitHub(
@@ -565,12 +595,14 @@ export class GitHubSyncService {
       resources: [],
       wouldCreateTaxonomy: []
     };
+    const beat = this.queueHeartbeat(options.queueId);
     logger.info('Import started', { repo: repoUrl, dryRun: !!options.dryRun });
 
     try {
       // Fetch README content
       logger.info(`Fetching README from ${repoUrl}...`);
       const { content: readmeContent, branch: readmeBranch } = await this.client.fetchFile(repoUrl, 'README.md');
+      await beat();
       result.branch = readmeBranch;
       
       // STEP 1: Validate with awesome-lint BEFORE importing
@@ -618,6 +650,7 @@ export class GitHubSyncService {
       logger.info('Parsing awesome list content...');
       const parsedList = await parseAwesomeList(readmeContent);
       const dbResources = convertToDbResources(parsedList);
+      await beat();
       
       logger.info(`Found ${dbResources.length} resources in the awesome list`);
       
@@ -696,6 +729,7 @@ export class GitHubSyncService {
       result.wouldCreateTaxonomy = plannedTaxonomy;
 
       logger.info('Category hierarchy setup complete');
+      await beat();
       
       // STEP 4: Process each resource. The catalog is read once: reading every
       // row per item timed the request out on a catalog of a few thousand.
@@ -708,7 +742,9 @@ export class GitHubSyncService {
       // A dry run records the rows it would write under ids no real row has,
       // so later items match them exactly as the real run does.
       let plannedId = 0;
+      await beat();
       for (const resource of dbResources) {
+        await beat();
         const urlKey = normalizeUrlForDedup(resource.url ?? '');
         const listedUnder = firstListing.get(urlKey);
         if (listedUnder !== undefined) {
@@ -1083,6 +1119,7 @@ export class GitHubSyncService {
       exported: 0,
       errors: []
     };
+    const beat = this.queueHeartbeat(options.queueId);
     logger.info('Export started', {
       repo: repoUrl,
       dryRun: !!options.dryRun,
@@ -1106,10 +1143,12 @@ export class GitHubSyncService {
 
       // Get repository info
       const { data: repoInfo } = await octokit.repos.get({ owner, repo });
+      await beat();
       const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
       // Fetch all approved resources using storage method
       const currentResources = await this.resourceRepo.getAllApprovedResources();
+      await beat();
 
       if (currentResources.length === 0) {
         throw new Error('No approved resources to export');
@@ -1119,6 +1158,7 @@ export class GitHubSyncService {
 
       // Get last sync history to calculate diff
       const lastSync = await this.syncRepo.getLastSyncHistory(repoUrl, 'export');
+      await beat();
       const lastSnapshot = lastSync?.snapshot?.resources as Resource[] || [];
 
       // Calculate diff: added, updated, removed
@@ -1171,11 +1211,13 @@ export class GitHubSyncService {
         logger.info('[export-link-check] scanning generated README for confirmed-broken links...');
         const gate = await runExportLinkGate(readmeContent, {
           onProgress: (checked, total) => {
+            void beat();
             if (checked % 200 === 0 || checked === total) {
               logger.info(`[export-link-check] first pass ${checked}/${total}`);
             }
           },
         });
+        await beat();
         if (!gate.passed) {
           const details = gate.confirmedBroken
             .map((b) => `  - ${b.url} (${b.verdict})`)
@@ -1202,6 +1244,7 @@ export class GitHubSyncService {
       }
 
       // Detect the default branch (main, master, or repository default)
+      await beat();
       const defaultBranch = await this.detectDefaultBranch(octokit, owner, repo);
       result.branch = defaultBranch;
 
@@ -1211,6 +1254,7 @@ export class GitHubSyncService {
         repo,
         ref: `heads/${defaultBranch}`
       });
+      await beat();
       const currentCommitSha = refData.object.sha;
 
       // Get the tree SHA of the current commit
@@ -1219,6 +1263,7 @@ export class GitHubSyncService {
         repo,
         commit_sha: currentCommitSha
       });
+      await beat();
       const currentTreeSha = commitData.tree.sha;
 
       // Create blobs for README and CONTRIBUTING files
@@ -1228,6 +1273,7 @@ export class GitHubSyncService {
         content: Buffer.from(readmeContent).toString('base64'),
         encoding: 'base64'
       });
+      await beat();
 
       const contributingBlob = await octokit.git.createBlob({
         owner,
@@ -1235,6 +1281,8 @@ export class GitHubSyncService {
         content: Buffer.from(contributingContent).toString('base64'),
         encoding: 'base64'
       });
+
+      await beat();
 
       // Create a new tree with both files
       const { data: treeData } = await octokit.git.createTree({
@@ -1256,6 +1304,7 @@ export class GitHubSyncService {
           }
         ]
       });
+      await beat();
 
       // Create a commit
       const { data: newCommit } = await octokit.git.createCommit({
@@ -1265,6 +1314,7 @@ export class GitHubSyncService {
         tree: treeData.sha,
         parents: [currentCommitSha]
       });
+      await beat();
 
       // Update the reference to point to the new commit (commit directly to default branch)
       await octokit.git.updateRef({
@@ -1273,6 +1323,7 @@ export class GitHubSyncService {
         ref: `heads/${defaultBranch}`,
         sha: newCommit.sha
       });
+      await beat();
 
       result.commitSha = newCommit.sha;
       result.commitUrl = newCommit.html_url;
@@ -1292,6 +1343,7 @@ export class GitHubSyncService {
       // Promise.all here exhausted the pg pool on large exports)
       const resourceIds = currentResources.map(r => r.id);
       await this.resourceRepo.markResourcesSynced(resourceIds);
+      await beat();
 
       // Store sync history with snapshot and diff counts
       await this.syncRepo.saveSyncHistory({
@@ -1442,7 +1494,7 @@ export class GitHubSyncService {
           // importFromGitHub insert a second one.
           const result = await this.importFromGitHub(
             item.repositoryUrl,
-            { dryRun: false },
+            { dryRun: false, queueId: item.id },
             { queueRowOwnedByCaller: true },
           );
 

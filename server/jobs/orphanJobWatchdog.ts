@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
-import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
+import { and, eq, inArray, notInArray, lt, or, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
@@ -9,7 +9,8 @@ import { runWithJobContext } from "../ops/requestContext";
 const logger = createLogger("job-watchdog");
 
 // GitHub sync queue rows have no worker liveness columns; they keep the
-// fixed age threshold. AI jobs (enrichment/research) use worker liveness
+// fixed age threshold, measured from their last metadata heartbeat (see
+// runStartupSweep). AI jobs (enrichment/research) use worker liveness
 // (server/ai/jobLiveness.ts) instead — see sweepOrphanedJobs.
 const ORPHAN_THRESHOLD_MS = 5 * 60 * 1000;
 // Run15 BUG-011 prod follow-up: 'pending' queue rows are legitimate short-term
@@ -84,16 +85,36 @@ export async function sweepOrphanedJobs(
     if (flipped) enrichmentFailed++;
   }
 
-  // Queue rows: only flip 'processing' rows whose start predates the cutoff —
-  // those are the genuine orphans whose worker died. 'pending' rows are a
-  // legitimate backlog and must NOT be failed just because no worker has
-  // picked them up yet (architect review: avoid failing untouched backlog by age).
+  // Queue rows: only flip 'processing' rows that have shown no sign of life
+  // since the cutoff — those are the genuine orphans whose worker died.
+  // 'pending' rows are a legitimate backlog and must NOT be failed just because
+  // no worker has picked them up yet (architect review: avoid failing untouched
+  // backlog by age).
+  // A sync records metadata.processingStartedAt when it starts and refreshes
+  // metadata.heartbeatAt at its progress points, so the last sign of life is the
+  // newer of the two. Rows written before that change have neither key and keep
+  // the old rule: created_at older than the cutoff.
+  // Only ISO-shaped strings are cast; anything else counts as absent, so one
+  // malformed value cannot abort the sweep. A metadata that is not an object
+  // yields null from ->>, so it falls back to created_at.
+  const isoOrNull = (key: string) =>
+    sql`(CASE WHEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} ~ '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|[+-]\\d{2}:?\\d{2})$' THEN ${githubSyncQueue.metadata}->>${sql.raw("'" + key + "'")} END)`;
+  const lastSignOfLife = sql`coalesce(${isoOrNull('heartbeatAt')}, ${isoOrNull('processingStartedAt')})`;
   const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
   const gConditions = [
     or(
       and(
         inArray(githubSyncQueue.status, ['processing']),
-        lt(githubSyncQueue.createdAt, cutoff),
+        or(
+          and(
+            sql`${lastSignOfLife} is not null`,
+            sql`(${lastSignOfLife})::timestamptz < ${cutoff.toISOString()}::timestamptz`,
+          ),
+          and(
+            sql`${lastSignOfLife} is null`,
+            lt(githubSyncQueue.createdAt, cutoff),
+          ),
+        ),
       ),
       // Abandoned backlog: pending for over a week is never legitimate.
       and(
@@ -157,11 +178,15 @@ export async function sweepOrphanedJobs(
 export const runOrphanWatchdogStartup = (): Promise<void> =>
   runWithJobContext('orphan-watchdog', 'startup', runStartupSweep);
 
-// Known limit: github_sync_queue has no worker liveness columns, so this boot
-// sweep (no exclusions) fails every 'processing' sync row older than 5 minutes,
-// including one a sibling instance is still running. Telling them apart needs a
-// heartbeat/worker column on that table (shared/schema.ts), which is outside
-// this file; the sync resumes from its next queued item.
+// The boot sweep has no exclusions, so it cannot know which rows this process
+// owns. github_sync_queue has no liveness columns, so a sync records its own in
+// the row's metadata jsonb: processingStartedAt when GithubSyncRepository marks
+// it 'processing', heartbeatAt refreshed (at most every 30 s, no timer) by
+// syncService at each imported item and export step. A sibling instance's
+// running sync keeps a fresh heartbeat and is left alone; a row whose worker
+// died stops beating and is failed once its last sign of life is older than the
+// cutoff. Rows written before this change carry neither key and are judged by
+// created_at as before.
 async function runStartupSweep(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();

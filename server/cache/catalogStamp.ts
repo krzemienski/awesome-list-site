@@ -31,14 +31,22 @@ export const CATALOG_STAMP_INTERVAL_MS = 30_000;
 // One round trip. Small tables are hashed whole, so a rename or reorder moves
 // the stamp whether or not the writer bumped updated_at. resources and
 // resource_tags are hashed by the fields the public catalog reads: per row id,
-// updated_at, status, kind, category path and metadata->'tags', ordered by id.
-// max(updated_at) alone is not enough: two edits in one millisecond share it,
-// and the tag-canonicalization maintenance route rewrites metadata.tags without
-// touching updated_at. resource_tags is hashed as its ordered (resource_id,
-// tag_id) pairs, so a swap that keeps the count and an id sum still moves it.
+// updated_at, xmin, status, kind, category path and metadata->'tags', ordered
+// by id. max(updated_at) alone is not enough: two edits in one millisecond
+// share it, and the tag-canonicalization maintenance route rewrites
+// metadata.tags without touching updated_at. xmin is the id of the transaction
+// that wrote the row's current version, so every UPDATE moves it even when it
+// leaves updated_at and every hashed column unchanged (two writes to one
+// resource in the same millisecond, or a write that sets updated_at to the value
+// it already has). That also means a bookkeeping UPDATE (githubSynced, view
+// counters) moves the stamp and clears the cache once: over-invalidation is
+// accepted here, serving a stale page is not. resource_tags needs no xmin: a
+// row there is only its (resource_id, tag_id) pair, so any change to its
+// content is a different pair, and the pairs are hashed in order, so a swap
+// that keeps the count and an id sum still moves the stamp.
 const CATALOG_STAMP_SQL = `
   SELECT concat_ws('|',
-    (SELECT md5(coalesce(string_agg(concat_ws(':', r.id, r.updated_at, r.status, r.kind,
+    (SELECT md5(coalesce(string_agg(concat_ws(':', r.id, r.updated_at, r.xmin, r.status, r.kind,
         r.category, r.subcategory, r.sub_subcategory, r.metadata->'tags'), ',' ORDER BY r.id), ''))
        FROM resources r),
     (SELECT md5(coalesce(string_agg(c::text, ',' ORDER BY c.id), '')) FROM categories c),
