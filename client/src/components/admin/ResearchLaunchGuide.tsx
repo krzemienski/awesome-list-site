@@ -51,6 +51,12 @@ const LOW_BUDGET_USD = 1.25;
 
 const NUMBER_FIELDS = ["target-discoveries", "budget", "turns", "minimum-duration"];
 
+// One predicate per launch-limit rule: the render-time hints and the click-time validate() share them.
+const budgetInRange = (n: number) => Number.isFinite(n) && n > 0;
+const turnsInRange = (n: number) => Number.isInteger(n) && n > 0;
+const minutesInRange = (n: number) => Number.isInteger(n) && n >= 1 && n <= 240;
+const targetInRange = (n: number) => Number.isInteger(n) && n > 0 && n <= 1000;
+
 const hint = (warn: boolean) => `mt-1 text-xs ${warn ? WARN_TEXT : "text-muted-foreground"}`;
 
 function Step({ n, title, summary, children }: { n: number; title: string; summary?: ReactNode; children: ReactNode }) {
@@ -221,7 +227,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   });
 
   const minutesN = parseField("minimum-duration", minDurationMinutes);
-  const minutesValid = Number.isInteger(minutesN) && minutesN >= 1 && minutesN <= 240;
+  const minutesValid = minutesInRange(minutesN);
   const budgetN = parseField("budget", maxBudget);
   const turnsN = parseField("turns", maxTurns);
 
@@ -233,22 +239,18 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
       return { field: "prompt", message: "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\"." };
     }
     if (!isBlank("budget", maxBudget)) {
-      const budgetNow = parseField("budget", maxBudget);
-      if (!Number.isFinite(budgetNow) || budgetNow <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
+      if (!budgetInRange(parseField("budget", maxBudget))) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
     }
     if (!isBlank("turns", maxTurns)) {
-      const turnsNow = parseField("turns", maxTurns);
-      if (!Number.isInteger(turnsNow) || turnsNow <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
+      if (!turnsInRange(parseField("turns", maxTurns))) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
     }
     if (!isBlank("minimum-duration", minDurationMinutes)) {
-      const minutesNow = parseField("minimum-duration", minDurationMinutes);
-      if (!Number.isInteger(minutesNow) || minutesNow < 1 || minutesNow > 240) {
+      if (!minutesInRange(parseField("minimum-duration", minDurationMinutes))) {
         return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
       }
     }
     if (!isBlank("target-discoveries", targetDiscoveries)) {
-      const targetNow = parseField("target-discoveries", targetDiscoveries);
-      if (!Number.isInteger(targetNow) || targetNow <= 0 || targetNow > 1000) {
+      if (!targetInRange(parseField("target-discoveries", targetDiscoveries))) {
         return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
       }
     }
@@ -280,9 +282,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   const launchDisabled = !activeStateKnown || activeJobId !== null || preflightBlocked || !previewCurrent || start.isPending;
 
   const limitsSummary = [
-    target === null ? "no target" : Number.isInteger(target) && target > 0 ? `stop after ${target}` : "target?",
-    isBlank("budget", maxBudget) ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
-    isBlank("turns", maxTurns) ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
+    target === null ? "no target" : targetInRange(target) ? `stop after ${target}` : "target?",
+    isBlank("budget", maxBudget) ? "no budget cap" : budgetInRange(budgetN) ? `$${budgetN.toFixed(2)} cap` : "budget?",
+    isBlank("turns", maxTurns) ? "no turn cap" : turnsInRange(turnsN) ? `${turnsN} turns` : "turns?",
     isBlank("minimum-duration", minDurationMinutes) ? "no minimum duration" : minutesValid ? `${minutesN} min minimum` : "minimum?",
   ].join(" · ");
 
@@ -366,9 +368,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("target-discoveries", targetDiscoveries, setTargetDiscoveries)}
               {...invalidProps("target-discoveries")}
               className="mt-1 min-h-11" data-testid="input-target-discoveries" />
-            <p className={hint(target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000))} data-testid="text-target-hint">
+            <p className={hint(target !== null && !targetInRange(target))} data-testid="text-target-hint">
               {target === null ? "No target — runs until the budget or turns end."
-                : !Number.isInteger(target) || target <= 0 || target > 1000 ? "Whole number from 1 to 1000, or blank."
+                : !targetInRange(target) ?"Whole number from 1 to 1000, or blank."
                   : `Stops after ${target} new ${target === 1 ? "discovery" : "discoveries"}.`}
             </p>
           </div>
@@ -378,12 +380,12 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("budget", maxBudget, setMaxBudget)}
               {...invalidProps("budget")}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
-            <p className={hint(!isBlank("budget", maxBudget) && !(Number.isFinite(budgetN) && budgetN > 0))}>
+            <p className={hint(!isBlank("budget", maxBudget) && !(budgetInRange(budgetN)))}>
               {isBlank("budget", maxBudget) ? "No cap — the run spends until it stops or you cancel it."
-                : !(Number.isFinite(budgetN) && budgetN > 0) ? "Enter a positive amount in USD (blank = no cap)."
+                : !(budgetInRange(budgetN)) ? "Enter a positive amount in USD (blank = no cap)."
                   : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
-            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < Math.max(cheapestSavingRun?.costUsd ?? 0, LOW_BUDGET_USD) && (
+            {budgetInRange(budgetN) && budgetN < Math.max(cheapestSavingRun?.costUsd ?? 0, LOW_BUDGET_USD) && (
               <p className={hint(true)} data-testid="text-budget-low">
                 {cheapestSavingRun !== null && budgetN < cheapestSavingRun.costUsd
                   ? `No run in the job history saved a discovery for less than ${cheapestSavingRun.costBasis === "reported" ? "" : "about "}$${cheapestSavingRun.costUsd.toFixed(2)}.`
@@ -398,7 +400,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               {...numberInputProps("turns", maxTurns, setMaxTurns)}
               {...invalidProps("turns")}
               className="mt-1 min-h-11" data-testid="input-research-turns" />
-            <p className={hint(!isBlank("turns", maxTurns) && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
+            <p className={hint(!isBlank("turns", maxTurns) && !(turnsInRange(turnsN)))} data-testid="text-turns-hint">
               {isBlank("turns", maxTurns) ?"No turn cap." : "Positive whole number (blank = no cap)."}
             </p>
           </div>
