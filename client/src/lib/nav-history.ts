@@ -50,7 +50,7 @@ function stampEntryId(): void {
   if (state !== null && (typeof state !== "object" || Array.isArray(state))) return;
   entrySeq += 1;
   const id = `${Date.now().toString(36)}-${entrySeq.toString(36)}`;
-  window.history.replaceState({ ...(state as object | null), [ENTRY_ID_STATE_KEY]: id }, "");
+  window.history.replaceState({ ...state, [ENTRY_ID_STATE_KEY]: id }, "");
 }
 
 function currentScrollKey(): string | null {
