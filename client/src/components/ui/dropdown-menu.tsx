@@ -4,9 +4,52 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+// Radix returns focus to the trigger on close with a bare `trigger.focus()`
+// (react-dropdown-menu 2.2.1 dist/index.mjs:115). Chrome scrolls the page for
+// that call when the trigger is off screen or in a sticky container (LG-052).
+// The wrapper keeps the trigger element and the modal flag so the content can
+// return focus itself with `preventScroll`.
+interface DropdownMenuFocusReturn {
+  triggerRef: React.MutableRefObject<HTMLButtonElement | null>
+  modal: boolean
+}
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuFocusReturnContext =
+  React.createContext<DropdownMenuFocusReturn | null>(null)
+
+const DropdownMenu = ({
+  modal = true,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) => {
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null)
+  const focusReturn = React.useMemo(
+    () => ({ triggerRef, modal }),
+    [modal]
+  )
+  return (
+    <DropdownMenuFocusReturnContext.Provider value={focusReturn}>
+      <DropdownMenuPrimitive.Root modal={modal} {...props} />
+    </DropdownMenuFocusReturnContext.Provider>
+  )
+}
+DropdownMenu.displayName = "DropdownMenu"
+
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ ...props }, forwardedRef) => {
+  const focusReturn = React.useContext(DropdownMenuFocusReturnContext)
+  const setRef = React.useCallback(
+    (node: HTMLButtonElement | null) => {
+      if (focusReturn) focusReturn.triggerRef.current = node
+      if (typeof forwardedRef === "function") forwardedRef(node)
+      else if (forwardedRef) forwardedRef.current = node
+    },
+    [focusReturn, forwardedRef]
+  )
+  return <DropdownMenuPrimitive.Trigger ref={setRef} {...props} />
+})
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
@@ -57,19 +100,49 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <DropdownMenuPrimitive.Portal>
-    <DropdownMenuPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        "z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[var(--radix-dropdown-menu-content-transform-origin)]",
-        className
-      )}
-      {...props}
-    />
-  </DropdownMenuPrimitive.Portal>
-))
+>(
+  (
+    { className, sideOffset = 4, onInteractOutside, onCloseAutoFocus, ...props },
+    ref
+  ) => {
+    const focusReturn = React.useContext(DropdownMenuFocusReturnContext)
+    const interactedOutsideRef = React.useRef(false)
+    return (
+      <DropdownMenuPrimitive.Portal>
+        <DropdownMenuPrimitive.Content
+          ref={ref}
+          sideOffset={sideOffset}
+          className={cn(
+            "z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[var(--radix-dropdown-menu-content-transform-origin)]",
+            className
+          )}
+          onInteractOutside={(event) => {
+            onInteractOutside?.(event)
+            if (event.defaultPrevented || !focusReturn) return
+            // Same rule as Radix: an outside interaction keeps focus where the
+            // user put it, unless a modal menu was closed by a plain click.
+            const original = event.detail.originalEvent
+            const button = "button" in original ? original.button : 0
+            const ctrlLeftClick = button === 0 && "ctrlKey" in original && original.ctrlKey
+            if (!focusReturn.modal || button === 2 || ctrlLeftClick) {
+              interactedOutsideRef.current = true
+            }
+          }}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event)
+            if (event.defaultPrevented || !focusReturn) return
+            event.preventDefault()
+            if (!interactedOutsideRef.current) {
+              focusReturn.triggerRef.current?.focus({ preventScroll: true })
+            }
+            interactedOutsideRef.current = false
+          }}
+          {...props}
+        />
+      </DropdownMenuPrimitive.Portal>
+    )
+  }
+)
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<

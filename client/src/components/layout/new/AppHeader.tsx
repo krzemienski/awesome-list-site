@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Bookmark, Bell, Settings, User, LogOut, LogIn, Palette, Shield, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -53,8 +52,6 @@ function SearchIcon() {
 export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName, repoUrl, repoBranch }: AppHeaderProps) {
   const [location, navigate] = useLocation();
   const guestSavedCount = useGuestBookmarkIds().size;
-  const accountTriggerRef = useRef<HTMLButtonElement>(null);
-  const interactedOutsideRef = useRef(false);
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
     queryKey: ["/api/notifications?limit=50"],
     enabled: Boolean(user),
@@ -118,7 +115,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           reaches for the account menu, ahead of the sign-in page. */}
       <DropdownMenu modal={false} onOpenChange={(open) => { if (open) requestClerk(); }}>
         <DropdownMenuTrigger asChild>
-          <button ref={accountTriggerRef} type="button" className="user-pill" onPointerEnter={requestClerk}>
+          <button type="button" className="user-pill" onPointerEnter={requestClerk}>
             {user ? <Avatar className="header-avatar" aria-hidden="true">
               <AvatarImage src={user.avatar} alt="" />
               {/* The header chip shows one letter, as in the reference design. */}
@@ -128,21 +125,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
             <span className="sr-only">{user ? firstName : "Sign in"}, account menu</span>
           </button>
         </DropdownMenuTrigger>
-        {/* LG-052: Radix returns focus with a bare trigger.focus(). On this
-            sticky-header trigger Chrome scrolls the page ~400px for it (keyboard
-            Escape or item select). Return focus ourselves with preventScroll,
-            keeping Radix's rule of not refocusing after an outside interaction. */}
-        <DropdownMenuContent
-          className="header-account-menu w-56"
-          align="end"
-          sideOffset={8}
-          onInteractOutside={() => { interactedOutsideRef.current = true; }}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (!interactedOutsideRef.current) accountTriggerRef.current?.focus({ preventScroll: true });
-            interactedOutsideRef.current = false;
-          }}
-        >
+        <DropdownMenuContent className="header-account-menu w-56" align="end" sideOffset={8}>
           <DropdownMenuLabel className="font-normal">
             {user ? <div className="flex min-w-0 flex-col space-y-1">
               <p className="truncate text-sm font-medium">{user.name?.trim() ? user.name : user.email}</p>
