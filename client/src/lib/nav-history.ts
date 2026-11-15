@@ -51,12 +51,16 @@ function currentScrollKey(): string | null {
   return SCROLL_KEY_PREFIX + currentEntryKey() + pathname + search;
 }
 
-function savedScroll(): number {
+// null: nothing saved for this entry (or no key), as distinct from a saved 0.
+function savedScroll(): number | null {
   try {
     const key = currentScrollKey();
-    return key ? Number(sessionStorage.getItem(key)) || 0 : 0;
+    const raw = key ? sessionStorage.getItem(key) : null;
+    if (raw === null) return null;
+    const offset = Number(raw);
+    return Number.isFinite(offset) ? offset : null;
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -89,9 +93,10 @@ if (typeof window !== "undefined") {
     if (pathSearch === lastPathSearch) {
       // Hash-only (or same-URL) traversal: the route does not change, so the
       // restore effect never runs and must not be left owed to the next
-      // path navigation. Re-apply this entry's offset here, else leave it.
+      // path navigation. Re-apply this entry's offset here (0 included), and
+      // leave the position only when nothing was saved for it.
       const saved = savedScroll();
-      if (saved > 0) window.scrollTo({ top: saved, behavior: "instant" });
+      if (saved !== null) window.scrollTo({ top: saved, behavior: "instant" });
       return;
     }
     lastPathSearch = pathSearch;
@@ -150,7 +155,7 @@ export function useScrollRestoration(location: string, search: string): void {
     pendingPop = false;
 
     const saved = savedScroll();
-    if (saved <= 0) {
+    if (!saved || saved < 0) {
       window.scrollTo({ top: 0, behavior: "instant" });
       return;
     }
@@ -223,13 +228,26 @@ if (typeof window !== "undefined") {
   for (const type of ["popstate", "pushState", "replaceState"]) {
     window.addEventListener(type, () => {
       if (type !== "replaceState") navigationIsPop = type === "popstate";
-      if (type !== "popstate") lastPathSearch = window.location.pathname + window.location.search;
+      if (type !== "popstate") {
+        const pathSearch = window.location.pathname + window.location.search;
+        // A hash-only push is a new history entry (new storage key) but no
+        // route change, so no route effect saves an offset for it: record it
+        // here, once the URL has changed. A path or query change is saved by
+        // the route effect after it has scrolled to the top.
+        if (pathSearch === lastPathSearch) saveScroll();
+        lastPathSearch = pathSearch;
+      }
       if (window.location.pathname === lastPathname) return;
       lastPathname = window.location.pathname;
       const el = visibleHeading();
       outgoingHeading = el ? { el, text: el.textContent } : null;
     });
   }
+  // A native #fragment link creates its entry without going through wouter.
+  // A traversal that is still owed a restore must keep the saved offset.
+  window.addEventListener("hashchange", () => {
+    if (!pendingPop && !restoringScroll) saveScroll();
+  });
 }
 
 function fragmentId(): string {
