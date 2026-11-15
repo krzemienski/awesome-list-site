@@ -1098,10 +1098,10 @@ export default function ResourceDetail() {
                   </p>
                 )}
                 {related.reasons && related.reasons.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="resource-detail-related-reasons mt-2 flex flex-nowrap gap-1 min-w-0">
                     <span className="sr-only">Why recommended:</span>
                     {related.reasons.slice(0, 2).map((reason, reasonIndex) => (
-                      <span key={reasonIndex} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
+                      <span key={reasonIndex} title={reason} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5 min-w-0 truncate">
                         {reason}
                       </span>
                     ))}
