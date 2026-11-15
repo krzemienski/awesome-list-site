@@ -207,7 +207,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                     const raw = sanitizeText(JSON.stringify(ev.detail, null, 2));
                     const truncated = raw.length > DETAIL_MAX;
                     return (
-                      <pre className="sm:pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
+                      <pre className="sm:pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap [overflow-wrap:anywhere]">
                         {truncated ? raw.slice(0, DETAIL_MAX) : raw}
                         {truncated && (
                           <span className={TRUNCATION_TEXT}>
