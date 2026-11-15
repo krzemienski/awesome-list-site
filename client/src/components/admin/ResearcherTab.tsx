@@ -32,6 +32,7 @@ import {
   isActiveJobStatus,
 } from "@/components/admin/researchDisplay";
 import { useDiscoveryReview } from "@/components/admin/useDiscoveryReview";
+import { TURN_CUT_OFF_NOTE, isTurnCutOff, turnCutOffTitle } from "@/components/admin/researchTurns";
 import {
   Search,
   XCircle,
@@ -478,7 +479,12 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                         <span className="block text-[10px] text-muted-foreground">{COST_BASIS_NOTE[job.costBasis]}</span>
                       )}
                     </td>
-                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns ?? "∞"}</td>
+                    <td className="mono queues-agent__cell-mono">
+                      {job.turnsUsed || 0}/{job.maxTurns ?? "∞"}
+                      {isTurnCutOff(job.status, job.turnsUsed ?? 0, job.maxTurns) && (
+                        <span className="block text-[10px] text-muted-foreground" title={turnCutOffTitle(job.maxTurns!)}>{TURN_CUT_OFF_NOTE}</span>
+                      )}
+                    </td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
@@ -804,23 +810,17 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                               </>
                             )}
                           </TableCell>
-                          {/* NB-032 (run18): turnsUsed accumulates across
-                              continuation runs while maxTurns is per-run, so used
-                              can exceed the cap — annotate instead of hiding. */}
                           <TableCell>
                             {job.status === 'cancelled' && (job.turnsUsed || 0) === 0 ? (
                               <span className="text-muted-foreground">—</span>
                             ) : job.maxTurns == null ? (
                               /* Unlimited-turns job: no cap to annotate against. */
                               <>{job.turnsUsed || 0}/∞</>
-                            ) : (job.turnsUsed || 0) > (job.maxTurns || 0) ? (
-                              /* NB-032: visible continuation annotation (was
-                                 tooltip-only) — turns accrue across runs while
-                                 the cap is per-run. */
-                              <span title={`used across continuation runs (cap ${job.maxTurns}/run)`}>
+                            ) : isTurnCutOff(job.status, job.turnsUsed ?? 0, job.maxTurns) ? (
+                              <span title={turnCutOffTitle(job.maxTurns)}>
                                 {job.turnsUsed}/{job.maxTurns}
                                 <span className="block text-[10px] text-muted-foreground whitespace-nowrap">
-                                  over cap: continued runs
+                                  {TURN_CUT_OFF_NOTE}
                                 </span>
                               </span>
                             ) : (
@@ -1003,15 +1003,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
 
               <div className="flex items-center justify-between">
                 <Label className="text-xs text-muted-foreground">
-                  {/* NB-032 (run18): annotate turns that exceed the per-run cap. */}
                   Turns:{' '}
                   {selectedJob.maxTurns == null ? (
                     /* Unlimited-turns job: no cap to annotate against. */
                     <>{selectedJob.turnsUsed || 0}/∞</>
-                  ) : (selectedJob.turnsUsed || 0) > (selectedJob.maxTurns || 0) ? (
-                    /* NB-032: visible continuation annotation. */
-                    <span title={`used across continuation runs (cap ${selectedJob.maxTurns}/run)`}>
-                      {selectedJob.turnsUsed}/{selectedJob.maxTurns} (continued runs; cap {selectedJob.maxTurns}/run)
+                  ) : isTurnCutOff(selectedJob.status, selectedJob.turnsUsed ?? 0, selectedJob.maxTurns) ? (
+                    <span title={turnCutOffTitle(selectedJob.maxTurns)}>
+                      {selectedJob.turnsUsed}/{selectedJob.maxTurns} ({TURN_CUT_OFF_NOTE})
                     </span>
                   ) : (
                     <>{selectedJob.turnsUsed || 0}/{selectedJob.maxTurns}</>
