@@ -9,6 +9,10 @@ import { OK_SOLID_BUTTON, getDiscoveryStatusBadge, getVerificationBadges } from 
 import { useDiscoveryReview } from "./useDiscoveryReview";
 import { useMotionTokens } from "./useMotionTokens";
 
+// The agent's category labels are free text; .chip is nowrap, so a long one ran
+// past its card. Same wrap as .resource-detail-onward-tag .chip.
+const LONG_LABEL_BADGE = "max-w-full whitespace-normal [overflow-wrap:anywhere]";
+
 /**
  * A run's saved discoveries. Each new one animates into the list while the
  * run is live; the same rows carry approve / reject so the run's ending is
@@ -60,8 +64,8 @@ export function ResearchRunDiscoveries({ discoveries, active }: { discoveries: R
                   </a>
                   {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{sanitizeDisplay(d.description)}</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
-                    {d.suggestedCategory && <Badge variant="secondary" className="text-xs">{d.suggestedCategory}</Badge>}
-                    {d.suggestedSubcategory && <Badge variant="outline" className="text-xs">{d.suggestedSubcategory}</Badge>}
+                    {d.suggestedCategory && <Badge variant="secondary" className={`text-xs ${LONG_LABEL_BADGE}`}>{d.suggestedCategory}</Badge>}
+                    {d.suggestedSubcategory && <Badge variant="outline" className={`text-xs ${LONG_LABEL_BADGE}`}>{d.suggestedSubcategory}</Badge>}
                     {d.confidence != null && <Badge variant="outline" className="text-xs">{d.confidence}% confidence</Badge>}
                   </div>
                 </div>

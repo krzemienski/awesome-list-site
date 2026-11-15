@@ -16,7 +16,7 @@ import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import type { AgentEvent, ResearchDiscovery, ResearchJob } from "@shared/schema";
-import { COST_BASIS_NOTE, formatCost, getStatusBadge, humanizeJobError, isActiveJobStatus, isConfigJobError } from "./researchDisplay";
+import { COST_BASIS_NOTE, formatCost, getStatusBadge, humanizeJobError, isActiveJobStatus, isConfigJobError, isTurnCutOff, turnCutOffTitle } from "./researchDisplay";
 import { OUTCOME_LABEL, STEP_LABEL, deriveRunProgress, type RunOutcome } from "./researchRunProgress";
 import { ResearchPhaseTimeline } from "./ResearchPhaseTimeline";
 import { ResearchRunDiscoveries } from "./ResearchRunDiscoveries";
@@ -329,8 +329,8 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
                 <dd className="text-sm font-medium" data-testid="text-run-turns">
                   {active && turnsUsed === 0
                     ? `counted at the end · cap ${job.maxTurns ?? "none"}`
-                    : (outcome === "budget_stopped" || outcome === "turn_stopped") && job.maxTurns && turnsUsed > job.maxTurns
-                      ? `${turnsUsed} (cap ${job.maxTurns}; the last turn was cut off by the stop)`
+                    : isTurnCutOff(outcome, turnsUsed, job.maxTurns)
+                      ? `${turnsUsed} (${turnCutOffTitle(job.maxTurns!).toLowerCase()})`
                       : `${turnsUsed} of ${job.maxTurns ?? "∞"}`}
                 </dd>
                 {!active && job.maxTurns ? <Progress value={(Math.min(turnsUsed, job.maxTurns) / job.maxTurns) * 100} className="mt-1 h-1.5" aria-label="Turns used against the cap" /> : null}
