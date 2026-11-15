@@ -62,6 +62,7 @@ let pendingPop =
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
     pendingPop = true;
+    cancelStamp();
   });
 }
 
@@ -71,6 +72,64 @@ if (typeof window !== "undefined") {
 // gets focus if the restore left it in view.
 let navigationIsPop = pendingPop;
 let restoringScroll = false;
+
+// LG-051: two history entries can share one URL (/category/x → /resource/1 →
+// /category/x), and the sessionStorage key above is the URL, so Back to the
+// first one would restore the second one's offset. Each entry therefore also
+// keeps its own offset in its own history.state, merged into whatever state
+// wouter or a page already put there. Reading it back needs no entry id: the
+// browser hands each entry's state back on popstate. Entries without a stamped
+// offset (made before this shipped, or by code that replaced the state) fall
+// back to the sessionStorage key.
+const STAMP_DEBOUNCE_MS = 150;
+let stampTimer: number | undefined;
+
+function stampedScroll(): number | null {
+  const state: unknown = window.history.state;
+  if (state === null || typeof state !== "object") return null;
+  const offset = (state as { scrollY?: unknown }).scrollY;
+  return typeof offset === "number" && Number.isFinite(offset) && offset >= 0 ? offset : null;
+}
+
+// Uses the native replaceState, not window.history's: wouter's wrapper
+// announces every call to its subscribers, and the analytics tracker counts a
+// same-URL replaceState as a page view (use-analytics.tsx). A stamp is neither.
+function stampScroll(): void {
+  if (!currentScrollKey()) return;
+  const state: unknown = window.history.state;
+  if (state !== null && (typeof state !== "object" || Array.isArray(state))) return;
+  const offset = Math.round(window.scrollY);
+  if (stampedScroll() === offset) return;
+  try {
+    History.prototype.replaceState.call(window.history, { ...state, scrollY: offset }, "");
+  } catch {
+    // replaceState can be rate-limited or refused — the sessionStorage copy remains.
+  }
+}
+
+function cancelStamp(): void {
+  window.clearTimeout(stampTimer);
+  stampTimer = undefined;
+}
+
+// While a pop's offset is still being re-applied the page is shorter than the
+// saved offset and scroll events carry the clamped position, not the user's.
+function flushStamp(): void {
+  cancelStamp();
+  if (!restoringScroll) stampScroll();
+}
+
+// Debounced: replaceState is rate-limited (Safari: ~100 calls per 30 s), so a
+// scroll gesture stamps once, when it pauses. The timer is dropped when the
+// location moves, so it cannot write the old page's offset onto the new entry.
+function scheduleStamp(): void {
+  cancelStamp();
+  const scheduledFor = currentScrollKey();
+  stampTimer = window.setTimeout(() => {
+    stampTimer = undefined;
+    if (currentScrollKey() === scheduledFor) flushStamp();
+  }, STAMP_DEBOUNCE_MS);
+}
 
 // `location` is wouter's path; `search` its query. Positions are keyed by
 // both, so a Back/Forward that only changes the query (?page=2 → ?page=3)
@@ -91,12 +150,29 @@ export function useScrollRestoration(location: string, search: string): void {
       requestAnimationFrame(() => {
         rafPending = false;
         saveScroll();
+        scheduleStamp();
       });
+    };
+    // A click or Enter right after scrolling navigates before the debounce
+    // fires; stamp synchronously so the entry being left keeps its offset.
+    // Enter only, and not on repeat: held arrow keys must not hammer replaceState.
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.isPrimary) flushStamp();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && !event.repeat) flushStamp();
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("keydown", onKeyDown, true);
+    window.addEventListener("pagehide", flushStamp);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("keydown", onKeyDown, true);
+      window.removeEventListener("pagehide", flushStamp);
+      cancelStamp();
     };
   }, []);
 
@@ -111,6 +187,7 @@ export function useScrollRestoration(location: string, search: string): void {
       // scrolling to a list top that is already at the top) fires no scroll
       // event, so without this Forward would find nothing saved for it.
       saveScroll();
+      stampScroll();
       return;
     }
     pendingPop = false;
@@ -118,7 +195,7 @@ export function useScrollRestoration(location: string, search: string): void {
     let saved = 0;
     try {
       const key = currentScrollKey();
-      saved = key ? Number(sessionStorage.getItem(key)) || 0 : 0;
+      saved = !key ? 0 : stampedScroll() ?? (Number(sessionStorage.getItem(key)) || 0);
     } catch {
       saved = 0;
     }
@@ -194,7 +271,10 @@ let lastPathname = typeof window !== "undefined" ? window.location.pathname : ""
 if (typeof window !== "undefined") {
   for (const type of ["popstate", "pushState", "replaceState"]) {
     window.addEventListener(type, () => {
-      if (type !== "replaceState") navigationIsPop = type === "popstate";
+      if (type !== "replaceState") {
+        navigationIsPop = type === "popstate";
+        cancelStamp();
+      }
       if (window.location.pathname === lastPathname) return;
       lastPathname = window.location.pathname;
       const el = visibleHeading();
