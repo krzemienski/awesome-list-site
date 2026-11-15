@@ -329,7 +329,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
                 <dd className="text-sm font-medium" data-testid="text-run-turns">
                   {active && turnsUsed === 0
                     ? `counted at the end · cap ${job.maxTurns ?? "none"}`
-                    : !active && job.maxTurns && turnsUsed > job.maxTurns
+                    : (outcome === "budget_stopped" || outcome === "turn_stopped") && job.maxTurns && turnsUsed > job.maxTurns
                       ? `${turnsUsed} (cap ${job.maxTurns}; the last turn was cut off by the stop)`
                       : `${turnsUsed} of ${job.maxTurns ?? "∞"}`}
                 </dd>
