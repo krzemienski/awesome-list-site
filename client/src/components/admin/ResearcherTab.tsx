@@ -863,7 +863,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                             <TableCell colSpan={9} className="p-0">
                               <Alert variant="destructive" live="off" className="rounded-none border-x-0 border-t-0">
                                 <AlertCircle className="w-4 h-4" />
-                                <AlertDescription className="text-xs break-all">
+                                <AlertDescription className="text-xs [overflow-wrap:anywhere]">
                                   Job #{job.id}: {humanizeJobError(job.errorMessage)}
                                 </AlertDescription>
                               </Alert>
@@ -982,7 +982,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Base URL</Label>
-                  <p className="text-xs font-mono mt-1 break-all">{selectedJob.baseUrl || 'Platform default'}</p>
+                  <p className="text-xs font-mono mt-1 [overflow-wrap:anywhere]">{selectedJob.baseUrl || 'Platform default'}</p>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Auth Token</Label>
@@ -995,9 +995,11 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                 <Alert variant="destructive" live="off">
                   <AlertCircle className="w-4 h-4" />
                   {/* NB-018 (run18): long unbroken tokens/URLs in agent errors
-                      blew the banner to ~1,786px inside the dialog — force the
-                      text to wrap and clip within the modal width. */}
-                  <AlertDescription className="max-w-full overflow-hidden break-all whitespace-pre-wrap">
+                      blew the banner to ~1,786px inside the dialog. LG-058:
+                      break-all also split ordinary words ("higher ca / p");
+                      wrap between words and break a token only when it cannot
+                      fit a line on its own. */}
+                  <AlertDescription className="max-w-full overflow-hidden [overflow-wrap:anywhere] whitespace-pre-wrap">
                     {humanizeJobError(selectedJob.errorMessage)}
                   </AlertDescription>
                 </Alert>
@@ -1050,7 +1052,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                           {entry.role}
                         </Badge>
                         <span
-                          className={'whitespace-pre-wrap break-words break-all flex-1 min-w-0 ' + (AGENT_ROLE_TEXT_STYLES[entry.role] || 'text-foreground')}
+                          className={'whitespace-pre-wrap [overflow-wrap:anywhere] flex-1 min-w-0 ' + (AGENT_ROLE_TEXT_STYLES[entry.role] || 'text-foreground')}
                         >
                           {entry.content}
                         </span>
