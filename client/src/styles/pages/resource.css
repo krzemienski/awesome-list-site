@@ -205,6 +205,9 @@
   .resource-detail-related-body { --related-row-h: 7.125rem; }
 }
 .resource-detail-related-reason { border-radius: var(--radius-pill); }
+/* Reasons stay on one line (each chip ellipsises, its full text is in the
+   title and the DOM) so a long label can never push a row past --related-row-h. */
+.resource-detail-related-reasons { overflow: hidden; }
 
 /* Keep exploring: under the actions on narrow screens; on wide ones it sits in
    the otherwise empty column beside the page, level with the heading (the
