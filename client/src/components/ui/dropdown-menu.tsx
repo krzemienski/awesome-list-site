@@ -130,12 +130,13 @@ const DropdownMenuContent = React.forwardRef<
           }}
           onCloseAutoFocus={(event) => {
             onCloseAutoFocus?.(event)
+            const interactedOutside = interactedOutsideRef.current
+            interactedOutsideRef.current = false
             if (event.defaultPrevented || !focusReturn) return
             event.preventDefault()
-            if (!interactedOutsideRef.current) {
+            if (!interactedOutside) {
               focusReturn.triggerRef.current?.focus({ preventScroll: true })
             }
-            interactedOutsideRef.current = false
           }}
           {...props}
         />
