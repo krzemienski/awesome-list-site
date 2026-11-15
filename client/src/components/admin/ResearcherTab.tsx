@@ -24,15 +24,17 @@ import {
   type CheapestSavingRun,
   OK_SOLID_BUTTON,
   OK_TEXT,
+  TURN_CUT_OFF_NOTE,
   formatCost,
   getDiscoveryStatusBadge,
   getStatusBadge,
   getVerificationBadges,
   humanizeJobError,
   isActiveJobStatus,
+  isTurnCutOff,
+  turnCutOffTitle,
 } from "@/components/admin/researchDisplay";
 import { useDiscoveryReview } from "@/components/admin/useDiscoveryReview";
-import { TURN_CUT_OFF_NOTE, isTurnCutOff, turnCutOffTitle } from "@/components/admin/researchTurns";
 import {
   Search,
   XCircle,
