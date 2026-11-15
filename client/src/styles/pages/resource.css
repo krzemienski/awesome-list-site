@@ -187,11 +187,22 @@
 }
 .resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .resource-detail-related-item { border-radius: var(--radius-sm); }
-/* The card body keeps the height of its reserved placeholder rows (about
-   5.9rem each plus the 0.5rem gap) so fewer rows or a short message after
-   load do not pull the content below upward. */
+/* One reserved height for every state of the card body: loading, one or two
+   rows, "all shown above", empty and error. --related-row-h is the tallest a
+   row or placeholder renders (104px from 640px; 114px below it, where a
+   title can wrap to two lines). The reserve is that per placeholder row, the
+   0.5rem gaps and the card's 1.5rem bottom padding (min-height counts the
+   padding), so the card is the same height before and after the list lands,
+   whatever the list holds. */
 .resource-detail-related-body {
-  min-height: calc(var(--related-rows) * 5.9rem + (var(--related-rows) - 1) * 0.5rem);
+  --related-row-h: 6.5rem;
+  min-height: calc(var(--related-rows) * var(--related-row-h) + (var(--related-rows) - 1) * 0.5rem + 1.5rem);
+}
+.resource-detail-related-body [data-testid="related-placeholder"] {
+  min-height: var(--related-row-h);
+}
+@media (max-width: 639px) {
+  .resource-detail-related-body { --related-row-h: 7.125rem; }
 }
 .resource-detail-related-reason { border-radius: var(--radius-pill); }
 
