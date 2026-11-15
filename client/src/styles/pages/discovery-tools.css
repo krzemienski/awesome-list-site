@@ -505,12 +505,20 @@
     background: transparent;
   }
 
+  /* LG-054: beside the icon the label got 96px at 390px, less than the 116px
+     "Recommendations" needs, and overflow-wrap:anywhere broke it mid-word.
+     The icon now sits above the label so the label gets the whole cell, and
+     it wraps only between words (overflow-wrap:normal never splits a word). */
   .discovery-tools-tab {
     min-width: 0;
-    justify-content: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 8px;
     white-space: normal;
-    overflow-wrap: anywhere;
-    text-align: start;
+    overflow-wrap: normal;
+    word-break: normal;
+    text-align: center;
   }
 
   /* A wrapping label squeezed the icon to nothing ("AI Recommendations" lost
@@ -530,5 +538,21 @@
   .discovery-tools-cta-primary,
   .discovery-tools-cta-secondary {
     width: 100%;
+  }
+}
+
+/* LG-054: below 360px a half-width cell (117px at 320px) is narrower than the
+   116px "Recommendations", so the tabs stack full width, icon beside label. */
+@media (max-width: 359px) {
+  .discovery-tools-tabs-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .discovery-tools-tab {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+    text-align: start;
   }
 }
