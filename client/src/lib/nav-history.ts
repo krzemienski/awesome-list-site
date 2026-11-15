@@ -233,8 +233,11 @@ if (typeof window !== "undefined") {
         // A hash-only push is a new history entry (new storage key) but no
         // route change, so no route effect saves an offset for it: record it
         // here, once the URL has changed. A path or query change is saved by
-        // the route effect after it has scrolled to the top.
-        if (pathSearch === lastPathSearch) saveScroll();
+        // the route effect after it has scrolled to the top. Not while a pop
+        // restore is owed or waiting for content: useAnalytics replaces the
+        // same URL on every popstate, and that must not save the current
+        // position over the destination entry's offset.
+        if (pathSearch === lastPathSearch && !pendingPop && !restoringScroll) saveScroll();
         lastPathSearch = pathSearch;
       }
       if (window.location.pathname === lastPathname) return;
