@@ -32,10 +32,36 @@ const SCROLL_KEY_PREFIX = "scrollpos:";
 // never hold one, so these paths keep no scroll position at all.
 const NO_SCROLL_KEY_PATHS = /^\/(sign-in|sign-up|forgot-password|reset-password|verify)/;
 
+// LG-051: two history entries can share one URL (/category/x -> /resource/1 ->
+// /category/x), so a URL-only key restores the second visit's offset on Back to
+// the first. The Navigation API gives each history entry a browser-generated
+// key that is kept across reloads and replaceState; nothing is written to
+// history.state. Without the API the key stays the URL alone. Read only in
+// handlers and effects, never during render or at module load.
+function currentEntryKey(): string {
+  if (typeof window === "undefined") return "";
+  const key = (window as { navigation?: { currentEntry?: { key?: string } | null } }).navigation
+    ?.currentEntry?.key;
+  return key ? key + ":" : "";
+}
+
 function currentScrollKey(): string | null {
   const { pathname, search } = window.location;
   if (NO_SCROLL_KEY_PATHS.test(pathname)) return null;
-  return SCROLL_KEY_PREFIX + pathname + search;
+  return SCROLL_KEY_PREFIX + currentEntryKey() + pathname + search;
+}
+
+// null: nothing saved for this entry (or no key), as distinct from a saved 0.
+function savedScroll(): number | null {
+  try {
+    const key = currentScrollKey();
+    const raw = key ? sessionStorage.getItem(key) : null;
+    if (raw === null) return null;
+    const offset = Number(raw);
+    return Number.isFinite(offset) ? offset : null;
+  } catch {
+    return null;
+  }
 }
 
 function saveScroll(): void {
@@ -54,6 +80,8 @@ function saveScroll(): void {
 // flushes the location render (and this hook's effect) synchronously inside
 // wouter's handler, and the effect reads a stale `false`. Registering at
 // module load guarantees this listener runs first.
+let lastPathSearch =
+  typeof window !== "undefined" ? window.location.pathname + window.location.search : "";
 let pendingPop =
   typeof performance !== "undefined" &&
   (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)
@@ -61,6 +89,17 @@ let pendingPop =
 
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
+    const pathSearch = window.location.pathname + window.location.search;
+    if (pathSearch === lastPathSearch) {
+      // Hash-only (or same-URL) traversal: the route does not change, so the
+      // restore effect never runs and must not be left owed to the next
+      // path navigation. Re-apply this entry's offset here (0 included), and
+      // leave the position only when nothing was saved for it.
+      const saved = savedScroll();
+      if (saved !== null) window.scrollTo({ top: saved, behavior: "instant" });
+      return;
+    }
+    lastPathSearch = pathSearch;
     pendingPop = true;
   });
 }
@@ -115,14 +154,8 @@ export function useScrollRestoration(location: string, search: string): void {
     }
     pendingPop = false;
 
-    let saved = 0;
-    try {
-      const key = currentScrollKey();
-      saved = key ? Number(sessionStorage.getItem(key)) || 0 : 0;
-    } catch {
-      saved = 0;
-    }
-    if (saved <= 0) {
+    const saved = savedScroll();
+    if (!saved || saved < 0) {
       window.scrollTo({ top: 0, behavior: "instant" });
       return;
     }
@@ -195,12 +228,29 @@ if (typeof window !== "undefined") {
   for (const type of ["popstate", "pushState", "replaceState"]) {
     window.addEventListener(type, () => {
       if (type !== "replaceState") navigationIsPop = type === "popstate";
+      if (type !== "popstate") {
+        const pathSearch = window.location.pathname + window.location.search;
+        // A hash-only push is a new history entry (new storage key) but no
+        // route change, so no route effect saves an offset for it: record it
+        // here, once the URL has changed. A path or query change is saved by
+        // the route effect after it has scrolled to the top. Not while a pop
+        // restore is owed or waiting for content: useAnalytics replaces the
+        // same URL on every popstate, and that must not save the current
+        // position over the destination entry's offset.
+        if (pathSearch === lastPathSearch && !pendingPop && !restoringScroll) saveScroll();
+        lastPathSearch = pathSearch;
+      }
       if (window.location.pathname === lastPathname) return;
       lastPathname = window.location.pathname;
       const el = visibleHeading();
       outgoingHeading = el ? { el, text: el.textContent } : null;
     });
   }
+  // A native #fragment link creates its entry without going through wouter.
+  // A traversal that is still owed a restore must keep the saved offset.
+  window.addEventListener("hashchange", () => {
+    if (!pendingPop && !restoringScroll) saveScroll();
+  });
 }
 
 function fragmentId(): string {
