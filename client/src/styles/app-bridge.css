@@ -276,8 +276,13 @@ body { font-feature-settings: "ss01", "cv11"; }
 
 /* AF01: a keyboard-scrollable table region fills its card edge to edge, and
    the card clips overflow for its rounded corners, so an outset ring lost its
-   sides. The region's ring is drawn inside its own box instead. */
-[role="region"][tabindex]:focus-visible {
+   sides. The region's ring is drawn inside its own box instead, and the
+   region rises above its sibling scroll-cue gradient (z-10) while focused so
+   the gradient never covers the ring's right edge. Other regions (the agent
+   graph, the toaster) keep the shared outset ring. */
+[role="region"][tabindex]:has(table):focus-visible {
+  position: relative;
+  z-index: 11;
   outline-offset: -3px;
 }
 
