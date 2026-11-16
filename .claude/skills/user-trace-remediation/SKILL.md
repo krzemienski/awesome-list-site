@@ -13,7 +13,7 @@ Run on demand only. The trace is read-only: it writes nothing to production and 
 ## How the sources fit
 
 - No single source sees everything. The server sees every request but not what rendered. PostHog sees the browser, but only after consent, and never for automated browsers (`navigator.webdriver`), admin sessions carrying the `analytics-admin-session` marker, `/qa-*` paths or non-production hosts (`client/src/lib/analytics-suppression.ts`). A finding is strong when two independent sources agree.
-- Audit traffic pollutes both sides. Server counts include it. PostHog mostly drops it, yet sessions whose `distinct_id` starts `qa-audit-` reached replay on 2026-11-15. Split by class (`real`/`test`, `human`/`bot`) or by QA time window before counting.
+- Audit traffic pollutes both sides. Server counts include it. PostHog mostly drops it, yet sessions whose `distinct_id` starts `qa-audit-` reached replay on 2026-11-15. Split by class before counting: usage is `real`/`test`; `traffic_hourly` is `human`, `bot-search`, `bot-ai`, `bot-other` and `qa` (`server/ops/operationalTelemetry.ts`), so drop `qa` and report bots apart.
 - Empty is a result. Zero `$exception` rows while audit browsers are suppressed says little; zero human 5xx in `traffic_hourly` says a lot. Say which kind each empty result is.
 - Post-run docs are claims. A ledger row marked fixed stays a hypothesis until a live source shows the symptom gone on the live revision.
 
@@ -25,7 +25,7 @@ Run on demand only. The trace is read-only: it writes nothing to production and 
 
 ## Steps
 
-Write outputs under `.local/audit/<RUN_UTC>/trace/` (gitignored): one raw file per source, then `user-trace-report.md`. Each finding cites the file and the exact query behind it.
+Write outputs under `.local/audit/<RUN_UTC>/trace/`. It is excluded only by `.git/info/exclude`, not `.gitignore`, so never stage it: one raw file per source, then `user-trace-report.md`. Each finding cites the file and the exact query behind it.
 
 ### 1. Collect and normalize
 
@@ -67,7 +67,7 @@ Done when every journey from step 2 has its dependency list.
 
 Join on time window, template and revision:
 
-- PostHog vitals or `site_error` spike on a template, then `traffic_hourly` for that template and hour, then `/api/admin/logs` records in that hour (`rid`, `inst`), then the post-run doc that last touched that code.
+- PostHog vitals or `site_error` spike on a template, then `traffic_hourly` for that template and hour, then `/api/admin/logs` records in that hour (`rid`, `instance`), then the post-run doc that last touched that code.
 - A post-run "fixed on X" claim, then the symptom's query on the live revision: confirmed, regressed, or never reproduced.
 
 Done when every candidate finding carries its agreement count (1, 2, 3+ independent sources).
