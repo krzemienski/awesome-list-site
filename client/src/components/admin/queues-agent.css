@@ -387,11 +387,6 @@
   margin: 0;
 }
 
-.queues-agent .queues-agent__table-body [role="region"] {
-  outline-offset: 2px;
-}
-
-.queues-agent .queues-agent__table-body [role="region"]:focus-visible,
 .queues-agent .queues-agent__event-log [role="log"]:focus-visible,
 .queues-agent .queues-agent__graph:focus-visible {
   outline: 2px solid var(--accent);
