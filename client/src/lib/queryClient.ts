@@ -27,7 +27,7 @@ export class ApiError extends Error {
   }
 }
 
-function isRetryableTransient(error: unknown): error is ApiError {
+export function isRetryableTransient(error: unknown): error is ApiError {
   return (
     error instanceof ApiError
     && (error.status === 429 || (error.status === 503 && error.retryAfterSec !== undefined))
@@ -53,19 +53,23 @@ export function isGoneError(error: unknown): boolean {
   );
 }
 
-/** Retry-After as seconds: delta-seconds or an HTTP-date (RFC 9110 10.2.3). */
-export function retryAfterSeconds(res: Response): number | undefined {
+/** Retry-After as seconds: delta-seconds or an HTTP-date (RFC 9110 10.2.3); a date already passed means 0. */
+function retryAfterSeconds(res: Response): number | undefined {
   const header = res.headers.get("Retry-After")?.trim();
   if (!header) return undefined;
   const seconds = /^\d+$/.test(header) ? Number(header) : Math.ceil((Date.parse(header) - Date.now()) / 1000);
-  return Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
+  return Number.isFinite(seconds) ? Math.max(0, seconds) : undefined;
+}
+
+/** The ApiError for a non-OK response. The delay is read before the body so a dated header cannot lapse meanwhile. */
+export async function responseError(res: Response): Promise<ApiError> {
+  const retryAfter = retryAfterSeconds(res);
+  const text = (await res.text()) || res.statusText;
+  return new ApiError(res.status, text, retryAfter);
 }
 
 export async function throwIfResNotOk(res: Response) {
-  if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new ApiError(res.status, text, retryAfterSeconds(res));
-  }
+  if (!res.ok) throw await responseError(res);
 }
 
 export async function apiRequest(

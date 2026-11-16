@@ -8,7 +8,7 @@
 import type { ResourceKind } from "@shared/resourceKinds";
 import { isRealCategory } from "@shared/catalog-counts";
 import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
-import { ApiError, apiRequest, catalogRequestCache, retryAfterSeconds, throwIfResNotOk } from "@/lib/queryClient";
+import { ApiError, apiRequest, catalogRequestCache, isRetryableTransient, responseError, throwIfResNotOk } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
 /**
@@ -30,12 +30,14 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
 }
 
 /**
- * An index.html prefetch the server answered with Retry-After is thrown, so the
- * query layer waits as asked. Any other non-OK prefetch falls through to a
- * fresh request, as before.
+ * An index.html prefetch the query layer would retry (429, or 503 with
+ * Retry-After) is thrown, so it waits as asked. Any other non-OK prefetch falls
+ * through to a fresh request, as before.
  */
 async function throwIfRetryLater(response: Response): Promise<void> {
-  if (!response.ok && retryAfterSeconds(response) !== undefined) await throwIfResNotOk(response);
+  if (response.ok) return;
+  const error = await responseError(response);
+  if (isRetryableTransient(error)) throw error;
 }
 
 export async function fetchStaticAwesomeList(): Promise<any> {
@@ -83,7 +85,7 @@ export async function fetchStaticAwesomeList(): Promise<any> {
       lastError = err;
       // The server named a delay: let the query layer wait it out instead of
       // re-requesting after the fixed backoff below.
-      if (err instanceof ApiError && err.retryAfterSec !== undefined) throw err;
+      if (isRetryableTransient(err)) throw err;
       const isAbort = err instanceof DOMException && err.name === 'AbortError';
       const isLast = attempt === AWESOME_LIST_MAX_ATTEMPTS;
       if (isLast) {
