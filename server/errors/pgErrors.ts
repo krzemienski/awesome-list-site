@@ -37,7 +37,7 @@ function isPgDatabaseError(value: unknown): value is PgDatabaseError {
   return typeof e?.severity === "string" && typeof e.code === "string" && /^[0-9A-Z]{5}$/.test(e.code);
 }
 
-function findPgError(error: unknown): PgDatabaseError | undefined {
+export function findPgError(error: unknown): PgDatabaseError | undefined {
   return causeChain(error).find(isPgDatabaseError);
 }
 
