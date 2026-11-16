@@ -909,7 +909,8 @@ function homeShellChrome(): string {
       description: `Browse all categories of curated video development resources on ${SITE_NAME} — players, encoders, codecs, streaming, AI, tools, and more.`,
     },
     "/admin": {
-      title: `Admin — ${SITE_NAME}`,
+      // Bare /admin opens the Overview tab, so it gets that section's title.
+      title: `${adminPageTitle("overview")} — ${SITE_NAME}`,
       description: `${SITE_NAME} admin panel.`,
       // Internal admin panel — noindex; must never appear in search results.
       noindex: true,
