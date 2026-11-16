@@ -5,7 +5,7 @@ import type { EnrichmentJob, LinkHealthJob } from "@shared/schema";
 import StatStatusChip from "@/components/admin/canonical/StatusChip";
 import TableShell from "@/components/admin/canonical/TableShell";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
-import { formatRelativeAgo } from "@/lib/utils";
+import { formatRelativeAgo, maskEmail } from "@/lib/utils";
 import "@/styles/pages/admin-overview.css";
 
 interface OverviewStats {
@@ -146,10 +146,8 @@ const title = (value: string) =>
   value.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 const auditActor = (entry: AuditEntry) => {
-  const actor = entry.performedByEmail ?? entry.performedBy ?? "system";
-  if (!actor.includes("@")) return actor;
-  const [local, domain] = actor.split("@");
-  return `${local.slice(0, 1)}•••@${domain}`;
+  if (entry.performedByEmail) return maskEmail(entry.performedByEmail);
+  return entry.performedBy ?? "system";
 };
 
 const dateValue = (value: string | null | undefined) => {

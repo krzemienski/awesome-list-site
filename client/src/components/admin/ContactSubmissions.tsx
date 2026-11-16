@@ -24,6 +24,7 @@ import "@/styles/pages/admin-ops-users-audit.css";
 import { apiFetch } from "@/lib/api-fetch";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { maskEmail } from "@/lib/utils";
 
 interface ContactSubmission {
   id: string;
@@ -46,12 +47,6 @@ const DELETE_TIMEOUT_MS = 15_000;
 
 // A DELETE that timed out: the server's outcome is unknown.
 class TimedOutError extends Error {}
-
-function maskEmail(email: string): string {
-  const at = email.indexOf("@");
-  if (at <= 0) return "••••••";
-  return `${email[0]}•••${email.slice(at)}`;
-}
 
 function formatDate(date: string | Date | null | undefined): string {
   if (!date) return "—";
