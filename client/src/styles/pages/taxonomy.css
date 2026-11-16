@@ -411,9 +411,10 @@
   pointer-events: auto;
 }
 
-/* The tray takes the featured chip's corner while it is shown. */
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__featured,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__featured {
+/* The tray takes the featured chip's corner while it is shown. Personal cards
+   drop the tray below the top row, so their chip stays visible. */
+.taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):hover .resource-card__featured,
+.taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):focus-within .resource-card__featured {
   visibility: hidden;
 }
 
@@ -431,15 +432,23 @@
 }
 
 /* Touch screens never hover, so the tray stays shown there; it sits in the
-   empty band, so showing it costs no layout. */
+   empty band, so showing it costs no layout. A featured card's chip owns that
+   corner, so its tray drops to its own strip like a personal card's and the
+   chip stays visible (PD01: touch visitors never saw "Featured"). */
 @media (hover: none) {
   .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .taxonomy-page .resource-card--taxonomy .resource-card__featured {
-    visibility: hidden;
+  .taxonomy-page .resource-card--taxonomy:has(.resource-card__featured) .resource-card__top {
+    margin-bottom: 58px !important;
+  }
+
+  .taxonomy-page .resource-card--taxonomy:has(.resource-card__featured) .resource-card__reveal {
+    top: 72px;
+    left: 20px;
+    justify-content: flex-start;
   }
 }
 
