@@ -362,11 +362,9 @@
     padding: 1rem;
   }
 
+  /* TV02: Open Link (flex: 1) and the 44px Suggest Edit button share a row,
+     as on taxonomy cards; they wrap only when the card is too narrow. */
   .resource-card__actions {
     flex-wrap: wrap;
-  }
-
-  .resource-card__visit-button {
-    flex-basis: 100%;
   }
 }
