@@ -14,10 +14,9 @@ try {
   b = await openAdminBrowser();
   const { page } = b;
   await page.goto(`${BASE}/admin?tab=resources&status=all`, { waitUntil: "domcontentloaded" });
-  const search = page.getByTestId("input-search-resources");
+  const search = page.getByTestId("input-search-resources-header");
   await search.waitFor({ state: "attached", timeout: 60000 });
-  if (!(await search.isVisible())) await page.getByTestId("input-search-resources-header").fill(`d10ui_${RUN}`);
-  else await search.fill(`d10ui_${RUN}`);
+  await search.fill(`d10ui_${RUN}`);
   await page.getByTestId(`row-resource-${resId}`).waitFor({ timeout: 30000 });
 
   for (const target of ["approved", "pending", "rejected"]) {

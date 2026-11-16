@@ -90,9 +90,9 @@ try {
   // ---- Admin table: editor edit of A's title, then delete P ----
   await spaNav(page, `/admin?tab=resources&status=all`);
   await page.getByTestId("tab-resources").click().catch(() => {});
-  const search = page.getByTestId("input-search-resources");
+  const search = page.getByTestId("input-search-resources-header");
   await search.waitFor({ state: "attached", timeout: 20000 });
-  if (await search.isVisible()) await search.fill(`d06_`); else await page.getByTestId("input-search-resources-header").fill(`d06_`);
+  await search.fill(`d06_`);
   await page.getByTestId(`row-resource-${A.id}`).waitFor({ timeout: 20000 });
   const rowA = (await page.getByTestId(`row-resource-${A.id}`).textContent()) ?? "";
   expect(I, rowA.includes("d06_A_edited_by_suggestion"), "admin table shows A's edit-approved title without reload");
