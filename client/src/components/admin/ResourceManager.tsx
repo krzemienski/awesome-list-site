@@ -1283,7 +1283,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
-          <form role="search" aria-label="Search resources" onSubmit={handleSearch} className="admin-catalog-resources__header-actions">
+          {/* A plain form (no search landmark): it also holds the tools toggle
+              and Add. Enter submits it, which skips the search debounce. */}
+          <form onSubmit={handleSearch} className="admin-catalog-resources__header-actions">
             <Input
               placeholder="Search…"
               aria-label="Search by title or URL"
