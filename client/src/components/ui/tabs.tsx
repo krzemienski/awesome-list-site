@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils"
 // The canonical sheet styles the selected tab as `.tab.active`, so the root
 // shares its current value with the triggers and each trigger adds `active`
 // itself. Works for both controlled (`value`) and uncontrolled (`defaultValue`) use.
-const TabsValueContext = React.createContext<string | undefined>(undefined)
+// The root also shares its change handler so a trigger can select itself on a
+// pointer press (see TabsTrigger).
+interface TabsState {
+  value: string | undefined
+  select: ((next: string) => void) | undefined
+}
+const TabsValueContext = React.createContext<TabsState>({ value: undefined, select: undefined })
 
 const Tabs = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
@@ -14,8 +20,8 @@ const Tabs = React.forwardRef<
 >(({ value, defaultValue, onValueChange, ...props }, ref) => {
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue)
   const currentValue = value ?? uncontrolledValue
-  // Radix Tabs ≥1.2 focuses a trigger on mousedown before activating it, and in
-  // automatic mode that focus already activates it, so one click reports the
+  // A pointer press focuses the trigger before selecting it (TabsTrigger), and
+  // in automatic mode that focus already selects it, so one click reports the
   // same value twice within a single task. Drop the repeat.
   const pendingValueRef = React.useRef<string | null>(null)
 
@@ -32,8 +38,13 @@ const Tabs = React.forwardRef<
     [value, onValueChange]
   )
 
+  const state = React.useMemo(
+    () => ({ value: currentValue, select: handleValueChange }),
+    [currentValue, handleValueChange]
+  )
+
   return (
-    <TabsValueContext.Provider value={currentValue}>
+    <TabsValueContext.Provider value={state}>
       <TabsPrimitive.Root
         ref={ref}
         value={currentValue}
@@ -56,12 +67,27 @@ TabsList.displayName = TabsPrimitive.List.displayName
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, value, ...props }, ref) => {
-  const isActive = React.useContext(TabsValueContext) === value
+>(({ className, value, onMouseDown, ...props }, ref) => {
+  const { value: selected, select } = React.useContext(TabsValueContext)
+  const isActive = selected === value
+  // G02: Radix focuses the trigger from script on mousedown, and Chrome marks
+  // script focus :focus-visible, so a mouse click drew the keyboard ring. A
+  // primary-button press is handled here instead: focus without the ring, then
+  // select (manual-activation lists do not select on focus). Preventing the
+  // default skips Radix's own mousedown handler and the native focus. Like
+  // Radix, a press on the tab that is already selected changes nothing.
+  const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onMouseDown?.(event)
+    if (event.defaultPrevented || props.disabled || event.button !== 0 || event.ctrlKey) return
+    event.preventDefault()
+    event.currentTarget.focus({ focusVisible: false } as FocusOptions)
+    if (!isActive) select?.(value)
+  }
   return (
     <TabsPrimitive.Trigger
       ref={ref}
       value={value}
+      onMouseDown={handleMouseDown}
       className={cn(
         // `.tab` keeps the UA button leading; min-h-11 is the 44px touch floor.
         // justify-center only shows when a consumer stretches tabs into a grid.
