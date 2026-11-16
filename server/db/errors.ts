@@ -1,5 +1,6 @@
+import { DrizzleQueryError } from "drizzle-orm/errors";
 import { ServiceUnavailableError } from "../middleware/errors";
-import { findPgError } from "../errors/pgErrors";
+import { causeChain, findPgError } from "../errors/pgErrors";
 
 const TRANSIENT_SQLSTATES = new Set([
   "40001", // serialization_failure
@@ -14,6 +15,22 @@ const TRANSIENT_SQLSTATES = new Set([
   "57P03", // cannot_connect_now
 ]);
 
+/** What node-postgres, pg-pool and Node's socket layer say when the connection, not the query, failed. */
+const CONNECTION_FAILURE_PHRASES = [
+  "timeout exceeded when trying to connect",
+  "connection timeout",
+  "connection terminated",
+  "connection ended unexpectedly",
+  "query read timeout",
+  "not queryable",
+  "econnreset",
+  "etimedout",
+  "epipe",
+  "socket hang up",
+];
+
+const isTransientCode = (code: string) => code.startsWith("08") || TRANSIENT_SQLSTATES.has(code);
+
 export function databaseErrorCode(error: unknown): string {
   const err = error as any;
   return String(err?.code ?? err?.cause?.code ?? "");
@@ -21,24 +38,18 @@ export function databaseErrorCode(error: unknown): string {
 
 export function isDatabaseUnavailableError(error: unknown): boolean {
   if (error instanceof ServiceUnavailableError) return true;
-  const code = databaseErrorCode(error);
-  if (code.startsWith("08") || TRANSIENT_SQLSTATES.has(code)) return true;
-  // Postgres answered (an error with `severity` anywhere in the cause chain), so
-  // the connection worked: only its own code decides. The phrases below would
-  // otherwise match the query's params ("Fix RTMP connection timeout" in a
-  // duplicate-title 23505 became a 503 instead of a 409).
+  // Postgres answered, so its own code decides. FATAL means it ended the session
+  // (idle-in-transaction timeout, termination, a Neon proxy compute failure), so
+  // the same query on a fresh connection is the remedy.
   const pg = findPgError(error);
-  if (pg) return pg.code.startsWith("08") || TRANSIENT_SQLSTATES.has(pg.code);
-  // Drizzle wraps the pg error ("Failed query: ...") and keeps the cause, so
-  // read both messages; the outer one alone hides "Connection terminated".
-  const message = `${(error as any)?.message ?? ""} ${(error as any)?.cause?.message ?? ""}`.toLowerCase();
-  return (
-    message.includes("timeout exceeded when trying to connect") ||
-    message.includes("connection timeout") ||
-    message.includes("connection terminated") ||
-    message.includes("connection ended unexpectedly") ||
-    message.includes("econnreset") ||
-    message.includes("etimedout") ||
-    message.includes("socket hang up")
-  );
+  if (pg) return pg.severity === "FATAL" || isTransientCode(pg.code);
+  if (isTransientCode(databaseErrorCode(error))) return true;
+  // No server answer: read every error in the chain except Drizzle's wrapper,
+  // whose message embeds the query's params ("Fix RTMP connection timeout").
+  const text = causeChain(error)
+    .filter((e) => !(e instanceof DrizzleQueryError))
+    .map((e) => `${(e as any)?.code ?? ""} ${(e as any)?.message ?? ""}`)
+    .join(" ")
+    .toLowerCase();
+  return CONNECTION_FAILURE_PHRASES.some((phrase) => text.includes(phrase));
 }
