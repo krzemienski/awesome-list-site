@@ -8,7 +8,7 @@
 import type { ResourceKind } from "@shared/resourceKinds";
 import { isRealCategory } from "@shared/catalog-counts";
 import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
-import { apiRequest, catalogRequestCache, throwIfResNotOk } from "@/lib/queryClient";
+import { ApiError, apiRequest, catalogRequestCache, throwIfResNotOk } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
 /**
@@ -60,9 +60,7 @@ export async function fetchStaticAwesomeList(): Promise<any> {
   for (let attempt = 1; attempt <= AWESOME_LIST_MAX_ATTEMPTS; attempt++) {
     try {
       const response = await fetchWithTimeout(url, AWESOME_LIST_TIMEOUT_MS);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText || ''} from ${url}`.trim());
-      }
+      await throwIfResNotOk(response);
       try {
         return await response.json();
       } catch (parseErr) {
@@ -76,6 +74,8 @@ export async function fetchStaticAwesomeList(): Promise<any> {
       const isAbort = err instanceof DOMException && err.name === 'AbortError';
       const isLast = attempt === AWESOME_LIST_MAX_ATTEMPTS;
       if (isLast) {
+        // Keep the status so the query layer can honour a 503's Retry-After.
+        if (err instanceof ApiError) throw err;
         const why = isAbort
           ? `request timed out after ${AWESOME_LIST_TIMEOUT_MS / 1000}s`
           : err instanceof Error
@@ -198,9 +198,7 @@ export async function fetchListingPage(
     }
   }
   const response = await fetchWithTimeout(url, AWESOME_LIST_TIMEOUT_MS);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} ${response.statusText || ""} from ${url}`.trim());
-  }
+  await throwIfResNotOk(response);
   return response.json();
 }
 

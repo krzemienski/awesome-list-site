@@ -93,12 +93,11 @@ function parseKindParam(value: string | null): ResourceKind | null {
     : null;
 }
 
-// fetchListingPage throws `Error("HTTP 404 ... from /api/awesome-list/listing…")`
-// for an unknown top-level slug. Detect that specific status so an invalid
-// category/subcategory renders the polished not-found page instead of the
+// fetchListingPage answers an unknown top-level slug with a 404 ApiError, so an
+// invalid category/subcategory renders the not-found page instead of the
 // transient "Please try again" error state.
 function isNotFoundError(error: unknown): boolean {
-  return error instanceof Error && /^HTTP 404\b/.test(error.message);
+  return error instanceof ApiError && error.status === 404;
 }
 
 // Both listing queries key the node at [1] (level) and [2] (slug). Paging,
