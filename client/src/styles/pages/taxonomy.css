@@ -411,11 +411,15 @@
   pointer-events: auto;
 }
 
-/* The tray takes the featured chip's corner while it is shown. Personal cards
-   drop the tray below the top row, so their chip stays visible. */
-.taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):hover .resource-card__featured,
-.taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):focus-within .resource-card__featured {
-  visibility: hidden;
+/* With a mouse, the tray takes the featured chip's corner while it is shown.
+   Personal cards drop the tray below the top row, so their chip stays visible.
+   Touch screens never get this: a tap leaves sticky :hover/:focus-within, and
+   there the tray has already moved off the chip (PD01). */
+@media (hover: hover) {
+  .taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):hover .resource-card__featured,
+  .taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):focus-within .resource-card__featured {
+    visibility: hidden;
+  }
 }
 
 /* Cards that carry favorite/bookmark controls (tag pages) have them at the
@@ -445,8 +449,10 @@
     margin-bottom: 58px !important;
   }
 
-  .taxonomy-page .resource-card--taxonomy:has(.resource-card__featured) .resource-card__reveal {
-    top: 72px;
+  /* A featured-only top row is 36px (the mark), not the 44px of personal
+     buttons, so the tray sits 8px higher to keep the same gaps. */
+  .taxonomy-page .resource-card--taxonomy:not(.resource-card--personal):has(.resource-card__featured) .resource-card__reveal {
+    top: 64px;
     left: 20px;
     justify-content: flex-start;
   }
