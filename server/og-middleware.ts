@@ -1077,7 +1077,7 @@ function homeShellChrome(): string {
           ? {
               paragraphs: [
                 "Share a valuable video development tool, library, article, or course with the community. All submissions are reviewed before being published.",
-                "You can preview the submission form without an account, but you must log in to actually submit a resource.",
+                "You can preview the submission form without an account, but you must sign in to actually submit a resource.",
               ],
               links: [{ path: "/sign-in", label: "Sign in to submit a resource" }],
               // BUG-015: real form markup for non-JS crawlers.
