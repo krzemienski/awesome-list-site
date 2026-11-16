@@ -98,6 +98,11 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   const tagSearchId = useId();
   const [open, setOpenState] = useState(false);
   const setOpen = (next: boolean) => { setOpenState(next); onSheetOpenChange?.(next); };
+  // An unmount closes the sheet without onOpenChange (Search hides the panel
+  // for a too-long query), so report it closed or the owner keeps waiting.
+  const sheetCloseRef = useRef(onSheetOpenChange);
+  sheetCloseRef.current = onSheetOpenChange;
+  useEffect(() => () => sheetCloseRef.current?.(false), []);
   const [tagSearch, setTagSearch] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   // The sheet stays open while facets are toggled so counts and results update
