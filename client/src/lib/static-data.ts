@@ -8,7 +8,7 @@
 import type { ResourceKind } from "@shared/resourceKinds";
 import { isRealCategory } from "@shared/catalog-counts";
 import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
-import { ApiError, apiRequest, catalogRequestCache, throwIfResNotOk } from "@/lib/queryClient";
+import { ApiError, apiRequest, catalogRequestCache, retryAfterSeconds, throwIfResNotOk } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
 /**
@@ -29,6 +29,15 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
   }
 }
 
+/**
+ * An index.html prefetch the server answered with Retry-After is thrown, so the
+ * query layer waits as asked. Any other non-OK prefetch falls through to a
+ * fresh request, as before.
+ */
+async function throwIfRetryLater(response: Response): Promise<void> {
+  if (!response.ok && retryAfterSeconds(response) !== undefined) await throwIfResNotOk(response);
+}
+
 export async function fetchStaticAwesomeList(): Promise<any> {
   // Check if we already have data from SSR
   if (typeof window !== 'undefined') {
@@ -43,10 +52,11 @@ export async function fetchStaticAwesomeList(): Promise<any> {
     const early: Promise<Response> | undefined = (window as any).__awesomeListEarlyFetch;
     if (early) {
       (window as any).__awesomeListEarlyFetch = undefined;
+      const earlyResponse = await early.catch(() => undefined);
+      if (earlyResponse) await throwIfRetryLater(earlyResponse);
       try {
-        const response = await early;
-        if (response.ok) {
-          return await response.json();
+        if (earlyResponse?.ok) {
+          return await earlyResponse.json();
         }
       } catch {
         /* fall through to the standard fetch below */
@@ -71,6 +81,9 @@ export async function fetchStaticAwesomeList(): Promise<any> {
       }
     } catch (err) {
       lastError = err;
+      // The server named a delay: let the query layer wait it out instead of
+      // re-requesting after the fixed backoff below.
+      if (err instanceof ApiError && err.retryAfterSec !== undefined) throw err;
       const isAbort = err instanceof DOMException && err.name === 'AbortError';
       const isLast = attempt === AWESOME_LIST_MAX_ATTEMPTS;
       if (isLast) {
@@ -193,7 +206,8 @@ export async function fetchListingPage(
     const early = (window as any).__awesomeListListingEarlyFetch;
     if (early?.url === url && early.promise) {
       (window as any).__awesomeListListingEarlyFetch = undefined;
-      const response = await early.promise;
+      const response: Response = await early.promise;
+      await throwIfRetryLater(response);
       if (response.ok) return response.json();
     }
   }
@@ -208,10 +222,11 @@ export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {
     const early: Promise<Response> | undefined = (window as any).__awesomeListNavEarlyFetch;
     if (early) {
       (window as any).__awesomeListNavEarlyFetch = undefined;
+      const earlyResponse = await early.catch(() => undefined);
+      if (earlyResponse) await throwIfRetryLater(earlyResponse);
       try {
-        const response = await early;
-        if (response.ok) {
-          return await response.json();
+        if (earlyResponse?.ok) {
+          return await earlyResponse.json();
         }
       } catch {
         /* fall through to the standard fetch below */

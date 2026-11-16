@@ -53,15 +53,18 @@ export function isGoneError(error: unknown): boolean {
   );
 }
 
+/** Retry-After as seconds: delta-seconds or an HTTP-date (RFC 9110 10.2.3). */
+export function retryAfterSeconds(res: Response): number | undefined {
+  const header = res.headers.get("Retry-After")?.trim();
+  if (!header) return undefined;
+  const seconds = /^\d+$/.test(header) ? Number(header) : Math.ceil((Date.parse(header) - Date.now()) / 1000);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
+}
+
 export async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    const retryAfter = Number(res.headers.get("Retry-After"));
-    throw new ApiError(
-      res.status,
-      text,
-      Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined,
-    );
+    throw new ApiError(res.status, text, retryAfterSeconds(res));
   }
 }
 
