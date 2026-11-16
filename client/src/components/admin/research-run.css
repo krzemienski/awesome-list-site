@@ -26,7 +26,6 @@
 
 .research-guide__step {
   border-top: var(--hairline-w, 1px) solid var(--border);
-  container-type: inline-size;
   min-width: 0;
   padding-top: var(--space-4, 1rem);
 }
@@ -65,6 +64,8 @@
 }
 
 .research-guide__step-body {
+  container-name: research-step;
+  container-type: inline-size;
   min-width: 0;
   padding-left: 2.25rem;
 }
@@ -88,10 +89,13 @@
   margin-top: .15rem;
 }
 
-/* Four fields each: one row of four on a wide step, else 2x2, else one column.
-   auto-fit wrapped them 3+1 at tablet widths, leaving the fourth field alone on
-   a row (PC02). The thresholds are measured on the step (the container), not the
-   grid, so fields are about 11rem at the 51rem switch. */
+/* Four fields each: one row of four when every field keeps 12rem, else 2x2,
+   else one column. auto-fit wrapped them 3+1 at tablet widths, leaving the
+   fourth field alone on a row (PC02). The container is the step body, whose
+   content box excludes the step's indent, so each threshold is the grid's own
+   width: 4 x 12rem + 3 gaps = 51rem, 2 x 12rem + 1 gap = 25rem. Advanced sits in
+   a box with 1rem padding and a hairline border on each side, so its
+   thresholds are 2rem wider (53rem and 27rem; the 2px border fits in the slack). */
 .research-guide__limits,
 .research-guide__advanced {
   display: grid;
@@ -99,13 +103,19 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-@container (max-width: 50.99rem) {
-  .research-guide__limits,
+@container research-step (max-width: 50.99rem) {
+  .research-guide__limits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container research-step (max-width: 24.99rem) {
+  .research-guide__limits { grid-template-columns: minmax(0, 1fr); }
+}
+
+@container research-step (max-width: 53.12rem) {
   .research-guide__advanced { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@container (max-width: 24.99rem) {
-  .research-guide__limits,
+@container research-step (max-width: 27.12rem) {
   .research-guide__advanced { grid-template-columns: minmax(0, 1fr); }
 }
 
