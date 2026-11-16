@@ -27,6 +27,13 @@ export class ApiError extends Error {
   }
 }
 
+function isRetryableTransient(error: unknown): error is ApiError {
+  return (
+    error instanceof ApiError
+    && (error.status === 429 || (error.status === 503 && error.retryAfterSec !== undefined))
+  );
+}
+
 function hasValidationFailedBody(body: string): boolean {
   try {
     return JSON.parse(body)?.error === "validation_failed";
@@ -46,7 +53,7 @@ export function isGoneError(error: unknown): boolean {
   );
 }
 
-async function throwIfResNotOk(res: Response) {
+export async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     const retryAfter = Number(res.headers.get("Retry-After"));
@@ -306,13 +313,15 @@ export const queryClient = new QueryClient({
       // up to twice, honoring the server's Retry-After when it's short.
       // Long Retry-After values (>10s) fail fast to the visible error/retry
       // card instead of pinning the UI in a skeleton state.
+      // A 503 with Retry-After is the server's "database blipped, try again in
+      // 1 s" (errorHandler isDatabaseUnavailableError); without a retry one
+      // dropped Neon socket rendered an error panel (B-002, 2026-11-15 12:12Z).
       retry: (failureCount, error) =>
-        error instanceof ApiError &&
-        error.status === 429 &&
+        isRetryableTransient(error) &&
         (error.retryAfterSec ?? 2) <= 10 &&
         failureCount < 2,
       retryDelay: (failureCount, error) =>
-        error instanceof ApiError && error.status === 429
+        isRetryableTransient(error)
           ? Math.min(error.retryAfterSec ?? 2, 10) * 1000
           : Math.min(1000 * 2 ** failureCount, 30_000),
     },

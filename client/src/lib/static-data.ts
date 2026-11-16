@@ -8,7 +8,7 @@
 import type { ResourceKind } from "@shared/resourceKinds";
 import { isRealCategory } from "@shared/catalog-counts";
 import type { CatalogNav, CatalogNavCategory, CatalogNavNode } from "@shared/catalog-nav";
-import { apiRequest, catalogRequestCache } from "@/lib/queryClient";
+import { apiRequest, catalogRequestCache, throwIfResNotOk } from "@/lib/queryClient";
 import { apiFetch } from "./api-fetch";
 
 /**
@@ -221,9 +221,7 @@ export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {
     }
   }
   const response = await fetchWithTimeout('/api/awesome-list/nav', AWESOME_LIST_TIMEOUT_MS);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} ${response.statusText || ''} from /api/awesome-list/nav`.trim());
-  }
+  await throwIfResNotOk(response);
   return await response.json();
 }
 
