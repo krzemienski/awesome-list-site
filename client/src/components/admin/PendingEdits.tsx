@@ -499,7 +499,7 @@ export default function PendingEdits() {
                           other admin queues; the raw user id is only a fallback. */}
                       <span
                         className="queue-review-truncate"
-                        title={edit.submittedByEmail ?? edit.submittedBy}
+                        title={edit.submittedByEmail ? maskEmail(edit.submittedByEmail) : edit.submittedBy}
                         data-testid={`text-edit-editor-${edit.id}`}
                       >
                         {edit.submittedByEmail ? maskEmail(edit.submittedByEmail) : edit.submittedBy}
@@ -587,7 +587,7 @@ export default function PendingEdits() {
                   <p className="text-sm"><strong>Title:</strong> {selectedEdit.resource?.title}</p>
                   <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-6 max-lg:min-h-11 items-center text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
                   <p className="text-sm"><strong>Category:</strong> {selectedEdit.resource?.category}</p>
-                  <p className="text-sm" data-testid="text-edit-detail-editor"><strong>Suggested by:</strong> {selectedEdit.submittedByEmail ?? selectedEdit.submittedBy}</p>
+                  <p className="text-sm" data-testid="text-edit-detail-editor"><strong>Suggested by:</strong> {selectedEdit.submittedByEmail ? maskEmail(selectedEdit.submittedByEmail) : selectedEdit.submittedBy}</p>
                 </div>
               </div>
 

@@ -95,6 +95,7 @@ export function formatAdminDate(date: string | Date): string {
  */
 export function maskEmail(email: string): string {
   const at = email.indexOf("@");
-  if (at <= 0) return email;
+  // Not a well-formed address: show nothing of it rather than the raw value.
+  if (at <= 0) return "••••••";
   return `${email[0]}•••${email.slice(at)}`;
 }
