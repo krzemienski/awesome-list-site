@@ -22,9 +22,9 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
   if (error instanceof ServiceUnavailableError) return true;
   const code = databaseErrorCode(error);
   if (code.startsWith("08") || TRANSIENT_SQLSTATES.has(code)) return true;
-  const message = String(
-    (error as any)?.message ?? (error as any)?.cause?.message ?? "",
-  ).toLowerCase();
+  // Drizzle wraps the pg error ("Failed query: ...") and keeps the cause, so
+  // read both messages; the outer one alone hides "Connection terminated".
+  const message = `${(error as any)?.message ?? ""} ${(error as any)?.cause?.message ?? ""}`.toLowerCase();
   return (
     message.includes("timeout exceeded when trying to connect") ||
     message.includes("connection timeout") ||
