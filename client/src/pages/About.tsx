@@ -139,6 +139,7 @@ export default function About() {
           </CardContent>
         </Card>
 
+        <div className="about-callout-frame">
         <div className="about-callout-grid" aria-label="About this project">
           {ABOUT_PROJECT.facts.map((fact, index) => (
             <div key={fact.title} className="about-card about-callout-card">
@@ -147,6 +148,7 @@ export default function About() {
               <div className="about-callout-copy">{fact.description}</div>
             </div>
           ))}
+        </div>
         </div>
       </header>
 

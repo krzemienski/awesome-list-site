@@ -537,7 +537,6 @@ export default function TaxonomyListing({ level }: Props) {
   // An empty tile is a dead end: a subcategory with no approved resources, or
   // one the kind filter has ruled out. The crawler HTML hides them too.
   const childTiles = listingData?.children.filter((child) => child.count > 0) ?? [];
-  // The Uncategorized tile sits in the same grid, so the badge counts it.
   // Tile counts follow the kind filter only; a search or any other filter
   // narrows the results below but not the tiles, so name what they ignore (CV01).
   const ignoredFilters = [
@@ -560,7 +559,9 @@ export default function TaxonomyListing({ level }: Props) {
   const tileScopeNoun = level === "category" ? "category" : "collection";
   // The tiles' names carry the same caveat as the note above them.
   const tileScope = !tileCountsIgnore ? undefined : kind ? "kind filter only" : `${tileScopeNoun} total`;
-  const tileCount = childTiles.length + ((listingData?.generalCount ?? 0) > 0 ? 1 : 0);
+  // The badge counts the subcategory tiles shown (those with resources), not the
+  // Uncategorized tile, which is not a subcategory (RV02).
+  const subcategoryCount = childTiles.length;
 
   const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);
   const siblingParent = navPlacement?.parent?.slug ? navPlacement.parent : undefined;
@@ -782,7 +783,7 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{tags.length > 0 ? (listingData.scopeIntroTagged ?? listingData.scopeIntro) : listingData.scopeIntro}</p>
     </section>
-     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}{tags.length > 0 ? " in total" : ""}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{tileCount} {tileCount === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
+     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}{tags.length > 0 ? " in total" : ""}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && subcategoryCount > 0 && <span className="chip">{subcategoryCount} {subcategoryCount === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
     </header>
     {/* Directly under the header's toggle: after the subcategory tiles the
         opened panel landed below the fold at 1440x900 and the click looked inert. */}
