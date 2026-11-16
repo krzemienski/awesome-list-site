@@ -406,7 +406,7 @@ function AccountFeatures({
           <Card>
             <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center">
               <Button asChild className="w-full sm:w-auto">
-                <Link href="/sign-in">Login to Get Started</Link>
+                <Link href="/sign-in">Sign in to get started</Link>
               </Button>
               <Button
                 asChild

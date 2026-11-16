@@ -383,7 +383,7 @@ export default function Profile({ user }: ProfileProps) {
   if (!user) {
     return (
       <div className="account-page account-page--form py-8 px-4 text-center">
-        <p className="text-muted-foreground">Please log in to view your profile.</p>
+        <p className="text-muted-foreground">Please sign in to view your profile.</p>
       </div>
     );
   }

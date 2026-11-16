@@ -1094,7 +1094,7 @@ function homeShellChrome(): string {
                 readOnly: {
                   notice: "The form below is read-only. Please",
                   signInHref: "/sign-in?redirect_url=%2Fsubmit",
-                  signInLabel: "log in",
+                  signInLabel: "sign in",
                   signInSuffix: " to submit a resource.",
                 },
                 fields: [
