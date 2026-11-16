@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { SearchEntryButton } from "@/components/search/SearchEntryButton";
 import { Paginator } from "@/components/ui/paginator";
 import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, throwIfResNotOk } from "@/lib/queryClient";
 import { trackTagInteraction } from "@/lib/analytics";
 import { strictUrlPage } from "@/lib/page-param";
 import { slugify } from "@/lib/utils";
@@ -82,7 +82,7 @@ export default function TagLanding() {
       if (early?.url === url && early.promise) {
         (window as any).__tagListingEarlyFetch = undefined;
         const response = await early.promise;
-        if (!response.ok) throw new Error(`HTTP ${response.status} from ${url}`);
+        await throwIfResNotOk(response);
         return response.json();
       }
       return apiRequest(url, { method: "GET" });
