@@ -41,17 +41,14 @@ import { focusElement, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
 // one shared module so the SSR middleware accepts exactly the same
 // /admin/:section deep-links (unknown sections fall back to the default tab).
-import { normalizeAdminTab as normalizeTab } from "@shared/admin-tabs";
-const CANONICAL_TABS = [
-  ["overview", "Overview", LayoutGrid], ["approvals", "Approvals", Shield],
-  ["edits", "Edits", List], ["enrichment", "Enrichment", Sparkles],
-  ["researcher", "Researcher", Zap], ["export", "Export", ArrowRight],
-  ["database", "Database", Database], ["resources", "Resources", Folder],
-  ["categories", "Categories", List], ["subcategories", "Subcategories", List],
-  ["users", "Users", Users], ["github", "GitHub", Settings],
-  ["linkhealth", "Link Health", Activity], ["audit", "Audit", List],
-  ["research", "Research", Sparkles],
-] as const;
+import { ADMIN_TAB_LABELS, adminPageTitle, normalizeAdminTab as normalizeTab, type AdminTabId } from "@shared/admin-tabs";
+const CANONICAL_TABS = ([
+  ["overview", LayoutGrid], ["approvals", Shield], ["edits", List], ["enrichment", Sparkles],
+  ["researcher", Zap], ["export", ArrowRight], ["database", Database], ["resources", Folder],
+  ["categories", List], ["subcategories", List], ["users", Users], ["github", Settings],
+  ["linkhealth", Activity], ["audit", List], ["research", Sparkles],
+] as const).map(([id, Icon]) => [id, ADMIN_TAB_LABELS[id], Icon] as const);
+const SETTINGS_MENU_SECTIONS: ReadonlySet<AdminTabId> = new Set(["journeys", "digests", "contact", "subsubcategories"]);
 
 function tabFromWindow(): string | null {
   if (typeof window === "undefined") return null;
@@ -111,13 +108,16 @@ export default function AdminDashboard() {
   // Settings-menu sections that extend a strip tab highlight it; Journeys and
   // Digests have no parent tab, so each renders its own panel with no strip
   // tab selected.
+  const activeTabId = normalizeTab(activeTab);
   const visibleTab = ({ subsubcategories: "subcategories" } as Record<string, string>)[activeTab] ?? activeTab;
   // Journeys and Digests open from the Settings menu with no strip tab
   // selected, so the Settings trigger names the open section instead.
   // Sections reached only through the Settings menu: the trigger names the
   // open one, because no strip tab can (Sub-Subcats also keeps its parent
   // Subcategories tab highlighted).
-  const settingsSection = ({ journeys: "Journeys", digests: "Digests", contact: "Contact inbox", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
+  const settingsSection = activeTabId && SETTINGS_MENU_SECTIONS.has(activeTabId)
+    ? ADMIN_TAB_LABELS[activeTabId]
+    : undefined;
 
   // Keep the tab in sync if the user navigates between /admin/:section links,
   // and from one back to bare /admin (the route is shared, so the dashboard
@@ -309,7 +309,7 @@ export default function AdminDashboard() {
   // unmount the loading masthead and reuse its sibling's node for the loaded one.
   const adminSeoHead = (
     <SEOHead
-      title="Admin"
+      title={activeTabId ? adminPageTitle(activeTabId) : "Admin"}
       description="Awesome Video admin panel."
       noindex
     />

@@ -9,6 +9,20 @@ const ADMIN_TAB_IDS = [
 
 export type AdminTabId = (typeof ADMIN_TAB_IDS)[number];
 
+// Each section's visible name: the strip tab and Settings-menu labels, and the
+// "<section> · Admin" page title the SPA and the SSR meta both serve.
+export const ADMIN_TAB_LABELS: Readonly<Record<AdminTabId, string>> = {
+  overview: "Overview", approvals: "Approvals", edits: "Edits", enrichment: "Enrichment",
+  researcher: "Researcher", export: "Export", database: "Database", resources: "Resources",
+  categories: "Categories", subcategories: "Subcategories", subsubcategories: "Sub-Subcats",
+  journeys: "Journeys", users: "Users", github: "GitHub", linkhealth: "Link Health",
+  digests: "Digests", audit: "Audit", research: "Research", contact: "Contact inbox",
+};
+
+export function adminPageTitle(tab: AdminTabId): string {
+  return `${ADMIN_TAB_LABELS[tab]} · Admin`;
+}
+
 // Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
 const ADMIN_TAB_ALIASES: Readonly<Record<string, AdminTabId>> = {
   "link-health": "linkhealth",

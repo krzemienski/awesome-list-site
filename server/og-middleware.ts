@@ -8,7 +8,7 @@ import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize
 import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
 import { getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
-import { normalizeAdminTab } from "@shared/admin-tabs";
+import { adminPageTitle, normalizeAdminTab, type AdminTabId } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
@@ -348,6 +348,11 @@ function isAdminSignIn(url: string): boolean {
   return new URLSearchParams(url.split("?")[1] || "").has("admin");
 }
 
+// /admin?tab=<section> opens that tab in the SPA (BUG-074), so its head names it.
+function adminTabFromQuery(url: string): AdminTabId | null {
+  return normalizeAdminTab(new URLSearchParams(url.split("?")[1] || "").get("tab"));
+}
+
 // Active ?tags= / legacy ?tag= filters, parsed with the SAME rule as the
 // hydrated client (parseTagsParam -> parseTagFilterValues).
 function activeTagFilters(url: string): string[] {
@@ -382,8 +387,10 @@ async function resolveRoute(
   // them into the key so page 2 is not served page 1's cached body (BUG-001).
   // All other params are ignored.
   const page = parsePage(url);
+  const adminQueryTab = cleanPath === "/admin" ? adminTabFromQuery(url) : null;
   const key = cleanPath === "/sign-in" && isAdminSignIn(url)
     ? "/sign-in?admin"
+    : adminQueryTab ? `/admin?tab=${adminQueryTab}`
     : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   return getPublicCacheValue({
     namespace: "route-meta",
@@ -909,7 +916,8 @@ function homeShellChrome(): string {
       description: `Browse all categories of curated video development resources on ${SITE_NAME} — players, encoders, codecs, streaming, AI, tools, and more.`,
     },
     "/admin": {
-      title: `Admin — ${SITE_NAME}`,
+      // Bare /admin opens the Overview tab, so it gets that section's title.
+      title: `${adminPageTitle("overview")} — ${SITE_NAME}`,
       description: `${SITE_NAME} admin panel.`,
       // Internal admin panel — noindex; must never appear in search results.
       noindex: true,
@@ -924,7 +932,9 @@ function homeShellChrome(): string {
   // (sso-callback after Google, factor-one, verify-email-address, ...); the
   // client renders the same auth page for all of them, so they share its meta.
   const authFlow = path.match(/^\/(sign-in|sign-up)\/[^?#]+$/)?.[1];
-  const staticKey = adminSection && normalizeAdminTab(adminSection)
+  const adminTab = adminSection ? normalizeAdminTab(adminSection)
+    : path === "/admin" ? adminTabFromQuery(url) : null;
+  const staticKey = adminTab
     ? "/admin"
     : authFlow
       ? `/${authFlow}`
@@ -932,6 +942,7 @@ function homeShellChrome(): string {
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
+    if (adminTab) m.title = `${adminPageTitle(adminTab)} — ${SITE_NAME}`;
     m.image = ogImage(path);
     let bodyHtml: string | undefined;
     if (path === "/journeys") {
