@@ -57,7 +57,9 @@ export function isGoneError(error: unknown): boolean {
 function retryAfterSeconds(res: Response): number | undefined {
   const header = res.headers.get("Retry-After")?.trim();
   if (!header) return undefined;
-  const seconds = /^\d+$/.test(header) ? Number(header) : Math.ceil((Date.parse(header) - Date.now()) / 1000);
+  const seconds = /^\d+$/.test(header) ? Number(header)
+    : /[a-z]/i.test(header) ? Math.ceil((Date.parse(header) - Date.now()) / 1000)
+    : NaN;
   return Number.isFinite(seconds) ? Math.max(0, seconds) : undefined;
 }
 
