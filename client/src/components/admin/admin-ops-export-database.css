@@ -558,11 +558,11 @@
   margin-bottom: 10px;
 }
 
+/* Descriptions wrap: the Tables and Rows scope notes are the explanation,
+   so an ellipsis must not cut them off (PB01). */
 .admin-ops-database .admin-ops-stat__description {
   line-height: 1.6;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .admin-ops-database .admin-ops-table {
