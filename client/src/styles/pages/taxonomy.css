@@ -294,6 +294,23 @@
   }
 }
 
+/* TV01: pinned absolute at right: 0, the toggle covered the last chip once a
+   kind filter added a chip (13px overlap at 820). It is the row's last flex
+   item instead. The negative margins keep the 44px button at the absolute
+   rule's offset (top -6px on a 27px chip line), and with no room it wraps to
+   its own line rather than covering a chip. */
+@media (min-width: 640px) {
+  .taxonomy-summary {
+    row-gap: 14px;
+  }
+
+  .taxonomy-tools-toggle {
+    position: static;
+    flex: none;
+    margin: -6px 0 -11px auto;
+  }
+}
+
 .taxonomy-tools-toggle__icon {
   display: none;
   width: 16px;
