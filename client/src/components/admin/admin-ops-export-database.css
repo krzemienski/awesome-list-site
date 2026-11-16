@@ -538,11 +538,11 @@
   min-height: 0;
 }
 
-/* The frozen database panel uses the same intrinsic auto-fill grid at every
-   viewport rather than the shared dashboard strip's fixed breakpoints. */
+/* Four cards follow the shared strip's 4 / 2 / 1 columns
+   (admin-ops-primitives.css). The old auto-fill minmax(200px) grid wrapped
+   them 3+1 at tablet widths, leaving Migrations alone on a row (PC01). */
 .admin-ops-database .admin-ops-stat-strip {
   gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 .admin-ops-database .admin-ops-stat {
