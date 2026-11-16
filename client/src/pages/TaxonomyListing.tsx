@@ -559,8 +559,8 @@ export default function TaxonomyListing({ level }: Props) {
   const tileScopeNoun = level === "category" ? "category" : "collection";
   // The tiles' names carry the same caveat as the note above them.
   const tileScope = !tileCountsIgnore ? undefined : kind ? "kind filter only" : `${tileScopeNoun} total`;
-  // The badge counts real subcategories only, like /advanced and the API; the
-  // Uncategorized tile in the grid is not a subcategory (RV02).
+  // The badge counts the subcategory tiles shown (those with resources), not the
+  // Uncategorized tile, which is not a subcategory (RV02).
   const subcategoryCount = childTiles.length;
 
   const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);

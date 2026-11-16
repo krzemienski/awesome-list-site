@@ -88,22 +88,18 @@
   border-radius: 3px;
 }
 
-/* Four fact cards: one row of four when each gets 220px, else 2x2, else one
-   column. auto-fill wrapped them 3+1 at tablet widths, leaving the fourth card
-   alone under a gap (RV03). 4 x 220 + 3 x 12 = 916px; 2 x 220 + 12 = 452px. */
+/* Four fact cards in a 760px column: 2x2, or one column when two 220px cards
+   no longer fit. auto-fill wrapped them 3+1, leaving the fourth card alone
+   under a gap (RV03). 2 x 220 + 12 = 452px. */
 .about-callout-frame {
   container-type: inline-size;
 }
 
 .about-callout-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 14px;
-}
-
-@container (width < 916px) {
-  .about-callout-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @container (width < 452px) {
