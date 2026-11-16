@@ -587,7 +587,7 @@ export default function JourneyDetail() {
                   className="underline font-medium py-1"
                   data-testid="button-login-journey"
                 >
-                  log in
+                  sign in
                 </Link> to start this journey and track your progress.
               </AlertDescription>
             </Alert>

@@ -562,8 +562,8 @@ export default function SubmitResource() {
   const onSubmit = (data: SubmitResourceFormData) => {
     if (!isAuthenticated) {
       toast({
-        title: "Login required",
-        description: "Please log in to submit a resource.",
+        title: "Sign-in required",
+        description: "Please sign in to submit a resource.",
         variant: "destructive",
       });
       redirectToLogin();
@@ -666,10 +666,10 @@ export default function SubmitResource() {
               ) : !isAuthenticated ? (
                 <Alert live="off" className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
                   <LogIn className="submit-alert-icon" /> {/* DS-OK: status warn */}
-                  <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
+                  <AlertTitle>Sign in to submit</AlertTitle> {/* DS-OK: status warn */}
                   <AlertDescription className="leading-7">
                     The form below is read-only. Please{" "}
-                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex min-h-6 items-center" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex min-h-6 items-center" data-testid="link-login">sign in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>

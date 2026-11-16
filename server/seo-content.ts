@@ -722,7 +722,7 @@ export function renderStaticPageContent(opts: {
      * BUG-008 (audit 2): when set, the form renders read-only — fields inside
      * a <fieldset disabled>, NO action/method and NO submit control — plus a
      * sign-in prompt mirroring the logged-out React UI ("The form below is
-     * read-only. Please log in…"). A no-JS visitor is never invited into a
+     * read-only. Please sign in…"). A no-JS visitor is never invited into a
      * POST that would be silently swallowed; crafted POSTs to page routes now
      * get an explicit 405 from the method guard in server/index.ts.
      */
