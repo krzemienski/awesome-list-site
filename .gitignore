@@ -157,6 +157,8 @@ tests/parity/expected/*.repeat.png
 
 # Local agent scratch (screenshots, harness runs, worktrees)
 .cache/
+# Audit run state and trace exports (production logs, telemetry); never committed.
+/.local/
 
 # Audit proof media (screenshots, recordings) stays local; notes and JSON in proof/ stay tracked.
 /docs/audit-final/proof/**/*.png

@@ -51,6 +51,10 @@ export interface LogQueryResult {
   scanned: number;
   /** Objects that could not be read; their records are missing from the result. */
   failedReads: number;
+  /** Lines that were not valid JSON (torn writes); their records are missing from the result. */
+  skippedLines: number;
+  /** An hour held more objects than the cap; its unread objects are not reachable by paging. */
+  cutHour: boolean;
   truncated: boolean;
   /** When truncated: pass as `until` to read the next (older) page. A record at exactly this time may repeat. */
   nextUntil?: string;
@@ -118,29 +122,35 @@ function matches(record: LogRecord, query: LogQuery): boolean {
   return !query.q || `${record.message} ${record.fields ?? ""}`.toLowerCase().includes(query.q);
 }
 
-function parseLines(jsonl: string): LogRecord[] {
+function parseLines(jsonl: string): { records: LogRecord[]; skipped: number } {
   const records: LogRecord[] = [];
+  let skipped = 0;
   for (const line of jsonl.split("\n")) {
     if (!line) continue;
     try {
       records.push(JSON.parse(line) as LogRecord);
     } catch {
-      // a torn or foreign line is skipped, not fatal
+      skipped++;
     }
   }
-  return records;
+  return { records, skipped };
 }
 
 export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promise<LogQueryResult> {
   const { names, resumeUntil, cutHour } = await listWindowObjects(storage, query.since, query.until);
   const found: LogRecord[] = [];
   let failedReads = 0;
+  let skippedLines = 0;
   for (let i = 0; i < names.length; i += READ_CONCURRENCY) {
     const settled = await Promise.allSettled(names.slice(i, i + READ_CONCURRENCY).map(async (name) =>
       unwrap(await storage.client.downloadAsText(name), "read")));
     for (const result of settled) {
       if (result.status === "rejected") failedReads++;
-      else found.push(...parseLines(result.value).filter((record) => matches(record, query)));
+      else {
+        const parsed = parseLines(result.value);
+        skippedLines += parsed.skipped;
+        found.push(...parsed.records.filter((record) => matches(record, query)));
+      }
     }
   }
   found.sort((a, b) => b._time.localeCompare(a._time));
@@ -152,6 +162,8 @@ export async function queryLogs(storage: PrivateStorage, query: LogQuery): Promi
     instances: [...new Set(found.map((record) => record.instance))].sort(),
     scanned: names.length,
     failedReads,
+    skippedLines,
+    cutHour,
     truncated: nextUntil !== undefined || cutHour,
     nextUntil,
   };
