@@ -184,9 +184,9 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   return (
     <div className="admin-ops-database">
       <div className="admin-ops-stat-strip">
-        {/* App tables in the public schema only. A backup also copies the
-            migration journal (drizzle schema), so its manifest counts one more
-            table and its rows (PB01). */}
+        {/* Live counts of the app tables (public schema). A backup also copies
+            the migration journal (drizzle schema) and is a snapshot from when it
+            ran, so its manifest counts one more table and differs in rows (PB01). */}
         <Stat
           label="Tables"
           value={database ? database.tables.toLocaleString() : "—"}
@@ -199,7 +199,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               {database ? database.totalRows.toLocaleString() : "—"}
             </span>
           }
-          description="in app tables; backups add the migration journal"
+          description="live, app tables; a backup adds the migration journal as of its run"
         />
         <Stat
           label="Disk"
