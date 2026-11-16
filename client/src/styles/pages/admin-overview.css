@@ -5,11 +5,20 @@
  */
 .admin-overview-stats-canonical.admin-stat-strip {
   display: grid;
-  /* auto-fit, not auto-fill: four cards in a wide column must stretch across
-     it, not leave an empty fifth track (1280: cards stopped at x≈975). */
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* Four cards: one row of four when each gets 200px, else 2×2, else one
+     column. auto-fit wrapped them 3+1 at tablet widths (PA01). */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-block-end: var(--space-6, 1.5rem);
+}
+
+/* The strip's own width decides: 4 × 200px + 3 gaps = 842px, 2 × 200 + 1 gap = 414px. */
+.admin-stat-strip-frame { container-type: inline-size; }
+@container (max-width: 841px) {
+  .admin-overview-stats-canonical.admin-stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 413px) {
+  .admin-overview-stats-canonical.admin-stat-strip { grid-template-columns: minmax(0, 1fr); }
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat {

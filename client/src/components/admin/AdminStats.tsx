@@ -185,6 +185,7 @@ export default function AdminStats({
 
   return (
     <>
+    <div className="admin-stat-strip-frame">
     <div
       className="admin-stat-strip admin-overview-stats-canonical"
       data-testid="admin-stats"
@@ -245,6 +246,7 @@ export default function AdminStats({
         titleTestId="stat-title-approvals"
         testId="stat-card-approvals"
       />
+    </div>
     </div>
     {failedStatParts.length > 0 && (
       <AdminLoadError
