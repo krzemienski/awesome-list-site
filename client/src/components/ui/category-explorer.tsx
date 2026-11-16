@@ -304,20 +304,23 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     {tag}
                   </ChipButton>
                 ))}
-                {allTags.length > 20 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="min-h-10 px-2 text-xs max-lg:min-h-11"
-                    aria-expanded={showAllTags}
-                    onClick={() => setShowAllTags(value => !value)}
-                    data-testid="button-explorer-tags-toggle"
-                  >
-                    {showAllTags ? "Show fewer tags" : `Show all ${allTags.length} tags`}
-                  </Button>
-                )}
               </div>
+              {/* Outside the scrolling chip box, so the toggle is never clipped by
+                  its height cap (RV01: at touch widths the 44px chips filled the
+                  7rem box and hid it). */}
+              {allTags.length > 20 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 min-h-10 px-2 text-xs max-lg:min-h-11"
+                  aria-expanded={showAllTags}
+                  onClick={() => setShowAllTags(value => !value)}
+                  data-testid="button-explorer-tags-toggle"
+                >
+                  {showAllTags ? "Show fewer tags" : `Show all ${allTags.length} tags`}
+                </Button>
+              )}
             </div>
           )}
 
