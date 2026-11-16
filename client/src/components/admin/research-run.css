@@ -88,9 +88,10 @@
   margin-top: .15rem;
 }
 
-/* Four fields each: one row of four when each gets 12rem, else 2x2, else one
-   column. auto-fit wrapped them 3+1 at tablet widths, leaving the fourth
-   field alone on a row (PC02). 4 x 12rem + 3 gaps = 51rem; 2 x 12rem + 1 gap = 25rem. */
+/* Four fields each: one row of four on a wide step, else 2x2, else one column.
+   auto-fit wrapped them 3+1 at tablet widths, leaving the fourth field alone on
+   a row (PC02). The thresholds are measured on the step (the container), not the
+   grid, so fields are about 11rem at the 51rem switch. */
 .research-guide__limits,
 .research-guide__advanced {
   display: grid;
