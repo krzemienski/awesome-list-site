@@ -1,5 +1,5 @@
 import { DrizzleQueryError } from "drizzle-orm/errors";
-import { ServiceUnavailableError } from "../middleware/errors";
+import { AppError, ServiceUnavailableError } from "../middleware/errors";
 import { causeChain, findPgError } from "../errors/pgErrors";
 
 const TRANSIENT_SQLSTATES = new Set([
@@ -30,6 +30,7 @@ const CONNECTION_FAILURE_PHRASES = [
 ];
 
 const isTransientCode = (code: string) => code.startsWith("08") || TRANSIENT_SQLSTATES.has(code);
+const isConfigFatal = (code: string) => code.startsWith("28") || code === "3D000";
 
 export function databaseErrorCode(error: unknown): string {
   const err = error as any;
@@ -37,18 +38,22 @@ export function databaseErrorCode(error: unknown): string {
 }
 
 export function isDatabaseUnavailableError(error: unknown): boolean {
-  if (error instanceof ServiceUnavailableError) return true;
-  // Postgres answered, so its own code decides. FATAL means it ended the session
-  // (idle-in-transaction timeout, termination, a Neon proxy compute failure), so
-  // the same query on a fresh connection is the remedy.
+  // An app error already chose its status; its message can echo user input.
+  if (error instanceof AppError) return error instanceof ServiceUnavailableError;
+  // Postgres answered, so its own code decides. A FATAL mid-session (idle timeout,
+  // termination, a Neon compute failure) is cured by a fresh connection; a FATAL at
+  // connect for credentials (class 28) or a missing database (3D000) is config.
   const pg = findPgError(error);
-  if (pg) return pg.severity === "FATAL" || isTransientCode(pg.code);
+  if (pg) return (pg.severity === "FATAL" && !isConfigFatal(pg.code)) || isTransientCode(pg.code);
   if (isTransientCode(databaseErrorCode(error))) return true;
   // No server answer: read every error in the chain except Drizzle's wrapper,
   // whose message embeds the query's params ("Fix RTMP connection timeout").
   const text = causeChain(error)
     .filter((e) => !(e instanceof DrizzleQueryError))
-    .map((e) => `${(e as any)?.code ?? ""} ${(e as any)?.message ?? ""}`)
+    .map((e) => {
+      const { code, message } = (e ?? {}) as { code?: unknown; message?: unknown };
+      return `${typeof code === "string" ? code : ""} ${typeof message === "string" ? message : ""}`;
+    })
     .join(" ")
     .toLowerCase();
   return CONNECTION_FAILURE_PHRASES.some((phrase) => text.includes(phrase));
