@@ -26,6 +26,7 @@
 
 .research-guide__step {
   border-top: var(--hairline-w, 1px) solid var(--border);
+  container-type: inline-size;
   min-width: 0;
   padding-top: var(--space-4, 1rem);
 }
@@ -87,11 +88,24 @@
   margin-top: .15rem;
 }
 
+/* Four fields each: one row of four when each gets 12rem, else 2x2, else one
+   column. auto-fit wrapped them 3+1 at tablet widths, leaving the fourth
+   field alone on a row (PC02). 4 x 12rem + 3 gaps = 51rem; 2 x 12rem + 1 gap = 25rem. */
 .research-guide__limits,
 .research-guide__advanced {
   display: grid;
   gap: var(--space-4, 1rem);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@container (max-width: 50.99rem) {
+  .research-guide__limits,
+  .research-guide__advanced { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container (max-width: 24.99rem) {
+  .research-guide__limits,
+  .research-guide__advanced { grid-template-columns: minmax(0, 1fr); }
 }
 
 .research-guide__advanced {
