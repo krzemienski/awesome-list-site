@@ -74,13 +74,14 @@ const TabsTrigger = React.forwardRef<
   // script focus :focus-visible, so a mouse click drew the keyboard ring. A
   // primary-button press is handled here instead: focus without the ring, then
   // select (manual-activation lists do not select on focus). Preventing the
-  // default skips Radix's own mousedown handler and the native focus.
+  // default skips Radix's own mousedown handler and the native focus. Like
+  // Radix, a press on the tab that is already selected changes nothing.
   const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
     onMouseDown?.(event)
     if (event.defaultPrevented || props.disabled || event.button !== 0 || event.ctrlKey) return
     event.preventDefault()
     event.currentTarget.focus({ focusVisible: false } as FocusOptions)
-    select?.(value)
+    if (!isActive) select?.(value)
   }
   return (
     <TabsPrimitive.Trigger
