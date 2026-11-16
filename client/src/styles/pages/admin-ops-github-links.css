@@ -338,10 +338,6 @@
   border-color: var(--border);
 }
 
-.ops-link-health__flagged-card .ops-link-health__flagged-table-wrap {
-  margin-inline: -0.25rem;
-}
-
 .ops-link-health__flagged-card .ops-link-health__resource-cell {
   color: var(--text);
   font-weight: 500;
