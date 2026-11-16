@@ -21,7 +21,7 @@ interface PgDatabaseError {
 const MAX_CAUSE_DEPTH = 8;
 
 /** `error` and its `cause`s, outermost first. Drizzle wraps more than once. */
-function causeChain(error: unknown): unknown[] {
+export function causeChain(error: unknown): unknown[] {
   const chain: unknown[] = [];
   for (let current = error; current != null && chain.length < MAX_CAUSE_DEPTH;
     current = (current as { cause?: unknown }).cause) {
