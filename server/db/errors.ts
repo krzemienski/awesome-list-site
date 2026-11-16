@@ -1,4 +1,5 @@
 import { ServiceUnavailableError } from "../middleware/errors";
+import { findPgError } from "../errors/pgErrors";
 
 const TRANSIENT_SQLSTATES = new Set([
   "40001", // serialization_failure
@@ -13,8 +14,6 @@ const TRANSIENT_SQLSTATES = new Set([
   "57P03", // cannot_connect_now
 ]);
 
-const SQLSTATE = /^[0-9A-Z]{5}$/;
-
 export function databaseErrorCode(error: unknown): string {
   const err = error as any;
   return String(err?.code ?? err?.cause?.code ?? "");
@@ -24,10 +23,12 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
   if (error instanceof ServiceUnavailableError) return true;
   const code = databaseErrorCode(error);
   if (code.startsWith("08") || TRANSIENT_SQLSTATES.has(code)) return true;
-  // Postgres answered with a SQLSTATE, so the connection worked. The phrases
-  // below would otherwise match the query's own params ("Fix RTMP connection
-  // timeout" in a duplicate-title 23505 became a 503 instead of a 409).
-  if (SQLSTATE.test(code)) return false;
+  // Postgres answered (an error with `severity` anywhere in the cause chain), so
+  // the connection worked: only its own code decides. The phrases below would
+  // otherwise match the query's params ("Fix RTMP connection timeout" in a
+  // duplicate-title 23505 became a 503 instead of a 409).
+  const pg = findPgError(error);
+  if (pg) return pg.code.startsWith("08") || TRANSIENT_SQLSTATES.has(pg.code);
   // Drizzle wraps the pg error ("Failed query: ...") and keeps the cause, so
   // read both messages; the outer one alone hides "Connection terminated".
   const message = `${(error as any)?.message ?? ""} ${(error as any)?.cause?.message ?? ""}`.toLowerCase();
