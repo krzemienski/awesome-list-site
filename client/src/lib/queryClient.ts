@@ -329,7 +329,7 @@ export const queryClient = new QueryClient({
         failureCount < 2,
       retryDelay: (failureCount, error) =>
         isRetryableTransient(error)
-          ? Math.min(error.retryAfterSec ?? 2, 10) * 1000
+          ? Math.min(Math.max(error.retryAfterSec ?? 2, 1), 10) * 1000
           : Math.min(1000 * 2 ** failureCount, 30_000),
     },
     mutations: {
