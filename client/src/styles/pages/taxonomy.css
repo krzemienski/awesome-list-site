@@ -144,6 +144,12 @@
   font-weight: 600;
 }
 
+/* The tile-count caveat sits between the heading and the grid, spaced like
+   the heading above it (R201). */
+.taxonomy-tile-note {
+  margin-bottom: 16px;
+}
+
 .taxonomy-child-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
