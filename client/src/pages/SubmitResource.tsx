@@ -512,12 +512,9 @@ export default function SubmitResource() {
       form.reset(EMPTY_VALUES);
       safeRemoveItem(DRAFT_KEY);
       draftSeenAtRef.current = 0;
-      toast({
-        title: "Success!",
-        description: "Your resource has been submitted for review. It will be visible once approved by an admin.",
-        variant: "default",
-      });
-      
+      // The focused role=status card is the one success announcement; a toast
+      // here made screen readers announce every submit twice.
+
       // Invalidate resources cache
       void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });

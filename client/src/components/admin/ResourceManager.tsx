@@ -18,7 +18,6 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Search,
   ExternalLink,
   Database,
   Filter,
@@ -1284,10 +1283,16 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
-          <div className="admin-catalog-resources__header-actions">
+          {/* A plain form (no search landmark): it also holds the tools toggle
+              and Add. Enter submits it, which skips the search debounce. */}
+          <form onSubmit={handleSearch} className="admin-catalog-resources__header-actions">
             <Input
               placeholder="Search…"
+              aria-label="Search by title or URL"
               value={search}
+              /* R4-018: the query key includes `search`, so each keystroke
+                 refetches live — reset to page 1 too, or a deep page index
+                 survives into a smaller result set ("Page 101 of 11"). */
               onChange={(event) => updateListQuery({ search: event.target.value })}
               data-testid="input-search-resources-header"
             />
@@ -1309,29 +1314,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               <Plus className="h-3 w-3" />
               Add
             </button>
-          </div>
+          </form>
         </CardHeader>
         <CardContent className="admin-catalog-resources__content space-y-4">
-          <form
+          <div
             id="resource-filters"
             role="region"
             aria-label="Resource filters and tools"
-            onSubmit={handleSearch}
             className="admin-catalog-resources__filters flex flex-col sm:flex-row sm:flex-wrap gap-3"
           >
-            <div className="flex-1 relative min-w-52">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
-              <Input
-                placeholder="Search by title or URL..."
-                value={search}
-                /* R4-018: the query key includes `search`, so each keystroke
-                   refetches live — reset to page 1 too, or a deep page index
-                   survives into a smaller result set ("Page 101 of 11"). */
-                onChange={(e) => updateListQuery({ search: e.target.value })}
-                className="pl-10"
-                data-testid="input-search-resources"
-              />
-            </div>
             {/* Run16 BUG-009: the "All ..." items carry value="all" (Radix forbids
                 value=""), but the API treats a literal status/category of "all"
                 as a real filter value and matches nothing. Map "all" back to ""
@@ -1378,9 +1369,6 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             >
               ★ Featured only
             </ChipButton>
-            <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
-              <Search className="h-4 w-4" />
-            </Button>
             {hasActiveFilters && (
               <Button
                 type="button"
@@ -1396,7 +1384,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <X className="h-4 w-4" />
               </Button>
             )}
-          </form>
+          </div>
 
           {selectedResourceIds.length > 0 && (
             <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
