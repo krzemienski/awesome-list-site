@@ -16,9 +16,9 @@ export function countedName(name: string, count: number): string {
   return `${name} ${resourceCountLabel(count)}`;
 }
 
-/** Accessible name for a taxonomy/tag tile: "<name> N resource(s)[, category total]". */
-export function tileLabel(name: string, count: number, categoryTotal = false): string {
-  return `${countedName(name, count)}${categoryTotal ? ", category total" : ""}`;
+/** Accessible name for a taxonomy/tag tile: "<name> N resource(s)[, <scope>]". */
+export function tileLabel(name: string, count: number, scope?: string): string {
+  return `${countedName(name, count)}${scope ? `, ${scope}` : ""}`;
 }
 
 /**
