@@ -462,7 +462,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               <p className="mt-1 text-xs text-muted-foreground">Encrypted at rest; only the last 4 characters are shown afterwards.</p>
             </div>
             {baseUrlIsPlainHttp && (
-              <Label htmlFor="research-confirm-insecure-http" className="research-guide__choice sm:col-span-2">
+              <Label htmlFor="research-confirm-insecure-http" className="research-guide__choice col-span-full">
                 <Checkbox id="research-confirm-insecure-http" checked={confirmInsecureHttp}
                   onCheckedChange={(v) => setConfirmInsecureHttp(v === true)} data-testid="checkbox-confirm-insecure-http" />
                 <span className="text-xs font-normal">Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.</span>
