@@ -72,21 +72,22 @@ const MAX_TERM_REASONS = 3;
 /** Score of a same-category filler: below every ranked match (which all score at least 0.15 + a signal). */
 const CATEGORY_FILL_SCORE = 0.1;
 
-function tokenize(text: string): Set<string> {
-  return new Set(
-    (text || "")
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .map((w) => (w.length > 4 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w))
-      .filter((w) => w.length >= 3 && !STOP_WORDS.has(w)),
-  );
+const stem = (w: string): string => (w.length > 4 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w);
+
+/** Stem -> the first word in `text` that produced it, so labels show "libraries", not the stem "librarie". */
+function tokenize(text: string): Map<string, string> {
+  const terms = new Map<string, string>();
+  for (const word of (text || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/)) {
+    const term = stem(word);
+    if (term.length >= 3 && !STOP_WORDS.has(term) && !terms.has(term)) terms.set(term, word);
+  }
+  return terms;
 }
 
 /** 0 for terms common across the pool, up to 1 for a term only a few resources use. */
-function rarityWeights(docs: Set<string>[]): (term: string) => number {
+function rarityWeights(docs: Map<string, string>[]): (term: string) => number {
   const docFreq = new Map<string, number>();
-  for (const doc of docs) for (const t of doc) docFreq.set(t, (docFreq.get(t) ?? 0) + 1);
+  for (const doc of docs) for (const t of doc.keys()) docFreq.set(t, (docFreq.get(t) ?? 0) + 1);
   const total = docs.length;
   return (term) => {
     const df = docFreq.get(term) ?? 0;
@@ -154,7 +155,7 @@ export function buildRelatedResources(
     }
 
     const titleTokens = tokenize(r.title);
-    const shared = [...candidateTokens[i]]
+    const shared = [...candidateTokens[i].keys()]
       .filter((t) => currentTokens.has(t))
       .map((t) => ({
         term: t,
@@ -166,7 +167,7 @@ export function buildRelatedResources(
     if (sharedWeight >= KEYWORD_FLOOR && shared.some((t) => currentTitleTokens.has(t.term))) {
       related = true;
       rawScore += Math.min(KEYWORD_SCORE_CAP, sharedWeight * KEYWORD_SCORE_PER_WEIGHT);
-      const terms = shared.slice(0, MAX_TERM_REASONS).map((t) => t.term);
+      const terms = shared.slice(0, MAX_TERM_REASONS).map((t) => currentTokens.get(t.term) ?? t.term);
       reasons.push(`Shared topic terms: ${terms.join(", ")}`);
     }
 
