@@ -8,7 +8,7 @@ import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize
 import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
 import { getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
-import { normalizeAdminTab } from "@shared/admin-tabs";
+import { adminPageTitle, normalizeAdminTab } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
@@ -924,7 +924,8 @@ function homeShellChrome(): string {
   // (sso-callback after Google, factor-one, verify-email-address, ...); the
   // client renders the same auth page for all of them, so they share its meta.
   const authFlow = path.match(/^\/(sign-in|sign-up)\/[^?#]+$/)?.[1];
-  const staticKey = adminSection && normalizeAdminTab(adminSection)
+  const adminTab = adminSection ? normalizeAdminTab(adminSection) : null;
+  const staticKey = adminTab
     ? "/admin"
     : authFlow
       ? `/${authFlow}`
@@ -932,6 +933,7 @@ function homeShellChrome(): string {
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
+    if (adminTab) m.title = `${adminPageTitle(adminTab)} — ${SITE_NAME}`;
     m.image = ogImage(path);
     let bodyHtml: string | undefined;
     if (path === "/journeys") {
