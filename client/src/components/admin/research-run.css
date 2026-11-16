@@ -95,7 +95,7 @@
    content box excludes the step's indent, so each threshold is the grid's own
    width: 4 x 12rem + 3 gaps = 51rem, 2 x 12rem + 1 gap = 25rem. Advanced sits in
    a box with 1rem padding and a hairline border on each side, so its
-   thresholds are 2rem wider (53rem and 27rem; the 2px border fits in the slack). */
+   thresholds add 2rem + 2px (53.125rem and 27.125rem). */
 .research-guide__limits,
 .research-guide__advanced {
   display: grid;
@@ -103,19 +103,19 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-@container research-step (max-width: 50.99rem) {
+@container research-step (width < 51rem) {
   .research-guide__limits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@container research-step (max-width: 24.99rem) {
+@container research-step (width < 25rem) {
   .research-guide__limits { grid-template-columns: minmax(0, 1fr); }
 }
 
-@container research-step (max-width: 53.12rem) {
+@container research-step (width < 53.125rem) {
   .research-guide__advanced { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@container research-step (max-width: 27.12rem) {
+@container research-step (width < 27.125rem) {
   .research-guide__advanced { grid-template-columns: minmax(0, 1fr); }
 }
 
