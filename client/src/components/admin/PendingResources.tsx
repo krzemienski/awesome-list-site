@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
-import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
+import { formatAdminDate, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
@@ -681,7 +681,8 @@ export default function PendingResources() {
               </thead>
               <tbody>
                 {pendingResources.map((resource) => {
-                  const submitter = resource.submittedByEmail ?? resource.submittedBy;
+                  // Same masking as Edits, Audit and Link reports: no full email in the queue (PE02).
+                  const submitter = resource.submittedByEmail ? maskEmail(resource.submittedByEmail) : resource.submittedBy;
                   const tags = getSubmissionTags(resource);
                   return (
                   <tr key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
@@ -897,7 +898,7 @@ export default function PendingResources() {
                       <User className="h-3 w-3" />
                       Submitted By
                     </Label>
-                    <p className="text-sm mt-1 break-words">{selectedResource.submittedByEmail ?? selectedResource.submittedBy}</p>
+                    <p className="text-sm mt-1 break-words">{selectedResource.submittedByEmail ? maskEmail(selectedResource.submittedByEmail) : selectedResource.submittedBy}</p>
                   </div>
                 )}
               </div>
