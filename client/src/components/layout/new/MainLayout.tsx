@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
 import { lazyOptional, retryOptionalChunks } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
@@ -11,7 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusElement } from "@/hooks/focus-handoff";
 import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
 import { preloadSearchDialog, takePendingPalette } from "@/lib/search-dialog-loader";
@@ -41,16 +41,87 @@ function ClientContactDialogHost() {
   return <ContactDialogHost />;
 }
 
-/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
+/** The button appears after this many viewport heights of scrolling. */
+const BACK_TO_TOP_SHOW_AFTER_VIEWPORTS = 1.5;
+/** How long it lingers once the user stops scrolling up. */
+const BACK_TO_TOP_LINGER_MS = 2000;
+/** A scroll counts as the user's when a wheel/touch/key/pointer event came this recently. */
+const USER_SCROLL_WINDOW_MS = 600;
+
+/**
+ * Floating "back to top" button (NN/g: lower right, shown only after several
+ * screens and an upward scroll, one per page). It overlays content instead of
+ * reserving a gutter, so it must not sit there while someone reads: it shows
+ * on an upward scroll, lingers briefly, hides near the footer, and is
+ * unmounted (not just transparent) whenever hidden so it is never a tab stop.
+ * While shown, <html data-back-to-top> lets CSS keep focus scrolling clear of it.
+ */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const focusHeld = useRef(false); // the button has keyboard focus
+  const hoverHeld = useRef(false); // the pointer is over the button
+  const timer = useRef<number | undefined>(undefined);
+
+  // The button never hides while it holds focus (that would drop focus to
+  // <body>): every hide waits for blur, which re-arms the linger.
+  const hide = useCallback(() => {
+    window.clearTimeout(timer.current);
+    if (focusHeld.current) return;
+    // An unmount never fires pointerleave, so clear the hover hold here.
+    hoverHeld.current = false;
+    setVisible(false);
+  }, []);
+  const lingerThenHide = useCallback(() => {
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      if (!focusHeld.current && !hoverHeld.current) hide();
+    }, BACK_TO_TOP_LINGER_MS);
+  }, [hide]);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
-    onScroll();
+    let lastY = window.scrollY;
+    let lastIntent = 0;
+    // An upward scroll only counts when the user caused it: scroll restoration
+    // on Back/Forward, hash jumps and route resets scroll without any of these.
+    const noteIntent = () => {
+      lastIntent = performance.now();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (["ArrowUp", "PageUp", "Home"].includes(e.key) || (e.key === " " && e.shiftKey)) noteIntent();
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      const goingUp = y < lastY;
+      lastY = y;
+      const footerTop = document.querySelector(".app-footer")?.getBoundingClientRect().top;
+      const nearFooter = footerTop !== undefined && footerTop < window.innerHeight;
+      if (y <= window.innerHeight * BACK_TO_TOP_SHOW_AFTER_VIEWPORTS || nearFooter) {
+        hide();
+      } else if (goingUp && performance.now() - lastIntent < USER_SCROLL_WINDOW_MS) {
+        setVisible(true);
+        lingerThenHide();
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    window.addEventListener("wheel", noteIntent, { passive: true });
+    window.addEventListener("touchmove", noteIntent, { passive: true });
+    window.addEventListener("pointerdown", noteIntent, { passive: true });
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", noteIntent);
+      window.removeEventListener("touchmove", noteIntent);
+      window.removeEventListener("pointerdown", noteIntent);
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(timer.current);
+    };
+  }, [hide, lingerThenHide]);
+
+  useEffect(() => {
+    if (!visible) return;
+    document.documentElement.setAttribute("data-back-to-top", "");
+    return () => document.documentElement.removeAttribute("data-back-to-top");
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -59,18 +130,35 @@ function BackToTop() {
       variant="outline"
       size="icon"
       onClick={(e) => {
-        // The button unmounts once the page is back near the top; hand focus
-        // to the page heading so keyboard users don't drop to <body>.
-        handoffFocusOnUnmount(e.currentTarget);
         window.scrollTo({ top: 0, behavior: scrollBehavior() });
+        // The button hides once the page is back near the top. Move focus to
+        // <main> without scrolling so keyboard users don't drop to <body>.
+        if (e.currentTarget.matches(":focus")) {
+          focusElement(document.getElementById("main"), { preventScroll: true });
+        }
+      }}
+      onFocus={() => {
+        focusHeld.current = true;
+      }}
+      onBlur={(e) => {
+        // A window or app switch blurs the window while the button keeps focus.
+        if (document.activeElement === e.currentTarget) return;
+        focusHeld.current = false;
+        lingerThenHide();
+      }}
+      onPointerEnter={() => {
+        hoverHeld.current = true;
+      }}
+      onPointerLeave={() => {
+        hoverHeld.current = false;
+        lingerThenHide();
       }}
       aria-label="Back to top"
       data-testid="button-back-to-top"
-      // Fixed to the SCREEN, so it is lifted by the app shell's
-      // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      // It floats in --back-to-top-lane (index.css), which the shell's end
-      // gutter keeps clear of content at every width.
-      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
+      // Fixed to the SCREEN. The bottom offset clears whichever is larger: the
+      // app shell's --app-bottom-inset (consent banner, which already includes
+      // the safe area) or the device's own bottom inset.
+      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--back-to-top-lift))] right-[max(var(--back-to-top-offset),env(safe-area-inset-right,0px))] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)] motion-safe:animate-in motion-safe:fade-in-0"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>
