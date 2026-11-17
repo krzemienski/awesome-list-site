@@ -69,7 +69,7 @@ function check(raw) {
   let rest = cmd;
   for (const s of sshSegs) rest = rest.replace(s, ' ');
   const masked = mask(rest);
-  const pushRe = new RegExp(BOUNDARY + '((?:npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|npm\\s+run\\s+db:push)\\b', 'g');
+  const pushRe = new RegExp(BOUNDARY + '((?:(?:\\S*\\/)?npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|(?:\\S*\\/)?npm\\s+run\\s+db:push)\\b', 'g');
   for (let m; (m = pushRe.exec(masked)); ) {
     const start = masked.lastIndexOf('\n', m.index) + 1;
     const prefix = rest.slice(start, m.index + m[0].length);
