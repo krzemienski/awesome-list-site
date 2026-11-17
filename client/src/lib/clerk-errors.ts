@@ -13,6 +13,7 @@ export interface ClerkErrorLike {
   code: string;
   message: string;
   longMessage?: string;
+  meta?: { paramName?: string };
 }
 
 /** Clerk codes that mean the visitor is already signed in: not a failure. */
@@ -31,13 +32,15 @@ export function describeSignInError(error: ClerkErrorLike): AuthErrorView {
     case "form_identifier_not_found":
       return { target: "email", message: "No account uses this email. Check it, or create an account." };
     case "form_param_format_invalid":
-      return { target: "email", message: "Enter an email address like name@example.com." };
+      return error.meta?.paramName === "code"
+        ? { target: "code", message: "Enter the 6-digit code from the email." }
+        : { target: "email", message: "Enter an email address like name@example.com." };
     case "form_password_incorrect":
-      return { target: "password", message: "That password is incorrect. Try again, or reset it." };
+      return { target: "password", message: "That password is incorrect. Try again, or email yourself a code." };
     case "form_password_pwned":
       return {
         target: "password",
-        message: "This password appeared in a data breach. Reset it to sign in.",
+        message: "This password appeared in a data breach. Email yourself a code to sign in.",
       };
     case "strategy_for_user_invalid":
       return {

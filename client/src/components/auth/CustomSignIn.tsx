@@ -64,6 +64,15 @@ export default function CustomSignIn() {
     if (isSignedIn && !finishing.current) setLocation(requestedReturnPath() ?? "/");
   }, [isSignedIn, setLocation]);
 
+  // The one live region for field errors. Each failed attempt bumps the key so
+  // the text is a new node and is read again, even when the message repeats and
+  // the failing field already had focus (focus() alone announces nothing then).
+  const fieldMessage = problem.email ?? problem.password ?? problem.code;
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (fieldMessage) setAttempt((n) => n + 1);
+  }, [problem, fieldMessage]);
+
   // Focus the first invalid field after a failed attempt.
   useEffect(() => {
     if (step !== "credentials") return;
@@ -108,7 +117,8 @@ export default function CustomSignIn() {
   // say the account needs something this form cannot do.
   const advance = useCallback(async () => {
     if (signIn.status === "complete") return finish();
-    if (signIn.status === "needs_client_trust") return sendTrustCode();
+    const canEmailTrust = signIn.supportedSecondFactors?.some((factor) => factor.strategy === "email_code");
+    if (signIn.status === "needs_client_trust" && canEmailTrust) return sendTrustCode();
     setProblem({ ...NO_PROBLEM, global: UNSUPPORTED_STEP });
   }, [signIn, finish, sendTrustCode]);
 
@@ -181,12 +191,12 @@ export default function CustomSignIn() {
       if (error) fail(error);
     });
 
-  const startOver = () => {
-    void signIn.reset();
-    setStep("credentials");
-    setPassword("");
-    setProblem(NO_PROBLEM);
-  };
+  const startOver = () =>
+    void run(async () => {
+      await signIn.reset();
+      setStep("credentials");
+      setPassword("");
+    });
 
   const startOAuth = (strategy: OAuthProvider) => {
     setRedirecting(strategy);
@@ -207,6 +217,9 @@ export default function CustomSignIn() {
     <div className="flex w-full max-w-sm flex-col gap-4 px-4" data-testid="custom-sign-in">
       <h1 className="page-title text-xl">{authPageHeadings.signIn}</h1>
       <p className="text-sm text-muted-foreground">Sign in to continue to Awesome Video</p>
+      <p role="status" aria-live="polite" className="sr-only" data-testid="auth-field-announcer">
+        <span key={attempt}>{fieldMessage}</span>
+      </p>
       {problem.global && (
         <Alert variant="destructive" live="assertive" data-testid="text-sign-in-error">
           {problem.global}
@@ -257,6 +270,7 @@ export default function CustomSignIn() {
         </>
       ) : (
         <CodeStep
+          key={step}
           email={email.trim()}
           busy={busy}
           error={problem.code}

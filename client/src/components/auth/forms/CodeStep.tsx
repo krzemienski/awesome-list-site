@@ -50,7 +50,7 @@ export function CodeStep({ email, busy, error, onSubmit, onResend, onStartOver, 
       <AuthField
         ref={inputRef}
         label="Verification code"
-        hint={`We sent a 6-digit code to ${email}.`}
+        hint={email ? `We sent a 6-digit code to ${email}.` : "We sent a 6-digit code to your email."}
         error={error}
         testId="input-auth-code"
         type="text"
@@ -75,7 +75,7 @@ export function CodeStep({ email, busy, error, onSubmit, onResend, onStartOver, 
         >
           {cooldown > 0 ? `Send a new code in ${cooldown}s` : "Send a new code"}
         </Button>
-        <Button type="button" variant="link" onClick={onStartOver} data-testid="button-auth-code-start-over">
+        <Button type="button" variant="link" disabled={busy} onClick={onStartOver} data-testid="button-auth-code-start-over">
           Use a different email
         </Button>
       </div>
