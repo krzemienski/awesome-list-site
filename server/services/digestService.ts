@@ -43,6 +43,7 @@ import {
 } from "../email";
 import { clerkUserHasVerifiedEmail, rowEmailIsVerifiedInClerk } from "../lib/clerkAccountLink";
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 
 const logger = createLogger("digest");
 
@@ -1167,7 +1168,7 @@ async function runRetentionDelete(
   run: () => Promise<unknown[]>,
 ): Promise<number | null> {
   try {
-    return (await run()).length;
+    return (await retryOnDatabaseDrop(logger, `Digest retention delete (${table})`, run)).length;
   } catch (error) {
     // Drizzle wraps the driver error; the SQLSTATE lives on its cause.
     const cause = error instanceof Error && error.cause ? error.cause : error;

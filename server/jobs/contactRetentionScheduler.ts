@@ -1,6 +1,7 @@
 import { config } from "../config";
 import { ContactRepository, purgeExpiredContactSubmissions } from "../repositories/ContactRepository";
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
@@ -19,12 +20,12 @@ async function runCycle(): Promise<void> {
   running = true;
   let deletedCount = 0;
   try {
-    if (!config.contact.enabled && !(await new ContactRepository().countSubmissions())) return;
+    if (!config.contact.enabled && !(await retryOnDatabaseDrop(logger, "Contact retention purge", () => new ContactRepository().countSubmissions()))) return;
     logger.info("Contact retention purge started");
     let batches = 0;
     let deleted: number;
     do {
-      deleted = await purgeExpiredContactSubmissions(BATCH_SIZE);
+      deleted = await retryOnDatabaseDrop(logger, "Contact retention purge", () => purgeExpiredContactSubmissions(BATCH_SIZE));
       deletedCount += deleted;
       batches++;
     } while (deleted === BATCH_SIZE && batches < MAX_BATCHES);

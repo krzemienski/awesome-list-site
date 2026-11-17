@@ -56,9 +56,18 @@ const pool = new Pool({
 });
 
 // Add error handler for connection issues
+// The pool emits this only for an idle client. A server-side drop (restart, scale to zero,
+// reaped socket) is a normal state, not a fault: pg-pool discards the client and the next
+// query opens a fresh one, so it logs at warn. Anything else stays an error.
+function logConnectionError(message: string, err: unknown): void {
+  const details = { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) };
+  if (isDatabaseUnavailableError(err)) logger.warn(message, details);
+  else logger.error(message, details);
+}
+
 pool.on('error', (err) => {
   recordPoolError();
-  logger.error('Database pool error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
+  logConnectionError('Database pool error:', err);
 });
 
 function markTransientRequestFailure(error: unknown): void {
@@ -83,7 +92,8 @@ pool.on('connect', (client: any) => {
   // request learns of the failure from its own query rejection (finish() below).
   client.on('error', (err: unknown) => {
     recordPoolError();
-    logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
+    // A query running on this client rejects through its own path and is reported there.
+    logConnectionError('Database client error:', err);
   });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
