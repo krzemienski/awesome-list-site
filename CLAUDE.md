@@ -32,9 +32,9 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 | Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` runs |
 | The nav tree has one producer (`HomeNavRepository`) and one type (`shared/catalog-nav.ts`). Every node carries `totalResourceCount`: display it, never re-sum. Corpus-tree counts and the non-category README names come only from `shared/catalog-counts.ts` (`corpusTotalCount`, `countNestedGroups`, `isRealCategory`). | `tsc` (producer and consumers share `CatalogNav`; nav nodes have no `resources`) |
 | User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
-| URLs containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook) |
-| A review message is sent only while the worktree `HEAD`, the pin in the worktree's git dir (`review-pin`) and the PR `headRefOid` are the same commit, and the reviewer's session cwd is that worktree. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook) |
-| `gh pr merge` (any `-R`) and a PUT to `…/pulls/<N>/merge` run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid`. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook) |
+| URLs (with or without `https://`, also `--url=`) containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook) |
+| A review pin (`pr=<N> sha=<sha> agent=<reviewer's agent id>`, in the review worktree's git dir) for an open PR blocks `SendMessage` only for its owner (`agent_id` equals `agent=`) and for a subagent whose cwd is inside that worktree, and only while the worktree `HEAD`, the pin and the PR `headRefOid` are not the same commit. The lead (no `agent_id`), a headless run and every other agent are never blocked, so a stale pin cannot stop anyone else from reporting; the owner re-pins to the new head or clears it with `git worktree remove --force <worktree>`. Reviewers never call EnterWorktree and use a unique `review-<N>-<sha8>-<UTC stamp>` path; the hook scans all review worktrees from the hook cwd's checkout, or from the main checkout when the cwd is outside the repo. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook) |
+| `gh pr merge` (any `-R`/`GH_REPO`, also inside `sh -c`, `eval`, `xargs`, behind `env`/`timeout`/`nohup`, and after a `cd`), a PUT to `…/pulls/<N>/merge` and a GraphQL merge mutation run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid` that is at least 60 s old. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook) |
 
 ## Shell
 
@@ -66,7 +66,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 
 - Respect hook blocks: report the block and ask. Never route around one.
 - Never print cookies, tokens or full emails.
-- QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`).
+- QA rows are created only as the audit admin or audit member. `/api/admin/qa-rows` deletes three row types (resources, resource edits, bookmark collections); clean those up through it within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`). Side effects of allowed QA writes that no path can delete are expected, never forbidden, and the run report lists them: audit-log rows and signed-in `user_interactions` view rows. No QA actor creates API keys, journey enrollments, onboarding progress, bookmarks without a cleanup step, or sign-ups other than a throwaway `@example.com` address stopped at the code screen. Member lanes browse `/resource/:id` signed out unless the row needs sign-in.
 
 ## Agent messaging
 
@@ -75,7 +75,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 ## Production QA conventions
 
 - Audits sign in with the audit admin and audit member accounts, never the owner account.
-- Any row a QA run creates has a title starting `[QA-qa-audit-<RUN_ID>]`, so `/api/admin/qa-rows` (`server/routes/domains/qa-cleanup.ts`) can find and delete it.
+- Any resource, resource edit or bookmark collection a QA run creates has a title (collection: name) starting `[QA-qa-audit-<RUN_ID>]`, so `/api/admin/qa-rows` (`server/routes/domains/qa-cleanup.ts`, tables `resources`, `resource_edits`, `bookmark_collections`) can find and delete it. Every QA resource insert and status change also writes an audit-log row (`server/repositories/ResourceRepository.ts:947`, `server/repositories/resourcePublication.ts:86`) and each cleanup delete writes a `qa_cleanup` row (`qa-cleanup.ts:237`); qa-rows lists audit-log and bookmark rows with `deletable:false` (`qa-cleanup.ts:202`). A signed-in member who opens `/resource/:id` writes a `user_interactions` view row (`client/src/pages/ResourceDetail.tsx:501-507`, `POST /api/interactions`). Both are expected side effects: record them in the run report, do not avoid them by skipping QA writes. No QA actor creates API keys, journey enrollments, onboarding progress, bookmarks without a cleanup step, or sign-ups other than a throwaway `@example.com` address stopped at the code screen. Member lanes browse `/resource/:id` signed out unless the row needs sign-in.
 - Deploys go through the `replit-deploy` skill, including its pre-publish schema check.
 
 ## Deploy
