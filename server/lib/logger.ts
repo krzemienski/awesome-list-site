@@ -32,6 +32,7 @@ import { randomUUID } from "node:crypto";
 import { getRequestLogContext, requestHadDatabaseUnavailableError } from "../ops/requestContext";
 import { databaseOutageLevel } from "../db/outage";
 import { getLogSink, type LogRecord } from "./logSink";
+import { messageWithoutEchoedValue } from "../errors/pgErrors";
 
 export type LogLevel = "info" | "warn" | "error";
 
@@ -234,12 +235,12 @@ const formatScalar = (value: unknown): string => {
 };
 
 const errorDetails = (error: Error): Record<string, unknown> => {
-  const details: Record<string, unknown> = { err: error.message || error.name };
+  const details: Record<string, unknown> = { err: messageWithoutEchoedValue(error) || error.name };
   const extra = error as Error & { code?: unknown; status?: unknown; statusCode?: unknown; cause?: unknown };
   if (typeof extra.code === "string" || typeof extra.code === "number") details.code = extra.code;
   const status = extra.status ?? extra.statusCode;
   if (typeof status === "number") details.status = status;
-  if (extra.cause instanceof Error && extra.cause.message) details.cause = extra.cause.message;
+  if (extra.cause instanceof Error && extra.cause.message) details.cause = messageWithoutEchoedValue(extra.cause);
   return details;
 };
 

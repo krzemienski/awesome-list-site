@@ -28,6 +28,7 @@ import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger } from "./lib/logger";
 import { logDatabaseError } from "./db/errors";
+import { retryOnDatabaseDrop } from "./db/retryOnDatabaseDrop";
 import { AuditRepository } from "./repositories/AuditRepository";
 
 const logger = createLogger("auth");
@@ -196,7 +197,8 @@ export async function ensureDbUser(
         sign_up_method: "clerk",
       });
       logger.info("New account provisioned from Clerk sign-up", { user: created.id });
-      writeRegisterAudit(created.id, "Account created from Clerk sign-up").catch((error) => {
+      // Nothing writes this row again, unlike the sign-in row: a dropped connection would lose it for good.
+      retryOnDatabaseDrop(logger, "auth.register audit row", () => writeRegisterAudit(created.id, "Account created from Clerk sign-up")).catch((error) => {
         logDatabaseError(logger, "[clerkAuth] auth.register audit row failed", error, { user: created.id, errorClass: errorClass(error) });
       });
     }
