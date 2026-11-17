@@ -36,7 +36,7 @@ Check these first; if one is missing, stop and tell the user exactly which, beca
    The `.replit.dev` hostname can change after a cluster migration; if the alias stops resolving, get the new one from the SSH pane.
 
    Run this check first on every deploy. If it fails, the deploy still goes ahead: steps 2–3 use the **Agent sync** (end of step 6) instead of SSH. Tell the user once that SSH is down, because every Agent sync is a paid Agent run.
-3. **Owner admin session.** `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" https://awesome.video/api/admin/stats` must print 200: steps 5.3a and 5.3b need it. On 401, hand the owner `! bash ~/.cache/awesome-audit/refresh-owner.sh` at the start, before the sync, not mid-deploy (the agent cannot read `.env`). Every admin POST, PUT or DELETE also needs `-H 'Origin: https://awesome.video'`: a 403 means that header is missing, a 401 means the session or password is wrong.
+3. **Owner admin session.** `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" https://awesome.video/api/admin/stats` must print 200: steps 5.3a and 5.3b need it. On 401, re-mint it once with `bash ~/.cache/awesome-audit/refresh-owner.sh` at the start, before the sync, never mid-deploy (CLAUDE.md, Production QA conventions). If a hook denies that run, hand the owner the same line as `! bash ~/.cache/awesome-audit/refresh-owner.sh`. Every admin POST, PUT or DELETE also needs `-H 'Origin: https://awesome.video'`: a 403 means that header is missing, a 401 means the session or password is wrong.
 
 ## Steps
 
