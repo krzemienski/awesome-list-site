@@ -99,11 +99,29 @@ import { ServiceUnavailableError } from "./middleware/errors";
 import { HOME_DEADLINE_PASSED, loadHomeNav, withinHomeDeadline } from "./home-ssr-data";
 import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
 import { createLogger } from "./lib/logger";
+import { CLERK_PROXY_PATH } from "./middleware/clerkProxyMiddleware";
 
 /** A corpus-tree node as this file reads it; the tree source itself is untyped. */
 type CorpusNode = CorpusCountNode & { name: string; slug: string };
 
 const logger = createLogger("og-middleware");
+
+/**
+ * Clerk's browser bundles for the sign-in and sign-up pages. The app loads them
+ * only after the entry module, the route chunk and ClerkRuntime have run, so
+ * each waits for the one before it (about 0.5 s of serial fetching). Hinting
+ * them in the document head starts both downloads at navigation. The URLs and
+ * `crossorigin` mode are exactly what clerk-js requests through the proxy, so
+ * the hint is consumed rather than fetched twice; if Clerk's default major
+ * versions move, the hint only goes unused.
+ */
+const CLERK_AUTH_PAGE_PRELOADS: { href: string; tag: string }[] = [
+  `${CLERK_PROXY_PATH}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`,
+  `${CLERK_PROXY_PATH}/npm/@clerk/ui@1/dist/ui.browser.js`,
+].map((href) => ({
+  href,
+  tag: `<link rel="preload" as="script" crossorigin href="${href}">`,
+}));
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -2589,7 +2607,8 @@ export function ogInjectionMiddleware() {
     let dependencyUnavailable = false;
     let bodyHtml: string | undefined;
     // Route-chunk hints for pages main.tsx renders only once their chunk is in.
-    let headPreload: { href: string; tag: string }[] = [];
+    let headPreload: { href: string; tag: string }[] =
+      urlPath === "/sign-in" || urlPath === "/sign-up" ? CLERK_AUTH_PAGE_PRELOADS : [];
     if (forcedNotFound) {
       // Malformed ?page short-circuits the resolver entirely so the junk URL
       // never lands in the public route-meta cache (parsePage would collapse it onto the
@@ -2749,13 +2768,13 @@ export function ogInjectionMiddleware() {
           // special-sequence interpretation in titles/descriptions.
           if (bodyHtml && html.includes("<!--app-html-->")) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);
-            const hints = headPreload
-              .filter(({ href }) => !html.includes(`href="${href}"`))
-              .map(({ tag }) => tag)
-              .join("");
-            if (hints && html.includes("</head>")) {
-              html = html.replace("</head>", () => `${hints}</head>`);
-            }
+          }
+          const hints = headPreload
+            .filter(({ href }) => !html.includes(`href="${href}"`))
+            .map(({ tag }) => tag)
+            .join("");
+          if (hints && html.includes("</head>")) {
+            html = html.replace("</head>", () => `${hints}</head>`);
           }
           // BUG-014: stamp the per-request CSP nonce onto every inline
           // <script>/<style> now that the head rewrite and SSR body injection
