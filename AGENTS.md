@@ -73,7 +73,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 ## Agent runs
 
 - The lead plans, briefs, merges, deploys and verifies; workers do the hands-on work. At most 2 working agents at once, plus one PR reviewer (`defect-loop`). Pass `model` on every spawn: workers `sonnet`; planners, verifiers and judges `opus`; never Fable.
-- While agents run, the lead stays: check in about every 10 minutes, correct drift with `SendMessage`, restart stalled agents. A check-in loop is fine; ops-watch, self-heal and CI monitors are not.
+- While agents run, the lead stays: check in about every 10 minutes, correct drift with `SendMessage`, restart stalled agents. A check-in loop is fine; background watchers, automatic repair loops and CI monitors are not.
 - Never call work done with a NOT-RUN, partial or unverified row open: run it. A call the owner delegated ("you choose") is decided and recorded, not asked again.
 - A `SendMessage` report is at most 5 lines: verdict, SHA, PASS/FAIL/NEEDS_YOU counts, evidence path. Full detail goes in the result JSON on disk.
 

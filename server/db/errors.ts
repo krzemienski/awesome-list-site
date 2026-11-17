@@ -32,7 +32,6 @@ const CONNECTION_FAILURE_PHRASES = [
   "etimedout",
   "epipe",
   "socket hang up",
-  "econnrefused",
   // libpq (pg_dump, pg_restore) words the same failures its own way.
   "connection refused",
   "server closed the connection unexpectedly",
