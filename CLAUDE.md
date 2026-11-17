@@ -32,6 +32,45 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 | Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` runs |
 | The nav tree has one producer (`HomeNavRepository`) and one type (`shared/catalog-nav.ts`). Every node carries `totalResourceCount`: display it, never re-sum. Corpus-tree counts and the non-category README names come only from `shared/catalog-counts.ts` (`corpusTotalCount`, `countNestedGroups`, `isRealCategory`). | `tsc` (producer and consumers share `CatalogNav`; nav nodes have no `resources`) |
 | User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
+| URLs containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook) |
+| A review message is sent only while the worktree `HEAD`, the pin in the worktree's git dir (`review-pin`) and the PR `headRefOid` are the same commit, and the reviewer's session cwd is that worktree. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook) |
+| `gh pr merge` (any `-R`) and a PUT to `…/pulls/<N>/merge` run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid`. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook) |
+
+## Shell
+
+- The shell is zsh. For loops, probes and anything with control flow, run `bash -c '…'` or `python3 -c '…'` inline instead of zsh syntax.
+- Quote every URL that contains `?`, `*` or `==`: `curl -s 'https://awesome.video/api/resources?page=2'`.
+- Never rely on unquoted `$VAR` word-splitting; use arrays (`args=(--flag value); cmd "${args[@]}"`).
+- Never name a variable `path`, `status` or `prompt` (zsh special variables).
+
+## Browser QA
+
+- `agent-browser` on system Chrome is the default driver. The chrome-devtools MCP gets at most one try with a 10 s timeout. Never report BLOCKED for driver reasons: switch driver and continue.
+- Use real pointer clicks and key presses. A DOM `.click()` is allowed only for below-fold targets that headless cannot scroll to, and the evidence must label it.
+- Dismiss overlays and wait for `#ssr-seo-hold` to be gone and `#root` to have children before interacting.
+- Set the viewport, then assert `window.innerWidth` before capturing evidence. Use tall viewports for pagers and footers.
+- Retry Radix radio groups with a held key before grading them.
+- Override `navigator.webdriver` only when judging analytics. Touch-emulation gaps are caveats, not failures.
+- On a daemon "os error 35", kill the daemon by PID and restart it.
+- Lane procedure: `.claude/skills/qa-lane/SKILL.md`.
+
+## Code Review
+
+- Review in a dedicated worktree at the PR head SHA and record that SHA. Re-check `headRefOid` right before the verdict; if it moved, re-verify the delta. The verdict names its SHA. Procedure: `.claude/skills/review-pr/SKILL.md`.
+- Read every review thread before merging.
+- Run TypeScript probes with `npx --yes vite-node@6.0.0`, not plain `tsx`. macOS `/tmp` is `/private/tmp`.
+- Compare touched-file eslint against the base commit, not against zero.
+- When local `main` is behind, read files with `git show origin/main:<path>`.
+
+## Safety
+
+- Respect hook blocks: report the block and ask. Never route around one.
+- Never print cookies, tokens or full emails.
+- QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`).
+
+## Agent messaging
+
+- A `SendMessage` report is at most 5 lines: verdict, SHA, PASS/FAIL/NEEDS_YOU counts, evidence path. Full detail goes in the result JSON on disk.
 
 ## Production QA conventions
 
