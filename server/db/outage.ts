@@ -16,9 +16,8 @@
  *      rate that is 30 s after the first failure.
  *   c) A partial outage in which most queries fail (more than half of the last 60 s) escalates
  *      after ESCALATION, because the scattered successes leave the window mostly failing.
- *   d) After recovery the level drops back to warn at once: error needs a failure within the
- *      last 60 s, and the first success that finds the window mostly healthy (or empty of
- *      failures) closes the episode.
+ *   d) After recovery the next failure logs warn again: a success that follows 10 s without any
+ *      failure closes the episode, as does one that finds the last 60 s mostly healthy.
  *
  * Failures more than EPISODE_IDLE_MS apart with no success between them are two episodes, not
  * one outage: two drops hours apart on a quiet site each start with a warn.
@@ -34,6 +33,9 @@ export const DATABASE_OUTAGE_ESCALATION_MS = 30_000;
 
 /** An episode with no failure for this long is over even if no success was seen (no traffic). */
 const EPISODE_IDLE_MS = 10 * 60_000;
+
+/** A success this long after the last failure ends the episode, whatever the 60 s counts say. */
+const RECOVERY_QUIET_MS = 10_000;
 
 /** Failures and successes are counted over the last SLOT_MS * SLOTS (60 s). */
 const SLOT_MS = 10_000;
@@ -69,7 +71,8 @@ export function noteDatabaseUnreachable(now: number = Date.now()): void {
 export function noteDatabaseReachable(now: number = Date.now()): void {
   successes[advance(now)]++;
   const failed = sum(failures);
-  if (episodeStart !== null && (failed === 0 || failed <= sum(successes))) episodeStart = null;
+  const quiet = now - lastFailureAt >= RECOVERY_QUIET_MS;
+  if (episodeStart !== null && (quiet || failed <= sum(successes))) episodeStart = null;
 }
 
 /** warn for a transient drop, error once the database has stayed unhealthy past the escalation window. */
