@@ -5,82 +5,71 @@
  * so the visitor never notices and the log line is only a warning. A database that stays
  * unhealthy is a real incident, and its failures log at error.
  *
+ * One state machine, no ring. An episode opens at its first failure and counts the failures and
+ * successes seen since it opened; a success from before it never counts.
+ *
  * What this guarantees, with ESCALATION = DATABASE_OUTAGE_ESCALATION_MS (30 s):
- *   a) A lone failure, or a failure followed by healthy traffic, logs warn only. An episode
- *      begins at the first failure and ends at the first success that finds the recent window
- *      (see WINDOW) mostly healthy, so one success inside a flapping outage does not end it.
- *   b) A hard outage escalates at the first failure logged at least ESCALATION after the
- *      episode began, at any request rate: the episode stays open until a success shows
- *      recovery, never because the next failure came late. One request every 90 s logs warn
- *      at t=0 and error from t=90 s on, for as long as the outage lasts. At a high request
- *      rate that is 30 s after the first failure.
- *   c) A partial outage in which most queries fail (more than half of the last 60 s) escalates
- *      after ESCALATION, because the scattered successes leave the window mostly failing.
- *   d) After recovery the next failure logs warn again: a success that follows 10 s without any
- *      failure closes the episode, as does one that finds the last 60 s mostly healthy.
+ *   a) A lone failure, or a failure followed by healthy traffic, logs warn only: the episode
+ *      closes once two successes in a row follow the failure and the failure is 10 s old.
+ *   b) A hard outage (no success) escalates at the first failure logged at least ESCALATION after
+ *      the episode opened, at any request rate. One request every 90 s logs warn at t=0 and error
+ *      from t=90 s on. At a high rate that is 30 s after the first failure.
+ *   c) A partial outage escalates once ESCALATION has passed and the episode holds more failures
+ *      than successes. Scattered successes do not close it: closing needs two in a row.
+ *   d) After recovery the next failure logs warn again: the episode is closed, so it opens fresh.
  *
- * Failures more than EPISODE_IDLE_MS apart with no success between them are two episodes, not
- * one outage: two drops hours apart on a quiet site each start with a warn.
+ * A failure more than EPISODE_IDLE_MS after the previous one opens a new episode instead of
+ * extending the old one, so two drops hours apart, or a recovery nobody saw for lack of traffic,
+ * each start with a warn.
  *
- * State is a few numbers per process: the episode start, the last failure, and success and
- * failure counts in a six-slot ring of ten-second slots. Leaf module, no imports, so the
- * logger, the pool and the error rule can all read it. Every function takes `now` so a clock
- * can be injected.
+ * State is five numbers per process. Leaf module, no imports, so the logger, the pool and the
+ * error rule can all read it. Every function takes `now` so a clock can be injected.
  */
 
 /** How long a database must stay unhealthy before its failures are errors. */
 export const DATABASE_OUTAGE_ESCALATION_MS = 30_000;
 
-/** An episode with no failure for this long is over even if no success was seen (no traffic). */
+/** A failure this long after the previous one opens a new episode, whatever happened in between. */
 const EPISODE_IDLE_MS = 10 * 60_000;
 
-/** A success this long after the last failure ends the episode, whatever the 60 s counts say. */
+/** An episode closes only when its last failure is at least this old. */
 const RECOVERY_QUIET_MS = 10_000;
 
-/** Failures and successes are counted over the last SLOT_MS * SLOTS (60 s). */
-const SLOT_MS = 10_000;
-const SLOTS = 6;
+/** ...and when this many successes in a row have followed that failure. */
+const RECOVERY_SUCCESSES = 2;
 
-const failures = new Array<number>(SLOTS).fill(0);
-const successes = new Array<number>(SLOTS).fill(0);
-let currentSlot = 0;
 let episodeStart: number | null = null;
 let lastFailureAt = 0;
-
-/** Moves the ring to `now`, clearing every slot that has aged out. */
-function advance(now: number): number {
-  const slot = Math.floor(now / SLOT_MS);
-  if (slot < currentSlot) return currentSlot % SLOTS;
-  const steps = Math.min(slot - currentSlot, SLOTS);
-  for (let i = 1; i <= steps; i++) {
-    failures[(currentSlot + i) % SLOTS] = 0;
-    successes[(currentSlot + i) % SLOTS] = 0;
-  }
-  currentSlot = slot;
-  return slot % SLOTS;
-}
-
-const sum = (counts: number[]) => counts.reduce((a, b) => a + b, 0);
+let epFailures = 0;
+let epSuccesses = 0;
+let successesSinceFailure = 0;
 
 export function noteDatabaseUnreachable(now: number = Date.now()): void {
-  failures[advance(now)]++;
-  if (episodeStart === null || now - lastFailureAt > EPISODE_IDLE_MS) episodeStart = now;
+  if (episodeStart === null || now - lastFailureAt > EPISODE_IDLE_MS) {
+    episodeStart = now;
+    epFailures = 0;
+    epSuccesses = 0;
+  }
+  epFailures++;
+  successesSinceFailure = 0;
   lastFailureAt = now;
 }
 
 export function noteDatabaseReachable(now: number = Date.now()): void {
-  successes[advance(now)]++;
-  const failed = sum(failures);
-  const quiet = now - lastFailureAt >= RECOVERY_QUIET_MS;
-  if (episodeStart !== null && (quiet || failed <= sum(successes))) episodeStart = null;
+  if (episodeStart === null) return;
+  epSuccesses++;
+  successesSinceFailure++;
+  if (successesSinceFailure >= RECOVERY_SUCCESSES && now - lastFailureAt >= RECOVERY_QUIET_MS) {
+    episodeStart = null;
+  }
 }
 
 /** warn for a transient drop, error once the database has stayed unhealthy past the escalation window. */
 export function databaseOutageLevel(now: number = Date.now()): "warn" | "error" {
   const sustained =
     episodeStart !== null &&
-    now - lastFailureAt <= SLOT_MS * SLOTS &&
-    now - episodeStart >= DATABASE_OUTAGE_ESCALATION_MS;
+    now - episodeStart >= DATABASE_OUTAGE_ESCALATION_MS &&
+    epFailures > epSuccesses;
   return sustained ? "error" : "warn";
 }
 
