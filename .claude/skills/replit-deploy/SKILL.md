@@ -198,7 +198,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready 
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
 
-If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` for an already signed-in owner in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Each must load the dashboard. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
+If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` in a browser as the audit admin, never the owner account, in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Sign in with the audit-admin route in `qa-lane` (credential file read inside one `bash -c`, nothing printed) and never click Sign out. Each state must load the dashboard. The owner admin cookie is checked by API only, never in a browser: `curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/admin/stats'` must return 200. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
 
 Shipped means LIVE equals TARGET. The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. A "success" from `get_publish_status` while `/api/version` still shows BEFORE is not shipped: keep the step 5 poll running (Autoscale cutover). If LIVE is neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build, or a `BUILD_REVISION` was set in the workspace environment.
 
@@ -209,7 +209,7 @@ Then check the site as a visitor in a browser against `https://awesome.video` (h
 3. Add an init script that sets `analytics-consent=denied` in localStorage and `umami.disabled=1`, so the consent bar and analytics stay out of the way.
 4. Read the browser console for errors on each page.
 
-Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. Do not sign in or write anything on production.
+Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. This visitor check does not sign in and writes nothing on production; the audit-admin check above is the only browser sign-in.
 
 ### 8. Report
 
