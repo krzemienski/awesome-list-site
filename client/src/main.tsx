@@ -5,7 +5,7 @@ import App from "./App";
 import "./index.css";
 import { queryClient } from "./lib/queryClient";
 import { AppProviders } from "./app-providers";
-import { initGA } from "./lib/analytics";
+import { getAnalyticsConsent, initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
@@ -165,6 +165,11 @@ if (!homeSsr) seedResourceBoot(queryClient);
     // bundle that never runs still leaves a usable page.)
     overlay.setAttribute("aria-hidden", "true");
     overlay.inert = true;
+    // The server only sees the cookie. A visitor whose choice lives in
+    // localStorage alone (or was made in another tab) got the static banner
+    // in the HTML; ConsentBanner drops the prepaint marker that hides it on
+    // mount, which is before this overlay leaves. Remove it here instead.
+    if (getAnalyticsConsent() !== null) overlay.querySelector(".system-consent-banner")?.remove();
     // JavaScript clients only see this visual hold; crawlers retain the raw
     // semantic h1. Demote before React mounts so the live DOM never has two h1s.
     const ssrH1 = overlay.querySelector("h1");

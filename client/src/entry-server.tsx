@@ -4,7 +4,8 @@ import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { AppProviders } from "./app-providers";
 import { App } from "./App";
 import Home from "./pages/Home";
-import type { HomeBoot } from "./lib/home-boot";
+import ConsentBanner from "./components/ui/consent-banner";
+import { HomeBootProvider, type HomeBoot } from "./lib/home-boot";
 
 export interface HomeSSRContext {
   boot: HomeBoot;
@@ -59,4 +60,21 @@ export function renderHome(context: HomeSSRContext) {
   );
 
   return { html, dehydratedState };
+}
+
+/**
+ * Render only the consent banner, for crawler-shell routes that are not
+ * server-rendered as React. It goes through the same component and the same
+ * boot value as Home, so the banner (or its absence for a visitor who already
+ * chose) cannot drift between routes. The caller places it in the document;
+ * those routes use createRoot, so this markup is replaced rather than hydrated.
+ */
+export function renderConsentBanner(boot: HomeBoot): string {
+  return renderToString(
+    <Router ssrPath={boot.path} ssrSearch={boot.search}>
+      <HomeBootProvider value={boot}>
+        <ConsentBanner />
+      </HomeBootProvider>
+    </Router>,
+  );
 }
