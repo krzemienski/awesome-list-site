@@ -10,7 +10,7 @@ import {
   recordPoolSnapshot,
 } from '../ops/operationalTelemetry';
 import { isDatabaseUnavailableError, logDatabaseError } from './errors';
-import { markRequestDatabaseUnavailable } from '../ops/requestContext';
+import { isInsideRequest, markRequestDatabaseReached, markRequestDatabaseUnavailable } from '../ops/requestContext';
 import { noteDatabaseReachable, noteDatabaseUnreachable } from './outage';
 import { createLogger } from "../lib/logger";
 import { DB_CONNECT_TIMEOUT_MS } from "./connect-timeout";
@@ -67,17 +67,20 @@ pool.on('error', (err) => {
 
 // A failed query is seen twice: by the client wrapper (finish) and by the pool.query wrapper that
 // also sees acquisition failures no client wrapper can. The outage tracker counts each error once.
+// Inside a request the tracker is fed once, when the request ends (ops/requestContext.ts); only work
+// outside a request (jobs, scheduler, startup) is noted here, per query.
 const notedFailures = new WeakSet<object>();
 
-function markTransientRequestFailure(error: unknown): void {
-  if (isDatabaseUnavailableError(error)) {
-    markRequestDatabaseUnavailable();
-    if (error && typeof error === 'object') {
-      if (notedFailures.has(error)) return;
-      notedFailures.add(error);
-    }
-    noteDatabaseUnreachable();
+// A ROLLBACK that fails after its transaction's connection died is the same incident, not a second one.
+function markTransientRequestFailure(error: unknown, followsFailure = false): void {
+  if (!isDatabaseUnavailableError(error)) return;
+  markRequestDatabaseUnavailable();
+  if (isInsideRequest() || followsFailure) return;
+  if (error && typeof error === 'object') {
+    if (notedFailures.has(error)) return;
+    notedFailures.add(error);
   }
+  noteDatabaseUnreachable();
 }
 
 // Instrument the actual pg clients used by both pool.query() and Drizzle
@@ -109,8 +112,8 @@ pool.on('connect', (client: any) => {
     const finish = (error?: unknown) => {
       if (finished) return;
       finished = true;
-      if (error) markTransientRequestFailure(error);
-      else noteDatabaseReachable();
+      if (error) markTransientRequestFailure(error, command === 'rollback');
+      else if (!markRequestDatabaseReached()) noteDatabaseReachable();
       recordDatabaseQuery(command, Date.now() - startedAt, error);
       recordPoolSnapshot({
         total: pool.totalCount,

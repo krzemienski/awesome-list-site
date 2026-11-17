@@ -1,11 +1,14 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
+import { noteDatabaseReachable, noteDatabaseUnreachable } from "../db/outage";
 import { markRequestServed } from "./serviceActivity";
 
 type OperationalRequestState = {
   kind: "request";
   databaseUnavailable: boolean;
+  /** At least one query of this request completed. */
+  databaseReached: boolean;
   /** Short per-request id so every log line of one request can be traced. */
   id: string;
   method: string;
@@ -29,6 +32,19 @@ export type LogContext =
 export function markRequestDatabaseUnavailable(): void {
   const state = requestContext.getStore();
   if (state) state.databaseUnavailable = true;
+}
+
+/** True inside an HTTP request, whose database outcome is noted once when it ends (not per query). */
+export function isInsideRequest(): boolean {
+  return requestContext.getStore()?.kind === "request";
+}
+
+/** Records a completed query against the current request. False outside one: the caller notes it itself. */
+export function markRequestDatabaseReached(): boolean {
+  const state = requestContext.getStore();
+  if (state?.kind !== "request") return false;
+  state.databaseReached = true;
+  return true;
 }
 
 /** Request id, method and path (or job name and id) for log lines written inside either. */
@@ -65,7 +81,22 @@ export function operationalRequestContext(
   res.locals.requestStartedAt = Date.now();
   const id = randomBytes(3).toString("hex");
   res.locals.requestId = id;
-  requestContext.run({ kind: "request", databaseUnavailable: false, id, method: req.method, path: req.path }, () => {
+  const state: OperationalRequestState = {
+    kind: "request",
+    databaseUnavailable: false,
+    databaseReached: false,
+    id,
+    method: req.method,
+    path: req.path,
+  };
+  // One outcome per request for the outage tracker: a failure if the request saw the database
+  // unavailable, a success if it ran queries and saw none. A listing runs several queries and a
+  // readiness probe five, so counting queries would let one healthy request close an episode.
+  res.once("close", () => {
+    if (state.databaseUnavailable) noteDatabaseUnreachable();
+    else if (state.databaseReached) noteDatabaseReachable();
+  });
+  requestContext.run(state, () => {
     const originalStatus = res.status.bind(res);
     const originalJson = res.json.bind(res);
 

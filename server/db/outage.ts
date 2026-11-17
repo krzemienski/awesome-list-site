@@ -8,9 +8,15 @@
  * One state machine, no ring. An episode opens at its first failure and counts the failures and
  * successes seen since it opened; a success from before it never counts.
  *
+ * Outcomes are counted per request, not per query: a request that saw the database unavailable is one
+ * failure, a request that ran queries and saw none is one success (ops/requestContext.ts notes it when
+ * the request ends). Work outside a request (jobs, scheduler, startup) is counted per query. A listing
+ * runs several queries and a readiness probe five, so per-query counting let one healthy request pass
+ * for "two successes in a row".
+ *
  * What this guarantees, with ESCALATION = DATABASE_OUTAGE_ESCALATION_MS (30 s):
  *   a) A lone failure, or a failure followed by healthy traffic, logs warn only: the episode
- *      closes once two successes in a row follow the failure and the failure is 10 s old.
+ *      closes once two successful requests in a row follow the failure and the failure is 10 s old.
  *   b) A hard outage (no success) escalates at the first failure logged at least ESCALATION after
  *      the episode opened, at any request rate. One request every 90 s logs warn at t=0 and error
  *      from t=90 s on. At a high rate that is 30 s after the first failure.
