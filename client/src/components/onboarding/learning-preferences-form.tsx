@@ -1,3 +1,4 @@
+import { PREFERENCE_SECTION_TEST_IDS } from "@/lib/onboarding-save-plan";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -78,7 +79,7 @@ export default function LearningPreferencesForm({
       {visible(1) ? (
         <fieldset
           className="space-y-4"
-          data-testid="preferences-section-skill"
+          data-testid={PREFERENCE_SECTION_TEST_IDS[0]}
           disabled={disabled}
         >
           <legend className="font-sans text-lg font-semibold">
@@ -124,7 +125,7 @@ export default function LearningPreferencesForm({
       {visible(2) ? (
         <fieldset
           className="space-y-4"
-          data-testid="preferences-section-topics"
+          data-testid={PREFERENCE_SECTION_TEST_IDS[1]}
           disabled={disabled}
         >
           <legend className="font-sans text-lg font-semibold">
@@ -168,7 +169,7 @@ export default function LearningPreferencesForm({
       {visible(3) ? (
         <fieldset
           className="space-y-4"
-          data-testid="preferences-section-goals"
+          data-testid={PREFERENCE_SECTION_TEST_IDS[2]}
           disabled={disabled}
         >
           <legend className="font-sans text-lg font-semibold">
@@ -211,7 +212,7 @@ export default function LearningPreferencesForm({
       {visible(4) ? (
         <fieldset
           className="space-y-4"
-          data-testid="preferences-section-formats"
+          data-testid={PREFERENCE_SECTION_TEST_IDS[3]}
           disabled={disabled}
         >
           <legend className="font-sans text-lg font-semibold">
@@ -257,7 +258,7 @@ export default function LearningPreferencesForm({
       {visible(5) ? (
         <fieldset
           className="space-y-4"
-          data-testid="preferences-section-time"
+          data-testid={PREFERENCE_SECTION_TEST_IDS[4]}
           disabled={disabled}
         >
           <legend className="font-sans text-lg font-semibold">
