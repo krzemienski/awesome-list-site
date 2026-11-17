@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { pool } from "./db";
 import { classifyDatabaseError } from "./ops/operationalTelemetry";
+import { isDatabaseUnavailableError } from "./db/errors";
 import {
   getMigrationBootState,
   migrationsAreReady,
@@ -16,6 +17,8 @@ type ProbeResult = {
   checkedAt: string;
   reason?: "database" | "migrations";
   errorClass?: string;
+  /** The database dropped or refused the connection: a retry is expected to work. */
+  transient?: boolean;
 };
 
 let inFlight: Promise<ProbeResult> | null = null;
@@ -99,6 +102,7 @@ async function runProbe(): Promise<ProbeResult> {
       ready: false,
       reason: "database",
       errorClass: classifyDatabaseError(error),
+      transient: isDatabaseUnavailableError(error),
       durationMs: Date.now() - startedAt,
       checkedAt,
     };

@@ -77,6 +77,8 @@ export function registerOperationsRoutes(
     const readiness = await checkReadiness();
     res.set("Cache-Control", "no-store");
     if (!readiness.ready) res.set("Retry-After", "1");
+    // The probe is shared between requests, so only it knows a dropped connection caused this 503.
+    if (readiness.transient) res.locals.databaseUnavailable = true;
     res.status(readiness.ready ? 200 : 503).json({
       status: readiness.ready ? "ready" : "not_ready",
     });

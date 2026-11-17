@@ -79,6 +79,9 @@ export function operationalRequestContext(
         res.setHeader("Retry-After", "1");
         return originalStatus(503);
       }
+      // A route that answers its own 503 for a dropped connection (sendOperationalFailure,
+      // the home feed) is a database 503 for the access log too.
+      if (statusCode === 503 && requestHadDatabaseUnavailableError()) res.locals.databaseUnavailable = true;
       return originalStatus(statusCode);
     }) as Response["status"];
 
