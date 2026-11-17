@@ -14,7 +14,7 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 3. Fix: one fixer per group, each in its own worktree from fresh `origin/main` (`git fetch origin` first), own branch, own PR. If groups touch the same files, merge them into one group.
 4. Review: each PR gets a `review-pr` pinned review by a reviewer that did not write it. REQUEST_CHANGES goes back to the fixer; any new push needs a fresh verdict.
 5. Merge guard: a PR merges only when every thread is resolved and the latest `VERDICT: APPROVE <sha>` names `headRefOid`. The hook enforces this. Never merge around it.
-6. Batch merge: merge the approved PRs together, then check `origin/main`.
+6. Batch merge: the lead merges a PR only after the reviewer's final report has arrived and its last `VERDICT` comment names `headRefOid` (an APPROVE comment alone is not enough: the reviewer may still be reversing it). The merge guard also refuses a verdict younger than 60 s. Merge the approved PRs together, then check `origin/main`.
 7. Deploy: one `replit-deploy` run for the batch. Done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200. Call that SHA `X`.
 8. Re-drive: run only the affected cells on `X` with `qa-lane`. A cell still failing returns to stage 2.
 9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. Then run QA cleanup (below).

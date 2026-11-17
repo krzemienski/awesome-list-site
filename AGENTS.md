@@ -34,7 +34,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 | User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
 | URLs (with or without `https://`, also `--url=`) containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
 | While a review worktree under `.claude/worktrees/` has a `review-pin` in its git dir for an open PR, no `SendMessage` goes out unless that worktree's `HEAD`, the pin and the PR `headRefOid` are the same commit. Reviewers never call EnterWorktree; the hook scans all review worktrees from any cwd. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
-| `gh pr merge` (any `-R`/`GH_REPO`, also inside `sh -c`, `eval`, `xargs`), a PUT to `…/pulls/<N>/merge` and a GraphQL merge mutation run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid`. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
+| `gh pr merge` (any `-R`/`GH_REPO`, also inside `sh -c`, `eval`, `xargs`), a PUT to `…/pulls/<N>/merge` and a GraphQL merge mutation run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid` that is at least 60 s old. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
 
 ## Shell
 

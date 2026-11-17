@@ -24,7 +24,7 @@ Reviews are bound to one commit. A verdict that names a different SHA than the P
 
    If `headRefOid` moved, update the worktree to the new head, re-pin, review the delta (`git diff <old>..<new>`) plus whatever it touches, and re-run step 4 (build and lint) at the new head before the verdict.
 8. Address every unresolved thread: read it, fix or answer it, and only then resolve it: `gh api graphql -f id=<threadId> -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}'`.
-9. Post the verdict as a PR comment (GitHub refuses self-approval, so the merge guard reads this comment). The first line is exactly one of:
+9. Post the verdict as a PR comment, as the LAST action of the review: only after every probe and the step 7 re-fetch are done. Never post a provisional APPROVE and reverse it later; a merge can land in the gap (#453 merged 8 s before its reviewer reversed). If a late finding changes the verdict, post the corrected comment before anything else and tell the lead at once (GitHub refuses self-approval, so the merge guard reads this comment). The first line is exactly one of:
 
    ```
    VERDICT: APPROVE <full-40-char-sha>
@@ -37,6 +37,7 @@ Reviews are bound to one commit. A verdict that names a different SHA than the P
 ## Rules
 
 - The verdict SHA is the full 40-character `headRefOid` read in step 7.
+- The verdict comment is the last action; the report to the lead follows it. The lead merges only after that report.
 - A new push after an APPROVE invalidates it: review the delta and post a fresh verdict.
 - Report to the lead in at most 5 lines: verdict, SHA, counts, comment URL.
 - A hook block is a stop sign: report it, never route around it. A stale-pin block names the worktree to remove; if it is not your own review's worktree, report it to the lead instead of removing it.
