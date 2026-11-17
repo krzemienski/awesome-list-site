@@ -26,21 +26,25 @@ header) before calling the release live.
 
 ## 4. Production QA identity
 
-Production has no throwaway test accounts: `/sign-up` is behind Cloudflare's
+Production has no throwaway sign-ups: `/sign-up` is behind Cloudflare's
 human check and a real emailed code, and the workspace's Clerk keys belong to
 the development instance (accounts created with them do not exist on
-awesome.video).
+awesome.video). QA runs use two kept Clerk accounts, the audit admin and the
+audit member; their credentials live outside the repo in `~/.cache/awesome-audit/`.
 
 | What you need to check | Identity |
 |---|---|
 | Public pages, SEO, guest flows, API reads | Signed out. No identity needed. |
-| Admin pages and signed-in member features | The owner admin session: `https://awesome.video/sign-in?admin` + the `OWNER_PASSWORD` secret. It is a signed 12-hour HttpOnly cookie for the `admin@example.com` account, independent of Clerk. |
+| Admin pages and signed-in member features in a browser, and any QA row | The audit admin or audit member account. |
+| Admin API calls (deploy checks, logs) | The owner admin session: `https://awesome.video/sign-in?admin` + the `OWNER_PASSWORD` secret. It is a signed 12-hour HttpOnly cookie for the `admin@example.com` account, independent of Clerk. |
 | The owner's own Clerk account | Signs in with Google or an email code (no password factor). Only the owner can use it. |
 
 Rules for using the owner admin session on production:
 
-1. Get the owner's go-ahead for each session. It is the only production admin,
-   and it is shared by everyone who checks production.
+1. Agents mint it once per batch and reuse it, under the owner's standing
+   go-ahead of 2026-10-30 (CLAUDE.md, "Production QA conventions"). Anyone
+   else gets the owner's go-ahead for each session. It is shared by everyone
+   who checks production.
 2. Prefer read-only checks. In an automated browser, abort every non-GET
    `/api` request except the ones the check needs (`POST /api/send` is the
    Replit widget, not the app).

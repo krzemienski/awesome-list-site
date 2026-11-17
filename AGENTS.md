@@ -65,7 +65,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 ## Safety
 
 - Respect hook blocks: report the block and ask. Never route around one.
-- Never print cookies, tokens or full emails.
+- Never paste or print a password, cookie, token or full email in chat, prompts, logs or evidence. A command gets a credential from its file (`-H @file`, or a variable sourced in the same call), never as typed text.
 - QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`).
 
 ## Agent messaging
@@ -74,7 +74,8 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 
 ## Production QA conventions
 
-- Audits sign in with the audit admin and audit member accounts, never the owner account.
+- Browser journeys and every QA row use the audit admin and audit member accounts, never the owner account.
+- The owner account has one use, under the owner's standing go-ahead of 2026-10-30: the admin header `~/.cache/awesome-audit/owner.hdr` for admin API calls (`replit-deploy` checks, logs, anchors). Probe it with `GET /api/admin/stats`; 200 means reuse. On 401 the lead re-mints it once per batch with `bash ~/.cache/awesome-audit/refresh-owner.sh`; if the sandbox or an approval rule refuses that, hand the owner the same command to run. `/api/auth/admin-login` allows 10 tries per 900 s across all agents: wait out a 429. Never click or call any Sign out or logout route: it ends every owner session.
 - Any row a QA run creates has a title starting `[QA-qa-audit-<RUN_ID>]`, so `/api/admin/qa-rows` (`server/routes/domains/qa-cleanup.ts`) can find and delete it.
 - Deploys go through the `replit-deploy` skill, including its pre-publish schema check.
 
