@@ -31,6 +31,7 @@
 import { randomUUID } from "node:crypto";
 import { getRequestLogContext } from "../ops/requestContext";
 import { isDatabaseUnavailableError } from "../db/errors";
+import { AppError } from "../middleware/errors";
 import { databaseOutageLevel, isDatabaseFailurePersistent } from "../db/outage";
 import { getLogSink, type LogRecord } from "./logSink";
 import { messageWithoutEchoedValue } from "../errors/pgErrors";
@@ -263,7 +264,7 @@ export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNo
 
 /** A drop that a job did not survive a retry of stays an error: the database stayed down. */
 const isTransientDatabaseError = (error: unknown): boolean =>
-  isDatabaseUnavailableError(error) && !isDatabaseFailurePersistent(error);
+  !(error instanceof AppError) && isDatabaseUnavailableError(error) && !isDatabaseFailurePersistent(error);
 
 /** An Error argument, or an error or err field of a details object, that is a transient database drop. */
 const isDatabaseUnavailableLogArg = (arg: unknown): boolean => {
