@@ -166,6 +166,17 @@ const inferredErrors = {
   "503": { name: "ErrorResponse", description: "Service temporarily unavailable", schema: jsonObjectResponseSchema },
 } satisfies import("./registry").ResponseSchemaMap;
 
+/** The public API's 503: the database dropped or refused a connection; the same request works a moment later. */
+const publicUnavailableResponse = {
+  name: "ErrorResponse",
+  description: "Service temporarily unavailable (a dropped database connection); retry after Retry-After seconds",
+  schema: jsonObjectResponseSchema,
+  headers: {
+    "Retry-After": "Seconds to wait before retrying",
+    "Cache-Control": "no-store: a 503 is never cached",
+  },
+} satisfies import("./registry").NamedResponseSchema;
+
 function inferredResponsesFor(
   method: HttpMethod,
   path: string,
@@ -193,6 +204,7 @@ function inferredResponsesFor(
   return {
     ...success,
     ...inferredErrors,
+    ...(path.startsWith("/api/public/") ? { "503": publicUnavailableResponse } : {}),
   };
 }
 

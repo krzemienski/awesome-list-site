@@ -152,6 +152,14 @@ function buildResponses(contract: ApiContract): Record<string, any> {
         },
       };
     }
+    if (named.headers) {
+      response.headers = Object.fromEntries(
+        Object.entries(named.headers).map(([header, description]) => [
+          header,
+          { description, schema: { type: "string" } },
+        ]),
+      );
+    }
     responses[status] = response;
   }
   return responses;
