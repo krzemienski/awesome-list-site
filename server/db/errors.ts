@@ -1,6 +1,7 @@
 import { DrizzleQueryError } from "drizzle-orm/errors";
 import { AppError, ServiceUnavailableError } from "../middleware/errors";
 import { causeChain, findPgError } from "../errors/pgErrors";
+import type { Logger } from "../lib/logger";
 
 const TRANSIENT_SQLSTATES = new Set([
   "40001", // serialization_failure
@@ -57,4 +58,28 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
     .join(" ")
     .toLowerCase();
   return CONNECTION_FAILURE_PHRASES.some((phrase) => text.includes(phrase));
+}
+
+/**
+ * The one place that decides how loudly a database failure is logged: warn when the database
+ * merely dropped or refused a connection (a restart, scale to zero, a reaped socket: a fresh
+ * connection cures it), error for anything else.
+ */
+export function databaseFailureLevel(error: unknown): "warn" | "error" {
+  return isDatabaseUnavailableError(error) ? "warn" : "error";
+}
+
+/** Logs `error` at its databaseFailureLevel with its code and message plus `extra`. */
+export function logDatabaseError(
+  logger: Logger,
+  message: string,
+  error: unknown,
+  extra: Record<string, unknown> = {},
+): void {
+  const details = {
+    code: databaseErrorCode(error) || "unknown",
+    message: error instanceof Error ? error.message : String(error),
+    ...extra,
+  };
+  logger[databaseFailureLevel(error)](message, details);
 }

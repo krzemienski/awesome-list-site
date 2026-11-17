@@ -10,6 +10,7 @@ import {
   markMigrationsRunning,
 } from './ops/bootState';
 import { createLogger } from "./lib/logger";
+import { logDatabaseError } from './db/errors';
 
 const logger = createLogger("migrations");
 
@@ -63,7 +64,7 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
   });
 
   pool.on('error', (err) => {
-    logger.error('Database pool error during migration:', err.message);
+    logDatabaseError(logger, 'Database pool error during migration:', err);
   });
 
   // If no migrations folder found, verify database is already set up

@@ -1,4 +1,5 @@
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 import { runScheduledBackupIfDue } from "../backup/scheduledBackup";
@@ -13,7 +14,8 @@ async function runCycle(): Promise<void> {
   if (running) return;
   running = true;
   try {
-    const result = await runWithJobContext("database-backup", "scheduler", runScheduledBackupIfDue);
+    const result = await runWithJobContext("database-backup", "scheduler", () =>
+      retryOnDatabaseDrop(logger, "Scheduled backup check", runScheduledBackupIfDue));
     if (result.status !== "skipped") logger.info("Scheduled backup check finished", { ...result });
   } catch (error) {
     logger.error("Scheduled backup check failed; retrying in 30 minutes", {

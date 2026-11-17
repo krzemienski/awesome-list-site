@@ -43,6 +43,8 @@ import {
 } from "../email";
 import { clerkUserHasVerifiedEmail, rowEmailIsVerifiedInClerk } from "../lib/clerkAccountLink";
 import { createLogger } from "../lib/logger";
+import { databaseFailureLevel } from "../db/errors";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 
 const logger = createLogger("digest");
 
@@ -1053,7 +1055,7 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
       providerMessageId: result.providerMessageId,
     });
   } catch (error) {
-    logger.error("Digest delivery failed", {
+    logger[databaseFailureLevel(error)]("Digest delivery failed", {
       digestJobId: job.id,
       channel: job.channel,
       errorClass: error instanceof Error ? error.name : "unknown",
@@ -1167,7 +1169,7 @@ async function runRetentionDelete(
   run: () => Promise<unknown[]>,
 ): Promise<number | null> {
   try {
-    return (await run()).length;
+    return (await retryOnDatabaseDrop(logger, `Digest retention delete (${table})`, run)).length;
   } catch (error) {
     // Drizzle wraps the driver error; the SQLSTATE lives on its cause.
     const cause = error instanceof Error && error.cause ? error.cause : error;

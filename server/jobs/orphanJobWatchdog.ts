@@ -4,6 +4,7 @@ import { and, eq, inArray, notInArray, lt, sql } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 
 const logger = createLogger("job-watchdog");
@@ -227,7 +228,7 @@ export const runOrphanWatchdogStartup = (): Promise<void> =>
 // created_at as before.
 async function runStartupSweep(): Promise<void> {
   try {
-    const r = await sweepOrphanedJobs();
+    const r = await retryOnDatabaseDrop(logger, "Orphan watchdog", sweepOrphanedJobs);
     if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
       logger.info(
         `🧹 Orphan watchdog: flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed (AI jobs: owner worker gone; sync queue: older than ${r.cutoff.toISOString()})`,

@@ -203,17 +203,27 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
   // Friendly copy for a failed submit, shown inline next to the dialog's buttons.
   const [submitError, setSubmitError] = useState<string | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  // LG-042: the inline error makes the dialog taller than its scroll area, which
-  // pushed the footer (and the focused Submit) out of view. Bring the footer
-  // back into the dialog's scroll container whenever an error appears.
+  // Bumped when a server field error (duplicate URL) renders under the focused field.
+  const [footerNudge, setFooterNudge] = useState(0);
+  // LG-042 / D-6: an inline error makes the dialog taller than its scroll area,
+  // which pushed the footer (and Submit) out of view. After the error renders,
+  // scroll the dialog just far enough to show the footer, but never so far that
+  // the field message a field error points at scrolls off the top.
   useEffect(() => {
-    if (!submitError) return;
+    if (!submitError && footerNudge === 0) return;
+    const footer = submitButtonRef.current?.parentElement;
+    const scroller = footer?.closest<HTMLElement>('[role="dialog"]');
+    if (!footer || !scroller) return;
+    const viewport = scroller.getBoundingClientRect();
+    let delta = footer.getBoundingClientRect().bottom - viewport.bottom;
+    const fieldMessage = submitError ? null : scroller.querySelector('[id$="-form-item-message"]');
+    if (fieldMessage) {
+      delta = Math.min(delta, fieldMessage.getBoundingClientRect().top - viewport.top - 8);
+    }
+    if (delta <= 0) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    submitButtonRef.current?.parentElement?.scrollIntoView({
-      block: "nearest",
-      behavior: reduceMotion ? "auto" : "smooth",
-    });
-  }, [submitError]);
+    scroller.scrollBy({ top: delta, behavior: reduceMotion ? "auto" : "smooth" });
+  }, [submitError, footerNudge]);
   const analyzeButtonRef = useRef<HTMLButtonElement>(null);
   const runAnalysisButtonRef = useRef<HTMLButtonElement>(null);
   const refocusAnalyzeRef = useRef(false);
@@ -522,6 +532,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
         if (body?.field === 'url' && body.message) {
           // Focus the field so the message is scrolled into view and the user can fix it.
           form.setError('url', { type: 'server', message: body.message }, { shouldFocus: true });
+          setFooterNudge((n) => n + 1);
           return;
         }
       }
