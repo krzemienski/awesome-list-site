@@ -20,6 +20,8 @@ const TRANSIENT_SQLSTATES = new Set([
 /** What node-postgres, pg-pool and Node's socket layer say when the connection, not the query, failed. */
 const CONNECTION_FAILURE_PHRASES = [
   "timeout exceeded when trying to connect",
+  // The readiness probe gave up waiting for pool.connect() (server/health.ts).
+  "pool acquisition timeout",
   "connection timeout",
   "connection terminated",
   "connection ended unexpectedly",
