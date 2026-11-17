@@ -16,6 +16,7 @@ type HomeRenderer = {
     home: unknown;
     kindCounts: unknown;
   }): { html: string; dehydratedState: unknown };
+  renderConsentBanner(boot: HomeBoot): string;
 };
 
 interface ClientManifestEntry {
@@ -63,6 +64,11 @@ function readCookie(req: Request, name: string): string | null {
   }
 }
 
+function consentCookie(req: Request): HomeBoot["consent"] {
+  const consent = readCookie(req, "analytics-consent");
+  return consent === "granted" || consent === "denied" ? consent : null;
+}
+
 function homeBoot(req: Request): HomeBoot {
   const url = new URL(req.originalUrl || req.url, "http://home-ssr.invalid");
   const requested = url.searchParams.get("layout");
@@ -73,7 +79,6 @@ function homeBoot(req: Request): HomeBoot {
       : stored === "curated"
         ? "curated"
         : "index";
-  const consent = readCookie(req, "analytics-consent");
   const sidebar = readCookie(req, "sidebar_state");
   const userAgent = req.headers["user-agent"] || "";
   const viewport =
@@ -98,7 +103,7 @@ function homeBoot(req: Request): HomeBoot {
     // The persisted cookie wins; otherwise desktop starts expanded while
     // tablet/phone start closed, matching the shell's breakpoint policy.
     sidebarOpen: sidebar === "true" ? true : sidebar === "false" ? false : viewport === "desktop",
-    consent: consent === "granted" || consent === "denied" ? consent : null,
+    consent: consentCookie(req),
     isAnonymous: true,
   };
 }
@@ -126,10 +131,11 @@ async function importRenderer(): Promise<HomeRenderer> {
   if (
     !loaded ||
     typeof loaded !== "object" ||
-    typeof (loaded as Partial<HomeRenderer>).renderHome !== "function"
+    typeof (loaded as Partial<HomeRenderer>).renderHome !== "function" ||
+    typeof (loaded as Partial<HomeRenderer>).renderConsentBanner !== "function"
   ) {
     throw new Error(
-      `[home-ssr] renderer module at ${rendererPath} does not export renderHome`,
+      `[home-ssr] renderer module at ${rendererPath} does not export renderHome and renderConsentBanner`,
     );
   }
   return loaded as HomeRenderer;
@@ -153,6 +159,26 @@ function renderer(): Promise<HomeRenderer> {
  */
 export async function prewarmSSRRenderer(): Promise<void> {
   await renderer();
+}
+
+let consentBannerWarned = false;
+
+/**
+ * The consent banner as server HTML for a crawler-shell route (everything
+ * except Home, which renders it inside its own tree). Empty when the visitor
+ * already chose, and on any renderer failure: the client banner still appears,
+ * just after hydration, as before.
+ */
+export async function renderConsentBannerHtml(req: Request): Promise<string> {
+  try {
+    return (await renderer()).renderConsentBanner(homeBoot(req));
+  } catch (error) {
+    if (!consentBannerWarned) {
+      consentBannerWarned = true;
+      logger.warn("[consent-banner] server render unavailable; the banner paints after hydration", error);
+    }
+    return "";
+  }
 }
 
 function clientManifest(): Promise<ClientManifest> {

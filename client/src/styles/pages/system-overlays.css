@@ -125,7 +125,7 @@
    sits in the same bottom-right corner. Doubled class: the viewport's `p-4`
    utility would otherwise win. */
 .system-toast-viewport.system-toast-viewport {
-  padding-bottom: max(var(--back-to-top-lane), env(safe-area-inset-bottom));
+  padding-bottom: var(--back-to-top-clear);
 }
 
 /*
