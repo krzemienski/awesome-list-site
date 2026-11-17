@@ -15,7 +15,7 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 - If a loaded session answers 401, sign in again once in this lane's session, never per row: open `/sign-in`, `fill` `#identifier-field`, click Continue, `fill` `#password-field`, submit (selectors from past runs; on a miss take a fresh `snapshot` instead of guessing). Fill each field from its credential file in one call, so the value never enters the transcript: `bash -c 'set -a; . ~/.cache/awesome-audit/audit-admin.env; agent-browser --session <lane> fill "#password-field" "$AUDIT_ADMIN_PASSWORD"'` (`AUDIT_ADMIN_EMAIL` the same way for `#identifier-field`; `member.env` for the member, whose key names you read with `cut -d= -f1`, never the values).
 - Mask other users' emails and names in screenshots, or skip the capture.
 - Do not write helper scripts (no `/tmp` `.sh`, `.js` or `.py` wrappers). One-off pipelines with curl and jq are fine.
-- A hook block is a stop sign: report it and ask. Never route around it.
+- A hook block, a declined permission prompt or a sandbox refusal is a stop sign: report it and ask. Never route around it.
 - Shell is zsh: quote URLs containing `?`, `*` or `==`; use `bash -c` for loops.
 
 ## 1. Preflight

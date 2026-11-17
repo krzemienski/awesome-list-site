@@ -17,7 +17,7 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 6. Batch merge: merge the approved PRs together, then check `origin/main`.
 7. Deploy: one `replit-deploy` run for the batch. Done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200. Call that SHA `X`.
 8. Re-drive: run only the affected cells on `X` with `qa-lane`. A cell still failing returns to stage 2.
-9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. Then run QA cleanup (below).
+9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. QA cleanup (below) runs only inside a fresh backup window, the 10 minutes after the next deploy's pre-publish backup; until then the rows stay in the ledger.
 
 ## QA cleanup
 
@@ -57,4 +57,4 @@ Read `state.json` and `PROGRESS.md`, then `curl -s 'https://awesome.video/api/ve
 - Workers report to the lead in at most 5 lines (verdict, SHA, counts, evidence path); detail lives in the result JSON.
 - After each worker returns, run `git status` in its worktree and spot-check one evidence file yourself, by its absolute path in the checkout the worker used.
 - Nothing is parked as a known limitation unless the owner said so; a blocked cell lists what was tried.
-- Hook blocks and 429s are reported, never routed around.
+- A hook block, a declined permission prompt or a sandbox refusal, and 429s, are reported, never routed around.
