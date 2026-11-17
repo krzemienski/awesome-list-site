@@ -5,6 +5,7 @@ import { desc, eq, ne, and, inArray, notInArray, or, lt, sql } from "drizzle-orm
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
 import { createLogger } from "../lib/logger";
+import { logDatabaseError } from "../db/errors";
 import { RETAINED_SCANS, linkHealthArchivedFilter } from "./linkRemediation";
 
 const logger = createLogger("link-health");
@@ -202,7 +203,7 @@ export const linkHealthService = {
     scanControllers.set(row.id, new AbortController());
     logger.info('Link scan started', { jobId: row.id });
     this.runCheckInBackground(row.id).catch(err => {
-      logger.error('Link scan failed', { jobId: row.id }, err);
+      logDatabaseError(logger, 'Link scan failed', err, { jobId: row.id });
     });
 
     return jobRowToApi(row);
@@ -402,7 +403,7 @@ export const linkHealthService = {
           completedAt: new Date(),
         })
         .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')))
-        .catch(e => logger.error('Failed to mark job failed:', e.message));
+        .catch(e => logDatabaseError(logger, 'Failed to mark job failed:', e));
       throw err;
     } finally {
       scanControllers.delete(jobId);

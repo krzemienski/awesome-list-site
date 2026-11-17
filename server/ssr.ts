@@ -5,6 +5,7 @@ import { pathToFileURL } from "url";
 import { HOME_DEADLINE_PASSED, homeDeadlineRemainingMs, loadHomeSSRData, withinHomeDeadline } from "./home-ssr-data";
 import type { HomeBoot } from "../client/src/lib/home-boot";
 import { createLogger } from "./lib/logger";
+import { logDatabaseError } from "./db/errors";
 
 const logger = createLogger("ssr");
 
@@ -389,7 +390,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
     // the public cache. A failure before the deadline is logged by the catch
     // below; one after it would otherwise go unreported.
     prepared.catch((error: unknown) => {
-      if (servedFallback) logger.error("[home-ssr] render preparation failed after the SPA fallback was sent", error);
+      if (servedFallback) logDatabaseError(logger, "[home-ssr] render preparation failed after the SPA fallback was sent", error);
     });
     const ready = await withinHomeDeadline(res, prepared);
     // renderHome and the document build below are synchronous, so no timer can
@@ -421,7 +422,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
   } catch (error) {
     // A document-render failure must not turn a healthy public route into a
     // blank/error page. The normal static SPA remains the explicit fallback.
-    logger.error("[home-ssr] render failed; using the existing SPA fallback", error);
+    logDatabaseError(logger, "[home-ssr] render failed; using the existing SPA fallback", error);
     next();
   }
 }

@@ -1,5 +1,6 @@
 import { ServiceUnavailableError } from "../middleware/errors";
 import { createLogger } from "../lib/logger";
+import { databaseFailureLevel } from "../db/errors";
 
 const logger = createLogger("heavy-work");
 
@@ -117,7 +118,7 @@ export async function startHeavyWork(
       },
       (error) => {
         stats.failed++;
-        logger.error("Background work failed", {
+        logger[databaseFailureLevel(error)]("Background work failed", {
           label,
           ms: Date.now() - startedAt,
           errorClass: error instanceof Error ? error.name : "unknown",

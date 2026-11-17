@@ -2,6 +2,7 @@ import type { Request, RequestHandler } from "express";
 import { storage } from "../storage";
 import { asyncHandler } from "./asyncHandler";
 import { createLogger } from "../lib/logger";
+import { logDatabaseError } from "../db/errors";
 
 const logger = createLogger("api-auth");
 
@@ -77,7 +78,7 @@ async function resolveApiKey(req: Request, authHeader: string): Promise<ApiKeyRe
 
   // Update lastUsedAt timestamp in background (don't await to avoid blocking)
   storage.updateApiKeyLastUsed(apiKey.id).catch((err: any) => {
-    logger.error("Failed to update API key lastUsedAt:", err);
+    logDatabaseError(logger, "Failed to update API key lastUsedAt:", err);
   });
 
   return { ok: true };

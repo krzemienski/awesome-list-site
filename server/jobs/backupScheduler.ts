@@ -3,6 +3,8 @@ import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 import { runScheduledBackupIfDue } from "../backup/scheduledBackup";
+import { DatabaseBackupError } from "../backup/databaseBackup";
+import { databaseErrorCode } from "../db/errors";
 
 const logger = createLogger("backup-scheduler");
 
@@ -18,8 +20,9 @@ async function runCycle(): Promise<void> {
       retryOnDatabaseDrop(logger, "Scheduled backup check", runScheduledBackupIfDue));
     if (result.status !== "skipped") logger.info("Scheduled backup check finished", { ...result });
   } catch (error) {
-    logger.error("Scheduled backup check failed; retrying in 30 minutes", {
-      reason: error instanceof Error ? error.message : "unknown error",
+    logger.error("Scheduled backup check failed; retrying in 30 minutes", error, {
+      code: databaseErrorCode(error) || undefined,
+      stage: error instanceof DatabaseBackupError ? error.stage : undefined,
     });
   } finally {
     running = false;
