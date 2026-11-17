@@ -89,10 +89,12 @@ function check(raw) {
     if (!HAS_AUTH.test(seg)) continue;
     const paths = seg.match(/\/api\/admin\/[^\s'"?]*/g);
     if (paths.every((x) => ROUTINE.test(x))) continue;
+    // A create whose body carries the QA title prefix makes a row qa-rows can delete (owner, 2026-11-16).
+    if (method.toUpperCase() === 'POST' && seg.includes('[QA-')) continue;
     const path = paths.find((x) => !ROUTINE.test(x)).replace(/\d{3,}|user_\w+/g, ':id');
     const unresolved = /https?:\/\/\$/.test(seg) || /(?:^|\s)\$\w+\/api/.test(seg);
     return ['ask', `Production admin write: ${method.toUpperCase()} ${path}${unresolved ? ' (host is an unresolved variable, treated as production)' : ''}. ` +
-      'Confirm the target is a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. /api/admin/qa-rows and POST /api/admin/database-backups (any; one per deploy is a written rule, not enforced) are exempt.'];
+      'Confirm the target is a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. /api/admin/qa-rows, POST /api/admin/database-backups and a POST whose body carries the [QA- title prefix are exempt. An unattended lane logs this ask as a pending row and continues with other work.'];
   }
   return null;
 }

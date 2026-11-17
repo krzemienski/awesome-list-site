@@ -41,8 +41,9 @@ audit member; their credentials live outside the repo in `~/.cache/awesome-audit
 
 Rules for using the owner admin session on production:
 
-1. Agents mint it once per batch and reuse it, under the owner's standing
-   go-ahead of 2026-10-30 (CLAUDE.md, "Production QA conventions"). Anyone
+1. Agents mint it once per batch and reuse it (owner, 2026-10-30: "you are
+   not blocked"; owner, 2026-11-16, delegating this call: "you decide";
+   CLAUDE.md, "Production QA conventions"). Anyone
    else gets the owner's go-ahead for each session. It is shared by everyone
    who checks production.
 2. Use it for admin API reads and writes only, never in a browser UI. Browser
