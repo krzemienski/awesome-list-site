@@ -1,5 +1,6 @@
 import { isDatabaseUnavailableError } from "./errors";
 import type { Logger } from "../lib/logger";
+import { markDatabaseFailurePersistent } from "./outage";
 
 /** Long enough for the pool to discard the dead clients and open fresh ones. */
 export const DATABASE_DROP_RETRY_DELAY_MS = 3000;
@@ -24,6 +25,11 @@ export async function retryOnDatabaseDrop<T>(
       retryInMs: DATABASE_DROP_RETRY_DELAY_MS,
     });
     await new Promise((resolve) => setTimeout(resolve, DATABASE_DROP_RETRY_DELAY_MS));
-    return run();
+    try {
+      return await run();
+    } catch (second) {
+      markDatabaseFailurePersistent(second);
+      throw second;
+    }
   }
 }

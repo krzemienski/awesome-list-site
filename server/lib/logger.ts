@@ -29,8 +29,9 @@
  * set) is built from these same scrubbed values; nothing raw reaches it.
  */
 import { randomUUID } from "node:crypto";
-import { getRequestLogContext, requestHadDatabaseUnavailableError } from "../ops/requestContext";
-import { databaseOutageLevel } from "../db/outage";
+import { getRequestLogContext } from "../ops/requestContext";
+import { isDatabaseUnavailableError } from "../db/errors";
+import { databaseOutageLevel, isDatabaseFailurePersistent } from "../db/outage";
 import { getLogSink, type LogRecord } from "./logSink";
 import { messageWithoutEchoedValue } from "../errors/pgErrors";
 
@@ -260,16 +261,29 @@ const write = (level: LogLevel, line: string, record: LogRecord) => {
 /** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
 export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNotice).flush(timeoutMs);
 
+/** A drop that a job did not survive a retry of stays an error: the database stayed down. */
+const isTransientDatabaseError = (error: unknown): boolean =>
+  isDatabaseUnavailableError(error) && !isDatabaseFailurePersistent(error);
+
+/** An Error argument, or an error or err field of a details object, that is a transient database drop. */
+const isDatabaseUnavailableLogArg = (arg: unknown): boolean => {
+  if (arg instanceof Error) return isTransientDatabaseError(arg);
+  if (!arg || typeof arg !== "object" || Array.isArray(arg)) return false;
+  const record = arg as Record<string, unknown>;
+  return [record.error, record.err].some((nested) => nested instanceof Error && isTransientDatabaseError(nested));
+};
+
 const emit = (
   requestedLevel: LogLevel,
   area: string,
   args: unknown[],
   options: { requestContext?: boolean } = {},
 ) => {
-  // A request whose database connection dropped fails in many catch blocks that each log an
-  // error. Those are one transient event: warn until the outage is sustained (db/outage.ts).
+  // A catch block that logs an error which is itself a dropped or refused connection reports
+  // one transient event: warn until the outage is sustained (db/outage.ts). Any other error,
+  // even in a request or job that saw a drop, keeps its level.
   const level: LogLevel =
-    requestedLevel === "error" && requestHadDatabaseUnavailableError() ? databaseOutageLevel() : requestedLevel;
+    requestedLevel === "error" && args.some(isDatabaseUnavailableLogArg) ? databaseOutageLevel() : requestedLevel;
   const words: string[] = [];
   const pairs: string[] = [];
   let lineArea = area;

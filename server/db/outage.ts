@@ -80,3 +80,13 @@ export function databaseOutageLevel(now: number = Date.now()): "warn" | "error" 
     now - episodeStart >= DATABASE_OUTAGE_ESCALATION_MS;
   return sustained ? "error" : "warn";
 }
+
+const failedAgainAfterRetry = new WeakSet<object>();
+
+/** A job retried after a drop and failed again: the database stayed down, so its error log stays an error. */
+export function markDatabaseFailurePersistent(error: unknown): void {
+  if (error && typeof error === "object") failedAgainAfterRetry.add(error);
+}
+
+export const isDatabaseFailurePersistent = (error: unknown): boolean =>
+  !!error && typeof error === "object" && failedAgainAfterRetry.has(error);
