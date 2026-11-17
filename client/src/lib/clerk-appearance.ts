@@ -285,8 +285,8 @@ function buildClerkAppearance(
       // border over Clerk's shadow ring (app-bridge.css).
       button: "btn auth-edge",
       // Clerk caps the card at the VIEWPORT width less 2.5rem, which is wider
-      // than the page column on a phone: the card spilled past both gutters.
-      // Cap both boxes at the column.
+      // than the page column on a phone: the card spilled past both gutters
+      // and under the back-to-top button. Cap both boxes at the column.
       rootBox: { maxWidth: "100%" },
       // The account modal (openUserProfile) renders an 880px card inside
       // modalContent, a flex item with no width cap, so the 100% caps above
