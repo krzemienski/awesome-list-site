@@ -2,7 +2,7 @@ import { DrizzleQueryError } from "drizzle-orm/errors";
 import { AppError, ServiceUnavailableError } from "../middleware/errors";
 import { causeChain, findPgError } from "../errors/pgErrors";
 import type { Logger } from "../lib/logger";
-import { databaseOutageLevel } from "./outage";
+import { databaseOutageLevel, isDatabaseFailurePersistent } from "./outage";
 
 const TRANSIENT_SQLSTATES = new Set([
   "40001", // serialization_failure
@@ -80,11 +80,12 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
 /**
  * The one place that decides how loudly a database failure is logged: warn when the database
  * merely dropped or refused a connection (a restart, scale to zero, a reaped socket: a fresh
- * connection cures it), error for anything else, and error for a drop once it has lasted
- * DATABASE_OUTAGE_ESCALATION_MS (see ./outage).
+ * connection cures it), error for anything else, error for a drop a retry did not cure (marked
+ * persistent), and error for a drop once it has lasted DATABASE_OUTAGE_ESCALATION_MS (see ./outage).
  */
 export function databaseFailureLevel(error: unknown): "warn" | "error" {
-  return isDatabaseUnavailableError(error) ? databaseOutageLevel() : "error";
+  if (!isDatabaseUnavailableError(error) || isDatabaseFailurePersistent(error)) return "error";
+  return databaseOutageLevel();
 }
 
 /**
