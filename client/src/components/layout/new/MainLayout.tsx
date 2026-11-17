@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
 import { lazyOptional, retryOptionalChunks } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
@@ -41,16 +41,62 @@ function ClientContactDialogHost() {
   return <ContactDialogHost />;
 }
 
-/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
+/** The button appears after this many viewport heights of scrolling. */
+const BACK_TO_TOP_SHOW_AFTER_VIEWPORTS = 1.5;
+/** How long it lingers once the user stops scrolling up. */
+const BACK_TO_TOP_LINGER_MS = 2000;
+
+/**
+ * Floating "back to top" button (NN/g: lower right, shown only after several
+ * screens and an upward scroll, one per page). It overlays content instead of
+ * reserving a gutter, so it must not sit there while someone reads: it shows
+ * on an upward scroll, lingers briefly, hides near the footer, and is
+ * unmounted (not just transparent) whenever hidden so it is never a tab stop.
+ * While shown, <html data-back-to-top> lets CSS keep focus scrolling clear of it.
+ */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const focused = useRef(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
-    onScroll();
+    let lastY = window.scrollY;
+    let timer: number | undefined;
+    const hide = () => {
+      focused.current = false;
+      setVisible(false);
+    };
+    const lingerThenHide = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (!focused.current) hide();
+      }, BACK_TO_TOP_LINGER_MS);
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      const goingUp = y < lastY;
+      lastY = y;
+      const footerTop = document.querySelector(".app-footer")?.getBoundingClientRect().top;
+      const nearFooter = footerTop !== undefined && footerTop < window.innerHeight;
+      if (y <= window.innerHeight * BACK_TO_TOP_SHOW_AFTER_VIEWPORTS || (nearFooter && !focused.current)) {
+        window.clearTimeout(timer);
+        hide();
+      } else if (goingUp) {
+        setVisible(true);
+        lingerThenHide();
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(timer);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    document.documentElement.setAttribute("data-back-to-top", "");
+    return () => document.documentElement.removeAttribute("data-back-to-top");
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -64,13 +110,18 @@ function BackToTop() {
         handoffFocusOnUnmount(e.currentTarget);
         window.scrollTo({ top: 0, behavior: scrollBehavior() });
       }}
+      onFocus={() => {
+        focused.current = true;
+      }}
+      onBlur={() => {
+        focused.current = false;
+      }}
       aria-label="Back to top"
       data-testid="button-back-to-top"
-      // Fixed to the SCREEN, so it is lifted by the app shell's
-      // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      // It floats in --back-to-top-lane (index.css), which the shell's end
-      // gutter keeps clear of content at every width.
-      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
+      // Fixed to the SCREEN. The bottom offset clears whichever is larger: the
+      // app shell's --app-bottom-inset (consent banner, which already includes
+      // the safe area) or the device's own bottom inset.
+      className="fixed bottom-[calc(var(--back-to-top-offset)+max(var(--app-bottom-inset,0px),env(safe-area-inset-bottom,0px)))] right-[max(var(--back-to-top-offset),env(safe-area-inset-right,0px))] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)] motion-safe:animate-in motion-safe:fade-in-0"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>

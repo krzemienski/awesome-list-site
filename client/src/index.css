@@ -123,13 +123,10 @@
   :root {
     --app-bottom-inset: 0px;
     /* The fixed back-to-top button (MainLayout) sits --back-to-top-offset in
-       from the viewport's right and bottom edges. --back-to-top-lane is the
-       vertical strip at the right edge that it floats in: the button plus its
-       offset plus a gap. Content scrolls past a fixed button at every scroll
-       position, so no content may ever enter that strip. Each shell box
-       (page wrap, footer) sizes its own end padding so its content ends at
-       least a lane from the viewport edge, counting the free space the box's
-       centering already leaves there: wide screens reserve nothing extra. */
+       from the viewport's right and bottom edges. It only overlays content
+       while it is showing (after a scroll up, away from the footer), so the
+       page reserves no gutter for it. --back-to-top-lane is the clearance the
+       toast stack leaves above it and the focus scroll-padding keeps. */
     --back-to-top-size: 2.75rem;
     --back-to-top-offset: 0.75rem;
     --back-to-top-lane: calc(var(--back-to-top-size) + var(--back-to-top-offset) + 0.25rem);
@@ -142,6 +139,12 @@
      settle above the bar instead of underneath it. */
   * {
     scroll-margin-bottom: var(--app-bottom-inset, 0px);
+  }
+
+  /* WCAG 2.4.11: while the back-to-top button is showing (MainLayout sets the
+     attribute), focus and anchor scrolling settle above it, not under it. */
+  html[data-back-to-top] {
+    scroll-padding-bottom: var(--back-to-top-lane);
   }
 
   code, pre, kbd, samp {
