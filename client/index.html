@@ -190,7 +190,9 @@
       html[data-home-ssr="true"][data-home-layout-pending="true"] #home-layout-boot-skeleton {
         display: block; min-height: 100vh; background: var(--bg); padding: 40px 20px;
       }
-      html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner {
+      html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner,
+      html[data-consent-known="true"] #ssr-seo-hold .system-consent-banner,
+      html[data-consent-known="true"] #root > .system-consent-banner {
         display: none !important;
       }
     </style>

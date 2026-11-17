@@ -97,7 +97,7 @@ import { UNCACHED_CATALOG_CACHE_CONTROL } from "./http-cache-policy";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { HOME_DEADLINE_PASSED, loadHomeNav, withinHomeDeadline } from "./home-ssr-data";
-import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
+import { RESOURCE_DETAIL_MANIFEST_KEY, renderConsentBannerHtml, routeChunkPreloadTags } from "./ssr";
 import { createLogger } from "./lib/logger";
 import { CLERK_PROXY_PATH } from "./middleware/clerkProxyMiddleware";
 
@@ -2711,6 +2711,11 @@ export function ogInjectionMiddleware() {
       });
     }
 
+    // The consent banner rides in the same server HTML as the page copy, so
+    // it paints with the first frame instead of after hydration (it is the
+    // mobile LCP element). Last in the shell so it stays the bottom row.
+    const consentBannerHtml = bodyHtml ? await renderConsentBannerHtml(req) : "";
+
     // Wrap res.end / res.write to capture HTML and rewrite it.
     const origWrite = res.write.bind(res);
     const origEnd = res.end.bind(res);
@@ -2767,7 +2772,7 @@ export function ogInjectionMiddleware() {
           // mismatch). The function form of replace() avoids `$`
           // special-sequence interpretation in titles/descriptions.
           if (bodyHtml && html.includes("<!--app-html-->")) {
-            html = html.replace("<!--app-html-->", () => bodyHtml!);
+            html = html.replace("<!--app-html-->", () => bodyHtml! + consentBannerHtml);
           }
           const hints = headPreload
             .filter(({ href }) => !html.includes(`href="${href}"`))
