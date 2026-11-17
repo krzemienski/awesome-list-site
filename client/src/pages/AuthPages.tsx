@@ -3,7 +3,7 @@
  * out of the anonymous entry bundle; the Clerk widgets render through
  * <ClerkSlot>, i.e. inside the lazily mounted Clerk runtime.
  */
-import { useEffect, useLayoutEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { SignIn, SignUp } from "@clerk/react";
 import { useLocation, useSearch } from "wouter";
 import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
@@ -15,8 +15,7 @@ import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-template
 import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
-import CustomSignIn from "@/components/auth/CustomSignIn";
-import SsoCallback from "@/components/auth/SsoCallback";
+import { NEW_MEMBER_LANDING } from "@/lib/auth-navigation";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { useOnlineStatus } from "@/hooks/use-online-status";
@@ -24,8 +23,9 @@ import { humanizeApiError, OFFLINE_MESSAGE } from "@/lib/apiError";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// A new account lands where Home offers the optional onboarding invitation.
-const NEW_MEMBER_LANDING = `${basePath}/?context=account&welcome=1`;
+// The app-owned form is opt-in (?form=custom); keep it out of the default chunk.
+const CustomSignIn = lazy(() => import("@/components/auth/CustomSignIn"));
+const SsoCallback = lazy(() => import("@/components/auth/SsoCallback"));
 
 // Clerk's own requests bypass the app API layer, so offline they just hang.
 function OfflineNotice() {
@@ -84,7 +84,7 @@ export function SignInPage() {
           <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
             <StaleSessionGate>
               {customForm ? (
-                customStep
+                <Suspense fallback={null}>{customStep}</Suspense>
               ) : (
                 <SignIn
                   routing="path"

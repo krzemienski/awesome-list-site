@@ -2,6 +2,18 @@ import { requestedReturnPath } from "@/lib/returnUrl";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+/** A new account lands where Home offers the optional onboarding invitation. */
+export const NEW_MEMBER_LANDING = `${basePath}/?context=account&welcome=1`;
+
+/** `path` plus the validated ?redirect_url= of this page, so a hop keeps the destination. */
+export function withReturnPath(path: string, extra = ""): string {
+  const params = new URLSearchParams(extra);
+  const requested = requestedReturnPath();
+  if (requested) params.set("redirect_url", requested);
+  const query = params.toString();
+  return query ? `${path}?${query}` : path;
+}
+
 /** The two arguments Clerk hands a `finalize({ navigate })` callback. */
 interface FinalizeNavigateArgs {
   session: { currentTask?: { key: string } | null };
@@ -50,7 +62,7 @@ export function standardFormHref(pathname: "/sign-in" | "/sign-up"): string {
 
 /** Where an OAuth provider sends the visitor back to, handled by SsoCallback. */
 export function ssoCallbackUrl(): string {
-  return `${basePath}/sign-in/sso-callback?form=custom`;
+  return withReturnPath(`${basePath}/sign-in/sso-callback`, "form=custom");
 }
 
 /** Where an OAuth sign-in lands once complete: the validated return path or Home. */
