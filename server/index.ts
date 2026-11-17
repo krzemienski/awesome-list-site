@@ -552,6 +552,7 @@ app.use((req, res, next) => {
         status: res.statusCode,
         durationMs: duration,
         group,
+        databaseUnavailable: res.statusCode === 503 && res.locals.databaseUnavailable === true,
         // Who did it, for mutating calls (admin actions included): the
         // pseudonymous account id only.
         userId: req.method !== "GET" && req.method !== "HEAD" ? (req as { dbUser?: { id?: string } }).dbUser?.id : undefined,

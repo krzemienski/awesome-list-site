@@ -37,6 +37,7 @@ import {
   normalizeValidationBody,
 } from "../contracts/envelope";
 import { createLogger } from "../lib/logger";
+import { sendDatabaseUnavailable } from "./databaseUnavailable";
 
 const logger = createLogger("errors");
 
@@ -108,14 +109,7 @@ export function errorHandler(
   }
 
   if (isDatabaseUnavailableError(err)) {
-    res
-      .status(503)
-      .set("Retry-After", "1")
-      .json({ message: "Database is temporarily unavailable" });
-    logger.error("Database unavailable", {
-      status: 503,
-      code: (err as any)?.code ?? (err as any)?.cause?.code ?? "timeout",
-    });
+    sendDatabaseUnavailable(res, err);
     return;
   }
 

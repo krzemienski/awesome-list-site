@@ -46,6 +46,7 @@ import {
 } from "../http-cache-policy";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { createLogger } from "../lib/logger";
+import { isDatabaseUnavailableError } from "../db/errors";
 
 const logger = createLogger("public-api");
 
@@ -230,6 +231,7 @@ export function registerPublicApiRoutes(app: Express): void {
         resources: (result.resources ?? []).map(stripInternalResourceFields),
       });
     } catch (error) {
+      if (isDatabaseUnavailableError(error)) throw error;
       logger.error('Error fetching public resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
@@ -325,6 +327,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json(stripInternalResourceFields(resource));
     } catch (error) {
+      if (isDatabaseUnavailableError(error)) throw error;
       logger.error('Error fetching public resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
@@ -378,6 +381,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json({ categories });
     } catch (error) {
+      if (isDatabaseUnavailableError(error)) throw error;
       logger.error('Error fetching public categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
@@ -431,6 +435,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json(payload);
     } catch (error) {
+      if (isDatabaseUnavailableError(error)) throw error;
       logger.error('Error fetching public tags:', error);
       res.status(500).json({ message: 'Failed to fetch tags' });
     }
