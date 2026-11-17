@@ -10,10 +10,7 @@ import {
   ONBOARDING_STEP_COUNT,
   type LearningPreferencesValues,
 } from "@shared/onboarding-values";
-import {
-  completedLearningPreferencesSchema,
-  learningPreferencesValuesSchema,
-} from "@shared/onboarding";
+import { learningPreferencesValuesSchema } from "@shared/onboarding";
 import LearningPreferencesForm, {
   LEARNING_PREFERENCE_STEPS,
 } from "@/components/onboarding/learning-preferences-form";
@@ -22,6 +19,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  focusPreferenceSection,
+  planSave,
+  type PreferenceErrors,
+} from "@/lib/onboarding-save-plan";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/safeStorage";
@@ -38,10 +40,6 @@ interface CategoryOption {
   name: string;
   resourceCount: number;
 }
-
-type PreferenceErrors = Partial<
-  Record<keyof LearningPreferencesValues, string>
->;
 
 function stepFromUrl(): number | null {
   const raw = Number(new URLSearchParams(window.location.search).get("step"));
@@ -240,29 +238,34 @@ export default function Onboarding() {
     requestAnimationFrame(() => headingRef.current?.focus());
   };
 
-  const editsBlockedFromSaving =
-    preferences?.onboardingStatus === "completed" &&
-    !completedLearningPreferencesSchema.safeParse(values).success;
+  // A completed profile must keep every section filled (the server answers 400
+  // otherwise). When the values cannot be saved as completed, never send the
+  // PUT: keep the draft, go to the first incomplete step, show its inline
+  // error and focus it. Returns true when the save was blocked.
+  const blockUnsavableEdits = (writesCompleted: boolean): boolean => {
+    const plan = planSave(values, writesCompleted);
+    if (plan.action === "send") return false;
+    if (plan.step === step) rememberDraft(values, step);
+    else navigateStep(plan.step);
+    setErrors(plan.errors);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => focusPreferenceSection(plan.step)),
+    );
+    return true;
+  };
 
   const handleNext = async () => {
     if (!validateStep(step)) return;
     setRequestError(null);
     const nextStep = Math.min(step + 1, ONBOARDING_STEP_COUNT);
+    const alreadyCompleted = preferences?.onboardingStatus === "completed";
+    if (blockUnsavableEdits(alreadyCompleted)) return;
     try {
-      // A finished profile stays "completed", and the server rejects a
-      // completed profile with an empty section. When the user emptied a later
-      // step and came Back, keep the edit as a draft and let the final step
-      // save it, instead of sending a PUT that can only 400.
-      if (!editsBlockedFromSaving) {
-        await savePreferencesAsync({
-          ...values,
-          onboardingStatus:
-            preferences?.onboardingStatus === "completed"
-              ? "completed"
-              : "in_progress",
-          onboardingStep: nextStep,
-        });
-      }
+      await savePreferencesAsync({
+        ...values,
+        onboardingStatus: alreadyCompleted ? "completed" : "in_progress",
+        onboardingStep: nextStep,
+      });
       trackOnboardingStepCompleted(step, stepName(step));
       navigateStep(nextStep);
     } catch (error) {
@@ -287,18 +290,16 @@ export default function Onboarding() {
 
   const handleSkip = async () => {
     // Revisiting a finished onboarding edits saved preferences; leaving early
-    // keeps it completed, so the step being left must still be valid.
+    // keeps it completed, so every section must still be valid.
     const alreadyCompleted = preferences?.onboardingStatus === "completed";
-    if (alreadyCompleted && !validateStep(step)) return;
     setRequestError(null);
+    if (blockUnsavableEdits(alreadyCompleted)) return;
     try {
-      if (!editsBlockedFromSaving) {
-        await savePreferencesAsync({
-          ...values,
-          onboardingStatus: alreadyCompleted ? "completed" : "dismissed",
-          onboardingStep: step,
-        });
-      }
+      await savePreferencesAsync({
+        ...values,
+        onboardingStatus: alreadyCompleted ? "completed" : "dismissed",
+        onboardingStep: step,
+      });
       trackOnboardingSkipped({
         stepNumber: step,
         stepName: stepName(step),
@@ -317,6 +318,7 @@ export default function Onboarding() {
   const handleComplete = async () => {
     if (!validateStep(step)) return;
     setRequestError(null);
+    if (blockUnsavableEdits(true)) return;
     try {
       await savePreferencesAsync({
         ...values,
