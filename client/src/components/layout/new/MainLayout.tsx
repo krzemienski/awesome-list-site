@@ -66,7 +66,10 @@ function BackToTop() {
   // <body>): every hide waits for blur, which re-arms the linger.
   const hide = useCallback(() => {
     window.clearTimeout(timer.current);
-    if (!focusHeld.current) setVisible(false);
+    if (focusHeld.current) return;
+    // An unmount never fires pointerleave, so clear the hover hold here.
+    hoverHeld.current = false;
+    setVisible(false);
   }, []);
   const lingerThenHide = useCallback(() => {
     window.clearTimeout(timer.current);
@@ -137,7 +140,9 @@ function BackToTop() {
       onFocus={() => {
         focusHeld.current = true;
       }}
-      onBlur={() => {
+      onBlur={(e) => {
+        // A window or app switch blurs the window while the button keeps focus.
+        if (document.activeElement === e.currentTarget) return;
         focusHeld.current = false;
         lingerThenHide();
       }}
