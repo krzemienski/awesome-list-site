@@ -77,7 +77,7 @@ function signUpMethodFromUser(user: UserResource | null | undefined): string | u
   return user?.passwordEnabled ? "password" : undefined;
 }
 
-function isNewAccount(user: UserResource | null | undefined, sessionCreatedAt: Date | undefined): boolean {
+export function isNewAccount(user: UserResource | null | undefined, sessionCreatedAt: Date | undefined): boolean {
   const userCreatedAt = user?.createdAt?.getTime();
   const sessionAt = sessionCreatedAt?.getTime();
   if (userCreatedAt === undefined || sessionAt === undefined) return false;

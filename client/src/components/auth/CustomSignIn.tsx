@@ -44,6 +44,8 @@ export default function CustomSignIn() {
   const [redirecting, setRedirecting] = useState<OAuthProvider | null>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const stepRef = useRef(step);
+  stepRef.current = step;
   const finishing = useRef(false);
   const ticketTried = useRef(false);
 
@@ -87,7 +89,9 @@ export default function CustomSignIn() {
         return;
       }
       const view = describeSignInError(error);
-      setProblem({ ...NO_PROBLEM, [view.target]: view.message });
+      // Only the code field is on screen after the credentials step.
+      const target = stepRef.current !== "credentials" && view.target !== "code" ? "global" : view.target;
+      setProblem({ ...NO_PROBLEM, [target]: view.message });
     },
     [setLocation],
   );
@@ -196,6 +200,7 @@ export default function CustomSignIn() {
       await signIn.reset();
       setStep("credentials");
       setPassword("");
+      requestAnimationFrame(() => emailRef.current?.focus());
     });
 
   const startOAuth = (strategy: OAuthProvider) => {
