@@ -81,3 +81,14 @@ export function isUniqueViolation(error: unknown, constraintIncludes?: string): 
   // An unnamed violation is still a uniqueness conflict on this write.
   return !constraintIncludes || !pg.constraint || pg.constraint.includes(constraintIncludes);
 }
+
+/**
+ * `error.message`, without the value a data exception (SQLSTATE class 22) echoes back:
+ * `invalid input syntax for type integer: "visitor-typed text"`. That value is a bound
+ * parameter, so a log line must not carry it. Other messages are returned unchanged.
+ */
+export function messageWithoutEchoedValue(error: Error): string {
+  return isPgDatabaseError(error) && error.code.startsWith("22")
+    ? error.message.replace(/"(?:[^"]|"")*"/g, '"[value]"')
+    : error.message;
+}

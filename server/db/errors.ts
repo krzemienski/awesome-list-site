@@ -28,14 +28,26 @@ const CONNECTION_FAILURE_PHRASES = [
   "etimedout",
   "epipe",
   "socket hang up",
+  "econnrefused",
+  // libpq (pg_dump, pg_restore) words the same failures its own way.
+  "connection refused",
+  "server closed the connection unexpectedly",
+  "terminating connection due to",
+  "the database system is starting up",
+  "the database system is shutting down",
+  "timeout expired",
 ];
 
 const isTransientCode = (code: string) => code.startsWith("08") || TRANSIENT_SQLSTATES.has(code);
 const isConfigFatal = (code: string) => code.startsWith("28") || code === "3D000";
 
+/** The first string or numeric `code` on the error or any of its causes. */
 export function databaseErrorCode(error: unknown): string {
-  const err = error as any;
-  return String(err?.code ?? err?.cause?.code ?? "");
+  for (const link of causeChain(error)) {
+    const code = (link as { code?: unknown } | null)?.code;
+    if (typeof code === "string" || typeof code === "number") return String(code);
+  }
+  return "";
 }
 
 export function isDatabaseUnavailableError(error: unknown): boolean {
