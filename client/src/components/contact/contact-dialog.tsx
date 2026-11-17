@@ -17,6 +17,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { CONTACT_MESSAGE_MAX_LENGTH, CONTACT_MESSAGE_MIN_LENGTH } from "@shared/contact";
 import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import {
@@ -43,7 +45,8 @@ const schema = z.object({
   name: singleLine(100, "Name"),
   replyTo: z.string().trim().email("Enter a valid email address").max(320, "Email address is too long"),
   subject: singleLine(200, "Subject"),
-  message: z.string().trim().min(20, "Message must be at least 20 characters").max(4000, "Message must be 4000 characters or less")
+  message: z.string().trim().min(CONTACT_MESSAGE_MIN_LENGTH, `Message must be at least ${CONTACT_MESSAGE_MIN_LENGTH} characters`)
+    .max(CONTACT_MESSAGE_MAX_LENGTH, `Message must be ${CONTACT_MESSAGE_MAX_LENGTH} characters or less`)
     .refine((value) => !value.includes("\u0000"), "Message contains an invalid character"),
   // Deliberately accepts a value: the server treats it as a silent honeypot
   // success and never persists it. Rejecting it client-side would reveal it.
@@ -201,6 +204,9 @@ export function ContactDialogHost() {
                   <FormItem>
                     <FormLabel>Message<RequiredMark /></FormLabel>
                     <FormControl><Textarea rows={6} data-testid="contact-message" required aria-required="true" {...field} /></FormControl>
+                    <FormDescription data-testid="contact-message-hint">
+                      At least {CONTACT_MESSAGE_MIN_LENGTH} characters.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

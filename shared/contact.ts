@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const CONTACT_MESSAGE_MIN_LENGTH = 20;
+export const CONTACT_MESSAGE_MAX_LENGTH = 4000;
+
 const singleLine = (max: number) =>
   z.string().trim().min(1).max(max)
     // \p{Cc} = Unicode control characters (C0, DEL, C1) — newlines included.
@@ -10,8 +13,8 @@ export const contactSubmissionSchema = z.object({
   replyTo: z.string().trim().email("must be a valid email address").max(320),
   subject: singleLine(200),
   message: z.string().trim()
-    .min(20, "message must be at least 20 characters")
-    .max(4000, "message must be at most 4000 characters")
+    .min(CONTACT_MESSAGE_MIN_LENGTH, `message must be at least ${CONTACT_MESSAGE_MIN_LENGTH} characters`)
+    .max(CONTACT_MESSAGE_MAX_LENGTH, `message must be at most ${CONTACT_MESSAGE_MAX_LENGTH} characters`)
     .refine((value) => !value.includes("\u0000"), "message contains an invalid character"),
   // Honeypot. The form renders this field hidden, so real visitors never fill
   // it. Any string is ACCEPTED here on purpose: POST /api/contact answers a
