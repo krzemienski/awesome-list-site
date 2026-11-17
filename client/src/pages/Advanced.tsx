@@ -362,19 +362,18 @@ export default function Advanced() {
             These advanced features help you discover, analyze, and share awesome list data more effectively
           </p>
           <div className="discovery-tools-cta-actions">
-            {/* BUG-011 (run19) linked this to /search because an empty query
-                used to browse the full catalog; audit2 BUG-019 made empty
-                /search an explicit "enter a search term" prompt, so the
-                honest browse-everything destination is the categories hub. */}
+            {/* An empty /search is an explicit "enter a search term" prompt, but a
+                non-default sort counts as browsing (searchCanBrowse), so
+                sort=name-asc lists the whole catalog A to Z, paged. */}
             <Link
-              href="/categories"
+              href="/search?sort=name-asc"
               className="discovery-tools-cta-primary"
               data-testid="link-browse-all-resources"
             >
               Browse All Resources
             </Link>
             <Link
-              href={categories[0]?.slug ? `/category/${categories[0].slug}` : "/"}
+              href="/categories"
               className="discovery-tools-cta-secondary"
             >
               Explore Categories
