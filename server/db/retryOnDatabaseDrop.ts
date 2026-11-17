@@ -20,7 +20,7 @@ export async function retryOnDatabaseDrop<T>(
     return await run();
   } catch (error) {
     if (!isDatabaseUnavailableError(error)) throw error;
-    logger.warn(`${job} lost its database connection; retrying once on a fresh one`, {
+    logger.warn(`${job} hit a transient database failure (dropped connection, timeout or deadlock); retrying once`, {
       retryInMs: DATABASE_DROP_RETRY_DELAY_MS,
     });
     await new Promise((resolve) => setTimeout(resolve, DATABASE_DROP_RETRY_DELAY_MS));

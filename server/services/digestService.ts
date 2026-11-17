@@ -43,6 +43,7 @@ import {
 } from "../email";
 import { clerkUserHasVerifiedEmail, rowEmailIsVerifiedInClerk } from "../lib/clerkAccountLink";
 import { createLogger } from "../lib/logger";
+import { databaseFailureLevel } from "../db/errors";
 import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 
 const logger = createLogger("digest");
@@ -1054,7 +1055,7 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
       providerMessageId: result.providerMessageId,
     });
   } catch (error) {
-    logger.error("Digest delivery failed", {
+    logger[databaseFailureLevel(error)]("Digest delivery failed", {
       digestJobId: job.id,
       channel: job.channel,
       errorClass: error instanceof Error ? error.name : "unknown",
