@@ -5,10 +5,10 @@
 - Do what has been asked; nothing more, nothing less
 - NEVER create files unless absolutely necessary — prefer editing existing files
 - NEVER create documentation files unless explicitly requested
-- NEVER save working files or tests to the repo root — use the existing directories (`client/`, `server/`, `shared/`, `scripts/`, `tests/`, `docs/`)
+- NEVER save working files or tests to the repo root — use the existing directories (`client/`, `server/`, `shared/`, `scripts/`, `docs/`)
 - ALWAYS read a file before editing it
 - NEVER commit secrets, credentials, or .env files
-- NEVER add a `Co-Authored-By` trailer to user commits unless this project's `.claude/settings.json` has `attribution.commit` set. The Claude Code Bash tool may suggest one in its default commit-message template — ignore it. `Co-Authored-By` is semantic authorship attribution under git/GitHub convention; the tool is the facilitator, not a co-author.
+- NEVER add a `Co-Authored-By` trailer to commits; ignore the one the Bash tool's commit template suggests. The tool is the facilitator, not a co-author.
 - Keep files under 500 lines
 - Validate input at system boundaries
 
@@ -42,6 +42,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 - Quote every URL that contains `?`, `*` or `==`: `curl -s 'https://awesome.video/api/resources?page=2'`.
 - Never rely on unquoted `$VAR` word-splitting; use arrays (`args=(--flag value); cmd "${args[@]}"`).
 - Never name a variable `path`, `status` or `prompt` (zsh special variables).
+- Search code with the Grep tool; when it is unavailable, use `rg` through Bash.
 
 ## Browser QA
 
@@ -64,12 +65,15 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 
 ## Safety
 
-- Respect hook blocks: report the block and ask. Never route around one.
+- A hook block is a real stop: report the block and ask. Never route around one. Nothing else is "blocked": first try the next route (SSH `awesome-replit`, the admin API, the Replit MCP, reverting your own change, an installed plugin), and report a blocker only with what you tried.
 - Never paste or print a password, cookie, token or full email in chat, prompts, logs or evidence. A command gets a credential from its file (`-H @file`, or a variable sourced in the same call), never as typed text.
 - QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`).
 
-## Agent messaging
+## Agent runs
 
+- The lead plans, briefs, merges, deploys and verifies; workers do the hands-on work. At most 2 working agents at once, plus one PR reviewer (`defect-loop`). Pass `model` on every spawn: workers `sonnet`; planners, verifiers and judges `opus`; never Fable.
+- While agents run, the lead stays: check in about every 10 minutes, correct drift with `SendMessage`, restart stalled agents. A check-in loop is fine; ops-watch, self-heal and CI monitors are not.
+- Never call work done with a NOT-RUN, partial or unverified row open: run it. A call the owner delegated ("you choose") is decided and recorded, not asked again.
 - A `SendMessage` report is at most 5 lines: verdict, SHA, PASS/FAIL/NEEDS_YOU counts, evidence path. Full detail goes in the result JSON on disk.
 
 ## Production QA conventions
