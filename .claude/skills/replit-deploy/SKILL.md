@@ -42,20 +42,23 @@ Check these first; if one is missing, stop and tell the user exactly which, beca
 
 Save every command and its output under `e2e-evidence/replit-deploy/<UTC timestamp>/` (one file per step). The final report cites these files.
 
+One statement per Bash call, with literal paths. A worktree-isolated session refuses anything it cannot parse as plain commands ("too complex to verify"), and a refused call is a lost turn: no `TS=$(date ...); EV=...; mkdir ...` chains, no `{ ...; } > "$EV/..."` groups, no `cd` chains, no shell functions or loops. The quoted `ssh awesome-replit '…'` scripts and the step 5.3a probe block are the exceptions: paste each whole as its own call. Read the timestamp once with `date -u +%Y%m%dT%H%M%SZ`, then type it into each path: `mkdir -p e2e-evidence/replit-deploy/20261116T201500Z`, then each command alone with `2>&1 | tee e2e-evidence/replit-deploy/20261116T201500Z/01-pin.txt`.
+
 ### 1. Pin the target
 
 First check whether a final pass or a timed observation window (the 2-hour no-5xx window, a 24-hour reading) is running on the live SHA. A publish voids that pass and restarts the window. If the diff since BEFORE is docs or reports only, do not publish: hold the docs PR until the next code batch, or say which window the publish resets. Merge run reports before the last code deploy, not after it.
 
+Run each line as its own call and note the printed SHAs:
 ```bash
 git fetch origin
-TARGET=$(git rev-parse origin/main)
-BEFORE=$(curl -s https://awesome.video/api/version | jq -r .revision)   # the live SHA
-echo "TARGET=$TARGET BEFORE=$BEFORE"
-git cat-file -e "$BEFORE^{commit}" 2>/dev/null || git fetch origin "$BEFORE" \
-  || git fetch awesome-replit:workspace '+refs/heads/*:refs/remotes/replit-ws/*'
-git rev-parse "$BEFORE^{tree}" "$TARGET^{tree}"
+git rev-parse origin/main                                    # TARGET
+curl -s https://awesome.video/api/version | jq -r .revision  # BEFORE, the live SHA
+git cat-file -e '<BEFORE>^{commit}'                          # exit 0: present locally, skip the next two
+git fetch origin <BEFORE>
+git fetch awesome-replit:workspace '+refs/heads/*:refs/remotes/replit-ws/*'
+git rev-parse '<BEFORE>^{tree}' '<TARGET>^{tree}'
 ```
-Every later block uses `$TARGET`, `$BEFORE` and `$LIVE`. Shell variables do not survive between separate shell calls, so set them again (from the SHAs echoed here) in each new shell. A live commit from before the guard is often only in the workspace, so the last fetch pulls the workspace branches over SSH. Production is current when `$BEFORE` equals `$TARGET` or the two trees are equal; then say so and stop unless the user asked for a forced republish. If neither fetch yields a live commit that differs from TARGET, the comparison is UNVERIFIED: report it as such and never call production behind on SHAs alone.
+Later blocks write `$TARGET`, `$BEFORE` and `$LIVE`; type the literal SHA printed here instead, because shell variables do not survive between calls. A live commit from before the guard is often only in the workspace, so the last fetch pulls the workspace branches over SSH, and only when the first fetch did not find it. Production is current when `$BEFORE` equals `$TARGET` or the two trees are equal; then say so and stop unless the user asked for a forced republish. If neither fetch yields a live commit that differs from TARGET, the comparison is UNVERIFIED: report it as such and never call production behind on SHAs alone.
 
 Check GitHub CI for TARGET (`gh run list --branch main --limit 5`). A failing required check on TARGET is a stop condition: shipping it is a decision for the user.
 
@@ -75,7 +78,7 @@ Stop conditions:
 - **Dirty tree** (`git status --porcelain` not empty): someone or Replit Agent has uncommitted work there. Report the file list.
 - **Not on `main`.**
 - **Workspace-only commits** (`origin/main..HEAD` not empty): report them with `git log --stat`. They are usually Agent checkpoints; the user decides whether to push them to GitHub or drop them.
-  - The publish commit is the one exception. Every publish adds an empty "Published your App" commit (author Replit Agent) on top of the published HEAD. When origin/main already contains it (Replit sometimes pushes it), `origin/main..HEAD` is empty and the plain fast-forward below works. When it is the only workspace-only commit, `git rev-parse <it>^{tree} <it>^^{tree}` prints the same tree twice (it changes no files), and `git branch -a --contains <it>` shows it kept on `replit-agent` / `gitsafe-backup/main`, move main with `git reset --keep origin/main` instead of `--ff-only`. Anything else is still a stop.
+  - The publish commit is the one exception. Every publish adds an empty "Published your App" commit (author Replit Agent) on top of the published HEAD. When origin/main already contains it (Replit sometimes pushes it), `origin/main..HEAD` is empty and the plain fast-forward below works. When it is the only workspace-only commit, `git rev-parse <it>^{tree} <it>^^{tree}` prints the same tree twice (it changes no files), and `git branch -a --contains <it>` shows it kept on `replit-agent` / `gitsafe-backup/main`, move main with `git reset --keep origin/main` instead of `--ff-only`. Anything else is still a stop. Never `git reset --hard origin/main` here, alone or chained: a hook blocks it as discarding work, and on the workspace it would silently drop Agent checkpoints that exist nowhere else. `--keep` aborts when a local change conflicts, which is the safe failure, and the dirty-tree stop above already ran.
 
 Otherwise fast-forward only:
 ```bash
@@ -85,7 +88,7 @@ The printed HEAD must equal TARGET.
 
 After any publish, run `git fetch` (locally and in the workspace) before you branch, merge or create a worktree, because origin/main may have gained the publish commit.
 
-When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
+When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash -f sha=<head> --jq .sha`, where `<head>` is the reviewed head from `gh pr view <N> --json headRefOid --jq .headRefOid`. GitHub answers 409 instead of merging when the branch moved after the review.
 
 If `git fetch` fails on auth, the workspace has lost its GitHub connection; stop and tell the user to reconnect it in the Git pane.
 
@@ -194,8 +197,7 @@ Then stop and report: what failed, at which stage, the evidence, and that produc
 Also check the www host: `curl -sSI https://www.awesome.video/` must answer one 301 whose `location` is `https://awesome.video/` (a scheme-less target loops). The redirect is a Cloudflare zone rule; fix it with the Cloudflare plugin's API, not as an owner chore.
 
 ```bash
-LIVE=$(curl -s https://awesome.video/api/version | jq -r .revision)
-echo "LIVE=$LIVE TARGET=$TARGET"                           # must be equal
+curl -s https://awesome.video/api/version | jq -r .revision   # LIVE, must equal TARGET
 curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready   # 200
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
