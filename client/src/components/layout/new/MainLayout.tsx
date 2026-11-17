@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
 import { lazyOptional, retryOptionalChunks } from "@/lib/lazy-optional";
 import { ArrowUp } from "lucide-react";
@@ -11,7 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
 import { preloadSearchDialog, takePendingPalette } from "@/lib/search-dialog-loader";
@@ -45,6 +45,8 @@ function ClientContactDialogHost() {
 const BACK_TO_TOP_SHOW_AFTER_VIEWPORTS = 1.5;
 /** How long it lingers once the user stops scrolling up. */
 const BACK_TO_TOP_LINGER_MS = 2000;
+/** A scroll counts as the user's when a wheel/touch/key/pointer event came this recently. */
+const USER_SCROLL_WINDOW_MS = 600;
 
 /**
  * Floating "back to top" button (NN/g: lower right, shown only after several
@@ -56,20 +58,30 @@ const BACK_TO_TOP_LINGER_MS = 2000;
  */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
-  const focused = useRef(false);
+  const held = useRef(false); // keyboard focus or pointer is on the button
+  const timer = useRef<number | undefined>(undefined);
+
+  const hide = useCallback(() => {
+    window.clearTimeout(timer.current);
+    setVisible(false);
+  }, []);
+  const lingerThenHide = useCallback(() => {
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      if (!held.current) hide();
+    }, BACK_TO_TOP_LINGER_MS);
+  }, [hide]);
 
   useEffect(() => {
     let lastY = window.scrollY;
-    let timer: number | undefined;
-    const hide = () => {
-      focused.current = false;
-      setVisible(false);
+    let lastIntent = 0;
+    // An upward scroll only counts when the user caused it: scroll restoration
+    // on Back/Forward, hash jumps and route resets scroll without any of these.
+    const noteIntent = () => {
+      lastIntent = performance.now();
     };
-    const lingerThenHide = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        if (!focused.current) hide();
-      }, BACK_TO_TOP_LINGER_MS);
+    const onKey = (e: KeyboardEvent) => {
+      if (["ArrowUp", "PageUp", "Home"].includes(e.key) || (e.key === " " && e.shiftKey)) noteIntent();
     };
     const onScroll = () => {
       const y = window.scrollY;
@@ -77,20 +89,33 @@ function BackToTop() {
       lastY = y;
       const footerTop = document.querySelector(".app-footer")?.getBoundingClientRect().top;
       const nearFooter = footerTop !== undefined && footerTop < window.innerHeight;
-      if (y <= window.innerHeight * BACK_TO_TOP_SHOW_AFTER_VIEWPORTS || (nearFooter && !focused.current)) {
-        window.clearTimeout(timer);
+      if (y <= window.innerHeight * BACK_TO_TOP_SHOW_AFTER_VIEWPORTS || nearFooter) {
+        // Hidden while it holds focus would drop focus to <body>: hand it to
+        // the page heading first.
+        if (document.activeElement?.getAttribute("data-testid") === "button-back-to-top") {
+          focusPageHeading();
+        }
+        held.current = false;
         hide();
-      } else if (goingUp) {
+      } else if (goingUp && performance.now() - lastIntent < USER_SCROLL_WINDOW_MS) {
         setVisible(true);
         lingerThenHide();
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", noteIntent, { passive: true });
+    window.addEventListener("touchmove", noteIntent, { passive: true });
+    window.addEventListener("pointerdown", noteIntent, { passive: true });
+    window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.clearTimeout(timer);
+      window.removeEventListener("wheel", noteIntent);
+      window.removeEventListener("touchmove", noteIntent);
+      window.removeEventListener("pointerdown", noteIntent);
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(timer.current);
     };
-  }, []);
+  }, [hide, lingerThenHide]);
 
   useEffect(() => {
     if (!visible) return;
@@ -111,17 +136,25 @@ function BackToTop() {
         window.scrollTo({ top: 0, behavior: scrollBehavior() });
       }}
       onFocus={() => {
-        focused.current = true;
+        held.current = true;
       }}
       onBlur={() => {
-        focused.current = false;
+        held.current = false;
+        lingerThenHide();
+      }}
+      onPointerEnter={() => {
+        held.current = true;
+      }}
+      onPointerLeave={() => {
+        held.current = false;
+        lingerThenHide();
       }}
       aria-label="Back to top"
       data-testid="button-back-to-top"
       // Fixed to the SCREEN. The bottom offset clears whichever is larger: the
       // app shell's --app-bottom-inset (consent banner, which already includes
       // the safe area) or the device's own bottom inset.
-      className="fixed bottom-[calc(var(--back-to-top-offset)+max(var(--app-bottom-inset,0px),env(safe-area-inset-bottom,0px)))] right-[max(var(--back-to-top-offset),env(safe-area-inset-right,0px))] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)] motion-safe:animate-in motion-safe:fade-in-0"
+      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--back-to-top-lift))] right-[max(var(--back-to-top-offset),env(safe-area-inset-right,0px))] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)] motion-safe:animate-in motion-safe:fade-in-0"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>

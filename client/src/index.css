@@ -130,6 +130,14 @@
     --back-to-top-size: 2.75rem;
     --back-to-top-offset: 0.75rem;
     --back-to-top-lane: calc(var(--back-to-top-size) + var(--back-to-top-offset) + 0.25rem);
+    /* How far above the screen's bottom edge the button's offset starts: the
+       consent banner's inset (which already includes the safe area) or the
+       device's own bottom inset, whichever is larger. */
+    --back-to-top-lift: max(var(--app-bottom-inset, 0px), env(safe-area-inset-bottom, 0px));
+    /* What the lift adds beyond --app-bottom-inset, which toasts and
+       scroll-margin already honour. The button, the toast stack and the focus
+       scroll-padding all clear lane + this, so they cannot drift apart. */
+    --back-to-top-clear: calc(var(--back-to-top-lane) + var(--back-to-top-lift) - var(--app-bottom-inset, 0px));
   }
 
   /* BUG-006 (audit2): a bottom bar hides whatever a scroll-into-view lands
@@ -144,7 +152,7 @@
   /* WCAG 2.4.11: while the back-to-top button is showing (MainLayout sets the
      attribute), focus and anchor scrolling settle above it, not under it. */
   html[data-back-to-top] {
-    scroll-padding-bottom: var(--back-to-top-lane);
+    scroll-padding-bottom: var(--back-to-top-clear);
   }
 
   code, pre, kbd, samp {
