@@ -32,9 +32,9 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 | Code that fails the typecheck never ships. esbuild strips types, so a missing method used to bundle cleanly and crash at runtime. | `tsc --noEmit` inside `npm run build`, which `scripts/publish-build.sh` runs |
 | The nav tree has one producer (`HomeNavRepository`) and one type (`shared/catalog-nav.ts`). Every node carries `totalResourceCount`: display it, never re-sum. Corpus-tree counts and the non-category README names come only from `shared/catalog-counts.ts` (`corpusTotalCount`, `countNestedGroups`, `isRealCategory`). | `tsc` (producer and consumers share `CatalogNav`; nav nodes have no `resources`) |
 | User rows leave the API only through the `sanitizeUser` whitelist (`server/validation/inputs.ts`), never as raw `User` objects with `password`. | Nothing automatic: both user routes use it today. Treat a new user-returning route as a review item |
-| URLs containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
-| A review message is sent only while the worktree `HEAD`, the pin in the worktree's git dir (`review-pin`) and the PR `headRefOid` are the same commit, and the reviewer's session cwd is that worktree. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
-| `gh pr merge` (any `-R`) and a PUT to `…/pulls/<N>/merge` run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid`. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
+| URLs (with or without `https://`, also `--url=`) containing `?`, `*` or `==` in `curl`/`wget` commands are quoted (single quotes preferred). | `~/.claude/hooks/awesome-list-site/url-quote-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
+| While a review worktree under `.claude/worktrees/` has a `review-pin` in its git dir for an open PR, no `SendMessage` goes out unless that worktree's `HEAD`, the pin and the PR `headRefOid` are the same commit. Reviewers never call EnterWorktree; the hook scans all review worktrees from any cwd. | `~/.claude/hooks/awesome-list-site/review-pin-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
+| `gh pr merge` (any `-R`/`GH_REPO`, also inside `sh -c`, `eval`, `xargs`), a PUT to `…/pulls/<N>/merge` and a GraphQL merge mutation run only with every review thread resolved and a `VERDICT: APPROVE <sha>` comment naming `headRefOid`. | `~/.claude/hooks/awesome-list-site/merge-guard.py` (Claude Code user hook; Codex has no equivalent, check by hand) |
 
 ## Shell
 
@@ -66,7 +66,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 
 - Respect hook blocks: report the block and ask. Never route around one.
 - Never print cookies, tokens or full emails.
-- QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`).
+- QA rows are created only as the audit admin or audit member, and cleaned up through `/api/admin/qa-rows` within 10 minutes of a fresh backup (see `.claude/skills/defect-loop/SKILL.md`). Lanes never create API keys, journey enrollments, onboarding progress or bookmarks: no QA path deletes them.
 
 ## Agent messaging
 

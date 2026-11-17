@@ -10,8 +10,8 @@ Reviews are bound to one commit. A verdict that names a different SHA than the P
 ## Steps
 
 1. Record the head: `gh pr view <N> --json headRefOid,baseRefName,files` and write down `headRefOid` (call it `HEAD40`).
-2. Worktree at that SHA, inside the checkout: `git fetch origin && git worktree add .claude/worktrees/review-<N> <HEAD40>`. Make it your session cwd with the EnterWorktree tool and `path: .claude/worktrees/review-<N>` (for a subagent the switch affects only that agent). The pin hook reads the pin from the hook's cwd, so `git -C` or `cd` into the worktree is not enough. Work only there.
-3. Pin file, in the worktree's own git dir so it can never appear in `git status` or a commit: `echo 'pr=<N> sha=<HEAD40>' > "$(git rev-parse --absolute-git-dir)/review-pin"` (run it from the worktree). While it exists, the review-pin hook blocks any `SendMessage` from that cwd if the worktree `HEAD`, the pin and the live `headRefOid` disagree. Removing the worktree removes the pin.
+2. Worktree at that SHA, inside the checkout: `git fetch origin && git worktree add .claude/worktrees/review-<N> <HEAD40>`. Never call EnterWorktree: reviewers are in-process teammates, so it moves the whole session and refuses the lead's and every lane's next Bash call. Work only inside the worktree with `git -C .claude/worktrees/review-<N> …`, or `cd` inside one Bash call (the shell cwd does not carry into your next call anyway). The pin hook scans every worktree under `.claude/worktrees/`, so it fires from the main checkout.
+3. Pin file, in the worktree's own git dir so it can never appear in `git status` or a commit: `bash -c 'cd .claude/worktrees/review-<N> && echo "pr=<N> sha=<HEAD40>" > "$(git rev-parse --absolute-git-dir)/review-pin"'`. Write and read it only through that `$(git rev-parse --absolute-git-dir)` form: the scout-block hook denies any Bash command that names a literal `.git` path, and you must not route around it. While the pin exists and PR <N> is open, the review-pin hook blocks every agent's `SendMessage` if the worktree `HEAD`, the pin and the live `headRefOid` disagree. The block message names the worktree; a stale pin is cleared with `git worktree remove --force <worktree>`, which removes the pin with it.
 4. Build and lint: `npm ci` if needed (PRs here come from same-repo branches, so the install runs trusted code; do not run it on a fork's head), then `npm run build`. Run `npx eslint <touched files>` at the PR head and again in a second worktree at the base commit, and diff the two outputs. Only new errors count.
 5. Read every changed file and its callers (Grep tool). Read the PR body and the claims it makes.
 6. Prove each behavioural claim with a before/after probe run with `npx --yes vite-node@6.0.0` (not plain `tsx`; macOS `/tmp` is `/private/tmp`; it is not a project dependency, so never add it to `package.json`). When local `main` is behind, read base files with `git show origin/main:<path>`. Prove UI claims on the real system (agent-browser, curl), never with mocks.
@@ -32,11 +32,11 @@ Reviews are bound to one commit. A verdict that names a different SHA than the P
    ```
 
    Then list findings with `path:line` and the probes run with their output. Post with `gh pr comment <N> --body-file <file>`.
-10. Clean up: `git worktree remove --force .claude/worktrees/review-<N>`.
+10. Clean up, last, after the verdict comment is posted and the report sent: `git worktree remove --force .claude/worktrees/review-<N>` (and the base-commit worktree from step 4). Run it from the main checkout; your session cwd was never inside the worktree, so nothing else needs leaving first. Do not call ExitWorktree.
 
 ## Rules
 
 - The verdict SHA is the full 40-character `headRefOid` read in step 7.
 - A new push after an APPROVE invalidates it: review the delta and post a fresh verdict.
 - Report to the lead in at most 5 lines: verdict, SHA, counts, comment URL.
-- A hook block is a stop sign: report it, never route around it.
+- A hook block is a stop sign: report it, never route around it. A stale-pin block names the worktree to remove; if it is not your own review's worktree, report it to the lead instead of removing it.

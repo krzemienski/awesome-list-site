@@ -5,7 +5,7 @@ description: Orchestrate a full production audit and fix cycle for awesome.video
 
 # Defect loop (orchestrator)
 
-The lead plans, integrates and verifies. Workers do the hands-on work. Concurrency cap: 2 sonnet workers plus 1 reviewer at a time; fan-out runs 2 lanes at a time with `--model sonnet` (see `qa-lane`). Every deploy goes through the `replit-deploy` skill. Paths: `ROOT=.local/audit/<RUN_ID>`; lane results `ROOT/results/<lane>.json`; evidence `ROOT/evidence/<lane>/<row>/<width>-<sha>.png`.
+The lead plans, integrates and verifies. Workers do the hands-on work. Concurrency cap: 2 sonnet workers plus 1 reviewer at a time; fan-out runs 2 lanes at a time with `--model sonnet` (see `qa-lane`). Every deploy goes through the `replit-deploy` skill. Paths: `ROOT=.local/audit/<RUN_ID>`; lane results `ROOT/results/<lane>.json`; evidence `ROOT/evidence/<lane>/<row>/<width>-<sha>-a<N>.png`.
 
 ## Stages
 
