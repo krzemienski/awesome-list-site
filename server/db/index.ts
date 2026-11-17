@@ -156,8 +156,15 @@ const originalPoolQuery = pool.query.bind(pool);
 // so the query would be dispatched, timed and logged under that request's
 // context. Run connect callbacks in the context of the caller that asked.
 const originalPoolConnect = pool.connect.bind(pool) as (cb?: unknown) => unknown;
-(pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) =>
-  typeof cb === 'function' ? originalPoolConnect(AsyncResource.bind(cb as (...a: unknown[]) => unknown)) : originalPoolConnect();
+// The promise form (Drizzle transactions, pool.connect() in routes) fails before any client
+// exists, so its rejection is noted here like pool.query's.
+(pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) => {
+  if (typeof cb === 'function') return originalPoolConnect(AsyncResource.bind(cb as (...a: unknown[]) => unknown));
+  return (originalPoolConnect() as Promise<unknown>).catch((error) => {
+    markTransientRequestFailure(error);
+    throw error;
+  });
+};
 (pool as any).query = (...args: any[]) => {
   const callbackIndex =
     typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
