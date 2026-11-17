@@ -224,6 +224,19 @@ type OutgoingHeading = { el: HTMLElement; text: string | null } | null;
 let outgoingHeading: OutgoingHeading = null;
 let lastPathname = typeof window !== "undefined" ? window.location.pathname : "";
 
+// The scroll listener saves one animation frame after a scroll, so a push made
+// in the same task as (or just after) a scroll would otherwise leave the
+// outgoing entry with an older offset, and Back would restore that. Save the
+// live offset under the outgoing entry's key before the URL changes; the
+// listener below runs after it and can only key the new entry.
+if (typeof window !== "undefined") {
+  const push = window.history.pushState.bind(window.history);
+  window.history.pushState = (...args: Parameters<History["pushState"]>) => {
+    if (!pendingPop && !restoringScroll) saveScroll();
+    return push(...args);
+  };
+}
+
 if (typeof window !== "undefined") {
   for (const type of ["popstate", "pushState", "replaceState"]) {
     window.addEventListener(type, () => {
