@@ -122,7 +122,9 @@ git diff -U0 "$BEFORE" "$TARGET" -- migrations | rg -i "^\+[^+]" | rg -iv "^\+\s
 ssh awesome-replit 'set -e; cd ~/workspace; npm install'                 # only when needed
 ```
 
-Only when `shared/schema.ts` changed, run db:push. The `DATABASE_URL` presence check belongs to this branch, so a deploy that skips db:push skips the check too:
+Only when `shared/schema.ts` changed, run db:push. The `DATABASE_URL` presence check belongs to this branch, so a deploy that skips db:push skips the check too. The project hook `scripts/hooks/prod-write-guard.mjs` asks a person before this command runs; that schema change already needs the owner at the Publishing pane, so tell them both at once. With nobody at the prompt, the ask is a hook block: report it.
+
+Then:
 
 ```bash
 ssh awesome-replit 'cd ~/workspace
