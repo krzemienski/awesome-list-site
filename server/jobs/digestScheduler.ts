@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { runDigestCycle } from "../services/digestService";
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
@@ -19,7 +20,7 @@ async function runCycle(workerId: string): Promise<void> {
   const startedAt = Date.now();
   logger.info("Digest cycle started");
   try {
-    const result = await runDigestCycle({ workerId, limit: 20 });
+    const result = await retryOnDatabaseDrop(logger, "Digest cycle", () => runDigestCycle({ workerId, limit: 20 }));
     logger.info("Digest cycle finished", {
       recovered: result.recovered,
       queued: result.queued,

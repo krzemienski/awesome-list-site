@@ -2,6 +2,7 @@ import pkg from "pg";
 import type { Store, Options, IncrementResponse, ClientRateLimitInfo } from "express-rate-limit";
 import { MemoryStore } from "express-rate-limit";
 import { createLogger } from "../lib/logger";
+import { databaseFailureLevel, logDatabaseError } from "../db/errors";
 
 const logger = createLogger("rate-limit");
 
@@ -55,22 +56,21 @@ function getPool(): InstanceType<typeof Pool> {
       // client-side race timeout.
       statement_timeout: QUERY_TIMEOUT_MS,
     });
-    sharedPool.on("error", (err) => {
-      logger.error("[rate-limit] pg pool error:", err.message);
-    });
+    sharedPool.on("error", (err) => logDatabaseError(logger, "[rate-limit] pg pool error:", err));
   }
   return sharedPool;
 }
 
-function openBreaker(reason: string): void {
+function openBreaker(err: unknown): void {
   breakerOpenUntil = Date.now() + BREAKER_OPEN_MS;
   // Log at most once per breaker window to avoid flooding during an outage.
   if (Date.now() - lastBreakerLogAt > BREAKER_OPEN_MS) {
     lastBreakerLogAt = Date.now();
-    logger.error(
+    const reason = err instanceof Error ? err.message : "unknown error";
+    const message =
       `[rate-limit] Postgres store unavailable (${reason}); ` +
-        `falling back to per-instance in-memory limiting for ${BREAKER_OPEN_MS / 1000}s`,
-    );
+      `falling back to per-instance in-memory limiting for ${BREAKER_OPEN_MS / 1000}s`;
+    logger[databaseFailureLevel(err)](message);
   }
 }
 
@@ -133,7 +133,7 @@ export class PgRateLimitStore implements Store {
       const row = result.rows[0];
       return { totalHits: Number(row.hits), resetTime: new Date(row.reset_at) };
     } catch (err: any) {
-      openBreaker(err?.message ?? "unknown error");
+      openBreaker(err);
       return this.fallback.increment(key);
     }
   }
@@ -151,7 +151,7 @@ export class PgRateLimitStore implements Store {
         ),
       );
     } catch (err: any) {
-      openBreaker(err?.message ?? "unknown error");
+      openBreaker(err);
     }
   }
 
@@ -165,7 +165,7 @@ export class PgRateLimitStore implements Store {
         ),
       );
     } catch (err: any) {
-      openBreaker(err?.message ?? "unknown error");
+      openBreaker(err);
     }
   }
 
@@ -185,7 +185,7 @@ export class PgRateLimitStore implements Store {
       if (!row) return undefined;
       return { totalHits: Number(row.hits), resetTime: new Date(row.reset_at) };
     } catch (err: any) {
-      openBreaker(err?.message ?? "unknown error");
+      openBreaker(err);
       return this.fallback.get(key);
     }
   }

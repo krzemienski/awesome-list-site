@@ -1,4 +1,5 @@
 import { createLogger } from "../lib/logger";
+import { retryOnDatabaseDrop } from "../db/retryOnDatabaseDrop";
 import { runWithJobContext } from "../ops/requestContext";
 import { POST_BOOT_DELAY_MS, deferUntilServing } from "../ops/serviceActivity";
 
@@ -23,8 +24,7 @@ export function initializeLinkHealthScheduler(): void {
   if (hours === 0) {
     logger.info("Link health schedule off (LINK_HEALTH_INTERVAL_HOURS=0)");
     const recover = deferUntilServing(() =>
-      service()
-        .then(s => s.recoverInterruptedJobs())
+      retryOnDatabaseDrop(logger, "Interrupted-job recovery", async () => (await service()).recoverInterruptedJobs())
         .catch((err: unknown) => logger.error("Interrupted-job recovery failed:", messageOf(err))),
     );
     setTimeout(recover, POST_BOOT_DELAY_MS).unref();
@@ -37,7 +37,7 @@ export function initializeLinkHealthScheduler(): void {
   const tick = deferUntilServing(() =>
     runWithJobContext("link-health", "tick", async () => {
       try {
-        const job = await (await service()).startCheckIfDue(hours);
+        const job = await retryOnDatabaseDrop(logger, "Scheduled link scan", async () => (await service()).startCheckIfDue(hours));
         if (job) logger.info(`Scheduled link scan started (job ${job.id}, every ${hours}h)`);
       } catch (err) {
         logger.error("Scheduled link scan failed to start:", messageOf(err));

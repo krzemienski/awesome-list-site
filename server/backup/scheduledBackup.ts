@@ -13,6 +13,7 @@
  */
 import pg from "pg";
 import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
+import { isDatabaseUnavailableError, logDatabaseError } from "../db/errors";
 import { createLogger } from "../lib/logger";
 import { ServiceUnavailableError } from "../middleware/errors";
 import { runHeavyWork } from "../ops/heavyWork";
@@ -156,6 +157,9 @@ async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
 }
 
 function logRunFailure(run: BackupRun, error: unknown): ScheduledBackupResult {
+  // A dropped connection rejects so the scheduler's retryOnDatabaseDrop runs the check once more;
+  // the lock is released and the second run lists again under it, so it cannot double a backup.
+  if (isDatabaseUnavailableError(error)) throw error;
   // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
   // Passing the Error is what puts err/code/cause on the line; the original call logged only errorClass.
   logger.error("Scheduled backup failed", error, {
@@ -194,7 +198,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
   // databaseBackup.ts is per process, and another Autoscale instance may be dumping.
   run.stage = "lock-connect";
   const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: DB_CONNECT_TIMEOUT_MS });
-  lockClient.on("error", (error) => logger.error("Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) }));
+  lockClient.on("error", (error) => logDatabaseError(logger, "Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) }));
   try {
     await lockClient.connect();
     run.stage = "lock-query";

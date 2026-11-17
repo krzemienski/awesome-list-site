@@ -9,7 +9,7 @@ import {
   recordPoolError,
   recordPoolSnapshot,
 } from '../ops/operationalTelemetry';
-import { isDatabaseUnavailableError } from './errors';
+import { isDatabaseUnavailableError, logDatabaseError } from './errors';
 import { markRequestDatabaseUnavailable } from '../ops/requestContext';
 import { createLogger } from "../lib/logger";
 import { DB_CONNECT_TIMEOUT_MS } from "./connect-timeout";
@@ -56,9 +56,12 @@ const pool = new Pool({
 });
 
 // Add error handler for connection issues
+// The pool emits this only for an idle client. A server-side drop (restart, scale to zero,
+// reaped socket) is a normal state, not a fault: pg-pool discards the client and the next
+// query opens a fresh one, so it logs at warn. Anything else stays an error.
 pool.on('error', (err) => {
   recordPoolError();
-  logger.error('Database pool error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
+  logDatabaseError(logger, 'Database pool error:', err);
 });
 
 function markTransientRequestFailure(error: unknown): void {
@@ -83,7 +86,8 @@ pool.on('connect', (client: any) => {
   // request learns of the failure from its own query rejection (finish() below).
   client.on('error', (err: unknown) => {
     recordPoolError();
-    logger.error('Database client error:', { code: (err as any)?.code ?? 'unknown', message: err instanceof Error ? err.message : String(err) });
+    // A query running on this client rejects through its own path and is reported there.
+    logDatabaseError(logger, 'Database client error:', err);
   });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
