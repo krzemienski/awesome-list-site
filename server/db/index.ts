@@ -65,9 +65,17 @@ pool.on('error', (err) => {
   logDatabaseError(logger, 'Database pool error:', err);
 });
 
+// A failed query is seen twice: by the client wrapper (finish) and by the pool.query wrapper that
+// also sees acquisition failures no client wrapper can. The outage tracker counts each error once.
+const notedFailures = new WeakSet<object>();
+
 function markTransientRequestFailure(error: unknown): void {
   if (isDatabaseUnavailableError(error)) {
     markRequestDatabaseUnavailable();
+    if (error && typeof error === 'object') {
+      if (notedFailures.has(error)) return;
+      notedFailures.add(error);
+    }
     noteDatabaseUnreachable();
   }
 }
