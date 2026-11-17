@@ -15,6 +15,7 @@ import {
 } from './recommendations';
 import { claudeService } from './claudeService';
 import { createLogger } from "../lib/logger";
+import { logDatabaseError } from "../db/errors";
 
 const logger = createLogger("recommendations");
 
@@ -264,7 +265,7 @@ export class RecommendationEngine {
           .map(jp => jp.journeyId);
       }
     } catch (error) {
-      logger.error('Error fetching user preferences and interactions, using provided profile:', error);
+      logDatabaseError(logger, 'Error fetching user preferences and interactions, using provided profile:', error);
       // enrichedProfile already has a copy of userProfile
     }
 
@@ -861,7 +862,7 @@ export class RecommendationEngine {
     try {
       return await storage.getUserFavorites(userId);
     } catch (error) {
-      logger.error('Error fetching user favorites:', error);
+      logDatabaseError(logger, 'Error fetching user favorites:', error);
       return [];
     }
   }
@@ -873,7 +874,7 @@ export class RecommendationEngine {
     try {
       return await storage.getUserBookmarks(userId);
     } catch (error) {
-      logger.error('Error fetching user bookmarks:', error);
+      logDatabaseError(logger, 'Error fetching user bookmarks:', error);
       return [];
     }
   }
@@ -906,7 +907,7 @@ export class RecommendationEngine {
       };
 
     } catch (error) {
-      logger.error('Error fetching popular resources:', error);
+      logDatabaseError(logger, 'Error fetching popular resources:', error);
       // Fallback: keep the input order (the catalog's newest-first listing) so
       // identical inputs give identical output; the caller flags it degraded
       // and keeps it out of every cache.

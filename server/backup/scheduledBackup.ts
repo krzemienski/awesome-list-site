@@ -159,7 +159,10 @@ async function backupIfDue(run: BackupRun): Promise<ScheduledBackupResult> {
 function logRunFailure(run: BackupRun, error: unknown): ScheduledBackupResult {
   // A dropped connection rejects so the scheduler's retryOnDatabaseDrop runs the check once more;
   // the lock is released and the second run lists again under it, so it cannot double a backup.
-  if (isDatabaseUnavailableError(error)) throw error;
+  // The stage is carried on the wrapper because the scheduler's own log line cannot know it.
+  if (isDatabaseUnavailableError(error)) {
+    throw new DatabaseBackupError("Scheduled backup hit a database failure", 503, { cause: error, stage: run.stage });
+  }
   // The logger scrubs the message (connection strings, credentials, known secrets) and clips it.
   // Passing the Error is what puts err/code/cause on the line; the original call logged only errorClass.
   logger.error("Scheduled backup failed", error, {

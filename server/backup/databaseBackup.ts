@@ -48,6 +48,7 @@ import { createInterface } from "node:readline";
 import pg from "pg";
 import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
 import { createLogger } from "../lib/logger";
+import { databaseFailureLevel } from "../db/errors";
 import {
   isPrivateStorageConfigured,
   PrivateStorageError,
@@ -72,10 +73,14 @@ export class DatabaseBackupError extends Error {
     message: string,
     /** HTTP status the admin API should use (never 500 — the contract layer masks 500 bodies). */
     readonly status: 409 | 422 | 503 = 503,
+    options: { cause?: unknown; stage?: string } = {},
   ) {
-    super(message);
+    super(message, { cause: options.cause });
     this.name = "DatabaseBackupError";
+    this.stage = options.stage;
   }
+  /** The scheduled run's stage when the failure was wrapped, for the log line. */
+  readonly stage?: string;
 }
 
 export interface SchemaInventory {
@@ -293,7 +298,8 @@ async function withClient<T>(connectionString: string, fn: (client: pg.Client) =
   try {
     await client.connect();
   } catch (error) {
-    throw new DatabaseBackupError(`Could not connect to the database: ${redact((error as Error).message)}`);
+    // The cause keeps the SQLSTATE or errno, so a refused or dropped connect is classified as transient.
+    throw new DatabaseBackupError(`Could not connect to the database: ${redact((error as Error).message)}`, 503, { cause: error });
   }
   try {
     return await fn(client);
@@ -469,7 +475,8 @@ export async function createDatabaseBackup(options: {
       return manifest;
     });
   } catch (error) {
-    logger.error("Database backup failed; nothing was stored", {
+    // A dropped connection is retried by the scheduler, so it is a warning here.
+    logger[databaseFailureLevel(error)]("Database backup failed; nothing was stored", {
       backupId,
       reason: redact(error instanceof Error ? error.message : String(error)),
     });

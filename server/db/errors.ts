@@ -69,17 +69,26 @@ export function databaseFailureLevel(error: unknown): "warn" | "error" {
   return isDatabaseUnavailableError(error) ? "warn" : "error";
 }
 
-/** Logs `error` at its databaseFailureLevel with its code and message plus `extra`. */
+/**
+ * Logs `error` at its databaseFailureLevel plus `extra`. A warning carries the code and message.
+ * An error passes the Error itself, so the line also gets its cause and scrubbed stack.
+ */
 export function logDatabaseError(
   logger: Logger,
   message: string,
   error: unknown,
   extra: Record<string, unknown> = {},
 ): void {
-  const details = {
-    code: databaseErrorCode(error) || "unknown",
+  const code = databaseErrorCode(error) || "unknown";
+  if (databaseFailureLevel(error) === "error" && error instanceof Error) {
+    // The logger reads an own `code` off the Error; a Drizzle wrapper keeps it on its cause.
+    const ownCode = typeof (error as { code?: unknown }).code === "string";
+    logger.error(message, error, ownCode ? extra : { code, ...extra });
+    return;
+  }
+  logger[databaseFailureLevel(error)](message, {
+    code,
     message: error instanceof Error ? error.message : String(error),
     ...extra,
-  };
-  logger[databaseFailureLevel(error)](message, details);
+  });
 }

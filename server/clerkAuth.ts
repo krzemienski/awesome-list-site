@@ -27,6 +27,7 @@ import { deletedUserTombstones, users, type AuthMethod, type User } from "@share
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger } from "./lib/logger";
+import { logDatabaseError } from "./db/errors";
 import { AuditRepository } from "./repositories/AuditRepository";
 
 const logger = createLogger("auth");
@@ -96,7 +97,7 @@ function recordSignIn(identity: ClerkSessionIdentity, userId: string): void {
   }
   auditRepo.logSignInOnce(userId, identity.sessionId, "Signed in with Clerk", SESSION_FALLBACK_WINDOW_MS).catch((error) => {
     seenSessions.delete(key);
-    logger.error("[clerkAuth] auth.login audit row failed", { user: userId, errorClass: errorClass(error) });
+    logDatabaseError(logger, "[clerkAuth] auth.login audit row failed", error, { user: userId, errorClass: errorClass(error) });
   });
 }
 
@@ -196,7 +197,7 @@ export async function ensureDbUser(
       });
       logger.info("New account provisioned from Clerk sign-up", { user: created.id });
       writeRegisterAudit(created.id, "Account created from Clerk sign-up").catch((error) => {
-        logger.error("[clerkAuth] auth.register audit row failed", { user: created.id, errorClass: errorClass(error) });
+        logDatabaseError(logger, "[clerkAuth] auth.register audit row failed", error, { user: created.id, errorClass: errorClass(error) });
       });
     }
     return created;

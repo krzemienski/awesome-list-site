@@ -2,6 +2,7 @@ import { db } from "../db";
 import { agentEvents, type AgentEvent } from "@shared/schema";
 import { and, asc, eq, gt } from "drizzle-orm";
 import { createLogger } from "../lib/logger";
+import { logDatabaseError } from "../db/errors";
 
 const logger = createLogger("ai-agent");
 
@@ -118,9 +119,10 @@ export class AgentEventEmitter {
         try { this.afterEmitHook(e); } catch { /* hook must never break the run */ }
       }
     } catch (err: any) {
-      logger.error(
+      logDatabaseError(
+        logger,
         `[agentEvents:${this.jobType}:${this.jobId}] emit failed (seq ${seq}, ${e.eventType}):`,
-        err?.message || err,
+        err,
       );
     }
   }

@@ -195,6 +195,6 @@ export class PgRateLimitStore implements Store {
     if (Math.random() >= GC_PROBABILITY) return;
     getPool()
       .query(`DELETE FROM rate_limit_hits WHERE reset_at < now() - interval '1 hour'`)
-      .catch((err) => logger.error("[rate-limit] GC failed:", err.message));
+      .catch((err) => logDatabaseError(logger, "[rate-limit] GC failed:", err));
   }
 }
