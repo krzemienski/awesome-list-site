@@ -9,7 +9,7 @@ const LOCAL_URL = /^(?:\w+:\/\/)?(?:[^@/]*@)?(?:localhost|127\.0\.0\.1|0\.0\.0\.
 const LOCAL_SOCKET_URL = /^\w+:\/\/\/[^?]*\?(?:[^#]*&)?host=\/tmp(?:[/&]|$)/;
 const ADMIN_TARGET = /((?:\w+:\/\/)?[^\s'"/]*)\/api\/admin\//g;
 const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?\n\s*\2\s*(?:\n|$)/g;
-const BOUNDARY = String.raw`(?:^|[;&|(\n\`{]|\$\(|\b(?:do|then|else)\s)\s*(?:(?:sudo|env|time|command|\w+=\S*)\s+)*`;
+const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|while|until)\s)\s*(?:(?:sudo|env|time|command|\w+=\S*)\s+)*`;
 const WRITE_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?(POST|PUT|PATCH|DELETE)\b|--request[\s=]+['"]?(POST|PUT|PATCH|DELETE)\b/i;
 const ANY_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?([A-Z]+)|--request[\s=]+['"]?([A-Z]+)/i;
 const DATA_FLAG = /(?:^|\s)(?:-d|--data(?:-raw|-binary|-urlencode|-ascii)?|--json|-F|--form|-T|--upload-file)(?:[\s=]|$)/;
@@ -42,6 +42,10 @@ function expandVars(seg, cmd) {
   return seg.replace(/\$\{?(\w+)\}?/g, (all, n) => vars[n] ?? all);
 }
 
+// The value of each data flag only, so a [QA- inside the URL does not earn the QA exemption.
+const BODY_ARG = /(?:^|\s)(?:-d|--data(?:-raw|-binary|-urlencode|-ascii)?|--json)(?:\s+|=|(?=["']))("(?:\\.|[^"\\])*"|'[^']*'|\S+)/g;
+const bodyArgs = (seg) => [...seg.matchAll(BODY_ARG)].map((m) => m[1]).join(' ');
+
 const mask = (cmd) => cmd.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, (s) => ' '.repeat(s.length));
 const decide = (permissionDecision, permissionDecisionReason) =>
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision, permissionDecisionReason } }));
@@ -65,7 +69,7 @@ function check(raw) {
   let rest = cmd;
   for (const s of sshSegs) rest = rest.replace(s, ' ');
   const masked = mask(rest);
-  const pushRe = new RegExp(BOUNDARY + '((?:npx\\s+)?drizzle-kit\\s+push|npm\\s+run\\s+db:push)\\b', 'g');
+  const pushRe = new RegExp(BOUNDARY + '((?:npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|npm\\s+run\\s+db:push)\\b', 'g');
   for (let m; (m = pushRe.exec(masked)); ) {
     const start = masked.lastIndexOf('\n', m.index) + 1;
     const prefix = rest.slice(start, m.index + m[0].length);
@@ -90,7 +94,7 @@ function check(raw) {
     const paths = seg.match(/\/api\/admin\/[^\s'"?]*/g);
     if (paths.every((x) => ROUTINE.test(x))) continue;
     // A create whose body carries the QA title prefix makes a row qa-rows can delete (owner, 2026-11-16).
-    if (method.toUpperCase() === 'POST' && seg.includes('[QA-')) continue;
+    if (method.toUpperCase() === 'POST' && bodyArgs(seg).includes('[QA-')) continue;
     const path = paths.find((x) => !ROUTINE.test(x)).replace(/\d{3,}|user_\w+/g, ':id');
     const unresolved = /https?:\/\/\$/.test(seg) || /(?:^|\s)\$\w+\/api/.test(seg);
     return ['ask', `Production admin write: ${method.toUpperCase()} ${path}${unresolved ? ' (host is an unresolved variable, treated as production)' : ''}. ` +
