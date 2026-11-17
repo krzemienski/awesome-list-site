@@ -45,23 +45,29 @@ Rules for using the owner admin session on production:
    go-ahead of 2026-10-30 (CLAUDE.md, "Production QA conventions"). Anyone
    else gets the owner's go-ahead for each session. It is shared by everyone
    who checks production.
-2. Prefer read-only checks. In an automated browser, abort every non-GET
+2. Use it for admin API reads and writes only, never in a browser UI. Browser
+   journeys use the audit accounts.
+3. Never trigger paid AI work: no recommendation Refresh / `?refresh=true`, no
+   enrichment or research job starts.
+4. Never sign out of this session, with "Sign out" or "Sign out all devices"
+   or by calling a sign-out route. It ends every owner session, including
+   other people's checks, and the cookie has no per-device identity, so the
+   server cannot end only one.
+5. Scripts calling admin APIs must send `Origin: https://awesome.video`, or the
+   cross-site guard answers 403.
+
+Rules for the audit accounts in a browser:
+
+1. Prefer read-only checks. In an automated browser, abort every non-GET
    `/api` request except the ones the check needs (`POST /api/send` is the
    Replit widget, not the app).
-3. If a check must write, keep it net-zero: snapshot the affected state first
+2. If a check must write, keep it net-zero: snapshot the affected state first
    (bookmarks, favorites, journey progress, notification preferences, theme),
    make the change through the UI, undo it the same way, and compare against
    the snapshot. Restore the theme to its exact previous value; to clear it,
    `PUT /api/user/preferences` with `{"themeSystem":null,"themeAccent":null}`
    (both together) and an `Origin: https://awesome.video` header.
-4. Never trigger paid AI work: no recommendation Refresh / `?refresh=true`, no
-   enrichment or research job starts.
-5. Signing out of this session, with "Sign out" or "Sign out all devices",
-   ends every owner session, including other people's checks. The cookie has
-   no per-device identity, so the server cannot end only one. Agree a sign-out
-   time with anyone else using the session, and sign in again afterwards.
-6. Scripts calling admin APIs must send `Origin: https://awesome.video`, or the
-   cross-site guard answers 403.
+3. Never trigger paid AI work (rule 3 above applies here too).
 
 `X-Admin-Audit-Key` (the `ADMIN_PASSWORD` secret) authenticates scripts in
 development only. Production's `ADMIN_PASSWORD` is an older value that
