@@ -52,7 +52,7 @@ Each rule names what enforces it. When a correction repeats a rule whose enforce
 - Dismiss overlays and wait for `#ssr-seo-hold` to be gone and `#root` to have children before interacting.
 - Set the viewport, then assert `window.innerWidth` before capturing evidence. Use tall viewports for pagers and footers.
 - Retry Radix radio groups with a held key before grading them.
-- Override `navigator.webdriver` only when judging analytics. Touch-emulation gaps are caveats, not failures.
+- Override `navigator.webdriver` only when judging analytics. Touch-emulation gaps are caveats, not failures, but touch rows run in touch Chrome (`qa-lane`).
 - On a daemon "os error 35", kill the daemon by PID and restart it.
 - Lane procedure: `.claude/skills/qa-lane/SKILL.md`.
 
