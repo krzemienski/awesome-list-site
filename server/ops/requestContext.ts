@@ -75,6 +75,7 @@ export function operationalRequestContext(
         requestHadDatabaseUnavailableError()
       ) {
         res.locals.databaseUnavailableTranslated = true;
+        res.locals.databaseUnavailable = true;
         res.setHeader("Retry-After", "1");
         return originalStatus(503);
       }

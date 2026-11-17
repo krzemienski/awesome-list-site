@@ -11,6 +11,7 @@ import {
 } from '../ops/operationalTelemetry';
 import { isDatabaseUnavailableError, logDatabaseError } from './errors';
 import { markRequestDatabaseUnavailable } from '../ops/requestContext';
+import { noteDatabaseReachable, noteDatabaseUnreachable } from './outage';
 import { createLogger } from "../lib/logger";
 import { DB_CONNECT_TIMEOUT_MS } from "./connect-timeout";
 
@@ -67,6 +68,7 @@ pool.on('error', (err) => {
 function markTransientRequestFailure(error: unknown): void {
   if (isDatabaseUnavailableError(error)) {
     markRequestDatabaseUnavailable();
+    noteDatabaseUnreachable();
   }
 }
 
@@ -100,6 +102,7 @@ pool.on('connect', (client: any) => {
       if (finished) return;
       finished = true;
       if (error) markTransientRequestFailure(error);
+      else noteDatabaseReachable();
       recordDatabaseQuery(command, Date.now() - startedAt, error);
       recordPoolSnapshot({
         total: pool.totalCount,

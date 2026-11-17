@@ -2,7 +2,7 @@ import type { Request, RequestHandler } from "express";
 import { storage } from "../storage";
 import { asyncHandler } from "./asyncHandler";
 import { createLogger } from "../lib/logger";
-import { logDatabaseError } from "../db/errors";
+import { isDatabaseUnavailableError, logDatabaseError } from "../db/errors";
 
 const logger = createLogger("api-auth");
 
@@ -95,6 +95,7 @@ export const requireApiKey: RequestHandler = asyncHandler(async function require
     if (!result.ok) return res.status(401).set("Cache-Control", "no-store").json({ message: result.message });
     return next();
   } catch (error) {
+    if (isDatabaseUnavailableError(error)) throw error;
     logger.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
@@ -114,6 +115,7 @@ export const optionalApiKey: RequestHandler = asyncHandler(async function option
     if (!result.ok) return res.status(401).set("Cache-Control", "no-store").json({ message: result.message });
     return next();
   } catch (error) {
+    if (isDatabaseUnavailableError(error)) throw error;
     logger.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
