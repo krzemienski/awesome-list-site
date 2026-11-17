@@ -108,7 +108,9 @@ export function errorHandler(
     return;
   }
 
-  if (isDatabaseUnavailableError(err)) {
+  // An AppError (a capacity 503 from ServiceUnavailableError) already chose its status and
+  // message below; only a dropped connection gets the database answer.
+  if (!(err instanceof AppError) && isDatabaseUnavailableError(err)) {
     sendDatabaseUnavailable(res, err);
     return;
   }

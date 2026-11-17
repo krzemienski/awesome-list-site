@@ -1,7 +1,6 @@
 import type { Response } from "express";
 import { createLogger } from "../lib/logger";
 import { databaseFailureLevel } from "../db/errors";
-import { noteDatabaseUnreachable } from "../db/outage";
 
 const logger = createLogger("errors");
 
@@ -11,7 +10,6 @@ const logger = createLogger("errors");
  * until the outage is sustained. Used by the central error handler and by route catches.
  */
 export function sendDatabaseUnavailable(res: Response, error: unknown, message = "Database is temporarily unavailable"): void {
-  noteDatabaseUnreachable();
   res.locals.databaseUnavailable = true;
   res.status(503).set("Retry-After", "1").json({ message });
   logger[databaseFailureLevel(error)]("Database unavailable", {
