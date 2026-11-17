@@ -266,12 +266,19 @@ export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNo
 const isTransientDatabaseError = (error: unknown): boolean =>
   !(error instanceof AppError) && isDatabaseUnavailableError(error) && !isDatabaseFailurePersistent(error);
 
-/** An Error argument, or an error or err field of a details object, that is a transient database drop. */
-const isDatabaseUnavailableLogArg = (arg: unknown): boolean => {
-  if (arg instanceof Error) return isTransientDatabaseError(arg);
-  if (!arg || typeof arg !== "object" || Array.isArray(arg)) return false;
-  const record = arg as Record<string, unknown>;
-  return [record.error, record.err].some((nested) => nested instanceof Error && isTransientDatabaseError(nested));
+/** The Error arguments of a log call: an Error itself, or the error or err field of a details object. */
+const errorArgs = (args: unknown[]): Error[] =>
+  args.flatMap((arg): Error[] => {
+    if (arg instanceof Error) return [arg];
+    if (!arg || typeof arg !== "object" || Array.isArray(arg)) return [];
+    const record = arg as Record<string, unknown>;
+    return [record.error, record.err].filter((nested): nested is Error => nested instanceof Error);
+  });
+
+/** A call is a transient drop only when it carries errors and every one of them is one. */
+const isDatabaseDropCall = (args: unknown[]): boolean => {
+  const errors = errorArgs(args);
+  return errors.length > 0 && errors.every(isTransientDatabaseError);
 };
 
 const emit = (
@@ -282,9 +289,9 @@ const emit = (
 ) => {
   // A catch block that logs an error which is itself a dropped or refused connection reports
   // one transient event: warn until the outage is sustained (db/outage.ts). Any other error,
-  // even in a request or job that saw a drop, keeps its level.
+  // even in a request or job that saw a drop, keeps its level, and so does a call that mixes a drop with another error.
   const level: LogLevel =
-    requestedLevel === "error" && args.some(isDatabaseUnavailableLogArg) ? databaseOutageLevel() : requestedLevel;
+    requestedLevel === "error" && isDatabaseDropCall(args) ? databaseOutageLevel() : requestedLevel;
   const words: string[] = [];
   const pairs: string[] = [];
   let lineArea = area;
