@@ -11,7 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
-import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusElement } from "@/hooks/focus-handoff";
 import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
 import { preloadSearchDialog, takePendingPalette } from "@/lib/search-dialog-loader";
@@ -58,17 +58,20 @@ const USER_SCROLL_WINDOW_MS = 600;
  */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
-  const held = useRef(false); // keyboard focus or pointer is on the button
+  const focusHeld = useRef(false); // the button has keyboard focus
+  const hoverHeld = useRef(false); // the pointer is over the button
   const timer = useRef<number | undefined>(undefined);
 
+  // The button never hides while it holds focus (that would drop focus to
+  // <body>): every hide waits for blur, which re-arms the linger.
   const hide = useCallback(() => {
     window.clearTimeout(timer.current);
-    setVisible(false);
+    if (!focusHeld.current) setVisible(false);
   }, []);
   const lingerThenHide = useCallback(() => {
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
-      if (!held.current) hide();
+      if (!focusHeld.current && !hoverHeld.current) hide();
     }, BACK_TO_TOP_LINGER_MS);
   }, [hide]);
 
@@ -90,12 +93,6 @@ function BackToTop() {
       const footerTop = document.querySelector(".app-footer")?.getBoundingClientRect().top;
       const nearFooter = footerTop !== undefined && footerTop < window.innerHeight;
       if (y <= window.innerHeight * BACK_TO_TOP_SHOW_AFTER_VIEWPORTS || nearFooter) {
-        // Hidden while it holds focus would drop focus to <body>: hand it to
-        // the page heading first.
-        if (document.activeElement?.getAttribute("data-testid") === "button-back-to-top") {
-          focusPageHeading();
-        }
-        held.current = false;
         hide();
       } else if (goingUp && performance.now() - lastIntent < USER_SCROLL_WINDOW_MS) {
         setVisible(true);
@@ -130,23 +127,25 @@ function BackToTop() {
       variant="outline"
       size="icon"
       onClick={(e) => {
-        // The button unmounts once the page is back near the top; hand focus
-        // to the page heading so keyboard users don't drop to <body>.
-        handoffFocusOnUnmount(e.currentTarget);
         window.scrollTo({ top: 0, behavior: scrollBehavior() });
+        // The button hides once the page is back near the top. Move focus to
+        // <main> without scrolling so keyboard users don't drop to <body>.
+        if (e.currentTarget.matches(":focus")) {
+          focusElement(document.getElementById("main"), { preventScroll: true });
+        }
       }}
       onFocus={() => {
-        held.current = true;
+        focusHeld.current = true;
       }}
       onBlur={() => {
-        held.current = false;
+        focusHeld.current = false;
         lingerThenHide();
       }}
       onPointerEnter={() => {
-        held.current = true;
+        hoverHeld.current = true;
       }}
       onPointerLeave={() => {
-        held.current = false;
+        hoverHeld.current = false;
         lingerThenHide();
       }}
       aria-label="Back to top"
