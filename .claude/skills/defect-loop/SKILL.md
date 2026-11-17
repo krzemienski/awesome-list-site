@@ -24,7 +24,7 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 `/api/admin/qa-rows` (`server/routes/domains/qa-cleanup.ts`) deletes only rows that carry the `[QA-qa-audit-<RUN_ID>]` prefix and whose owner is in `QA_CLEANUP_USER_IDS`. Conditions:
 
 - Lanes create QA rows only as the audit admin or audit member. Both accounts did the qa-rows cleanup in run 20261115T2340Z, so they are inferred to be on the allowlist; the allowlist itself is a Replit secret and cannot be read.
-- Lanes never create sign-ups, or edits on resources that lack the prefix: those cannot be listed or deleted (edits are listed through their parent resource's title).
+- Lanes never create sign-ups (except a throwaway `@example.com` address stopped at the code screen) or edits on resources that lack the prefix: those cannot be listed or deleted (edits are listed through their parent resource's title). Audit-log rows and signed-in view interactions from allowed QA writes are expected and go in the run report.
 - Each DELETE sends `{"expectedTitle": "<exact title>", "backupSha256": "<newest backup dump sha256>"}`, and the newest backup must be under 10 minutes old. Run cleanup right after a `replit-deploy` step 5.3b backup, or ask the owner for one extra backup first (the standing approval covers one backup per deploy only).
 - Run cleanup as the audit admin, never the owner account.
 
