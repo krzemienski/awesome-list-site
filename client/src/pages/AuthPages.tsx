@@ -15,6 +15,8 @@ import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-template
 import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
+import CustomSignIn from "@/components/auth/CustomSignIn";
+import SsoCallback from "@/components/auth/SsoCallback";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { useOnlineStatus } from "@/hooks/use-online-status";
@@ -60,6 +62,12 @@ export function SignInPage() {
   const adminPasswordMode =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).has("admin");
+  // /sign-in?form=custom opts into the app-owned form; plain /sign-in keeps
+  // Clerk's prebuilt one. Its OAuth return lands on /sign-in/sso-callback.
+  const customForm =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("form") === "custom";
+  const customStep = location.endsWith("/sso-callback") ? <SsoCallback /> : <CustomSignIn />;
   return (
     <div
       className="flex justify-center py-10"
@@ -75,13 +83,17 @@ export function SignInPage() {
           <OfflineNotice />
           <ClerkSlot fallback={<ClerkUiFallback flow="sign-in" />}>
             <StaleSessionGate>
-              <SignIn
-                routing="path"
-                path={`${basePath}/sign-in`}
-                signUpUrl={`${basePath}/sign-up`}
-                signUpFallbackRedirectUrl={NEW_MEMBER_LANDING}
-                fallback={<ClerkUiFallback flow="sign-in" />}
-              />
+              {customForm ? (
+                customStep
+              ) : (
+                <SignIn
+                  routing="path"
+                  path={`${basePath}/sign-in`}
+                  signUpUrl={`${basePath}/sign-up`}
+                  signUpFallbackRedirectUrl={NEW_MEMBER_LANDING}
+                  fallback={<ClerkUiFallback flow="sign-in" />}
+                />
+              )}
             </StaleSessionGate>
           </ClerkSlot>
         </div>
