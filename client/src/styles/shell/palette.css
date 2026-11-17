@@ -90,6 +90,18 @@
   padding: 6px;
 }
 
+/* Status messages sit outside the listbox (see search-dialog.tsx). A list with
+   no rows drops its padding so the message lands where it did as a list child. */
+.search-palette-list-bare {
+  flex: none;
+  padding: 0;
+}
+
+.search-palette-status-region {
+  flex: none;
+  padding: 0 6px 6px;
+}
+
 .search-palette-group {
   position: relative;
   padding: 4px 0 2px;

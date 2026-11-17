@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useCommandState } from "cmdk";
@@ -367,6 +367,91 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
     </CommandGroup>
   );
 
+  const listHasRows = !(showResults && (queryTooLong || isPending || resourceQuery.isError));
+  // Status and loading messages live outside <CommandList>: cmdk gives the list
+  // role=listbox, whose only allowed children are options and groups.
+  let paletteStatus: ReactNode = null;
+  if (showResults) {
+    if (queryTooLong) {
+      paletteStatus = (
+        <div className="search-palette-status search-palette-status-error" data-testid="search-too-long" role="alert">
+          <span>
+            Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has{" "}
+            {queryTrimmed.length.toLocaleString()} — shorten it to search.
+          </span>
+        </div>
+      );
+    } else if (isPending) {
+      paletteStatus = (
+        <div className="search-palette-status" data-testid="search-loading" role="status">
+          <Loader2 className="animate-spin" />
+          Searching…
+        </div>
+      );
+    } else if (resourceQuery.isError) {
+      paletteStatus = (
+        <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
+          {/* A 400 is the query itself being rejected: resending it
+              can't succeed, so show the reason and no retry. */}
+          {resourceQuery.error instanceof ApiError && resourceQuery.error.status === 400 ? (
+            <span>{resourceQuery.error.message}</span>
+          ) : (
+            <>
+              <span>Search failed. Please try again.</span>
+              <button
+                type="button"
+                onKeyDown={keepNativeEnter}
+                onClick={() => {
+                  // This button unmounts while the refetch runs; keep
+                  // the keyboard in the search input, where results land.
+                  inputRef.current?.focus();
+                  void resourceQuery.refetch();
+                }}
+              >
+                Try again
+              </button>
+            </>
+          )}
+        </div>
+      );
+    } else if (resourcesOffline || categoriesQuery.isError) {
+      paletteStatus = (
+        <>
+          {resourcesOffline && (
+            <div className="search-palette-status" data-testid="search-offline" role="status">
+              <WifiOff aria-hidden="true" />
+              <strong>You’re offline</strong>
+              <span>Resource results will load when your connection is back.</span>
+            </div>
+          )}
+          {categoriesQuery.isError && (
+            <div className="search-palette-inline-error" role="status">
+              Categories are unavailable right now.
+            </div>
+          )}
+        </>
+      );
+    }
+  } else if (
+    (categoriesQuery.isLoading && defaultCategories.length === 0) ||
+    (categoriesQuery.isError && defaultCategories.length === 0) ||
+    featuredQuery.isError
+  ) {
+    paletteStatus = (
+      <>
+        {categoriesQuery.isLoading && defaultCategories.length === 0 && (
+          <div className="search-palette-inline-error" role="status">Loading categories…</div>
+        )}
+        {categoriesQuery.isError && defaultCategories.length === 0 && (
+          <div className="search-palette-inline-error" role="status">Categories are unavailable right now.</div>
+        )}
+        {featuredQuery.isError && (
+          <div className="search-palette-inline-error" role="status">Featured resources are unavailable right now.</div>
+        )}
+      </>
+    );
+  }
+
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
       <DialogPrimitive.Portal>
@@ -432,45 +517,9 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
               }}
             />
 
-            <CommandList className="search-palette-list">
+            <CommandList className={listHasRows ? "search-palette-list" : "search-palette-list search-palette-list-bare"}>
               {showResults ? (
-                queryTooLong ? (
-                  <div className="search-palette-status search-palette-status-error" data-testid="search-too-long" role="alert">
-                    <span>
-                      Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has{" "}
-                      {queryTrimmed.length.toLocaleString()} — shorten it to search.
-                    </span>
-                  </div>
-                ) : isPending ? (
-                  <div className="search-palette-status" data-testid="search-loading" role="status">
-                    <Loader2 className="animate-spin" />
-                    Searching…
-                  </div>
-                ) : resourceQuery.isError ? (
-                  <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
-                    {/* A 400 is the query itself being rejected: resending it
-                        can't succeed, so show the reason and no retry. */}
-                    {resourceQuery.error instanceof ApiError && resourceQuery.error.status === 400 ? (
-                      <span>{resourceQuery.error.message}</span>
-                    ) : (
-                      <>
-                        <span>Search failed. Please try again.</span>
-                        <button
-                          type="button"
-                          onKeyDown={keepNativeEnter}
-                          onClick={() => {
-                            // This button unmounts while the refetch runs; keep
-                            // the keyboard in the search input, where results land.
-                            inputRef.current?.focus();
-                            void resourceQuery.refetch();
-                          }}
-                        >
-                          Try again
-                        </button>
-                      </>
-                    )}
-                  </div>
-                ) : (
+                !listHasRows ? null : (
                   <>
                     {renderRecentSearches(true)}
                     {results.length > 0 && (
@@ -525,13 +574,7 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
                         ))}
                       </CommandGroup>
                     )}
-                    {resourcesOffline ? (
-                      <div className="search-palette-status" data-testid="search-offline" role="status">
-                        <WifiOff aria-hidden="true" />
-                        <strong>You’re offline</strong>
-                        <span>Resource results will load when your connection is back.</span>
-                      </div>
-                    ) : !hasNonResourceMatches && results.length === 0 && (
+                    {!resourcesOffline && !hasNonResourceMatches && results.length === 0 && (
                       <>
                         <div className="search-palette-status" data-testid="search-no-results">
                           <Search aria-hidden="true" />
@@ -558,11 +601,6 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
                         {renderDefaultJumps()}
                       </>
                     )}
-                    {categoriesQuery.isError && (
-                      <div className="search-palette-inline-error" role="status">
-                        Categories are unavailable right now.
-                      </div>
-                    )}
                   </>
                 )
               ) : (
@@ -570,18 +608,10 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
                   {renderDefaultJumps()}
                   {renderPages()}
                   {renderRecentSearches()}
-                  {categoriesQuery.isLoading && defaultCategories.length === 0 && (
-                    <div className="search-palette-inline-error" role="status">Loading categories…</div>
-                  )}
-                  {categoriesQuery.isError && defaultCategories.length === 0 && (
-                    <div className="search-palette-inline-error" role="status">Categories are unavailable right now.</div>
-                  )}
-                  {featuredQuery.isError && (
-                    <div className="search-palette-inline-error" role="status">Featured resources are unavailable right now.</div>
-                  )}
                 </>
               )}
             </CommandList>
+            {paletteStatus ? <div className="search-palette-status-region">{paletteStatus}</div> : null}
             <PaletteFooter showResults={showResults} shownResults={results.length} totalMatches={totalMatches} />
           </Command>
         </DialogPrimitive.Content>
