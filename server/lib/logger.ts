@@ -30,9 +30,7 @@
  */
 import { randomUUID } from "node:crypto";
 import { getRequestLogContext } from "../ops/requestContext";
-import { isDatabaseUnavailableError } from "../db/errors";
-import { AppError } from "../middleware/errors";
-import { databaseOutageLevel, isDatabaseFailurePersistent } from "../db/outage";
+import { databaseOutageLevel } from "../db/outage";
 import { getLogSink, type LogRecord } from "./logSink";
 import { messageWithoutEchoedValue } from "../errors/pgErrors";
 
@@ -262,36 +260,12 @@ const write = (level: LogLevel, line: string, record: LogRecord) => {
 /** Waits for buffered records to be shipped, for at most `timeoutMs` (crash and SIGTERM handlers). */
 export const flushLogs = (timeoutMs: number): Promise<void> => getLogSink(sinkNotice).flush(timeoutMs);
 
-/** A drop that a job did not survive a retry of stays an error: the database stayed down. */
-const isTransientDatabaseError = (error: unknown): boolean =>
-  !(error instanceof AppError) && isDatabaseUnavailableError(error) && !isDatabaseFailurePersistent(error);
-
-/** The Error arguments of a log call: an Error itself, or the error or err field of a details object. */
-const errorArgs = (args: unknown[]): Error[] =>
-  args.flatMap((arg): Error[] => {
-    if (arg instanceof Error) return [arg];
-    if (!arg || typeof arg !== "object" || Array.isArray(arg)) return [];
-    const record = arg as Record<string, unknown>;
-    return [record.error, record.err].filter((nested): nested is Error => nested instanceof Error);
-  });
-
-/** A call is a transient drop only when it carries errors and every one of them is one. */
-const isDatabaseDropCall = (args: unknown[]): boolean => {
-  const errors = errorArgs(args);
-  return errors.length > 0 && errors.every(isTransientDatabaseError);
-};
-
 const emit = (
-  requestedLevel: LogLevel,
+  level: LogLevel,
   area: string,
   args: unknown[],
   options: { requestContext?: boolean } = {},
 ) => {
-  // A catch block that logs an error which is itself a dropped or refused connection reports
-  // one transient event: warn until the outage is sustained (db/outage.ts). Any other error,
-  // even in a request or job that saw a drop, keeps its level, and so does a call that mixes a drop with another error.
-  const level: LogLevel =
-    requestedLevel === "error" && isDatabaseDropCall(args) ? databaseOutageLevel() : requestedLevel;
   const words: string[] = [];
   const pairs: string[] = [];
   let lineArea = area;
