@@ -30,7 +30,7 @@ function segment(cmd, from, endQuote) {
 
 // Only a small, literal curl grammar earns an exemption. Everything ambiguous asks.
 function curlRequest(text) {
-  if (/`|\$\(/.test(text)) return null;
+  if (/`|\$/.test(text)) return null;
   const args = [];
   let word = '', quote = null, started = false;
   for (const c of text) {
