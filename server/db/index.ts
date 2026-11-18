@@ -209,7 +209,8 @@ export function startReadinessAcquisition() {
       return originalPoolConnect(AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
         try {
           if (error) markTransientRequestFailure(error, false, requestOperation);
-          return cb(error, ...callbackArgs);
+          const callback = cb as (...args: unknown[]) => unknown;
+          return callback(error, ...callbackArgs);
         } finally {
           requestOperation?.finish();
         }
