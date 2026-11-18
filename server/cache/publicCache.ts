@@ -289,7 +289,7 @@ export async function getPublicCacheValue<T>(options: {
       return value;
     } catch (error) {
       stats.rebuildFailures++;
-      if (isDatabaseUnavailableError(error)) markRequestDatabaseUnavailable();
+      if (!(error instanceof ServiceUnavailableError) && isDatabaseUnavailableError(error)) markRequestDatabaseUnavailable();
       throw error;
     } finally {
       if (inFlight.get(flightKey) === loader) {
