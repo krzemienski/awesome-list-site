@@ -121,6 +121,34 @@ export class AuditRepository {
     });
   }
 
+  /** Record registration once per application user, even after a lost commit acknowledgement. */
+  async logRegisterOnce(userId: string, notes: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(hashtextextended(${`auth.register:${userId}`}, 0))`,
+      );
+      // A separate READ COMMITTED query sees the previous lock holder's committed row.
+      const [existing] = await tx
+        .select({ id: resourceAuditLog.id })
+        .from(resourceAuditLog)
+        .where(and(
+          eq(resourceAuditLog.action, "auth.register"),
+          eq(resourceAuditLog.performedBy, userId),
+        ))
+        .limit(1);
+      if (existing) return;
+
+      await tx.insert(resourceAuditLog).values({
+        resourceId: null,
+        originalResourceId: null,
+        action: "auth.register",
+        performedBy: userId,
+        changes: { method: "clerk" },
+        notes,
+      });
+    }, { isolationLevel: "read committed" });
+  }
+
   /**
    * Insert one `auth.login` row for a sign-in unless the database already has
    * it. Check and insert are a single statement, so two requests in one
