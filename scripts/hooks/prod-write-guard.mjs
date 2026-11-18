@@ -105,7 +105,7 @@ function check(raw) {
     return ['ask', 'An unrecognized SSH wrapper may run a command on the production Replit workspace. Confirm the complete invocation before continuing.'];
   }
   const heredocText = sshSegs.length && HEREDOC.test(cmd) ? cmd : '';
-  for (const s of [...sshSegs, heredocText]) {
+  for (const s of [...sshSegs, ...(heredocText ? [heredocText] : [])]) {
     const hit = s.match(REMOTE_DANGER);
     if (hit) return ['ask', `Remote command on the production Replit workspace contains "${hit[0].trim()}". ` +
       'replit-deploy runs `npm run db:push` here only when the diff touches shared/schema.ts, and publish applies the same schema to production. ' +
