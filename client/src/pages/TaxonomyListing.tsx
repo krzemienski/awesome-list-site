@@ -407,7 +407,7 @@ export default function TaxonomyListing({ level }: Props) {
   const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pendingResultsFocusRef = useRef(false);
-  const pendingPageScrollRef = useRef<number | null>(null);
+  const pendingPageScrollRef = useRef<{ page: number; scrollKey: string; offset: number } | null>(null);
   const offlineRouteRef = useRef<string | null>(null);
   const pendingAnalyticsRef = useRef<{
     signature: string;
@@ -535,9 +535,15 @@ export default function TaxonomyListing({ level }: Props) {
     pushSnapshot.current = snapshot;
     const scrollToPage = pendingPageScrollRef.current;
     pendingPageScrollRef.current = null;
-    if (!fromUrl && scrollToPage === page) {
-      // Push before scrolling so nav-history saves the outgoing offset even
-      // when reduced motion makes the scroll to the new results instant.
+    if (!fromUrl && scrollToPage?.page === page) {
+      // pushState's automatic save may see a loading-clamped offset instead
+      // of the outgoing entry's pre-click position captured below.
+      try {
+        sessionStorage.setItem(scrollToPage.scrollKey, String(scrollToPage.offset));
+      } catch {
+        // Storage unavailable: restoration degrades as in nav-history.
+      }
+      // Push before destination scrolling, including instant reduced motion.
       resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
     }
   }, [hydratedRoute, level, location, page, paginationReady, slug, snapshot, stateHref, totalPages]);
@@ -715,7 +721,14 @@ export default function TaxonomyListing({ level }: Props) {
     requestResultsFocus();
   };
   const onPage = (nextPage: number) => {
-    pendingPageScrollRef.current = nextPage;
+    // Match nav-history's entry key before setPage can shorten the document.
+    const browserWindow: Window & { navigation?: { currentEntry?: { key?: string } | null } } = window;
+    const entryKey = browserWindow.navigation?.currentEntry?.key;
+    pendingPageScrollRef.current = {
+      page: nextPage,
+      scrollKey: `scrollpos:${entryKey ? `${entryKey}:` : ""}${window.location.pathname}${window.location.search}`,
+      offset: window.scrollY,
+    };
     setPage(nextPage);
     requestResultsFocus();
   };
