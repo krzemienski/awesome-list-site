@@ -1,6 +1,7 @@
 import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
+import type { PoolClient } from 'pg';
 const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 import {
@@ -167,6 +168,22 @@ const originalPoolQuery = pool.query.bind(pool);
 // so the query would be dispatched, timed and logged under that request's
 // context. Run connect callbacks in the context of the caller that asked.
 const originalPoolConnect = pool.connect.bind(pool) as (cb?: unknown) => unknown;
+
+export function startReadinessAcquisition() {
+  // The readiness deadline and pg's late rejection are one outcome, with different errors.
+  let failureNoted = false;
+  const noteFailure = (error: unknown): void => {
+    if (failureNoted) return;
+    failureNoted = true;
+    markTransientRequestFailure(error);
+  };
+  const acquisition = (originalPoolConnect() as Promise<PoolClient>).catch((error: unknown) => {
+    noteFailure(error);
+    throw error;
+  });
+  return { acquisition, noteFailure };
+}
+
 // The promise form (Drizzle transactions, pool.connect() in routes) fails before any client
 // exists, so its rejection is noted here like pool.query's.
 (pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) => {
