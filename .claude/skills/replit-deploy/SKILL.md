@@ -36,26 +36,29 @@ Check these first; if one is missing, stop and tell the user exactly which, beca
    The `.replit.dev` hostname can change after a cluster migration; if the alias stops resolving, get the new one from the SSH pane.
 
    Run this check first on every deploy. If it fails, the deploy still goes ahead: steps 2–3 use the **Agent sync** (end of step 6) instead of SSH. Tell the user once that SSH is down, because every Agent sync is a paid Agent run.
-3. **Owner admin session.** `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" https://awesome.video/api/admin/stats` must print 200: steps 5.3a and 5.3b need it. On 401, hand the owner `! bash ~/.cache/awesome-audit/refresh-owner.sh` at the start, before the sync, not mid-deploy (the agent cannot read `.env`). Every admin POST, PUT or DELETE also needs `-H 'Origin: https://awesome.video'`: a 403 means that header is missing, a 401 means the session or password is wrong.
+3. **Owner admin session.** `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" https://awesome.video/api/admin/stats` must print 200: steps 5.3a and 5.3b need it. On 401, re-mint it once with `bash ~/.cache/awesome-audit/refresh-owner.sh` at the start, before the sync, never mid-deploy (CLAUDE.md, Production QA conventions). If a hook, prompt or sandbox refuses that run, hand the owner the same line as `! bash ~/.cache/awesome-audit/refresh-owner.sh`. Every admin POST, PUT or DELETE also needs `-H 'Origin: https://awesome.video'`: a 403 means that header is missing, a 401 means the session or password is wrong.
 
 ## Steps
 
 Save every command and its output under `e2e-evidence/replit-deploy/<UTC timestamp>/` (one file per step). The final report cites these files.
 
+One statement per Bash call, with literal paths. A worktree-isolated session refuses anything it cannot parse as plain commands ("too complex to verify"), and a refused call is a lost turn: no `TS=$(date ...); EV=...; mkdir ...` chains, no `{ ...; } > "$EV/..."` groups, no `cd` chains, no shell functions or loops. The quoted `ssh awesome-replit '…'` scripts are the exception: paste each whole as its own call. Read the timestamp once with `date -u +%Y%m%dT%H%M%SZ`, then type it into each path: `mkdir -p e2e-evidence/replit-deploy/20261116T201500Z`, then each command alone with `2>&1 | tee e2e-evidence/replit-deploy/20261116T201500Z/01-pin.txt`.
+
 ### 1. Pin the target
 
 First check whether a final pass or a timed observation window (the 2-hour no-5xx window, a 24-hour reading) is running on the live SHA. A publish voids that pass and restarts the window. If the diff since BEFORE is docs or reports only, do not publish: hold the docs PR until the next code batch, or say which window the publish resets. Merge run reports before the last code deploy, not after it.
 
+Run each line as its own call and note the printed SHAs:
 ```bash
 git fetch origin
-TARGET=$(git rev-parse origin/main)
-BEFORE=$(curl -s https://awesome.video/api/version | jq -r .revision)   # the live SHA
-echo "TARGET=$TARGET BEFORE=$BEFORE"
-git cat-file -e "$BEFORE^{commit}" 2>/dev/null || git fetch origin "$BEFORE" \
-  || git fetch awesome-replit:workspace '+refs/heads/*:refs/remotes/replit-ws/*'
-git rev-parse "$BEFORE^{tree}" "$TARGET^{tree}"
+git rev-parse origin/main                                    # TARGET
+curl -s https://awesome.video/api/version | jq -r .revision  # BEFORE, the live SHA
+git cat-file -e '<BEFORE>^{commit}'                          # exit 0: present locally, skip the next two
+git fetch origin <BEFORE>
+git fetch awesome-replit:workspace '+refs/heads/*:refs/remotes/replit-ws/*'
+git rev-parse '<BEFORE>^{tree}' '<TARGET>^{tree}'
 ```
-Every later block uses `$TARGET`, `$BEFORE` and `$LIVE`. Shell variables do not survive between separate shell calls, so set them again (from the SHAs echoed here) in each new shell. A live commit from before the guard is often only in the workspace, so the last fetch pulls the workspace branches over SSH. Production is current when `$BEFORE` equals `$TARGET` or the two trees are equal; then say so and stop unless the user asked for a forced republish. If neither fetch yields a live commit that differs from TARGET, the comparison is UNVERIFIED: report it as such and never call production behind on SHAs alone.
+Later blocks write `$TARGET`, `$BEFORE` and `$LIVE`; type the literal SHA printed here instead, because shell variables do not survive between calls. A live commit from before the guard is often only in the workspace, so the last fetch pulls the workspace branches over SSH, and only when the first fetch did not find it. Production is current when `$BEFORE` equals `$TARGET` or the two trees are equal; then say so and stop unless the user asked for a forced republish. If neither fetch yields a live commit that differs from TARGET, the comparison is UNVERIFIED: report it as such and never call production behind on SHAs alone.
 
 Check GitHub CI for TARGET (`gh run list --branch main --limit 5`). A failing required check on TARGET is a stop condition: shipping it is a decision for the user.
 
@@ -75,7 +78,7 @@ Stop conditions:
 - **Dirty tree** (`git status --porcelain` not empty): someone or Replit Agent has uncommitted work there. Report the file list.
 - **Not on `main`.**
 - **Workspace-only commits** (`origin/main..HEAD` not empty): report them with `git log --stat`. They are usually Agent checkpoints; the user decides whether to push them to GitHub or drop them.
-  - The publish commit is the one exception. Every publish adds an empty "Published your App" commit (author Replit Agent) on top of the published HEAD. When origin/main already contains it (Replit sometimes pushes it), `origin/main..HEAD` is empty and the plain fast-forward below works. When it is the only workspace-only commit, `git rev-parse <it>^{tree} <it>^^{tree}` prints the same tree twice (it changes no files), and `git branch -a --contains <it>` shows it kept on `replit-agent` / `gitsafe-backup/main`, move main with `git reset --keep origin/main` instead of `--ff-only`. Anything else is still a stop.
+  - The publish commit is the one exception. Every publish adds an empty "Published your App" commit (author Replit Agent) on top of the published HEAD. When origin/main already contains it (Replit sometimes pushes it), `origin/main..HEAD` is empty and the plain fast-forward below works. When it is the only workspace-only commit, `git rev-parse <it>^{tree} <it>^^{tree}` prints the same tree twice (it changes no files), and `git branch -a --contains <it>` shows it kept on `replit-agent` / `gitsafe-backup/main`, move main with `git reset --keep origin/main` instead of `--ff-only`. Anything else is still a stop. Never `git reset --hard origin/main` here, alone or chained: on the workspace it would silently drop Agent checkpoints that exist nowhere else. `--keep` aborts when a local change conflicts, which is the safe failure, and the dirty-tree stop above already ran.
 
 Otherwise fast-forward only:
 ```bash
@@ -85,7 +88,7 @@ The printed HEAD must equal TARGET.
 
 After any publish, run `git fetch` (locally and in the workspace) before you branch, merge or create a worktree, because origin/main may have gained the publish commit.
 
-When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash --jq .sha`.
+When `main` is checked out in another worktree, `gh pr merge` fails; merge with `gh api repos/<owner>/<repo>/pulls/<N>/merge -X PUT -f merge_method=squash -f sha=<head> --jq .sha`, where `<head>` is the reviewed head from `gh pr view <N> --json headRefOid --jq .headRefOid`. GitHub answers 409 instead of merging when the branch moved after the review.
 
 If `git fetch` fails on auth, the workspace has lost its GitHub connection; stop and tell the user to reconnect it in the Git pane.
 
@@ -119,7 +122,9 @@ git diff -U0 "$BEFORE" "$TARGET" -- migrations | rg -i "^\+[^+]" | rg -iv "^\+\s
 ssh awesome-replit 'set -e; cd ~/workspace; npm install'                 # only when needed
 ```
 
-Only when `shared/schema.ts` changed, run db:push. The `DATABASE_URL` presence check belongs to this branch, so a deploy that skips db:push skips the check too:
+Only when `shared/schema.ts` changed, run db:push. The `DATABASE_URL` presence check belongs to this branch, so a deploy that skips db:push skips the check too. The project hook `scripts/hooks/prod-write-guard.mjs` asks a person before this command runs; that schema change already needs the owner at the Publishing pane, so tell them both at once. With nobody at the prompt, the ask is a hook block: report it.
+
+Then:
 
 ```bash
 ssh awesome-replit 'cd ~/workspace
@@ -149,25 +154,19 @@ Before publishing, list the live audit lanes and tell each that the revision is 
 1. Find the app: `search_apps` by URL returns `[]` (2026-11-06), and a name search ("Awesome Video") also returns look-alike apps. Search by name, or take the replId from the `awesome-replit` SSH user (`ssh awesome-replit 'echo $REPL_ID'`), then confirm with `get_publish_status(replId)` that the deployment serves https://awesome.video before any publish. Cache nothing across runs. The `deploymentId` that `get_publish_status` returns is a different UUID from the replId; passing it as `replId` fails with "No Replit app matched this ID". The replId is the `User` value in the SSH config: `ssh -G awesome-replit | awk '/^user /{print $2}'`.
 2. `get_publish_status(replId)` first. If a publish is already in progress, wait for it instead of starting another.
 3. Pre-publish check, immediately before step 3a (and before telling the owner to publish). `ask_question(replId, "Run git status --short and git rev-parse HEAD^{tree} and quote both outputs verbatim.")`, or the same commands over SSH. `git status --short` must print nothing at all: no `??` line and no modified file. A `package-lock.json` that step 3's `npm install` rewrote also fails; restore it with `git checkout -- package-lock.json` and check again. HEAD's tree must equal `git rev-parse "$TARGET^{tree}"`. Delete unwanted untracked files now, before the publish, never after. The build guard (step 4) refuses untracked files and a tree that is not main's, but it does not see modified tracked files or ignored files, so this check is the only one for those. Ignored files ship too, so no secret-bearing file may be in the workspace; secrets live in Replit Secrets. A workspace `.env` (gitignored, not in the repo) may hold only the mirror of public `VITE_*` config (#273): check its key names only (`cut -d= -f1 .env`, never the values) and stop only if a secret key name (a password, token, key or `DATABASE_URL`) appears. From here until step 5 ends, make no edit in the workspace, and publish only while no Replit Agent run or other writer is active there: autosave commits untracked files into the build that is being published.
-3a. (Step 5.3a) Running-jobs check, immediately before step 4 and again after any wait in step 4. A deploy restarts the instance and kills in-process scans (three jobs died "Interrupted by server restart"). Paste this as its own shell call (the `exit 1` ends that shell); it uses the cached owner header file and never prints it. Every probe fails closed:
+3a. (Step 5.3a) Running-jobs check, immediately before step 4 and again after any wait in step 4. A deploy restarts the instance and kills in-process scans (three jobs died "Interrupted by server restart"). Run each probe below as its own one-line call, one per call; they use the cached owner header file and never print it. Each must print exactly `0`. Anything else is a STOP: `1` or a count above 0 (running), `bad-shape` or `null-status` (unreadable), or empty output (curl failed on a 401, 5xx or bad JSON, so idle cannot be proven).
 
 ```bash
-H="$HOME/.cache/awesome-audit/owner.hdr"; B=https://awesome.video; busy=0
-probe(){ out=$(curl -sf -H @"$H" "$B$2" | jq -r "$3") || { echo "STOP: $1 probe failed (401/5xx/bad JSON)"; busy=1; return; }
-  [ "$out" = "0" ] && echo "ok   $1" || { echo "STOP: $1 running or unreadable ($out)"; busy=1; }; }
-LIST='if (.jobs|type)!="array" then "bad-shape" elif ([.jobs[]|select(.status==null)]|length)>0 then "null-status" else [.jobs[]|select(.status=="pending" or .status=="processing")]|length end'
-probe link-scan  /api/admin/link-health/status '.job as $j | if $j==null then 0 elif ($j.status|type)!="string" then "null-status" elif ($j.status=="pending" or $j.status=="processing") then 1 else 0 end'
-probe enrichment "/api/enrichment/jobs?limit=5" "$LIST"
-probe researcher "/api/researcher/jobs?limit=5" "$LIST"
-GH='if (.items|type)!="array" then "bad-shape" else (.items|length) end'
-probe github-pending    "/api/github/sync-status?status=pending" "$GH"
-probe github-processing "/api/github/sync-status?status=processing" "$GH"
-probe backup /api/admin/database-backups 'if (.inFlight|type)!="boolean" then "bad-shape" elif .inFlight then 1 else 0 end'
-[ "$busy" = 0 ] && echo "ALL CLEAR" || { echo "STOPPED: do not publish; ask the owner"; exit 1; }
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/admin/link-health/status' | jq -r '.job as $j | if $j==null then 0 elif ($j.status|type)!="string" then "null-status" elif ($j.status=="pending" or $j.status=="processing") then 1 else 0 end'   # link-scan
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/enrichment/jobs?limit=5' | jq -r 'if (.jobs|type)!="array" then "bad-shape" elif ([.jobs[]|select(.status==null)]|length)>0 then "null-status" else [.jobs[]|select(.status=="pending" or .status=="processing")]|length end'   # enrichment
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/researcher/jobs?limit=5' | jq -r 'if (.jobs|type)!="array" then "bad-shape" elif ([.jobs[]|select(.status==null)]|length)>0 then "null-status" else [.jobs[]|select(.status=="pending" or .status=="processing")]|length end'   # researcher
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/github/sync-status?status=pending' | jq -r 'if (.items|type)!="array" then "bad-shape" else (.items|length) end'   # github-pending
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/github/sync-status?status=processing' | jq -r 'if (.items|type)!="array" then "bad-shape" else (.items|length) end'   # github-processing
+curl -sf -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/admin/database-backups' | jq -r 'if (.inFlight|type)!="boolean" then "bad-shape" elif .inFlight then 1 else 0 end'   # backup
 ```
-Any `STOP` line means: do not publish. Report the job id and `createdAt` and ask the owner. Never cancel a job to proceed. A 401 on any probe is also a STOP (idle cannot be proven).
+All six printing `0` is ALL CLEAR. Any other result means: do not publish. Report the job id and `createdAt` and ask the owner. Never cancel a job to proceed.
 
-3b. (Step 5.3b) Fresh backup, after 3a passes and immediately before step 4. The owner's standing approval (PLAN decision 17) allows exactly one `POST /api/admin/database-backups` per deploy, only after the schema and running-jobs checks pass and just before `publish_app`. Send it as `curl -X POST -H @owner.hdr -H 'Origin: https://awesome.video' -H 'Content-Type: application/json' -d '{}' .../api/admin/database-backups`. It creates a backup and changes no site data; it covers no restore, no deletion and no other POST. Then check, via `GET /api/admin/database-backups` (newest first):
+3b. (Step 5.3b) Fresh backup, after 3a passes and immediately before step 4. The owner's standing approval (PLAN decision 17) allows exactly one `POST /api/admin/database-backups` per deploy (QA cleanup batches take their own, `defect-loop`), only after the schema and running-jobs checks pass and just before `publish_app`. Send it as `curl -X POST -H @"$HOME/.cache/awesome-audit/owner.hdr" -H 'Origin: https://awesome.video' -H 'Content-Type: application/json' -d '{}' .../api/admin/database-backups`. It creates a backup and changes no site data; it covers no restore, no deletion and no other POST. Then check, via `GET /api/admin/database-backups` (newest first):
    1. The POST returned 201 and its id is the first list entry (409 means one is in flight: wait and re-run 3a).
    2. The newest `completedAt` is under 10 minutes old.
    3. `tableCount` is at least 42 and `totalRows` is at least 99 % of the previous backup's. `agent_events` grows quickly, so a longer gap can add rows legitimately; a drop is the failure.
@@ -180,7 +179,7 @@ Record each status response verbatim.
 
 ### 6. If the publish fails or hangs
 
-For runtime logs, first query the app's own sink: `curl -s -H @owner.hdr "https://awesome.video/api/admin/logs?since=-60m&limit=500"` (`since` takes an ISO time or `-60m`, plus `until`, `level`, `area`, `q`; always pass `limit`, max 2000; records carry `_time`, `level`, `area`, `instance`, `message`). It does not see the build log or a crash before the logger starts. For those, `ask_question` is the next route, during a deploy or not. It takes one question at a time: while one runs, another returns "Agent busy, NOT submitted". Merge related questions into one call, wait for its answer, and resend anything that came back NOT submitted. Try, in order:
+For runtime logs, first query the app's own sink: `curl -s -H @"$HOME/.cache/awesome-audit/owner.hdr" "https://awesome.video/api/admin/logs?since=-60m&limit=500"` (`since` takes an ISO time or `-60m`, plus `until`, `level`, `area`, `q`; always pass `limit`, max 2000; records carry `_time`, `level`, `area`, `instance`, `message`). It does not see the build log or a crash before the logger starts. For those, `ask_question` is the next route, during a deploy or not. It takes one question at a time: while one runs, another returns "Agent busy, NOT submitted". Merge related questions into one call, wait for its answer, and resend anything that came back NOT submitted. Try, in order:
 1. `ask_question(replId, "Read the build log and runtime logs of the most recent deployment and quote the first ERROR or FAILED lines verbatim, each with its timestamp.")`. This is read-only but may cost Agent credits. Ask for verbatim timestamped lines, and still quote the answer as Agent's claim, not as the log.
 2. Reproduce over SSH: rerun step 4, and `ssh awesome-replit 'cd ~/workspace; NODE_ENV=production PORT=5099 timeout 30 node dist/index.js'` to catch startup crashes (missing env, port, migration errors).
 3. A stuck publish waiting on the **database conflict dialog** cannot be answered from MCP. Stop and tell the user to open Publishing in Replit and review the schema changes there.
@@ -194,13 +193,12 @@ Then stop and report: what failed, at which stage, the evidence, and that produc
 Also check the www host: `curl -sSI https://www.awesome.video/` must answer one 301 whose `location` is `https://awesome.video/` (a scheme-less target loops). The redirect is a Cloudflare zone rule; fix it with the Cloudflare plugin's API, not as an owner chore.
 
 ```bash
-LIVE=$(curl -s https://awesome.video/api/version | jq -r .revision)
-echo "LIVE=$LIVE TARGET=$TARGET"                           # must be equal
+curl -s https://awesome.video/api/version | jq -r .revision   # LIVE, must equal TARGET
 curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready   # 200
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
 
-If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` for an already signed-in owner in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Each must load the dashboard. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
+If the release touches client sign-in or session code (`useAuth`, `clerkAuth`, admin cookies, ClerkProvider), prove `/admin` in a browser as the audit admin, never the owner account, in three states: a fresh browser profile, a valid session cookie with localStorage cleared, and a valid cookie with stale localStorage from the previous build. Sign in with the audit-admin route in `qa-lane` (credential file read inside one `bash -c`, nothing printed) and never click Sign out. Each state must load the dashboard. The owner admin cookie is checked by API only, never in a browser: `curl -s -o /dev/null -w '%{http_code}' -H @"$HOME/.cache/awesome-audit/owner.hdr" 'https://awesome.video/api/admin/stats'` must print 200. Known limit, accepted: the owner-cookie `/admin` client path is not driven in a browser, so a client regression there shows only if the audit-admin states also break. A PR note such as "log in again once" is an open FAIL, not a caveat (#289 shipped that way and broke /admin; #298 fixed it).
 
 Shipped means LIVE equals TARGET. The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. A "success" from `get_publish_status` while `/api/version` still shows BEFORE is not shipped: keep the step 5 poll running (Autoscale cutover). If LIVE is neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build, or a `BUILD_REVISION` was set in the workspace environment.
 
@@ -211,7 +209,7 @@ Then check the site as a visitor in a browser against `https://awesome.video` (h
 3. Add an init script that sets `analytics-consent=denied` in localStorage and `umami.disabled=1`, so the consent bar and analytics stay out of the way.
 4. Read the browser console for errors on each page.
 
-Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. Do not sign in or write anything on production.
+Include one behaviour that only the new release has, because a cutover can briefly serve the previous build. This visitor check does not sign in and writes nothing on production; the audit-admin check above is the only browser sign-in.
 
 ### 8. Report
 

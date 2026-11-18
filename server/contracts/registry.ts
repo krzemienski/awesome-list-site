@@ -50,6 +50,8 @@ export interface NamedResponseSchema {
    * JSON schema.
    */
   contentType?: string;
+  /** Response headers to document: header name to its description. */
+  headers?: Record<string, string>;
 }
 
 export interface ApiContractInput {

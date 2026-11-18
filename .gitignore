@@ -94,6 +94,7 @@ playwright/.cache/
 # Agent / tooling working dirs (not part of the app)
 .claude/*
 !.claude/skills/
+!.claude/settings.json
 .omc/
 .anneal/
 .a5c/

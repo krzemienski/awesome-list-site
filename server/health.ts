@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
-import { pool } from "./db";
+import { startReadinessAcquisition } from "./db";
 import { classifyDatabaseError } from "./ops/operationalTelemetry";
+import { isDatabaseUnavailableError } from "./db/errors";
 import {
   getMigrationBootState,
   migrationsAreReady,
@@ -16,6 +17,8 @@ type ProbeResult = {
   checkedAt: string;
   reason?: "database" | "migrations";
   errorClass?: string;
+  /** The database dropped or refused the connection: a retry is expected to work. */
+  transient?: boolean;
 };
 
 let inFlight: Promise<ProbeResult> | null = null;
@@ -34,7 +37,7 @@ async function acquireProbeClient(): Promise<PoolClient> {
     // Same cause as the timeout that abandoned it, so it classifies as "timeout".
     throw new Error("readiness pool acquisition timeout: an earlier probe's acquisition is still pending");
   }
-  const acquisition = pool.connect();
+  const { acquisition, noteFailure } = startReadinessAcquisition();
   let timer: NodeJS.Timeout | undefined;
   try {
     return await Promise.race([
@@ -47,6 +50,7 @@ async function acquireProbeClient(): Promise<PoolClient> {
       }),
     ]);
   } catch (error) {
+    noteFailure(error);
     // If the late client arrives after our deadline, release it immediately.
     const abandoned = acquisition
       .then((client) => client.release())
@@ -99,6 +103,7 @@ async function runProbe(): Promise<ProbeResult> {
       ready: false,
       reason: "database",
       errorClass: classifyDatabaseError(error),
+      transient: isDatabaseUnavailableError(error),
       durationMs: Date.now() - startedAt,
       checkedAt,
     };

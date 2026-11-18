@@ -81,3 +81,17 @@ export function isUniqueViolation(error: unknown, constraintIncludes?: string): 
   // An unnamed violation is still a uniqueness conflict on this write.
   return !constraintIncludes || !pg.constraint || pg.constraint.includes(constraintIncludes);
 }
+
+/**
+ * The PostgreSQL cause's message, without the value a data exception (SQLSTATE class 22) echoes back:
+ * `invalid input syntax for type integer: "visitor-typed text"`. That value is a bound
+ * parameter, so a log line must not carry it or Drizzle's SQL/params wrapper.
+ * Embedded quotes are not escaped, so drop everything from the first quote onward.
+ * Non-class-22 messages are returned unchanged.
+ */
+export function messageWithoutEchoedValue(error: Error): string {
+  const pg = findPgError(error);
+  if (!pg?.code.startsWith("22")) return error.message;
+  const firstQuote = pg.message.indexOf('"');
+  return firstQuote < 0 ? pg.message : `${pg.message.slice(0, firstQuote)}"[value]"`;
+}

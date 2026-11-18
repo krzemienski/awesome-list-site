@@ -29,7 +29,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
-import { AppError, ValidationError } from "./errors";
+import { AppError, ServiceUnavailableError, ValidationError } from "./errors";
 import { ZodError } from "zod";
 import { databaseErrorCode, isDatabaseUnavailableError } from "../db/errors";
 import {
@@ -37,6 +37,7 @@ import {
   normalizeValidationBody,
 } from "../contracts/envelope";
 import { createLogger } from "../lib/logger";
+import { sendDatabaseUnavailable } from "./databaseUnavailable";
 
 const logger = createLogger("errors");
 
@@ -107,15 +108,10 @@ export function errorHandler(
     return;
   }
 
-  if (isDatabaseUnavailableError(err)) {
-    res
-      .status(503)
-      .set("Retry-After", "1")
-      .json({ message: "Database is temporarily unavailable" });
-    logger.error("Database unavailable", {
-      status: 503,
-      code: (err as any)?.code ?? (err as any)?.cause?.code ?? "timeout",
-    });
+  // An AppError (a capacity 503 from ServiceUnavailableError) already chose its status and
+  // message below; only a dropped connection gets the database answer.
+  if (!(err instanceof AppError) && isDatabaseUnavailableError(err)) {
+    sendDatabaseUnavailable(res, err);
     return;
   }
 
@@ -141,6 +137,9 @@ export function errorHandler(
 
   // Handle AppError instances (operational errors)
   if (err instanceof AppError) {
+    if (err instanceof ServiceUnavailableError) {
+      res.setHeader("Retry-After", "1");
+    }
     const body = {
       message: err.message,
       ...(err instanceof ValidationError && err.errors

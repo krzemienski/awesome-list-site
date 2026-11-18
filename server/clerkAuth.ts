@@ -28,6 +28,7 @@ import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger } from "./lib/logger";
 import { logDatabaseError } from "./db/errors";
+import { retryOnDatabaseDrop } from "./db/retryOnDatabaseDrop";
 import { AuditRepository } from "./repositories/AuditRepository";
 
 const logger = createLogger("auth");
@@ -68,7 +69,7 @@ const seenSessions = new Map<string, number>();
 const errorClass = (error: unknown) => (error instanceof Error ? error.name : "unknown");
 
 function writeRegisterAudit(userId: string, notes: string): Promise<void> {
-  return auditRepo.logResourceAudit(null, "auth.register", userId, { method: "clerk" }, notes);
+  return auditRepo.logRegisterOnce(userId, notes);
 }
 
 /**
@@ -196,7 +197,8 @@ export async function ensureDbUser(
         sign_up_method: "clerk",
       });
       logger.info("New account provisioned from Clerk sign-up", { user: created.id });
-      writeRegisterAudit(created.id, "Account created from Clerk sign-up").catch((error) => {
+      // Registration has no later replay; the idempotent writer also makes a lost commit acknowledgement safe to retry.
+      retryOnDatabaseDrop(logger, "auth.register audit row", () => writeRegisterAudit(created.id, "Account created from Clerk sign-up")).catch((error) => {
         logDatabaseError(logger, "[clerkAuth] auth.register audit row failed", error, { user: created.id, errorClass: errorClass(error) });
       });
     }

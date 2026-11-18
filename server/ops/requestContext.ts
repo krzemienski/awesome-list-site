@@ -1,11 +1,17 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
+import { noteDatabaseReachable, noteDatabaseUnreachable } from "../db/outage";
 import { markRequestServed } from "./serviceActivity";
 
 type OperationalRequestState = {
   kind: "request";
+  closed: boolean;
+  outstandingDatabaseOperations: number;
+  outcomeRecorded: boolean;
   databaseUnavailable: boolean;
+  /** At least one query of this request completed. */
+  databaseReached: boolean;
   /** Short per-request id so every log line of one request can be traced. */
   id: string;
   method: string;
@@ -26,9 +32,41 @@ export type LogContext =
   | { kind: "request"; id: string; method: string; path: string }
   | { kind: "job"; job: string; jobId: string };
 
+export interface RequestDatabaseOperation {
+  markUnavailable(): void;
+  finish(reached?: boolean): void;
+}
+
 export function markRequestDatabaseUnavailable(): void {
   const state = requestContext.getStore();
-  if (state) state.databaseUnavailable = true;
+  if (state && (state.kind === "job" || !state.outcomeRecorded)) state.databaseUnavailable = true;
+}
+
+function recordRequestDatabaseOutcome(state: OperationalRequestState): void {
+  if (!state.closed || state.outstandingDatabaseOperations > 0 || state.outcomeRecorded) return;
+  state.outcomeRecorded = true;
+  if (state.databaseUnavailable) noteDatabaseUnreachable();
+  else if (state.databaseReached) noteDatabaseReachable();
+}
+
+/** Captures ownership until settlement, even if the HTTP response closes first. */
+export function startRequestDatabaseOperation(): RequestDatabaseOperation | undefined {
+  const state = requestContext.getStore();
+  if (state?.kind !== "request" || state.outcomeRecorded) return;
+  state.outstandingDatabaseOperations++;
+  let finished = false;
+  return {
+    markUnavailable() {
+      state.databaseUnavailable = true;
+    },
+    finish(reached = false) {
+      if (finished) return;
+      finished = true;
+      if (reached) state.databaseReached = true;
+      state.outstandingDatabaseOperations--;
+      recordRequestDatabaseOutcome(state);
+    },
+  };
 }
 
 /** Request id, method and path (or job name and id) for log lines written inside either. */
@@ -65,7 +103,26 @@ export function operationalRequestContext(
   res.locals.requestStartedAt = Date.now();
   const id = randomBytes(3).toString("hex");
   res.locals.requestId = id;
-  requestContext.run({ kind: "request", databaseUnavailable: false, id, method: req.method, path: req.path }, () => {
+  const state: OperationalRequestState = {
+    kind: "request",
+    closed: false,
+    outstandingDatabaseOperations: 0,
+    outcomeRecorded: false,
+    databaseUnavailable: false,
+    databaseReached: false,
+    id,
+    method: req.method,
+    path: req.path,
+  };
+  // One outcome per request for the outage tracker: a failure if the request saw the database
+  // unavailable, a success if it ran queries and saw none. A listing runs several queries and a
+  // readiness probe five, so counting queries would let one healthy request close an episode.
+  // Promise.all can reject and close the response while sibling queries are still running.
+  res.once("close", () => {
+    state.closed = true;
+    recordRequestDatabaseOutcome(state);
+  });
+  requestContext.run(state, () => {
     const originalStatus = res.status.bind(res);
     const originalJson = res.json.bind(res);
 
@@ -75,9 +132,13 @@ export function operationalRequestContext(
         requestHadDatabaseUnavailableError()
       ) {
         res.locals.databaseUnavailableTranslated = true;
+        res.locals.databaseUnavailable = true;
         res.setHeader("Retry-After", "1");
         return originalStatus(503);
       }
+      // A route that answers its own 503 for a dropped connection (sendOperationalFailure,
+      // the home feed) is a database 503 for the access log too.
+      if (statusCode === 503 && requestHadDatabaseUnavailableError()) res.locals.databaseUnavailable = true;
       return originalStatus(statusCode);
     }) as Response["status"];
 

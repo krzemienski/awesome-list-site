@@ -152,6 +152,14 @@ function buildResponses(contract: ApiContract): Record<string, any> {
         },
       };
     }
+    if (named.headers) {
+      response.headers = Object.fromEntries(
+        Object.entries(named.headers).map(([header, description]) => [
+          header,
+          { description, schema: { type: "string" } },
+        ]),
+      );
+    }
     responses[status] = response;
   }
   return responses;
@@ -315,8 +323,8 @@ export function mergeContractPaths(
     paths: { ...(generated.paths ?? {}) },
   };
   // Existing paths win: layer base paths on top of generated ones.
-  for (const [p, methods] of Object.entries(base.paths ?? {})) {
-    merged.paths[p] = { ...(merged.paths[p] ?? {}), ...(methods as object) };
+  for (const [p, methods] of Object.entries((base.paths ?? {}) as Record<string, object>)) {
+    merged.paths[p] = { ...(merged.paths[p] ?? {}), ...methods };
   }
   return merged;
 }

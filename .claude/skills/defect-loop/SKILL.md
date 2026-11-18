@@ -17,7 +17,7 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 6. Batch merge: the lead merges a PR only after the reviewer's final report has arrived and its last `VERDICT` comment names `headRefOid` (an APPROVE comment alone is not enough: the reviewer may still be reversing it). The merge guard also refuses a verdict younger than 60 s. Merge the approved PRs together, then check `origin/main`.
 7. Deploy: one `replit-deploy` run for the batch. Done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200. Call that SHA `X`.
 8. Re-drive: run only the affected cells on `X` with `qa-lane`. A cell still failing returns to stage 2.
-9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. Then run QA cleanup (below).
+9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. Then run QA cleanup (below), which takes its own fresh backup.
 
 ## QA cleanup
 
@@ -25,8 +25,11 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 
 - Lanes create QA rows only as the audit admin or audit member. Both accounts did the qa-rows cleanup in run 20261115T2340Z, so they are inferred to be on the allowlist; the allowlist itself is a Replit secret and cannot be read.
 - Lanes never create sign-ups (except a throwaway `@example.com` address stopped at the code screen) or edits on resources that lack the prefix: those cannot be listed or deleted (edits are listed through their parent resource's title). Audit-log rows and signed-in view interactions from allowed QA writes are expected and go in the run report.
-- Each DELETE sends `{"expectedTitle": "<exact title>", "backupSha256": "<newest backup dump sha256>"}`, and the newest backup must be under 10 minutes old. Run cleanup right after a `replit-deploy` step 5.3b backup, or ask the owner for one extra backup first (the standing approval covers one backup per deploy only).
+- Each DELETE is `DELETE /api/admin/qa-rows/<table>/<id>` (`resources`, `resource_edits` or `bookmark_collections`) with `-H 'Origin: https://awesome.video'` and the body exactly `{"expectedTitle": "<stored title>", "backupSha256": "<sha256>"}`; any other key is a 400 (`qa-cleanup.ts:67-70`, `:221`). `backupSha256` is `.backups[0].sha256` from `GET /api/admin/database-backups`, and that backup's `completedAt` must be under 10 minutes old, or the route answers 409 (`:87-101`). 503 = backup storage not configured (`qa-cleanup.ts:88`); 403 "Not an authorised QA cleanup account" (`:211`) = caller not on the allowlist.
+- Each cleanup batch takes one backup first: one `POST /api/admin/database-backups` (owner header, `Origin` header, body `{}`), then wait until `GET` shows it newest with `inFlight` false, and run every DELETE within 10 minutes of its `completedAt` (owner, 2026-11-16, delegating this call: "you decide"). One backup per batch, never per row. If the POST fails, the rows stay in the ledger for the next batch or the next deploy's step 5.3b backup.
 - Run cleanup as the audit admin, never the owner account.
+- Procedure: `GET /api/admin/qa-rows` (rows under `.rows.<table>`, each with `deletable`; audit-log and bookmark rows never are, `:201-202`). Keep only this run's prefix. Save each row as JSON under `ROOT/cleanup/` before its DELETE, then GET again and check that the counts dropped by exactly the deleted ids. Record `<table> <id> <title> <status>` per row in `ROOT/cleanup/ledger.md`.
+- A 403 "Row does not belong to a QA cleanup account" (`:230`) means the creating account is not on the allowlist; a 409 listing per-table counts (`:233-235`) means other users' data depends on the row. Record the id and the answer, leave the row, and never clear other users' rows.
 
 ## state.json (`ROOT/state.json`, rewrite after every stage)
 
@@ -47,11 +50,11 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 
 ## Resume
 
-Read `state.json` and `PROGRESS.md`, then `curl -s 'https://awesome.video/api/version'` and `git fetch origin`. If `liveSha` moved, cells graded on the old SHA are stale: re-run them. Continue at `stage`; never repeat a finished stage. A lane left `running` has no trusted result: re-run it. After a 429 or other API failure, write state first, stop, and relaunch only the failed workers once, at lower parallelism.
+Read `state.json` and `PROGRESS.md`, then `curl -s 'https://awesome.video/api/version'` and `git fetch origin`. The same anchors open every check-in: `git rev-parse origin/main` against the live revision (full SHAs), `/api/health/ready` (200) and `gh pr list --state open --json number,headRefOid`. If `liveSha` moved, cells graded on the old SHA are stale: re-run them. Continue at `stage`; never repeat a finished stage. A lane left `running` has no trusted result: re-run it. After a 429 or other API failure, write state first, stop, and relaunch only the failed workers once, at lower parallelism.
 
 ## Rules
 
 - Workers report to the lead in at most 5 lines (verdict, SHA, counts, evidence path); detail lives in the result JSON.
-- After each worker returns, run `git status` in its worktree and spot-check one evidence file yourself.
+- After each worker returns, run `git status` in its worktree and spot-check one evidence file yourself, by its absolute path in the checkout the worker used.
 - Nothing is parked as a known limitation unless the owner said so; a blocked cell lists what was tried.
-- Hook blocks and 429s are reported, never routed around.
+- A hook block, a declined permission prompt or a sandbox refusal, and 429s, are reported, never routed around.

@@ -552,6 +552,7 @@ app.use((req, res, next) => {
         status: res.statusCode,
         durationMs: duration,
         group,
+        databaseUnavailable: res.statusCode === 503 && res.locals.databaseUnavailable === true,
         // Who did it, for mutating calls (admin actions included): the
         // pseudonymous account id only.
         userId: req.method !== "GET" && req.method !== "HEAD" ? (req as { dbUser?: { id?: string } }).dbUser?.id : undefined,
@@ -572,6 +573,7 @@ app.use((req, res, next) => {
           path,
           status: res.statusCode,
           durationMs: duration,
+          databaseUnavailable: res.statusCode === 503 && res.locals.databaseUnavailable === true,
           shed: res.locals.shed === true,
           clientClass: clientClass(req.get("user-agent"), req.get("x-audit-run")),
           shedReason: res.locals.shedReason as string | undefined,

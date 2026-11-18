@@ -48,7 +48,7 @@ import { createInterface } from "node:readline";
 import pg from "pg";
 import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
 import { createLogger } from "../lib/logger";
-import { databaseFailureLevel } from "../db/errors";
+import { databaseFailureLevel, markDatabaseOperationError } from "../db/errors";
 import {
   isPrivateStorageConfigured,
   PrivateStorageError,
@@ -298,6 +298,7 @@ async function withClient<T>(connectionString: string, fn: (client: pg.Client) =
   try {
     await client.connect();
   } catch (error) {
+    markDatabaseOperationError(error);
     // The cause keeps the SQLSTATE or errno, so a refused or dropped connect is classified as transient.
     throw new DatabaseBackupError(`Could not connect to the database: ${redact((error as Error).message)}`, 503, { cause: error });
   }
@@ -507,7 +508,8 @@ export async function listDatabaseBackupsDetailed(environment: BackupEnvironment
   settled.forEach((result, i) => {
     if (result.status === "fulfilled") return void backups.push(result.value);
     unreadable.push(manifestNames[i]);
-    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(String(result.reason?.message ?? result.reason)) });
+    const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
+    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(reason) });
   });
   backups.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return { backups, unreadable };

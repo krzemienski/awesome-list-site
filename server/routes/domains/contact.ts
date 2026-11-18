@@ -36,7 +36,7 @@ import { SITE_URL } from "../../og-middleware";
 import { validateBody } from "../../validation/inputs";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
-import { isDatabaseUnavailableError } from "../../db/errors";
+import { databaseFailureLevel, isDatabaseUnavailableError } from "../../db/errors";
 import { runInTransaction } from "../../db";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { createLogger } from "../../lib/logger";
@@ -151,7 +151,7 @@ function sendDatabaseFailure(
   fallbackMessage: string,
 ): void {
   const databaseUnavailable = isDatabaseUnavailableError(error);
-  logger.error(`[contact] ${logLabel}`, { databaseUnavailable });
+  logger[databaseFailureLevel(error)](`[contact] ${logLabel}`, { databaseUnavailable });
   if (databaseUnavailable) {
     res.status(503).set("Retry-After", "1")
       .json({ message: "Contact service is temporarily unavailable" });

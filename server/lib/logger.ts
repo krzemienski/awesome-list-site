@@ -30,7 +30,9 @@
  */
 import { randomUUID } from "node:crypto";
 import { getRequestLogContext } from "../ops/requestContext";
+import { databaseOutageLevel } from "../db/outage";
 import { getLogSink, type LogRecord } from "./logSink";
+import { messageWithoutEchoedValue } from "../errors/pgErrors";
 
 export type LogLevel = "info" | "warn" | "error";
 
@@ -233,12 +235,12 @@ const formatScalar = (value: unknown): string => {
 };
 
 const errorDetails = (error: Error): Record<string, unknown> => {
-  const details: Record<string, unknown> = { err: error.message || error.name };
+  const details: Record<string, unknown> = { err: messageWithoutEchoedValue(error) || error.name };
   const extra = error as Error & { code?: unknown; status?: unknown; statusCode?: unknown; cause?: unknown };
   if (typeof extra.code === "string" || typeof extra.code === "number") details.code = extra.code;
   const status = extra.status ?? extra.statusCode;
   if (typeof status === "number") details.status = status;
-  if (extra.cause instanceof Error && extra.cause.message) details.cause = extra.cause.message;
+  if (extra.cause instanceof Error && extra.cause.message) details.cause = messageWithoutEchoedValue(extra.cause);
   return details;
 };
 
@@ -388,12 +390,14 @@ export function logHttpRequest(entry: {
   userId?: string | number;
   /** An intentional 503 from ServiceUnavailableError (load shedding): WARN, one signature. */
   shed?: boolean;
+  /** A 503 answered because the database dropped or refused the connection: WARN until the outage is sustained. */
+  databaseUnavailable?: boolean;
   /** Shed lines only: the caller's client class (never the user-agent) and why it was shed. */
   clientClass?: string;
   shedReason?: string;
 }): void {
   const level: LogLevel =
-    entry.shed ? "warn" : entry.status >= 500 ? "error" : entry.status >= 400 && entry.status !== 401 ? "warn" : "info";
+    entry.shed ? "warn" : entry.databaseUnavailable ? databaseOutageLevel() : entry.status >= 500 ? "error" : entry.status >= 400 && entry.status !== 401 ? "warn" : "info";
   const details: Record<string, unknown> = { status: entry.status, ms: entry.durationMs };
   if (entry.group) details.group = entry.group;
   if (entry.userId !== undefined) details.user = entry.userId;

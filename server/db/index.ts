@@ -1,6 +1,7 @@
 import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
+import type { PoolClient } from 'pg';
 const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 import {
@@ -9,8 +10,10 @@ import {
   recordPoolError,
   recordPoolSnapshot,
 } from '../ops/operationalTelemetry';
-import { isDatabaseUnavailableError, logDatabaseError } from './errors';
-import { markRequestDatabaseUnavailable } from '../ops/requestContext';
+import { isDatabaseUnavailableError, logDatabaseError, markDatabaseOperationError } from './errors';
+import { markRequestDatabaseUnavailable, startRequestDatabaseOperation } from '../ops/requestContext';
+import type { RequestDatabaseOperation } from '../ops/requestContext';
+import { noteDatabaseReachable, noteDatabaseUnreachable } from './outage';
 import { createLogger } from "../lib/logger";
 import { DB_CONNECT_TIMEOUT_MS } from "./connect-timeout";
 
@@ -61,13 +64,32 @@ const pool = new Pool({
 // query opens a fresh one, so it logs at warn. Anything else stays an error.
 pool.on('error', (err) => {
   recordPoolError();
+  markDatabaseOperationError(err);
   logDatabaseError(logger, 'Database pool error:', err);
 });
 
-function markTransientRequestFailure(error: unknown): void {
-  if (isDatabaseUnavailableError(error)) {
-    markRequestDatabaseUnavailable();
+// A failed query is seen twice: by the client wrapper (finish) and by the pool.query wrapper that
+// also sees acquisition failures no client wrapper can. The outage tracker counts each error once.
+// Request-owned work is noted once after response close and all operations settle
+// (ops/requestContext.ts); other work, including new post-outcome operations, is noted per query.
+const notedFailures = new WeakSet<object>();
+
+// A ROLLBACK that fails after its transaction's connection died is the same incident, not a second one.
+function markTransientRequestFailure(
+  error: unknown,
+  followsFailure = false,
+  requestOperation?: RequestDatabaseOperation,
+): void {
+  markDatabaseOperationError(error);
+  if (!isDatabaseUnavailableError(error)) return;
+  if (requestOperation) requestOperation.markUnavailable();
+  else markRequestDatabaseUnavailable();
+  if (requestOperation || followsFailure) return;
+  if (error && typeof error === 'object') {
+    if (notedFailures.has(error)) return;
+    notedFailures.add(error);
   }
+  noteDatabaseUnreachable();
 }
 
 // Instrument the actual pg clients used by both pool.query() and Drizzle
@@ -86,12 +108,14 @@ pool.on('connect', (client: any) => {
   // request learns of the failure from its own query rejection (finish() below).
   client.on('error', (err: unknown) => {
     recordPoolError();
+    markDatabaseOperationError(err);
     // A query running on this client rejects through its own path and is reported there.
     logDatabaseError(logger, 'Database client error:', err);
   });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
     const startedAt = Date.now();
+    const requestOperation = startRequestDatabaseOperation();
     const command = queryCommand(args[0]);
     const callbackIndex =
       typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
@@ -99,7 +123,9 @@ pool.on('connect', (client: any) => {
     const finish = (error?: unknown) => {
       if (finished) return;
       finished = true;
-      if (error) markTransientRequestFailure(error);
+      if (error) markTransientRequestFailure(error, command === 'rollback', requestOperation);
+      else if (!requestOperation) noteDatabaseReachable();
+      requestOperation?.finish(!error);
       recordDatabaseQuery(command, Date.now() - startedAt, error);
       recordPoolSnapshot({
         total: pool.totalCount,
@@ -153,29 +179,91 @@ const originalPoolQuery = pool.query.bind(pool);
 // so the query would be dispatched, timed and logged under that request's
 // context. Run connect callbacks in the context of the caller that asked.
 const originalPoolConnect = pool.connect.bind(pool) as (cb?: unknown) => unknown;
-(pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) =>
-  typeof cb === 'function' ? originalPoolConnect(AsyncResource.bind(cb as (...a: unknown[]) => unknown)) : originalPoolConnect();
+
+export function startReadinessAcquisition() {
+  // The readiness deadline and pg's late rejection are one outcome, with different errors.
+  const requestOperation = startRequestDatabaseOperation();
+  let failureNoted = false;
+  const noteFailure = (error: unknown): void => {
+    if (failureNoted) return;
+    failureNoted = true;
+    markTransientRequestFailure(error, false, requestOperation);
+  };
+  let acquisition: Promise<PoolClient>;
+  try {
+    acquisition = (originalPoolConnect() as Promise<PoolClient>).catch((error: unknown) => {
+      noteFailure(error);
+      throw error;
+    }).finally(() => requestOperation?.finish());
+  } catch (error) {
+    noteFailure(error);
+    requestOperation?.finish();
+    throw error;
+  }
+  return { acquisition, noteFailure };
+}
+
+// The promise form (Drizzle transactions, pool.connect() in routes) fails before any client
+// exists, so its rejection is noted here like pool.query's.
+(pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) => {
+  const requestOperation = startRequestDatabaseOperation();
+  try {
+    if (typeof cb === 'function') {
+      return originalPoolConnect(AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
+        try {
+          if (error) markTransientRequestFailure(error, false, requestOperation);
+          const callback = cb as (...args: unknown[]) => unknown;
+          return callback(error, ...callbackArgs);
+        } finally {
+          requestOperation?.finish();
+        }
+      }));
+    }
+    return (originalPoolConnect() as Promise<unknown>).catch((error) => {
+      markTransientRequestFailure(error, false, requestOperation);
+      throw error;
+    }).finally(() => requestOperation?.finish());
+  } catch (error) {
+    markTransientRequestFailure(error, false, requestOperation);
+    requestOperation?.finish();
+    throw error;
+  }
+};
 (pool as any).query = (...args: any[]) => {
+  const requestOperation = startRequestDatabaseOperation();
   const callbackIndex =
     typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
+  let finished = false;
+  const finish = (error?: unknown) => {
+    if (finished) return;
+    finished = true;
+    if (error) markTransientRequestFailure(error, false, requestOperation);
+    requestOperation?.finish();
+  };
   if (callbackIndex >= 0) {
     const callback = args[callbackIndex];
     args[callbackIndex] = AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
-      if (error) markTransientRequestFailure(error);
+      finish(error);
       return callback(error, ...callbackArgs);
     });
   }
   try {
     const result = (originalPoolQuery as any)(...args);
     if (callbackIndex < 0 && result && typeof (result as any).then === 'function') {
-      return (result as Promise<unknown>).catch((error) => {
-        markTransientRequestFailure(error);
-        throw error;
-      });
+      return (result as Promise<unknown>).then(
+        (value) => {
+          finish();
+          return value;
+        },
+        (error) => {
+          finish(error);
+          throw error;
+        },
+      );
     }
     return result;
   } catch (error) {
-    markTransientRequestFailure(error);
+    finish(error);
     throw error;
   }
 };

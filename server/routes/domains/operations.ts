@@ -31,6 +31,7 @@ import { registerPublicApiRoutes } from "../../api/public";
 import { checkReadiness, getReadinessSnapshot } from "../../health";
 import { getHeavyWorkSnapshot } from "../../ops/heavyWork";
 import { getOperationalTelemetrySnapshot } from "../../ops/operationalTelemetry";
+import { markRequestDatabaseUnavailable } from "../../ops/requestContext";
 import { getPublicCacheSnapshot } from "../../cache/publicCache";
 import type { UserRepository } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
@@ -77,6 +78,11 @@ export function registerOperationsRoutes(
     const readiness = await checkReadiness();
     res.set("Cache-Control", "no-store");
     if (!readiness.ready) res.set("Retry-After", "1");
+    // The probe is shared between requests, so only it knows a dropped connection caused this 503.
+    if (readiness.transient) {
+      res.locals.databaseUnavailable = true;
+      markRequestDatabaseUnavailable();
+    }
     res.status(readiness.ready ? 200 : 503).json({
       status: readiness.ready ? "ready" : "not_ready",
     });
@@ -88,6 +94,12 @@ export function registerOperationsRoutes(
     isAdmin,
     asyncHandler(async (_req, res) => {
       const readiness = await checkReadiness();
+      // Shared/cached transient results belong to every consumer, including
+      // an admin diagnostic whose Clerk lookup succeeded before the await.
+      if (readiness.transient) {
+        res.locals.databaseUnavailable = true;
+        markRequestDatabaseUnavailable();
+      }
       res.set("Cache-Control", "no-store");
       res.json({
         status: readiness.ready ? "ready" : "degraded",
@@ -230,8 +242,8 @@ export function registerOperationsRoutes(
     const describe = (op: any): string => {
       if (op?.summary) return op.summary;
       if (op?.description) return op.description;
-      const success = Object.entries(op?.responses ?? {}).find(([status]) => status.startsWith('2'));
-      const text = (success?.[1] as { description?: string } | undefined)?.description ?? '';
+      const success = Object.entries((op?.responses ?? {}) as Record<string, { description?: string }>).find(([status]) => status.startsWith('2'));
+      const text = success?.[1]?.description ?? '';
       return genericDescriptions.has(text) ? '' : text;
     };
     const rows: string[] = [];
