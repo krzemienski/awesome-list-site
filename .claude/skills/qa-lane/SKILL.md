@@ -13,6 +13,7 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 - Never run `agent-browser cookies get`. Never print or cat `~/.cache/awesome-audit/*`, `.env`, tokens or cookies. Check a session only by status code (for example `GET /api/admin/stats` returns 200).
 - Lanes use the cached audit admin and audit member sessions, never the owner account. Load a cached session with `agent-browser --session <lane> cookies set --curl "$HOME/.cache/awesome-audit/<file>" --domain awesome.video`.
 - If a loaded session answers 401, sign in again once in this lane's session, never per row: open `/sign-in`, `fill` `#identifier-field`, click Continue, `fill` `#password-field`, submit (selectors from past runs; on a miss take a fresh `snapshot` instead of guessing). Fill each field from its credential file in one call, so the value never enters the transcript: `bash -c 'set -a; . ~/.cache/awesome-audit/audit-admin.env; agent-browser --session <lane> fill "#password-field" "$AUDIT_ADMIN_PASSWORD"'` (`AUDIT_ADMIN_EMAIL` the same way for `#identifier-field`; `member.env` for the member, whose key names you read with `cut -d= -f1`, never the values).
+- HARs contain no bodies or personal data. Stop and sanitize the current capture before sign-in or credential entry; restart on `about:blank` after authentication. Never record credential flows or retain raw HAR exports, cookies, headers, query values, names or emails in evidence.
 - Mask other users' emails and names in screenshots, or skip the capture.
 - Do not write helper scripts (no `/tmp` `.sh`, `.js` or `.py` wrappers). One-off pipelines with curl and jq are fine.
 - A hook block, a declined permission prompt or a sandbox refusal is a stop sign: report it and ask. Never route around it. It stops that one action, not the lane: record it as a pending row and carry on with the other rows.
@@ -22,8 +23,8 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 
 1. Driver: `agent-browser` on system Chrome (`--executable-path` to system Chrome; the bundled Chrome 149 floods keydowns). Record `agent-browser --version` and the Chrome version in the lane result. The chrome-devtools MCP gets at most one try with a 10 s timeout; a driver problem is never a BLOCKED grade, switch driver. If you do use the MCP: `take_snapshot` and screenshot `filePath` must be absolute and inside the workspace (`$ROOT/...`; `/tmp` is denied), and `wait_for` takes `text` as a JSON array (`{"text":["Enrichment queue"]}`).
 2. `curl -s 'https://awesome.video/api/version'` and record the revision as `shaStart`. If it differs from `SHA`, stop and report.
-3. Isolated session: `agent-browser --session <lane> ...` on every command.
-4. Start the HAR now: `agent-browser --session <lane> network har start`. (`docs/history/reports/prod-ops-2026-11-06/LANE-RULES.md` writes `har start`; that is shorthand, the real command is `network har start|stop`.)
+3. Isolated session: `agent-browser --session <lane> ...` on every command. Open `about:blank` before starting capture; do not open the target first.
+4. With a CLI supporting body-free capture, start `agent-browser --session <lane> network har start --content none` while still on `about:blank`, then open the target. The installed CLI's documented HAR syntax currently has no `--content` option: a bare `network har start` is not a safe substitute. If no-body capture is unsupported or refused, record HAR as NEEDS_YOU and request a compatible CLI; never fall back to recording bodies. (`har start` in older reports is shorthand for `network har start|stop`.)
 5. Consent and analytics: on the site origin set `localStorage` `analytics-consent=denied` and `umami.disabled=1` with `eval`, then reload. Record `navigator.webdriver` once (true means analytics are suppressed; override it only when a row judges analytics).
 
 ## 2. Per row, per width (390, 768, 1280)
@@ -44,15 +45,41 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 
 1. `mktemp -d /tmp/touch-XXXX` and note the printed directory.
 2. In the background: `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=<free port> --user-data-dir=<that directory> --touch-events=enabled --blink-settings=primaryPointerType=2,primaryHoverType=1,availablePointerTypes=2,availableHoverTypes=1 about:blank`. Note its PID.
-3. `agent-browser --session <lane>-touch --cdp <port> open <url>`, then `agent-browser --session <lane>-touch --cdp <port> eval "matchMedia('(pointer: coarse)').matches"` must print `true` before any touch grade. `navigator.maxTouchPoints` stays 0; never grade on it.
-4. Start the touch session's HAR with `agent-browser --session <lane>-touch --cdp <port> network har start` before driving its rows.
-5. Before stopping that PID, export and redact the touch HAR to `$ROOT/evidence/<lane>/<lane>-touch.har` with the same `network har stop` and header-stripping rules as the main lane. Include both sessions in the result's `nonGet` and `methodTable` accounting.
+3. Attach without visiting the target: `agent-browser --session <lane>-touch --cdp <port> open about:blank`. Start `agent-browser --session <lane>-touch --cdp <port> network har start --content none` on that blank page, subject to the same no-body support requirement as preflight. Do not open `<url>` until recording has started successfully.
+4. Now `agent-browser --session <lane>-touch --cdp <port> open <url>`, then `agent-browser --session <lane>-touch --cdp <port> eval "matchMedia('(pointer: coarse)').matches"` must print `true` before any touch grade. `navigator.maxTouchPoints` stays 0; never grade on it. The HAR includes this initial target navigation.
+5. Before stopping that PID, export and sanitize the touch HAR to `$ROOT/evidence/<lane>/<lane>-touch.har` with the same private-export and field-removal procedure as the main lane (substitute `<lane>-touch` and add `--cdp <port>` to the stop command). Include both sessions in the result's `nonGet` and `methodTable` accounting.
 6. At the end stop only that PID and remove the profile directory by its literal path.
 
 ## 3. Finish
 
-1. `agent-browser --session <lane> network har stop $ROOT/evidence/<lane>/<lane>.har`. Run it BEFORE any session close: a close discards the HAR. Then strip the session headers in place: `jq '(.log.entries[] | .request.headers, .response.headers) |= map(select(.name | ascii_downcase | IN("cookie","set-cookie","authorization") | not))' <har> > <har>.tmp && mv <har>.tmp <har>`. Read the HAR only through the jq below, never `cat` it.
-2. Method table: `jq -r '.log.entries[] | .request.method + " " + (.request.url|split("/")[2])' <har> | sort | uniq -c`. Every request that is not GET, HEAD or OPTIONS is listed with URL, method, status and the click that caused it. Do not explain one away.
+1. Stop BEFORE any session close: a close discards the HAR. Export only to an owner-only temporary directory outside the repository, sanitize in the same shell call, and delete the raw export on every exit. Never print or inspect it. Use this inline command, substituting the lane and absolute evidence destination:
+
+   ```bash
+   bash -c '
+   set -euo pipefail
+   umask 077
+   scratchDir=$(mktemp -d "${TMPDIR:-/tmp}/qa-har.XXXXXX")
+   trap '\''rm -f "$scratchDir/raw.har" "$scratchDir/redacted.har"; rmdir "$scratchDir"'\'' EXIT
+   agent-browser --session <lane> network har stop "$scratchDir/raw.har" >/dev/null 2>&1
+   jq '\''
+     def safe_url:
+       if test("^https://awesome[.]video([/?#]|$)") then
+         "https://awesome.video" +
+         (sub("^https://awesome[.]video"; "") | split("?")[0] | split("#")[0] |
+          split("/") | map(if IN("", "api", "admin", "qa-rows", "database-backups", "resources", "resource_edits", "bookmark_collections", "stats", "health", "ready", "version", "auth", "sign-in", "sign-up") then . else ":redacted" end) | join("/"))
+       else "https://redacted.invalid/" end;
+     {log: {version: "1.2", creator: {name: "qa-lane-redacted", version: "1"}, entries:
+       [.log.entries[] | {
+         request: {method: (.request.method | if IN("GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE", "CONNECT", "TRACE") then . else "OTHER" end), url: (.request.url | safe_url)},
+         response: {status: (.response.status | if type == "number" then . else 0 end)}
+       }]}}
+   '\'' "$scratchDir/raw.har" > "$scratchDir/redacted.har" 2>/dev/null
+   mv "$scratchDir/redacted.har" "<absolute-evidence-destination.har>"
+   '
+   ```
+
+   This allowlist produces a reduced HAR method/status ledger, not a replayable archive: it removes request `postData`, response `content` (including `text`), both cookie arrays, all request/response headers, query/parameter arrays, redirect URLs, page titles, comments and other metadata. It strips URL query strings/fragments, retains only known fixed awesome.video path segments, redacts dynamic segments and replaces every other origin (including credential-bearing URLs). Body-free capture does not replace this sanitation. On failure keep no export and mark HAR UNVERIFIED; never attach raw files. Read only the sanitized ledger through the jq below.
+2. Method table: `jq -r '.log.entries[] | .request.method + " " + (.request.url|split("/")[2])' <sanitized-har> | sort | uniq -c`. Every request that is not GET, HEAD or OPTIONS is listed with sanitized URL, method, status and the click that caused it. Correlate redacted paths with the row's non-sensitive route label; never restore query values or dynamic identifiers. Do not explain one away.
 3. `curl -s 'https://awesome.video/api/version'` again as `shaEnd`. If it differs from `shaStart`, the lane's cells are void: say so, do not grade.
 4. Write `$ROOT/results/<lane>.json`: `{lane, shaStart, shaEnd, driver, cells:[{row,width,grade,evidence}], nonGet:[...], methodTable, flaky:[...], notes}`.
 5. Send one `SendMessage` to the lead, at most 5 lines: verdict, SHA, PASS/FAIL/NEEDS_YOU counts, `$ROOT/results/<lane>.json`.
