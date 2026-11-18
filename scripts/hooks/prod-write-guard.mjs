@@ -80,7 +80,7 @@ function curlRequest(text) {
       const absolute = target.includes('://') ? target : `http://${target}`;
       // Curl expands quoted globs too; only a literal IPv6 host may contain brackets.
       const withoutIpv6Host = absolute.replace(/^(https?:\/\/(?:[^@/?#]*@)?)\[[a-f0-9:.]+\](?=[:/?#]|$)/i, '$1');
-      if (/[$`\\{}*]/.test(target) || /[\[\]]/.test(withoutIpv6Host)) throw new Error('Dynamic curl target');
+      if (/[$`\\{}*]/.test(target) || withoutIpv6Host.includes('[') || withoutIpv6Host.includes(']')) throw new Error('Dynamic curl target');
       const url = new URL(absolute);
       if (!/^https?:$/.test(url.protocol) || url.pathname.includes('%')) throw new Error('Ambiguous curl target');
       return url;
