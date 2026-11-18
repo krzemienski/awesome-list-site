@@ -242,8 +242,8 @@ export function registerOperationsRoutes(
     const describe = (op: any): string => {
       if (op?.summary) return op.summary;
       if (op?.description) return op.description;
-      const success = Object.entries(op?.responses ?? {}).find(([status]) => status.startsWith('2'));
-      const text = (success?.[1] as { description?: string } | undefined)?.description ?? '';
+      const success = Object.entries((op?.responses ?? {}) as Record<string, { description?: string }>).find(([status]) => status.startsWith('2'));
+      const text = success?.[1]?.description ?? '';
       return genericDescriptions.has(text) ? '' : text;
     };
     const rows: string[] = [];

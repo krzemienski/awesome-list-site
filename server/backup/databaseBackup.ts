@@ -508,7 +508,8 @@ export async function listDatabaseBackupsDetailed(environment: BackupEnvironment
   settled.forEach((result, i) => {
     if (result.status === "fulfilled") return void backups.push(result.value);
     unreadable.push(manifestNames[i]);
-    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(String(result.reason?.message ?? result.reason)) });
+    const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
+    logger.warn("Skipping unreadable backup manifest", { object: manifestNames[i], reason: redact(reason) });
   });
   backups.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return { backups, unreadable };
