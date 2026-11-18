@@ -16,7 +16,9 @@
  */
 import { ServiceUnavailableError } from "../middleware/errors";
 import { afterCommit } from "../db";
+import { isDatabaseUnavailableError } from "../db/errors";
 import { createLogger } from "../lib/logger";
+import { markRequestDatabaseUnavailable } from "../ops/requestContext";
 import { refreshCatalogStampIfDue } from "./catalogStamp";
 
 const logger = createLogger("public-cache");
@@ -287,6 +289,7 @@ export async function getPublicCacheValue<T>(options: {
       return value;
     } catch (error) {
       stats.rebuildFailures++;
+      if (isDatabaseUnavailableError(error)) markRequestDatabaseUnavailable();
       throw error;
     } finally {
       if (inFlight.get(flightKey) === loader) {
