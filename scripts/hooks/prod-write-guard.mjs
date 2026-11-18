@@ -93,9 +93,17 @@ function check(raw) {
   const cmd = raw.replace(/\\\n/g, '');
 
   // 3. ssh to the Replit workspace running a schema or destructive command, also when the script is a heredoc body.
-  const sshSegs = [...cmd.matchAll(SSH_COMMAND)]
-    .map((m) => segment(cmd, m.index + m[0].length, m[2] ? null : m[1]))
-    .filter((s) => /\bawesome-replit\b/.test(s));
+  let unrecognizedSsh = cmd;
+  const sshSegs = [];
+  for (const m of cmd.matchAll(SSH_COMMAND)) {
+    const text = segment(cmd, m.index + m[0].length, m[2] ? null : m[1]);
+    const end = m.index + m[0].length + text.length;
+    unrecognizedSsh = unrecognizedSsh.slice(0, m.index) + ' '.repeat(end - m.index) + unrecognizedSsh.slice(end);
+    if (/\bawesome-replit\b/.test(text)) sshSegs.push(text);
+  }
+  if (/\bssh\b/i.test(unrecognizedSsh.replace(/["']/g, '')) && /\bawesome-replit\b/.test(unrecognizedSsh)) {
+    return ['ask', 'An unrecognized SSH wrapper may run a command on the production Replit workspace. Confirm the complete invocation before continuing.'];
+  }
   const heredocText = sshSegs.length && HEREDOC.test(cmd) ? cmd : '';
   for (const s of [...sshSegs, heredocText]) {
     const hit = s.match(REMOTE_DANGER);
@@ -108,7 +116,7 @@ function check(raw) {
   // wrappers and CLI options can change the effective target after prefix checks.
   let rest = cmd;
   for (const s of sshSegs) rest = rest.replace(s, ' ');
-  // Quoted wrapper bodies disappear under mask(); never let them hide a schema push.
+  // Inspect shell-wrapper bodies directly; never let them hide a schema push.
   for (const m of rest.matchAll(SHELL_COMMAND)) {
     const body = segment(rest, m.index + m[0].length, m[2] ? null : m[1]);
     if (/db:push|\bdrizzle-kit\b/i.test(body)) {
