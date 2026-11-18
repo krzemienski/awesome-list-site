@@ -304,9 +304,6 @@ async function withClient<T>(connectionString: string, fn: (client: pg.Client) =
   }
   try {
     return await fn(client);
-  } catch (error) {
-    markDatabaseOperationError(error);
-    throw error;
   } finally {
     await client.end().catch(() => undefined);
   }
