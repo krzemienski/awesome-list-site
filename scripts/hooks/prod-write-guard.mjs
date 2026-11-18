@@ -83,7 +83,7 @@ function curlRequest(text) {
         : target.includes('://') ? target : `http://${target}`;
       // Curl expands quoted globs too; only a literal IPv6 host may contain brackets.
       const withoutIpv6Host = absolute.replace(/^(https?:\/\/(?:[^@/?#]*@)?)\[[a-f0-9:.]+\](?=[:/?#]|$)/i, '$1');
-      if (/[$`\\{}*]/.test(target) || withoutIpv6Host.includes('[') || withoutIpv6Host.includes(']')) throw new Error('Dynamic curl target');
+      if (target.startsWith('@') || /[$`\\{}*]/.test(target) || withoutIpv6Host.includes('[') || withoutIpv6Host.includes(']')) throw new Error('Dynamic curl target');
       const url = new URL(absolute);
       if (!/^https?:$/.test(url.protocol) || url.pathname.includes('%')) throw new Error('Ambiguous curl target');
       return url;
@@ -108,7 +108,7 @@ const decide = (permissionDecision, permissionDecisionReason) =>
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision, permissionDecisionReason } }));
 
 function check(raw) {
-  const cmd = raw.replace(/\\\n/g, ' ');
+  const cmd = raw.replace(/\\\n/g, '');
 
   // 3. ssh to the Replit workspace running a schema or destructive command, also when the script is a heredoc body.
   const sshSegs = segmentsAfter(cmd, 'ssh').filter((s) => /\bawesome-replit\b/.test(s));
