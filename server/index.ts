@@ -573,6 +573,7 @@ app.use((req, res, next) => {
           path,
           status: res.statusCode,
           durationMs: duration,
+          databaseUnavailable: res.statusCode === 503 && res.locals.databaseUnavailable === true,
           shed: res.locals.shed === true,
           clientClass: clientClass(req.get("user-agent"), req.get("x-audit-run")),
           shedReason: res.locals.shedReason as string | undefined,
