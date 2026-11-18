@@ -11,6 +11,7 @@ const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|whi
 // Recognize quoted commands, executable paths, and commands inside shell strings.
 const CURL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?curl\b(\1)?`, 'g');
 const SHELL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?(?:sh|bash|zsh|dash|ash|ksh|fish|eval)\b(\1)?`, 'g');
+const SSH_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?ssh\b(\1)?`, 'g');
 const REMOTE_DANGER = /db:push|drizzle-kit|\bDROP\s|\bTRUNCATE\b|\bDELETE\s+FROM\b|\brm\s+-[A-Za-z]*r[A-Za-z]*\b|\bgit\s+reset\s+--hard\b/i;
 
 // Text of one shell segment, ending at an unquoted separator or its enclosing shell-string quote.
@@ -26,13 +27,6 @@ function segment(cmd, from, endQuote) {
   }
   return cmd.slice(from);
 }
-
-const segmentsAfter = (cmd, word) => {
-  const out = [];
-  const re = new RegExp(BOUNDARY + '(' + word + ')\\b', 'g');
-  for (let m; (m = re.exec(cmd)); ) out.push(segment(cmd, m.index + m[0].length - m[1].length));
-  return out;
-};
 
 // Only a small, literal curl grammar earns an exemption. Everything ambiguous asks.
 function curlRequest(text) {
@@ -92,18 +86,6 @@ function curlRequest(text) {
   } catch { return null; }
 }
 
-function isLocalDatabaseUrl(value) {
-  try {
-    const url = new URL(value);
-    if (!/^postgres(?:ql)?:$/.test(url.protocol) || url.searchParams.has('hostaddr')) return false;
-    const hosts = url.searchParams.getAll('host');
-    // Only a single local Unix socket may use host=, never an override of a URL host.
-    if (hosts.length) return !url.host && hosts.length === 1 && /^\/tmp(?:\/[^,]*)?$/.test(hosts[0]);
-    return LOCAL_URL.test(value);
-  } catch { return false; }
-}
-
-const mask = (cmd) => cmd.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, (s) => ' '.repeat(s.length));
 const decide = (permissionDecision, permissionDecisionReason) =>
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision, permissionDecisionReason } }));
 
@@ -111,7 +93,9 @@ function check(raw) {
   const cmd = raw.replace(/\\\n/g, '');
 
   // 3. ssh to the Replit workspace running a schema or destructive command, also when the script is a heredoc body.
-  const sshSegs = segmentsAfter(cmd, 'ssh').filter((s) => /\bawesome-replit\b/.test(s));
+  const sshSegs = [...cmd.matchAll(SSH_COMMAND)]
+    .map((m) => segment(cmd, m.index + m[0].length, m[2] ? null : m[1]))
+    .filter((s) => /\bawesome-replit\b/.test(s));
   const heredocText = sshSegs.length && HEREDOC.test(cmd) ? cmd : '';
   for (const s of [...sshSegs, heredocText]) {
     const hit = s.match(REMOTE_DANGER);
@@ -120,7 +104,8 @@ function check(raw) {
       'Approve only if that is the intended deploy step; otherwise deny.'];
   }
 
-  // 2. Local drizzle-kit push / db:push must carry an inline local DATABASE_URL.
+  // 2. Schema pushes have no local exemption: dotenv, inherited environment,
+  // wrappers and CLI options can change the effective target after prefix checks.
   let rest = cmd;
   for (const s of sshSegs) rest = rest.replace(s, ' ');
   // Quoted wrapper bodies disappear under mask(); never let them hide a schema push.
@@ -130,35 +115,8 @@ function check(raw) {
       return ['deny', 'A shell wrapper contains db:push or drizzle-kit. Run the schema command directly with an inline throwaway local DATABASE_URL so the guard can inspect it.'];
     }
   }
-  const masked = mask(rest);
-  const pushRe = new RegExp(BOUNDARY + '((?:(?:\\S*\\/)?npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|(?:\\S*\\/)?npm\\s+run\\s+db:push)\\b', 'g');
-  let unrecognizedPush = rest;
-  for (let m; (m = pushRe.exec(masked)); ) {
-    const prefix = rest.slice(m.index, m.index + m[0].length);
-    const beforeExecutable = prefix.replace(/(?:\S*\/)?(?:npx|npm)\s+$/, '');
-    if (!/^(?:\s*|[;&|(]\s*)DATABASE_URL=(?:"[^"]+"|'[^']+'|\S+)\s+$/.test(beforeExecutable)) {
-      return ['deny', 'Schema commands must run directly with a leading inline DATABASE_URL; sudo, env, shell wrappers and indirect prefixes are not local exemptions.'];
-    }
-    const assignments = [...prefix.matchAll(/(?:^|[\s;&|(])([A-Za-z_]\w*)=/g)];
-    if (assignments.some((entry) => entry[1] !== 'DATABASE_URL')) {
-      return ['deny', 'Schema commands allow only an inline DATABASE_URL assignment; dotenv, config-path, loader and other environment overrides require review.'];
-    }
-    const assignment = [...masked.slice(m.index, m.index + m[0].length).matchAll(/(?:^|[\s;&|(])DATABASE_URL=/g)].pop();
-    const url = assignment && prefix.slice(assignment.index + assignment[0].length).match(/^(["']?)(\S+?)\1(?:\s|$)/);
-    if (!url || /[\\$`]/.test(prefix) || !isLocalDatabaseUrl(url[2])) {
-      return ['deny', 'drizzle-kit push / npm run db:push needs an inline throwaway local database, or it targets whatever DATABASE_URL the shell or dotenv file provides (Neon or production). ' +
-        'Prefix the command: DATABASE_URL=postgresql://localhost:5432/<throwaway_db> npx drizzle-kit push --force. ' +
-        'The production schema change goes through the replit-deploy skill, not from here.'];
-    }
-    // Only target-neutral flags are understood; connection/config overrides cannot use the local exemption.
-    const suffix = segment(rest, m.index + m[0].length);
-    if (!/^(?:\s+--(?:force|strict|verbose)?)*\s*$/.test(suffix)) {
-      return ['deny', 'Schema command arguments may override the inline DATABASE_URL or configuration. Run directly with only --force, --strict or --verbose, without target/config overrides.'];
-    }
-    unrecognizedPush = unrecognizedPush.slice(0, m.index) + ' '.repeat(m[0].length) + unrecognizedPush.slice(m.index + m[0].length);
-  }
-  if (/db:push|\bdrizzle-kit\b[^;&|()\n]*\bpush\b/i.test(unrecognizedPush.replace(/["']/g, ''))) {
-    return ['deny', 'A schema push command or wrapper could not be safely recognized. Run the schema command directly with an inline throwaway local DATABASE_URL and no target/config overrides.'];
+  if (/db:push|\bdrizzle-kit\b[^;&|()\n]*\bpush\b/i.test(rest.replace(/["']/g, ''))) {
+    return ['deny', 'Schema pushes are denied by this guard because dotenv, inherited environment, wrappers and CLI options can change the effective database target. Production schema changes go through the reviewed replit-deploy flow.'];
   }
 
   // 1. All nonlocal admin curl requests ask, except exact routine method/path pairs.
