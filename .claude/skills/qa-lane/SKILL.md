@@ -45,7 +45,9 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 1. `mktemp -d /tmp/touch-XXXX` and note the printed directory.
 2. In the background: `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=<free port> --user-data-dir=<that directory> --touch-events=enabled --blink-settings=primaryPointerType=2,primaryHoverType=1,availablePointerTypes=2,availableHoverTypes=1 about:blank`. Note its PID.
 3. `agent-browser --session <lane>-touch --cdp <port> open <url>`, then `agent-browser --session <lane>-touch --cdp <port> eval "matchMedia('(pointer: coarse)').matches"` must print `true` before any touch grade. `navigator.maxTouchPoints` stays 0; never grade on it.
-4. At the end stop only that PID and remove the profile directory by its literal path.
+4. Start the touch session's HAR with `agent-browser --session <lane>-touch --cdp <port> network har start` before driving its rows.
+5. Before stopping that PID, export and redact the touch HAR to `$ROOT/evidence/<lane>/<lane>-touch.har` with the same `network har stop` and header-stripping rules as the main lane. Include both sessions in the result's `nonGet` and `methodTable` accounting.
+6. At the end stop only that PID and remove the profile directory by its literal path.
 
 ## 3. Finish
 
