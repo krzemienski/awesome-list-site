@@ -7,6 +7,8 @@ import { markRequestServed } from "./serviceActivity";
 type OperationalRequestState = {
   kind: "request";
   closed: boolean;
+  outstandingDatabaseOperations: number;
+  outcomeRecorded: boolean;
   databaseUnavailable: boolean;
   /** At least one query of this request completed. */
   databaseReached: boolean;
@@ -30,23 +32,41 @@ export type LogContext =
   | { kind: "request"; id: string; method: string; path: string }
   | { kind: "job"; job: string; jobId: string };
 
+export interface RequestDatabaseOperation {
+  markUnavailable(): void;
+  finish(reached?: boolean): void;
+}
+
 export function markRequestDatabaseUnavailable(): void {
   const state = requestContext.getStore();
-  if (state) state.databaseUnavailable = true;
+  if (state && (state.kind === "job" || !state.outcomeRecorded)) state.databaseUnavailable = true;
 }
 
-/** True inside a live HTTP request, whose database outcome is noted once when it ends (not per query). */
-export function isInsideRequest(): boolean {
-  const state = requestContext.getStore();
-  return state?.kind === "request" && !state.closed;
+function recordRequestDatabaseOutcome(state: OperationalRequestState): void {
+  if (!state.closed || state.outstandingDatabaseOperations > 0 || state.outcomeRecorded) return;
+  state.outcomeRecorded = true;
+  if (state.databaseUnavailable) noteDatabaseUnreachable();
+  else if (state.databaseReached) noteDatabaseReachable();
 }
 
-/** Records a completed query against the current live request. Otherwise the caller notes it itself. */
-export function markRequestDatabaseReached(): boolean {
+/** Captures ownership until settlement, even if the HTTP response closes first. */
+export function startRequestDatabaseOperation(): RequestDatabaseOperation | undefined {
   const state = requestContext.getStore();
-  if (state?.kind !== "request" || state.closed) return false;
-  state.databaseReached = true;
-  return true;
+  if (state?.kind !== "request" || state.outcomeRecorded) return;
+  state.outstandingDatabaseOperations++;
+  let finished = false;
+  return {
+    markUnavailable() {
+      state.databaseUnavailable = true;
+    },
+    finish(reached = false) {
+      if (finished) return;
+      finished = true;
+      if (reached) state.databaseReached = true;
+      state.outstandingDatabaseOperations--;
+      recordRequestDatabaseOutcome(state);
+    },
+  };
 }
 
 /** Request id, method and path (or job name and id) for log lines written inside either. */
@@ -86,6 +106,8 @@ export function operationalRequestContext(
   const state: OperationalRequestState = {
     kind: "request",
     closed: false,
+    outstandingDatabaseOperations: 0,
+    outcomeRecorded: false,
     databaseUnavailable: false,
     databaseReached: false,
     id,
@@ -95,10 +117,10 @@ export function operationalRequestContext(
   // One outcome per request for the outage tracker: a failure if the request saw the database
   // unavailable, a success if it ran queries and saw none. A listing runs several queries and a
   // readiness probe five, so counting queries would let one healthy request close an episode.
+  // Promise.all can reject and close the response while sibling queries are still running.
   res.once("close", () => {
     state.closed = true;
-    if (state.databaseUnavailable) noteDatabaseUnreachable();
-    else if (state.databaseReached) noteDatabaseReachable();
+    recordRequestDatabaseOutcome(state);
   });
   requestContext.run(state, () => {
     const originalStatus = res.status.bind(res);

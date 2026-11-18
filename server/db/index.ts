@@ -11,7 +11,8 @@ import {
   recordPoolSnapshot,
 } from '../ops/operationalTelemetry';
 import { isDatabaseUnavailableError, logDatabaseError } from './errors';
-import { isInsideRequest, markRequestDatabaseReached, markRequestDatabaseUnavailable } from '../ops/requestContext';
+import { markRequestDatabaseUnavailable, startRequestDatabaseOperation } from '../ops/requestContext';
+import type { RequestDatabaseOperation } from '../ops/requestContext';
 import { noteDatabaseReachable, noteDatabaseUnreachable } from './outage';
 import { createLogger } from "../lib/logger";
 import { DB_CONNECT_TIMEOUT_MS } from "./connect-timeout";
@@ -68,15 +69,20 @@ pool.on('error', (err) => {
 
 // A failed query is seen twice: by the client wrapper (finish) and by the pool.query wrapper that
 // also sees acquisition failures no client wrapper can. The outage tracker counts each error once.
-// Inside a request the tracker is fed once, when the request ends (ops/requestContext.ts); only work
-// outside a request (jobs, scheduler, startup) is noted here, per query.
+// Request-owned work is noted once after response close and all operations settle
+// (ops/requestContext.ts); other work, including new post-outcome operations, is noted per query.
 const notedFailures = new WeakSet<object>();
 
 // A ROLLBACK that fails after its transaction's connection died is the same incident, not a second one.
-function markTransientRequestFailure(error: unknown, followsFailure = false): void {
+function markTransientRequestFailure(
+  error: unknown,
+  followsFailure = false,
+  requestOperation?: RequestDatabaseOperation,
+): void {
   if (!isDatabaseUnavailableError(error)) return;
-  markRequestDatabaseUnavailable();
-  if (isInsideRequest() || followsFailure) return;
+  if (requestOperation) requestOperation.markUnavailable();
+  else markRequestDatabaseUnavailable();
+  if (requestOperation || followsFailure) return;
   if (error && typeof error === 'object') {
     if (notedFailures.has(error)) return;
     notedFailures.add(error);
@@ -106,6 +112,7 @@ pool.on('connect', (client: any) => {
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
     const startedAt = Date.now();
+    const requestOperation = startRequestDatabaseOperation();
     const command = queryCommand(args[0]);
     const callbackIndex =
       typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
@@ -113,8 +120,9 @@ pool.on('connect', (client: any) => {
     const finish = (error?: unknown) => {
       if (finished) return;
       finished = true;
-      if (error) markTransientRequestFailure(error, command === 'rollback');
-      else if (!markRequestDatabaseReached()) noteDatabaseReachable();
+      if (error) markTransientRequestFailure(error, command === 'rollback', requestOperation);
+      else if (!requestOperation) noteDatabaseReachable();
+      requestOperation?.finish(!error);
       recordDatabaseQuery(command, Date.now() - startedAt, error);
       recordPoolSnapshot({
         total: pool.totalCount,
@@ -171,49 +179,87 @@ const originalPoolConnect = pool.connect.bind(pool) as (cb?: unknown) => unknown
 
 export function startReadinessAcquisition() {
   // The readiness deadline and pg's late rejection are one outcome, with different errors.
+  const requestOperation = startRequestDatabaseOperation();
   let failureNoted = false;
   const noteFailure = (error: unknown): void => {
     if (failureNoted) return;
     failureNoted = true;
-    markTransientRequestFailure(error);
+    markTransientRequestFailure(error, false, requestOperation);
   };
-  const acquisition = (originalPoolConnect() as Promise<PoolClient>).catch((error: unknown) => {
+  let acquisition: Promise<PoolClient>;
+  try {
+    acquisition = (originalPoolConnect() as Promise<PoolClient>).catch((error: unknown) => {
+      noteFailure(error);
+      throw error;
+    }).finally(() => requestOperation?.finish());
+  } catch (error) {
     noteFailure(error);
+    requestOperation?.finish();
     throw error;
-  });
+  }
   return { acquisition, noteFailure };
 }
 
 // The promise form (Drizzle transactions, pool.connect() in routes) fails before any client
 // exists, so its rejection is noted here like pool.query's.
 (pool as unknown as { connect: typeof originalPoolConnect }).connect = (cb) => {
-  if (typeof cb === 'function') return originalPoolConnect(AsyncResource.bind(cb as (...a: unknown[]) => unknown));
-  return (originalPoolConnect() as Promise<unknown>).catch((error) => {
-    markTransientRequestFailure(error);
+  const requestOperation = startRequestDatabaseOperation();
+  try {
+    if (typeof cb === 'function') {
+      return originalPoolConnect(AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
+        try {
+          if (error) markTransientRequestFailure(error, false, requestOperation);
+          return cb(error, ...callbackArgs);
+        } finally {
+          requestOperation?.finish();
+        }
+      }));
+    }
+    return (originalPoolConnect() as Promise<unknown>).catch((error) => {
+      markTransientRequestFailure(error, false, requestOperation);
+      throw error;
+    }).finally(() => requestOperation?.finish());
+  } catch (error) {
+    markTransientRequestFailure(error, false, requestOperation);
+    requestOperation?.finish();
     throw error;
-  });
+  }
 };
 (pool as any).query = (...args: any[]) => {
+  const requestOperation = startRequestDatabaseOperation();
   const callbackIndex =
     typeof args[args.length - 1] === 'function' ? args.length - 1 : -1;
+  let finished = false;
+  const finish = (error?: unknown) => {
+    if (finished) return;
+    finished = true;
+    if (error) markTransientRequestFailure(error, false, requestOperation);
+    requestOperation?.finish();
+  };
   if (callbackIndex >= 0) {
     const callback = args[callbackIndex];
     args[callbackIndex] = AsyncResource.bind((error: unknown, ...callbackArgs: unknown[]) => {
-      if (error) markTransientRequestFailure(error);
+      finish(error);
       return callback(error, ...callbackArgs);
     });
   }
   try {
     const result = (originalPoolQuery as any)(...args);
     if (callbackIndex < 0 && result && typeof (result as any).then === 'function') {
-      return (result as Promise<unknown>).catch((error) => {
-        markTransientRequestFailure(error);
-        throw error;
-      });
+      return (result as Promise<unknown>).then(
+        (value) => {
+          finish();
+          return value;
+        },
+        (error) => {
+          finish(error);
+          throw error;
+        },
+      );
     }
     return result;
   } catch (error) {
-    markTransientRequestFailure(error);
+    finish(error);
     throw error;
   }
 };
