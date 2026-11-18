@@ -110,6 +110,10 @@ function check(raw) {
     if (hit) return ['ask', `Remote command on the production Replit workspace contains "${hit[0].trim()}". ` +
       'replit-deploy runs `npm run db:push` here only when the diff touches shared/schema.ts, and publish applies the same schema to production. ' +
       'Approve only if that is the intended deploy step; otherwise deny.'];
+    const readOnly = /^\s*awesome-replit\s+(?:pwd|ls|git\s+(?:status|diff|show|log|rev-parse))(?:\s+[^;&|\n]*)?\s*$/.test(s);
+    if (!readOnly) {
+      return ['ask', 'Production SSH is allowed without review only for complete read-only pwd, ls, and git status/diff/show/log/rev-parse commands. Confirm any deploy, mutation, or unrecognized remote command.'];
+    }
   }
 
   // 2. Schema pushes have no local exemption: dotenv, inherited environment,
