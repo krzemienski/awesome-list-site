@@ -85,6 +85,7 @@ export function noteDatabaseReachable(now: number = Date.now()): void {
 export function databaseOutageLevel(now: number = Date.now()): "warn" | "error" {
   const sustained =
     episodeStart !== null &&
+    now - lastFailureAt <= EPISODE_IDLE_MS &&
     now - episodeStart >= DATABASE_OUTAGE_ESCALATION_MS &&
     epFailures > epSuccesses;
   return sustained ? "error" : "warn";
