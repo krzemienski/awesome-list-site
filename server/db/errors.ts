@@ -57,6 +57,13 @@ const DATABASE_CONNECTION_MESSAGES = [
   /^(?:pg_dump(?:all)?|pg_restore|psql)\b/i,
 ];
 
+const databaseOperationErrors = new WeakSet<object>();
+
+/** Record provenance at database operation boundaries without changing the error. */
+export function markDatabaseOperationError(error: unknown): void {
+  if (error && typeof error === "object") databaseOperationErrors.add(error);
+}
+
 /** The first string or numeric `code` on the error or any of its causes. */
 export function databaseErrorCode(error: unknown): string {
   for (const link of causeChain(error)) {
@@ -88,7 +95,8 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
     };
     const text = typeof message === "string" ? message : "";
     // pg-pool attaches its client to idle socket errors, whose stack may be Node-only.
-    databaseSource ||= client instanceof nodePostgres.Client
+    databaseSource ||= (typeof link === "object" && link !== null && databaseOperationErrors.has(link))
+      || client instanceof nodePostgres.Client
       || DATABASE_CONNECTION_MESSAGES.some((pattern) => pattern.test(text))
       || (typeof stack === "string" && DATABASE_DRIVER_FRAME.test(stack));
     if (!databaseSource) continue;

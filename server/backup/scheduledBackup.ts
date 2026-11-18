@@ -13,7 +13,7 @@
  */
 import pg from "pg";
 import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
-import { isDatabaseUnavailableError, logDatabaseError } from "../db/errors";
+import { isDatabaseUnavailableError, logDatabaseError, markDatabaseOperationError } from "../db/errors";
 import { createLogger } from "../lib/logger";
 import { ServiceUnavailableError } from "../middleware/errors";
 import { runHeavyWork } from "../ops/heavyWork";
@@ -201,7 +201,10 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
   // databaseBackup.ts is per process, and another Autoscale instance may be dumping.
   run.stage = "lock-connect";
   const lockClient = new pg.Client({ connectionString: databaseUrl, connectionTimeoutMillis: DB_CONNECT_TIMEOUT_MS });
-  lockClient.on("error", (error) => logDatabaseError(logger, "Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) }));
+  lockClient.on("error", (error) => {
+    markDatabaseOperationError(error);
+    logDatabaseError(logger, "Backup lock connection error", error, { stage: run.stage, errorClass: errorClass(error) });
+  });
   try {
     await lockClient.connect();
     run.stage = "lock-query";
@@ -219,6 +222,7 @@ export async function runScheduledBackupIfDue(): Promise<ScheduledBackupResult> 
       await lockClient.query("select pg_advisory_unlock($1, $2)", [...BACKUP_LOCK]).catch(() => undefined);
     }
   } catch (error) {
+    if (run.stage === "lock-connect" || run.stage === "lock-query") markDatabaseOperationError(error);
     return logRunFailure(run, error);
   } finally {
     await lockClient.end().catch(() => undefined);
