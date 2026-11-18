@@ -53,6 +53,8 @@ function curlRequest(text) {
   }
   if (quote) return null;
   if (started) args.push(word);
+  // curl reads ~/.curlrc before CLI arguments; only a leading -q disables it.
+  if (args[0] !== '-q' && args[0] !== '--disable') return null;
 
   let method = null, data = false;
   const targets = [];
