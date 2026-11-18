@@ -77,8 +77,11 @@ function curlRequest(text) {
   if (!targets.length) return null;
   try {
     const urls = targets.map((target) => {
-      if (/[$`\\]/.test(target)) throw new Error('Dynamic curl target');
-      const url = new URL(target.includes('://') ? target : `http://${target}`);
+      const absolute = target.includes('://') ? target : `http://${target}`;
+      // Curl expands quoted globs too; only a literal IPv6 host may contain brackets.
+      const withoutIpv6Host = absolute.replace(/^(https?:\/\/(?:[^@/?#]*@)?)\[[a-f0-9:.]+\](?=[:/?#]|$)/i, '$1');
+      if (/[$`\\{}*]/.test(target) || /[\[\]]/.test(withoutIpv6Host)) throw new Error('Dynamic curl target');
+      const url = new URL(absolute);
       if (!/^https?:$/.test(url.protocol) || url.pathname.includes('%')) throw new Error('Ambiguous curl target');
       return url;
     });
@@ -126,6 +129,7 @@ function check(raw) {
   }
   const masked = mask(rest);
   const pushRe = new RegExp(BOUNDARY + '((?:(?:\\S*\\/)?npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|(?:\\S*\\/)?npm\\s+run\\s+db:push)\\b', 'g');
+  let unrecognizedPush = rest;
   for (let m; (m = pushRe.exec(masked)); ) {
     const prefix = rest.slice(m.index, m.index + m[0].length);
     const assignment = [...masked.slice(m.index, m.index + m[0].length).matchAll(/(?:^|[\s;&|(])DATABASE_URL=/g)].pop();
@@ -135,11 +139,24 @@ function check(raw) {
         'Prefix the command: DATABASE_URL=postgresql://localhost:5432/<throwaway_db> npx drizzle-kit push --force. ' +
         'The production schema change goes through the replit-deploy skill, not from here.'];
     }
+    // Only target-neutral flags are understood; connection/config overrides cannot use the local exemption.
+    const suffix = segment(rest, m.index + m[0].length);
+    if (!/^(?:\s+--(?:force|strict|verbose)?)*\s*$/.test(suffix)) {
+      return ['deny', 'Schema command arguments may override the inline DATABASE_URL or configuration. Run directly with only --force, --strict or --verbose, without target/config overrides.'];
+    }
+    unrecognizedPush = unrecognizedPush.slice(0, m.index) + ' '.repeat(m[0].length) + unrecognizedPush.slice(m.index + m[0].length);
+  }
+  if (/db:push|\bdrizzle-kit\b[^;&|()\n]*\bpush\b/i.test(unrecognizedPush.replace(/["']/g, ''))) {
+    return ['deny', 'A schema push command or wrapper could not be safely recognized. Run the schema command directly with an inline throwaway local DATABASE_URL and no target/config overrides.'];
   }
 
   // 1. All nonlocal admin curl requests ask, except exact routine method/path pairs.
+  let unrecognizedCurl = cmd;
   for (const m of cmd.matchAll(CURL_COMMAND)) {
-    const request = curlRequest(segment(cmd, m.index + m[0].length, m[2] ? null : m[1]));
+    const text = segment(cmd, m.index + m[0].length, m[2] ? null : m[1]);
+    const end = m.index + m[0].length + text.length;
+    unrecognizedCurl = unrecognizedCurl.slice(0, m.index) + ' '.repeat(end - m.index) + unrecognizedCurl.slice(end);
+    const request = curlRequest(text);
     if (request) {
       if (!request.urls.some((url) => ADMIN.test(url.pathname))) continue;
       if (request.urls.every((url) => LOCAL_URL.test(url.href))) continue;
@@ -153,6 +170,9 @@ function check(raw) {
       'Confirm the target and method concern a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. ' +
       'Only exact GET qa-rows, DELETE qa-rows/<allowed-table>/<positive-id>, and GET/POST database-backups routes are routine exemptions. ' +
       'Unparsed options, attached options and unresolved variables never earn an exemption. An unattended lane records this ask as a pending row and continues with other work.'];
+  }
+  if (/\bcurl\b/i.test(unrecognizedCurl.replace(/["']/g, ''))) {
+    return ['ask', 'An unrecognized curl command or wrapper may target the admin API. Run curl directly so the guard can inspect its target, method and exact routine exemption; otherwise confirm the complete invocation.'];
   }
   if (HEREDOC.test(cmd)) return ['ask', 'Command contains a heredoc or here-string whose contents may execute. Confirm the complete command and its input do not write production data.'];
   return null;
