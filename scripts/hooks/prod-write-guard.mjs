@@ -9,19 +9,23 @@ const LOCAL_URL = /^(?:\w+:\/\/)?(?:[^@/]*@)?(?:localhost|127\.0\.0\.1|0\.0\.0\.
 const LOCAL_SOCKET_URL = /^\w+:\/\/\/[^?]*\?(?:[^#]*&)?host=\/tmp(?:[/&]|$)/;
 const ADMIN_TARGET = /((?:\w+:\/\/)?[^\s'"/]*)\/api\/admin\//g;
 const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?\n\s*\2\s*(?:\n|$)/g;
-const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|while|until)\s)\s*(?:(?:sudo|env|time|command|\w+=\S*)\s+)*`;
+const COMMAND_PREFIX = String.raw`\s*(?:(?:sudo|env|time|command|\w+=\S*)\s+)*`;
+const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|while|until)\s)${COMMAND_PREFIX}`;
+// Only curl treats shell-string quotes as boundaries and accepts an executable path.
+const CURL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?curl\b(\1)?`, 'g');
 const WRITE_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?(POST|PUT|PATCH|DELETE)\b|--request[\s=]+['"]?(POST|PUT|PATCH|DELETE)\b/i;
 const ANY_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?([A-Z]+)|--request[\s=]+['"]?([A-Z]+)/i;
 const DATA_FLAG = /(?:^|\s)(?:-d|--data(?:-raw|-binary|-urlencode|-ascii)?|--json|-F|--form|-T|--upload-file)(?:[\s=]|$)/;
 const REMOTE_DANGER = /db:push|drizzle-kit|\bDROP\s|\bTRUNCATE\b|\bDELETE\s+FROM\b|\brm\s+-[A-Za-z]*(?:rf|fr)\b/i;
 
-// Text of one shell segment starting at `from`, ending at an unquoted ; & | ) or newline.
-function segment(cmd, from) {
+// Text of one shell segment, ending at an unquoted separator or its enclosing shell-string quote.
+function segment(cmd, from, endQuote) {
   let q = null;
   for (let i = from; i < cmd.length; i++) {
     const c = cmd[i];
     if (q) { if (c === '\\' && q === '"') i++; else if (c === q) q = null; continue; }
     if (c === '\\') { i++; continue; }
+    if (c === endQuote) return cmd.slice(from, i);
     if (c === "'" || c === '"') q = c;
     else if (';&|)\n'.includes(c)) return cmd.slice(from, i);
   }
@@ -82,7 +86,8 @@ function check(raw) {
   }
 
   // 1. Non-GET curl against /api/admin/ on production (or a host held in a variable).
-  for (const raw1 of segmentsAfter(cmd, 'curl')) {
+  for (const m of cmd.matchAll(CURL_COMMAND)) {
+    const raw1 = segment(cmd, m.index + m[0].length, m[2] ? null : m[1]);
     const seg = expandVars(raw1, cmd);
     const explicit = seg.match(ANY_METHOD);
     const method = (seg.match(WRITE_METHOD) || [])[1] || (seg.match(WRITE_METHOD) || [])[2]
