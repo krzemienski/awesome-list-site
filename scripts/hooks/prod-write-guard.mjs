@@ -3,13 +3,11 @@
 // Prints a permissionDecision ("ask" or "deny"); prints nothing to pass. Fails open on any error.
 const ADMIN = /\/api\/admin\//;
 const ROUTINE = /^\/api\/admin\/(?:qa-rows(?:[/?]|$)|database-backups\/?(?:\?|$))/;
-const HAS_AUTH = /(?:^|\s)(?:-b|--cookie|-u|--user)[\s=]|(?:^|\s)(?:-H|--header)[\s=]*["']?(?:@|\$)|(?:cookie|authorization)\s*:/i;
 // A local target is decided by the URL host only, so a query string or path that says "localhost" does not count.
 const LOCAL_URL = /^(?:\w+:\/\/)?(?:[^@/]*@)?(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(?::\d+)?(?:[/?]|$)/;
-const LOCAL_SOCKET_URL = /^\w+:\/\/\/[^?]*\?(?:[^#]*&)?host=\/tmp(?:[/&]|$)/;
 const ADMIN_TARGET = /((?:\w+:\/\/)?[^\s'"/]*)\/api\/admin\//g;
-const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?\n\s*\2\s*(?:\n|$)/g;
-const COMMAND_PREFIX = String.raw`\s*(?:(?:sudo|env|time|command|\w+=\S*)\s+)*`;
+const HEREDOC = /<</;
+const COMMAND_PREFIX = String.raw`[ \t]*(?:(?:sudo|env|time|command|\w+=[^\s;&|()]*)[ \t]+)*`;
 const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|while|until)\s)${COMMAND_PREFIX}`;
 // Only curl treats shell-string quotes as boundaries and accepts an executable path.
 const CURL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?curl\b(\1)?`, 'g');
@@ -46,22 +44,27 @@ function expandVars(seg, cmd) {
   return seg.replace(/\$\{?(\w+)\}?/g, (all, n) => vars[n] ?? all);
 }
 
-// The value of each data flag only, so a [QA- inside the URL does not earn the QA exemption.
-const BODY_ARG = /(?:^|\s)(?:-d|--data(?:-raw|-binary|-urlencode|-ascii)?|--json)(?:\s+|=|(?=["']))("(?:\\.|[^"\\])*"|'[^']*'|\S+)/g;
-const bodyArgs = (seg) => [...seg.matchAll(BODY_ARG)].map((m) => m[1]).join(' ');
+function isLocalDatabaseUrl(value) {
+  try {
+    const url = new URL(value);
+    if (!/^postgres(?:ql)?:$/.test(url.protocol) || url.searchParams.has('hostaddr')) return false;
+    const hosts = url.searchParams.getAll('host');
+    // Only a single local Unix socket may use host=, never an override of a URL host.
+    if (hosts.length) return !url.host && hosts.length === 1 && /^\/tmp(?:\/[^,]*)?$/.test(hosts[0]);
+    return LOCAL_URL.test(value);
+  } catch { return false; }
+}
 
 const mask = (cmd) => cmd.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, (s) => ' '.repeat(s.length));
 const decide = (permissionDecision, permissionDecisionReason) =>
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision, permissionDecisionReason } }));
 
 function check(raw) {
-  const joined = raw.replace(/\\\n/g, ' ');
-  const cmd = joined.replace(HEREDOC, '\n');
+  const cmd = raw.replace(/\\\n/g, ' ');
 
   // 3. ssh to the Replit workspace running a schema or destructive command, also when the script is a heredoc body.
   const sshSegs = segmentsAfter(cmd, 'ssh').filter((s) => /\bawesome-replit\b/.test(s));
-  const sshRaw = segmentsAfter(joined, 'ssh').filter((s) => /\bawesome-replit\b/.test(s));
-  const heredocText = sshRaw.length ? (joined.match(HEREDOC) || []).join('\n') : '';
+  const heredocText = sshSegs.length && HEREDOC.test(cmd) ? cmd : '';
   for (const s of [...sshSegs, heredocText]) {
     const hit = s.match(REMOTE_DANGER);
     if (hit) return ['ask', `Remote command on the production Replit workspace contains "${hit[0].trim()}". ` +
@@ -75,10 +78,10 @@ function check(raw) {
   const masked = mask(rest);
   const pushRe = new RegExp(BOUNDARY + '((?:(?:\\S*\\/)?npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|(?:\\S*\\/)?npm\\s+run\\s+db:push)\\b', 'g');
   for (let m; (m = pushRe.exec(masked)); ) {
-    const start = masked.lastIndexOf('\n', m.index) + 1;
-    const prefix = rest.slice(start, m.index + m[0].length);
-    const url = [...prefix.matchAll(/DATABASE_URL=(["']?)(\S+?)\1(?:\s|$)/g)].pop();
-    if (!url || !(LOCAL_URL.test(url[2]) || LOCAL_SOCKET_URL.test(url[2]))) {
+    const prefix = rest.slice(m.index, m.index + m[0].length);
+    const assignment = [...masked.slice(m.index, m.index + m[0].length).matchAll(/(?:^|[\s;&|(])DATABASE_URL=/g)].pop();
+    const url = assignment && prefix.slice(assignment.index + assignment[0].length).match(/^(["']?)(\S+?)\1(?:\s|$)/);
+    if (!url || /[\\$`]/.test(prefix) || !isLocalDatabaseUrl(url[2])) {
       return ['deny', 'drizzle-kit push / npm run db:push needs an inline throwaway local database, or it targets whatever DATABASE_URL the shell or dotenv file provides (Neon or production). ' +
         'Prefix the command: DATABASE_URL=postgresql://localhost:5432/<throwaway_db> npx drizzle-kit push --force. ' +
         'The production schema change goes through the replit-deploy skill, not from here.'];
@@ -88,23 +91,23 @@ function check(raw) {
   // 1. Non-GET curl against /api/admin/ on production (or a host held in a variable).
   for (const m of cmd.matchAll(CURL_COMMAND)) {
     const raw1 = segment(cmd, m.index + m[0].length, m[2] ? null : m[1]);
-    const seg = expandVars(raw1, cmd);
+    const seg = expandVars(raw1, cmd.slice(0, m.index));
     const explicit = seg.match(ANY_METHOD);
-    const method = (seg.match(WRITE_METHOD) || [])[1] || (seg.match(WRITE_METHOD) || [])[2]
+    const write = seg.match(WRITE_METHOD);
+    const method = write?.[1] || write?.[2] || explicit?.[1] || explicit?.[2]
       || (!explicit && !/(?:^|\s)-G\b/.test(seg) && DATA_FLAG.test(seg) ? 'POST' : null);
-    if (!method || !ADMIN.test(seg)) continue;
-    const hosts = [...seg.matchAll(ADMIN_TARGET)].map((m) => m[1]);
-    if (hosts.length && hosts.every((h) => LOCAL_URL.test(h))) continue;
-    if (!HAS_AUTH.test(seg)) continue;
+    if (!method || method.toUpperCase() === 'GET' || !ADMIN.test(seg)) continue;
+    // Authentication may be attached (-b"$JAR"), configured, or otherwise unparsed; it never exempts a write.
+    const hosts = [...raw1.matchAll(ADMIN_TARGET)].map((m) => m[1]);
+    if (!/[$`]/.test(raw1) && hosts.length && hosts.every((h) => LOCAL_URL.test(h))) continue;
     const paths = seg.match(/\/api\/admin\/[^\s'"?]*/g);
     if (paths.every((x) => ROUTINE.test(x))) continue;
-    // A create whose body carries the QA title prefix makes a row qa-rows can delete (owner, 2026-11-16).
-    if (method.toUpperCase() === 'POST' && bodyArgs(seg).includes('[QA-')) continue;
     const path = paths.find((x) => !ROUTINE.test(x)).replace(/\d{3,}|user_\w+/g, ':id');
     const unresolved = /https?:\/\/\$/.test(seg) || /(?:^|\s)\$\w+\/api/.test(seg);
     return ['ask', `Production admin write: ${method.toUpperCase()} ${path}${unresolved ? ' (host is an unresolved variable, treated as production)' : ''}. ` +
-      'Confirm the target is a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. /api/admin/qa-rows, POST /api/admin/database-backups and a POST whose body carries the [QA- title prefix are exempt. An unattended lane logs this ask as a pending row and continues with other work.'];
+      'Confirm the target is a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. /api/admin/qa-rows and /api/admin/database-backups are exempt. An unattended lane logs this ask as a pending row and continues with other work.'];
   }
+  if (HEREDOC.test(cmd)) return ['ask', 'Command contains a heredoc or here-string whose contents may execute. Confirm the complete command and its input do not write production data.'];
   return null;
 }
 
