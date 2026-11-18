@@ -135,6 +135,9 @@ function check(raw) {
   let unrecognizedPush = rest;
   for (let m; (m = pushRe.exec(masked)); ) {
     const prefix = rest.slice(m.index, m.index + m[0].length);
+    if (!/^(?:\s*|[;&|(]\s*)DATABASE_URL=/.test(prefix)) {
+      return ['deny', 'Schema commands must run directly with a leading inline DATABASE_URL; sudo, env, shell wrappers and indirect prefixes are not local exemptions.'];
+    }
     const assignments = [...prefix.matchAll(/(?:^|[\s;&|(])([A-Za-z_]\w*)=/g)];
     if (assignments.some((entry) => entry[1] !== 'DATABASE_URL')) {
       return ['deny', 'Schema commands allow only an inline DATABASE_URL assignment; dotenv, config-path, loader and other environment overrides require review.'];
