@@ -407,6 +407,7 @@ export default function TaxonomyListing({ level }: Props) {
   const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pendingResultsFocusRef = useRef(false);
+  const pendingPageScrollRef = useRef<number | null>(null);
   const offlineRouteRef = useRef<string | null>(null);
   const pendingAnalyticsRef = useRef<{
     signature: string;
@@ -532,6 +533,13 @@ export default function TaxonomyListing({ level }: Props) {
     urlSyncInitialized.current = true;
     syncedRoute.current = hydratedRoute;
     pushSnapshot.current = snapshot;
+    const scrollToPage = pendingPageScrollRef.current;
+    pendingPageScrollRef.current = null;
+    if (!fromUrl && scrollToPage === page) {
+      // Push before scrolling so nav-history saves the outgoing offset even
+      // when reduced motion makes the scroll to the new results instant.
+      resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    }
   }, [hydratedRoute, level, location, page, paginationReady, slug, snapshot, stateHref, totalPages]);
 
   // An empty tile is a dead end: a subcategory with no approved resources, or
@@ -707,11 +715,9 @@ export default function TaxonomyListing({ level }: Props) {
     requestResultsFocus();
   };
   const onPage = (nextPage: number) => {
+    pendingPageScrollRef.current = nextPage;
     setPage(nextPage);
     requestResultsFocus();
-    // The header, filters and child tiles above the results don't change with
-    // the page, so the top of the window would show none of the new cards.
-    resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
   };
   const makeHref = (nextPage: number) => {
     const next = new URLSearchParams(window.location.search);
