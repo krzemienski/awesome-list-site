@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 // PreToolUse(Bash) guard for production writes. Reads the hook JSON on stdin.
 // Prints a permissionDecision ("ask" or "deny"); prints nothing to pass. Fails open on any error.
-const ADMIN = /\/api\/admin\//;
-const ROUTINE = /^\/api\/admin\/(?:qa-rows(?:[/?]|$)|database-backups\/?(?:\?|$))/;
+const ADMIN = /^\/api\/admin(?:\/|$)/i;
+const QA_DELETE = /^\/api\/admin\/qa-rows\/(?:resources|resource_edits|bookmark_collections)\/[1-9]\d*\/?$/;
 // A local target is decided by the URL host only, so a query string or path that says "localhost" does not count.
 const LOCAL_URL = /^(?:\w+:\/\/)?(?:[^@/]*@)?(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(?::\d+)?(?:[/?]|$)/;
-const ADMIN_TARGET = /((?:\w+:\/\/)?[^\s'"/]*)\/api\/admin\//g;
 const HEREDOC = /<</;
 const COMMAND_PREFIX = String.raw`[ \t]*(?:(?:sudo|env|time|command|\w+=[^\s;&|()]*)[ \t]+)*`;
 const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|while|until)\s)${COMMAND_PREFIX}`;
-// Only curl treats shell-string quotes as boundaries and accepts an executable path.
+// Recognize quoted commands, executable paths, and commands inside shell strings.
 const CURL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?curl\b(\1)?`, 'g');
-const WRITE_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?(POST|PUT|PATCH|DELETE)\b|--request[\s=]+['"]?(POST|PUT|PATCH|DELETE)\b/i;
-const ANY_METHOD = /(?:^|\s)-[A-Za-z]*X\s*=?\s*['"]?([A-Z]+)|--request[\s=]+['"]?([A-Z]+)/i;
-const DATA_FLAG = /(?:^|\s)(?:-d|--data(?:-raw|-binary|-urlencode|-ascii)?|--json|-F|--form|-T|--upload-file)(?:[\s=]|$)/;
+const SHELL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?(?:sh|bash|zsh|dash|ash|ksh|fish|eval)\b(\1)?`, 'g');
 const REMOTE_DANGER = /db:push|drizzle-kit|\bDROP\s|\bTRUNCATE\b|\bDELETE\s+FROM\b|\brm\s+-[A-Za-z]*(?:rf|fr)\b/i;
 
 // Text of one shell segment, ending at an unquoted separator or its enclosing shell-string quote.
@@ -37,11 +34,57 @@ const segmentsAfter = (cmd, word) => {
   return out;
 };
 
-// Substitute NAME=value assignments seen earlier in the command so $B/api/... resolves.
-function expandVars(seg, cmd) {
-  const vars = {};
-  for (const m of cmd.matchAll(/(?:^|[;&\s])(\w+)=(["']?)([^\s"';&|]+)\2/g)) vars[m[1]] = m[3];
-  return seg.replace(/\$\{?(\w+)\}?/g, (all, n) => vars[n] ?? all);
+// Only a small, literal curl grammar earns an exemption. Everything ambiguous asks.
+function curlRequest(text) {
+  if (/`|\$\(/.test(text)) return null;
+  const args = [];
+  let word = '', quote = null, started = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '\\' && quote !== "'") return null;
+    if (quote) { if (c === quote) quote = null; else word += c; }
+    else if (c === '"' || c === "'") { quote = c; started = true; }
+    else if (/\s/.test(c)) {
+      if (started) { args.push(word); word = ''; started = false; }
+    } else {
+      if (';&|<>(){}[]*?$`#'.includes(c)) return null;
+      word += c;
+      started = true;
+    }
+  }
+  if (quote) return null;
+  if (started) args.push(word);
+
+  let method = null, data = false;
+  const targets = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (/^-[sSf]+$/.test(arg) || ['-q', '--disable', '--silent', '--show-error', '--fail', '--compressed'].includes(arg)) continue;
+    if (arg === '-X' || arg === '--request' || arg === '-I' || arg === '--head') {
+      if (method) return null;
+      method = arg === '-I' || arg === '--head' ? 'HEAD' : args[++i];
+      if (!/^(GET|HEAD|OPTIONS|POST|PUT|PATCH|DELETE)$/.test(method ?? '')) return null;
+    } else if (['-H', '--header', '-b', '--cookie', '-A', '--user-agent', '-o', '--output'].includes(arg)) {
+      if (++i >= args.length) return null;
+    } else if (['-d', '--data', '--data-raw', '--data-binary', '--data-urlencode', '--data-ascii', '--json'].includes(arg)) {
+      if (++i >= args.length) return null;
+      data = true;
+    } else if (arg === '--url') {
+      if (++i >= args.length) return null;
+      targets.push(args[i]);
+    } else if (arg.startsWith('-')) return null;
+    else targets.push(arg);
+  }
+  if (!targets.length) return null;
+  try {
+    const urls = targets.map((target) => {
+      if (/[$`\\]/.test(target)) throw new Error('Dynamic curl target');
+      const url = new URL(target.includes('://') ? target : `http://${target}`);
+      if (!/^https?:$/.test(url.protocol) || url.pathname.includes('%')) throw new Error('Ambiguous curl target');
+      return url;
+    });
+    return { method: method ?? (data ? 'POST' : 'GET'), urls };
+  } catch { return null; }
 }
 
 function isLocalDatabaseUrl(value) {
@@ -75,6 +118,13 @@ function check(raw) {
   // 2. Local drizzle-kit push / db:push must carry an inline local DATABASE_URL.
   let rest = cmd;
   for (const s of sshSegs) rest = rest.replace(s, ' ');
+  // Quoted wrapper bodies disappear under mask(); never let them hide a schema push.
+  for (const m of rest.matchAll(SHELL_COMMAND)) {
+    const body = segment(rest, m.index + m[0].length, m[2] ? null : m[1]);
+    if (/db:push|\bdrizzle-kit\b/i.test(body)) {
+      return ['deny', 'A shell wrapper contains db:push or drizzle-kit. Run the schema command directly with an inline throwaway local DATABASE_URL so the guard can inspect it.'];
+    }
+  }
   const masked = mask(rest);
   const pushRe = new RegExp(BOUNDARY + '((?:(?:\\S*\\/)?npx\\s+)?(?:\\S*\\/)?drizzle-kit\\s+push|(?:\\S*\\/)?npm\\s+run\\s+db:push)\\b', 'g');
   for (let m; (m = pushRe.exec(masked)); ) {
@@ -88,24 +138,22 @@ function check(raw) {
     }
   }
 
-  // 1. Non-GET curl against /api/admin/ on production (or a host held in a variable).
+  // 1. All nonlocal admin curl requests ask, except exact routine method/path pairs.
   for (const m of cmd.matchAll(CURL_COMMAND)) {
-    const raw1 = segment(cmd, m.index + m[0].length, m[2] ? null : m[1]);
-    const seg = expandVars(raw1, cmd.slice(0, m.index));
-    const explicit = seg.match(ANY_METHOD);
-    const write = seg.match(WRITE_METHOD);
-    const method = write?.[1] || write?.[2] || explicit?.[1] || explicit?.[2]
-      || (!explicit && !/(?:^|\s)-G\b/.test(seg) && DATA_FLAG.test(seg) ? 'POST' : null);
-    if (!method || method.toUpperCase() === 'GET' || !ADMIN.test(seg)) continue;
-    // Authentication may be attached (-b"$JAR"), configured, or otherwise unparsed; it never exempts a write.
-    const hosts = [...raw1.matchAll(ADMIN_TARGET)].map((m) => m[1]);
-    if (!/[$`]/.test(raw1) && hosts.length && hosts.every((h) => LOCAL_URL.test(h))) continue;
-    const paths = seg.match(/\/api\/admin\/[^\s'"?]*/g);
-    if (paths.every((x) => ROUTINE.test(x))) continue;
-    const path = paths.find((x) => !ROUTINE.test(x)).replace(/\d{3,}|user_\w+/g, ':id');
-    const unresolved = /https?:\/\/\$/.test(seg) || /(?:^|\s)\$\w+\/api/.test(seg);
-    return ['ask', `Production admin write: ${method.toUpperCase()} ${path}${unresolved ? ' (host is an unresolved variable, treated as production)' : ''}. ` +
-      'Confirm the target is a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. /api/admin/qa-rows and /api/admin/database-backups are exempt. An unattended lane logs this ask as a pending row and continues with other work.'];
+    const request = curlRequest(segment(cmd, m.index + m[0].length, m[2] ? null : m[1]));
+    if (request) {
+      if (!request.urls.some((url) => ADMIN.test(url.pathname))) continue;
+      if (request.urls.every((url) => LOCAL_URL.test(url.href))) continue;
+      const pathname = request.urls[0].pathname;
+      const routine = (request.method === 'GET' && ['/api/admin/qa-rows', '/api/admin/qa-rows/'].includes(pathname))
+        || (['GET', 'POST'].includes(request.method) && ['/api/admin/database-backups', '/api/admin/database-backups/'].includes(pathname))
+        || (request.method === 'DELETE' && QA_DELETE.test(pathname));
+      if (request.urls.length === 1 && routine) continue;
+    }
+    return ['ask', 'Nonlocal admin curl, or a curl command whose target/options cannot be safely parsed, requires approval. ' +
+      'Confirm the target and method concern a [QA-qa-audit-<RUN_ID>] row or an audit account, never owner data. ' +
+      'Only exact GET qa-rows, DELETE qa-rows/<allowed-table>/<positive-id>, and GET/POST database-backups routes are routine exemptions. ' +
+      'Unparsed options, attached options and unresolved variables never earn an exemption. An unattended lane records this ask as a pending row and continues with other work.'];
   }
   if (HEREDOC.test(cmd)) return ['ask', 'Command contains a heredoc or here-string whose contents may execute. Confirm the complete command and its input do not write production data.'];
   return null;
