@@ -39,8 +39,7 @@ function curlRequest(text) {
   if (/`|\$\(/.test(text)) return null;
   const args = [];
   let word = '', quote = null, started = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
+  for (const c of text) {
     if (c === '\\' && quote !== "'") return null;
     if (quote) { if (c === quote) quote = null; else word += c; }
     else if (c === '"' || c === "'") { quote = c; started = true; }
