@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // PreToolUse(Bash) guard for production writes. Reads the hook JSON on stdin.
-// Prints a permissionDecision ("ask" or "deny"); prints nothing to pass. Fails open on any error.
+// Prints a permissionDecision ("ask" or "deny"); prints nothing to pass. Denies invalid input or inspection errors.
 const ADMIN = /^\/api\/admin(?:\/|$)/i;
 const QA_DELETE = /^\/api\/admin\/qa-rows\/(?:resources|resource_edits|bookmark_collections)\/[1-9]\d*\/?$/;
 // A local target is decided by the URL host only, so a query string or path that says "localhost" does not count.
@@ -11,7 +11,7 @@ const BOUNDARY = String.raw`(?:^|[;&|(\n\`{!]|\$\(|\b(?:do|then|else|if|elif|whi
 // Recognize quoted commands, executable paths, and commands inside shell strings.
 const CURL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?curl\b(\1)?`, 'g');
 const SHELL_COMMAND = new RegExp(String.raw`(?:${BOUNDARY}|(["'])${COMMAND_PREFIX})(?:[^\s'";&|()]*\/)?(?:sh|bash|zsh|dash|ash|ksh|fish|eval)\b(\1)?`, 'g');
-const REMOTE_DANGER = /db:push|drizzle-kit|\bDROP\s|\bTRUNCATE\b|\bDELETE\s+FROM\b|\brm\s+-[A-Za-z]*(?:rf|fr)\b/i;
+const REMOTE_DANGER = /db:push|drizzle-kit|\bDROP\s|\bTRUNCATE\b|\bDELETE\s+FROM\b|\brm\s+-[A-Za-z]*r[A-Za-z]*\b|\bgit\s+reset\s+--hard\b/i;
 
 // Text of one shell segment, ending at an unquoted separator or its enclosing shell-string quote.
 function segment(cmd, from, endQuote) {
@@ -77,7 +77,8 @@ function curlRequest(text) {
   if (!targets.length) return null;
   try {
     const urls = targets.map((target) => {
-      const absolute = target.includes('://') ? target : `http://${target}`;
+      const absolute = target.startsWith('//') ? `http:${target}`
+        : target.includes('://') ? target : `http://${target}`;
       // Curl expands quoted globs too; only a literal IPv6 host may contain brackets.
       const withoutIpv6Host = absolute.replace(/^(https?:\/\/(?:[^@/?#]*@)?)\[[a-f0-9:.]+\](?=[:/?#]|$)/i, '$1');
       if (/[$`\\{}*]/.test(target) || withoutIpv6Host.includes('[') || withoutIpv6Host.includes(']')) throw new Error('Dynamic curl target');
@@ -183,8 +184,14 @@ process.stdin.on('data', (d) => (input += d));
 process.stdin.on('end', () => {
   try {
     const p = JSON.parse(input);
-    if (p.tool_name && p.tool_name !== 'Bash') return;
-    const r = check(String(p.tool_input?.command ?? ''));
+    if (typeof p?.tool_name === 'string' && p.tool_name && p.tool_name !== 'Bash') return;
+    if (typeof p?.tool_input?.command !== 'string') {
+      decide('deny', 'Bash hook input must include a string tool_input.command so the production write guard can inspect it.');
+      return;
+    }
+    const r = check(p.tool_input.command);
     if (r) decide(...r);
-  } catch { /* fail open */ }
+  } catch {
+    decide('deny', 'The production write guard could not parse or inspect the hook input; an unchecked command cannot run.');
+  }
 });
