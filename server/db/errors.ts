@@ -1,4 +1,5 @@
 import { DrizzleQueryError } from "drizzle-orm/errors";
+import nodePostgres from "pg";
 import { AppError, ServiceUnavailableError } from "../middleware/errors";
 import { causeChain, findPgError } from "../errors/pgErrors";
 import type { Logger } from "../lib/logger";
@@ -46,6 +47,16 @@ const CONNECTION_FAILURE_PHRASES = [
 const isTransientCode = (code: string) => code.startsWith("08") || TRANSIENT_SQLSTATES.has(code);
 const isConfigFatal = (code: string) => code.startsWith("28") || code === "3D000";
 
+// Match stack frames, not the first line: an error message can contain arbitrary input.
+// Drizzle transaction frames alone are not provenance: their callback can fail on fetch.
+const DATABASE_DRIVER_FRAME = /^[ \t]+at .*[/\\]node_modules[/\\]pg(?:-(?:pool|protocol|native))?[/\\]/m;
+const DATABASE_CONNECTION_MESSAGES = [
+  /^(?:readiness )?pool acquisition timeout\b/i,
+  /^(?:database|postgres(?:ql)?|node-postgres|pg(?:-pool)?|pool) (?:connection|connect|query|acquisition|error)\b/i,
+  /^(?:failed|unable) to connect to (?:the )?(?:database|postgres(?:ql)?)\b/i,
+  /^(?:pg_dump(?:all)?|pg_restore|psql)\b/i,
+];
+
 /** The first string or numeric `code` on the error or any of its causes. */
 export function databaseErrorCode(error: unknown): string {
   for (const link of causeChain(error)) {
@@ -64,17 +75,27 @@ export function isDatabaseUnavailableError(error: unknown): boolean {
   const pg = findPgError(error);
   if (pg) return (pg.severity === "FATAL" && !isConfigFatal(pg.code)) || isTransientCode(pg.code);
   if (isTransientCode(databaseErrorCode(error))) return true;
-  // No server answer: read every error in the chain except Drizzle's wrapper,
-  // whose message embeds the query's params ("Fix RTMP connection timeout").
-  const text = causeChain(error)
-    .filter((e) => !(e instanceof DrizzleQueryError))
-    .map((e) => {
-      const { code, message } = (e ?? {}) as { code?: unknown; message?: unknown };
-      return `${typeof code === "string" ? code : ""} ${typeof message === "string" ? message : ""}`;
-    })
-    .join(" ")
-    .toLowerCase();
-  return CONNECTION_FAILURE_PHRASES.some((phrase) => text.includes(phrase));
+  // Socket errors also come from fetch and other upstream services. Only inspect
+  // connection failures at or below a database source; never read Drizzle's SQL/params.
+  let databaseSource = false;
+  for (const link of causeChain(error)) {
+    if (link instanceof DrizzleQueryError) {
+      databaseSource = true;
+      continue;
+    }
+    const { code, message, stack, client } = (link ?? {}) as {
+      code?: unknown; message?: unknown; stack?: unknown; client?: unknown;
+    };
+    const text = typeof message === "string" ? message : "";
+    // pg-pool attaches its client to idle socket errors, whose stack may be Node-only.
+    databaseSource ||= client instanceof nodePostgres.Client
+      || DATABASE_CONNECTION_MESSAGES.some((pattern) => pattern.test(text))
+      || (typeof stack === "string" && DATABASE_DRIVER_FRAME.test(stack));
+    if (!databaseSource) continue;
+    const failure = `${typeof code === "string" ? code : ""} ${text}`.toLowerCase();
+    if (CONNECTION_FAILURE_PHRASES.some((phrase) => failure.includes(phrase))) return true;
+  }
+  return false;
 }
 
 /**

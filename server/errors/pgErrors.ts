@@ -83,12 +83,14 @@ export function isUniqueViolation(error: unknown, constraintIncludes?: string): 
 }
 
 /**
- * `error.message`, without the value a data exception (SQLSTATE class 22) echoes back:
+ * The PostgreSQL cause's message, without the value a data exception (SQLSTATE class 22) echoes back:
  * `invalid input syntax for type integer: "visitor-typed text"`. That value is a bound
- * parameter, so a log line must not carry it. Other messages are returned unchanged.
+ * parameter, so a log line must not carry it or Drizzle's SQL/params wrapper.
+ * Non-class-22 messages are returned unchanged.
  */
 export function messageWithoutEchoedValue(error: Error): string {
-  return isPgDatabaseError(error) && error.code.startsWith("22")
-    ? error.message.replace(/"(?:[^"]|"")*"/g, '"[value]"')
+  const pg = findPgError(error);
+  return pg?.code.startsWith("22")
+    ? pg.message.replace(/"(?:[^"]|"")*"/g, '"[value]"')
     : error.message;
 }
