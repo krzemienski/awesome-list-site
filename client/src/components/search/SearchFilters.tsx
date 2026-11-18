@@ -167,11 +167,12 @@ export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevan
     chips.push({ key: "sort", value: state.sort, text: `Unsupported sort: ${state.sort}` });
   }
   state.tags.forEach(tag => chips.push({ key: "tags", value: tag, text: `Tag: ${tagLabel(tag)}` }));
-  if (!chips.length) return null;
   // At phone widths "Clear all" always takes its own row: a category chip that
   // swaps its slug for the resolved name changes width, and "Clear all" used to
   // wrap (or not) with it, shifting everything below the row.
-  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<div className="max-sm:basis-full"><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
+  // Keep the first chip from mounting a new row and pushing the results down.
+  // Phone height is chip + gap + the separate Clear all row; wider is one chip row.
+  return <div className="flex min-h-11 flex-wrap items-center gap-2 max-sm:min-h-24" data-testid="active-filter-chips">{chips.length > 0 && <>{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<div className="max-sm:basis-full"><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></>}</div>;
 }
 
 export const sortLabels = RESOURCE_SEARCH_SORT_LABELS as Record<string, string>;
