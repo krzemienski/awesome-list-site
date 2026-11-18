@@ -48,7 +48,7 @@ import { createInterface } from "node:readline";
 import pg from "pg";
 import { DB_CONNECT_TIMEOUT_MS } from "../db/connect-timeout";
 import { createLogger } from "../lib/logger";
-import { databaseFailureLevel } from "../db/errors";
+import { databaseFailureLevel, markDatabaseOperationError } from "../db/errors";
 import {
   isPrivateStorageConfigured,
   PrivateStorageError,
@@ -298,11 +298,15 @@ async function withClient<T>(connectionString: string, fn: (client: pg.Client) =
   try {
     await client.connect();
   } catch (error) {
+    markDatabaseOperationError(error);
     // The cause keeps the SQLSTATE or errno, so a refused or dropped connect is classified as transient.
     throw new DatabaseBackupError(`Could not connect to the database: ${redact((error as Error).message)}`, 503, { cause: error });
   }
   try {
     return await fn(client);
+  } catch (error) {
+    markDatabaseOperationError(error);
+    throw error;
   } finally {
     await client.end().catch(() => undefined);
   }

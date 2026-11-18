@@ -10,7 +10,7 @@ import {
   recordPoolError,
   recordPoolSnapshot,
 } from '../ops/operationalTelemetry';
-import { isDatabaseUnavailableError, logDatabaseError } from './errors';
+import { isDatabaseUnavailableError, logDatabaseError, markDatabaseOperationError } from './errors';
 import { markRequestDatabaseUnavailable, startRequestDatabaseOperation } from '../ops/requestContext';
 import type { RequestDatabaseOperation } from '../ops/requestContext';
 import { noteDatabaseReachable, noteDatabaseUnreachable } from './outage';
@@ -64,6 +64,7 @@ const pool = new Pool({
 // query opens a fresh one, so it logs at warn. Anything else stays an error.
 pool.on('error', (err) => {
   recordPoolError();
+  markDatabaseOperationError(err);
   logDatabaseError(logger, 'Database pool error:', err);
 });
 
@@ -79,6 +80,7 @@ function markTransientRequestFailure(
   followsFailure = false,
   requestOperation?: RequestDatabaseOperation,
 ): void {
+  markDatabaseOperationError(error);
   if (!isDatabaseUnavailableError(error)) return;
   if (requestOperation) requestOperation.markUnavailable();
   else markRequestDatabaseUnavailable();
@@ -106,6 +108,7 @@ pool.on('connect', (client: any) => {
   // request learns of the failure from its own query rejection (finish() below).
   client.on('error', (err: unknown) => {
     recordPoolError();
+    markDatabaseOperationError(err);
     // A query running on this client rejects through its own path and is reported there.
     logDatabaseError(logger, 'Database client error:', err);
   });
