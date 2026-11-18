@@ -324,7 +324,7 @@ export function mergeContractPaths(
   };
   // Existing paths win: layer base paths on top of generated ones.
   for (const [p, methods] of Object.entries((base.paths ?? {}) as Record<string, object>)) {
-    merged.paths[p] = { ...(merged.paths[p] ?? {}), ...(methods as object) };
+    merged.paths[p] = { ...(merged.paths[p] ?? {}), ...methods };
   }
   return merged;
 }
