@@ -135,6 +135,10 @@ function check(raw) {
   let unrecognizedPush = rest;
   for (let m; (m = pushRe.exec(masked)); ) {
     const prefix = rest.slice(m.index, m.index + m[0].length);
+    const assignments = [...prefix.matchAll(/(?:^|[\s;&|(])([A-Za-z_]\w*)=/g)];
+    if (assignments.some((entry) => entry[1] !== 'DATABASE_URL')) {
+      return ['deny', 'Schema commands allow only an inline DATABASE_URL assignment; dotenv, config-path, loader and other environment overrides require review.'];
+    }
     const assignment = [...masked.slice(m.index, m.index + m[0].length).matchAll(/(?:^|[\s;&|(])DATABASE_URL=/g)].pop();
     const url = assignment && prefix.slice(assignment.index + assignment[0].length).match(/^(["']?)(\S+?)\1(?:\s|$)/);
     if (!url || /[\\$`]/.test(prefix) || !isLocalDatabaseUrl(url[2])) {
