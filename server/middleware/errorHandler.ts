@@ -29,7 +29,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
-import { AppError, ValidationError } from "./errors";
+import { AppError, ServiceUnavailableError, ValidationError } from "./errors";
 import { ZodError } from "zod";
 import { databaseErrorCode, isDatabaseUnavailableError } from "../db/errors";
 import {
@@ -137,6 +137,9 @@ export function errorHandler(
 
   // Handle AppError instances (operational errors)
   if (err instanceof AppError) {
+    if (err instanceof ServiceUnavailableError) {
+      res.setHeader("Retry-After", "1");
+    }
     const body = {
       message: err.message,
       ...(err instanceof ValidationError && err.errors
