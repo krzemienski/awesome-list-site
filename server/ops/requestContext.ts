@@ -6,6 +6,7 @@ import { markRequestServed } from "./serviceActivity";
 
 type OperationalRequestState = {
   kind: "request";
+  closed: boolean;
   databaseUnavailable: boolean;
   /** At least one query of this request completed. */
   databaseReached: boolean;
@@ -34,15 +35,16 @@ export function markRequestDatabaseUnavailable(): void {
   if (state) state.databaseUnavailable = true;
 }
 
-/** True inside an HTTP request, whose database outcome is noted once when it ends (not per query). */
+/** True inside a live HTTP request, whose database outcome is noted once when it ends (not per query). */
 export function isInsideRequest(): boolean {
-  return requestContext.getStore()?.kind === "request";
+  const state = requestContext.getStore();
+  return state?.kind === "request" && !state.closed;
 }
 
-/** Records a completed query against the current request. False outside one: the caller notes it itself. */
+/** Records a completed query against the current live request. Otherwise the caller notes it itself. */
 export function markRequestDatabaseReached(): boolean {
   const state = requestContext.getStore();
-  if (state?.kind !== "request") return false;
+  if (state?.kind !== "request" || state.closed) return false;
   state.databaseReached = true;
   return true;
 }
@@ -83,6 +85,7 @@ export function operationalRequestContext(
   res.locals.requestId = id;
   const state: OperationalRequestState = {
     kind: "request",
+    closed: false,
     databaseUnavailable: false,
     databaseReached: false,
     id,
@@ -93,6 +96,7 @@ export function operationalRequestContext(
   // unavailable, a success if it ran queries and saw none. A listing runs several queries and a
   // readiness probe five, so counting queries would let one healthy request close an episode.
   res.once("close", () => {
+    state.closed = true;
     if (state.databaseUnavailable) noteDatabaseUnreachable();
     else if (state.databaseReached) noteDatabaseReachable();
   });
