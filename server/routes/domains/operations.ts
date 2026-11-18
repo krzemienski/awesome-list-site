@@ -94,6 +94,12 @@ export function registerOperationsRoutes(
     isAdmin,
     asyncHandler(async (_req, res) => {
       const readiness = await checkReadiness();
+      // Shared/cached transient results belong to every consumer, including
+      // an admin diagnostic whose Clerk lookup succeeded before the await.
+      if (readiness.transient) {
+        res.locals.databaseUnavailable = true;
+        markRequestDatabaseUnavailable();
+      }
       res.set("Cache-Control", "no-store");
       res.json({
         status: readiness.ready ? "ready" : "degraded",
