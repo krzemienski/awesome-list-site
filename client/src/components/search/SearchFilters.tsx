@@ -24,6 +24,8 @@ type Props = {
   otherControls: string[];
   /** Fires when the mobile Filters sheet opens or closes. */
   onSheetOpenChange?: (open: boolean) => void;
+  /** Search places its active chips in this component's existing rows. */
+  showActiveFilters?: boolean;
 };
 
 /**
@@ -94,7 +96,7 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
   </FacetGroup>;
 }
 
-export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls, onSheetOpenChange }: Props) {
+export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls, onSheetOpenChange, showActiveFilters = false }: Props) {
   const tagSearchId = useId();
   const [open, setOpenState] = useState(false);
   const setOpen = (next: boolean) => { setOpenState(next); onSheetOpenChange?.(next); };
@@ -155,11 +157,22 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     </FacetGroup>}
   </div>;
   };
-  return <><aside className="hidden w-64 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 lg:block">{content(true)}</aside>
-    <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button ref={triggerRef} variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="flex w-[min(90vw,360px)] flex-col gap-0 overflow-hidden p-0" onCloseAutoFocus={e => { e.preventDefault(); triggerRef.current?.focus(); }}><SheetHeader className="shrink-0 px-6 pt-6"><SheetTitle>Filters</SheetTitle><SheetDescription data-testid="text-active-filter-count" aria-live="polite">{activeCount === 0 ? "No filters applied." : `${activeCount} ${activeCount === 1 ? "filter" : "filters"} applied.`}</SheetDescription></SheetHeader><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6 pt-5">{content(false)}</div><div className="shrink-0 border-t border-[var(--border)] bg-background px-6 py-3"><Button className="min-h-11 w-full" onClick={() => setOpen(false)} data-testid="button-close-filters">Done</Button></div></SheetContent></Sheet></div></>;
+  return <>
+    <aside className="hidden w-64 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 lg:block">
+      {showActiveFilters && <ActiveFilters state={state} onChange={onChange} onClear={onClear} />}
+      {content(true)}
+    </aside>
+    <div className="flex items-center gap-2 lg:hidden">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild><Button ref={triggerRef} variant="outline" className="min-h-11 shrink-0 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger>
+        <SheetContent side="left" className="flex w-[min(90vw,360px)] flex-col gap-0 overflow-hidden p-0" onCloseAutoFocus={e => { e.preventDefault(); triggerRef.current?.focus(); }}><SheetHeader className="shrink-0 px-6 pt-6"><SheetTitle>Filters</SheetTitle><SheetDescription data-testid="text-active-filter-count" aria-live="polite">{activeCount === 0 ? "No filters applied." : `${activeCount} ${activeCount === 1 ? "filter" : "filters"} applied.`}</SheetDescription></SheetHeader><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6 pt-5">{content(false)}</div><div className="shrink-0 border-t border-[var(--border)] bg-background px-6 py-3"><Button className="min-h-11 w-full" onClick={() => setOpen(false)} data-testid="button-close-filters">Done</Button></div></SheetContent>
+      </Sheet>
+      {showActiveFilters && <ActiveFilters compact state={state} onChange={onChange} onClear={onClear} />}
+    </div>
+  </>;
 }
 
-export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevance" }: { state: FilterState; onChange: (key: keyof FilterState, value: string | string[]) => void; onClear: () => void; defaultSort?: string }) {
+export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevance", compact = false }: { state: FilterState; onChange: (key: keyof FilterState, value: string | string[]) => void; onClear: () => void; defaultSort?: string; compact?: boolean }) {
   const chips: { key: keyof FilterState; value: string; text: string }[] = [];
   const chipLabels: Partial<Record<keyof FilterState, Record<string, string>>> = { provider: RESOURCE_PROVIDER_LABELS, format: RESOURCE_FORMAT_LABELS, skillLevel: RESOURCE_SKILL_LEVEL_LABELS };
   (["category", "subcategory", "subSubcategory", "provider", "format", "skillLevel"] as const).forEach(key => { if (state[key]) { const value = state[key] as string; chips.push({ key, value, text: `${fieldLabel(key)}: ${chipLabels[key]?.[value] ?? label(value)}` }); } });
@@ -168,10 +181,11 @@ export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevan
   }
   state.tags.forEach(tag => chips.push({ key: "tags", value: tag, text: `Tag: ${tagLabel(tag)}` }));
   if (!chips.length) return null;
-  // At phone widths "Clear all" always takes its own row: a category chip that
-  // swaps its slug for the resolved name changes width, and "Clear all" used to
-  // wrap (or not) with it, shifting everything below the row.
-  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<div className="max-sm:basis-full"><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
+  // Compact chips share Search's existing filter row and wrap (no hidden
+  // scroll); a long chip truncates (full text in title and accessible name)
+  // so it and "Clear all" stay on screen. The default layout is used by
+  // Search's desktop sidebar, its too-long-query state, and taxonomy pages.
+  return <div className={cn("flex items-center gap-2", compact ? "min-w-0 flex-1" : "mb-4", (!compact || chips.length > 1) && "flex-wrap")} data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} title={chip.text} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className={cn("btn ghost search-filter-chip max-w-full", compact && "min-w-0")} aria-label={`Remove ${chip.text}`}><span className="truncate">{chip.text}</span><X className="h-3.5 w-3.5 shrink-0" /></button>)}<div className={compact ? "shrink-0" : "max-sm:basis-full"}><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
 }
 
 export const sortLabels = RESOURCE_SEARCH_SORT_LABELS as Record<string, string>;
