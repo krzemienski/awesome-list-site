@@ -394,7 +394,11 @@ export function renderTaxonomyContent(opts: {
   const relatedLinks: LinkItem[] = (opts.relatedLinks ?? []).map((item) => ({
     href: internalHref(item.href),
     label: item.name,
-    meta: typeof item.count === "number" ? `${count(item.count)} resources` : undefined,
+    // Tag counts come from the current page's resources only; category counts
+    // are tag-wide facets.
+    meta: typeof item.count === "number"
+      ? `${count(item.count)} resources${opts.introKind === "tag-intro" && item.href.startsWith("/tag/") ? " on this page" : ""}`
+      : undefined,
   }));
 
   // BUG-001/004/010: paginate the resource list so ?page=N returns a distinct
