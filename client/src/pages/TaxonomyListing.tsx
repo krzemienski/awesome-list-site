@@ -66,6 +66,8 @@ function acceptedSort(value: string): string | null {
 const parseSort = (raw: string | null) => (raw ? acceptedSort(raw) ?? raw : "default");
 
 interface TaxonomyFilterSnapshot {
+  /** Normalized search text, so an intended state is matched against the settled one. */
+  search: string;
   tags: string[];
   provider: string;
   format: string;
@@ -77,6 +79,7 @@ interface TaxonomyFilterSnapshot {
 
 function taxonomyFilterSignature(next: TaxonomyFilterSnapshot) {
   return JSON.stringify([
+    next.search,
     next.selection,
     next.tags.map(normalizeTag).sort(),
     next.provider,
@@ -416,7 +419,7 @@ export default function TaxonomyListing({ level }: Props) {
     kind: "filter" | "sort" | "tag";
     tagAction?: "apply" | "remove";
   } | null>(null);
-  const currentFilterState = { tags, provider, format, skillLevel, sort, selection, kind };
+  const currentFilterState = { search: normalizedSearch, tags, provider, format, skillLevel, sort, selection, kind };
   const currentFilterSignature = taxonomyFilterSignature(currentFilterState);
   const resultSetKey = (forPage: number) => JSON.stringify([currentFilterSignature, searchTerm, view, forPage]);
   const currentResultSet = resultSetKey(page);
@@ -474,14 +477,16 @@ export default function TaxonomyListing({ level }: Props) {
 
   useEffect(() => {
     const pending = pendingAnalyticsRef.current;
-    if (!pending || !taxonomySearch.data || taxonomySearch.isPlaceholderData) return;
+    // paginationReady = search settled and the displayed total is not a placeholder,
+    // for both the filtered (taxonomySearch) and unfiltered (listing) sources.
+    if (!pending || !paginationReady) return;
     if (pending.signature !== currentFilterSignature) return;
     const surface = `taxonomy_${level}`;
-    if (pending.kind === "sort") trackSortChange(pending.value, surface, taxonomySearch.data.total);
-    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.tagAction ?? "apply", surface, taxonomySearch.data.total);
-    else trackFilterUsage(pending.type, pending.value, taxonomySearch.data.total, surface);
+    if (pending.kind === "sort") trackSortChange(pending.value, surface, total);
+    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.tagAction ?? "apply", surface, total);
+    else trackFilterUsage(pending.type, pending.value, total, surface);
     pendingAnalyticsRef.current = null;
-  }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
+  }, [currentFilterSignature, level, paginationReady, total]);
 
   // A ?page= spelling the server also rejects (0, -5, abc, 1e3, 007) shows
   // page 1; say so rather than rewriting the URL silently.
@@ -686,7 +691,7 @@ export default function TaxonomyListing({ level }: Props) {
   // search term and scope; "all" also clears the search term and the subcategory /
   // Uncategorized scope. Route and view stay in both cases.
   const resetFilters = (extent: "facets" | "all") => {
-    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", kind: null, sort: "default", ...(extent === "all" ? { selection: "all" } : {}) };
+    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", kind: null, sort: "default", ...(extent === "all" ? { search: "", selection: "all" } : {}) };
     if (extent === "all") {
       setSearchTerm("");
       setSelection("all");
