@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
-import { discoveryRedirect } from "@shared/discovery-params";
+import { discoveryRedirect, legacyHomeSearchRedirect } from "@shared/discovery-params";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useRouteFocus, useScrollRestoration } from "./lib/nav-history";
@@ -758,7 +758,7 @@ function Router({
   // component type on every Router render, which remounted the whole page
   // (guards included) whenever auth/nav state changed.
   const search = useSearch();
-  const legacyHomeQuery = new URLSearchParams(search).get("q")?.trim() || "";
+  const legacyHomeTarget = legacyHomeSearchRedirect(search);
   const productProfile = resolveProductProfile(location);
   useLayoutEffect(() => {
     applyProductProfile(productProfile);
@@ -853,8 +853,8 @@ function Router({
   // wrong redirect can flash before /api/auth/user answers. The old
   // app-wide skeleton gate is gone entirely; the guards own their loading UI.
 
-  const homeElement = legacyHomeQuery ? (
-    <Redirect to={`/search?q=${encodeURIComponent(legacyHomeQuery)}`} replace />
+  const homeElement = legacyHomeTarget ? (
+    <Redirect to={legacyHomeTarget} replace />
   ) : (
     <Home nav={nav} navLoading={navLoading} />
   );

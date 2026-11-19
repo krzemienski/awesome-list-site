@@ -5,7 +5,7 @@ import { corpusTotalCount, type CorpusCountNode } from "@shared/catalog-counts";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
-import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
+import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect, legacyHomeSearchRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
 import { getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
 import { adminPageTitle, normalizeAdminTab, type AdminTabId } from "@shared/admin-tabs";
@@ -2427,10 +2427,11 @@ export function ogInjectionMiddleware() {
     // /?q=term was silently rendering the homepage; 301 it to the real search
     // results page so search is a first-class, linkable route (VG-4).
     if (urlPath === "/") {
-      const qs = (req.originalUrl || req.url).split("?")[1] || "";
-      const q = new URLSearchParams(qs).get("q");
-      if (q && q.trim()) {
-        return res.redirect(301, `/search?q=${encodeURIComponent(q.trim())}`);
+      const rawUrl = req.originalUrl || req.url;
+      const queryStart = rawUrl.indexOf("?");
+      if (queryStart !== -1) {
+        const target = legacyHomeSearchRedirect(rawUrl.slice(queryStart + 1));
+        if (target) return res.redirect(301, target);
       }
     }
     // /recommendations is now a real page (see staticRoutes) — no redirect.
