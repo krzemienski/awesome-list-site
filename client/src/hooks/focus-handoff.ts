@@ -18,9 +18,9 @@ export function focusElement(
 }
 
 /** The page's h1, falling back to <main id="main">. */
-export function focusPageHeading(): boolean {
+export function focusPageHeading(options?: FocusOptions): boolean {
   const main = document.getElementById("main");
-  return focusElement(main?.querySelector<HTMLElement>("h1") ?? main);
+  return focusElement(main?.querySelector<HTMLElement>("h1") ?? main, options);
 }
 
 const SETTLE_MS = 350;
@@ -62,7 +62,7 @@ export function handoffFocusOnUnmount(
       return;
     }
     finish();
-    if (!focusElement(resolveTarget?.(), options)) focusPageHeading();
+    if (!focusElement(resolveTarget?.(), options)) focusPageHeading(options);
   };
   observer.observe(document.body, { childList: true, subtree: true });
 }
