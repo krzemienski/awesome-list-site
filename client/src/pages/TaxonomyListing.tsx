@@ -66,6 +66,8 @@ function acceptedSort(value: string): string | null {
 const parseSort = (raw: string | null) => (raw ? acceptedSort(raw) ?? raw : "default");
 
 interface TaxonomyFilterSnapshot {
+  /** Normalized search text, so an intended state is matched against the settled one. */
+  search: string;
   tags: string[];
   provider: string;
   format: string;
@@ -77,6 +79,7 @@ interface TaxonomyFilterSnapshot {
 
 function taxonomyFilterSignature(next: TaxonomyFilterSnapshot) {
   return JSON.stringify([
+    next.search,
     next.selection,
     next.tags.map(normalizeTag).sort(),
     next.provider,
@@ -416,7 +419,7 @@ export default function TaxonomyListing({ level }: Props) {
     kind: "filter" | "sort" | "tag";
     tagAction?: "apply" | "remove";
   } | null>(null);
-  const currentFilterState = { tags, provider, format, skillLevel, sort, selection, kind };
+  const currentFilterState = { search: normalizedSearch, tags, provider, format, skillLevel, sort, selection, kind };
   const currentFilterSignature = taxonomyFilterSignature(currentFilterState);
   const resultSetKey = (forPage: number) => JSON.stringify([currentFilterSignature, searchTerm, view, forPage]);
   const currentResultSet = resultSetKey(page);
@@ -474,14 +477,16 @@ export default function TaxonomyListing({ level }: Props) {
 
   useEffect(() => {
     const pending = pendingAnalyticsRef.current;
-    if (!pending || !taxonomySearch.data || taxonomySearch.isPlaceholderData) return;
+    // paginationReady = search settled and the displayed total is not a placeholder,
+    // for both the filtered (taxonomySearch) and unfiltered (listing) sources.
+    if (!pending || !paginationReady) return;
     if (pending.signature !== currentFilterSignature) return;
     const surface = `taxonomy_${level}`;
-    if (pending.kind === "sort") trackSortChange(pending.value, surface, taxonomySearch.data.total);
-    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.tagAction ?? "apply", surface, taxonomySearch.data.total);
-    else trackFilterUsage(pending.type, pending.value, taxonomySearch.data.total, surface);
+    if (pending.kind === "sort") trackSortChange(pending.value, surface, total);
+    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.tagAction ?? "apply", surface, total);
+    else trackFilterUsage(pending.type, pending.value, total, surface);
     pendingAnalyticsRef.current = null;
-  }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
+  }, [currentFilterSignature, level, paginationReady, total]);
 
   // A ?page= spelling the server also rejects (0, -5, abc, 1e3, 007) shows
   // page 1; say so rather than rewriting the URL silently.
@@ -682,8 +687,16 @@ export default function TaxonomyListing({ level }: Props) {
     setPage(1);
     requestResultsFocus();
   };
-  const clearFacetFilters = () => {
-    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", kind: null, sort: "default" };
+  // One reset path. "facets" clears tags/provider/format/level/kind/sort and keeps the
+  // search term and scope; "all" also clears the search term and the subcategory /
+  // Uncategorized scope. Route and view stay in both cases.
+  const resetFilters = (extent: "facets" | "all") => {
+    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", kind: null, sort: "default", ...(extent === "all" ? { search: "", selection: "all" } : {}) };
+    if (extent === "all") {
+      setSearchTerm("");
+      setSelection("all");
+      setGeneral(false);
+    }
     setTags([]);
     setProvider("");
     setFormat("");
@@ -694,6 +707,8 @@ export default function TaxonomyListing({ level }: Props) {
     queueAnalytics(next, "all", "cleared");
     requestResultsFocus();
   };
+  // No-arg wrapper so onClear never leaks a MouseEvent into the extent.
+  const clearAllFilters = () => resetFilters("all");
   // Replaces the rejected URL rather than pushing, so Back doesn't return to it.
   const clearInvalidFilters = () => {
     replaceNextUrlSync.current = true;
@@ -706,11 +721,6 @@ export default function TaxonomyListing({ level }: Props) {
     setSort("default");
     setPage(1);
     requestResultsFocus();
-  };
-  // C10-V1-01: the active-filter row's "Clear all" also removes the search chip.
-  const clearAllFilters = () => {
-    setSearchTerm("");
-    clearFacetFilters();
   };
   const broadenScope = () => {
     const next = { ...currentFilterState, selection: "all" };
@@ -826,7 +836,7 @@ export default function TaxonomyListing({ level }: Props) {
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
     <div className="taxonomy-active-filters">{!toolsOpen && scopeNarrowed && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove filter “${scopeLabel}”`} onClick={broadenScope} data-testid="chip-taxonomy-scope">{scopeLabel}<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
-      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets otherControls={["search", ...(showScopeSelect ? ["subcategory"] : []), "resource kind", "sort"]} /></div>
+      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearAllFilters} hideTaxonomyFacets otherControls={["search", ...(showScopeSelect ? ["subcategory"] : []), "resource kind", "sort"]} /></div>
       <div className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
           {/* The listing's single count statement: visible range, matching total,
@@ -840,7 +850,7 @@ export default function TaxonomyListing({ level }: Props) {
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
           {invalidFilters ? <StatePanel tone="error" label="Invalid filters" title="These filters can’t be applied" inline testId="taxonomy-invalid-filters" actions={<Button variant="outline" onClick={clearInvalidFilters} data-testid="button-clear-invalid-filters">Clear invalid filters</Button>}>{invalidFilters.message}</StatePanel>
              : resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
-             : resources.length === 0 ? <StatePanel tone="empty" label={emptyCollection ? "No resources" : "No matches"} title={emptyCollection ? "No resources here yet" : "No resources match this combination"} inline testId="empty-resources" actions={<>{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? `Search all of ${siteName}` : "Search the broader category"}</Link></Button>}</>}>{emptyCollection ? `Nothing has been approved for this ${level === "category" ? "category" : "collection"} yet. Browse the wider catalog in the meantime.` : "Clear a filter, remove the search, or broaden where you're looking."}</StatePanel> :
+             : resources.length === 0 ? <StatePanel tone="empty" label={emptyCollection ? "No resources" : "No matches"} title={emptyCollection ? "No resources here yet" : "No resources match this combination"} inline testId="empty-resources" actions={<>{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={() => resetFilters("facets")} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? `Search all of ${siteName}` : "Search the broader category"}</Link></Button>}</>}>{emptyCollection ? `Nothing has been approved for this ${level === "category" ? "category" : "collection"} yet. Browse the wider catalog in the meantime.` : "Clear a filter, remove the search, or broaden where you're looking."}</StatePanel> :
             <div className={view === "grid" ? "taxonomy-grid" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
                const normalized = {
                  ...resource,
