@@ -1,4 +1,5 @@
 import type { AwesomeListNav, AwesomeListNavNode, ListingLevel } from "@/lib/static-data";
+import { discoveryRedirect, searchPageQuery } from "@shared/discovery-params";
 
 const MAX_DISTANCE = 2;
 
@@ -44,12 +45,15 @@ function nodesAtLevel(nav: AwesomeListNav, level: ListingLevel): AwesomeListNavN
 /**
  * "Did you mean …?" for a mistyped taxonomy slug: the closest real slug at
  * the same level, matched on the full slug and each hyphen token so
- * "comunity" still finds "community-events".
+ * "comunity" still finds "community-events". When `search` is given, the
+ * visitor's destination-supported discovery state (discoveryRedirect's
+ * allowlist: search/q, filters, tags, sort, kind, page, view) rides along.
  */
 export function findTaxonomySuggestion(
   nav: AwesomeListNav | undefined,
   level: ListingLevel,
   slug: string | undefined,
+  search = "",
 ): { label: string; href: string } | undefined {
   if (!nav || !slug) return undefined;
   const needle = slug.toLowerCase();
@@ -61,17 +65,20 @@ export function findTaxonomySuggestion(
     if (dist <= MAX_DISTANCE && (!best || dist < best.dist)) best = { node, dist };
   }
   return best
-    ? { label: `Did you mean ${best.node.name}?`, href: `/${level}/${best.node.slug}` }
+    ? { label: `Did you mean ${best.node.name}?`, href: discoveryRedirect(`/${level}/${best.node.slug}`, search) }
     : undefined;
 }
 
 /**
  * Suggestion for an unknown URL: a mistyped single-segment page
  * ("/abuot" -> About), else a mistyped category slug in "/<x>/<slug>" form.
+ * A typo corrected to /search carries the visitor's search state (allowlisted
+ * q/filters/tags/sort/page); every other suggestion is a fresh link.
  */
 export function findRouteSuggestion(
   pathname: string,
   nav: AwesomeListNav | undefined,
+  search = "",
 ): { label: string; href: string } | undefined {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length !== 1) return undefined;
@@ -81,6 +88,9 @@ export function findRouteSuggestion(
     const dist = levenshtein(needle, page.path);
     if (dist <= MAX_DISTANCE && (!best || dist < best.dist)) best = { page, dist };
   }
-  if (best) return { label: `Did you mean ${best.page.name}?`, href: `/${best.page.path}` };
+  if (best) {
+    const state = best.page.path === "search" ? searchPageQuery(search) : "";
+    return { label: `Did you mean ${best.page.name}?`, href: `/${best.page.path}${state}` };
+  }
   return findTaxonomySuggestion(nav, "category", needle);
 }

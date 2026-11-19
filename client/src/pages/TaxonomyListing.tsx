@@ -594,7 +594,7 @@ export default function TaxonomyListing({ level }: Props) {
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
-  if (isNotFoundError(listing.error)) return <NotFound suggestion={findTaxonomySuggestion(nav, level, slug)} />;
+  if (isNotFoundError(listing.error)) return <NotFound suggestion={findTaxonomySuggestion(nav, level, slug, search)} />;
   if (pageError) {
     return (
       <ErrorPage

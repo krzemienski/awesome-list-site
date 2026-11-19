@@ -64,6 +64,16 @@ export function legacyHomeSearchRedirect(search: string): string | null {
   return `/search?${target.toString()}`;
 }
 
+/** Query string (with leading "?", or "") carrying only the state /search reads:
+ * q and its `search` alias, filters, repeated tags, sort and page. */
+export function searchPageQuery(search: string): string {
+  const source = new URLSearchParams(search);
+  const target = new URLSearchParams();
+  for (const key of ["q", "search", ...SEARCH_PAGE_KEYS]) for (const value of source.getAll(key)) target.append(key, value);
+  const query = target.toString();
+  return query ? `?${query}` : "";
+}
+
 /** Compatibility redirects preserve only destination-supported discovery state. */
 export function discoveryRedirect(path: string, search: string): string {
   const source = new URLSearchParams(search);
