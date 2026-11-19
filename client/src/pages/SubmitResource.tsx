@@ -324,6 +324,10 @@ export default function SubmitResource() {
   const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Timestamp of the newest draft THIS tab has loaded or written.
   const draftSeenAtRef = useRef(0);
+  // Field values this tab last loaded from, or wrote to, the shared draft. On a
+  // remote deletion, fields still equal to these are stale synced content;
+  // fields that differ were typed locally afterwards.
+  const draftSyncedRef = useRef<Partial<SubmitResourceFormData>>({});
 
   const draftHasContent = (v: Partial<SubmitResourceFormData>) =>
     !!(v.title || v.url || v.description || v.tags || v.category);
@@ -371,6 +375,7 @@ export default function SubmitResource() {
         // or a later form.reset() would bring it back.
         form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
         draftSeenAtRef.current = draft.updatedAt;
+        draftSyncedRef.current = { ...draft.values };
         toast({
           title: "Draft restored",
           description:
@@ -405,6 +410,7 @@ export default function SubmitResource() {
         const updatedAt = Date.now();
         safeSetItem(DRAFT_KEY, JSON.stringify({ values, updatedAt }));
         draftSeenAtRef.current = updatedAt;
+        draftSyncedRef.current = { ...values };
       } else {
         safeRemoveItem(DRAFT_KEY);
       }
@@ -418,8 +424,11 @@ export default function SubmitResource() {
       draftSaveTimer.current = null;
       if (draftRestoredRef.current) writeDraft(form.getValues());
     };
-    const subscription = form.watch((values) => {
+    const subscription = form.watch((values, info) => {
       if (!draftRestoredRef.current) return;
+      // Whole-form resets (restore, cross-tab sync, submit) carry no field
+      // name; only a real field edit may enqueue a draft write.
+      if (!info?.name) return;
       clearTimeout(draftSaveTimer.current ?? undefined);
       draftSaveTimer.current = setTimeout(() => {
         draftSaveTimer.current = null;
@@ -444,18 +453,28 @@ export default function SubmitResource() {
     const onStorage = (e: StorageEvent) => {
       if (e.key !== DRAFT_KEY) return;
       if (e.newValue === null) {
-        // Draft cleared elsewhere (logout or emptied form): reset if we were
-        // showing draft content and have no newer local edits in flight.
         draftSeenAtRef.current = 0;
-        // Cleared elsewhere (logout / submit in another tab): a pending
-        // debounced write from this tab must not resurrect it.
+        // Draft cleared elsewhere (discard / submit / emptied form / logout):
+        // a pending write must not bring it back. Fields still holding the
+        // synchronized content are dropped; fields typed since stay on screen
+        // and are saved by the next edit.
         clearTimeout(draftSaveTimer.current ?? undefined);
         draftSaveTimer.current = null;
+        const synced = draftSyncedRef.current;
+        const next: Partial<SubmitResourceFormData> = { ...form.getValues() };
+        for (const k of Object.keys(EMPTY_VALUES) as (keyof SubmitResourceFormData)[]) {
+          if (synced[k] !== undefined && next[k] === synced[k]) next[k] = EMPTY_VALUES[k];
+        }
+        draftSyncedRef.current = {};
+        form.reset(next, { keepDefaultValues: true });
         return;
       }
       const draft = parseDraft(e.newValue);
       if (!draft || draft.updatedAt <= draftSeenAtRef.current) return;
+      clearTimeout(draftSaveTimer.current ?? undefined);
+      draftSaveTimer.current = null;
       draftSeenAtRef.current = draft.updatedAt;
+      draftSyncedRef.current = { ...draft.values };
       form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
     };
     window.addEventListener("storage", onStorage);
