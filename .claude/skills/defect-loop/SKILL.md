@@ -1,23 +1,23 @@
 ---
 name: defect-loop
-description: Orchestrate a full production audit and fix cycle for awesome.video: baseline audit, triage by root cause, one fixer per group, pinned reviews, batch merge, one deploy, re-drive, final pass. Use when asked to run the defect loop, to audit and fix until clean, or to resume a run from state.json.
+description: Run an audit and fix cycle for awesome.video on request: audit the live site (the whole product or only the area named), triage failures by root cause, fix each cause in its own PR, ship each ready fix promptly through the release path, re-drive the affected cells, and optionally close with a full pass and a two-hour window. Use when asked to run the defect loop, to audit and fix until clean, or to resume a run from state.json. It is not part of releasing, and a release never waits for it.
 ---
 
 # Defect loop (orchestrator)
 
-The lead plans, integrates and verifies. Workers do the hands-on work. Concurrency cap: 2 sonnet workers plus 1 reviewer at a time; fan-out runs 2 lanes at a time with `--model sonnet` (see `qa-lane`). Every deploy goes through the `replit-deploy` skill. Paths: `ROOT=.local/audit/<RUN_ID>`; lane results `ROOT/results/<lane>.json`; evidence `ROOT/evidence/<lane>/<row>/<width>-<sha>-a<N>.png`.
+The lead plans, integrates and verifies. Workers do the hands-on work. This audit run caps itself at 2 sonnet workers at a time, and fan-out runs 2 lanes at a time with `--model sonnet` (see `qa-lane`); the cap belongs to the audit, not to merging or releasing. Paths: `ROOT=.local/audit/<RUN_ID>`; lane results `ROOT/results/<lane>.json`; evidence `ROOT/evidence/<lane>/<row>/<width>-<sha>-a<N>.png`.
+
+A fix does not wait for the rest of the audit. Each logical fix that is ready merges and releases on its own, promptly, through `RELEASE.md` (merge ready, sync, publish once, verify; the `replit-deploy` skill carries it out). The audit decides what to fix; it never decides when a release may happen, and a release never waits for a pass or a window.
 
 ## Stages
 
-1. Baseline: pin `X0` = live `/api/version`. Run the full audit with `qa-lane` on `X0`. Cells from a lane whose start and end SHA differ are void; re-run that lane.
+1. Audit: record `X0` = live `/api/version`, then drive with `qa-lane` the rows the request names: the whole inventory for a full audit, or only the affected area. A full baseline is not a prerequisite for fixing a known defect. Cells from a lane whose start and end SHA differ are void; re-run that lane.
 2. Triage: group FAIL cells by root cause, not symptom. One defect class is one group (every overflow-wrap failure is one group). Record each group with its cells and a suspected file.
 3. Fix: one fixer per group, each in its own worktree from fresh `origin/main` (`git fetch origin` first), own branch, own PR. If groups touch the same files, merge them into one group.
-4. Review: each PR gets a `review-pr` pinned review by a reviewer that did not write it. REQUEST_CHANGES goes back to the fixer; any new push needs a fresh verdict.
-5. Merge guard: a PR merges only when every thread is resolved and the latest `VERDICT: APPROVE <sha>` names `headRefOid`. The hook enforces this. Never merge around it.
-6. Batch merge: the lead merges a PR only after the reviewer's final report has arrived and its last `VERDICT` comment names `headRefOid` (an APPROVE comment alone is not enough: the reviewer may still be reversing it). The merge guard also refuses a verdict younger than 60 s. Merge the approved PRs together, then check `origin/main`.
-7. Deploy: one `replit-deploy` run for the batch. Done when `/api/version` equals `origin/main` and `/api/health/ready` returns 200. Call that SHA `X`.
-8. Re-drive: run only the affected cells on `X` with `qa-lane`. A cell still failing returns to stage 2.
-9. Final pass: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY in the final pass goes back to stage 2 (triage), and the next deploy gives a new `X` that is pinned again; the pass and the window then restart on it. Then run QA cleanup (below), which takes its own fresh backup.
+4. Check the build, touched-file lint delta and changed behavior. Address substantive findings. Independent review is optional; respect GitHub permissions and platform requirements.
+5. Merge and release: merge the ready PR, then release it with `replit-deploy` (done when `/api/version` equals `origin/main`, `/api/health/ready` returns 200 and the changed behavior works). Do this for each ready fix as it lands; two fixes that are ready at the same moment may share one release, but never hold one back to batch. Call the live SHA `X`.
+6. Re-drive: run only the affected cells on `X` with `qa-lane`. A cell still failing returns to stage 2.
+7. Closure, only when the request asks for it: full audit on `X`, then a 2 h window. Done means one `X` with a clean full pass (no FAIL, no FLAKY) and, in the window, 0 error-level records (`GET /api/admin/logs?level=error`, read `.records`, page with `until=nextUntil`) and 0 app `5xx`. Any FAIL or FLAKY goes back to stage 2. A later release gives a new `X`, and the pass and the window restart on it; the release is never held back by the one in progress. Then run QA cleanup (below), which takes its own fresh backup.
 
 ## QA cleanup
 
@@ -26,7 +26,7 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 - Lanes create QA rows only as the audit admin or audit member. Both accounts did the qa-rows cleanup in run 20261115T2340Z, so they are inferred to be on the allowlist; the allowlist itself is a Replit secret and cannot be read.
 - Lanes never create sign-ups (except a throwaway `@example.com` address stopped at the code screen) or edits on resources that lack the prefix: those cannot be listed or deleted (edits are listed through their parent resource's title). Audit-log rows and signed-in view interactions from allowed QA writes are expected and go in the run report.
 - Each DELETE is `DELETE /api/admin/qa-rows/<table>/<id>` (`resources`, `resource_edits` or `bookmark_collections`) with `-H 'Origin: https://awesome.video'` and the body exactly `{"runId": "<RUN_ID>", "expectedTitle": "<stored title>", "backupSha256": "<sha256>"}`; any other key is a 400, and so is an `expectedTitle` that does not start with this run's prefix (`deleteBodySchema` in `qa-cleanup.ts`). The stored title must also start with that prefix and equal `expectedTitle`, or the route answers 409. `backupSha256` is `.backups[0].sha256` from `GET /api/admin/database-backups`, and that backup's `completedAt` must be under 10 minutes old, or the route answers 409 (`checkBackup`). 503 = backup storage not configured; 403 "Not an authorised QA cleanup account" = caller not on the allowlist.
-- Each cleanup batch takes one backup first: one `POST /api/admin/database-backups` (owner header, `Origin` header, body `{}`), then wait until `GET` shows it newest with `inFlight` false, and run every DELETE within 10 minutes of its `completedAt` (owner, 2026-11-16, delegating this call: "you decide"). One backup per batch, never per row. If the POST fails, the rows stay in the ledger for the next batch or the next deploy's step 5.3b backup.
+- Each cleanup batch takes one backup first: one `POST /api/admin/database-backups` (owner header, `Origin` header, body `{}`), then wait until `GET` shows it newest with `inFlight` false, and run every DELETE within 10 minutes of its `completedAt` (owner, 2026-11-16, delegating this call: "you decide"). One backup per batch, never per row. If the POST fails, the rows stay in the ledger for the next cleanup batch. A release takes no backup of its own.
 - Run cleanup as the audit admin, never the owner account.
 - Procedure: `GET '/api/admin/qa-rows?runId=<RUN_ID>'` (quote the URL; rows under `.rows.<table>`, each with `deletable`; audit-log and bookmark rows never are). The database is already narrowed to this run before the 500-row limit, so a count of 500 means "capped", not "total". Save each row as JSON under `ROOT/cleanup/` before its DELETE, then GET again and check that the counts dropped by exactly the deleted ids. Record `<table> <id> <title> <status>` per row in `ROOT/cleanup/ledger.md`.
 - A 403 "Row does not belong to a QA cleanup account" means the creating account is not on the allowlist; a 409 listing per-table counts means other users' data depends on the row. Record the id and the answer, leave the row, and never clear other users' rows.
@@ -35,15 +35,14 @@ The lead plans, integrates and verifies. Workers do the hands-on work. Concurren
 
 ```json
 {
-  "runId": "", "stage": "baseline|triage|fix|review|merge|deploy|redrive|final|done",
+  "runId": "", "stage": "audit|triage|fix|check|release|redrive|closure|done",
   "liveSha": "", "baselineSha": "",
   "lanes": {"L1": {"status": "pending|running|done", "shaStart": "", "shaEnd": "", "result": "results/L1.json"}},
   "cells": {"L1-03@390": {"grade": "PASS|FAIL|FLAKY|NEEDS_YOU|UNVERIFIED", "sha": "", "evidence": ""}},
   "defects": {"D1": {"group": "", "cells": [], "rootCause": "", "status": "open|fixing|fixed|verified"}},
   "branches": {"D1": "fix/d1-slug"},
   "prs": {"D1": {"number": 0, "headRefOid": ""}},
-  "approvedShas": {"D1": ""},
-  "deploys": [{"sha": "", "at": "", "ready": true}],
+  "releases": [{"sha": "", "at": "", "ready": true}],
   "windows": {"start": "", "end": "", "errors5xx": 0}
 }
 ```
