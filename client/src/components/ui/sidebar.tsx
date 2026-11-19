@@ -6,6 +6,7 @@ import { PanelLeft, X } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { focusPageHeading } from "@/hooks/focus-handoff"
 import { trackSidebarToggled } from "@/lib/analytics"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -406,7 +407,19 @@ const Sidebar = React.forwardRef<
               // This is intentionally explicit: Radix's saved trigger can be
               // detached while AppHeader reacts to the drawer state.
               e.preventDefault()
-              restoreDrawerFocus()
+              if (restoreDrawerFocus()) return
+              // Crossing above the drawer breakpoint unmounts this dialog and
+              // hides its opener, so there is nothing to restore to. Land on
+              // the page heading unless focus already sits somewhere real.
+              // The live media query is read because this handler closes over
+              // the last drawer-mode render.
+              const active = document.activeElement
+              if (
+                (!active || active === document.body) &&
+                !window.matchMedia("(max-width: 1024px)").matches
+              ) {
+                focusPageHeading({ preventScroll: true })
+              }
             }}
           >
             <DialogPrimitive.Title className="sr-only">
