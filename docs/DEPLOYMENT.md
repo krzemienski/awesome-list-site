@@ -93,8 +93,9 @@ reports the commit that shipped.
 
 The procedure is kept in one place, the project skill
 [`.claude/skills/replit-deploy/SKILL.md`](../.claude/skills/replit-deploy/SKILL.md).
-It covers syncing the workspace, when to run `npm install` and
-`npm run db:push`, the schema review when a schema file or migration changed,
+It covers syncing the workspace, when to run `npm run db:push` (the publish
+build does the clean lockfile install, so the workspace runs no `npm ci`), the schema review when a schema file or migration changed (a fresh recoverable
+backup and human review before applying a destructive or ambiguous diff),
 publishing once, and proving the release is live (version, readiness and the
 changed behavior). A release is four moves: merge ready changes, sync to the
 intended `origin/main`, publish once, verify. [RELEASE.md](../RELEASE.md) is the

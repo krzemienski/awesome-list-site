@@ -9,16 +9,27 @@ set -euo pipefail
 
 MAIN_REF=refs/remotes/origin/main
 TRIM_SCRIPT=scripts/deployment/trim-publish-image.mjs
-# Public settings the workspace .env mirrors from .replit [userenv.*], plus the
-# legacy client/.env (Vite never reads it: envDir is the repo root). Any other
-# key either changes what the build bakes in or may be a secret, so it is
-# refused by name. Values are never printed.
-PUBLIC_DOTENV_KEYS="VITE_SITE_URL VITE_SITE_TITLE VITE_SITE_DESCRIPTION VITE_DEFAULT_THEME VITE_CONTACT_VARIANT VITE_GA_MEASUREMENT_ID VITE_MIXPANEL_TOKEN VITE_POSTHOG_KEY VITE_POSTHOG_HOST VITE_AMPLITUDE_API_KEY"
+# Public VITE_* settings the app reads (client/src: analytics, contact variant,
+# site metadata, Clerk publishable key and proxy URL). The workspace .env mirrors
+# the .replit [userenv.*] subset, plus the legacy client/.env (Vite never reads
+# it: envDir is the repo root). The same list gates .env files and the exported
+# VITE_* environment (Vite bakes every exported VITE_* variable into the client).
+# Any other key either changes what the build bakes in or may be a secret (for
+# example VITE_OPENAI_API_KEY, which client/env.d.ts types but no code reads),
+# so it is refused by name. Values are never printed.
+PUBLIC_DOTENV_KEYS="VITE_SITE_URL VITE_SITE_TITLE VITE_SITE_DESCRIPTION VITE_DEFAULT_THEME VITE_CONTACT_VARIANT VITE_GA_MEASUREMENT_ID VITE_MIXPANEL_TOKEN VITE_POSTHOG_KEY VITE_POSTHOG_HOST VITE_AMPLITUDE_API_KEY VITE_CLERK_PUBLISHABLE_KEY VITE_CLERK_PROXY_URL"
 # Root files the build tools search for and that main does not have. Vite takes
 # the first vite.config.* it finds in this order (js, mjs, ts, ...), so an extra
 # one would replace main's vite.config.ts; PostCSS and browserslist files change
-# the emitted CSS.
-UNTRACKED_BUILD_CONFIG="vite.config.js vite.config.mjs vite.config.cjs vite.config.mts vite.config.cts postcss.config.js postcss.config.cjs postcss.config.mjs postcss.config.ts postcss.config.mts postcss.config.cts .postcssrc .postcssrc.json .postcssrc.yaml .postcssrc.yml .postcssrc.js .postcssrc.cjs .postcssrc.mjs .postcssrc.ts .postcssrc.mts .postcssrc.cts .browserslistrc browserslist"
+# the emitted CSS; an extra .npmrc changes how dependencies are installed. Each
+# element is one exact root path (matched with :(literal), never as a glob).
+UNTRACKED_BUILD_CONFIG=(
+  vite.config.js vite.config.mjs vite.config.cjs vite.config.mts vite.config.cts
+  postcss.config.js postcss.config.cjs postcss.config.mjs postcss.config.ts postcss.config.mts postcss.config.cts
+  .postcssrc .postcssrc.json .postcssrc.yaml .postcssrc.yml .postcssrc.js .postcssrc.cjs .postcssrc.mjs .postcssrc.ts .postcssrc.mts .postcssrc.cts
+  .browserslistrc browserslist
+  .npmrc
+)
 MAIN_COMMIT=""
 SCAN_DIR=""
 
@@ -90,6 +101,37 @@ require_no_dotenv_redirect() {
     show_first_lines "$names"
     refuse_publish "dotenv could load files and values that are not the declared public config."
   fi
+}
+
+# Vite exposes every VITE_* variable of the process environment to the client
+# bundle regardless of any .env file, so an inherited one outside the declared
+# public list could bake a secret or foreign value into the build. Names only.
+require_public_vite_env() {
+  local names
+  names=$(awk -v allowed="$PUBLIC_DOTENV_KEYS" '
+    BEGIN {
+      n = split(allowed, list, " "); for (i = 1; i <= n; i++) ok[list[i]] = 1
+      for (name in ENVIRON) if (name ~ /^VITE_/ && !(name in ok)) print name
+    }') \
+    || refuse_publish "could not read the build environment."
+  if [ -n "$names" ]; then
+    echo "publish-build: VITE_* variables in the build environment that are not declared public config (names only):" >&2
+    show_first_lines "$(printf '%s\n' "$names" | sort)"
+    refuse_publish "Vite would bake these into the browser bundle."
+  fi
+}
+
+# The install below trusts package.json, package-lock.json and .npmrc, so each
+# must be a regular file that main tracks, byte-identical to main's.
+require_install_inputs_are_main() {
+  local file
+  for file in package.json package-lock.json .npmrc; do
+    if [ -L "$file" ] || [ ! -f "$file" ] \
+      || ! git cat-file -e "$MAIN_COMMIT:$file" 2>/dev/null \
+      || [ "$(git hash-object --no-filters -- "$file" 2>/dev/null)" != "$(git rev-parse --verify --quiet "$MAIN_COMMIT:$file")" ]; then
+      refuse_publish "$file is missing, not a regular file, or differs from origin/main's, so the locked dependency install cannot be trusted."
+    fi
+  done
 }
 
 # A dotenv file the build may read must be a regular file whose every line is a
@@ -167,6 +209,7 @@ scan_git() {
 #     .omc/state (agent session state: tsc skips dot directories, Tailwind
 #     skips Git-ignored files, and no tracked source names .omc, so nothing
 #     imports them) and the legacy client/.env checked like .env below.
+#     migrations/ gets the same ignored-or-not check with no exception at all.
 #   - Root build config that main lacks (see UNTRACKED_BUILD_CONFIG) and any
 #     root dotenv file besides .env are refused, ignored or not. vite.config.ts
 #     loads .env through dotenv, and Vite also reads .env.local, .env.production
@@ -193,7 +236,7 @@ require_workspace_files_match_main() {
   while IFS= read -r dir; do
     excludes+=(":(exclude,literal)$dir")
   done <<<"$evidence"
-  for name in $UNTRACKED_BUILD_CONFIG; do
+  for name in "${UNTRACKED_BUILD_CONFIG[@]}"; do
     config_paths+=(":(literal)$name")
   done
 
@@ -218,9 +261,9 @@ require_workspace_files_match_main() {
     refuse_publish "this build would ship files that are not GitHub main's."
   fi
 
-  inputs=$(scan_git ls-files --others -- client shared server \
+  inputs=$(scan_git ls-files --others -- client shared server migrations \
     | awk '(!/^(client|shared|server)\/(.+\/)?\.omc\/state\/.+\.jsonl?$/ || /^client\/public\//) && $0 != "client/.env"') \
-    || refuse_publish "could not list untracked files under client, shared and server."
+    || refuse_publish "could not list untracked files under client, shared, server and migrations."
   if [ -n "$inputs" ]; then
     echo "publish-build: untracked or ignored files where the build reads inputs:" >&2
     show_first_lines "$inputs"
@@ -255,13 +298,28 @@ is_publish_copy() {
 require_head_on_origin_main
 require_revision_is_main
 require_no_dotenv_redirect
+require_public_vite_env
 require_workspace_files_match_main
+require_install_inputs_are_main
 
 echo "publish-build: HEAD $(git rev-parse --short HEAD) and the workspace files match origin/main $(git rev-parse --short "$MAIN_REF"); stamping BUILD_REVISION=$BUILD_REVISION."
 
 # Production copy only: drop attached_assets first so a true @assets dependency
 # fails the build rather than being embedded.
 if is_publish_copy; then node "$TRIM_SCRIPT" --pre-build; fi
+
+# Production copy only: install exactly main's lockfile, dev dependencies
+# included (tsc, vite and esbuild are devDependencies), before every build so no
+# stale or extra package survives from an earlier image. `npm ci` deletes
+# node_modules first, so it never runs in the interactive workspace, where it
+# would wipe the dependencies the dev server is using; there the build reuses the
+# installed tree and the result is not a publishable artifact. .npmrc
+# (legacy-peer-deps) is main's, verified above.
+if is_publish_copy; then
+  npm --prefix "$PWD" ci --include=dev --no-dry-run --no-package-lock-only --no-audit --no-fund
+else
+  echo "publish-build: not the production copy (no REPLIT_DEPLOYMENT/REPLIT_PUBLISH_IMAGE_TRIM marker); skipping npm ci so the workspace node_modules is left untouched." >&2
+fi
 
 npm run build
 

@@ -48,7 +48,9 @@ hook or provider refusal is a stop, not a reason to switch tools.
   effect is on docs, skills, notes or tooling that production never loads has no
   runtime purpose: skip the publish and report "skipped, no runtime purpose".
   Production may then trail `origin/main`, and the next release carries those
-  commits.
+  commits. A skipped release is not a deploy: production still serves BEFORE,
+  so never call it current or equal to `origin/main`, and never report it as
+  shipped.
 - **Intended main.** A release ships `origin/main` as fetched at sync time
   (`TARGET`). It must contain the change you merged. Merges that landed before
   the sync ride along; merges that land after it go in the next release.
@@ -59,24 +61,43 @@ hook or provider refusal is a stop, not a reason to switch tools.
   rather than this page for its exact checks.
 - **Schema review, only when it applies.** It applies when `shared/schema.ts` or
   `migrations/` changed since the live revision. Run `npm run db:push` against
-  the dev database only when `shared/schema.ts` changed, stop for the owner on a
-  destructive migration (drop, truncate, delete, column type change), and let
-  the owner publish from the Publishing pane when Replit refuses `publish_app`
-  for the schema diff. No schema change, no review.
+  the dev database only when `shared/schema.ts` changed, and let the owner
+  publish from the Publishing pane when Replit refuses `publish_app` for the
+  schema diff. Judge the actual diff the Publishing pane shows, not only the git
+  diff: a git diff that looked safe does not clear a pane diff that drops,
+  truncates, deletes, changes a column type, or that you cannot read with
+  certainty. For a destructive or ambiguous actual diff:
+  1. Take a production backup for this change after the request: its
+     `completedAt` must be later than the request, it must be the newest, with
+     `inFlight` false, and no relevant production write may land between it and
+     the owner's approval (otherwise take another). Confirm it is recoverable
+     from its stored checksum and size; a row count alone does not prove that,
+     and no restore is run.
+  2. Stop for human review of that diff and apply only after the owner says so,
+     even if the git diff looked safe.
+  3. A backup that is missing, stale, failing or unverifiable means do not
+     apply. Report it and wait.
+  A routine code-only release (a pane diff that is plainly additive or absent)
+  takes no backup. An empty Git diff never overrides an actual Publishing-pane
+  diff.
 - **Publish once.** One `publish_app` call, or one **Publish** click by the
   owner. Replit runs the build (`bash scripts/publish-build.sh`) and starts the
-  server with `npm run start`. No separate workspace build, backup, sweep of
-  every job type or reviewer runs before it.
+  server with `npm run start`. The publish build does the clean lockfile
+  install, so the workspace runs no separate `npm ci` or `npm install`. No
+  separate workspace build, routine backup, sweep of every job type or reviewer
+  runs before it.
 - **Jobs.** A restart interrupts in-process jobs (link scans, enrichment,
   research, GitHub sync), and the server fails stranded jobs at its next start.
   For a job you already know is running, look up that one job. If a restart
   would waste real work (a long scan, a paid run), let it finish or ask the
   owner before publishing; never cancel it to publish. Otherwise record it as an
   interruption warning in the report and publish. Do not sweep every job type.
-- **Backups.** A publish takes none and needs none. The server takes a scheduled
-  daily backup. A manual one is for a QA cleanup batch (the delete route accepts
-  only the newest backup, completed no more than 10 minutes ago) or for when the
-  owner asks. See `docs/DATABASE-BACKUP.md`.
+- **Backups.** A routine code-only publish takes none and needs none. The
+  server takes a scheduled daily backup. A manual one is required before
+  applying a destructive or ambiguous schema diff (see Schema review), for a QA
+  cleanup batch (the delete route accepts only the newest backup, completed no
+  more than 10 minutes ago), or when the owner asks. The owner declined adding
+  a per-publish backup for routine releases. See `docs/DATABASE-BACKUP.md`.
 
 ## 3. Verify
 
@@ -90,6 +111,11 @@ Check in this order and stop on the first failure:
    behavior that only the new commit has (a response field, page copy, a
    header, the changed screen). Drive it the way a person meets it: a browser
    for UI, `curl` for an API, header or server-rendered text.
+
+A release is complete only for the exact intended SHA: `/api/version` equals
+it, readiness is 200 and the changed behavior works. Say "production is
+current with `origin/main`" only when the live SHA equals `origin/main`. After
+a skipped docs-only merge it does not.
 
 ### Audit and closure are not part of a release
 

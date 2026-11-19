@@ -26,7 +26,7 @@ A fix does not wait for the rest of the audit. Each logical fix that is ready me
 - Lanes create QA rows only as the audit admin or audit member. Both accounts did the qa-rows cleanup in run 20261115T2340Z, so they are inferred to be on the allowlist; the allowlist itself is a Replit secret and cannot be read.
 - Lanes never create sign-ups (except a throwaway `@example.com` address stopped at the code screen) or edits on resources that lack the prefix: those cannot be listed or deleted (edits are listed through their parent resource's title). Audit-log rows and signed-in view interactions from allowed QA writes are expected and go in the run report.
 - Each DELETE is `DELETE /api/admin/qa-rows/<table>/<id>` (`resources`, `resource_edits` or `bookmark_collections`) with `-H 'Origin: https://awesome.video'` and the body exactly `{"runId": "<RUN_ID>", "expectedTitle": "<stored title>", "backupSha256": "<sha256>"}`; any other key is a 400, and so is an `expectedTitle` that does not start with this run's prefix (`deleteBodySchema` in `qa-cleanup.ts`). The stored title must also start with that prefix and equal `expectedTitle`, or the route answers 409. `backupSha256` is `.backups[0].sha256` from `GET /api/admin/database-backups`, and that backup's `completedAt` must be under 10 minutes old, or the route answers 409 (`checkBackup`). 503 = backup storage not configured; 403 "Not an authorised QA cleanup account" = caller not on the allowlist.
-- Each cleanup batch takes one backup first: one `POST /api/admin/database-backups` (owner header, `Origin` header, body `{}`), then wait until `GET` shows it newest with `inFlight` false, and run every DELETE within 10 minutes of its `completedAt` (owner, 2026-11-16, delegating this call: "you decide"). One backup per batch, never per row. If the POST fails, the rows stay in the ledger for the next cleanup batch. A release takes no backup of its own.
+- Each cleanup batch takes one backup first: one `POST /api/admin/database-backups` (owner header, `Origin` header, body `{}`), then wait until `GET` shows it newest with `inFlight` false, and run every DELETE within 10 minutes of its `completedAt` (owner, 2026-11-16, delegating this call: "you decide"). One backup per batch, never per row. If the POST fails, the rows stay in the ledger for the next cleanup batch. A routine release takes no backup of its own; only a destructive or ambiguous schema diff does (`RELEASE.md`).
 - Run cleanup as the audit admin, never the owner account.
 - Procedure: `GET '/api/admin/qa-rows?runId=<RUN_ID>'` (quote the URL; rows under `.rows.<table>`, each with `deletable`; audit-log and bookmark rows never are). The database is already narrowed to this run before the 500-row limit, so a count of 500 means "capped", not "total". Save each row as JSON under `ROOT/cleanup/` before its DELETE, then GET again and check that the counts dropped by exactly the deleted ids. Record `<table> <id> <title> <status>` per row in `ROOT/cleanup/ledger.md`.
 - A 403 "Row does not belong to a QA cleanup account" means the creating account is not on the allowlist; a 409 listing per-table counts means other users' data depends on the row. Record the id and the answer, leave the row, and never clear other users' rows.
@@ -49,7 +49,45 @@ A fix does not wait for the rest of the audit. Each logical fix that is ready me
 
 ## Resume
 
-Read `state.json` and `PROGRESS.md`, then `curl -s 'https://awesome.video/api/version'` and `git fetch origin`. The same anchors open every check-in: `git rev-parse origin/main` against the live revision (full SHAs), `/api/health/ready` (200) and `gh pr list --state open --json number,headRefOid`. If `liveSha` moved, cells graded on the old SHA are stale: re-run them. Continue at `stage`; never repeat a finished stage. A lane left `running` has no trusted result: re-run it. After a 429 or other API failure, write state first, stop, and relaunch only the failed workers once, at lower parallelism.
+Read `state.json` and `PROGRESS.md`. A state file written before the stage rename (`stage` of `baseline`, `review`, `merge`, `deploy` or `final`, or a `deploys` array) must first go through the state migration below; never edit it by hand and never resume a rewrite on the old shape. Then `curl -s 'https://awesome.video/api/version'` and `git fetch origin`. The same anchors open every check-in: `git rev-parse origin/main` against the live revision (full SHAs), `/api/health/ready` (200) and `gh pr list --state open --json number,headRefOid`. If `liveSha` moved, cells graded on the old SHA are stale: re-run them. Continue at `stage`; never repeat a finished stage. A lane left `running` has no trusted result: re-run it. After a 429 or other API failure, write state first, stop, and relaunch only the failed workers once, at lower parallelism.
+
+## State migration (old `stage` names and `deploys`)
+
+Current stages are `audit|triage|fix|check|release|redrive|closure|done`, and release history lives in `releases`. Older runs used `baseline|triage|fix|review|merge|deploy|redrive|final|done` and a `deploys` array. Real historical files also carry run-specific stages (`closed-superseded`, `final-matrix-observation`, `browser-matrix-and-independent-review`), `deploys` entries of different shapes (`{sha, mergedPr, ...}`, `{n, before, target, ...}`) or an empty array, no `deploys` at all, and some use `publishes` or `deploy_queue` instead. The filter below is lossless and idempotent:
+
+- maps only the five old stage names (`baseline`→`audit`, `review`→`check`, `merge`→`release`, `deploy`→`release`, `final`→`closure`); any other stage text is kept exactly;
+- when `deploys` exists: it must be an array and `releases` (if present) must be an array, otherwise the filter errors and writes nothing. Old `deploys` entries come first, unchanged, then any `releases` entry not identical to one of them, so chronology holds and identical overlap is not duplicated; then `deploys` is dropped;
+- leaves `lanes` (a `running` lane stays `running`), `cells`, `publishes`, `deploy_queue` and every other field untouched, and invents nothing.
+
+Test it on a private copy, never on the live file first:
+
+```bash
+set -euo pipefail
+umask 077
+d=$(mktemp -d) && chmod 700 "$d"
+cat > "$d/migrate.jq" <<'JQ'
+{"baseline":"audit","review":"check","merge":"release","deploy":"release","final":"closure"} as $map
+| .stage as $s
+| (if ($s|type)=="string" and ($map|has($s)) then .stage = $map[$s] else . end)
+| if has("releases") and (.releases|type) != "array" then error("releases is not an array")
+  elif has("deploys") then
+    (if (.deploys|type) != "array" then error("deploys is not an array")
+     else .deploys as $d | (.releases // []) as $r
+       | .releases = ($d + [$r[] | select(. as $x | ($d|index([$x])) == null)])
+       | del(.deploys) end)
+  else . end
+JQ
+cp ROOT/state.json "$d/old.json"
+jq -e -f "$d/migrate.jq" "$d/old.json" > "$d/new.json"
+jq -f "$d/migrate.jq" "$d/new.json" | cmp - "$d/new.json"    # idempotent: no output
+jq -c '[.stage, (.releases|length), has("deploys"), has("publishes")]' "$d/new.json"
+```
+
+Example: `{"stage":"deploy","deploys":[{"sha":"a"},{"sha":"b"}],"releases":[{"sha":"b"},{"sha":"c"}],"lanes":{"L1":{"status":"running"}},"x":1}` becomes `{"stage":"release","releases":[{"sha":"a"},{"sha":"b"},{"sha":"c"}],"lanes":{"L1":{"status":"running"}},"x":1}`.
+
+Both legacy `merge` and `deploy` resume at `release`. Check the PR merge SHA, release receipts, current live revision and Replit publish status before choosing the next action. Do not merge again, issue a second publish, or mark a release complete from the stage name alone.
+
+Fail closed: if the filter errors, if the migrated `stage` is not a current stage (an unknown or run-specific one), if a `publishes` or `deploy_queue` key exists, stop and reconcile by hand (read them, copy real entries into `releases`, set `stage` from the evidence) before resuming; never advance or rewrite the run on a guess. Otherwise keep the original as `ROOT/state.pre-migrate.json`, then replace `ROOT/state.json` once. Delete the private temp directory afterwards.
 
 ## Rules
 
