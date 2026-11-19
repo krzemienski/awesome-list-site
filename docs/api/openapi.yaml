@@ -1740,6 +1740,18 @@ components:
       required:
         - id
       additionalProperties: {}
+    QaRowsQuery:
+      type: object
+      properties:
+        runId:
+          type: string
+          pattern: ^[0-9]{8}T[0-9]{4}(?:[0-9]{2})?Z$
+          description: >-
+            Audit run id YYYYMMDDTHHMM[SS]Z, for example 20261119T084150Z (a real UTC date and time); the server derives
+            the [QA-qa-audit-<runId>] prefix from it
+      required:
+        - runId
+      additionalProperties: false
     delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -1754,6 +1766,26 @@ components:
         - table
         - id
       additionalProperties: {}
+    delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Body:
+      type: object
+      properties:
+        runId:
+          type: string
+          pattern: ^[0-9]{8}T[0-9]{4}(?:[0-9]{2})?Z$
+          description: >-
+            Audit run id YYYYMMDDTHHMM[SS]Z, for example 20261119T084150Z (a real UTC date and time); the server derives
+            the [QA-qa-audit-<runId>] prefix from it
+        expectedTitle:
+          type: string
+          minLength: 1
+        backupSha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+      required:
+        - runId
+        - expectedTitle
+        - backupSha256
+      additionalProperties: false
     get_3a__2f_api_2f_github_2f_sync-status_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -14565,6 +14597,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
         - admin
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: ^[0-9]{8}T[0-9]{4}(?:[0-9]{2})?Z$
+            description: >-
+              Audit run id YYYYMMDDTHHMM[SS]Z, for example 20261119T084150Z (a real UTC date and time); the server
+              derives the [QA-qa-audit-<runId>] prefix from it
       security:
         - SessionCookie: []
       x-domain: admin
@@ -14573,7 +14615,8 @@ paths:
       x-middleware:
         - requireAuth
         - isAdmin
-      x-contract-schemas: {}
+      x-contract-schemas:
+        query: QaRowsQuery
   /api/admin/qa-rows/{table}/{id}:
     delete:
       operationId: delete:/api/admin/qa-rows/{table}/{id}
@@ -14661,11 +14704,11 @@ paths:
             type: string
             pattern: ^\d+$
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JsonObjectBody'
+              $ref: '#/components/schemas/delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Body'
       security:
         - SessionCookie: []
       x-domain: admin
@@ -14676,7 +14719,7 @@ paths:
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Params
-        body: JsonObjectBody
+        body: delete_3a__2f_api_2f_admin_2f_qa-rows_2f__7b_table_7d__2f__7b_id_7d_.Body
   /api/github/configure:
     post:
       operationId: post:/api/github/configure
