@@ -32,12 +32,22 @@ import {
   userBookmarks,
 } from "@shared/schema";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { setRouteQuerySchema } from "../../contracts/install";
 import { invalidatePublicCache } from "../../cache/publicCache";
 import { listDatabaseBackups, isBackupStorageConfigured } from "../../backup/databaseBackup";
 import type { LearningJourneyRepository } from "../../repositories/LearningJourneyRepository";
 
 /** A run id looks like 20261119T084150Z (UTC date, `T`, HHMM or HHMMSS, `Z`). */
 export const RUN_ID_PATTERN = /^[0-9]{8}T[0-9]{4}(?:[0-9]{2})?Z$/;
+/** A real UTC date and clock time: reject 20261399T9999Z, which the pattern alone allows. */
+function isRealRunId(runId: string): boolean {
+  const [, y, mo, d, h, mi, sec = "0"] = /^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)?Z$/.exec(runId) ?? [];
+  if (!y) return false;
+  const t = new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi, +sec));
+  return t.toISOString().startsWith(`${y}-${mo}-${d}T${h}:${mi}:${sec.padStart(2, "0")}`);
+}
+const runIdSchema = z.string().regex(RUN_ID_PATTERN).refine(isRealRunId, "runId must be a real UTC date and time")
+  .describe("Audit run id YYYYMMDDTHHMM[SS]Z, for example 20261119T084150Z (a real UTC date and time); the server derives the [QA-qa-audit-<runId>] prefix from it");
 export const qaRunPrefix = (runId: string): string => `[QA-qa-audit-${runId}]`;
 export const QA_BACKUP_MAX_AGE_MS = 10 * 60 * 1000;
 const LIST_LIMIT = 500;
@@ -72,12 +82,12 @@ const FOREIGN_ROW_SOURCES: [table: string, resourceColumn: string, userColumn: s
 ];
 
 const deleteBodySchema = z.object({
-  runId: z.string().regex(RUN_ID_PATTERN),
+  runId: runIdSchema,
   expectedTitle: z.string().min(1),
   backupSha256: z.string().regex(/^[0-9a-f]{64}$/i),
 }).strict();
 
-const listQuerySchema = z.object({ runId: z.string().regex(RUN_ID_PATTERN) }).strict();
+const listQuerySchema = z.object({ runId: runIdSchema }).strict();
 
 function allowedUserIds(): Set<string> {
   return new Set((process.env.QA_CLEANUP_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean));
@@ -115,6 +125,8 @@ async function checkBackup(backupSha256: string): Promise<Refusal | null> {
 
 export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): void {
   const { isAuthenticated, isAdmin, learningJourneyRepo } = ctx;
+  // Documented in OpenAPI exactly as enforced: runId is required, nothing else is accepted.
+  setRouteQuerySchema("get", "/api/admin/qa-rows", { name: "QaRowsQuery", schema: listQuerySchema });
 
   const deletable: Record<string, DeletableTable> = {
     resources: {
@@ -221,7 +233,7 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
     res.json({ runId, prefix, generatedAt: new Date().toISOString(), counts, rows });
   }));
 
-  app.delete("/api/admin/qa-rows/:table/:id", isAuthenticated, isAdmin, asyncHandler(async (req: AuthedRequest, res) => {
+  const deleteRow = asyncHandler(async (req: AuthedRequest, res) => {
     const allowed = allowedUserIds();
     if (!allowed.has(callerId(req))) return res.status(403).json({ message: "Not an authorised QA cleanup account" });
 
@@ -265,5 +277,9 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
 
     invalidatePublicCache("resource-mutation");
     res.json({ table: tableName, deleted: outcome.deleted });
-  }));
+  });
+  // The handler validates the body itself after the allowlist check (403 first); the tag only
+  // lets the contract installer publish this schema in OpenAPI.
+  Object.defineProperty(deleteRow, "validationSchema", { value: deleteBodySchema });
+  app.delete("/api/admin/qa-rows/:table/:id", isAuthenticated, isAdmin, deleteRow);
 }
