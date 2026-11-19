@@ -1,19 +1,24 @@
 /**
  * DOMAIN ROUTER: QA-row cleanup (#77)
  *
- *   GET    /api/admin/qa-rows              rows whose title starts with QA_PREFIX
- *   DELETE /api/admin/qa-rows/:table/:id   delete ONE such row (resources,
- *                                          resource_edits, bookmark_collections)
+ *   GET    /api/admin/qa-rows?runId=<RUN_ID>   rows of ONE audit run: titles that
+ *                                              start with "[QA-qa-audit-<RUN_ID>]"
+ *   DELETE /api/admin/qa-rows/:table/:id       delete ONE such row (resources,
+ *                                              resource_edits, bookmark_collections);
+ *                                              the body carries the same runId
  *
  * Every guard is server-side and none can be widened by a client:
+ *   0. `runId` must match RUN_ID_PATTERN and the server builds the prefix from it;
  *   1. the caller's user id is in env QA_CLEANUP_USER_IDS (comma list);
  *   2. the row's submitter/owner is in the same list;
  *   3. inside the delete transaction the row is locked FOR UPDATE and its title
- *      must start with QA_PREFIX and equal the request's `expectedTitle`;
+ *      must start with the run's prefix and equal the request's `expectedTitle`;
  *   4. `backupSha256` must equal the newest database backup's dump sha256 and
  *      that backup must have completed less than QA_BACKUP_MAX_AGE_MS ago.
- * There is no bulk delete and no prefix parameter. Audit-log and bookmark rows
- * are listed but never deletable (the log is append-only; a bookmark has no title).
+ * There is no bulk delete and no client-supplied prefix: a client sends only a
+ * RUN_ID, never a prefix, wildcard or shorter prefix. Audit-log and bookmark
+ * rows are listed but never deletable (the log is append-only; a bookmark has
+ * no title).
  */
 import type { Express, RequestHandler } from "express";
 import { z } from "zod";
@@ -31,7 +36,9 @@ import { invalidatePublicCache } from "../../cache/publicCache";
 import { listDatabaseBackups, isBackupStorageConfigured } from "../../backup/databaseBackup";
 import type { LearningJourneyRepository } from "../../repositories/LearningJourneyRepository";
 
-export const QA_PREFIX = "[QA-";
+/** A run id looks like 20261119T084150Z (UTC date, `T`, HHMM or HHMMSS, `Z`). */
+export const RUN_ID_PATTERN = /^[0-9]{8}T[0-9]{4}(?:[0-9]{2})?Z$/;
+export const qaRunPrefix = (runId: string): string => `[QA-qa-audit-${runId}]`;
 export const QA_BACKUP_MAX_AGE_MS = 10 * 60 * 1000;
 const LIST_LIMIT = 500;
 
@@ -65,15 +72,18 @@ const FOREIGN_ROW_SOURCES: [table: string, resourceColumn: string, userColumn: s
 ];
 
 const deleteBodySchema = z.object({
+  runId: z.string().regex(RUN_ID_PATTERN),
   expectedTitle: z.string().min(1),
   backupSha256: z.string().regex(/^[0-9a-f]{64}$/i),
 }).strict();
+
+const listQuerySchema = z.object({ runId: z.string().regex(RUN_ID_PATTERN) }).strict();
 
 function allowedUserIds(): Set<string> {
   return new Set((process.env.QA_CLEANUP_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean));
 }
 
-const startsWithPrefix = (column: unknown): SQL => sql`starts_with(${column}, ${QA_PREFIX})`;
+const startsWithPrefix = (column: unknown, prefix: string): SQL => sql`starts_with(${column}, ${prefix})`;
 
 function callerId(req: AuthedRequest): string {
   return String(req.dbUser?.id ?? "");
@@ -166,29 +176,34 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
     const allowed = allowedUserIds();
     if (!allowed.has(callerId(req))) return res.status(403).json({ message: "Not an authorised QA cleanup account" });
 
+    const query = listQuerySchema.safeParse(req.query);
+    if (!query.success) return res.status(400).json({ message: "Query must be exactly ?runId=<RUN_ID>, for example 20261119T084150Z" });
+    const { runId } = query.data;
+    const prefix = qaRunPrefix(runId);
+
     const [resourceRows, editRows, bookmarkRows, collectionRows, auditRows] = await Promise.all([
       db.select({
         id: resources.id, title: resources.title, status: resources.status,
         submittedBy: resources.submittedBy, createdAt: resources.createdAt,
-      }).from(resources).where(startsWithPrefix(resources.title)).orderBy(desc(resources.id)).limit(LIST_LIMIT),
+      }).from(resources).where(startsWithPrefix(resources.title, prefix)).orderBy(desc(resources.id)).limit(LIST_LIMIT),
       db.select({
         id: resourceEdits.id, resourceId: resourceEdits.resourceId, title: resources.title,
         status: resourceEdits.status, submittedBy: resourceEdits.submittedBy, createdAt: resourceEdits.createdAt,
       }).from(resourceEdits).innerJoin(resources, eq(resources.id, resourceEdits.resourceId))
-        .where(startsWithPrefix(resources.title)).orderBy(desc(resourceEdits.id)).limit(LIST_LIMIT),
+        .where(startsWithPrefix(resources.title, prefix)).orderBy(desc(resourceEdits.id)).limit(LIST_LIMIT),
       db.select({
         userId: userBookmarks.userId, resourceId: userBookmarks.resourceId, createdAt: userBookmarks.createdAt,
-      }).from(userBookmarks).where(startsWithPrefix(userBookmarks.notes)).limit(LIST_LIMIT),
+      }).from(userBookmarks).where(startsWithPrefix(userBookmarks.notes, prefix)).limit(LIST_LIMIT),
       db.select({
         id: bookmarkCollections.id, title: bookmarkCollections.name,
         submittedBy: bookmarkCollections.userId, createdAt: bookmarkCollections.createdAt,
-      }).from(bookmarkCollections).where(startsWithPrefix(bookmarkCollections.name))
+      }).from(bookmarkCollections).where(startsWithPrefix(bookmarkCollections.name, prefix))
         .orderBy(desc(bookmarkCollections.id)).limit(LIST_LIMIT),
       db.select({
         id: resourceAuditLog.id, action: resourceAuditLog.action,
         originalResourceId: resourceAuditLog.originalResourceId, createdAt: resourceAuditLog.createdAt,
       }).from(resourceAuditLog)
-        .where(sql`position(${QA_PREFIX} in coalesce(${resourceAuditLog.notes}, '') || coalesce(${resourceAuditLog.changes}::text, '')) > 0`)
+        .where(sql`position(${prefix} in coalesce(${resourceAuditLog.notes}, '') || coalesce(${resourceAuditLog.changes}::text, '')) > 0`)
         .orderBy(desc(resourceAuditLog.id)).limit(LIST_LIMIT),
     ]);
 
@@ -203,7 +218,7 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
     };
     const counts = Object.fromEntries(Object.entries(rows).map(([table, list]) => [table, list.length]));
     res.setHeader("Cache-Control", "private, no-store");
-    res.json({ prefix: QA_PREFIX, generatedAt: new Date().toISOString(), counts, rows });
+    res.json({ runId, prefix, generatedAt: new Date().toISOString(), counts, rows });
   }));
 
   app.delete("/api/admin/qa-rows/:table/:id", isAuthenticated, isAdmin, asyncHandler(async (req: AuthedRequest, res) => {
@@ -218,8 +233,11 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
       return res.status(400).json({ message: "id must be a positive integer" });
     }
     const body = deleteBodySchema.safeParse(req.body ?? {});
-    if (!body.success) return res.status(400).json({ message: "Body must be {expectedTitle, backupSha256}" });
-    const { expectedTitle, backupSha256 } = body.data;
+    if (!body.success) return res.status(400).json({ message: "Body must be {runId, expectedTitle, backupSha256}" });
+    const { runId, expectedTitle, backupSha256 } = body.data;
+    const prefix = qaRunPrefix(runId);
+    // Refuse before any backup or database work when the client's own title is outside the run.
+    if (!expectedTitle.startsWith(prefix)) return res.status(400).json({ message: `expectedTitle must start with ${prefix}` });
 
     const backupRefusal = await checkBackup(backupSha256);
     if (backupRefusal) return res.status(backupRefusal.status).json({ message: backupRefusal.message });
@@ -228,7 +246,7 @@ export function registerQaCleanupRoutes(app: Express, ctx: QaCleanupContext): vo
       const row = await target.lock(tx, id);
       if (!row) return refuse(404, "Row not found");
       if (row.owner === null || !allowed.has(row.owner)) return refuse(403, "Row does not belong to a QA cleanup account");
-      if (!row.title.startsWith(QA_PREFIX)) return refuse(409, `Title no longer starts with ${QA_PREFIX}`);
+      if (!row.title.startsWith(prefix)) return refuse(409, `Title no longer starts with ${prefix}`);
       if (row.title !== expectedTitle) return refuse(409, "expectedTitle does not match the stored title");
       const foreign = await target.foreignRows?.(tx, id, [...allowed]);
       if (foreign && Object.keys(foreign).length > 0) {
