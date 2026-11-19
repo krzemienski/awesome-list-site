@@ -61,7 +61,7 @@ preconfigured).
   `npm run build`, then trims
   development-only files from the publish image. It does not boot the app or
   touch the production database. See [RELEASE.md](../RELEASE.md) for the
-  release checklist and the production QA identity.
+  release contract and the production QA identity.
 - **Run**: `npm run start`.
 - **Target**: `autoscale`, exposing internal port 5000 as external port 80.
 
@@ -86,19 +86,22 @@ git-ignored and untracked files, so never keep secret-bearing files such as
 `.env` in the workspace; secrets belong in Replit **Secrets**. The workspace
 must match `origin/main` when you publish.
 
-`scripts/publish-build.sh` enforces part of this. It fails the build unless
-the tree of `HEAD` equals the tree of `origin/main` (Replit's empty "Published
-your App" commit passes), and it fails when untracked files are present. It
-does not check modified tracked files or ignored files, so
-`git status --short` must still print nothing. On success it stamps the
-`origin/main` commit into the bundle, so `https://awesome.video/api/version`
-reports exactly the GitHub `main` commit that shipped.
+`scripts/publish-build.sh` guards this at build time and says why when it
+refuses; read the script for its exact checks. When it passes, the bundle is
+stamped with the GitHub `main` commit, so `https://awesome.video/api/version`
+reports the commit that shipped.
 
 The procedure is kept in one place, the project skill
 [`.claude/skills/replit-deploy/SKILL.md`](../.claude/skills/replit-deploy/SKILL.md).
-It covers syncing the workspace, when to run `npm install` and
-`npm run db:push`, the check before you publish, publishing, and proving the
-release is live. Change the procedure there, not here.
+It covers syncing the workspace, when to run `npm run db:push` (the publish
+build does the clean lockfile install, so the workspace runs no `npm ci`), the schema review when a schema file or migration changed (a fresh recoverable
+backup and human review before applying a destructive or ambiguous diff),
+publishing once, and proving the release is live (version, readiness and the
+changed behavior). A release is four moves: merge ready changes, sync to the
+intended `origin/main`, publish once, verify. [RELEASE.md](../RELEASE.md) is the
+contract: a change with no runtime purpose (docs, skills, notes) is not
+published, and a full audit and its two-hour closure are separate and never
+gate a publish. Change the procedure in the skill, not here.
 
 ## Docker / Self-Hosting
 

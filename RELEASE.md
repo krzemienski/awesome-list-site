@@ -1,28 +1,130 @@
 # Releasing awesome.video
 
-The site is published from this Replit workspace. Only the owner publishes.
+Production is published from this Replit workspace. A release is one pass:
 
-## 1. Before publishing
+1. **Merge ready** changes into GitHub `main`.
+2. **Sync** the workspace to the intended `origin/main`.
+3. **Publish once.**
+4. **Verify** the version, readiness and the changed behavior.
 
-- Every change in the release has been checked in the running dev app
-  (browser and API). There is no test suite or pre-publish gate.
+Each ready logical fix goes through this on its own, promptly. A release is
+never held for a batch, an audit pass or an observation window.
+`.claude/skills/replit-deploy/SKILL.md` holds the commands and recovery routes;
+this page is the contract they implement. An agent publishes with Replit's
+`publish_app` tool. When `shared/schema.ts` changed since the live revision,
+Replit refuses that tool and the owner publishes from the **Publishing** pane
+instead. A release adds no reviewer agent, review pin, verdict, timer, waiting
+period, agent or thread count, evidence bundle, paid Agent run or owner-session
+preflight of its own. A platform provider's refusal (Replit, GitHub,
+Cloudflare, Clerk) is a stop: report it verbatim. The one documented refusal,
+the schema review below, is handed to the owner; nothing else is retried or
+routed around.
+
+## 1. Merge ready
+
+A change is ready to merge when:
+
+- `npm run build` passes (it runs `tsc --noEmit` before bundling) and
+  `npx eslint <touched files>` adds no new errors against the base commit.
+  There is no test suite or pre-publish gate.
+- Its changed behavior was checked in the running app (browser and API).
 - Database migrations in `migrations/` are journaled and idempotent. Publish
   applies the dev schema diff to production and the boot migrator then re-runs
   the same migrations, so a non-idempotent migration fails the publish.
-- Note the commit you are publishing (`git log --oneline -1`).
+- Address substantive review findings; merge the head you checked.
 
-## 2. Publish
+GitHub permissions and platform-enforced rules apply. This project adds no
+reviewer, approval comment, pin, timer or unresolved-thread count. An actual
+hook or provider refusal is a stop, not a reason to switch tools.
 
-Use the Replit **Publish** button. The build runs `bash scripts/publish-build.sh`
-(`npm run build`, then the publish-image trim); the server starts with
-`npm run start`.
+## 2. Sync and publish once
 
-## 3. Confirm production runs the new code
+- **Purpose.** Release a merge only when it has a runtime purpose: it changes
+  what production runs, serves, builds or stores (code, config the app reads,
+  migrations, dependencies, public assets, a file the server serves), or the
+  owner asks for production to carry it. Judge it from the diff and from who
+  reads the changed file, not from its extension or directory; if you cannot tell
+  whether production reads a file, search for its reader. A change whose only
+  effect is on docs, skills, notes or tooling that production never loads has no
+  runtime purpose: skip the publish and report "skipped, no runtime purpose".
+  Production may then trail `origin/main`, and the next release carries those
+  commits. A skipped release is not a deploy: production still serves BEFORE,
+  so never call it current or equal to `origin/main`, and never report it as
+  shipped.
+- **Intended main.** A release ships `origin/main` as fetched at sync time
+  (`TARGET`). It must contain the change you merged. Merges that landed before
+  the sync ride along; merges that land after it go in the next release.
+- **Sync.** Fast-forward the Replit workspace to `TARGET`. Publish snapshots the
+  workspace files, not GitHub, so no unintended build input or image content
+  may differ. Preserve local work; do not delete files to force a sync. The publish build
+  script, `scripts/publish-build.sh`, states what it refuses and why; read it
+  rather than this page for its exact checks.
+- **Schema review, only when it applies.** It applies when `shared/schema.ts` or
+  `migrations/` changed since the live revision. Run `npm run db:push` against
+  the dev database only when `shared/schema.ts` changed, and let the owner
+  publish from the Publishing pane when Replit refuses `publish_app` for the
+  schema diff. Judge the actual diff the Publishing pane shows, not only the git
+  diff: a git diff that looked safe does not clear a pane diff that drops,
+  truncates, deletes, changes a column type, or that you cannot read with
+  certainty. For a destructive or ambiguous actual diff:
+  1. Take a production backup for this change after the request: its
+     `completedAt` must be later than the request, it must be the newest, with
+     `inFlight` false, and no relevant production write may land between it and
+     the owner's approval (otherwise take another). Confirm it is recoverable
+     from its stored checksum and size; a row count alone does not prove that,
+     and no restore is run.
+  2. Stop for human review of that diff and apply only after the owner says so,
+     even if the git diff looked safe.
+  3. A backup that is missing, stale, failing or unverifiable means do not
+     apply. Report it and wait.
+  A routine code-only release (a pane diff that is plainly additive or absent)
+  takes no backup. An empty Git diff never overrides an actual Publishing-pane
+  diff.
+- **Publish once.** One `publish_app` call, or one **Publish** click by the
+  owner. Replit runs the build (`bash scripts/publish-build.sh`) and starts the
+  server with `npm run start`. The publish build does the clean lockfile
+  install, so the workspace runs no separate `npm ci` or `npm install`. No
+  separate workspace build, routine backup, sweep of every job type or reviewer
+  runs before it.
+- **Jobs.** A restart interrupts in-process jobs (link scans, enrichment,
+  research, GitHub sync), and the server fails stranded jobs at its next start.
+  For a job you already know is running, look up that one job. If a restart
+  would waste real work (a long scan, a paid run), let it finish or ask the
+  owner before publishing; never cancel it to publish. Otherwise record it as an
+  interruption warning in the report and publish. Do not sweep every job type.
+- **Backups.** A routine code-only publish takes none and needs none. The
+  server takes a scheduled daily backup. A manual one is required before
+  applying a destructive or ambiguous schema diff (see Schema review), for a QA
+  cleanup batch (the delete route accepts only the newest backup, completed no
+  more than 10 minutes ago), or when the owner asks. The owner declined adding
+  a per-publish backup for routine releases. See `docs/DATABASE-BACKUP.md`.
 
-`https://awesome.video/api/version` returns `{"revision":"<sha>"}`. A publish
-can occasionally leave production on the previous commit, so also check one
-behaviour that only the new commit has (a response field, page copy, or a
-header) before calling the release live.
+## 3. Verify
+
+Check in this order and stop on the first failure:
+
+1. **Version.** `https://awesome.video/api/version` returns
+   `{"revision":"<TARGET>"}`.
+2. **Readiness.** `https://awesome.video/api/health/ready` returns 200.
+3. **Changed behavior.** A publish can occasionally leave production on the
+   previous commit, and a cutover can briefly serve the old build, so check one
+   behavior that only the new commit has (a response field, page copy, a
+   header, the changed screen). Drive it the way a person meets it: a browser
+   for UI, `curl` for an API, header or server-rendered text.
+
+A release is complete only for the exact intended SHA: `/api/version` equals
+it, readiness is 200 and the changed behavior works. Say "production is
+current with `origin/main`" only when the live SHA equals `origin/main`. After
+a skipped docs-only merge it does not.
+
+### Audit and closure are not part of a release
+
+A full production audit and its closure (a clean full pass on one SHA, then the
+two-hour window with no error-level log record and no app 5xx; see
+`.claude/skills/defect-loop/SKILL.md`) are separate work that runs on request.
+They never gate a merge or a publish, and a publish is never held for one. A
+publish ends a closure in progress on the older SHA; the audit run records that
+and restarts on the live SHA.
 
 ## 4. Production QA identity
 
@@ -36,7 +138,7 @@ audit member; their credentials live outside the repo in `~/.cache/awesome-audit
 |---|---|
 | Public pages, SEO, guest flows, API reads | Signed out. No identity needed. |
 | Admin pages and signed-in member features in a browser, and any QA row | The audit admin or audit member account. |
-| Admin API calls (deploy checks, logs) | The owner admin session: `https://awesome.video/sign-in?admin` + the `OWNER_PASSWORD` secret. It is a signed 12-hour HttpOnly cookie for the `admin@example.com` account, independent of Clerk. |
+| Admin API calls (targeted job lookups, logs) | The owner admin session: `https://awesome.video/sign-in?admin` + the `OWNER_PASSWORD` secret. It is a signed 12-hour HttpOnly cookie for the `admin@example.com` account, independent of Clerk. |
 | The owner's own Clerk account | Signs in with Google or an email code (no password factor). Only the owner can use it. |
 
 Rules for using the owner admin session on production:

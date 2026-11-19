@@ -5,8 +5,9 @@ import { fileURLToPath } from "node:url";
 // Only these development artifacts are expendable in the publishing copy.
 // Keep runtime dependencies (node_modules), dist, migrations, and source
 // intact. Everything listed here is consumed BEFORE this step runs (the gate
-// builds first, and `npm run build` bakes BUILD_REVISION from git at that
-// point) and is never read by `node dist/index.js`:
+// builds first, and `npm run build` bakes the BUILD_REVISION that
+// publish-build.sh pinned to origin/main at that point) and is never read by
+// `node dist/index.js`:
 //   - .git: history/packs (~2.4 GiB); the runtime only sees the baked revision
 //   - parity baselines / docs/parity*: frozen capture evidence (~5.6 GiB)
 //   - docs/audit-final/proof: per-row screenshots and recordings (~10 MB/row)
@@ -41,10 +42,20 @@ const targets = [
   "playwright-report",
   "attached_assets",
 ];
+// Targets publish-build.sh may find untracked in the workspace without refusing
+// the build: evidence and run output that no build step reads and that --apply
+// deletes from the publishing copy, so what ships is still GitHub main's files.
+// Left out on purpose:
+//   - attached_assets: vite.config.ts aliases `@assets` to it, so it is a build
+//     input and any file in it must be refused, not excused;
+//   - .git: version-control metadata, not a workspace file to compare.
+const evidenceTargets = targets.filter((t) => t !== "attached_assets" && t !== ".git");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const mode = process.argv[2] ?? "--dry-run";
-if (!["--dry-run", "--apply"].includes(mode) || process.argv.length > 3) {
-  throw new Error("Usage: node scripts/deployment/trim-publish-image.mjs [--dry-run|--apply]");
+if (!["--dry-run", "--apply", "--pre-build", "--list-evidence"].includes(mode) || process.argv.length > 3) {
+  throw new Error(
+    "Usage: node scripts/deployment/trim-publish-image.mjs [--dry-run|--apply|--pre-build|--list-evidence]",
+  );
 }
 // Publishing markers. REPLIT_DEPLOYMENT=1 is set by Replit only at runtime
 // (never during the build command), so the publish build relies on
@@ -53,11 +64,14 @@ if (!["--dry-run", "--apply"].includes(mode) || process.argv.length > 3) {
 const publishMarker =
   process.env.REPLIT_DEPLOYMENT === "1" ||
   process.env.REPLIT_PUBLISH_IMAGE_TRIM === "1";
-if (mode === "--apply" && !publishMarker) {
+if ((mode === "--apply" || mode === "--pre-build") && !publishMarker) {
   throw new Error(
     "Refusing cleanup outside publishing: REPLIT_PUBLISH_IMAGE_TRIM (or REPLIT_DEPLOYMENT) must be 1. Use --dry-run in the workspace.",
   );
 }
+// --pre-build runs before `npm run build` and removes only attached_assets from
+// the publishing copy, so a real import of an ignored asset fails the build
+// instead of being embedded. Same marker and symlink protection as --apply.
 // Do NOT gate on REPLIT_DEV_DOMAIN: the publish build container inherits it
 // (confirmed by the 2026-09-17 publish log, where this step aborted with
 // "REPLIT_DEV_DOMAIN is set" even though REPLIT_PUBLISH_IMAGE_TRIM=1 came
@@ -71,6 +85,12 @@ const platformDirs = [".cache/replit", ".config", ".local", ".replit", "replit.n
 for (const target of targets) {
   const hit = platformDirs.find((p) => p === target || p.startsWith(`${target}/`) || target.startsWith(`${p}/`));
   if (hit) throw new Error(`Refusing to trim ${target}: it contains or lives inside runtime-required ${hit}`);
+}
+
+// publish-build.sh reads this list. It only prints; it never touches the disk.
+if (mode === "--list-evidence") {
+  for (const target of evidenceTargets) console.log(target);
+  process.exit(0);
 }
 
 // Check every path before deleting anything. Never follow symlinked parents
@@ -101,14 +121,14 @@ function makeDirectoriesWritable(dir) {
   }
 }
 
-for (const target of targets) {
+for (const target of mode === "--pre-build" ? ["attached_assets"] : targets) {
   const absolute = path.join(root, target);
   if (!fs.existsSync(absolute)) {
     console.log(`[publish-image] Already absent: ${target}`);
     continue;
   }
-  console.log(`[publish-image] ${mode === "--apply" ? "Removing" : "Would remove"} ${target}`);
-  if (mode === "--apply") {
+  console.log(`[publish-image] ${mode !== "--dry-run" ? "Removing" : "Would remove"} ${target}`);
+  if (mode !== "--dry-run") {
     makeDirectoriesWritable(absolute);
     fs.rmSync(absolute, { recursive: true, force: true });
   }
