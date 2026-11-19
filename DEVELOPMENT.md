@@ -193,42 +193,12 @@ npm run type-check
 - `0` - No type errors
 - `2` - Type errors found
 
-### End-to-End Tests
+### Functional Validation
 
-The Playwright e2e suite under `tests/e2e/` is run automatically on every push
-and PR via the `e2e-tests` job in `.github/workflows/test.yml`. To run it
-locally:
-
-```bash
-# 1. Install Playwright browser binaries (one-time setup, ~200MB)
-npx playwright install --with-deps
-
-# 2. Run the full e2e suite
-npm run test:e2e
-```
-
-`playwright.config.ts` starts `npm run dev` on `http://localhost:5000` for you,
-so you do not need to start a server yourself. The specs use explicit
-DOM/content assertions rather than `networkidle`, which keeps Vite's HMR
-connection from making load checks flaky.
-
-If you already have a server running on `:5000`, Playwright reuses it locally.
-CI always starts the configured dev server.
-
-To run a single spec or filter by title:
-
-```bash
-npm run test:e2e -- tests/e2e/admin-users-audit.spec.ts
-npm run test:e2e -- --grep "Audit tab"
-```
-
-The `admin-users-audit.spec.ts` spec relies on an admin account and the
-`test-user-123` fixture user. Auth is now Clerk-based (the old password
-login and reset script were removed); see `tests/README.md` for fixture
-requirements and the auth-check migration status.
-
-Test artifacts (`playwright-report/`, `test-results/`) are git-ignored —
-do not commit them.
+The repository has no automated test suite, Playwright config, or CI workflow.
+Validate behavior manually in a browser against the running dev server
+(`npm run dev`, `http://localhost:5000`): exercise the changed flow as a real
+user, including error and offline states.
 
 ### Combined Quality Check
 
@@ -349,48 +319,6 @@ echo "npx lint-staged" > .husky/pre-commit
 - Prevents committing code with linting errors
 - Automatically formats staged files
 - Runs only on changed files (fast)
-
-## CI/CD Integration
-
-### GitHub Actions
-
-**Example workflow** (`.github/workflows/quality-check.yml`):
-
-```yaml
-name: Code Quality
-
-on: [push, pull_request]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: Type check
-        run: npm run type-check
-
-      - name: Build
-        run: npm run build
-```
-
-**Benefits:**
-- Catches errors before merging PRs
-- Enforces code quality standards
-- Prevents broken builds from reaching production
 
 ## Troubleshooting
 

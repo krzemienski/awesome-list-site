@@ -119,7 +119,7 @@ npm run check:awesome-bot
 1. Run the development server and test changes
 2. Ensure no TypeScript errors: `npm run type-check`
 3. Lint and format: `npm run lint` and `npm run format:check`
-4. Run tests: `npm run test:unit` (plus `npm run test:integration` / `npm run test:e2e` for larger changes)
+4. Exercise the changed flow by hand in a browser against `npm run dev`
 5. Test on mobile viewport sizes
 6. Update documentation if needed
 
@@ -201,15 +201,8 @@ See [docs/CODE-MAP.md](docs/CODE-MAP.md) for detailed codebase navigation.
 
 **One-off scripts belong in `scripts/`, never at the repository root.** The root is reserved
 for configs a tool auto-discovers (`eslint.config.js`, `postcss.config.js`, the `.ts` configs).
-The registered `root-script-drift` validation (`node scripts/validation/root-script-drift.mjs`)
-fails when a root-level `.js/.mjs/.cjs/.ts` file is referenced by no npm script, workflow,
-import, or tooling config. Only a real invocation counts: a mention in a doc, a comment, or a
-plain string inside source code is deliberately not a reference. Commands are read against
-their executable, so `node probe.mjs` keeps a file while `echo probe.mjs`, `env echo probe.mjs`
-and `git add probe.mjs` do not. Configs are read through their own schema rather than by key
-name, so a value only counts where that format actually runs or loads it — an `env:` entry
-called `command`, a `with:` input or an npm `config` field is metadata — and a config the gate
-cannot parse fails the check instead of being scanned as text.
+Review rejects stray root-level `.js/.mjs/.cjs/.ts` files that no npm script, import, or tooling
+config references.
 
 ## Documentation
 
