@@ -92,5 +92,5 @@ export function findRouteSuggestion(
     const state = best.page.path === "search" ? searchPageQuery(search) : "";
     return { label: `Did you mean ${best.page.name}?`, href: `/${best.page.path}${state}` };
   }
-  return findTaxonomySuggestion(nav, "category", needle);
+  return findTaxonomySuggestion(nav, "category", needle, search);
 }
