@@ -181,9 +181,11 @@ export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevan
   }
   state.tags.forEach(tag => chips.push({ key: "tags", value: tag, text: `Tag: ${tagLabel(tag)}` }));
   if (!chips.length) return null;
-  // Compact chips share Search's existing filter row and scroll horizontally;
-  // the default layout is used by Search's desktop sidebar and taxonomy pages.
-  return <div className={cn("flex items-center gap-2", compact ? "min-w-0 flex-nowrap overflow-x-auto" : "mb-4 flex-wrap")} data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="btn ghost search-filter-chip shrink-0" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<div className={compact ? "shrink-0" : "max-sm:basis-full"}><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
+  // Compact chips share Search's existing filter row and wrap (no hidden
+  // scroll); a long chip truncates (full text in title and accessible name)
+  // so it and "Clear all" stay on screen. The default layout is used by
+  // Search's desktop sidebar, its too-long-query state, and taxonomy pages.
+  return <div className={cn("flex items-center gap-2", compact ? "min-w-0 flex-1" : "mb-4", (!compact || chips.length > 1) && "flex-wrap")} data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} title={chip.text} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className={cn("btn ghost search-filter-chip max-w-full", compact && "min-w-0")} aria-label={`Remove ${chip.text}`}><span className="truncate">{chip.text}</span><X className="h-3.5 w-3.5 shrink-0" /></button>)}<div className={compact ? "shrink-0" : "max-sm:basis-full"}><Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div></div>;
 }
 
 export const sortLabels = RESOURCE_SEARCH_SORT_LABELS as Record<string, string>;
