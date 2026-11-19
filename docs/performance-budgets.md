@@ -23,11 +23,15 @@ npm run build
 
 Vite emits `.vite/manifest.json`; follow its logical entry keys (not hashed
 filenames) to find the initial JavaScript files and compare their raw, gzip,
-and brotli sizes with the ceilings above.
+and brotli sizes with the ceilings above. The manifest does not list modules;
+`dist/public/bundle-modules.json` (emitted by the plugin in `vite.config.ts`)
+lists the source modules in each chunk, so use it to confirm the excluded
+modules above are absent from the entry chunk.
 
 ## Mobile profile
 
-Profile by hand in a browser at 390×844 @2x, 150 ms latency, 1.6 Mbps download,
+Profile the production build (`npm run build && npm run start`, not
+`npm run dev`) by hand in a browser at 390×844 @2x, 150 ms latency, 1.6 Mbps download,
 750 Kbps upload, and 4× CPU slowdown with cache disabled. Record
 DOMContentLoaded, React home readiness, first category readiness, script
 transfer/decoded bytes, script evaluation, and total task duration.

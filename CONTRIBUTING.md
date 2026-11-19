@@ -105,20 +105,13 @@ curl -X POST http://localhost:5000/api/resources \
   -d '{"title":"Test","url":"https://example.com"}'
 ```
 
-### Validation Testing
-
-```bash
-# Validate exported Awesome-list links (requires the documented awesome_bot setup)
-npm run check:awesome-bot
-```
-
 ## Pull Request Process
 
 ### Before Submitting
 
 1. Run the development server and test changes
 2. Ensure no TypeScript errors: `npm run type-check`
-3. Lint and format: `npm run lint` and `npm run format:check`
+3. Lint touched files and check formatting: `npx eslint <touched files>` (compare with base; whole-repo `npm run lint` already fails there) and `npm run format:check`
 4. Exercise the changed flow by hand in a browser against `npm run dev`
 5. Test on mobile viewport sizes
 6. Update documentation if needed

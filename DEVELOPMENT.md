@@ -10,7 +10,6 @@ This guide covers code quality tooling, development workflows, and best practice
 - [Available Commands](#available-commands)
 - [Editor Integration](#editor-integration)
 - [Pre-commit Workflow](#pre-commit-workflow)
-- [CI/CD Integration](#cicd-integration)
 - [Troubleshooting](#troubleshooting)
 
 ## Code Quality Tools
@@ -138,11 +137,11 @@ See `.prettierignore` for the full list. Key exclusions:
 ### Linting
 
 ```bash
-# Run ESLint on all files
-npm run lint
+# Lint the files you touched (whole-repo `npm run lint` already fails on the base branch)
+npx eslint <touched files>
 
-# Auto-fix ESLint errors (when possible)
-npm run lint -- --fix
+# Auto-fix ESLint errors in those files (when possible)
+npx eslint --fix <touched files>
 ```
 
 **What it checks:**
@@ -205,7 +204,7 @@ user, including error and offline states.
 Run all quality checks before committing:
 
 ```bash
-npm run lint && npm run format:check && npm run type-check
+npx eslint <touched files> && npm run format:check && npm run type-check
 ```
 
 ## Editor Integration
@@ -274,8 +273,8 @@ Before committing code, run:
 # 1. Format all files
 npm run format
 
-# 2. Lint and auto-fix
-npm run lint -- --fix
+# 2. Lint touched files and auto-fix
+npx eslint --fix <touched files>
 
 # 3. Type check
 npm run type-check
@@ -391,10 +390,10 @@ npm run type-check
 
 ```bash
 # Lint only changed files (Git)
-git diff --name-only --cached | grep '\\.tsx\\?$' | xargs npm run lint --
+git diff --name-only --cached | grep '\\.tsx\\?$' | xargs npx eslint
 
 # Lint specific directory
-npm run lint -- client/src/components
+npx eslint client/src/components
 ```
 
 **Speed up formatting:**

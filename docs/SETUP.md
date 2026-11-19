@@ -122,8 +122,9 @@ npm run db:studio        # open Drizzle Studio (GUI)
 ## Validation
 
 The repository has no automated test suite. Run `npm run type-check`,
-`npm run lint`, and `npm run build`, then exercise the changed flow by hand in
-a browser against `npm run dev`.
+`npx eslint <touched files>` (compare against base; whole-repo `npm run lint`
+already exits 1 there), and `npm run build`, then exercise the changed flow by
+hand in a browser against `npm run dev`.
 
 ## Troubleshooting
 
