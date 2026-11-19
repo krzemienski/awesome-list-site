@@ -2427,8 +2427,12 @@ export function ogInjectionMiddleware() {
     // /?q=term was silently rendering the homepage; 301 it to the real search
     // results page so search is a first-class, linkable route (VG-4).
     if (urlPath === "/") {
-      const target = legacyHomeSearchRedirect((req.originalUrl || req.url).split("?")[1] || "");
-      if (target) return res.redirect(301, target);
+      const rawUrl = req.originalUrl || req.url;
+      const queryStart = rawUrl.indexOf("?");
+      if (queryStart !== -1) {
+        const target = legacyHomeSearchRedirect(rawUrl.slice(queryStart + 1));
+        if (target) return res.redirect(301, target);
+      }
     }
     // /recommendations is now a real page (see staticRoutes) — no redirect.
     // /settings is now a real hub page (see staticRoutes) — no redirect.
