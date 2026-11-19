@@ -867,7 +867,7 @@ function Router({
       <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => void refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <RouteErrorBoundary location={location}>
         <Suspense fallback={<RouteFallback />}>
-          <NotFound suggestion={findRouteSuggestion(location, nav)} />
+          <NotFound suggestion={findRouteSuggestion(location, nav, search)} />
         </Suspense>
         </RouteErrorBoundary>
       </MainLayout>
@@ -1027,7 +1027,7 @@ function Router({
           </AuthGuard>
         </Route>
         <Route>
-          <NotFound suggestion={findRouteSuggestion(location, nav)} />
+          <NotFound suggestion={findRouteSuggestion(location, nav, search)} />
         </Route>
       </Switch>
       </Suspense>
