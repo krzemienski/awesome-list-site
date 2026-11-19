@@ -132,7 +132,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   const content = (collapsible: boolean) => {
     const tagsScroll = collapsible && listedTags.length > TAG_VISIBLE_ROWS;
     return <div className="space-y-6">
-    <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
+    <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && !(collapsible && showActiveFilters) && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
     {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results.{otherControls.length > 0 && ` Use ${orList(otherControls)} to narrow them.`}</p>}
     {/* Category is the entry point into the taxonomy, so it stays open; the two
         drill-down levels and the tag list are the long ones and open on demand. */}
