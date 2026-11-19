@@ -47,41 +47,8 @@ theme remains the fallback.
 
 ## Verification
 
-The reusable end-to-end auth harness is:
-
-```sh
-npm run validate:auth-return
-```
-
-It starts with an anonymous browser, checks deep-page redirects and
-`redirect_url` preservation, signs in disposable Clerk users, checks the
-returned authenticated route (including the admin guard), and exercises
-account recovery. It requires a development server on `:5000`,
-`DATABASE_URL`, `CLERK_SECRET_KEY`, and `ADMIN_PASSWORD` with at least eight
-characters. The harness creates and tears down QA identities and local bridge
-rows; it must not be run in parallel with another DB-heavy/browser audit.
-
-Evidence and full-page screenshots are written to:
-
-```text
-/tmp/validation/auth-return-audit/
-```
-
-The named screenshots are:
-
-- `auth-return.png`
-- `auth-return-profile.png`
-- `auth-return-admin-resources.png`
-- `auth-return-contributions.png`
-- `auth-return-bookmarks.png`
-- `auth-return-notifications.png`
-- `auth-return-onboarding.png`
-- `account-recovery-entry.png`
-- `account-recovery-verification.png`
-- `account-recovery-complete.png`
-
-The browser harness uses a 1280×900 viewport. Responsive appearance checks
-should additionally capture the sign-in and sign-up routes at 375px and
-1440px viewport widths, after each representative system/accent selection;
-keep those captures under the same audit directory with a descriptive suffix
-instead of replacing the canonical harness artifacts.
+No auth-return script exists. Verify by hand against `npm run dev` on `:5000`:
+anonymous deep-page redirects keep `redirect_url`, a signed-in user returns to
+the requested route (including the admin guard), and account recovery
+completes. Check the sign-in and sign-up routes at 375px and 1440px after each
+representative system/accent selection.

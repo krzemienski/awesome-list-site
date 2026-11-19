@@ -116,20 +116,15 @@ npm run db:studio        # open Drizzle Studio (GUI)
 ├── shared/schema.ts     # Drizzle schema + Zod types (source of truth)
 ├── migrations/          # SQL migrations (run in production)
 ├── scripts/             # Maintenance scripts (tsx)
-├── tests/               # unit / integration / e2e (+ helpers)
 └── docs/                # Documentation
 ```
 
-## Testing
+## Validation
 
-```bash
-npm run test:unit          # fast unit tests
-npm run test:integration   # API/integration tests (needs a test DATABASE_URL)
-npm run test:e2e           # Playwright (starts the app; see playwright.config.ts)
-```
-
-Integration and e2e tests expect a reachable PostgreSQL database. Point
-`DATABASE_URL` at a disposable/test database before running them.
+The repository has no automated test suite. Run `npm run type-check`,
+`npx eslint <touched files>` (compare against base; whole-repo `npm run lint`
+already exits 1 there), and `npm run build`, then exercise the changed flow by
+hand in a browser against `npm run dev`.
 
 ## Troubleshooting
 
