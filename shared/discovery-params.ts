@@ -45,6 +45,25 @@ export function searchApiParams(state: ReturnType<typeof readSearchState>, limit
   return p;
 }
 
+// Exactly what readSearchState() consumes (q wins over its `search` alias).
+const SEARCH_PAGE_KEYS = ["category", "subcategory", "subSubcategory", "tags", "tag", "provider", "format", "skillLevel", "sort", "page"] as const;
+
+/**
+ * Legacy /?q=… → /search. Returns null when there is no non-blank q (the home
+ * page keeps its own ?tags= filters). Carries only params /search reads, with
+ * repeated values kept in order; everything else (utm, layout, kind, …) is
+ * dropped. Values are copied verbatim so the pre-boot scrubber and its notice
+ * still run on the destination URL for any removed markup-shaped value.
+ */
+export function legacyHomeSearchRedirect(search: string): string | null {
+  const source = new URLSearchParams(search);
+  const q = source.get("q")?.trim();
+  if (!q) return null;
+  const target = new URLSearchParams({ q });
+  for (const key of SEARCH_PAGE_KEYS) for (const value of source.getAll(key)) target.append(key, value);
+  return `/search?${target.toString()}`;
+}
+
 /** Compatibility redirects preserve only destination-supported discovery state. */
 export function discoveryRedirect(path: string, search: string): string {
   const source = new URLSearchParams(search);
