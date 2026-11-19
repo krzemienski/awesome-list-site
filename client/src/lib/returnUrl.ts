@@ -37,6 +37,27 @@ export function isSafeReturnPath(value: string | null | undefined): value is str
   return normalizeReturnPath(value) !== null;
 }
 
+/**
+ * Clerk rewrites a relative ?redirect_url= into an absolute URL on its own
+ * origin when it builds the Sign in / Sign up switch link and merges that
+ * link's fragment back into the query. A same-origin absolute URL is that
+ * value, so reduce it to the app-relative path (re-validated by
+ * normalizeReturnPath); any other origin, scheme, credentials or control
+ * character yields null.
+ */
+function sameOriginAbsoluteToPath(value: string | null): string | null {
+  if (typeof window === "undefined" || value === null) return null;
+  if (CONTROL_CHARS.test(value) || !/^https?:\/\//i.test(value)) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return null;
+  }
+  if (parsed.origin !== window.location.origin || parsed.username || parsed.password) return null;
+  return normalizeReturnPath(`${parsed.pathname}${parsed.search}${parsed.hash}`);
+}
+
 /** The current location (path, query AND fragment), or the fallback. */
 export function currentReturnPath(fallback = "/"): string {
   if (typeof window === "undefined") return fallback;
@@ -79,14 +100,16 @@ export function foldInheritedHashIntoRedirect(): void {
 /**
  * Normalize (or drop) ?redirect_url= on the sign-in page before any consumer
  * reads it — Clerk honors the raw parameter, so an unsafe value must never
- * reach it. A safe value is replaced by its parsed same-origin form.
+ * reach it. A safe value is replaced by its parsed same-origin form; the
+ * same-origin absolute URL Clerk writes when switching between Sign in and
+ * Sign up is reduced to its app-relative path rather than dropped.
  */
 export function sanitizeRedirectParam(): void {
   if (typeof window === "undefined") return;
   const params = new URLSearchParams(window.location.search);
   if (!params.has("redirect_url")) return;
   const raw = params.get("redirect_url");
-  const normalized = normalizeReturnPath(raw);
+  const normalized = normalizeReturnPath(raw) ?? sameOriginAbsoluteToPath(raw);
   if (normalized === raw) return;
   if (normalized === null) params.delete("redirect_url");
   else params.set("redirect_url", normalized);
