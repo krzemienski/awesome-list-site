@@ -48,11 +48,6 @@ interface TagListingResponse {
   };
 }
 
-function listingTag(queryKeyUrl: unknown): string | null {
-  if (typeof queryKeyUrl !== "string") return null;
-  return new URLSearchParams(queryKeyUrl.split("?")[1] ?? "").get("tags");
-}
-
 function resourceTags(resource: any): string[] {
   const tags = resource?.tags ?? resource?.metadata?.tags;
   return Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === "string") : [];
@@ -89,14 +84,14 @@ export default function TagLanding() {
     },
     enabled: tagIsQueryable && pageReachable,
     staleTime: 60_000,
-    // Hold the current page only while paging within this tag; another tag's
-    // cards and total must never render under the new tag's heading.
-    placeholderData: (previous, previousQuery) =>
-      previousQuery && listingTag(previousQuery.queryKey[0]) === slug ? previous : undefined,
+    // No placeholderData: a page not yet cached is pending (skeleton, or the
+    // offline panel while paused), so the previous page's cards never sit
+    // under a URL and pager that already name another page. Cached pages
+    // still render at once, offline included.
   });
 
   const listedTotal = listing.data?.total;
-  const pastLastPage = listedTotal !== undefined && !listing.isPlaceholderData
+  const pastLastPage = listedTotal !== undefined
     && page > Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
   // A rejected ?page= disables the query but still reads page 1 from the
   // cache, so the listing data alone can't tell a 404 from a real view.
@@ -106,23 +101,30 @@ export default function TagLanding() {
   // matching category_viewed on the taxonomy pages.
   const viewedTagRef = useRef<string | null>(null);
   useEffect(() => {
-    if (notFound || listedTotal === undefined || listing.isPlaceholderData) return;
+    if (notFound || listedTotal === undefined) return;
     if (viewedTagRef.current === slug) return;
     viewedTagRef.current = slug;
     trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
-  }, [listedTotal, listing.isPlaceholderData, notFound, slug]);
+  }, [listedTotal, notFound, slug]);
 
   // After a page change, wait for the new page: the intro above the count is
   // built from its resources and can change height. Then bring the count to
   // the top and focus it so a screen reader announces the new range.
   const resultsCountRef = useRef<HTMLHeadingElement>(null);
+  const paginationRef = useRef<HTMLDivElement>(null);
   const pendingResultsFocusRef = useRef(false);
   useEffect(() => {
-    if (!pendingResultsFocusRef.current || !listing.data || listing.isPlaceholderData) return;
+    if (!pendingResultsFocusRef.current || !listing.data) return;
     pendingResultsFocusRef.current = false;
+    // The request can outlast the click that started it. Only take focus when
+    // it is still unclaimed (body/removed node, as when the offline panel's
+    // retry unmounts) or inside the paging UI; a visitor who moved to another control keeps it.
+    const active = document.activeElement;
+    const unclaimed = !active || active === document.body || !active.isConnected;
+    if (!unclaimed && !paginationRef.current?.contains(active)) return;
     resultsCountRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
     resultsCountRef.current?.focus({ preventScroll: true });
-  }, [listing.data, listing.isPlaceholderData]);
+  }, [listing.data]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
@@ -263,7 +265,7 @@ export default function TagLanding() {
           ))}
         </div>
         {totalPages > 1 && (
-          <div className="taxonomy-pagination">
+          <div className="taxonomy-pagination" ref={paginationRef}>
             <Paginator
               currentPage={page}
               totalPages={totalPages}
@@ -284,6 +286,11 @@ export default function TagLanding() {
       {(categories.length > 0 || relatedTags.length > 0) && (
         <section className="taxonomy-children" aria-labelledby="related-topics-heading" data-seo-section="related-topics">
           <h2 id="related-topics-heading">Explore related topics</h2>
+          {relatedTags.length > 0 && (
+            <p className="text-sm text-muted-foreground" data-testid="related-tag-scope-note">
+              Tag counts show matches on this page, not totals for the linked tags.
+            </p>
+          )}
           <div className="taxonomy-child-grid">
             {categories.map((category) => (
               <Link key={category.value} href={`/category/${slugify(category.value)}`} className="taxonomy-child card hoverable" aria-label={tileLabel(category.value, category.count)}>
@@ -291,7 +298,7 @@ export default function TagLanding() {
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable" aria-label={tileLabel(`#${tagDisplayName(related)}`, count)}>
+              <Link key={related} href={tagLandingPath(related)} className="taxonomy-child card hoverable" aria-label={tileLabel(`#${tagDisplayName(related)}`, count, "among this page's resources")}>
                 <span>#{tagDisplayName(related)}</span>{" "}<span className="chip mono">{formatTileCount(count)}</span>
               </Link>
             ))}
