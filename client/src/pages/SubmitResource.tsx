@@ -384,31 +384,56 @@ export default function SubmitResource() {
 
   // Debounced auto-save of the in-progress form to localStorage.
   useEffect(() => {
+    const writeDraft = (values: Partial<SubmitResourceFormData>) => {
+      // Fail closed on the authoritative auth cache (finishLogout updates it
+      // before the hard navigation), not on the last React render: every
+      // write path (debounce, pagehide, unmount) goes through here.
+      const auth = queryClient.getQueryData<{ isAuthenticated?: boolean }>([
+        "/api/auth/user",
+      ]);
+      if (!auth?.isAuthenticated) return;
+      // R5-015: last-write-wins with a staleness check — if another tab has
+      // written a NEWER draft since we last loaded/wrote, do NOT overwrite
+      // it with this tab's stale snapshot (the storage listener below will
+      // pull the newer content in instead).
+      const current = safeGetItem(DRAFT_KEY);
+      if (current) {
+        const stored = parseDraft(current);
+        if (stored && stored.updatedAt > draftSeenAtRef.current) return;
+      }
+      if (draftHasContent(values)) {
+        const updatedAt = Date.now();
+        safeSetItem(DRAFT_KEY, JSON.stringify({ values, updatedAt }));
+        draftSeenAtRef.current = updatedAt;
+      } else {
+        safeRemoveItem(DRAFT_KEY);
+      }
+    };
+    // The ONE flush path: a pending timer means a genuine unsaved edit.
+    // Submit, Discard, logout and an external clear all null the timer first,
+    // so they can never be resurrected here. Reads the live form values.
+    const flushDraft = () => {
+      if (!draftSaveTimer.current) return;
+      clearTimeout(draftSaveTimer.current);
+      draftSaveTimer.current = null;
+      if (draftRestoredRef.current) writeDraft(form.getValues());
+    };
     const subscription = form.watch((values) => {
       if (!draftRestoredRef.current) return;
-      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      clearTimeout(draftSaveTimer.current ?? undefined);
       draftSaveTimer.current = setTimeout(() => {
-        // R5-015: last-write-wins with a staleness check — if another tab has
-        // written a NEWER draft since we last loaded/wrote, do NOT overwrite
-        // it with this tab's stale snapshot (the storage listener below will
-        // pull the newer content in instead).
-        const current = safeGetItem(DRAFT_KEY);
-        if (current) {
-          const stored = parseDraft(current);
-          if (stored && stored.updatedAt > draftSeenAtRef.current) return;
-        }
-        if (draftHasContent(values)) {
-          const updatedAt = Date.now();
-          safeSetItem(DRAFT_KEY, JSON.stringify({ values, updatedAt }));
-          draftSeenAtRef.current = updatedAt;
-        } else {
-          safeRemoveItem(DRAFT_KEY);
-        }
+        draftSaveTimer.current = null;
+        writeDraft(values);
       }, 600);
     });
+    // Leaving /submit by SPA navigation (cleanup) or by a real document
+    // unload/reload/tab close (pagehide) inside the 600ms debounce window
+    // must not drop the last keystrokes.
+    window.addEventListener("pagehide", flushDraft);
     return () => {
       subscription.unsubscribe();
-      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      window.removeEventListener("pagehide", flushDraft);
+      flushDraft();
     };
   }, [form]);
 
@@ -422,6 +447,10 @@ export default function SubmitResource() {
         // Draft cleared elsewhere (logout or emptied form): reset if we were
         // showing draft content and have no newer local edits in flight.
         draftSeenAtRef.current = 0;
+        // Cleared elsewhere (logout / submit in another tab): a pending
+        // debounced write from this tab must not resurrect it.
+        clearTimeout(draftSaveTimer.current ?? undefined);
+        draftSaveTimer.current = null;
         return;
       }
       const draft = parseDraft(e.newValue);
@@ -503,7 +532,8 @@ export default function SubmitResource() {
 
       setShowSuccess(true);
       setSuccessCount((n) => n + 1);
-      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      clearTimeout(draftSaveTimer.current ?? undefined);
+      draftSaveTimer.current = null;
       // A mouse submit keeps focus in the last edited field; blur it while it
       // still holds its value, or the success card taking focus after the
       // reset blurs an empty field and "onTouched" flags it as required.
@@ -993,7 +1023,8 @@ export default function SubmitResource() {
                       <AlertDialogAction
                         data-testid="button-discard-confirm"
                         onClick={() => {
-                          if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+                          clearTimeout(draftSaveTimer.current ?? undefined);
+                          draftSaveTimer.current = null;
                           safeRemoveItem(DRAFT_KEY);
                           setLocation('/');
                         }}
