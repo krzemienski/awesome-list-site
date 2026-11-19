@@ -4,6 +4,7 @@ import { createElement, type ReactElement } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { signInHrefForCurrentLocation } from "@/lib/returnUrl";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast, type ToastOptions } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -116,10 +117,7 @@ function useResourceToggle(
   const signInAction = (onClick: () => void): ReactElement =>
     createElement(ToastAction, { altText: "Sign in", onClick }, "Sign in");
 
-  const goSignIn = () =>
-    setLocation(
-      `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`,
-    );
+  const goSignIn = () => setLocation(signInHrefForCurrentLocation());
 
   // Task #329: guest bookmark toggle — same one-click save/undo UX, stored on
   // this device. Guests get plain saves (the notes dialog via

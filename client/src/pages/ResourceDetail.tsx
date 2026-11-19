@@ -1,6 +1,7 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
+import { signInHrefForCurrentLocation } from "@/lib/returnUrl";
 import { useQuery } from "@tanstack/react-query";
 import { lazy, Suspense, useState, useEffect, useMemo, useRef, Fragment, type CSSProperties, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -404,11 +405,7 @@ export default function ResourceDetail() {
   const signInAction = (
     <ToastAction
       altText="Sign in"
-      onClick={() =>
-        setLocation(
-          `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`,
-        )
-      }
+      onClick={() => setLocation(signInHrefForCurrentLocation())}
     >
       Sign in
     </ToastAction>
