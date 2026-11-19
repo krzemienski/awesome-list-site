@@ -70,10 +70,8 @@ export function findTaxonomySuggestion(
 }
 
 /**
- * Suggestion for an unknown URL: a mistyped single-segment page
- * ("/abuot" -> About), else a mistyped category slug in "/<x>/<slug>" form.
- * A typo corrected to /search carries the visitor's search state (allowlisted
- * q/filters/tags/sort/page); every other suggestion is a fresh link.
+ * Match a single segment to a public page first, then to a category slug.
+ * Search and category corrections keep discovery parameters; other pages start fresh.
  */
 export function findRouteSuggestion(
   pathname: string,
