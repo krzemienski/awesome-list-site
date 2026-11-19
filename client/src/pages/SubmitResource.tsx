@@ -461,10 +461,22 @@ export default function SubmitResource() {
         clearTimeout(draftSaveTimer.current ?? undefined);
         draftSaveTimer.current = null;
         const synced = draftSyncedRef.current;
-        const next: Partial<SubmitResourceFormData> = { ...form.getValues() };
+        const live = form.getValues();
+        const next: Partial<SubmitResourceFormData> = { ...live };
         for (const k of Object.keys(EMPTY_VALUES) as (keyof SubmitResourceFormData)[]) {
           if (synced[k] !== undefined && next[k] === synced[k]) next[k] = EMPTY_VALUES[k];
         }
+        // A locally chosen child keeps the parents it depends on (third level
+        // -> subcategory -> category), even when those parents were synced
+        // values; a child with no live parent is an orphan and is dropped.
+        if (next.subSubcategory && !(live.subcategory && live.category)) {
+          next.subSubcategory = EMPTY_VALUES.subSubcategory;
+        }
+        if (next.subcategory && !live.category) {
+          next.subcategory = EMPTY_VALUES.subcategory;
+        }
+        if (next.subSubcategory) next.subcategory = live.subcategory;
+        if (next.subcategory) next.category = live.category;
         draftSyncedRef.current = {};
         form.reset(next, { keepDefaultValues: true });
         return;
