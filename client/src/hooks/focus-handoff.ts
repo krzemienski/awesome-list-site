@@ -18,9 +18,9 @@ export function focusElement(
 }
 
 /** The page's h1, falling back to <main id="main">. */
-export function focusPageHeading(): boolean {
+export function focusPageHeading(options?: FocusOptions): boolean {
   const main = document.getElementById("main");
-  return focusElement(main?.querySelector<HTMLElement>("h1") ?? main);
+  return focusElement(main?.querySelector<HTMLElement>("h1") ?? main, options);
 }
 
 const SETTLE_MS = 350;
@@ -33,10 +33,12 @@ const GIVE_UP_MS = 20000;
  * loading state first) and, if focus has fallen to <body>, move it to
  * `resolveTarget()` (default: the page h1). Focus the user has since moved
  * elsewhere is never stolen.
+ * `options` (e.g. `{ preventScroll: true }`) is passed to the target's focus call.
  */
 export function handoffFocusOnUnmount(
   trigger: HTMLElement | null,
   resolveTarget?: () => HTMLElement | null | undefined,
+  options?: FocusOptions,
 ): void {
   if (!trigger || document.activeElement !== trigger) return;
   let settle: number | undefined;
@@ -60,7 +62,7 @@ export function handoffFocusOnUnmount(
       return;
     }
     finish();
-    if (!focusElement(resolveTarget?.())) focusPageHeading();
+    if (!focusElement(resolveTarget?.(), options)) focusPageHeading(options);
   };
   observer.observe(document.body, { childList: true, subtree: true });
 }

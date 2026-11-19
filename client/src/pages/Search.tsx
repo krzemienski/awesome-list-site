@@ -1,4 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import "@/styles/pages/discovery.css";
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
@@ -291,9 +292,26 @@ export default function Search() {
   // problem, not a server verdict — say so instead of a generic failure.
   const connectionFailed = query.isError && !(query.error instanceof ApiError);
   const [stillOffline, setStillOffline] = useState(false);
-  useEffect(() => { if (!offline) setStillOffline(false); }, [offline]);
+  useEffect(() => {
+    if (!offline) { setStillOffline(false); return; }
+    // The offline card's Retry keeps focus while offline and unmounts when the
+    // connection returns. At that moment, if the control that holds focus is
+    // inside the results region (the Retry), start the shared hand-off: it moves
+    // focus to the results only if focus has fallen to <body> once the card is
+    // gone, so a control the user focused elsewhere is never stolen.
+    const onOnline = () => {
+      const active = document.activeElement;
+      if (!(active instanceof HTMLButtonElement) || !resultsRef.current?.contains(active)) return;
+      handoffFocusOnUnmount(active, () => resultsRef.current, { preventScroll: true });
+    };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, [offline]);
   const retrySearch = (e: MouseEvent<HTMLButtonElement>) => {
-    if (navigator.onLine === false) { setStillOffline(true); return; }
+    if (navigator.onLine === false) {
+      setStillOffline(true);
+      return;
+    }
     /* C6-SWEEP-06: the card unmounts once the refetch succeeds */
     if (document.activeElement === e.currentTarget) pendingResultsFocusRef.current = true;
     void query.refetch();
