@@ -5,7 +5,7 @@
 import type { Config as MixpanelConfig } from 'mixpanel-browser';
 import type { PostHogConfig } from 'posthog-js';
 import { scrubSdkUrlFields } from './analytics-hygiene';
-import { isAnalyticsSuppressed } from './analytics-suppression';
+import { isAnalyticsSuppressed, isInternalTraffic } from './analytics-suppression';
 import { getAnalyticsConsent } from './analytics';
 
 export interface IdentityUser {
@@ -164,6 +164,10 @@ export const amplitudeUrlScrubPlugin = {
           props['[Amplitude] Page Title'] = 'Search';
         }
       }
+    }
+    // Internal (QA) browsers are tagged on every event, the first ones included.
+    if (isInternalTraffic()) {
+      event.event_properties = { ...(event.event_properties as Record<string, unknown> | undefined), internal_traffic: true };
     }
     return Promise.resolve(event);
   },

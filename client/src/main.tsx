@@ -9,7 +9,7 @@ import { getAnalyticsConsent, initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
-import { syncReplitPageviewOptOut } from "./lib/analytics-suppression";
+import { syncInternalTrafficFlag, syncReplitPageviewOptOut } from "./lib/analytics-suppression";
 import { seedResourceBoot } from "./lib/resource-boot";
 
 function afterFirstPaint(callback: () => void): void {
@@ -60,6 +60,7 @@ function afterFirstPaint(callback: () => void): void {
 // Admin sessions and QA paths: quiet Replit's injected page-view tracker
 // before it records this document's first page view (it sends at load).
 syncReplitPageviewOptOut();
+syncInternalTrafficFlag();
 
 // Analytics SDKs are all consent-gated and deferred until the first painted
 // frame. The consent banner invokes these immediately after an explicit grant.

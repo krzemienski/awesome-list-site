@@ -26,6 +26,7 @@ One lane is a list of rows. Each row runs at three widths and ends in a graded c
 3. Isolated session: `agent-browser --session <lane> ...` on every command. Open `about:blank` before starting capture; do not open the target first.
 4. With a CLI supporting body-free capture, start `agent-browser --session <lane> network har start --content none` while still on `about:blank`, then open the target. This is main segment 01. The installed CLI's documented HAR syntax currently has no `--content` option: a bare `network har start` is not a safe substitute. If no-body capture is unsupported or refused, record HAR as NEEDS_YOU and request a compatible CLI; never fall back to recording bodies. (`har start` in older reports is shorthand for `network har start|stop`.)
 5. Consent and analytics: on the site origin set `localStorage` `analytics-consent=denied` and `umami.disabled=1` with `eval`, then reload. Record `navigator.webdriver` once (true means analytics are suppressed; override it only when a row judges analytics).
+6. Analytics-on runs (a row judges analytics, so `navigator.webdriver` is overridden): first load `https://awesome.video/?analytics_internal=1` once so every event the run sends carries `internal_traffic=true`. Without it the run's events look like real visitors in Amplitude.
 
 ## 2. Per row, per width (390, 768, 1280)
 

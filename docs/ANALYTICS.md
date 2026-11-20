@@ -279,6 +279,17 @@ exactly as before. The rules live in
   gate on it through `vendorSdksAllowed()`, and the dispatcher in
   `client/src/lib/analytics-dispatch.ts` re-checks the admin marker. A run that
   needs events on the wire must use a browser that does not set the flag.
+- **Internal traffic is tagged, not dropped.** A browser is internal when its
+  user agent contains `HeadlessChrome`, or when it loaded any page with
+  `?analytics_internal=1` (stored as `localStorage['analytics-internal']='1'`;
+  `?analytics_internal=0` clears it). `isInternalTraffic()` in
+  `client/src/lib/analytics-suppression.ts` decides, and the Amplitude
+  enrichment plugin (`amplitudeUrlScrubPlugin`) adds the event property
+  `internal_traffic: true` to every event the SDK sends, so QA runs that
+  override `navigator.webdriver` can still see their events arrive. Other
+  browsers send no such property. Filter it in Amplitude with
+  `internal_traffic` is not `true` (exclude), or `= true` to inspect QA
+  traffic. Mixpanel, PostHog and GA do not carry the marker.
 - **Not site errors.** `site_error` / `error` skip window errors from another
   origin (extensions, translate tools, third-party tags, "Script error."),
   ResizeObserver notices, `AbortError` rejections and cancelled API requests,
