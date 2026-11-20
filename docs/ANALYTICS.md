@@ -183,7 +183,7 @@ events (`resource_card_opened`, `resource_link_opened` with a `surface`, and
 `tag_interaction` with `action: 'card_click'`) show *which surface* produced
 that value — palette, catalogue card, taxonomy card, home card / recent list or
 the resource page itself — and `command_palette_opened` (`open_method`) sits in
-front of the palette's own `search_performed` → `resource_link_opened` path.
+front of the palette's own `search_performed` → `resource_card_opened` → `resource_viewed` path.
 Retention (2) re-uses the same value events weekly, joined with the area events
 that bring people back: notification and digest opens (4), journey resumes,
 collection activity (3) and recommendation opens (6). Contribution (5) and
@@ -385,7 +385,7 @@ taxonomy further down and are not repeated here.
 | `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
 | `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
 | `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
-| `guest_bookmark_merge_result` | — | PostHog | `resource_id`, `outcome` (`saved`, `already_saved`, `missing`, `unconfirmed`) | One result per item after a completed merge under the same signed-in identity. Match observed guest saves by session and resource. Interrupted runs and cross-session transitions can be unobservable. |
+| `guest_bookmark_merge_result` | — | PostHog | `resource_id`, `outcome` (`saved`, `already_saved`, `missing`, `unconfirmed`) | `saved` records confirmed bookmark presence after an upsert. `already_saved` records presence in the account before the attempted transfer. Match observed guest saves by session and resource. Same-origin tabs serialize the merge where Web Locks is available. Interrupted runs and cross-session transitions can be unobservable. |
 | `collection_created` | same | all four | `collection_id`, `collection_count` (the owner's collections after this one) — server-confirmed `POST /api/collections` | `trackCollectionCreated` ← `Bookmarks` |
 | `collection_renamed` | same | all four | `collection_id`, `item_count` — server-confirmed rename (the name itself is never sent) | `trackCollectionRenamed` ← `Bookmarks` |
 | `collection_deleted` | same | all four | `collection_id`, `item_count`, `was_published` — server-confirmed delete | `trackCollectionDeleted` ← `Bookmarks` |
@@ -559,7 +559,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | Event | Fires when / where | Key params |
 |---|---|---|
 | `page_engaged` | Leaving a page / tab hide — `use-analytics.tsx` | `page_path`, `engagement_time_msec` |
-| `resource_click` + `outbound_link` | Clicking a search result — `search-dialog.tsx` (documented **pair**, not a duplicate: one engagement signal, one outbound-navigation signal) | `content_*` / `link_url`, `link_domain` |
+| `resource_click` + `outbound_link` | Opening an external resource link from a detail page or resource card emits both GA4 events via `trackResourceClick`. | `content_*` / `link_url`, `link_domain` |
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |

@@ -48,8 +48,8 @@ no PII (enforced by the shared sender's property hygiene).
 |---|---|---|---|
 | `page_viewed` | Every SPA navigation (single source, exactly once) | `page_path`, `page_title`, `referrer_origin` | `lib/analytics.ts trackPageView` via `use-analytics` |
 | `resource_viewed` | Resource detail opened | `resource_id`, extras from caller | `trackSelectContent('resource', …)` |
-| `resource_link_opened` | Outbound resource link clicked (palette, detail page, resource / taxonomy / home cards) | `resource_title`, `link_url`, `link_domain`, `category`, `surface` | `trackResourceClick` |
-| `resource_card_opened` | Card title / View Details clicked → detail page | `resource_id`, `surface`, `card_control` | `trackResourceCardOpened` |
+| `resource_link_opened` | A visitor attempts to open an external resource from a detail page or resource, taxonomy, or home card. | `resource_title`, `link_url`, `link_domain`, `category`, `surface` | `trackResourceClick` |
+| `resource_card_opened` | A visitor opens the detail page from a card or the search palette. | `resource_id`, `surface`, `card_control`, and 1-based `result_rank` for ranked search results | `trackResourceCardOpened` |
 | `related_resource_opened` | Related Resources item clicked on a resource page | `resource_id`, `from_resource_id`, `position`, `match_score` | `trackRelatedResourceOpened` |
 | `related_category_opened` | "View all in …" clicked on a resource page | `from_resource_id`, `category` | `trackRelatedCategoryOpened` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |

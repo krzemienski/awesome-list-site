@@ -31,6 +31,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
+const resourceQueryUrl = (state: State) => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`;
 // parseTagsParam keeps the visitor's spelling of each tag, so an unknown tag
 // shows as typed instead of as its singular slug.
 const readState = (search: string): State => ({
@@ -60,7 +61,7 @@ export default function Search() {
   const lastTrackedSearchIntentRef = useRef("");
   const resultsRef = useRef<HTMLElement>(null);
   const pageAttemptRef = useRef<{
-    queryUrl: string;
+    queryUrls: Set<string>;
     attempt: NonNullable<ReturnType<typeof startSearchPageAttempt>>;
   } | null>(null);
   const pendingResultsFocusRef = useRef(false);
@@ -216,7 +217,7 @@ export default function Search() {
   const canBrowse = searchCanBrowse(state);
   const queryReady = isSearchableQuery(normalized);
   const shouldShowResults = queryReady || canBrowse;
-  const queryUrl = useMemo(() => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`, [state]);
+  const queryUrl = useMemo(() => resourceQueryUrl(state), [state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
   // A zero-result search used to offer only "Clear"; name a few real
@@ -287,8 +288,9 @@ export default function Search() {
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
   const recordPageRequest = (page: number, trigger: "pagination" | "retry") => {
     const attempt = startSearchPageAttempt(page, trigger);
-    const params = searchApiParams({ ...state, page }, PAGE_SIZE);
-    pageAttemptRef.current = attempt ? { queryUrl: `/api/resources?${params.toString()}`, attempt } : null;
+    pageAttemptRef.current = attempt
+      ? { queryUrls: new Set([resourceQueryUrl({ ...state, page })]), attempt }
+      : null;
   };
   const gotoPage = (n: number) => {
     recordPageRequest(n, "pagination");
@@ -308,17 +310,22 @@ export default function Search() {
   useEffect(() => {
     const pending = pageAttemptRef.current;
     if (!pending) return;
-    if (pending.queryUrl !== queryUrl) {
+    if (!pending.queryUrls.has(queryUrl)) {
       pageAttemptRef.current = null;
+      return;
+    }
+    if (data && safePage !== state.page) {
+      // The page clamp replaces the URL. Keep the original request until its fallback renders.
+      pending.queryUrls.add(resourceQueryUrl({ ...state, page: safePage }));
       return;
     }
     // This runs after the result region commits. Read the response's own page,
     // so a stale set of cards cannot count as a successful transition.
     if (!shouldShowResults || offline || !query.isSuccess || !data?.pagination ||
-        (data.resources.length === 0 && data.total > 0) || safePage !== state.page) return;
+        (data.resources.length === 0 && data.total > 0)) return;
     pageAttemptRef.current = null;
     trackSearchPageRendered(pending.attempt, data.pagination.page);
-  }, [data, offline, query.isSuccess, queryUrl, safePage, shouldShowResults, state.page]);
+  }, [data, offline, query.isSuccess, queryUrl, safePage, shouldShowResults, state]);
   // A request that failed in transport (no HTTP response) is a connection
   // problem, not a server verdict — say so instead of a generic failure.
   const connectionFailed = query.isError && !(query.error instanceof ApiError);

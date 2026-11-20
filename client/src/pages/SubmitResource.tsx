@@ -533,7 +533,7 @@ export default function SubmitResource() {
 
   // Submit mutation
   const submitMutation = useMutation({
-    mutationFn: async (data: SubmitResourceFormData) => {
+    mutationFn: async ({ data, categoryName }: { data: SubmitResourceFormData; categoryName: string }) => {
       // Parse tags from comma-separated string. Run15 BUG-008: no silent
       // .slice(0, 10) — the form schema rejects >10 tags with an error.
       const tagsArray = data.tags 
@@ -541,17 +541,11 @@ export default function SubmitResource() {
         : [];
 
       // Find the selected entities to get their names for submission
-      const categoryId = parseInt(data.category);
       const subcategoryId = data.subcategory ? parseInt(data.subcategory) : null;
       const subSubcategoryId = data.subSubcategory ? parseInt(data.subSubcategory) : null;
 
-      const category = categories.find(c => c.id === categoryId);
       const subcategory = subcategoryId ? subcategories.find(s => s.id === subcategoryId) : null;
       const subSubcategory = subSubcategoryId ? subSubcategories.find(ss => ss.id === subSubcategoryId) : null;
-
-      if (!category) {
-        throw new Error("Invalid category selected");
-      }
 
       const created: unknown = await apiRequest('/api/resources', {
         method: 'POST',
@@ -562,7 +556,7 @@ export default function SubmitResource() {
           title: data.title,
           url: data.url,
           description: data.description,
-          category: category.name,
+          category: categoryName,
           subcategory: subcategory?.name ?? undefined,
           subSubcategory: subSubcategory?.name ?? undefined,
           metadata: tagsArray.length > 0 ? { tags: tagsArray } : {},
@@ -573,13 +567,12 @@ export default function SubmitResource() {
         throw new Error("We couldn't confirm your submission. Your draft is still here.");
       }
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (_data, { categoryName }) => {
       trackSubmitResult("accepted");
       // GA4 conversion: resource submission completed.
-      const category = categories.find((c) => c.id === parseInt(variables.category));
       trackGenerateLead({
         content_type: 'resource_submission',
-        category: category?.name,
+        category: categoryName,
       });
 
       setShowSuccess(true);
@@ -652,12 +645,19 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
+    const category = categories.find((item) => String(item.id) === data.category);
+    if (!category) {
+      const error = { type: "validate", message: "Choose an available category before submitting." };
+      form.setError("category", error);
+      onInvalid({ category: error });
+      return;
+    }
     completeStep("review");
     trackSubmitFormSubmitted(
       data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean).length : 0,
       Boolean(data.subcategory),
     );
-    submitMutation.mutate(data);
+    submitMutation.mutate({ data, categoryName: category.name });
   };
 
   // BUG-002 (run19): no full-page spinner gate anymore — the form renders

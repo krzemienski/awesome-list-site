@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { trackBookmarksMerged, trackGuestBookmarkMergeResult } from "@/lib/analytics";
 import {
-  getGuestBookmarks,
+  readGuestBookmarks,
   removeGuestBookmarkIds,
   useGuestBookmarks,
 } from "@/lib/guestBookmarks";
@@ -17,9 +17,8 @@ import {
 //
 // Constraints honored:
 // - Runs through the EXISTING authed bookmark API only (no auth changes).
-// - Dedupes BEFORE posting: POST /api/bookmarks/:id is an upsert that resets
-//   notes/savedAt on conflict, so re-posting an id the account already has
-//   would clobber the user's notes.
+// - Checks the account first so an existing bookmark needs no POST and can
+//   be reported separately from a confirmed upsert.
 // - Checks the public detail endpoint before each push: a deleted resource
 //   would fail the bookmark POST with an opaque 500 (FK violation), polluting
 //   the authed API error rate (the task's guardrail) and retrying forever.
@@ -41,7 +40,7 @@ interface MergeOutcome {
 }
 
 async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOutcome | null> {
-  const ids = getGuestBookmarks().map((entry) => entry.id);
+  const ids = readGuestBookmarks().map((entry) => entry.id);
   if (ids.length === 0) return null;
 
   if (!isStillOwner()) return null;
@@ -155,7 +154,12 @@ export default function GuestBookmarkMerge() {
     // identity changed) so two runs never POST the same ids concurrently.
     runInFlight.current = runInFlight.current.catch(() => undefined).then(async () => {
       try {
-        const outcome = await pushGuestBookmarks(isStillOwner);
+        // Read the device store inside the lock: another tab may have
+        // transferred these items before its storage event reaches this tab.
+        const merge = () => pushGuestBookmarks(isStillOwner);
+        const outcome = navigator.locks
+          ? await navigator.locks.request("awesome-video-guest-bookmark-merge", merge)
+          : await merge();
         if (!outcome) return;
         if (outcome.merged > 0) {
           void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });

@@ -75,7 +75,7 @@ function sanitize(value: unknown): GuestBookmarkEntry[] {
   return out;
 }
 
-function readEntries(): GuestBookmarkEntry[] {
+export function readGuestBookmarks(): GuestBookmarkEntry[] {
   if (memoryEntries !== null) return memoryEntries;
   if (typeof window === "undefined") return EMPTY_ENTRIES;
   try {
@@ -134,7 +134,7 @@ export function isGuestStorePersistent(): boolean {
 }
 
 export function getGuestBookmarks(): GuestBookmarkEntry[] {
-  if (entriesCache === null) entriesCache = readEntries();
+  if (entriesCache === null) entriesCache = readGuestBookmarks();
   return entriesCache;
 }
 
@@ -202,7 +202,7 @@ export function removeGuestBookmarkIds(ids: Array<string | number>): number {
   const idSet = new Set(
     ids.map(normalizeId).filter((value): value is number => value !== null),
   );
-  const current = getGuestBookmarks();
+  const current = readGuestBookmarks();
   if (idSet.size === 0) return current.length;
   const next = current.filter((entry) => !idSet.has(entry.id));
   if (next.length !== current.length) writeEntries(next);
