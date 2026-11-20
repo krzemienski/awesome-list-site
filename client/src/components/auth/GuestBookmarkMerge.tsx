@@ -4,9 +4,9 @@ import { queryClient, apiRequest, isGoneError } from "@/lib/queryClient";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { trackBookmarksMerged } from "@/lib/analytics";
+import { trackBookmarksMerged, trackGuestBookmarkMergeResult } from "@/lib/analytics";
 import {
-  getGuestBookmarks,
+  readGuestBookmarks,
   removeGuestBookmarkIds,
   useGuestBookmarks,
 } from "@/lib/guestBookmarks";
@@ -17,9 +17,8 @@ import {
 //
 // Constraints honored:
 // - Runs through the EXISTING authed bookmark API only (no auth changes).
-// - Dedupes BEFORE posting: POST /api/bookmarks/:id is an upsert that resets
-//   notes/savedAt on conflict, so re-posting an id the account already has
-//   would clobber the user's notes.
+// - Checks the account first so an existing bookmark needs no POST and can
+//   be reported separately from a confirmed upsert.
 // - Checks the public detail endpoint before each push: a deleted resource
 //   would fail the bookmark POST with an opaque 500 (FK violation), polluting
 //   the authed API error rate (the task's guardrail) and retrying forever.
@@ -41,7 +40,7 @@ interface MergeOutcome {
 }
 
 async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOutcome | null> {
-  const ids = getGuestBookmarks().map((entry) => entry.id);
+  const ids = readGuestBookmarks().map((entry) => entry.id);
   if (ids.length === 0) return null;
 
   if (!isStillOwner()) return null;
@@ -86,18 +85,29 @@ async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOut
       break;
     }
     try {
-      await apiRequest(`/api/bookmarks/${id}`, {
+      const saved: unknown = await apiRequest(`/api/bookmarks/${id}`, {
         method: "POST",
         body: JSON.stringify({}),
         credentials: "include",
       });
-      merged.push(id);
+      if (typeof saved === "object" && saved !== null && "isBookmarked" in saved && saved.isBookmarked === true) {
+        merged.push(id);
+      } else {
+        failed.push(id);
+      }
     } catch {
       failed.push(id);
     }
   }
 
   removeGuestBookmarkIds([...merged, ...duplicates, ...missing]);
+
+  if (!interrupted && isStillOwner()) {
+    for (const id of merged) trackGuestBookmarkMergeResult(id, "saved");
+    for (const id of duplicates) trackGuestBookmarkMergeResult(id, "already_saved");
+    for (const id of missing) trackGuestBookmarkMergeResult(id, "missing");
+    for (const id of failed) trackGuestBookmarkMergeResult(id, "unconfirmed");
+  }
 
   return {
     merged: merged.length,
@@ -144,7 +154,13 @@ export default function GuestBookmarkMerge() {
     // identity changed) so two runs never POST the same ids concurrently.
     runInFlight.current = runInFlight.current.catch(() => undefined).then(async () => {
       try {
-        const outcome = await pushGuestBookmarks(isStillOwner);
+        // Read the device store inside the lock: another tab may have
+        // transferred these items before its storage event reaches this tab.
+        const merge = () => pushGuestBookmarks(isStillOwner);
+        const pending = navigator.locks
+          ? navigator.locks.request("awesome-video-guest-bookmark-merge", merge) as ReturnType<typeof merge>
+          : merge();
+        const outcome = await pending;
         if (!outcome) return;
         if (outcome.merged > 0) {
           void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });

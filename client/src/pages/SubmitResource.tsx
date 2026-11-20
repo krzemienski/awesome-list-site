@@ -41,7 +41,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
@@ -49,9 +49,11 @@ import {
   trackGenerateLead,
   trackSubmitFormStarted,
   trackSubmitFormSubmitted,
+  trackSubmitResult,
   trackSubmitStepCompleted,
   trackSubmitValidationFailed,
   type SubmitFormStep,
+  type SubmitResult,
 } from "@/lib/analytics";
 import { serverConversionHeaders } from "@/lib/mixpanel";
 import { scrollBehavior } from "@/lib/scroll-behavior";
@@ -121,6 +123,19 @@ const submitResourceSchema = z.object({
 });
 
 type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
+
+function submissionFailure(error: unknown): SubmitResult {
+  if (!(error instanceof ApiError)) return "unconfirmed";
+  switch (error.status) {
+    case 400:
+    case 422: return "server_invalid";
+    case 409: return "duplicate";
+    case 401:
+    case 403: return "access_denied";
+    case 429: return "rate_limited";
+    default: return error.status >= 500 ? "server_error" : "unconfirmed";
+  }
+}
 
 // R4-055: localStorage key for the in-progress /submit draft so an accidental
 // refresh, tab close, or navigation no longer wipes everything the user typed.
@@ -247,6 +262,7 @@ export default function SubmitResource() {
   }, [form]);
 
   const onInvalid = (errors: Record<string, unknown>) => {
+    trackSubmitResult("client_invalid");
     for (const name of FIELD_ORDER) {
       if (name in errors) trackSubmitValidationFailed(name, "client");
     }
@@ -517,7 +533,7 @@ export default function SubmitResource() {
 
   // Submit mutation
   const submitMutation = useMutation({
-    mutationFn: async (data: SubmitResourceFormData) => {
+    mutationFn: async ({ data, categoryName }: { data: SubmitResourceFormData; categoryName: string }) => {
       // Parse tags from comma-separated string. Run15 BUG-008: no silent
       // .slice(0, 10) — the form schema rejects >10 tags with an error.
       const tagsArray = data.tags 
@@ -525,19 +541,13 @@ export default function SubmitResource() {
         : [];
 
       // Find the selected entities to get their names for submission
-      const categoryId = parseInt(data.category);
       const subcategoryId = data.subcategory ? parseInt(data.subcategory) : null;
       const subSubcategoryId = data.subSubcategory ? parseInt(data.subSubcategory) : null;
 
-      const category = categories.find(c => c.id === categoryId);
       const subcategory = subcategoryId ? subcategories.find(s => s.id === subcategoryId) : null;
       const subSubcategory = subSubcategoryId ? subSubcategories.find(ss => ss.id === subSubcategoryId) : null;
 
-      if (!category) {
-        throw new Error("Invalid category selected");
-      }
-
-      return apiRequest('/api/resources', {
+      const created: unknown = await apiRequest('/api/resources', {
         method: 'POST',
         // serverConversionHeaders: consent + Mixpanel distinct-id so the
         // server can emit the resource_submitted conversion (Task 233).
@@ -546,19 +556,23 @@ export default function SubmitResource() {
           title: data.title,
           url: data.url,
           description: data.description,
-          category: category.name,
+          category: categoryName,
           subcategory: subcategory?.name ?? undefined,
           subSubcategory: subSubcategory?.name ?? undefined,
           metadata: tagsArray.length > 0 ? { tags: tagsArray } : {},
         }),
-      }) as Promise<unknown>;
+      });
+      if (typeof created !== "object" || created === null || !("id" in created)
+          || typeof created.id !== "number" || !Number.isInteger(created.id) || created.id < 1) {
+        throw new Error("We couldn't confirm your submission. Your draft is still here.");
+      }
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (_data, { categoryName }) => {
+      trackSubmitResult("accepted");
       // GA4 conversion: resource submission completed.
-      const category = categories.find((c) => c.id === parseInt(variables.category));
       trackGenerateLead({
         content_type: 'resource_submission',
-        category: category?.name,
+        category: categoryName,
       });
 
       setShowSuccess(true);
@@ -587,6 +601,7 @@ export default function SubmitResource() {
       // BUG-005 (run19): the server's 400 carries per-field messages in
       // `fieldErrors` — surface each at its form field (focusing the first)
       // instead of discarding them behind a generic toast.
+      trackSubmitResult(submissionFailure(error));
       const fieldErrors = extractFieldErrors(error);
       const formFields = [
         "title",
@@ -630,12 +645,19 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
+    const category = categories.find((item) => String(item.id) === data.category);
+    if (!category) {
+      const error = { type: "validate", message: "Choose an available category before submitting." };
+      form.setError("category", error);
+      onInvalid({ category: error });
+      return;
+    }
     completeStep("review");
     trackSubmitFormSubmitted(
       data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean).length : 0,
       Boolean(data.subcategory),
     );
-    submitMutation.mutate(data);
+    submitMutation.mutate({ data, categoryName: category.name });
   };
 
   // BUG-002 (run19): no full-page spinner gate anymore — the form renders

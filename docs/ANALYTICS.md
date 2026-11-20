@@ -183,7 +183,7 @@ events (`resource_card_opened`, `resource_link_opened` with a `surface`, and
 `tag_interaction` with `action: 'card_click'`) show *which surface* produced
 that value — palette, catalogue card, taxonomy card, home card / recent list or
 the resource page itself — and `command_palette_opened` (`open_method`) sits in
-front of the palette's own `search_performed` → `resource_link_opened` path.
+front of the palette's own `search_performed` → `resource_card_opened` → `resource_viewed` path.
 Retention (2) re-uses the same value events weekly, joined with the area events
 that bring people back: notification and digest opens (4), journey resumes,
 collection activity (3) and recommendation opens (6). Contribution (5) and
@@ -364,8 +364,12 @@ taxonomy further down and are not repeated here.
 |---|---|---|---|---|
 | `page_viewed` | `page_view` | all four | `page_title`, `referrer_origin` (GA4: page context only) | `trackPageView` ← `use-analytics` |
 | `resource_viewed` | `select_content` | all four | `resource_id` + caller extras (GA4: `content_type`, `content_id`, extras) | `trackSelectContent('resource', …)` |
-| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`search_palette` \| `resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← palette, detail page, `ResourceCard`, home cards |
+| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← detail page, `ResourceCard`, home cards |
 | `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
+| `search_page_requested` | — | PostHog | A search-page pagination control or online Retry starts a transition. `attempt_id` is unique to that action, with `requested_page` and `trigger`. | `startSearchPageAttempt` |
+| `search_page_rendered` | — | PostHog | The committed search results and API response are available. `rendered_page` comes from response metadata. Join on `attempt_id` and compare pages. | `trackSearchPageRendered` |
+| `navigation_not_found` | — | PostHog | The client renders its missing-route view. Initial document loads and internal navigations can both emit this event. | `trackMissingRoute` |
+| `not_found_suggestion_clicked` | — | PostHog | A visitor activates a missing-route suggestion. `suggestion_path` contains the destination path without query parameters. Use a subsequent destination view to establish recovery. | `trackMissingRoute` |
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
 | `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` (`search_page` \| `taxonomy_*` \| `home` (kind filter / clear all) \| `journeys_page` (category)) | `trackFilterUsage` |
 | `sort_changed` | `sort_change` | all four | `sort_type`, `surface` (`search_page` \| `taxonomy_*` \| `home` \| `categories_page`), `result_count`, `zero_results` | `trackSortChange` |
@@ -381,6 +385,7 @@ taxonomy further down and are not repeated here.
 | `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
 | `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
 | `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
+| `guest_bookmark_merge_result` | — | PostHog | `resource_id`, `outcome` (`saved`, `already_saved`, `missing`, `unconfirmed`) | `saved` records confirmed bookmark presence after an upsert. `already_saved` records presence in the account before the attempted transfer. Match observed guest saves by session and resource. Same-origin tabs serialize the merge where Web Locks is available. Interrupted runs and cross-session transitions can be unobservable. |
 | `collection_created` | same | all four | `collection_id`, `collection_count` (the owner's collections after this one) — server-confirmed `POST /api/collections` | `trackCollectionCreated` ← `Bookmarks` |
 | `collection_renamed` | same | all four | `collection_id`, `item_count` — server-confirmed rename (the name itself is never sent) | `trackCollectionRenamed` ← `Bookmarks` |
 | `collection_deleted` | same | all four | `collection_id`, `item_count`, `was_published` — server-confirmed delete | `trackCollectionDeleted` ← `Bookmarks` |
@@ -394,13 +399,14 @@ taxonomy further down and are not repeated here.
 | `public_collection_viewed` | same | all four | `collection_share_id`, `item_count` — once per shared collection per page visit when it loads (refetches don't re-fire), or when the visitor grants consent after it loaded; never the owner's identity or the collection name | `trackPublicCollectionViewed` ← `PublicCollection` |
 | `public_collection_resource_opened` | same | all four | `collection_share_id`, `resource_id`, `position` (1-based), `item_count`, `link_target: "detail" \| "external"` — click or middle-click on a card's title / View Details (detail) or Open Link (external) | `trackPublicCollectionResourceOpened` ← `PublicCollection` |
 | `public_collection_recovery_clicked` | same | all four | `collection_share_id` (only when well-formed), `recovery_action: "retry_error" \| "retry_offline" \| "explore_journeys" \| "home" \| "categories"`, `page_state: "not_found" \| "error" \| "offline"` | `trackPublicCollectionRecoveryClicked` ← `PublicCollection` |
-| `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title` \| `view_details`) | `trackResourceCardOpened` ← `ResourceCard`, home cards (the detail page's `resource_viewed` fires on arrival) |
+| `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title`, `view_details`, `card`, `palette_result`, or `palette_featured`). Ranked search-page and palette results include 1-based `result_rank`. On the search page this spans pages. Featured palette jumps omit rank. | `trackResourceCardOpened` ← detail links in cards and the search palette. `resource_viewed` records arrival. Older `resource_link_opened` events from `search_palette` recorded internal navigation. |
 | `related_resource_opened` | same | all four | `resource_id` (opened), `from_resource_id`, `position` (1-based), `match_score`, `surface` (`related_list` — Related Resources card; `resource_onward` — Keep exploring "More like this", retired: that list moved to the top block and now emits `resource_next_step_clicked`) | `trackRelatedResourceOpened` ← `ResourceDetail` Related Resources list |
 | `related_category_opened` | same | all four | `from_resource_id`, `category` (the collection's name), `surface` (`resource_onward`; `related_list` is the default for any other caller) | `trackRelatedCategoryOpened` ← `ResourceOnwardPaths` "More in …" / "View all in …" |
 | `resource_next_step_clicked` | same | all four | `surface` (`resource_top`), `kind` (`category` \| `related`), `from_resource_id`; `category` adds `target_slug`; `related` adds `target_id`, `position` (1-based, shared tags first) | `trackResourceNextStepClicked` ← `ResourceDetail` category chip and `ResourceTopNextSteps` "More like this" (above the description; the lower Related Resources card keeps `related_resource_opened`, Keep exploring keeps `related_category_opened`) |
 | `submit_form_started` | same | all four | `signed_in` | `trackSubmitFormStarted` ← `SubmitResource`, first focus or change inside the form (once per visit; signed-out visitors cannot reach it, the fields are disabled) |
 | `submit_step_completed` | same | all four | `step` (`sign_in_required` \| `details` \| `category` \| `review`) | `trackSubmitStepCompleted` ← `SubmitResource`: `sign_in_required` when the login wall renders for a signed-out visitor; `details` when title, URL and description pass validation; `category` when one is chosen; `review` when the submit click passes client validation (each once per visit) |
 | `submit_validation_failed` | same | all four | `field` (form field NAME: `title`, `url`, `description`, `category`, `subcategory`, `subSubcategory`, `tags`), `source` (`client` \| `server`) — never the value or message | `trackSubmitValidationFailed` ← `SubmitResource` invalid submit (one per failing field) and server field errors |
+| `submit_form_result` | — | PostHog | `outcome` (`accepted`, `client_invalid`, `server_invalid`, `duplicate`, `access_denied`, `rate_limited`, `server_error`, `unconfirmed`) | One result per submit attempt. Acceptance requires a successful create response with a resource ID. A lost response leaves the outcome unconfirmed. |
 | `submit_form_submitted` | same | all four | `tag_count`, `has_subcategory` | `trackSubmitFormSubmitted` ← `SubmitResource` submit handler once validation passes and the visitor is signed in (before the server answers; the server-confirmed outcome stays `resource_submitted`) |
 | `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button` \| `resource_page_button` \| `listing_page_button`), `surface` (page entries only: `resource_onward` \| `tag_page`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` (page entries open it through `openSearchPalette`) |
 | `export_started` / `export_downloaded` | same | all four | `export_format`, `export_scope` (`all` \| `selected_categories`), `category_count`, `resource_count` — never file contents | `trackExportStarted` / `trackExportDownloaded` ← `export-tools` |
@@ -553,7 +559,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | Event | Fires when / where | Key params |
 |---|---|---|
 | `page_engaged` | Leaving a page / tab hide — `use-analytics.tsx` | `page_path`, `engagement_time_msec` |
-| `resource_click` + `outbound_link` | Clicking a search result — `search-dialog.tsx` (documented **pair**, not a duplicate: one engagement signal, one outbound-navigation signal) | `content_*` / `link_url`, `link_domain` |
+| `resource_click` + `outbound_link` | Opening an external resource link from a detail page or resource card emits both GA4 events via `trackResourceClick`. | `content_*` / `link_url`, `link_domain` |
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |

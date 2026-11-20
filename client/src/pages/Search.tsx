@@ -23,6 +23,7 @@ import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/Se
 import { offeredFacets, orList } from "@/components/search/facet-options";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
+import { startSearchPageAttempt, trackSearchPageRendered } from "@/lib/analytics-discovery";
 import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
 import { searchPageSeo } from "@shared/seo-templates";
 import { fetchAwesomeListNav, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
@@ -30,6 +31,7 @@ import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
+const resourceQueryUrl = (state: State) => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`;
 // parseTagsParam keeps the visitor's spelling of each tag, so an unknown tag
 // shows as typed instead of as its singular slug.
 const readState = (search: string): State => ({
@@ -58,6 +60,10 @@ export default function Search() {
   const preservePageNoticeRef = useRef(false);
   const lastTrackedSearchIntentRef = useRef("");
   const resultsRef = useRef<HTMLElement>(null);
+  const pageAttemptRef = useRef<{
+    queryUrls: Set<string>;
+    attempt: NonNullable<ReturnType<typeof startSearchPageAttempt>>;
+  } | null>(null);
   const pendingResultsFocusRef = useRef(false);
   const resultsFocusTimerRef = useRef<number>();
   // The mobile Filters sheet owns focus while open and returns it to its trigger on close.
@@ -211,7 +217,7 @@ export default function Search() {
   const canBrowse = searchCanBrowse(state);
   const queryReady = isSearchableQuery(normalized);
   const shouldShowResults = queryReady || canBrowse;
-  const queryUrl = useMemo(() => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`, [state]);
+  const queryUrl = useMemo(() => resourceQueryUrl(state), [state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
   // A zero-result search used to offer only "Clear"; name a few real
@@ -221,7 +227,7 @@ export default function Search() {
     () => visibleNavCategories(nav?.categories).filter(category => category.slug).sort((a, b) => b.totalResourceCount - a.totalResourceCount).slice(0, 6),
     [nav],
   );
-  const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string }; resolvedFilters?: ResolvedFilters }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
+  const query = useQuery<{ resources: DbResource[]; total: number; pagination: { page: number }; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string }; resolvedFilters?: ResolvedFilters }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
   const data = query.data; const results = data?.resources ?? []; const total = data?.total ?? 0; const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE)); const safePage = Math.min(state.page, totalPages);
   useEffect(() => {
     if (!queryReady || !data) return;
@@ -280,7 +286,20 @@ export default function Search() {
   const facets = data?.facets ?? lastFacets.current;
   const facetNames = offeredFacets(facets, filterState);
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
-  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() }); };
+  const recordPageRequest = (page: number, trigger: "pagination" | "retry") => {
+    const attempt = startSearchPageAttempt(page, trigger);
+    pageAttemptRef.current = attempt
+      ? { queryUrls: new Set([resourceQueryUrl({ ...state, page })]), attempt }
+      : null;
+  };
+  const gotoPage = (n: number) => {
+    recordPageRequest(n, "pagination");
+    setState(s => ({ ...s, page: n }));
+    writeFilterParams({ page: n > 1 ? String(n) : null }, "push");
+    setPageNotice(null);
+    pendingResultsFocusRef.current = true;
+    resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+  };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
   // A search started offline is paused, not failed: isLoading and isError are
@@ -288,6 +307,25 @@ export default function Search() {
   // through to "No resources match" for a request that never reached the
   // catalog. The paused query resumes by itself on reconnect.
   const offline = queryUnavailableReason(query) === "offline";
+  useEffect(() => {
+    const pending = pageAttemptRef.current;
+    if (!pending) return;
+    if (!pending.queryUrls.has(queryUrl)) {
+      pageAttemptRef.current = null;
+      return;
+    }
+    if (data && safePage !== state.page) {
+      // The page clamp replaces the URL. Keep the original request until its fallback renders.
+      pending.queryUrls.add(resourceQueryUrl({ ...state, page: safePage }));
+      return;
+    }
+    // This runs after the result region commits. Read the response's own page,
+    // so a stale set of cards cannot count as a successful transition.
+    if (!shouldShowResults || offline || !query.isSuccess || !data?.pagination ||
+        (data.resources.length === 0 && data.total > 0)) return;
+    pageAttemptRef.current = null;
+    trackSearchPageRendered(pending.attempt, data.pagination.page);
+  }, [data, offline, query.isSuccess, queryUrl, safePage, shouldShowResults, state]);
   // A request that failed in transport (no HTTP response) is a connection
   // problem, not a server verdict — say so instead of a generic failure.
   const connectionFailed = query.isError && !(query.error instanceof ApiError);
@@ -314,6 +352,7 @@ export default function Search() {
     }
     /* C6-SWEEP-06: the card unmounts once the refetch succeeds */
     if (document.activeElement === e.currentTarget) pendingResultsFocusRef.current = true;
+    recordPageRequest(state.page, "retry");
     void query.refetch();
   };
   return <div className="discovery-page space-y-6">
@@ -330,7 +369,7 @@ export default function Search() {
        : query.isLoading || (!data && !query.isError) ? <><p className="sr-only" role="status">Loading search results…</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></>
        : query.isError ? <StatePanel tone="error" label={invalid ? "Invalid filters" : "Error · unavailable"} title={invalid ? "These filters can’t be applied" : "Search failed"} inline testId="search-results-error" actions={invalid ? <Button variant="outline" onClick={clearInvalidRequest} data-testid="button-clear-invalid-filters">Clear invalid filters</Button> : <RetryButton onRetry={retrySearch} handoffFocus={false} testId="button-retry-search" />}>{invalid ? query.error.message : connectionFailed ? "Search couldn't reach the catalog. Check your connection and try again." : "Something went wrong while searching. Please try again."}</StatePanel>
         : results.length === 0 ? <StatePanel tone="empty" label="No results" title={normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"} inline testId="text-no-results" actions={<>{hasActiveFilters && <Button variant="outline" onClick={() => clearFilters()} data-testid="button-clear-search-filters">Clear filters</Button>}{normalized && <Button variant="ghost" onClick={clearSearch} data-testid="button-clear-search-query">Clear search</Button>}<Button asChild variant="secondary"><Link href="/categories" data-testid="link-empty-browse-categories">Browse categories</Link></Button><Button asChild variant="secondary"><Link href="/advanced" data-testid="link-empty-advanced-discovery">Advanced discovery</Link></Button></>}>Try broadening your filters or search terms.{suggestedCategories.length > 0 && <nav aria-label="Popular categories" className="mt-3" data-testid="search-empty-categories"><p className="text-xs text-muted-foreground">Or start from a popular category:</p><ul className="mt-2 flex flex-wrap justify-center gap-2">{suggestedCategories.map(category => <li key={category.slug}><Link href={`/category/${category.slug}`} className="chip inline-flex min-h-11 items-center gap-2 hover:border-[var(--accent)]">{category.name}<span className="mono text-muted-foreground">{category.totalResourceCount}</span></Link></li>)}</ul></nav>}</StatePanel>
-       : <>{data?.search?.mode === "fuzzy" && data.search.suggestion && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm" role="status" data-testid="notice-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setInput(data.search!.suggestion!); update("q", data.search!.suggestion!); inputRef.current?.focus(); /* C6-V2-01: the notice unmounts with this button */ }}>{data.search.suggestion}</Button><span>?</span></div>}<p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{queryReady ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-grid">{results.map(r => <ResourceCard key={r.id} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
+       : <>{data?.search?.mode === "fuzzy" && data.search.suggestion && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm" role="status" data-testid="notice-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setInput(data.search!.suggestion!); update("q", data.search!.suggestion!); inputRef.current?.focus(); /* C6-V2-01: the notice unmounts with this button */ }}>{data.search.suggestion}</Button><span>?</span></div>}<p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{queryReady ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-grid">{results.map((r, index) => <ResourceCard key={r.id} searchResultRank={queryReady ? (safePage - 1) * PAGE_SIZE + index + 1 : undefined} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
     </section></div>
   </div>;
 }

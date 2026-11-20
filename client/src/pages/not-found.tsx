@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, List, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackPageNotFound } from "@/lib/analytics";
+import { trackMissingRoute } from "@/lib/analytics-discovery";
 import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 import { missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
@@ -26,6 +27,13 @@ interface NotFoundProps {
 
 export default function NotFound({ suggestion }: NotFoundProps) {
   useMissingRouteTelemetry(true);
+  const [pathname] = useLocation();
+  const lastMissingPath = useRef<string | null>(null);
+  useEffect(() => {
+    if (lastMissingPath.current === pathname) return;
+    lastMissingPath.current = pathname;
+    trackMissingRoute("navigation_not_found");
+  }, [pathname]);
   useEffect(() => {
     trackPageNotFound(window.location.pathname);
   }, []);
@@ -59,6 +67,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
           <p className="system-state-copy">
             <Link
               href={suggestion.href}
+              onClick={() => trackMissingRoute("not_found_suggestion_clicked", suggestion.href)}
               className="system-state-suggestion"
               data-testid="link-did-you-mean"
             >

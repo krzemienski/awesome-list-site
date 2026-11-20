@@ -667,6 +667,13 @@ export const trackGuestBookmarkRemoved = (
   });
 };
 
+export const trackGuestBookmarkMergeResult = (
+  resourceId: number,
+  outcome: 'saved' | 'already_saved' | 'missing' | 'unconfirmed',
+) => {
+  track('guest_bookmark_merge_result', { resource_id: String(resourceId), outcome }, posthogOnly);
+};
+
 export const trackGuestBookmarkAdded = (
   resourceId: string | number,
   guestSavedCount: number
@@ -708,6 +715,7 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     props,
     ga,
     product,
+    posthog: options.posthog ?? product,
     replit,
     pageUrl: location.href,
   };
@@ -762,6 +770,7 @@ interface TrackOptions {
    * resource_submitted) so their vendor coverage is unchanged.
    */
   product?: boolean;
+  posthog?: boolean;
   /**
    * Replit Analytics. Default: same as `product`. `false` for page_viewed
    * (the platform records page views); `true` for non-product events that
@@ -770,6 +779,8 @@ interface TrackOptions {
    */
   replit?: boolean;
 }
+
+export const posthogOnly: TrackOptions = { posthog: true, product: false, ga: false, replit: false };
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
@@ -810,12 +821,14 @@ export const trackAccountSecurityOpened = (entryPoint: 'profile_tab' | 'manage_b
 export const trackResourceCardOpened = (
   resourceId: string | number,
   surface: string,
-  control: 'title' | 'view_details' | 'card',
+  control: 'title' | 'view_details' | 'card' | 'palette_result' | 'palette_featured',
+  resultRank?: number,
 ) => {
   track('resource_card_opened', {
     resource_id: String(resourceId),
     surface,
     card_control: control,
+    ...(resultRank === undefined ? {} : { result_rank: resultRank }),
   });
 };
 
@@ -884,6 +897,14 @@ export const trackSubmitValidationFailed = (field: string, source: 'client' | 's
 
 export const trackSubmitFormSubmitted = (tagCount: number, hasSubcategory: boolean) => {
   track('submit_form_submitted', { tag_count: tagCount, has_subcategory: hasSubcategory });
+};
+
+export type SubmitResult =
+  | 'accepted' | 'client_invalid' | 'server_invalid' | 'duplicate'
+  | 'access_denied' | 'rate_limited' | 'server_error' | 'unconfirmed';
+
+export const trackSubmitResult = (outcome: SubmitResult) => {
+  track('submit_form_result', { outcome }, posthogOnly);
 };
 
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
