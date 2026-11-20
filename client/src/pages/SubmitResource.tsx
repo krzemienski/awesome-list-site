@@ -240,11 +240,17 @@ export default function SubmitResource() {
   };
   const completeStep = (step: SubmitFormStep) =>
     fireOnce(`step:${step}`, () => trackSubmitStepCompleted(step));
-  const startFunnel = () => {
+  const startAmplitudeFlow = () => {
     if (!submitFlow.current?.id) {
-      submitFlow.current = trackSubmitFormStarted(isAuthenticated, funnelSeen.current.has("started"));
+      submitFlow.current = trackSubmitFormStarted(isAuthenticated, "amplitude");
     }
-    funnelSeen.current.add("started");
+  };
+  const startFunnel = () => {
+    fireOnce("started", () => {
+      if (submitFlow.current?.id) trackSubmitFormStarted(isAuthenticated, "legacy");
+      else submitFlow.current = trackSubmitFormStarted(isAuthenticated);
+    });
+    startAmplitudeFlow();
   };
 
   // Signed-out visitors cannot type (the fields are disabled), so the sign-in
@@ -268,7 +274,7 @@ export default function SubmitResource() {
   }, [form]);
 
   const onInvalid = (errors: Record<string, unknown>) => {
-    if (funnelSeen.current.has("started")) startFunnel();
+    if (isAuthenticated) startAmplitudeFlow();
     trackSubmitResult("client_invalid", submitFlow.current);
     for (const name of FIELD_ORDER) {
       if (name in errors) trackSubmitValidationFailed(name, "client");
@@ -653,7 +659,7 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
-    if (funnelSeen.current.has("started")) startFunnel();
+    startAmplitudeFlow();
     const category = categories.find((item) => String(item.id) === data.category);
     if (!category) {
       const error = { type: "validate", message: "Choose an available category before submitting." };

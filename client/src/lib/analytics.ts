@@ -890,9 +890,9 @@ export const trackResourceNextStepClicked = (
 
 export type SubmitFormStep = 'sign_in_required' | 'details' | 'category' | 'review';
 
-export const trackSubmitFormStarted = (signedIn: boolean, amplitudeOnly = false): SubmitAnalyticsFlow | undefined => {
+export const trackSubmitFormStarted = (signedIn: boolean, target: 'all' | 'amplitude' | 'legacy' = 'all'): SubmitAnalyticsFlow | undefined => {
   let flow: SubmitAnalyticsFlow | undefined;
-  if (vendorSdksAllowed() && typeof crypto.randomUUID === 'function') {
+  if (target !== 'legacy' && vendorSdksAllowed() && typeof crypto.randomUUID === 'function') {
     if (!submissionConsentListening) {
       window.addEventListener('storage', (event) => {
         if (event.storageArea === localStorage && (event.key === CONSENT_KEY || event.key === null)
@@ -906,9 +906,10 @@ export const trackSubmitFormStarted = (signedIn: boolean, amplitudeOnly = false)
   }
   // A later consent grant/new form starts a fresh Amplitude flow without
   // repeating the other vendors' existing once-per-visit start event.
-  if (amplitudeOnly && !flow) return undefined;
+  if (target === 'amplitude' && !flow) return undefined;
   track('submit_form_started', { signed_in: signedIn }, {
-    ...(amplitudeOnly ? { product: false, amplitude: true, posthog: false, ga: false as const, replit: false } : {}),
+    ...(target === 'amplitude' ? { product: false, amplitude: true, posthog: false, ga: false as const, replit: false } : {}),
+    ...(target === 'legacy' ? { amplitude: false } : {}),
     amplitudeSubmitFlow: flow,
   });
   return flow;
