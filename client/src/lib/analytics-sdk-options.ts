@@ -156,7 +156,14 @@ export const amplitudeUrlScrubPlugin = {
   execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T | null> => {
     if (isAnalyticsSuppressed() || getAnalyticsConsent() !== 'granted') return Promise.resolve(null);
     for (const field of [event.event_properties, event.user_properties]) {
-      if (field && typeof field === 'object') scrubSdkUrlFields(field as Record<string, unknown>);
+      if (field && typeof field === 'object') {
+        const props = scrubSdkUrlFields(field as Record<string, unknown>);
+        // Search SEO titles contain the entered query, including during SPA transitions.
+        const title = props['[Amplitude] Page Title'];
+        if (typeof title === 'string' && title.startsWith('Search: ')) {
+          props['[Amplitude] Page Title'] = 'Search';
+        }
+      }
     }
     return Promise.resolve(event);
   },

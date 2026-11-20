@@ -42,7 +42,8 @@ export interface AnalyticsDispatchRequest {
   ga: { name: string; params: EventProps } | null;
   /** False for legacy GA4-only events (page_view, performance, ...). */
   product: boolean;
-  /** PostHog can also receive measurement events that have no other destination. */
+  /** Outcome events can be routed to individual consented vendors. */
+  amplitude: boolean;
   posthog: boolean;
   /** Replit Analytics; sent without a grant unless the visitor declined. */
   replit: boolean;
@@ -98,9 +99,7 @@ export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
     if (typeof context.page_location === 'string') lastGaLocation = context.page_location;
     safely(() => sendGaEvent(gaName, gaParams, context));
   }
-  if (request.product) {
-    safely(() => mpTrack(request.name, props));
-    safely(() => ampTrack(request.name, props));
-  }
+  if (request.product) safely(() => mpTrack(request.name, props));
+  if (request.amplitude) safely(() => ampTrack(request.name, props));
   if (request.posthog) safely(() => phCapture(request.name, props));
 };

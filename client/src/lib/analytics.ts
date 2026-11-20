@@ -594,10 +594,10 @@ export type SiteErrorType =
   | 'chunk_load_failed'
   | 'page_load_failed';
 
-// Replit Analytics half of every site error: the error TYPE only — never the
+// Replit and consented Amplitude receive the error TYPE only — never the
 // message, which can carry URLs, copied text or query values.
 export const trackSiteError = (errorType: SiteErrorType) => {
-  track('site_error', { error_type: errorType }, { ga: false, product: false, replit: true });
+  track('site_error', { error_type: errorType }, { ga: false, product: false, amplitude: true, replit: true });
 };
 
 export const trackFilterUsage = (
@@ -671,7 +671,7 @@ export const trackGuestBookmarkMergeResult = (
   resourceId: number,
   outcome: 'saved' | 'already_saved' | 'missing' | 'unconfirmed',
 ) => {
-  track('guest_bookmark_merge_result', { resource_id: String(resourceId), outcome }, posthogOnly);
+  track('guest_bookmark_merge_result', { resource_id: String(resourceId), outcome }, journeyOutcomeVendors);
 };
 
 export const trackGuestBookmarkAdded = (
@@ -716,6 +716,7 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     ga,
     product,
     posthog: options.posthog ?? product,
+    amplitude: options.amplitude ?? product,
     replit,
     pageUrl: location.href,
   };
@@ -771,6 +772,7 @@ interface TrackOptions {
    */
   product?: boolean;
   posthog?: boolean;
+  amplitude?: boolean;
   /**
    * Replit Analytics. Default: same as `product`. `false` for page_viewed
    * (the platform records page views); `true` for non-product events that
@@ -780,7 +782,7 @@ interface TrackOptions {
   replit?: boolean;
 }
 
-export const posthogOnly: TrackOptions = { posthog: true, product: false, ga: false, replit: false };
+export const journeyOutcomeVendors: TrackOptions = { amplitude: true, posthog: true, product: false, ga: false, replit: false };
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
@@ -904,7 +906,7 @@ export type SubmitResult =
   | 'access_denied' | 'rate_limited' | 'server_error' | 'unconfirmed';
 
 export const trackSubmitResult = (outcome: SubmitResult) => {
-  track('submit_form_result', { outcome }, posthogOnly);
+  track('submit_form_result', { outcome }, journeyOutcomeVendors);
 };
 
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
