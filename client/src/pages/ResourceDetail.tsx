@@ -840,20 +840,9 @@ export default function ResourceDetail() {
         </div>
       </div>
 
-      <ResourceTopNextSteps
-        related={topRelated}
-        loading={relatedQuery.isLoading}
-        failed={relatedQuery.isError}
-        onRelatedClick={handleTopRelatedClick}
-      />
-
-      <section className="resource-detail-description">
-        <h2 className="eyebrow">DESCRIPTION</h2>
-        <p data-testid="text-description">
-          {resource.description || 'No description available for this resource.'}
-        </p>
-      </section>
-
+      {/* Primary actions sit right after the heading so the Visit button is in
+          the first viewport, above the consent banner, before the related
+          strip and the description. */}
       <div className="resource-detail-actions" data-testid="resource-actions">
           <Button asChild>
             <a href={resource.url} target="_blank" rel="noopener noreferrer"
@@ -959,6 +948,20 @@ export default function ResourceDetail() {
           </Button>
         </div>
       )}
+
+      <ResourceTopNextSteps
+        related={topRelated}
+        loading={relatedQuery.isLoading}
+        failed={relatedQuery.isError}
+        onRelatedClick={handleTopRelatedClick}
+      />
+
+      <section className="resource-detail-description">
+        <h2 className="eyebrow">DESCRIPTION</h2>
+        <p data-testid="text-description">
+          {resource.description || 'No description available for this resource.'}
+        </p>
+      </section>
 
       <BookmarkNotesDialog
         open={notesDialogOpen}
