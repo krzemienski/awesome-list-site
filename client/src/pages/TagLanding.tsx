@@ -126,14 +126,31 @@ export default function TagLanding() {
     resultsCountRef.current?.focus({ preventScroll: true });
   }, [listing.data]);
 
+  // A page change the visitor started can land on the offline panel, which is
+  // far shorter than the 24 cards it replaced: the viewport would be left past
+  // the end, on the footer. When focus is unclaimed (its pager link just
+  // unmounted) or still in the pager, bring the panel up and focus Retry; a
+  // visitor who moved to another control keeps both focus and scroll. A direct visit never sets the flag.
+  const offlinePanelRef = useRef<HTMLDivElement>(null);
+  const showingOffline = queryUnavailableReason(listing) === "offline";
+  useEffect(() => {
+    const panel = offlinePanelRef.current;
+    if (!showingOffline || !pendingResultsFocusRef.current || !panel) return;
+    const active = document.activeElement;
+    const unclaimed = !active || active === document.body || !active.isConnected;
+    if (!unclaimed && !paginationRef.current?.contains(active)) return;
+    panel.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    panel.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
+  }, [showingOffline]);
+
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
     return <Redirect to={`${canonicalPath}${search ? `?${search}` : ""}`} replace />;
   }
 
   if (notFound) return <NotFound />;
-  if (queryUnavailableReason(listing) === "offline") {
-    return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" />;
+  if (showingOffline) {
+    return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" panelRef={offlinePanelRef} />;
   }
   // isPending, not isLoading: offline the fetch is paused (isLoading false),
   // which fell through to the no-data 404 below.

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 import SEOHead from "@/components/layout/SEOHead";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
@@ -9,9 +9,15 @@ import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
  * state the page saw "no data" and told the visitor the page does not exist.
  * The query resumes by itself on reconnect; Retry is the manual path.
  */
-export default function OfflinePageState({ onRetry, testId }: { onRetry: () => void; testId: string }) {
+export default function OfflinePageState({ onRetry, testId, panelRef: hostPanelRef }: {
+  onRetry: () => void;
+  testId: string;
+  /** Lets a host that started this state by a visitor action reveal the panel. */
+  panelRef?: RefObject<HTMLDivElement>;
+}) {
   const [stillOffline, setStillOffline] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const ownPanelRef = useRef<HTMLDivElement>(null);
+  const panelRef = hostPanelRef ?? ownPanelRef;
   // Reconnecting (or Retry) unmounts this state from under the visitor's
   // focus. A layout cleanup still runs while the panel is in the DOM, so it
   // can tell whether focus was inside and pass it to the loaded page's h1.
@@ -21,7 +27,7 @@ export default function OfflinePageState({ onRetry, testId }: { onRetry: () => v
       const active = document.activeElement;
       if (active instanceof HTMLElement && panel?.contains(active)) handoffFocusOnUnmount(active);
     };
-  }, []);
+  }, [panelRef]);
   return (
     <>
       <SEOHead title="You're offline" description="This page will load when your connection is back." noindex />
