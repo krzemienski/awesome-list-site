@@ -780,7 +780,7 @@ interface TrackOptions {
   replit?: boolean;
 }
 
-const posthogOnly: TrackOptions = { posthog: true, product: false, ga: false, replit: false };
+export const posthogOnly: TrackOptions = { posthog: true, product: false, ga: false, replit: false };
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 

@@ -364,8 +364,12 @@ taxonomy further down and are not repeated here.
 |---|---|---|---|---|
 | `page_viewed` | `page_view` | all four | `page_title`, `referrer_origin` (GA4: page context only) | `trackPageView` ← `use-analytics` |
 | `resource_viewed` | `select_content` | all four | `resource_id` + caller extras (GA4: `content_type`, `content_id`, extras) | `trackSelectContent('resource', …)` |
-| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`search_palette` \| `resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← palette, detail page, `ResourceCard`, home cards |
+| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← detail page, `ResourceCard`, home cards |
 | `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
+| `search_page_requested` | — | PostHog | A search-page pagination control or online Retry starts a transition. `attempt_id` is unique to that action, with `requested_page` and `trigger`. | `startSearchPageAttempt` |
+| `search_page_rendered` | — | PostHog | The committed search results and API response are available. `rendered_page` comes from response metadata. Join on `attempt_id` and compare pages. | `trackSearchPageRendered` |
+| `navigation_not_found` | — | PostHog | The client renders its missing-route view. Initial document loads and internal navigations can both emit this event. | `trackMissingRoute` |
+| `not_found_suggestion_clicked` | — | PostHog | A visitor activates a missing-route suggestion. `suggestion_path` contains the destination path without query parameters. Use a subsequent destination view to establish recovery. | `trackMissingRoute` |
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
 | `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` (`search_page` \| `taxonomy_*` \| `home` (kind filter / clear all) \| `journeys_page` (category)) | `trackFilterUsage` |
 | `sort_changed` | `sort_change` | all four | `sort_type`, `surface` (`search_page` \| `taxonomy_*` \| `home` \| `categories_page`), `result_count`, `zero_results` | `trackSortChange` |
