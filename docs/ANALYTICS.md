@@ -470,7 +470,7 @@ edit text, contribution search text or URLs beyond a hostname are sent.
 | `journey_resumed` | same | all four | `journey_id`, `surface` (`continue_learning_page` \| `home_preview`), `has_next_step`, `progress_percent` | `trackJourneyResumed` ← `useResumeJourney` `onSuccess` (never `journey_started`) |
 | `continue_learning_cta_clicked` | same | all four | `cta` (`recent_resource` \| `review_journey` \| `find_another_journey` \| `browse_available_journeys` \| `suggested_journey` \| `start_journey` \| `browse_resources`), `journey_id` / `resource_id` when the CTA has one | `trackContinueLearningCtaClicked` ← `ContinueLearning` |
 
-Amplitude additionally sends its own `Viewed Home Page` verification event and
+Amplitude sends its legacy `Viewed Home Page` marker when initialization finishes on the root path. It also sends
 autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` and
 `$pageleave`. Those are SDK events, not catalog events.
 
