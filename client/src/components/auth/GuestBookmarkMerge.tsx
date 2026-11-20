@@ -157,9 +157,10 @@ export default function GuestBookmarkMerge() {
         // Read the device store inside the lock: another tab may have
         // transferred these items before its storage event reaches this tab.
         const merge = () => pushGuestBookmarks(isStillOwner);
-        const outcome = navigator.locks
-          ? await navigator.locks.request("awesome-video-guest-bookmark-merge", merge)
-          : await merge();
+        const pending = navigator.locks
+          ? navigator.locks.request("awesome-video-guest-bookmark-merge", merge) as ReturnType<typeof merge>
+          : merge();
+        const outcome = await pending;
         if (!outcome) return;
         if (outcome.merged > 0) {
           void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
