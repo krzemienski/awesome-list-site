@@ -55,6 +55,9 @@ export default function ConsentBanner() {
   // leave that choice exactly as it was.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [draft, setDraft] = useState<"granted" | "denied" | "">("");
+  // True once the visitor picked a radio in the open dialog; a deliberate,
+  // unsaved pick must survive a decision made in another tab.
+  const draftEditedRef = useRef(false);
   const [legacyConsentReconciled, setLegacyConsentReconciled] = useState(
     () => !isInitialHomeHydration,
   );
@@ -157,12 +160,30 @@ export default function ConsentBanner() {
     const onOpen = () => {
       // The dialog preselects the saved choice; with none saved (the banner
       // was dismissed with Escape) nothing is preselected and Save waits.
+      draftEditedRef.current = false;
       setDraft(getAnalyticsConsent() ?? "");
       setSettingsOpen(true);
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
   }, []);
+
+  // Cross-tab reconciliation (UI only): another tab saved a decision to the
+  // canonical localStorage key. Re-read it, never write or start/stop vendors.
+  // A visible first-visit banner is dismissed through closeBanner (which keeps
+  // focus handling); an open, untouched settings draft follows the stored
+  // choice, while a draft the visitor edited is left for them to Save/Cancel.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== "analytics-consent" || e.storageArea !== window.localStorage) return;
+      const stored = getAnalyticsConsent();
+      if (stored === null) return;
+      if (!choiceMade) closeBanner();
+      if (settingsOpen && !draftEditedRef.current) setDraft(stored);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [choiceMade, settingsOpen, closeBanner]);
 
   if (!hasAnalyticsVendors) return null;
 
@@ -208,7 +229,10 @@ export default function ConsentBanner() {
         </DialogHeader>
         <RadioGroup
           value={draft}
-          onValueChange={(v) => setDraft(v as "granted" | "denied")}
+          onValueChange={(v) => {
+            draftEditedRef.current = true;
+            setDraft(v as "granted" | "denied");
+          }}
           aria-label="Analytics cookies"
           data-testid="cookie-settings-choice"
         >
