@@ -810,12 +810,14 @@ export const trackAccountSecurityOpened = (entryPoint: 'profile_tab' | 'manage_b
 export const trackResourceCardOpened = (
   resourceId: string | number,
   surface: string,
-  control: 'title' | 'view_details' | 'card',
+  control: 'title' | 'view_details' | 'card' | 'palette_result' | 'palette_featured',
+  resultRank?: number,
 ) => {
   track('resource_card_opened', {
     resource_id: String(resourceId),
     surface,
     card_control: control,
+    ...(resultRank === undefined ? {} : { result_rank: resultRank }),
   });
 };
 

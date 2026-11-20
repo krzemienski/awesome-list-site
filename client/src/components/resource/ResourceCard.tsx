@@ -41,6 +41,7 @@ interface ResourceCardProps {
     metadata?: Record<string, unknown>;
   };
   fullResource?: Resource & { resolvedKind?: ResourceKind; featured?: boolean };
+  searchResultRank?: number;
   className?: string;
   onClick?: () => void;
   /** When provided, normal clicks still apply the hosting page's filter while
@@ -59,6 +60,7 @@ import { categoryGlyph as resourceCategoryMark } from "@/lib/category-glyph";
 function ResourceCard({
   resource,
   fullResource,
+  searchResultRank,
   className,
   onClick,
   onTagClick,
@@ -168,7 +170,7 @@ function ResourceCard({
     <Link
       href={`/resource/${resource.id}`}
       className="resource-card__title-link"
-      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "title")}
+      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "title", searchResultRank)}
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -198,7 +200,7 @@ function ResourceCard({
     <Link
       href={`/resource/${resource.id}`}
       className="resource-card__meta-link no-print relative z-10"
-      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "view_details")}
+      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "view_details", searchResultRank)}
       data-testid={`link-view-details-${resource.id}`}
       aria-label={`View details for ${resource.name}`}
       title="View details"

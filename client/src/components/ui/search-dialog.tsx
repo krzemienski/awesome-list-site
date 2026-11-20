@@ -8,7 +8,7 @@ import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, WifiOff, X } from 
 import { useLocation } from "wouter";
 import { ApiError, apiRequest } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { trackSearch, trackResourceClick } from "@/lib/analytics";
+import { trackSearch, trackResourceCardOpened } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import type { Category } from "@shared/schema";
@@ -211,8 +211,13 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
     if (!isOpen) setQuery("");
   }, [isOpen]);
 
-  const openResource = (resource: DbSearchResource) => {
-    trackResourceClick(resource.title, resource.url, resource.category || "", "search_palette");
+  const openResource = (resource: DbSearchResource, resultRank?: number) => {
+    trackResourceCardOpened(
+      resource.id,
+      "search_palette",
+      resultRank === undefined ? "palette_featured" : "palette_result",
+      resultRank,
+    );
     if (isSearchableQuery(queryTrimmed)) setRecentSearches(saveRecentSearch(queryTrimmed));
     setIsOpen(false);
     navigate(`/resource/${resource.id}`);
@@ -528,7 +533,7 @@ export default function SearchDialog({ isOpen, setIsOpen, initialQuery, opener }
                           <CommandItem
                             key={`resource-${resource.id}`}
                             value={`resource-${resource.id}`}
-                            onSelect={() => openResource(resource)}
+                            onSelect={() => openResource(resource, index + 1)}
                             className="search-palette-row"
                             data-testid={`search-result-${index}`}
                           >
