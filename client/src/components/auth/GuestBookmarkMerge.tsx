@@ -86,12 +86,16 @@ async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOut
       break;
     }
     try {
-      await apiRequest(`/api/bookmarks/${id}`, {
+      const saved: unknown = await apiRequest(`/api/bookmarks/${id}`, {
         method: "POST",
         body: JSON.stringify({}),
         credentials: "include",
       });
-      merged.push(id);
+      if (typeof saved === "object" && saved !== null && "isBookmarked" in saved && saved.isBookmarked === true) {
+        merged.push(id);
+      } else {
+        failed.push(id);
+      }
     } catch {
       failed.push(id);
     }

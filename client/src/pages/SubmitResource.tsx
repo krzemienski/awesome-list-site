@@ -553,7 +553,7 @@ export default function SubmitResource() {
         throw new Error("Invalid category selected");
       }
 
-      return apiRequest('/api/resources', {
+      const created: unknown = await apiRequest('/api/resources', {
         method: 'POST',
         // serverConversionHeaders: consent + Mixpanel distinct-id so the
         // server can emit the resource_submitted conversion (Task 233).
@@ -567,12 +567,14 @@ export default function SubmitResource() {
           subSubcategory: subSubcategory?.name ?? undefined,
           metadata: tagsArray.length > 0 ? { tags: tagsArray } : {},
         }),
-      }) as Promise<unknown>;
+      });
+      if (typeof created !== "object" || created === null || !("id" in created)
+          || typeof created.id !== "number" || !Number.isInteger(created.id) || created.id < 1) {
+        throw new Error("We couldn't confirm your submission. Your draft is still here.");
+      }
     },
-    onSuccess: (data, variables) => {
-      const confirmed = typeof data === "object" && data !== null && "id" in data
-        && typeof data.id === "number" && Number.isInteger(data.id) && data.id > 0;
-      trackSubmitResult(confirmed ? "accepted" : "unconfirmed");
+    onSuccess: (_data, variables) => {
+      trackSubmitResult("accepted");
       // GA4 conversion: resource submission completed.
       const category = categories.find((c) => c.id === parseInt(variables.category));
       trackGenerateLead({
