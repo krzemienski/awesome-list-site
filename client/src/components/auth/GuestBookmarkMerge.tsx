@@ -4,7 +4,7 @@ import { queryClient, apiRequest, isGoneError } from "@/lib/queryClient";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { trackBookmarksMerged } from "@/lib/analytics";
+import { trackBookmarksMerged, trackGuestBookmarkMergeResult } from "@/lib/analytics";
 import {
   getGuestBookmarks,
   removeGuestBookmarkIds,
@@ -98,6 +98,13 @@ async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOut
   }
 
   removeGuestBookmarkIds([...merged, ...duplicates, ...missing]);
+
+  if (!interrupted && isStillOwner()) {
+    for (const id of merged) trackGuestBookmarkMergeResult(id, "saved");
+    for (const id of duplicates) trackGuestBookmarkMergeResult(id, "already_saved");
+    for (const id of missing) trackGuestBookmarkMergeResult(id, "missing");
+    for (const id of failed) trackGuestBookmarkMergeResult(id, "unconfirmed");
+  }
 
   return {
     merged: merged.length,
