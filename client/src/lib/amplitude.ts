@@ -287,9 +287,9 @@ export function initAmplitude(): void {
     initialized = true;
     initStarted = false;
 
-    // First verification event — sent only after every Unified product is
-    // ready, matching the previous initAll().then(...) behavior.
-    if (!disabled) {
+    // This legacy marker describes initialization on the home page.
+    // The SDK's page views cover subsequent SPA navigation.
+    if (!disabled && window.location.pathname === '/') {
       amplitude.track('Viewed Home Page', { prompt_version: 'BA400.4' });
     }
     const flush = pendingEvents;

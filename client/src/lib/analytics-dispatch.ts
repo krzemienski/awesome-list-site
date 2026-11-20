@@ -20,8 +20,9 @@
 //
 // Each vendor dispatcher keeps its own consent gate, pre-SDK buffer and revoke
 // kill switch, so this module adds no new queueing semantics — it only
-// decides WHICH vendors get the event and guarantees they all receive the same
-// cleaned properties. It is loaded with a dynamic import on the first event,
+// decides WHICH vendors get the event. Base properties are cleaned identically;
+// optional submission-flow correlation is added only to Amplitude. It is loaded
+// with a dynamic import on the first event,
 // so neither the hygiene rules nor the fan-out ship in the entry bundle (the
 // vendor wrappers it calls are already there; their SDKs are not).
 import { getAnalyticsConsent, sendGaEvent } from './analytics';
@@ -34,6 +35,11 @@ import { isAdminAnalyticsSession } from './analytics-suppression';
 
 type EventProps = Record<string, unknown>;
 
+/** In-memory only; id becomes undefined when its consent grant is revoked. */
+export interface SubmitAnalyticsFlow {
+  readonly id?: string;
+}
+
 export interface AnalyticsDispatchRequest {
   /** Catalog (product-analytics) name: Mixpanel, PostHog and Amplitude. */
   name: string;
@@ -42,7 +48,9 @@ export interface AnalyticsDispatchRequest {
   ga: { name: string; params: EventProps } | null;
   /** False for legacy GA4-only events (page_view, performance, ...). */
   product: boolean;
-  /** PostHog can also receive measurement events that have no other destination. */
+  /** Outcome events can be routed to individual consented vendors. */
+  amplitude: boolean;
+  amplitudeSubmitFlow?: SubmitAnalyticsFlow;
   posthog: boolean;
   /** Replit Analytics; sent without a grant unless the visitor declined. */
   replit: boolean;
@@ -98,9 +106,9 @@ export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
     if (typeof context.page_location === 'string') lastGaLocation = context.page_location;
     safely(() => sendGaEvent(gaName, gaParams, context));
   }
-  if (request.product) {
-    safely(() => mpTrack(request.name, props));
-    safely(() => ampTrack(request.name, props));
-  }
+  if (request.product) safely(() => mpTrack(request.name, props));
+  if (request.amplitude) safely(() => ampTrack(request.name, request.amplitudeSubmitFlow?.id
+    ? { ...props, submission_flow_id: request.amplitudeSubmitFlow.id }
+    : props));
   if (request.posthog) safely(() => phCapture(request.name, props));
 };

@@ -19,7 +19,7 @@
 //  - No PII is ever sent (no email/password/token/raw copied text).
 
 import { captureAcquisition, getAcquisition } from './acquisition';
-import type { AnalyticsDispatchRequest } from './analytics-dispatch';
+import type { AnalyticsDispatchRequest, SubmitAnalyticsFlow } from './analytics-dispatch';
 import { isAnalyticsSuppressed, syncReplitPageviewOptOut } from './analytics-suppression';
 
 // Define the gtag function globally
@@ -52,6 +52,8 @@ export const ANALYTICS_VENDORS = [
 // so gtag.js is never even downloaded pre-consent. Every tracking helper
 // already no-ops while window.gtag is undefined.
 const CONSENT_KEY = 'analytics-consent';
+let submissionConsentVersion = 0;
+let submissionConsentListening = false;
 export type AnalyticsConsent = 'granted' | 'denied' | null;
 
 export const getAnalyticsConsent = (): AnalyticsConsent => {
@@ -72,6 +74,7 @@ export const vendorSdksAllowed = (): boolean =>
   getAnalyticsConsent() === 'granted' && !isAnalyticsSuppressed();
 
 export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
+  if (value === 'denied') submissionConsentVersion++;
   try {
     localStorage.setItem(CONSENT_KEY, value);
   } catch {
@@ -594,10 +597,10 @@ export type SiteErrorType =
   | 'chunk_load_failed'
   | 'page_load_failed';
 
-// Replit Analytics half of every site error: the error TYPE only — never the
+// Replit and consented Amplitude receive the error TYPE only — never the
 // message, which can carry URLs, copied text or query values.
 export const trackSiteError = (errorType: SiteErrorType) => {
-  track('site_error', { error_type: errorType }, { ga: false, product: false, replit: true });
+  track('site_error', { error_type: errorType }, { ga: false, product: false, amplitude: true, replit: true });
 };
 
 export const trackFilterUsage = (
@@ -671,7 +674,7 @@ export const trackGuestBookmarkMergeResult = (
   resourceId: number,
   outcome: 'saved' | 'already_saved' | 'missing' | 'unconfirmed',
 ) => {
-  track('guest_bookmark_merge_result', { resource_id: String(resourceId), outcome }, posthogOnly);
+  track('guest_bookmark_merge_result', { resource_id: String(resourceId), outcome }, journeyOutcomeVendors);
 };
 
 export const trackGuestBookmarkAdded = (
@@ -716,6 +719,8 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     ga,
     product,
     posthog: options.posthog ?? product,
+    amplitude: options.amplitude ?? product,
+    amplitudeSubmitFlow: consent === 'granted' ? options.amplitudeSubmitFlow : undefined,
     replit,
     pageUrl: location.href,
   };
@@ -771,6 +776,9 @@ interface TrackOptions {
    */
   product?: boolean;
   posthog?: boolean;
+  amplitude?: boolean;
+  /** Ephemeral correlation added only to Amplitude after its consent gate. */
+  amplitudeSubmitFlow?: SubmitAnalyticsFlow;
   /**
    * Replit Analytics. Default: same as `product`. `false` for page_viewed
    * (the platform records page views); `true` for non-product events that
@@ -780,7 +788,7 @@ interface TrackOptions {
   replit?: boolean;
 }
 
-export const posthogOnly: TrackOptions = { posthog: true, product: false, ga: false, replit: false };
+export const journeyOutcomeVendors: TrackOptions = { amplitude: true, posthog: true, product: false, ga: false, replit: false };
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
@@ -882,8 +890,29 @@ export const trackResourceNextStepClicked = (
 
 export type SubmitFormStep = 'sign_in_required' | 'details' | 'category' | 'review';
 
-export const trackSubmitFormStarted = (signedIn: boolean) => {
-  track('submit_form_started', { signed_in: signedIn });
+export const trackSubmitFormStarted = (signedIn: boolean, target: 'all' | 'amplitude' | 'legacy' = 'all'): SubmitAnalyticsFlow | undefined => {
+  let flow: SubmitAnalyticsFlow | undefined;
+  if (target !== 'legacy' && vendorSdksAllowed() && typeof crypto.randomUUID === 'function') {
+    if (!submissionConsentListening) {
+      window.addEventListener('storage', (event) => {
+        if (event.storageArea === localStorage && (event.key === CONSENT_KEY || event.key === null)
+            && event.newValue !== 'granted') submissionConsentVersion++;
+      });
+      submissionConsentListening = true;
+    }
+    const id = crypto.randomUUID();
+    const version = submissionConsentVersion;
+    flow = { get id() { return version === submissionConsentVersion ? id : undefined; } };
+  }
+  // A later consent grant/new form starts a fresh Amplitude flow without
+  // repeating the other vendors' existing once-per-visit start event.
+  if (target === 'amplitude' && !flow) return undefined;
+  track('submit_form_started', { signed_in: signedIn }, {
+    ...(target === 'amplitude' ? { product: false, amplitude: true, posthog: false, ga: false as const, replit: false } : {}),
+    ...(target === 'legacy' ? { amplitude: false } : {}),
+    amplitudeSubmitFlow: flow,
+  });
+  return flow;
 };
 
 export const trackSubmitStepCompleted = (step: SubmitFormStep) => {
@@ -903,8 +932,8 @@ export type SubmitResult =
   | 'accepted' | 'client_invalid' | 'server_invalid' | 'duplicate'
   | 'access_denied' | 'rate_limited' | 'server_error' | 'unconfirmed';
 
-export const trackSubmitResult = (outcome: SubmitResult) => {
-  track('submit_form_result', { outcome }, posthogOnly);
+export const trackSubmitResult = (outcome: SubmitResult, flow?: SubmitAnalyticsFlow) => {
+  track('submit_form_result', { outcome }, { ...journeyOutcomeVendors, amplitudeSubmitFlow: flow });
 };
 
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
