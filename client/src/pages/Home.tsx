@@ -560,7 +560,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
     queryFn: () => fetchKindCounts(),
     staleTime: 1000 * 60,
   });
-  const { data: kindCounts, isLoading: kindCountsLoading } = kindCountsQuery;
+  const { data: kindCounts } = kindCountsQuery;
 
   // C4-V1-03: a fetch started offline is paused, not failed (no loading, no
   // error, no data), so Home rendered zero kind counts, an empty Recently
@@ -842,7 +842,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
         featured={filteredFeatured}
         stats={stats}
         kindCounts={tagScopedKindCounts ?? kindCounts}
-        kindCountsLoading={tagScopedKindCounts ? false : kindCountsLoading}
         kindCountsError={tagScopedKindCounts ? false : kindCountsUnavailable}
         selectedKind={selectedKind}
         onKindChange={handleKindChange}
