@@ -55,6 +55,7 @@ import {
   type SubmitFormStep,
   type SubmitResult,
 } from "@/lib/analytics";
+import type { SubmitAnalyticsFlow } from "@/lib/analytics-dispatch";
 import { serverConversionHeaders } from "@/lib/mixpanel";
 import { scrollBehavior } from "@/lib/scroll-behavior";
 import SEOHead from "@/components/layout/SEOHead";
@@ -228,9 +229,10 @@ export default function SubmitResource() {
     "tags",
   ];
 
-  // Funnel telemetry: each event fires once per page visit. Only field names
-  // and step names leave the page, never what was typed.
+  // Legacy funnel events stay once per visit. Amplitude also correlates each
+  // consented form flow, without sending form contents or persisting its ID.
   const funnelSeen = useRef(new Set<string>());
+  const submitFlow = useRef<SubmitAnalyticsFlow>();
   const fireOnce = (key: string, send: () => void) => {
     if (funnelSeen.current.has(key)) return;
     funnelSeen.current.add(key);
@@ -238,8 +240,12 @@ export default function SubmitResource() {
   };
   const completeStep = (step: SubmitFormStep) =>
     fireOnce(`step:${step}`, () => trackSubmitStepCompleted(step));
-  const startFunnel = () =>
-    fireOnce("started", () => trackSubmitFormStarted(isAuthenticated));
+  const startFunnel = () => {
+    if (!submitFlow.current?.id) {
+      submitFlow.current = trackSubmitFormStarted(isAuthenticated, funnelSeen.current.has("started"));
+    }
+    funnelSeen.current.add("started");
+  };
 
   // Signed-out visitors cannot type (the fields are disabled), so the sign-in
   // wall is the first and last step they reach.
@@ -262,7 +268,8 @@ export default function SubmitResource() {
   }, [form]);
 
   const onInvalid = (errors: Record<string, unknown>) => {
-    trackSubmitResult("client_invalid");
+    if (funnelSeen.current.has("started")) startFunnel();
+    trackSubmitResult("client_invalid", submitFlow.current);
     for (const name of FIELD_ORDER) {
       if (name in errors) trackSubmitValidationFailed(name, "client");
     }
@@ -533,7 +540,7 @@ export default function SubmitResource() {
 
   // Submit mutation
   const submitMutation = useMutation({
-    mutationFn: async ({ data, categoryName }: { data: SubmitResourceFormData; categoryName: string }) => {
+    mutationFn: async ({ data, categoryName }: { data: SubmitResourceFormData; categoryName: string; flow?: SubmitAnalyticsFlow }) => {
       // Parse tags from comma-separated string. Run15 BUG-008: no silent
       // .slice(0, 10) — the form schema rejects >10 tags with an error.
       const tagsArray = data.tags 
@@ -567,8 +574,9 @@ export default function SubmitResource() {
         throw new Error("We couldn't confirm your submission. Your draft is still here.");
       }
     },
-    onSuccess: (_data, { categoryName }) => {
-      trackSubmitResult("accepted");
+    onSuccess: (_data, { categoryName, flow }) => {
+      trackSubmitResult("accepted", flow);
+      submitFlow.current = undefined;
       // GA4 conversion: resource submission completed.
       trackGenerateLead({
         content_type: 'resource_submission',
@@ -597,11 +605,11 @@ export default function SubmitResource() {
       // Scroll to top
       window.scrollTo({ top: 0, behavior: scrollBehavior() });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { flow }) => {
       // BUG-005 (run19): the server's 400 carries per-field messages in
       // `fieldErrors` — surface each at its form field (focusing the first)
       // instead of discarding them behind a generic toast.
-      trackSubmitResult(submissionFailure(error));
+      trackSubmitResult(submissionFailure(error), flow);
       const fieldErrors = extractFieldErrors(error);
       const formFields = [
         "title",
@@ -645,6 +653,7 @@ export default function SubmitResource() {
       redirectToLogin();
       return;
     }
+    if (funnelSeen.current.has("started")) startFunnel();
     const category = categories.find((item) => String(item.id) === data.category);
     if (!category) {
       const error = { type: "validate", message: "Choose an available category before submitting." };
@@ -657,7 +666,7 @@ export default function SubmitResource() {
       data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean).length : 0,
       Boolean(data.subcategory),
     );
-    submitMutation.mutate({ data, categoryName: category.name });
+    submitMutation.mutate({ data, categoryName: category.name, flow: submitFlow.current });
   };
 
   // BUG-002 (run19): no full-page spinner gate anymore — the form renders

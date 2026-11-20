@@ -19,7 +19,7 @@
 //  - No PII is ever sent (no email/password/token/raw copied text).
 
 import { captureAcquisition, getAcquisition } from './acquisition';
-import type { AnalyticsDispatchRequest } from './analytics-dispatch';
+import type { AnalyticsDispatchRequest, SubmitAnalyticsFlow } from './analytics-dispatch';
 import { isAnalyticsSuppressed, syncReplitPageviewOptOut } from './analytics-suppression';
 
 // Define the gtag function globally
@@ -52,6 +52,8 @@ export const ANALYTICS_VENDORS = [
 // so gtag.js is never even downloaded pre-consent. Every tracking helper
 // already no-ops while window.gtag is undefined.
 const CONSENT_KEY = 'analytics-consent';
+let submissionConsentVersion = 0;
+let submissionConsentListening = false;
 export type AnalyticsConsent = 'granted' | 'denied' | null;
 
 export const getAnalyticsConsent = (): AnalyticsConsent => {
@@ -72,6 +74,7 @@ export const vendorSdksAllowed = (): boolean =>
   getAnalyticsConsent() === 'granted' && !isAnalyticsSuppressed();
 
 export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
+  if (value === 'denied') submissionConsentVersion++;
   try {
     localStorage.setItem(CONSENT_KEY, value);
   } catch {
@@ -717,6 +720,7 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     product,
     posthog: options.posthog ?? product,
     amplitude: options.amplitude ?? product,
+    amplitudeSubmitFlow: consent === 'granted' ? options.amplitudeSubmitFlow : undefined,
     replit,
     pageUrl: location.href,
   };
@@ -773,6 +777,8 @@ interface TrackOptions {
   product?: boolean;
   posthog?: boolean;
   amplitude?: boolean;
+  /** Ephemeral correlation added only to Amplitude after its consent gate. */
+  amplitudeSubmitFlow?: SubmitAnalyticsFlow;
   /**
    * Replit Analytics. Default: same as `product`. `false` for page_viewed
    * (the platform records page views); `true` for non-product events that
@@ -884,8 +890,28 @@ export const trackResourceNextStepClicked = (
 
 export type SubmitFormStep = 'sign_in_required' | 'details' | 'category' | 'review';
 
-export const trackSubmitFormStarted = (signedIn: boolean) => {
-  track('submit_form_started', { signed_in: signedIn });
+export const trackSubmitFormStarted = (signedIn: boolean, amplitudeOnly = false): SubmitAnalyticsFlow | undefined => {
+  let flow: SubmitAnalyticsFlow | undefined;
+  if (vendorSdksAllowed() && typeof crypto.randomUUID === 'function') {
+    if (!submissionConsentListening) {
+      window.addEventListener('storage', (event) => {
+        if (event.storageArea === localStorage && (event.key === CONSENT_KEY || event.key === null)
+            && event.newValue !== 'granted') submissionConsentVersion++;
+      });
+      submissionConsentListening = true;
+    }
+    const id = crypto.randomUUID();
+    const version = submissionConsentVersion;
+    flow = { get id() { return version === submissionConsentVersion ? id : undefined; } };
+  }
+  // A later consent grant/new form starts a fresh Amplitude flow without
+  // repeating the other vendors' existing once-per-visit start event.
+  if (amplitudeOnly && !flow) return undefined;
+  track('submit_form_started', { signed_in: signedIn }, {
+    ...(amplitudeOnly ? { product: false, amplitude: true, posthog: false, ga: false as const, replit: false } : {}),
+    amplitudeSubmitFlow: flow,
+  });
+  return flow;
 };
 
 export const trackSubmitStepCompleted = (step: SubmitFormStep) => {
@@ -905,8 +931,8 @@ export type SubmitResult =
   | 'accepted' | 'client_invalid' | 'server_invalid' | 'duplicate'
   | 'access_denied' | 'rate_limited' | 'server_error' | 'unconfirmed';
 
-export const trackSubmitResult = (outcome: SubmitResult) => {
-  track('submit_form_result', { outcome }, journeyOutcomeVendors);
+export const trackSubmitResult = (outcome: SubmitResult, flow?: SubmitAnalyticsFlow) => {
+  track('submit_form_result', { outcome }, { ...journeyOutcomeVendors, amplitudeSubmitFlow: flow });
 };
 
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
