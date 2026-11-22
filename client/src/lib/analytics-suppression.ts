@@ -26,6 +26,8 @@ const ADMIN_SESSION_KEY = 'analytics-admin-session';
 const UMAMI_DISABLED_KEY = 'umami.disabled';
 const UMAMI_SET_BY_APP_KEY = 'analytics-umami-disabled-by-app';
 const CONSENT_KEY = 'analytics-consent';
+const INTERNAL_TRAFFIC_KEY = 'analytics-internal';
+const INTERNAL_TRAFFIC_PARAM = 'analytics_internal';
 
 const SENTINEL_RESOURCE_PATH = /^\/resource\/9{8,}\/?$/;
 
@@ -74,6 +76,25 @@ export const isNonProductionHost = (hostname: string): boolean => hostname !== P
 
 export const isAutomatedBrowser = (): boolean =>
   typeof navigator !== 'undefined' && navigator.webdriver === true;
+
+/**
+ * Internal traffic is tagged, not dropped, so QA can still see its events
+ * arrive. `?analytics_internal=1` stores the marker on this browser,
+ * `?analytics_internal=0` clears it; a HeadlessChrome user agent always counts.
+ * Runs at startup, while the page URL still carries the parameter.
+ */
+export const syncInternalTrafficFlag = (): void => {
+  if (typeof window === 'undefined') return;
+  const value = new URLSearchParams(window.location.search).get(INTERNAL_TRAFFIC_PARAM);
+  if (value === '1') write(INTERNAL_TRAFFIC_KEY, '1');
+  else if (value === '0') write(INTERNAL_TRAFFIC_KEY, null);
+};
+
+export const isInternalTraffic = (): boolean => {
+  if (typeof navigator !== 'undefined' && navigator.userAgent.includes('HeadlessChrome')) return true;
+  syncInternalTrafficFlag();
+  return read(INTERNAL_TRAFFIC_KEY) === '1';
+};
 
 /**
  * True once the visitor chose Decline. The localStorage choice wins; the
