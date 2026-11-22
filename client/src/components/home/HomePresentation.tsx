@@ -52,7 +52,6 @@ export interface HomePresentationProps {
   featured: Resource[];
   stats: HomeStats;
   kindCounts?: ResourceKindCounts;
-  kindCountsLoading?: boolean;
   kindCountsError?: boolean;
   selectedKind?: ResourceKind | null;
   onKindChange?: (kind: ResourceKind | null) => void;
@@ -193,17 +192,18 @@ function StatStrip({ stats, layout }: { stats: HomeStats; layout: "index" | "cur
 
 function KindStrip({
   counts,
-  isLoading,
   isError,
   selectedKind,
   onKindChange,
 }: {
   counts?: ResourceKindCounts;
-  isLoading?: boolean;
   isError?: boolean;
   selectedKind?: ResourceKind | null;
   onKindChange?: (kind: ResourceKind | null) => void;
 }) {
+  // One state drives both the visible count and the accessible name, so they
+  // cannot disagree: real counts win over any stale loading/error flag.
+  const pendingState = isError ? "unavailable" : "loading";
   return (
     <div
       className="home-kind-strip"
@@ -216,7 +216,11 @@ function KindStrip({
           type="button"
           className="home-kind-chip"
           data-testid={`home-kind-chip-${kind}`}
-          aria-label={counts ? countedName(KIND_LABELS[kind], counts[kind]) : `${KIND_LABELS[kind]} loading`}
+          aria-label={
+            counts
+              ? countedName(KIND_LABELS[kind], counts[kind])
+              : `${KIND_LABELS[kind]} count ${pendingState}`
+          }
           title={`Browse ${KIND_LABELS[kind]}`}
           aria-pressed={selectedKind === kind}
           onClick={(event) => {
@@ -230,7 +234,7 @@ function KindStrip({
         >
           <span>{KIND_LABELS[kind]}</span>{" "}
           <span className="home-kind-count mono">
-            {isLoading ? "…" : isError ? "—" : formatCount(counts?.[kind] ?? 0)}
+            {counts ? formatCount(counts[kind]) : isError ? "—" : "…"}
           </span>
         </ChipButton>
       ))}
@@ -239,7 +243,7 @@ function KindStrip({
           assistive technology and QA so the visible counts can be reconciled
           with the endpoint total. */}
       <span className="sr-only" data-testid="home-kind-count-other">
-        other — {isLoading ? "loading" : isError ? "unavailable" : formatCount(counts?.other ?? 0)} resources
+        other — {counts ? `${formatCount(counts.other)} resources` : `count ${pendingState}`}
       </span>
     </div>
   );
@@ -249,7 +253,6 @@ function PageMeta({
   layout,
   stats,
   kindCounts,
-  kindCountsLoading,
   kindCountsError,
   selectedKind,
   onKindChange,
@@ -299,7 +302,6 @@ function PageMeta({
       </div>
       <KindStrip
         counts={kindCounts}
-        isLoading={kindCountsLoading}
         isError={kindCountsError}
         selectedKind={selectedKind}
         onKindChange={onKindChange}
@@ -855,7 +857,6 @@ export default function HomePresentation({
   featured,
   stats,
   kindCounts,
-  kindCountsLoading,
   kindCountsError,
   selectedKind,
   onKindChange,
@@ -871,7 +872,6 @@ export default function HomePresentation({
         layout={layout}
         stats={stats}
         kindCounts={kindCounts}
-        kindCountsLoading={kindCountsLoading}
         kindCountsError={kindCountsError}
         selectedKind={selectedKind}
         onKindChange={onKindChange}
